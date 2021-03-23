@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <servlet>
+        <servlet-name>InitServlet</servlet-name>
+        <servlet-class>cz.inovatika.sdnnt.indexer.InitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet>
+        <servlet-name>ApiServlet</servlet-name>
+        <servlet-class>cz.inovatika.sdnnt.indexer.ApiServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApiServlet</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>StaticServlet</servlet-name>
+        <jsp-file>/index.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StaticServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+        <url-pattern>/admin/*</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ConfigServlet</servlet-name>
+        <servlet-class>cz.inovatika.sdnnt.indexer.ConfigServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfigServlet</servlet-name>
+        <url-pattern>/config/*</url-pattern>
+        <url-pattern>/config</url-pattern>
+        <url-pattern>/assets/config.json</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>

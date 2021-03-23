@@ -1,0 +1,11 @@
+{
+  "solr.host": "http://localhost:8983/solr/",
+  "morpho.host": "lindat.mff.cuni.cz/services/morphodita/api",
+  "balicky_dir": "/home/alberto/Projects/NTK/balicky/",
+  "xserver": "http://aleph.techlib.cz/X?base=stk01",
+  "OAI": {
+    "url": "http://aleph.nkp.cz/OAI"
+  }
+}
+
+

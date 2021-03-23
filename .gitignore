@@ -1,0 +1,9 @@
+/harvester/target/
+/indexer/target/
+
+/solr/**/data
+/solr/filestore/
+/solr/userfiles/
+/sdnnt/target/
+sdnnt/nb-configuration.xml
+sdnnt/src/main/webapp/index.html
