@@ -32,7 +32,12 @@
       <artifactId>zjsonpatch</artifactId>
       <version>0.4.11</version>
     </dependency>
-
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+      <version>1.4.0</version>
+      <type>jar</type>
+    </dependency>
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>

@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="sdnnt" version="1.6">
+<schema name="catalog" version="1.6">
   
     <field name="identifier" type="string" indexed="true" stored="true" docValues="true" />
     <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
@@ -53,6 +53,7 @@
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
+    <field name="dedup_fields" type="string" indexed="true" stored="true" multiValued="false" />
     
    <field name="datestamp" type="date" indexed="true" stored="true"  />
    <field name="setSpec" type="string" indexed="true" stored="true"  />
