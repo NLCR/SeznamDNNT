@@ -1,1 +1,23 @@
-<p>footer works!</p>
+<footer>
+  <div class="app-container">
+    <div fxLayout="row" class="app-footer-wrapper">
+      <div fxFlex class="app-fx-left">
+        <p>
+          {{'NKP' | translate}} © {{ currentYear }}.
+        </p>
+      </div>
+      <div fxFlex class="app-fx-right">
+        <p>
+          Created by 
+          <a href="http://www.inovatika.cz" title="Inovatika" target="_blank">
+            <img src="./assets/img/logo-inovatika.png" alt="Inovatika" class="app-logo" />
+          </a>
+          <span class="app-pipe"></span>
+          <a href="http://creativecommons.org/licenses/by-nc/4.0/" [title]="'licence.cc_by_nc' | translate" target="_blank">
+            <img src="assets/img/logo-cc.png" [alt]="'licence.cc_by_nc' | translate" />
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>

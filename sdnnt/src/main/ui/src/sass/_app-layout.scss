@@ -1,0 +1,93 @@
+// --- LAYOUT ---
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// header
+header {
+  @import "./app-navbar";
+  // @import "./app-searchbar";
+}
+
+// main wrapper
+main {
+  display: block;
+  height: calc(100% - (#{$app-navbar-height}));
+
+
+  @import "./app-home";
+  // @import "./app-results";
+  // @import "./app-facets";
+  // @import "./app-paginator";
+}
+
+// general sroll wrapper
+.app-scroll-wrapper {
+  background-color: $app-main-bg-color;
+  height: 100%;
+  overflow: auto;
+
+  @import "./app-footer";
+}
+
+// display table layout
+.app-display-table {
+  display: block;
+  width: calc(100% - (#{$app-gap} * 2)) !important;
+  height: inherit;
+  min-height: calc(100% - #{$app-footer-height});
+
+  &.app-loading {
+    width: 100% !important;
+  }
+
+  .app-table-cell {
+    display: block;
+
+    &.app-left {
+      padding-right: calc(2 * #{$app-gap});
+      width: 100%;
+    }
+  }
+}
+
+// container
+.app-container {
+  margin: 0 auto;
+  max-width: $app-container;
+  width: 100%;
+
+  .app-graph & {
+    max-width: 100%;
+  }
+}
+
+.mat-list-item {
+  height: 32px !important;
+}
+
+// mq
+@media only screen and (min-width: 993px) {
+  .app-display-table {
+    display: table;
+    height: calc(100% - #{$app-footer-height});
+
+    .app-table-cell {
+      display: table-cell;
+      padding: calc(2 * #{$app-gap}) 0;
+      vertical-align: top;
+
+      &.app-left {
+        width: $app-table-cell-left-width;
+      }
+    }
+  }
+}
+

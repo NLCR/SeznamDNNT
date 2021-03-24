@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'app-navbar',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavbarComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private service: AppService,
+    public state: AppState
+    ) { }
 
   ngOnInit(): void {
   }
+
+  changeLang(lang: string) {
+    this.service.changeLang(lang);
+  }
+  
 
 }

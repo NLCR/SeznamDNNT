@@ -1,0 +1,33 @@
+// --- HOME ---
+
+app-home {
+  .app-sources-wrapper {
+    .mat-card {
+      @extend .app-row-gap-32, .app-font-family-rc;
+    
+      &.app-card-source {
+        @include setSourceColor(home_card);
+        color: $app-color-lightnes;
+
+        a {
+          @include setLinkColor($app-color-lightnes);
+        }
+        
+        .mat-card-header {
+          .mat-card-header-text {
+            width: 100%;
+
+            .mat-card-title {
+              min-height: 48px;
+
+              .mat-icon {
+                margin-right: 0;
+                @include setIcon(28);
+              }
+            }
+          }
+        }
+      } 
+    }
+  }
+}

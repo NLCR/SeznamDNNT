@@ -17,14 +17,14 @@ public class ISBN {
     private boolean strict;
     private final char[] SEPARATORS = {'-', ' '};
 
-    public ISBN() {
+    public ISBN() { 
         this.strict = false;
     }
 
     public ISBN(boolean strict) {
         this.strict = strict;
     }
-
+ 
     public boolean isValid(String isbn) {
         if (this.strict) {
             return val.isValid(isbn);

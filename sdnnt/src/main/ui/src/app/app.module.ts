@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +14,32 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { ResultItemComponent } from './components/result-item/result-item.component';
 import { FacetsComponent } from './components/facets/facets.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { AppConfiguration } from './app-configuration';
+import { AppService } from './app.service';
+import { AppState } from './app.state';
+import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { AppMaterialModule } from './app-material.module';
+import { FlexLayoutModule } from '@angular/flex-layout';
+
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
+
+export function createTranslateLoader(http: HttpClient) {
+  return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
+}
+
+const providers: any[] =[
+  { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
+  AppState, AppConfiguration, HttpClient, 
+  { provide: APP_INITIALIZER, useFactory: (config: AppConfiguration) => () => config.load(), deps: [AppConfiguration], multi: true },
+  DatePipe, DecimalPipe, AppService
+];
 
 @NgModule({
   declarations: [
@@ -30,9 +57,23 @@ import { FacetsComponent } from './components/facets/facets.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    HttpClientModule,
+    FormsModule,
+    CommonModule,
+    AppRoutingModule,
+    AppMaterialModule,
+    FlexLayoutModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: (createTranslateLoader),
+        deps: [HttpClient]
+      }
+    }),
+    AppRoutingModule,
+    BrowserAnimationsModule
   ],
-  providers: [],
+  providers,
   bootstrap: [AppComponent]
 })
 export class AppModule { }

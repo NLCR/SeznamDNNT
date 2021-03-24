@@ -1,0 +1,11 @@
+{
+  "/api/**": {
+    "target": "http://localhost:8080/sdnnt/api",
+    "pathRewrite": {
+      "^/api":""
+    },
+    "changeOrigin": false,
+    "secure": false,
+    "logLevel": "debug"
+  }
+}

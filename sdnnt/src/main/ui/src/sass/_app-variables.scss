@@ -1,0 +1,111 @@
+// --- VARIABLES ---
+
+// base colors
+$app-color-lightnes: #ffffff!default;
+$app-color-darknes: #000000 !default;
+$app-color-warning: mat-color($app-warn) !default;
+$app-color-info: mat-color($mat-amber, 900) !default;
+$app-color-fav: mat-color($mat-yellow, 800) !default;
+
+// gray colors
+$app-gray-0: mat-color($mat-gray, 50) !default;
+$app-gray-1: mat-color($mat-gray, 100) !default;
+$app-gray-2: mat-color($mat-gray, 200) !default;
+$app-gray-3: mat-color($mat-gray, 300) !default;
+$app-gray-4: mat-color($mat-gray, 400) !default;
+$app-gray-5: mat-color($mat-gray, 500) !default;
+$app-gray-6: mat-color($mat-gray, 600) !default;
+$app-gray-7: mat-color($mat-gray, 700) !default;
+$app-gray-8: mat-color($mat-gray, 800) !default;
+$app-gray-9: mat-color($mat-gray, 900) !default;
+
+$app-row-want: mat-color($mat-teal, 500) !default;
+$app-row-want-not: mat-color($mat-lime, 600) !default;
+$app-row-is-va: rgba(mat-color($mat-teal, 50), .5) !default;
+
+// source colors
+$sources: (
+  "rdcz": #546e7a, 
+  "vdk": #00897b,
+  "czbrd": #ED564B,
+  "dpz": #D7BA56,
+  "ep": #00bcd4
+);
+
+// layout
+$app-gap: 16px !default;
+$app-gap-icon: 5px !default;
+$app-container: 1280px !default;
+$app-border-radius: 4px !default;
+
+// navbar
+$app-navbar-height: 64px !default;
+$app-navbar-color: rgba($app-color-lightnes, .7);
+$app-navbar-link-color: $app-color-lightnes !default;
+
+// searchbar
+$app-searchbar-bg: $app-color-lightnes !default;
+$app-searchbar-height: 46px !default;
+$app-searchbar-max-width: 640px !default;
+$app-searchbar-color: $app-color-darknes !default;
+$app-searchbar-font-size: inherit !default;
+$app-searchbar-icon-gap: calc(#{$app-gap-icon} * 2) !default;
+
+// main
+$app-table-cell-left-width: 200px !default;
+$app-main-bg-color: $app-gray-1 !default;
+
+// facets
+$app-facet-list-item-height: 30px !default;
+$app-facet-list-item-val-mg-right: 10px !default;
+$app-facet-list-item-val-font-size: .9rem !default;
+$app-facet-list-item-val-color: $app-gray-5 !default;
+$app-facet-icon-color: $app-gray-5 !default;
+$app-facet-icon-active-color: $app-primary-color;
+
+// list
+$app-list-view-facet-item-height: 22px !default;
+$app-list-view-facet-item-color: $app-gray-6 !default;
+
+// footer
+$app-footer-height: 50px !default;
+$app-footer-color-bg: $app-gray-7 !default;
+$app-footer-color: rgba($app-color-lightnes, .6) !default;
+
+// components
+$app-button-line-height: 34px !default;
+
+// card
+$app-card-info-bg: mat-color($mat-amber, 50) !default;
+$app-card-title-font-size: 1.1rem !default;
+
+// result item table
+$app-table-head-row-height: 46px !default;
+$app-table-body-row-height: 38px !default;
+$app-table-body-row-even: $app-gray-0 !default;
+$app-table-body-row-highlight: $app-gray-1 !default;
+$app-table-first-cell-left-pd: 10px !default;
+
+$app-table-cell-status-AR: mat-color($mat-green, 50) !default;
+$app-table-cell-status-P: mat-color($mat-amber, 50) !default;
+$app-table-cell-status-A: mat-color($mat-purple, 50) !default;
+$app-table-cell-status-Z: mat-color($mat-cyan, 50) !default;
+$app-table-cell-status-ZP: mat-color($mat-deep-purple, 50) !default;
+$app-table-cell-status-V: mat-color($mat-red, 50) !default;
+$app-table-cell-status-PK: mat-color($mat-blue-gray, 50) !default;
+$app-table-cell-status-N: mat-color($mat-gray, 50) !default;
+$app-table-cell-status-RZ: mat-color($mat-lime, 50) !default;
+
+// tatus colors
+$colors-list:(
+  AR: $app-table-cell-status-AR,
+  P: $app-table-cell-status-P,
+  A: $app-table-cell-status-A,
+  Z: $app-table-cell-status-Z,
+  ZP: $app-table-cell-status-ZP,
+  V: $app-table-cell-status-V,
+  PK: $app-table-cell-status-PK,
+  N: $app-table-cell-status-N,
+  RZ: $app-table-cell-status-RZ,
+);
+

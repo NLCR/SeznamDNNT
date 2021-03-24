@@ -1,0 +1,150 @@
+// --- MIXINS ---
+
+// set border
+@mixin set-border($position, $height, $style, $color) {
+  @if ($position == "top") {
+    border-width: #{$height}px 0 0 0; 
+    border-style: solid;
+    border-color: $color;
+  }
+  @else if ($position == "right") {
+    border-width: 0 #{$height}px 0 0; 
+    border-style: solid;
+    border-color: $color;
+  }
+  @else if ($position == "bottom") {
+    border-width: 0 0 #{$height}px 0; 
+    border-style: solid;
+    border-color: $color;
+  }
+  @else if ($position == "left") {
+    border-width: 0 0 0 #{$height}px; 
+    border-style: solid;
+    border-color: $color;	
+  }
+  @else if ($position == "right-left-bottom") {
+    border-width: 0 #{$height}px #{$height}px #{$height}px; 
+    border-style: solid;
+    border-color: $color;	
+  }
+  @else if ($position == "right-bottom") {
+    border-width: 0 #{$height}px #{$height}px 0; 
+    border-style: solid;
+    border-color: $color;	
+  }
+  @else {
+    border-width: #{$height}px #{$height}px #{$height}px #{$height}px; 
+    border-style: solid;
+    border-color: $color;
+  }
+}
+
+// set icon size
+@mixin setIcon($size: null, $color: null, $position: null) {
+  @if ($size != null) {
+    font-size: #{$size}px;
+    height: #{$size}px;
+    width: #{$size}px;  
+  }
+  @if ($color != null) {
+    color: $color !important;
+  }
+  @if ($position != null) {
+    vertical-align: $position !important;  
+  }
+  
+}
+
+// clearfix
+@mixin cleanfix() {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+// set source color
+@mixin setSourceColor($type) {
+  @each $source, $color in $sources {
+    @if ($type == facet) {
+      .app-source-#{$source} {
+        color: $color !important; 
+      }    
+    }
+    @else if ($type == card) {
+      &.app-source-#{$source} {
+        //border-left: 5px solid #{$color} !important;
+        background-color: $color !important;
+      }   
+    }
+    @else if ($type == home_card) {
+      &.app-source-#{$source} {
+        background-color: $color !important;  
+      } 
+    }
+  }
+}
+
+// set status color
+@mixin setStatusColor() {
+  @each $key,$val in $colors-list{
+    &.app-status-#{$key} {
+      background-color: #{$val};
+    }
+  }
+}
+
+// set button / icon size
+@mixin setIconButton($buttonSize, $iconSize, $buttonMargin: 3) {
+  margin-left: #{$buttonMargin}px;
+  margin-right: #{$buttonMargin}px;
+  width: #{$buttonSize}px;
+  height: #{$buttonSize}px;
+  line-height: #{$buttonSize}px;
+
+  .mat-icon {
+    font-size: #{$iconSize}px;
+    height: #{$iconSize}px;
+    width: #{$iconSize}px;
+    line-height: #{$iconSize}px;
+  }
+}
+
+// set double button / icon size
+@mixin setDoubleIconButton($buttonSize, $firstIconSize, $secondIconSize, $buttonMargin: 3px) {
+  margin-left: #{$buttonMargin}px;
+  margin-right: #{$buttonMargin}px;
+  width: calc(#{$firstIconSize}px + #{$secondIconSize}px) !important;
+  height: $buttonSize;
+  line-height: $buttonSize;
+
+  .mat-icon {
+    &:first-child {
+      font-size: #{$firstIconSize}px;
+      height: #{$firstIconSize}px;
+      width: calc(#{$firstIconSize}px - 2px);
+      line-height: #{$firstIconSize}px;
+    } 
+
+    &:last-child {
+      font-size: #{$secondIconSize}px;
+      height: #{$secondIconSize}px;
+      width: #{$secondIconSize}px;
+      line-height: #{$secondIconSize}px; 
+    }
+  }
+}
+
+
+// set link color
+@mixin setLinkColor($color, $opacity: .7) {
+  color: $color;
+
+  &:hover {
+    color: rgba($color, $opacity);
+  }
+}

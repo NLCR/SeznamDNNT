@@ -1,0 +1,629 @@
+// --- GLOBAL ---
+
+a {
+  cursor: pointer;
+  text-decoration: none;
+  color: $app-primary-color;
+
+  &:hover {
+    color: darken($app-primary-color, 10);
+  }
+
+  &.app-icon-inside {
+    .mat-icon {
+      vertical-align: middle;
+    }
+  }
+
+  &.app-rotate-up {
+    .mat-icon {
+      transition: all 0.4s ease;
+      transform: rotateZ(180deg);
+    }
+  }
+
+  &.app-rotate-down {
+    .mat-icon {
+      transition: all 0.4s ease;
+      transform: rotateZ(0deg);
+    }
+  }
+}
+
+// cleaners
+.app-cleanfix {
+  @include cleanfix();
+}
+
+.app-clean-mg {
+  margin: 0 !important;
+}
+
+.app-clean-pd {
+  padding: 0 !important;
+}
+
+.app-clean-bg {
+  background-color: transparent !important;
+}
+
+.app-clean-radius {
+  border-radius: 0 !important;
+}
+
+.app-clean-border {
+  border: 0 !important;
+}
+
+.app-clean-shadow {
+  box-shadow: none !important;
+}
+
+// colors
+.app-color-warning {
+  color: $app-color-warning !important;
+}
+
+.app-color-info {
+  color: $app-color-info !important;
+}
+
+.mat-button-base .mat-icon.app-color-fav {
+  color: $app-color-fav !important;
+}
+
+// common
+.app-pipe {
+  border-left: 1px solid $app-gray-4;
+  margin: 0 calc(#{$app-gap} / 2);
+}
+
+.app-cursor-pointer {
+  cursor: pointer;
+}
+
+.app-row-gap-8 {
+  margin-bottom: calc(#{$app-gap} / 2) !important;
+}
+
+.app-row-gap-16 {
+  margin-bottom: $app-gap !important;
+}
+
+.app-row-gap-32 {
+  margin-bottom: calc(2 * #{$app-gap}) !important;
+}
+
+.app-full-width {
+  width: 100% !important;
+}
+
+.app-font-bold {
+  font-weight: 500;
+}
+
+.app-gap-icon-right {
+  margin-right: $app-gap-icon;
+}
+
+.app-gap-icon-left {
+  margin-left: $app-gap-icon;
+}
+
+.app-gap-button-right {
+  margin-right: calc(#{$app-gap} / 2);
+}
+
+.app-icon-18 {
+  @include setIcon(18, $position: text-bottom);
+}
+
+// font
+.app-font-family-rc {
+  font-family: 'Roboto Condensed', sans-serif !important;
+}
+
+// tag design
+.app-display-tags {
+  span {
+    background-color: $app-gray-3;
+    color: $app-gray-8;
+    font-size: 12px;
+    border-radius: $app-border-radius;
+    margin-right: $app-gap-icon;
+    padding: 3px 6px; 
+  }  
+}
+
+// toolbar
+.mat-toolbar {
+  font-size: inherit;
+}
+
+// mat dialog
+.mat-dialog-container {
+  .mat-dialog-content {
+    .mat-icon {
+      &:not(.app-icon-showing-more) {
+        @extend .app-gap-icon-right;
+        vertical-align: text-bottom;  
+      } 
+    }
+
+    .app-metadata {
+      color: $app-gray-6;
+
+      .mat-icon {
+        @include setIcon(18);
+        @extend .app-clean-mg;
+      }
+    }
+  }
+}
+
+// button toggle
+.mat-button-toggle-group {
+  @extend .app-clean-border;
+
+  .mat-button-toggle-appearance-standard {
+    @extend .app-clean-border;
+    background-color: $app-gray-1;
+
+    &.mat-button-toggle-checked {
+      background-color: $app-primary-color;
+      color: $app-color-lightnes;
+    }
+
+    .mat-button-toggle-label-content {
+      line-height: $app-button-line-height !important;
+    }
+  }
+}
+
+// button
+/* .mat-button-base {
+  padding: 0 10px !important;
+
+  .mat-icon {
+    @include setIcon(20);
+    margin-bottom: 3px;
+  }
+}
+
+.mat-flat-button {
+  &.mat-primary {
+    color: $app-color-lightnes !important;
+  }
+} */
+
+// mat form field
+.mat-form-field {
+  &.app-sort-field {
+    font-size: 14px !important;
+  }
+}
+
+// angular material table
+.mat-table {
+	width: 100%;
+
+	thead {
+		.mat-header-cell {
+			&:first-of-type {
+				padding-left: $app-table-first-cell-left-pd;
+			}
+
+			&.app-header-cell-30 {
+				width: 30px;
+			}
+
+			.mat-button {
+				.mat-icon {
+					@include setIcon(20px);
+				}
+			}
+		}
+	}
+
+	tbody {
+		.mat-row {
+			&.app-even {
+				background-color: $app-table-body-row-even;
+			}
+
+			&.app-is-va {
+				background-color: $app-row-is-va;
+			}
+
+			&:hover {
+				background-color: $app-table-body-row-highlight;
+			}
+		}
+
+		.mat-cell {
+			&:first-of-type {
+				padding-left: $app-table-first-cell-left-pd;
+			}
+
+			&.mat-column-button:last-child {
+				text-align: right;
+			}
+			
+			.mat-icon-button {
+				@include setIconButton(18, 18);	
+			}
+
+			.app-double-icon-button {
+				@include setDoubleIconButton(18px, 14px, 18px);
+			}
+		}
+	}
+
+	tfoot {
+		.mat-footer-cell {
+			&:first-of-type {
+				padding-left: $app-table-first-cell-left-pd;
+			}
+		}
+	}
+}
+
+// card
+.mat-card {
+  @extend .app-row-gap-16;
+
+  .mat-card-header {
+    .mat-card-avatar {
+      margin-right: $app-gap;
+    }
+    
+    .mat-card-header-text {
+      @extend .app-clean-mg;
+
+      .mat-icon {
+        //@extend .app-gap-icon-right;
+        margin-right: 8px;
+        vertical-align: bottom;
+      }
+
+      .mat-card-title {
+        .app-count {
+          font-weight: normal;
+          color: $app-gray-5;
+        }
+      }
+    }
+  }
+
+  .mat-card-content {
+    margin-bottom: calc(#{$app-gap} / 2);
+
+    .app-thumb {
+      img {
+        max-width: 150px;
+      }
+    }
+
+    .app-metadata {
+      color: $app-gray-6;
+      word-break: break-all;
+
+      .mat-icon {
+        @include setIcon(18);
+        @extend .app-clean-mg;
+      }
+    }
+
+    .mat-icon {
+      &:not(.app-icon-showing-more) {
+        @extend .app-gap-icon-right;
+        @include setIcon($position: text-bottom); 
+      } 
+    }
+  }
+
+  .mat-card-actions {
+    @extend .app-clean-mg;
+
+    .mat-button-base {
+      &:not(:first-child) {
+        margin: 0 0 0 8px;  
+      }
+      
+      &.mat-flat-button {
+        background-color: $app-gray-1;  
+      }
+    }
+  }
+
+  &.app-card-info {
+    @extend .app-clean-mg;
+    background-color: $app-card-info-bg;
+
+    .mat-card-content {
+      color: $app-color-info;
+
+      .app-text {
+        vertical-align: super;
+        font-weight: 500;
+      }
+
+      .mat-icon {
+        @include setIcon($position: baseline, $color: $app-color-info);
+      }
+    }
+  }
+}
+
+// app search card
+.app-search-card {
+	.mat-card-actions {
+		&.app-card-actions-top {
+			.mat-icon-button {
+				@include setIconButton(20, 20);	
+			}	
+		}
+		&.app-card-actions-bottom {
+			.mat-button {
+				.mat-icon {
+					@include setIcon(20);
+				}
+			}	
+		}
+	}
+
+	.mat-card-header {
+		.mat-card-header-text {
+			margin-left: 0;
+
+			.mat-icon-button {
+				@include setIconButton(18, 18);	
+      }
+      
+      .mat-card-title {
+        font-size: $app-card-title-font-size;
+      }
+		}
+	}
+}
+
+// mat button
+.mat-button,
+.mat-icon-button {
+	color: $app-gray-7;
+
+	.mat-button-focus-overlay {
+		display: none !important;
+	}
+}
+
+// popover card
+.app-popover-card {
+	@extend .app-clean-shadow;
+	border: 1px solid $app-gray-3;
+
+	.mat-card-header-text {
+		@extend .app-clean-mg;
+
+		.mat-card-title {
+			margin-bottom: 6px;
+			font-size: 1rem;
+    }
+  }
+  
+  .mat-card-subtitle {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+}
+
+// library logo in table
+.app-logo {
+	min-width: 34px;
+	display: inline-block;
+	vertical-align: inherit;
+
+	img {
+		max-height: 20px;
+	}
+}
+
+// no logo mark
+.app-no-logo {
+	font-weight: 500;
+	color: $app-gray-5;
+
+	&.app-row-want {
+		color: $app-row-want;
+	}
+
+	&.app-row-want-not {
+		color: $app-row-want-not;
+	}
+}
+
+// expansion panel
+.mat-expansion-panel {
+  .mat-expansion-panel-header {
+    font-weight: 500;
+  }
+
+  .mat-icon {
+    @include setIcon(18, $position: bottom);
+    color: $app-primary-color-darker;
+  }
+
+  .mat-expansion-panel-header,
+  .mat-expansion-panel-body {
+    padding-left: $app-gap;
+    padding-right: $app-gap;
+  }
+
+  &.app-clean-panel {
+    .mat-expansion-panel-header {
+      @extend .app-clean-pd;
+      height: auto !important;
+      
+      &:hover {
+        @extend .app-clean-bg;
+      }
+    }
+
+    .mat-expansion-panel-body {
+      @extend .app-clean-pd;
+    }
+  }
+}
+
+// mat list
+.mat-list {
+  .mat-subheader {
+    font-size: 15px;
+  }
+
+  .mat-list-item {
+    .mat-icon {
+      margin-right: $app-gap-icon !important;
+    }
+
+    &.active {
+      color: $app-primary-color !important;
+      font-weight: 500;
+    }
+  }
+
+  .mat-icon {
+    @include setIcon(18, $position: text-top);
+  }
+
+  &.app-list-view-facet {
+    .mat-list-item {
+      height: $app-list-view-facet-item-height;
+      color: $app-list-view-facet-item-color;
+
+      a {
+        &:hover {
+          color: $app-primary-color-darker;
+        }  
+      }
+    }
+  }
+}
+
+// source mark
+.app-sources {
+  position: absolute;
+  top: $app-gap;
+  left: -2px;
+  
+  .app-source {
+    width: 5px;
+    height: 40px;
+    margin-bottom: $app-gap-icon;
+    
+    @include setSourceColor(card);
+  }
+}
+
+// border card
+.app-card-border {
+  border: 1px solid $app-gray-3;
+  border-radius: $app-border-radius;
+  padding: $app-gap;
+  margin-bottom: $app-gap;
+
+  .app-card-border-header {
+    font-weight: 500;
+    margin-bottom: $app-gap-icon;
+
+    .app-count {
+      font-weight: normal;
+      color: $app-gray-5;
+    }
+  }
+}
+
+// common card behavior
+app-rdcz-item,
+app-czbrd-item,
+app-dpz-item {
+  & > .mat-card {
+    .mat-card-content {
+      @extend .app-clean-mg;
+    }
+
+    & > .mat-card-header {
+      .mat-card-header-text {
+        .mat-card-title {
+          scroll-margin-bottom: $app-gap;
+
+          .mat-icon-button {
+            vertical-align: top;
+          }
+        }
+      }
+    }
+
+    .mat-card-actions {
+      @extend .app-clean-pd;
+    }
+
+    & > .mat-card-content {
+      & > .mat-accordion {
+        display: block;
+        margin-bottom: $app-gap;
+
+        & > .mat-expansion-panel {
+          margin-bottom: 2px;
+
+          &.mat-expansion-panel-spacing {
+            @extend .app-clean-mg;
+          }
+  
+          & > .mat-expansion-panel-header {
+            background-color: $app-gray-1;
+  
+            .mat-content {
+              flex: none;
+  
+              .mat-expansion-panel-header-title {
+                .app-count {
+                  font-weight: normal;
+                  color: $app-gray-5;
+                  margin-left: $app-gap-icon;
+                }
+              }
+            }
+          }
+
+          & > .mat-expansion-panel-content {
+            & > .mat-expansion-panel-body {
+              padding-top: $app-gap;
+              padding-bottom: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // inner items
+  .app-inner-item {
+    &:not(:last-child) {
+      .mat-card {
+        border-bottom: 1px solid $app-gray-3;
+      }
+    }
+
+    &:last-child {
+      .mat-card {
+        padding-bottom: 0;
+      }
+    }
+
+    .mat-card {
+      padding: 0 0 16px 0;
+      @extend .app-clean-shadow;
+    }
+  }
+}

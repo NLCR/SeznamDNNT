@@ -130,63 +130,68 @@ public class OAIHarvester {
     Options opts = Options.getInstance();
     String resumptionToken = null;
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host")).build()) {
-      CloseableHttpClient client = HttpClients.createDefault();
-      HttpGet httpGet = new HttpGet(url);
-      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-        final HttpEntity entity = response1.getEntity();
-        if (entity != null) {
-          try (InputStream is = entity.getContent()) {
-            resumptionToken = readFromXML(is);
-            if (!recs.isEmpty()) {
-              solr.add(collection, recs);
-              indexed += recs.size();
-              recs.clear();
-            }
-            if (!toDelete.isEmpty()) {
-              solr.deleteById(collection, toDelete);
-              deleted += toDelete.size();
-              toDelete.clear();
-            }
-            is.close();
-          }
-        }
-      }
-
-      while (resumptionToken != null) {
-        url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
-        httpGet = new HttpGet(url);
+      try {
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
         try (CloseableHttpResponse response1 = client.execute(httpGet)) {
           final HttpEntity entity = response1.getEntity();
           if (entity != null) {
             try (InputStream is = entity.getContent()) {
               resumptionToken = readFromXML(is);
-              if (recs.size() > batchSize) {
+              if (!recs.isEmpty()) {
                 solr.add(collection, recs);
                 indexed += recs.size();
-                LOGGER.log(Level.INFO, "Current indexed: {0}", indexed);
                 recs.clear();
+              }
+              if (!toDelete.isEmpty()) {
+                solr.deleteById(collection, toDelete);
+                deleted += toDelete.size();
+                toDelete.clear();
               }
               is.close();
             }
           }
         }
-      
-      }
 
-      if (!recs.isEmpty()) {
-        solr.add(collection, recs);
-        indexed += recs.size();
-        recs.clear();
-      }
-      
-      if (!toDelete.isEmpty()) {
-        solr.deleteById(collection, toDelete);
-        deleted += toDelete.size();
-        toDelete.clear();
+        while (resumptionToken != null) {
+          url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
+          httpGet = new HttpGet(url);
+          try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+            final HttpEntity entity = response1.getEntity();
+            if (entity != null) {
+              try (InputStream is = entity.getContent()) {
+                resumptionToken = readFromXML(is);
+                if (recs.size() > batchSize) {
+                  solr.add(collection, recs);
+                  indexed += recs.size();
+                  LOGGER.log(Level.INFO, "Current indexed: {0}", indexed);
+                  recs.clear();
+                }
+                is.close();
+              }
+            }
+          }
+
+        }
+
+        if (!recs.isEmpty()) {
+          solr.add(collection, recs);
+          indexed += recs.size();
+          recs.clear();
+        }
+
+        if (!toDelete.isEmpty()) {
+          solr.deleteById(collection, toDelete);
+          deleted += toDelete.size();
+          toDelete.clear();
+        }
+      } catch (XMLStreamException | IOException exc) {
+        LOGGER.log(Level.SEVERE, null, exc);
+        ret.put("error", exc);
       }
       solr.commit(collection);
       solr.close();
-    } catch (XMLStreamException | SolrServerException | IOException ex) {
+    } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }

@@ -1,0 +1,14 @@
+{
+  "context": "",
+  "lang": "cs",
+  "snackDuration": 2000,
+  "scoreConfig": {
+    "isInTitle": 6.5,
+    "excludedThemes": [
+      "generalities"
+    ],
+    "titleTheme": 9.5,
+    "authorTheme": 8.5,
+    "bodyTheme": 1.8
+  }
+}

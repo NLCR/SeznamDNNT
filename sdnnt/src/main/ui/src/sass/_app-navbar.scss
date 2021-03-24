@@ -1,0 +1,43 @@
+// --- NAVBAR ---
+
+app-navbar {
+  color: $app-color-lightnes;
+
+  a {
+    color: $app-color-lightnes;
+    
+    &.app-logo {
+      margin-right: calc(2 * #{$app-gap});
+      
+      img {
+        height: 28px;
+        vertical-align: middle;
+      }
+    }
+
+    &:not(.app-logo) {
+      font-weight: normal;
+      text-decoration: unset;
+      color: $app-navbar-link-color;
+      margin-right: $app-gap;
+      padding: 8px;
+      border-radius: $app-border-radius;
+    }
+
+    &.app-active {
+      background-color: rgba($app-color-lightnes, .2);
+    }
+
+    .mat-icon {
+      @include setIcon(20, inherit, sub);
+    }
+  }
+
+  .app-fx-left {
+   
+  }
+
+  .app-fx-right {
+    text-align: right;
+  }
+}

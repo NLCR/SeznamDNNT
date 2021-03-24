@@ -1,1 +1,17 @@
-<p>navbar works!</p>
+<mat-toolbar class="app-navbar" color="primary">
+  <div class="app-container">
+    <div fxLayout="row" >
+      <div fxFlex class="app-fx-left">
+          <a routerLink="/" fxFlexAlign="center">Seznam děl nedostupných na trhu</a>
+      </div>
+      <div fxFlex class="app-fx-right">
+        <a routerLink="home" routerLinkActive="app-active" title="Home">{{ 'Home' | translate}}</a>
+        <a routerLink="help" routerLinkActive="app-active" title="Help">{{ 'Help' | translate}}</a>
+        <a routerLink="account" routerLinkActive="app-active" title="Account">{{ 'Account' | translate}}</a>
+        <a routerLink="admin" routerLinkActive="app-active" title="Admin">{{ 'Admin' | translate}}</a>
+        <a *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate}}</a>
+        <a *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate}}</a>
+      </div>
+    </div>
+  </div>
+</mat-toolbar>

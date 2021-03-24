@@ -1,0 +1,20 @@
+// --- FOOTER ---
+
+app-footer {
+  footer {
+    height: $app-footer-height;
+    width: 100%;
+    padding: 0 $app-gap;
+    background-color: $app-footer-color-bg;
+    color: $app-footer-color;
+
+    .app-fx-right {
+      text-align: right;
+
+      img {
+        height: 16px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
