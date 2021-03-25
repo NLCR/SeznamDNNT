@@ -5,6 +5,7 @@
  */
 package cz.inovatika.sdnnt.indexer;
 
+import cz.inovatika.sdnnt.Options;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;

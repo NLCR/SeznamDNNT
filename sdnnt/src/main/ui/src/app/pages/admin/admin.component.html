@@ -1,1 +1,10 @@
-<p>admin works!</p>
+<div>
+  <ul>
+    <li *ngFor="let t of config.homeTabs" (click)="selectText(t)" [class.active]="t === selected">{{ 'home.' + t |
+      translate }} </li>
+  </ul>
+</div>
+<div>
+<div><button mat-raised-button (click)="save()">{{ 'save' | translate }}</button></div>
+<angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig"></angular-editor>
+</div>

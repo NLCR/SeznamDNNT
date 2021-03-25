@@ -1,5 +1,7 @@
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.indexer.Indexer;
+import cz.inovatika.sdnnt.indexer.OAIHarvester;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;

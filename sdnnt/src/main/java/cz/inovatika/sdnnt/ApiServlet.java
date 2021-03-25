@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt;
 
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;

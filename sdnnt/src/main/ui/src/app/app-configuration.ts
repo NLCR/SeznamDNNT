@@ -22,8 +22,10 @@ import { AppState } from './app.state';
     public get snackDuration() {
         return this.config.snackDuration;
     }
-
-
+    
+    public get homeTabs() {
+        return this.config.homeTabs;
+    }
 
     /**
      * List the files holding section configuration in assets/configs folder

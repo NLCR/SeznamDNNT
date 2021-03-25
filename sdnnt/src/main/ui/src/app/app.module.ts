@@ -25,6 +25,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { AppMaterialModule } from './app-material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { AngularEditorModule } from '@kolkov/angular-editor';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -71,7 +72,8 @@ const providers: any[] =[
       }
     }),
     AppRoutingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AngularEditorModule
   ],
   providers,
   bootstrap: [AppComponent]

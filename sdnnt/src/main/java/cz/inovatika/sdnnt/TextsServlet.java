@@ -1,5 +1,11 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package cz.inovatika.sdnnt;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -9,23 +15,18 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
-import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.common.util.NamedList;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
 /**
  *
  * @author alberto
  */
-@WebServlet(value = "/search/*")
-public class SearchServlet extends HttpServlet {
-
-  public static final Logger LOGGER = Logger.getLogger(SearchServlet.class.getName());
+@WebServlet(name = "TextsServlet", urlPatterns = {"/texts/*"})
+public class TextsServlet extends HttpServlet {
+  
+  public static final Logger LOGGER = Logger.getLogger(TextsServlet.class.getName());
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,7 +39,7 @@ public class SearchServlet extends HttpServlet {
    */
   protected void processRequest(HttpServletRequest request, HttpServletResponse response)
           throws ServletException, IOException {
-    response.setContentType("application/json;charset=UTF-8");
+    response.setContentType("text/plain;charset=UTF-8");
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
     response.setDateHeader("Expires", 0); // Proxies.
@@ -47,8 +48,7 @@ public class SearchServlet extends HttpServlet {
       String actionNameParam = request.getPathInfo().substring(1);
       if (actionNameParam != null) {
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(request, response);
-        out.println(json.toString(2));
+        out.println(actionToDo.doPerform(request, response));
       } else {
 
         out.print("actionNameParam -> " + actionNameParam);
@@ -67,34 +67,41 @@ public class SearchServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
       out.print(e1.toString());
     }
-
   }
-
+  
   enum Actions {
-    CATALOG {
+    READ {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery q = new SolrQuery("*").setRows(10);
-          QueryRequest qreq = new QueryRequest(q);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
+      String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        try {
+          String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir") 
+                  + File.separator + req.getParameter("id") + "_" + req.getParameter("lang");
+          File file = new File(path);
+          return FileUtils.readFileToString(file,  "UTF-8");
 
-        return ret;
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          return ex.toString();
+        }
+      }
+    },
+    WRITE {
+      @Override
+      String doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        try {
+          String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir") 
+                  + File.separator + req.getParameter("id") + "_" + req.getParameter("lang");
+          File file = new File(path);
+          FileUtils.writeStringToFile(file, IOUtils.toString(req.getInputStream(), "UTF-8"), "UTF-8");
+          return new JSONObject().put("msg", "saved!").toString();
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          return new JSONObject().put("error", ex).toString();
+        }
       }
     };
 
-    abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    abstract String doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

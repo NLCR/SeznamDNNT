@@ -1,14 +1,5 @@
-<div class="app-searchbar-wrapper">
-  <div class="app-container">
-    <div fxLayout="row" fxLayoutGap="32px" class="app-search-form" fxLayoutAlign="start center">
-      <div fxFlex class="app-fx-left">
-        <input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()" [(ngModel)]="state.q" [matTooltip]="'q.tooltip' | translate" matTooltipPosition="above" />
-        <span fxFlex class="app-controls">
-          <a (click)="search()">
-            <mat-icon>search</mat-icon>
-          </a>
-        </span>
-      </div>
-    </div>
-  </div>
-</div>
+<input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()"
+  [(ngModel)]="state.q" [matTooltip]="'q.tooltip' | translate" matTooltipPosition="above" />
+<a (click)="search()">
+  <mat-icon>search</mat-icon>
+</a>

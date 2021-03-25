@@ -3,5 +3,18 @@
   "Help": "Nápověda",
   "Account": "Moje konto",
   "Admin": "Administrace",
-  "NKP": "Národní knihovna České republiky"
+  "NKP": "Národní knihovna České republiky",
+  "register": {
+    "button": "Přihlásit/registrovat se přes NDK"
+  },
+  "save": "ulozit",
+  "home": {
+    "news": "Aktuality",
+    "about": "O DNNT", 
+    "readers": "Ctenarum", 
+    "authors": "Autorum",
+    "publishers": "Nakladatelum",
+    "libraries": "Knihovnam",
+    "api": "Popis API"
+  }
 }

@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.indexer;
 
+import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;

@@ -1,5 +1,5 @@
 
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -34,13 +34,20 @@ export class AppService {
     });
   }
 
-    getBalicky(update: boolean = false): Observable<any> {
-        let url = 'candidates/balicky';
-        // url = '/assets/balicky.json'; // comment
-        const params: HttpParams = new HttpParams();
-        if (update) {
-            params.set('update', 'true');
-        }
-        return this.get(url, params);
-    }
+  search(params: HttpParams): Observable<any> {
+      let url = 'search/catalog';
+      return this.get(url, params);
+  }
+
+  getText(id: string): Observable<string> {
+      let url = '/texts/read';
+      const params: HttpParams = new HttpParams()
+      .set('id', id).set('lang', this.state.currentLang);
+      return this.get(url, params, 'plain/text');
+  }
+
+  saveText(id: string, text: string): Observable<string> {
+      let url = '/texts/write?id=' + id + '&lang=' + this.state.currentLang;
+      return this.post(url, text);
+  }
 }

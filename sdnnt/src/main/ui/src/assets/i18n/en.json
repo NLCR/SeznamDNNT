@@ -3,5 +3,18 @@
   "Help": "Help",
   "Account": "Account",
   "Admin": "Administration",
-  "NKP": "National Library of the Czech Republic"
+  "NKP": "National Library of the Czech Republic",
+  "register": {
+    "button": "Login/register using NDK"
+  },
+  "save": "save",
+  "home": {
+    "news": "News",
+    "about": "About", 
+    "readers": "For readers", 
+    "authors": "For authors",
+    "publishers": "For libraries",
+    "libraries": "For libraries",
+    "api": "API description"
+  }
 }

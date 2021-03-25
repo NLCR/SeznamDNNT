@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt;
 
 import java.io.File;
 import java.io.FilenameFilter;
