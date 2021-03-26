@@ -100,6 +100,31 @@ public class SearchServlet extends HttpServlet {
 
         return ret; 
       }
+    },
+    HISTORY {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("*")
+                  .setRows(100)
+                  .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
+                  .setFields("*,changes:[json]");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "history"); 
+          solr.close();
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
     };
 
     abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;

@@ -187,40 +187,40 @@ public class Indexer {
       } else if (docsCat.getNumFound() > 1) {
         ret.append("errors", "Found more than one record in catalog: " + docsCat.stream().map(d -> (String)d.getFirstValue("identifier")).collect(Collectors.joining()));
         return ret;
-      } 
-      SolrDocument docCat = docsCat.get(0);
-      String jsCat = (String) docCat.getFirstValue("raw");
-      
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode source = mapper.readTree(jsCat);
-      
-      // As target the sdnnt record
-      JsonNode target = mapper.readTree(jsDnt);
-      JsonNode fwPatch = JsonDiff.asJson(source, target);
-      removeReplaceOpsForIgnoredFields(fwPatch);
-      JsonNode bwPatch = JsonDiff.asJson(target, source);
-      removeReplaceOpsForIgnoredFields(bwPatch);
-      
-      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
-      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
-      
-            // Insert in history
-      SolrInputDocument idoc = new SolrInputDocument();
-      idoc.setField("identifier", id);
-      idoc.setField("user", user);
-      idoc.setField("type", "app");
-      idoc.setField("changes", ret.toString());
-      solr.add("history", idoc);
-      solr.commit("history");
-      
-      // Update record in catalog
-//      MarcRecord mr = MarcRecord.fromJSON(newRaw);      
-//      mr.fillSolrDoc();
-//      solr.add("catalog", mr.toSolrDoc());
-//      solr.commit("catalog");
+      } else {
+        SolrDocument docCat = docsCat.get(0);
+        String jsCat = (String) docCat.getFirstValue("raw");
 
-      ret.put("catalog_new", new JSONObject(JsonPatch.apply(fwPatch, source).toString()));
-      
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode source = mapper.readTree(jsCat);
+
+        // As target the sdnnt record
+        JsonNode target = mapper.readTree(jsDnt);
+        JsonNode fwPatch = JsonDiff.asJson(source, target);
+        removeReplaceOpsForIgnoredFields(fwPatch);
+        JsonNode bwPatch = JsonDiff.asJson(target, source);
+        removeReplaceOpsForIgnoredFields(bwPatch);
+
+        ret.put("forward_patch", new JSONArray(fwPatch.toString()));
+        ret.put("backward_patch", new JSONArray(bwPatch.toString()));
+
+              // Insert in history
+        SolrInputDocument idoc = new SolrInputDocument();
+        idoc.setField("identifier", id);
+        idoc.setField("user", user);
+        idoc.setField("type", "app");
+        idoc.setField("changes", ret.toString());
+        solr.add("history", idoc);
+        solr.commit("history");
+
+        // Update record in catalog
+  //      MarcRecord mr = MarcRecord.fromJSON(newRaw);      
+  //      mr.fillSolrDoc();
+  //      solr.add("catalog", mr.toSolrDoc());
+  //      solr.commit("catalog");
+
+        ret.put("catalog_new", new JSONObject(JsonPatch.apply(fwPatch, source).toString()));
+      }
       solr.close();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
