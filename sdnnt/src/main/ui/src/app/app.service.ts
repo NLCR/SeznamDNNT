@@ -39,6 +39,12 @@ export class AppService {
       return this.get(url, params);
   }
 
+  getHistory(identifier: string): Observable<any> {
+      let url = 'search/history';
+      const params: HttpParams = new HttpParams().set('identifier', identifier);
+      return this.get(url, params);
+  }
+
   getText(id: string): Observable<string> {
       let url = '/texts/read';
       const params: HttpParams = new HttpParams()

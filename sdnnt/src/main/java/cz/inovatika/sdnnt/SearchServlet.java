@@ -77,8 +77,16 @@ public class SearchServlet extends HttpServlet {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery q = new SolrQuery("*").setRows(10);
-          QueryRequest qreq = new QueryRequest(q);
+          String q = req.getParameter("q");
+          if (q == null) {
+            q = "*";
+          }
+          SolrQuery query = new SolrQuery(q)
+                  .setRows(20)
+                  .setParam("df", "fullText")
+                  .setFacet(true).addFacetField("item_type")
+                  .setParam("json.nl", "arrntv");
+          QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
@@ -90,7 +98,7 @@ public class SearchServlet extends HttpServlet {
           ret.put("error", ex);
         }
 
-        return ret;
+        return ret; 
       }
     };
 

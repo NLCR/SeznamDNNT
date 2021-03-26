@@ -21,11 +21,13 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
 import { AppState } from './app.state';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { AppMaterialModule } from './app-material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularEditorModule } from '@kolkov/angular-editor';
+import { PaginatorComponent } from './components/paginator/paginator.component';
+import { HistoryDialogComponent } from './components/history-dialog/history-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -54,12 +56,15 @@ const providers: any[] =[
     NavbarComponent,
     SearchBarComponent,
     ResultItemComponent,
-    FacetsComponent
+    FacetsComponent,
+    PaginatorComponent,
+    HistoryDialogComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     CommonModule,
     AppRoutingModule,
     AppMaterialModule,

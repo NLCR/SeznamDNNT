@@ -1,0 +1,43 @@
+<h1 mat-dialog-title>History for {{data.title}}</h1>
+<div mat-dialog-content>
+  <mat-tab-group>
+    <mat-tab label="Historie stavu">
+      <table mat-table [dataSource]="stavy" class="mat-elevation-z8">
+        <ng-container matColumnDef="indextime">
+          <th mat-header-cell *matHeaderCellDef> Datum </th>
+          <td mat-cell *matCellDef="let element"> {{element.indextime | date : 'DD.mm.YYYY'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="user">
+          <th mat-header-cell *matHeaderCellDef> Kdo </th>
+          <td mat-cell *matCellDef="let element"> {{element.user}} </td>
+        </ng-container>
+        <ng-container matColumnDef="from">
+          <th mat-header-cell *matHeaderCellDef> Ze stavu </th>
+          <td mat-cell *matCellDef="let element"> {{element.indextime}} </td>
+        </ng-container>
+        <ng-container matColumnDef="to">
+          <th mat-header-cell *matHeaderCellDef> Na stav </th>
+          <td mat-cell *matCellDef="let element"> {{element.indextime}} </td>
+        </ng-container>
+        <ng-container matColumnDef="poznamka">
+          <th mat-header-cell *matHeaderCellDef> Type </th>
+          <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </mat-tab>
+    <mat-tab label="Historie bibliografickeho zaznamu">
+      <ul>
+        <li *ngFor="let item of history">
+          {{item.indextime | date : 'DD.mm.YYYY'}} | {{ item.user }} | {{ item.type }}
+        </li>
+      </ul>
+    </mat-tab>
+  </mat-tab-group>
+  
+</div>
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial>Ok</button>
+</div>

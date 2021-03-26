@@ -14,7 +14,7 @@ export class SolrResponse {
   facet_counts: {
     facet_intervals: any;
     facet_ranges: any;
-    facet_fields: {[field: string]: {name: string, type: string, value: number}}[];
+    facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
     facet_heatmaps: any;
   };
   stats: {

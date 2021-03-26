@@ -1,1 +1,19 @@
-<p>result-item works!</p>
+<mat-card>
+  <mat-checkbox></mat-checkbox>
+  <div><strong>{{ doc.title }}</strong></div>
+  <div>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</div>
+  <div>{{ 'doc.state' | translate }} {{ 'state.' + doc.marc_990a | translate }} 
+    <mat-form-field appearance="fill">
+      <mat-label>Zmena stavu</mat-label>
+      <mat-select [formControl]="states" multiple>
+        <mat-option *ngFor="let stav of state.dntStates" [value]="stav">{{stav}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div>
+    <a [href]="doc.marc_998a" target="_blank">Link do DK</a> |
+    <a [href]="doc.marc_998a" target="_blank">Zaznam z katalogu</a> |
+    <a [href]="doc.marc_998a" target="_blank">Identifikatory</a> |
+    <a (click)="showHistory()">Historie zmen</a>
+  </div>
+</mat-card>

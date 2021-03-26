@@ -1,6 +1,6 @@
 import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Params, ParamMap } from '@angular/router';
-import { Configuration } from './shared/configuration';
+import { Configuration, Sort } from './shared/configuration';
 
 export class AppState {
 
@@ -17,7 +17,14 @@ export class AppState {
 
   public currentLang: string;
 
-  public q;
+  public q: string;
+  public page: number = 0;
+  public rows: number = 20;
+  public sort: Sort;
+  public sorts: Sort[];
+
+  // Seznam stavu zaznamu pro uzivatel
+  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
@@ -27,8 +34,8 @@ export class AppState {
   processParams(searchParams: ParamMap) {
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
-      if (p === 'view') {
-
+      if (p === 'q') {
+        this.q = param;
       } else {
         //this.addFilter(p, param, null, false);
       }

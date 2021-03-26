@@ -1,1 +1,12 @@
-<p>facets works!</p>
+<div>
+  <ul>
+    <li *ngFor="let facet of facets">
+      {{ facet }}
+      <ul>
+        <li *ngFor="let f of facet_fields[facet]">
+          {{f.name}}
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
