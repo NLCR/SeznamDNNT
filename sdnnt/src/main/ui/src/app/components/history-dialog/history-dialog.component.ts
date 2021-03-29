@@ -11,7 +11,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class HistoryDialogComponent implements OnInit {
 
-  displayedColumns: ['indextime','user','from','to','poznamka']
+  displayedColumns = ['indextime','user','from','to','poznamka']
   history: HistoryItem[] = [];
   stavy: HistoryItem[] = [];
 
@@ -24,7 +24,7 @@ export class HistoryDialogComponent implements OnInit {
     this.service.getHistory(this.data.identifier).subscribe(res => {
       this.history = res.response.docs;
       this.stavy = this.history.filter(item => {
-        return item.changes.backward_patch.find(p => p.path.indexOf('992') > 0);
+        return item.changes.backward_patch.findIndex(p => p.path.indexOf('990') > 0) > -1;
       });
     });
   }

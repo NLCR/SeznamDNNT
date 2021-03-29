@@ -2,5 +2,9 @@
   "context": "",
   "lang": "cs",
   "snackDuration": 2000,
-  "homeTabs": ["news", "about", "readers", "authors", "publishers", "libraries", "api"]
+  "homeTabs": ["news", "about", "readers", "authors", "publishers", "libraries", "api"],
+  "dntStates": {
+    "admin": ["PA", "A", "VS", "VN", "N", "NZN", "VVN", "VVS"],
+    "user": ["PA", "N"]
+  }
 }

@@ -1,6 +1,7 @@
 import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Params, ParamMap } from '@angular/router';
 import { Configuration, Sort } from './shared/configuration';
+import { User } from './shared/user';
 
 export class AppState {
 
@@ -24,11 +25,13 @@ export class AppState {
   public sorts: Sort[];
 
   // Seznam stavu zaznamu pro uzivatel
+  public user: User;
   public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
     this.currentLang = cfg.lang;
+    this.dntStates = cfg.dntStates[this.user ? this.user.role : 'user'];
   }
 
   processParams(searchParams: ParamMap) {

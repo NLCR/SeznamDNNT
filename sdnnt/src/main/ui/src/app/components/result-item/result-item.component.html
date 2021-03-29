@@ -2,13 +2,10 @@
   <mat-checkbox></mat-checkbox>
   <div><strong>{{ doc.title }}</strong></div>
   <div>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</div>
-  <div>{{ 'doc.state' | translate }} {{ 'state.' + doc.marc_990a | translate }} 
-    <mat-form-field appearance="fill">
-      <mat-label>Zmena stavu</mat-label>
-      <mat-select [formControl]="states" multiple>
-        <mat-option *ngFor="let stav of state.dntStates" [value]="stav">{{stav}}</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <div>{{ 'record.state' | translate }} {{ doc.marc_990a }} - {{ 'state.' + doc.marc_990a | translate }} <mat-icon [title]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon></div>
+  <div>
+    <button mat-raised-button (click)="showStates()">Zmena stavu</button>
+    
   </div>
   <div>
     <a [href]="doc.marc_998a" target="_blank">Link do DK</a> |

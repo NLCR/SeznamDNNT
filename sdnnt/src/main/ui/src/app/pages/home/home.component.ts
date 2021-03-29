@@ -22,6 +22,10 @@ export class HomeComponent implements OnInit {
     this.selectTab(this.config.homeTabs[0]);
   }
 
+  login() {
+
+  }
+
   register() {
 
   }

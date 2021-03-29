@@ -72,7 +72,7 @@ public class Indexer {
     Options opts = Options.getInstance();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       SolrQuery q = new SolrQuery("*").setRows(1)
-              .addFilterQuery("identifier:" + id)
+              .addFilterQuery("identifier:\"" + id + "\"")
               .setFields("raw");
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
@@ -97,10 +97,10 @@ public class Indexer {
       solr.commit("history");
       
       // Update record in catalog
-//      MarcRecord mr = MarcRecord.fromJSON(newRaw);      
-//      mr.fillSolrDoc();
-//      solr.add("catalog", mr.toSolrDoc());
-//      solr.commit("catalog");
+      MarcRecord mr = MarcRecord.fromJSON(newRaw.toString());      
+      mr.fillSolrDoc();
+      solr.add("catalog", mr.toSolrDoc());
+      solr.commit("catalog");
       
       //ret.put("newRecord", new JSONObject(JsonPatch.apply(fwPatch, source).toString()));
       //ret.put("newRaw", mr.toJSON());

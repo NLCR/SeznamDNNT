@@ -28,6 +28,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PaginatorComponent } from './components/paginator/paginator.component';
 import { HistoryDialogComponent } from './components/history-dialog/history-dialog.component';
+import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -58,7 +59,8 @@ const providers: any[] =[
     ResultItemComponent,
     FacetsComponent,
     PaginatorComponent,
-    HistoryDialogComponent
+    HistoryDialogComponent,
+    StatesDialogComponent
   ],
   imports: [
     BrowserModule,

@@ -45,6 +45,11 @@ export class AppService {
       return this.get(url, params);
   }
 
+  saveRecord(id: string, raw: any): Observable<string> {
+    let url = '/index/save?id=' + id;
+    return this.post(url, raw);
+}
+
   getText(id: string): Observable<string> {
       let url = '/texts/read';
       const params: HttpParams = new HttpParams()

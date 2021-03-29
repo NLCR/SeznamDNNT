@@ -26,6 +26,10 @@ import { AppState } from './app.state';
     public get homeTabs() {
         return this.config.homeTabs;
     }
+    
+    public get dntStates() {
+        return this.config.dntStates;
+    }
 
     /**
      * List the files holding section configuration in assets/configs folder

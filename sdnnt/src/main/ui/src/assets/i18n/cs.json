@@ -16,5 +16,33 @@
     "publishers": "Nakladatelum",
     "libraries": "Knihovnam",
     "api": "Popis API"
+  },
+
+  "record": {
+    "state": "stav"
+  },
+  "state": {
+    "undefined": "nezařazeno",
+    "PA": "dílo publikováno jako Návrh",
+    "A": "zařazeno",
+    "VS": "vyřazeno - dílo bylo na Seznamu (A)",
+    "VN": "vyřazeno – dílo bylo na Návrhu seznamu (PA)",
+    "N": "nezařazeno",
+    "NZN": "návrh k zařazení",
+    "VVN": "výzva k vyřazení",
+    "VVS": "výzva k vyřazení",
+
+    "tooltip": {
+      "undefined": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "PA": "dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
+      "A": "zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
+      "VS": "vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
+      "VN": "vyřazeno – dílo bylo na Návrhu seznamu (PA), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
+      "N": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "NZN": "návrh k zařazení do Návrhu seznamu (interní stav administrace)",
+      "VVN": "výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
+      "VVS": "výzva k vyřazení ze Seznamu (interní stav administrace)"
+      }
   }
+
 }

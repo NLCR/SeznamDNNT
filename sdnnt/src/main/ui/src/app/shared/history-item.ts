@@ -4,7 +4,7 @@ export interface DiffPatch {
   value: string;
 };
 
-export class HistoryItem {
+export interface HistoryItem {
   id: string;
   identifier: string;
   indextime: Date;

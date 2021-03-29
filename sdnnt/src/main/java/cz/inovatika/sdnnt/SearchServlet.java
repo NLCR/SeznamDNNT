@@ -85,7 +85,8 @@ public class SearchServlet extends HttpServlet {
                   .setRows(20)
                   .setParam("df", "fullText")
                   .setFacet(true).addFacetField("item_type")
-                  .setParam("json.nl", "arrntv");
+                  .setParam("json.nl", "arrntv")
+                  .setFields("*,raw:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
