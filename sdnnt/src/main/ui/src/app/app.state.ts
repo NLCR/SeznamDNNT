@@ -16,7 +16,11 @@ export class AppState {
   public _configSubject = new Subject();
   public configSubject: Observable<any> = this._configSubject.asObservable();
 
+  private loggedSubject: Subject<boolean> = new Subject();
+  public loggedChanged: Observable<boolean> = this.loggedSubject.asObservable();
+
   public currentLang: string;
+  public activePage: string;
 
   public q: string;
   public page: number = 0;
@@ -26,12 +30,13 @@ export class AppState {
 
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
-  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public logged = false;
+  // public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
     this.currentLang = cfg.lang;
-    this.dntStates = cfg.dntStates[this.user ? this.user.role : 'user'];
+    
   }
 
   processParams(searchParams: ParamMap) {
@@ -44,5 +49,17 @@ export class AppState {
       }
     });
     this._paramsProcessed.next();
+  }
+
+  setLogged(res: any) {
+    const changed = this.logged;
+    if (res.error) {
+      this.logged = false;
+      this.user = null;
+    } else {
+      this.logged = true;
+      this.user = res;
+    }
+    this.loggedSubject.next(changed === this.logged);
   }
 }

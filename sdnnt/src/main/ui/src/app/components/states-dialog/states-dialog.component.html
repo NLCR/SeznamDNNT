@@ -3,7 +3,7 @@
 <div>Choose new state</div>
 <div mat-dialog-content>
   <mat-radio-group aria-label="Select new state" [(ngModel)]="newState">
-    <mat-radio-button *ngFor="let stav of state.dntStates" [value]="stav">{{stav}} - {{ 'state.tooltip.'+stav | translate }}</mat-radio-button>
+    <mat-radio-button *ngFor="let stav of dntStates" [value]="stav">{{stav}} - {{ 'state.tooltip.'+stav | translate }}</mat-radio-button>
   </mat-radio-group>
 </div>
 <div mat-dialog-actions>

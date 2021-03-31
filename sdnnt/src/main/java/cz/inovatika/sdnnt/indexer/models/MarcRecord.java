@@ -54,6 +54,7 @@ public class MarcRecord {
 
   final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "250", "260", "856", "990", "992", "998", "956");
 
+  
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);

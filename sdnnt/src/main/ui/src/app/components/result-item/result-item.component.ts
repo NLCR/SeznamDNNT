@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { DataDialogComponent } from '../data-dialog/data-dialog.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
 
@@ -20,12 +22,32 @@ export class ResultItemComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
+    public config: AppConfiguration,
     public state: AppState,
     private service: AppService
   ) { }
 
   ngOnInit(): void {
     this.newState.setValue(this.doc.marc_990a);
+  }
+
+  showIdentifiers() {
+    const data = {
+      title: 'Identifikatory zaznamu ' + this.doc.title,
+      items: []
+    }
+
+    this.config.identifiers.forEach(f => {
+      if (this.doc['marc_' + f]) {
+        data.items.push({label: 'field.'+f, value: this.doc['marc_' + f]})
+      }
+    });
+    
+
+    const dialogRef = this.dialog.open(DataDialogComponent, {
+        width: '750px',
+        data
+      });
   }
 
   showHistory() {
@@ -76,3 +98,4 @@ export class ResultItemComponent implements OnInit {
   }
 
 }
+

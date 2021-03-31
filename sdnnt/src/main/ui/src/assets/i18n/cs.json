@@ -43,6 +43,12 @@
       "VVN": "výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
       "VVS": "výzva k vyřazení ze Seznamu (interní stav administrace)"
       }
+  },
+
+  "field": {
+    "015a": "Číslo nár.bibl.",
+    "020a": "ISBN",
+    "022a": "ISSN"
   }
 
 }

@@ -3,8 +3,10 @@
   "lang": "cs",
   "snackDuration": 2000,
   "homeTabs": ["news", "about", "readers", "authors", "publishers", "libraries", "api"],
+  "role": ["admin", "kurator", "user"],
   "dntStates": {
     "admin": ["PA", "A", "VS", "VN", "N", "NZN", "VVN", "VVS"],
     "user": ["PA", "N"]
-  }
+  },
+  "identifiers": ["015a", "020a", "022a"]
 }

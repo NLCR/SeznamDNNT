@@ -29,6 +29,8 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PaginatorComponent } from './components/paginator/paginator.component';
 import { HistoryDialogComponent } from './components/history-dialog/history-dialog.component';
 import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
+import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
+import { DataDialogComponent } from './components/data-dialog/data-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -60,7 +62,9 @@ const providers: any[] =[
     FacetsComponent,
     PaginatorComponent,
     HistoryDialogComponent,
-    StatesDialogComponent
+    StatesDialogComponent,
+    LoginDialogComponent,
+    DataDialogComponent
   ],
   imports: [
     BrowserModule,

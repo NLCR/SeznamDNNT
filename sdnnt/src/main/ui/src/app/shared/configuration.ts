@@ -7,7 +7,13 @@ export interface Configuration {
   lang: string;
   snackDuration: number;
   homeTabs: string[];
+
+  // Seznam roli
+  role: string[];
   
   // Seznam stavu zaznamu pro role
   dntStates: {[role: string]: string[]};
+
+  // Seznam poli identifikatoru
+  identifiers: string[];
 }

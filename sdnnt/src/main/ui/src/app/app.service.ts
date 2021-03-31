@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { AppState } from './app.state';
 import { TranslateService } from '@ngx-translate/core';
+import { User } from './shared/user';
 
 @Injectable()
 export class AppService {
@@ -26,8 +27,6 @@ export class AppService {
         return this.http.post<any>(`api${url}`, obj);
     }
 
-
-
   changeLang(lang: string) {
     this.translate.use(lang).subscribe(val => {
       this.state.currentLang = lang;
@@ -36,6 +35,11 @@ export class AppService {
 
   search(params: HttpParams): Observable<any> {
       let url = 'search/catalog';
+      return this.get(url, params);
+  }
+
+  searchAccount(params: HttpParams): Observable<any> {
+      let url = 'search/account';
       return this.get(url, params);
   }
 
@@ -60,5 +64,18 @@ export class AppService {
   saveText(id: string, text: string): Observable<string> {
       let url = '/texts/write?id=' + id + '&lang=' + this.state.currentLang;
       return this.post(url, text);
+  }
+
+  login(user: string, pwd: string): Observable<User> {
+    const url = '/user/login';
+    return this.post(url, { user, pwd });
+    // return of({name: user, role: "user"});
+    //return of({name: user, role: "admin"});
+  }
+
+  logout() {
+    const url = '/user/logout';
+    return this.get(url);
+    // return of({name: "", role: ""})
   }
 }

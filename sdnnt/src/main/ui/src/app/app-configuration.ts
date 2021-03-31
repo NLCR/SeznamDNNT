@@ -30,6 +30,14 @@ import { AppState } from './app.state';
     public get dntStates() {
         return this.config.dntStates;
     }
+    
+    public get identifiers() {
+        return this.config.identifiers;
+    }
+    
+    public get role() {
+        return this.config.role;
+    }
 
     /**
      * List the files holding section configuration in assets/configs folder

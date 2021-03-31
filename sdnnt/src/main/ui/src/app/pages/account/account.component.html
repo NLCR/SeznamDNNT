@@ -1,1 +1,19 @@
-<p>account works!</p>
+<div class="app-container">
+  <div fxLayout="row" >
+    <app-search-bar></app-search-bar>
+  </div>
+  <div fxLayout="row" >
+    <div fxFlex class="app-fx-left">{{ 'numFound' | translate }}: {{ numFound }}</div>
+    <div fxFlex class="app-fx-right"><app-paginator [numFound]="numFound"></app-paginator></div>
+  </div>
+  <div fxLayout="row" >
+    <div fxFlex class="app-fx-left">
+      <ng-container *ngIf="facets">
+        <app-facets [facet_fields]="facets"></app-facets>
+      </ng-container>
+    </div>
+    <div fxFlex >
+      <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+    </div>
+  </div>
+</div>

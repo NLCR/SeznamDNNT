@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'app-admin',
@@ -61,10 +62,12 @@ export class AdminComponent implements OnInit {
 
   constructor(
     public config: AppConfiguration,
+    public state: AppState,
     private service: AppService
   ) { }
 
   ngOnInit(): void {
+    this.state.activePage = 'Admin';
     this.service.getText(this.selected).subscribe(text => this.htmlContent = text);
   }
 

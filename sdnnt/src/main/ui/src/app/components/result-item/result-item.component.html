@@ -4,13 +4,12 @@
   <div>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</div>
   <div>{{ 'record.state' | translate }} {{ doc.marc_990a }} - {{ 'state.' + doc.marc_990a | translate }} <mat-icon [title]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon></div>
   <div>
-    <button mat-raised-button (click)="showStates()">Zmena stavu</button>
-    
+    <button mat-raised-button *ngIf="state.logged" (click)="showStates()">Zmena stavu</button>
   </div>
   <div>
-    <a [href]="doc.marc_998a" target="_blank">Link do DK</a> |
+    <a *ngIf="doc.marc_856u" [href]="doc.marc_856u" target="_blank">Link do DK</a> |
     <a [href]="doc.marc_998a" target="_blank">Zaznam z katalogu</a> |
-    <a [href]="doc.marc_998a" target="_blank">Identifikatory</a> |
-    <a (click)="showHistory()">Historie zmen</a>
+    <a (click)="showIdentifiers()">Identifikatory</a> |
+    <a *ngIf="state.logged" (click)="showHistory()">Historie zmen</a>
   </div>
 </mat-card>

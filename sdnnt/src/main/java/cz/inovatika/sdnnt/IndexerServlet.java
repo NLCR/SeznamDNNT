@@ -158,6 +158,11 @@ public class IndexerServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
+        JSONObject user = (JSONObject) req.getSession().getAttribute("user");
+          if (user == null) {
+            json.put("error", "Not logged");
+            return json;
+          }
         try {
           Indexer indexer = new Indexer();
           JSONObject inputJs;
@@ -166,7 +171,7 @@ public class IndexerServlet extends HttpServlet {
           } else {
             inputJs = new JSONObject(req.getParameter("json"));
           }
-          json = indexer.save(req.getParameter("id"), inputJs, "testUser");
+          json = indexer.save(req.getParameter("id"), inputJs, user.getString("name"));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

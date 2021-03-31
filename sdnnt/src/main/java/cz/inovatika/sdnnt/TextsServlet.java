@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.inovatika.sdnnt;
 
 import java.io.File;
@@ -14,7 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse; 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -26,7 +22,7 @@ import org.json.JSONObject;
 @WebServlet(name = "TextsServlet", urlPatterns = {"/texts/*"})
 public class TextsServlet extends HttpServlet {
   
-  public static final Logger LOGGER = Logger.getLogger(TextsServlet.class.getName());
+  public static final Logger LOGGER = Logger.getLogger(TextsServlet.class.getName()); 
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>

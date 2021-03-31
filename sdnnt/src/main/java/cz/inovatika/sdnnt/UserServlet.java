@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package cz.inovatika.sdnnt;
 
 import java.io.IOException;
@@ -9,6 +14,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -22,10 +28,10 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
-@WebServlet(value = "/search/*")
-public class SearchServlet extends HttpServlet {
-
-  public static final Logger LOGGER = Logger.getLogger(SearchServlet.class.getName());
+@WebServlet(name = "UserServlet", urlPatterns = {"/user/*"})
+public class UserServlet extends HttpServlet {
+  
+  public static final Logger LOGGER = Logger.getLogger(UserServlet.class.getName()); 
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -67,100 +73,24 @@ public class SearchServlet extends HttpServlet {
       response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
       out.print(e1.toString());
     }
-
   }
 
   enum Actions {
-    CATALOG {
+    LOGIN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
-          }
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a")
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
-
+        JSONObject json = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+        ret.put("name", json.getString("user")).put("role", "admin");
+        req.getSession(true).setAttribute("user", ret);
         return ret; 
       }
     },
-    ACCOUNT {
+    LOGOUT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
-          }
-          JSONObject user = (JSONObject) req.getSession().getAttribute("user");
-          if (user == null) {
-            ret.put("error", "Not logged");
-            return ret;
-          }
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a")
-                  .addFilterQuery("{!join fromIndex=history from=identifier to=identifier} user:" + user.getString("name"))
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
-
-        return ret; 
-      }
-    },
-    HISTORY {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery query = new SolrQuery("*")
-                  .setRows(100)
-                  .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-                  .setFields("*,changes:[json]");
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "history"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
-
+        req.getSession().invalidate();
         return ret; 
       }
     };

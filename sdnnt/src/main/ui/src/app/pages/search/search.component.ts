@@ -2,6 +2,7 @@ import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
@@ -20,11 +21,13 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private service: AppService
+    private service: AppService,
+    public state: AppState
     ) { }
 
 
   ngOnInit(): void {
+    this.state.activePage = 'Search';
     this.route.queryParams.subscribe(val => {
       this.search(val);
     });
@@ -33,7 +36,6 @@ export class SearchComponent implements OnInit {
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
-    // p.mapa = !this.state.isMapaCollapsed;
     this.docs = [];
     this.searchResponse = null;
     this.facets = null;

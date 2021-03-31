@@ -1,10 +1,28 @@
-<div>
-  <ul>
-    <li *ngFor="let t of config.homeTabs" (click)="selectText(t)" [class.active]="t === selected">{{ 'home.' + t |
-      translate }} </li>
-  </ul>
-</div>
-<div>
-<div><button mat-raised-button (click)="save()">{{ 'save' | translate }}</button></div>
-<angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig"></angular-editor>
-</div>
+<mat-tab-group>
+  <mat-tab label="Editace stranek">
+    <div>
+      <ul>
+        <li *ngFor="let t of config.homeTabs" (click)="selectText(t)" [class.active]="t === selected">{{ 'home.' + t |
+          translate }} </li>
+      </ul>
+    </div>
+    <div>
+      <div><button mat-raised-button (click)="save()">{{ 'save' | translate }}</button></div>
+      <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig">
+      </angular-editor>
+    </div>
+
+  </mat-tab>
+  <mat-tab label="Role">
+    <mat-tab-group>
+      <mat-tab label="Prehled roli">
+        <mat-list role="list">
+          <mat-list-item role="listitem" *ngFor="let role of config.role">{{role}}</mat-list-item>
+        </mat-list>
+      </mat-tab>
+      <mat-tab label="Formular">
+Naky formular
+      </mat-tab>
+    </mat-tab-group>
+  </mat-tab>
+</mat-tab-group>
