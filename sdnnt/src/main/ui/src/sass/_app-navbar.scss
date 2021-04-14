@@ -9,9 +9,18 @@ app-navbar {
     a {
       padding: 8px $app-gap;
       color: #96C120;
+      margin: 0 8px;
+      border: 1px solid transparent;
+
+      &:hover {
+        background-color: #96C120;
+        color: $app-color-lightnes;
+        border: 1px solid #96C120;
+      }
 
       &.app-active {
-        background-color: $app-gray-1;
+        //background-color: $app-gray-1;
+        border: 1px solid #96C120;
       }
     }
   }
