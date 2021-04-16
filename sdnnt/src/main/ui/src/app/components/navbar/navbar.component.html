@@ -2,7 +2,7 @@
   <div fxLayout="row" fxFlexFill fxLayoutAlign="start center">
     <div fxFlex class="app-left">
         <a routerLink="/" fxFlexAlign="center" title="Seznam děl nedostupných na trhu">
-          <img src="assets/img/logo-sddnt-blue.png" alt="" style="vertical-align: middle;" />
+          <img src="assets/img/logo-sdnnt-blue.png" alt="" style="vertical-align: middle;" />
           <!-- {{ state.activePage | translate }} -->
         </a>
     </div>
@@ -20,15 +20,6 @@
       <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" >{{ state.user.name }} {{ now | date : 'dd.MM.yyyy' }}</a>
       <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate}}</a>
       <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate}}</a>
-      <!-- <a routerLink="home" routerLinkActive="app-active" title="Home">{{ 'Home' | translate}}</a>
-      <a routerLink="help" routerLinkActive="app-active" title="Help">{{ 'Help' | translate}}</a>
-      <a *ngIf="!state.user" title="login" (click)="showLogin()">{{ 'Login' | translate}}</a>
-      <a *ngIf="state.user" routerLink="account" routerLinkActive="app-active" title="Account">{{ 'Account' | translate}}</a>
-      <a *ngIf="state.user" title="logout" (click)="logout()">{{ 'Logout' | translate}}</a>
-      <a *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" title="Admin">{{ 'Admin' | translate}}</a>
-      <a *ngIf="state.user" routerLink="account" routerLinkActive="app-active" >{{ state.user.name }} {{ now | date : 'dd.MM.yyyy' }}</a>
-      <a *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate}}</a>
-      <a *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate}}</a> -->
     </div>
   </div>
 </mat-toolbar>

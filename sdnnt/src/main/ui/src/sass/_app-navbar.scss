@@ -7,11 +7,6 @@ app-navbar {
 
   .app-right {
     a {
-      /* padding: 8px $app-gap;
-      color: #96C120;
-      margin: 0 8px; */
-      /* border: 1px solid transparent; */
-
       &.mat-stroked-button {
         @extend .app-clean-radius;
         color: #96C120;
@@ -19,7 +14,6 @@ app-navbar {
         margin: 0 8px;
 
         &.app-active {
-          //background-color: $app-gray-1;
           border: 1px solid #96C120;
         }
 
@@ -35,7 +29,6 @@ app-navbar {
       }
 
       &.app-active {
-        //background-color: $app-gray-1;
         border: 1px solid #96C120;
       }
     }
