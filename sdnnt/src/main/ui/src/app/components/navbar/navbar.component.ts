@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter  } from '@angular/core';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
@@ -10,11 +11,15 @@ import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
+  
+  // sidenav
+  @Output() public sidenavToggle = new EventEmitter();
 
   constructor(
     private dialog: MatDialog,
     private service: AppService,
-    public state: AppState
+    public state: AppState,
+    private overlay: Overlay
     ) { }
 
   ngOnInit(): void {
@@ -38,6 +43,11 @@ export class NavbarComponent implements OnInit {
       this.state.logged = false;
       this.state.user = null;
     });
+  }
+
+  // sidenav fuction
+  public onToggleSidenav = () => {
+    this.sidenavToggle.emit();
   }
   
 

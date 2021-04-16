@@ -25,6 +25,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatBadgeModule} from '@angular/material/badge';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 @NgModule({
   imports: [
@@ -52,7 +53,8 @@ import {MatBadgeModule} from '@angular/material/badge';
     MatAutocompleteModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatSidenavModule
   ],
   exports: [
     MatFormFieldModule,
@@ -78,7 +80,8 @@ import {MatBadgeModule} from '@angular/material/badge';
     MatStepperModule,
     MatAutocompleteModule,
     MatDatepickerModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatSidenavModule
   ],
   providers: []
 })
