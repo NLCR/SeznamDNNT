@@ -2,9 +2,10 @@
 
 app-navbar {
   .mat-toolbar {
-    @extend .mat-elevation-z1;
+    box-shadow: 0 8px 8px 0 rgb(0 0 0 / 4%);
+    border-bottom: 1px solid $app-gray-3;
     height: $app-navbar-height;
-    background-color: $app-gray-1;
+    background-color: transparent;
   }
 
   .app-right {

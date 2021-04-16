@@ -2,6 +2,14 @@
 
 app-footer {
   display: block;
-  background-color: $app-gray-5;
+  color: $app-footer-color;
+  background-color: $app-footer-bg;
   padding: $app-gap;
+
+  .app-right {
+    .app-logo {
+      height: $app-gap;
+      vertical-align: text-bottom;
+    }
+  }
 }

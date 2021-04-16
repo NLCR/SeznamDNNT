@@ -31,6 +31,9 @@ header {
 main {
   height: calc(100% - #{$app-navbar-height});
   overflow: auto;
+  background-color: $app-gray-1;
+  position: relative;
+  z-index: -1;
 }
 
 @import "./app-footer";
