@@ -6,7 +6,7 @@ a {
   color: $app-primary-color;
 
   &:hover {
-    color: darken($app-primary-color, 10);
+    //color: darken($app-primary-color, 10);
     text-decoration: none;
   }
 

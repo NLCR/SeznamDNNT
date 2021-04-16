@@ -14,14 +14,16 @@ app-navbar {
         @extend .app-clean-radius;
         color: #96C120;
         border-color: transparent;
-        margin: 0 8px;
+        margin: 0 4px;
 
         &.app-active {
           border: 1px solid #96C120;
         }
 
         .mat-icon {
-          @include setIcon($size: 20, $position: sub);
+          &:not(.app-menu .mat-icon) {
+            @include setIcon($size: 20, $position: sub);
+          }
         }
       }
 
