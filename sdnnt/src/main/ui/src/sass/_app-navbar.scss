@@ -2,9 +2,9 @@
 
 app-navbar {
   .mat-toolbar {
-    background-color: $app-color-lightnes;
-    background-color: red;
-    
+    @extend .mat-elevation-z1;
+    height: $app-navbar-height;
+    background-color: $app-gray-1;
   }
 
   .app-right {

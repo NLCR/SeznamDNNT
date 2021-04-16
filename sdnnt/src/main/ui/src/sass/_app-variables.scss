@@ -21,6 +21,12 @@ $app-gray-9: mat-color($mat-gray, 900) !default;
 
 // layout
 $app-gap: 16px !default;
+$app-gap-half: calc(#{$app-gap} / 2) !default;
+$app-gap-double: calc(#{$app-gap} * 2) !default;
 $app-gap-icon: 5px !default;
+$app-gap-button: 8px !default;
 $app-container: 1280px !default;
 $app-border-radius: 4px !default;
+
+// navbar
+$app-navbar-height: 90px !default;

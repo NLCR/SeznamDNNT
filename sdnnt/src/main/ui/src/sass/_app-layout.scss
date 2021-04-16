@@ -22,4 +22,22 @@ mat-sidenav {
   width: 250px;
 }
 
-@import "app-navbar";
+// header
+header {
+  @import "./app-navbar";
+  //@import "./app-searchbar";
+}
+
+main {
+  height: calc(100% - #{$app-navbar-height});
+  overflow: auto;
+}
+
+@import "./app-footer";
+
+// container
+.app-container {
+  margin: 0 auto;
+  max-width: $app-container;
+  width: 100%;
+}

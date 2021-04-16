@@ -75,7 +75,7 @@ a {
 }
 
 .app-row-gap-8 {
-  margin-bottom: calc(#{$app-gap} / 2) !important;
+  margin-bottom: $app-gap-half !important;
 }
 
 .app-row-gap-16 {
@@ -83,7 +83,7 @@ a {
 }
 
 .app-row-gap-32 {
-  margin-bottom: calc(2 * #{$app-gap}) !important;
+  margin-bottom: $app-gap-double !important;
 }
 
 .app-gap-icon-right {

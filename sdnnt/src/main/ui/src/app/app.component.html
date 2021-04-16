@@ -8,9 +8,11 @@
     <header>
       <app-navbar (sidenavToggle)="sidenav.toggle()"></app-navbar>
     </header>
-    <main>
-      <router-outlet></router-outlet> 
+    <main fxLayout="column">
+      <div fxFlex class="app-container">
+        <router-outlet></router-outlet>
+      </div>
+      <app-footer></app-footer>
     </main>
-    <!-- <app-footer></app-footer> -->
   </mat-sidenav-content>
 </mat-sidenav-container>
