@@ -1,0 +1,19 @@
+// --- SIDENAV LIST ---
+
+app-sidenav-list {
+  .mat-list-item {
+    background-color: transparent !important;
+
+    &.app-active {
+      color: $app-primary-color;
+      background-color: $app-gray-1 !important;
+      font-weight: bold;
+      border-radius: 0;
+    }
+
+    .mat-icon {
+      @include setIcon(20, inherit, sub);
+      margin-right: $app-gap-icon;
+    } 
+  }
+}

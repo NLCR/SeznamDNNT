@@ -1,1 +1,17 @@
-<p>sidenav-list works!</p>
+<mat-nav-list>
+  <a mat-list-item routerLink="home" (click)="onSidenavClose()" routerLinkActive="app-active" [title]="'Home' | translate">
+    <mat-icon>home</mat-icon> {{ 'Home' | translate }}
+  </a>
+  <a mat-list-item routerLink="help" (click)="onSidenavClose()" routerLinkActive="app-active" [title]="'help' | translate ">
+    <mat-icon>help_outline</mat-icon> {{ 'help' | translate }}
+  </a>
+  <mat-divider></mat-divider>
+  <a mat-list-item *ngIf="!state.user" (click)="showLogin(); onSidenavClose()" [title]="'Login' | translate">{{ 'Login' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate">{{ 'Account' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="logout(); onSidenavClose()" [title]="'Logout' | translate">{{ 'Logout' | translate }}</a>
+  <a mat-list-item *ngIf="state.user && state.user.role === 'admin'" (click)="onSidenavClose()" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate">{{ 'Admin' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active">{{ state.user.name }} {{ now | date : 'dd.MM.yyyy' }}</a>
+  <mat-divider></mat-divider>
+  <a mat-list-item *ngIf="state.currentLang !== 'en'" (click)="changeLang('en'); onSidenavClose()" [title]="'EN' | translate">{{ 'EN' | translate }}</a>
+  <a mat-list-item *ngIf="state.currentLang !== 'cs'" (click)="changeLang('cs'); onSidenavClose()" [title]="'CS' | translate">{{ 'CS' | translate }}</a>
+</mat-nav-list>

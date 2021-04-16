@@ -7,24 +7,24 @@
         </a>
     </div>
     <div class="app-right" fxHide.gt-sm>
-      <a mat-stroked-button (click)="onToggleSidenav()" class="app-sidenav-link">
+      <a mat-stroked-button (click)="onToggleSidenav()">
         <mat-icon>menu</mat-icon>
       </a>  
     </div>
     <div class="app-right" fxHide.sm fxHide.xs>
-      <a mat-stroked-button routerLink="home" routerLinkActive="app-active" title="Home">
-        <mat-icon>home</mat-icon> {{ 'Home' | translate}}
+      <a mat-stroked-button routerLink="home" routerLinkActive="app-active" [title]="'Home' | translate">
+        <mat-icon>home</mat-icon> {{ 'Home' | translate }}
       </a>
-      <a mat-stroked-button routerLink="help" routerLinkActive="app-active" title="Help">
-        <mat-icon>help</mat-icon> {{ 'Help' | translate}}
+      <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'Help' | translate">
+        <mat-icon>help</mat-icon> {{ 'Help' | translate }}
       </a>
-      <a mat-stroked-button *ngIf="!state.user" title="login" (click)="showLogin()">{{ 'Login' | translate}}</a>
-      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" title="Account">{{ 'Account' | translate}}</a>
-      <a mat-stroked-button *ngIf="state.user" title="logout" (click)="logout()">{{ 'Logout' | translate}}</a>
-      <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" title="Admin">{{ 'Admin' | translate}}</a>
+      <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'Login' | translate">{{ 'Login' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate">{{ 'Account' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" (click)="logout()" title="logout">{{ 'Logout' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate">{{ 'Admin' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" >{{ state.user.name }} {{ now | date : 'dd.MM.yyyy' }}</a>
-      <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate}}</a>
-      <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate}}</a>
+      <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate }}</a>
     </div>
   </div>
 </mat-toolbar>
