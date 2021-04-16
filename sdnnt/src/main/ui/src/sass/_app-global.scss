@@ -1,2 +1,103 @@
 // --- GLOBAL ---
 
+a {
+  cursor: pointer;
+  text-decoration: none;
+  color: $app-primary-color;
+
+  &:hover {
+    color: darken($app-primary-color, 10);
+    text-decoration: none;
+  }
+
+  &.app-disabled-link {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.3;
+    text-decoration: none;
+  }
+}
+
+// cleaners
+.app-cleanfix {
+  @include cleanfix();
+}
+
+.app-clean-mg {
+  margin: 0 !important;
+}
+
+.app-clean-pd {
+  padding: 0 !important;
+}
+
+.app-clean-bg {
+  background-color: transparent !important;
+}
+
+.app-clean-radius {
+  border-radius: 0 !important;
+}
+
+.app-clean-border {
+  border: 0 !important;
+}
+
+.app-clean-shadow {
+  box-shadow: none !important;
+}
+
+// colors
+.app-color-warning {
+  color: $app-color-warning !important;
+}
+
+.app-color-info {
+  color: $app-color-info !important;
+}
+
+.app-color-fav {
+  color: $app-color-fav !important;
+}
+
+// common
+.app-pipe {
+  border-left: 1px solid $app-gray-4;
+  margin: 0 calc(#{$app-gap} / 2);
+
+  &:last-child {
+    display: none;
+  }
+}
+
+.app-cursor-pointer {
+  cursor: pointer;
+}
+
+.app-row-gap-8 {
+  margin-bottom: calc(#{$app-gap} / 2) !important;
+}
+
+.app-row-gap-16 {
+  margin-bottom: $app-gap !important;
+}
+
+.app-row-gap-32 {
+  margin-bottom: calc(2 * #{$app-gap}) !important;
+}
+
+.app-gap-icon-right {
+  margin-right: $app-gap-icon;
+}
+
+.app-gap-icon-left {
+  margin-left: $app-gap-icon;
+}
+
+.app-full-width {
+  width: 100% !important;
+}
+
+.app-font-bold {
+  font-weight: 700;
+}

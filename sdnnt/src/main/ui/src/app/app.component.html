@@ -1,10 +1,26 @@
-<header>
+<!-- <header>
   <app-navbar></app-navbar>
 </header>
 
 <main>
-  <div class="app-scroll-wrapper" id="scroll-wrapper">
-    <router-outlet></router-outlet> 
-    <app-footer></app-footer>
-  </div>
-</main>
+  <router-outlet></router-outlet> 
+  <app-footer></app-footer>
+</main> -->
+
+
+<mat-sidenav-container>
+  <mat-sidenav #sidenav role="navigation">
+    <mat-nav-list>
+      <app-sidenav-list (sidenavClose)="sidenav.close()"></app-sidenav-list>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <header>
+      <app-navbar (sidenavToggle)="sidenav.toggle()"></app-navbar>
+    </header>
+    <main>
+      <router-outlet></router-outlet> 
+    </main>
+    <!-- <app-footer></app-footer> -->
+  </mat-sidenav-content>
+</mat-sidenav-container>

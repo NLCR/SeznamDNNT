@@ -6,7 +6,12 @@
           <!-- {{ state.activePage | translate }} -->
         </a>
     </div>
-    <div class="app-right">
+    <div class="app-right" fxHide.gt-sm>
+      <a mat-stroked-button (click)="onToggleSidenav()" class="app-sidenav-link">
+        <mat-icon>menu</mat-icon>
+      </a>  
+    </div>
+    <div class="app-right" fxHide.sm fxHide.xs>
       <a mat-stroked-button routerLink="home" routerLinkActive="app-active" title="Home">
         <mat-icon>home</mat-icon> {{ 'Home' | translate}}
       </a>
