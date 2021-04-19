@@ -4,6 +4,9 @@
   "Account": "Moje konto",
   "Admin": "Administrace",
   "NKP": "Národní knihovna České republiky",
+  "q" : {
+    "placeholder": "Zadejte dotaz ..."
+  },
   "register": {
     "button": "Přihlásit/registrovat se přes NDK"
   },
@@ -17,7 +20,6 @@
     "libraries": "Knihovnam",
     "api": "Popis API"
   },
-
   "record": {
     "state": "stav"
   },

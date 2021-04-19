@@ -27,4 +27,8 @@ export class SearchBarComponent implements OnInit {
     this.router.navigate(['/search'], { queryParams: p, queryParamsHandling: 'merge' });
   }
 
+  clearQuery() {
+    this.state.q = null;
+  }
+
 }
