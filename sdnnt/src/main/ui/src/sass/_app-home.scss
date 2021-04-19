@@ -1,5 +1,17 @@
 // --- HOME ---
 
 app-home {
-  
+  .mat-tab-group {
+    .mat-tab-body-wrapper {
+      //min-height: 300px;
+
+      .mat-tab-body {
+        padding: $app-gap-double;
+        background-color: $app-gray-0;
+        border-width: 0 1px 1px 1px;
+        border-style: solid;
+        border-color: $app-gray-3;
+      }
+    }
+  }
 }

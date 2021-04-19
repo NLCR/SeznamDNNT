@@ -55,8 +55,8 @@ export class AdminComponent implements OnInit {
     sanitize: true,
     toolbarPosition: 'top',
     toolbarHiddenButtons: [
-      ['bold', 'italic'],
-      ['fontSize']
+      /* ['bold', 'italic'],
+      ['fontSize'] */
     ]
 };
 

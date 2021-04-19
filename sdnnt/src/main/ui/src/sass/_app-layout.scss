@@ -22,12 +22,10 @@ mat-sidenav {
   width: 250px;
 }
 
-@import "./app-searchbar";
-
 // header
 header {
   @import "./app-navbar";
-  //@import "./app-searchbar";
+  @import "./app-searchbar";
 }
 
 main {
@@ -36,6 +34,8 @@ main {
   background-color: $app-gray-1;
   position: relative;
   z-index: -1;
+
+  @import "app-home";
 }
 
 @import "./app-footer";
