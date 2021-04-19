@@ -1,16 +1,7 @@
-<mat-tab-group mat-align-tabs="center" (selectedTabChange)="selectTab($event)">
-  <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
-    <div [innerHTML]="tabContent"></div>
-  </mat-tab>
-</mat-tab-group>
-
-
-<!-- <div>
-  <div>
-    <ul>
-      <li *ngFor="let tab of config.homeTabs" (click)="selectTab(tab)" [class.active]="tab === activeTab">{{ 'home.' + tab |
-        translate }} </li>
-    </ul>
-  </div>
-  <div [innerHTML]="tabContent"></div>
-</div> -->
+<div class="app-container">
+  <mat-tab-group mat-align-tabs="center" (selectedTabChange)="selectTab($event)">
+    <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
+      <div [innerHTML]="tabContent"></div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

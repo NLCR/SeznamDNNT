@@ -1,5 +1,5 @@
 <div class="app-searchbar-wrapper">
-  <input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()" [(ngModel)]="state.q" [matTooltip]="'q.tooltip' | translate" matTooltipPosition="above" />
+  <input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()" [(ngModel)]="state.q" />
   <span class="app-clear" *ngIf="state.q" matTooltip="Vymazat dotaz">
     <mat-icon class="app-cursor-pointer" (click)="clearQuery()">clear</mat-icon>
   </span>
@@ -9,12 +9,3 @@
     </a>
   </span>
 </div>
-
-
-
-
-<!-- <input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()" [(ngModel)]="state.q" [matTooltip]="'q.tooltip' | translate" matTooltipPosition="above" />
-<a (click)="search()">
-  <mat-icon>search</mat-icon>
-</a>
- -->

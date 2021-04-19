@@ -35,7 +35,11 @@ main {
   position: relative;
   z-index: -1;
 
-  @import "app-home";
+  .app-page-wrapper {
+    padding: $app-gap-double $app-gap;
+
+    @import "app-home";
+  }
 }
 
 @import "./app-footer";
@@ -45,5 +49,8 @@ main {
   margin: 0 auto;
   max-width: $app-container;
   width: 100%;
-  padding: $app-gap-double 0;
+}
+
+.app-container-fluid {
+  max-width: 100%;
 }
