@@ -1,24 +1,22 @@
 <div class="app-container">
   <div fxLayout="row" >
-    <app-searchbar></app-searchbar>
-  </div>
-  <div fxLayout="row" >
-    <div fxFlex class="app-fx-left">{{ 'numFound' | translate }}: {{ numFound }}</div>
-    <div fxFlex class="app-fx-left">
-      <mat-checkbox>Vybrat vse</mat-checkbox>
-      <button mat-raised-button>Hromdana zmena stavu</button>
-      <button mat-raised-button>Exporty</button>
-    </div>
-    <div fxFlex class="app-fx-right"><app-paginator [numFound]="numFound"></app-paginator></div>
-  </div>
-  <div fxLayout="row" >
-    <div fxFlex class="app-fx-left">
+    <div fxFlex="300px" class="app-left">
       <ng-container *ngIf="facets">
         <app-facets [facet_fields]="facets"></app-facets>
       </ng-container>
     </div>
-    <div fxFlex >
+    <div fxFlex class="app-result-wrapper">
       <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
     </div>
   </div>
 </div>
+
+<!-- <div fxLayout="row" >
+  <div fxFlex class="app-fx-left">{{ 'numFound' | translate }}: {{ numFound }}</div>
+  <div fxFlex class="app-fx-left">
+    <mat-checkbox>Vybrat vse</mat-checkbox>
+    <button mat-raised-button>Hromdana zmena stavu</button>
+    <button mat-raised-button>Exporty</button>
+  </div>
+  <div fxFlex class="app-fx-right"><app-paginator [numFound]="numFound"></app-paginator></div>
+</div> -->

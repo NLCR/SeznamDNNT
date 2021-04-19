@@ -41,6 +41,9 @@ $app-searchbar-field-color: $app-color-darknes !default;
 $app-searchbar-field-bg: $app-gray-2 !default;
 $app-searchbar-field-icon-gap: calc(#{$app-gap-icon} * 2) !default;
 
+// card
+$app-card-border-color: $app-gray-3;
+
 // footer
 $app-footer-bg: $app-gray-9 !default;
 $app-footer-color: rgba($app-color-lightnes, .6) !default;
