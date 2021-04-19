@@ -12,12 +12,12 @@ app-navbar {
     a {
       &.mat-stroked-button {
         @extend .app-clean-radius;
-        color: #96C120;
+        color: $app-primary-color;
         border-color: transparent;
         margin: 0 4px;
 
         &.app-active {
-          border: 1px solid #96C120;
+          border: 1px solid $app-primary-color;
         }
 
         .mat-icon {
@@ -28,13 +28,13 @@ app-navbar {
       }
 
       &:hover {
-        background-color: #96C120;
+        background-color: $app-primary-color;
         color: $app-color-lightnes;
-        border: 1px solid #96C120;
+        border: 1px solid $app-primary-color;
       }
 
       &.app-active {
-        border: 1px solid #96C120;
+        border: 1px solid $app-primary-color;
       }
     }
   }
