@@ -22,6 +22,8 @@ mat-sidenav {
   width: 250px;
 }
 
+@import "./app-searchbar";
+
 // header
 header {
   @import "./app-navbar";

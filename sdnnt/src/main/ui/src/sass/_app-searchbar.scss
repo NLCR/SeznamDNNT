@@ -1,0 +1,64 @@
+// --- SEARCHBAR ---
+
+app-searchbar {
+  .app-searchbar-wrapper {
+    display: flex;
+    align-items: center;
+    height: $app-searchbar-field-height;
+    max-width: $app-searchbar-field-max-width;
+    background-color: $app-searchbar-field-bg;
+    border-radius: $app-border-radius;
+    color: $app-searchbar-field-color;
+
+    &:focus-within {
+      box-shadow: inset 0px 0px 32px -25px rgba(0,0,0,0.70);
+    }
+
+    input {
+      @extend .app-clean-border, .app-clean-pd, .app-clean-bg;
+      padding-left: $app-gap !important;
+      width: 100%;
+      height: 100%;
+      border-top-left-radius: $app-border-radius;
+      border-bottom-left-radius: $app-border-radius;
+      font-size: initial;
+
+      &::placeholder {
+        color: $app-gray-5;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .app-clear {
+      height: 100%;
+      align-items: center;
+      display: flex;
+      padding: 0 $app-gap;
+      color: $app-gray-6;
+    }
+
+    .app-search {
+      text-align: right;
+      background-color: $app-accent-color;
+      padding: 0 $app-gap;
+      height: 100%;
+      display: flex;
+      border-top-right-radius: $app-border-radius;
+      border-bottom-right-radius: $app-border-radius;
+      align-items: center;
+      justify-content: center;
+
+      a {
+        @extend .app-clean-pd, .app-clean-mg;
+
+        .mat-icon {
+          @extend .app-clean-mg;
+          @include setIcon(28, $app-color-lightnes, middle);
+        }
+      }
+    }
+  }
+}

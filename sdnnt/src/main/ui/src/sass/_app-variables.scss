@@ -31,6 +31,16 @@ $app-border-radius: 4px !default;
 // navbar
 $app-navbar-height: 90px !default;
 
+// searchbar
+$app-searchbar-height: 110px !default;
+$app-searchbar-field-height: 46px !default;
+$app-searchbar-field-width: 700px  !default;
+$app-searchbar-field-width-1400: 600px !default;
+$app-searchbar-field-max-width: 100% !default;
+$app-searchbar-field-color: $app-color-darknes !default;
+$app-searchbar-field-bg: $app-gray-2 !default;
+$app-searchbar-field-icon-gap: calc(#{$app-gap-icon} * 2) !default;
+
 // footer
 $app-footer-bg: $app-gray-9 !default;
 $app-footer-color: rgba($app-color-lightnes, .6) !default;

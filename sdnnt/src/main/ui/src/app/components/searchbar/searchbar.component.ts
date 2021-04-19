@@ -4,9 +4,9 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 
 @Component({
-  selector: 'app-search-bar',
-  templateUrl: './search-bar.component.html',
-  styleUrls: ['./search-bar.component.scss']
+  selector: 'app-searchbar',
+  templateUrl: './searchbar.component.html',
+  styleUrls: ['./searchbar.component.scss']
 })
 export class SearchBarComponent implements OnInit {
 

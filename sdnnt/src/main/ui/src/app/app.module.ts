@@ -11,7 +11,7 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { SearchComponent } from './pages/search/search.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { SearchBarComponent } from './components/searchbar/searchbar.component';
 import { ResultItemComponent } from './components/result-item/result-item.component';
 import { FacetsComponent } from './components/facets/facets.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
