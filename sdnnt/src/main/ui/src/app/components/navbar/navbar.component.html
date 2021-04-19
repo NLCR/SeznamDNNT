@@ -21,6 +21,7 @@
       <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'Help' | translate">
         <mat-icon>help</mat-icon> {{ 'Help' | translate }}
       </a>
+      <a mat-stroked-button (click)="register()" [title]="'Login' | translate">{{ 'register.button' | translate }}</a>
       <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'Login' | translate">{{ 'Login' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate">{{ 'Account' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user" (click)="logout()" title="logout">{{ 'Logout' | translate }}</a>

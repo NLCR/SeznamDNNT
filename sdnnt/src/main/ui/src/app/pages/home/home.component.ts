@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.activePage = 'Home';
-    this.selectTab(this.config.homeTabs[0]);
+    this.getText(this.config.homeTabs[0]);
   }
 
   login() {
@@ -33,9 +33,14 @@ export class HomeComponent implements OnInit {
 
   }
 
-  selectTab(tab: string) {
+  getText(tab: string) {
     this.activeTab = tab;
     this.service.getText(tab).subscribe(text => this.tabContent = text);
+  }
+
+  selectTab(selected) {
+    const tab = this.config.homeTabs[selected.index];
+    this.getText(tab);
   }
 
 }
