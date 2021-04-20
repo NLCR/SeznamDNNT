@@ -147,17 +147,36 @@ a {
   }
 }
 
+// accordation
+.mat-accordion {
+  .mat-expansion-panel {
+    @extend .app-clean-shadow, .app-clean-bg;
+
+    .mat-expansion-panel-header {
+      border-bottom: 1px solid $app-gray-3;
+      .mat-expansion-panel-header-title {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
 // card
 .mat-card {
-  .mat-icon {
-    @include setIcon($size: 20);
-  }
+  @extend .app-clean-bg, .app-clean-shadow, .app-clean-radius;
+  border-bottom: 1px solid $app-brand-border-color;
   
   .mat-card-header-text {
     @extend .app-clean-mg;
 
     .mat-card-title {
       font-size: 16px;
+      display: flex;
+      align-items: flex-start;
+
+      .mat-checkbox {
+        display: flex;
+      }
     }
   }
 
@@ -168,5 +187,9 @@ a {
   .mat-card-actions {
     padding: 8px;
     margin-bottom: 0 !important;
+  }
+
+  .mat-icon {
+    @include setIcon($size: 20);
   }
 }

@@ -1,6 +1,6 @@
 <div class="app-container">
-  <div fxLayout="row" >
-    <div fxFlex="300px" class="app-left">
+  <div fxLayout="row" fxLayoutGap="16px">
+    <div fxFlex="350px" class="app-left">
       <ng-container *ngIf="facets">
         <app-facets [facet_fields]="facets"></app-facets>
       </ng-container>
@@ -14,7 +14,7 @@
           <app-paginator [numFound]="numFound"></app-paginator>
         </div>
       </div>
-      <div class="app-result-items-wrapper">
+      <div class="app-results-wrapper">
         <mat-card>
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
