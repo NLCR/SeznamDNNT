@@ -4,7 +4,7 @@ Devel
 Předpokládaný harmonogram
 | etapa  | termín |
 | ------------- | ------------- |
-| Analýza  | přelom březen/duben  |
+| Analýza  | duben  |
 | POC  | duben |
 | UI/data  | přelom duben/květen |
 | Produkční verze  | srpen |
