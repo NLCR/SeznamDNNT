@@ -60,7 +60,9 @@
     "link_do_dk": "Link do dk",
     "historie_zmen": "Historie změn",
     "num_found": "Počet nalezených záznamů",
-    "vybrat_vse": "Vybrat vše"
+    "vybrat_vse": "Vybrat vše",
+    "hromadna_zmena_stavu": "Hromadná změna stavu",
+    "export": "Export"
   }
 
 }

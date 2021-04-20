@@ -138,6 +138,15 @@ a {
   }
 }
 
+// button toggle
+.mat-button-toggle-appearance-standard {
+  @extend .app-clean-bg;
+  
+  .mat-button-toggle-label-content {
+    line-height: 34px;
+  }
+}
+
 // card
 .mat-card {
   .mat-icon {

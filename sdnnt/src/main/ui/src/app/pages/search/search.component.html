@@ -6,16 +6,28 @@
       </ng-container>
     </div>
     <div fxFlex>
-      <div fxLayout="row" fxLayoutGap="32px" class="app-row-gap-16">
+      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
         <div fxFlex>
-          <mat-checkbox>{{ 'desc.vybrat_vse' | translate }}</mat-checkbox>
-          
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div>
-          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+          <app-paginator [numFound]="numFound"></app-paginator>
         </div>
       </div>
       <div class="app-result-items-wrapper">
+        <mat-card>
+          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+            <div fxFlex>
+              <mat-checkbox>{{ 'desc.vybrat_vse' | translate }}</mat-checkbox>
+            </div>
+            <div>
+              <mat-button-toggle-group>
+                <mat-button-toggle value="bold">{{ 'desc.hromadna_zmena_stavu' | translate }}<mat-icon class="material-icons-outlined app-gap-icon-left">check</mat-icon></mat-button-toggle>
+                <mat-button-toggle value="italic">{{ 'desc.export' | translate }}<mat-icon class="material-icons-outlined app-gap-icon-left">file_download_outlined</mat-icon></mat-button-toggle>
+              </mat-button-toggle-group>
+            </div>
+          </div>
+        </mat-card>
         <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
       </div>
     </div>
