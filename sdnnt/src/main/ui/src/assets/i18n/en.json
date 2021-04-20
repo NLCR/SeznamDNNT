@@ -24,15 +24,15 @@
     "state": "stav"
   },
   "state": {
-    "undefined": "nezařazeno",
-    "PA": "dílo publikováno jako Návrh",
-    "A": "zařazeno",
-    "VS": "vyřazeno - dílo bylo na Seznamu (A)",
-    "VN": "vyřazeno – dílo bylo na Návrhu seznamu (PA)",
-    "N": "nezařazeno",
-    "NZN": "návrh k zařazení",
-    "VVN": "výzva k vyřazení",
-    "VVS": "výzva k vyřazení",
+    "undefined": "unclassified",
+    "PA": "work published as draft",
+    "A": "included",
+    "VS": "discarded - work was on the list (A)",
+    "VN": "discarded - the work was on the draft list (PA)",
+    "N": "unclassified",
+    "NZN": "proposal for inclusion",
+    "VVN": "call for decommissioning",
+    "VVS": "call for decommissioning",
 
     "tooltip": {
       "undefined": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
@@ -58,6 +58,8 @@
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",
     "link_do_dk": "Link to dk",
-    "historie_zmen": "History of changes"
+    "historie_zmen": "History of changes",
+    "num_found": "Number of records found",
+    "vybrat_vse": "Select all"
   }
 }

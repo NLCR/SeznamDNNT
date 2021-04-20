@@ -25,10 +25,10 @@
   },
   "state": {
     "undefined": "nezařazeno",
-    "PA": "dílo publikováno jako Návrh",
+    "PA": "dílo publikováno jako návrh",
     "A": "zařazeno",
-    "VS": "vyřazeno - dílo bylo na Seznamu (A)",
-    "VN": "vyřazeno – dílo bylo na Návrhu seznamu (PA)",
+    "VS": "vyřazeno - dílo bylo na seznamu (A)",
+    "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
     "N": "nezařazeno",
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
@@ -58,7 +58,9 @@
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",
     "link_do_dk": "Link do dk",
-    "historie_zmen": "Historie změn"
+    "historie_zmen": "Historie změn",
+    "num_found": "Počet nalezených záznamů",
+    "vybrat_vse": "Vybrat vše"
   }
 
 }

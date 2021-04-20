@@ -5,8 +5,19 @@
         <app-facets [facet_fields]="facets"></app-facets>
       </ng-container>
     </div>
-    <div fxFlex class="app-result-wrapper">
-      <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+    <div fxFlex>
+      <div fxLayout="row" fxLayoutGap="32px" class="app-row-gap-16">
+        <div fxFlex>
+          <mat-checkbox>{{ 'desc.vybrat_vse' | translate }}</mat-checkbox>
+          
+        </div>
+        <div>
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+        </div>
+      </div>
+      <div class="app-result-items-wrapper">
+        <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+      </div>
     </div>
   </div>
 </div>
