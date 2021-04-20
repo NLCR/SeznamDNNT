@@ -1,15 +1,33 @@
 <mat-card>
-  <mat-checkbox></mat-checkbox>
-  <div><strong>{{ doc.title }}</strong></div>
-  <div>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</div>
-  <div>{{ 'record.state' | translate }} {{ doc.marc_990a }} - {{ 'state.' + doc.marc_990a | translate }} <mat-icon [title]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon></div>
-  <div>
-    <button mat-raised-button *ngIf="state.logged" (click)="showStates()">Zmena stavu</button>
-  </div>
-  <div>
-    <a *ngIf="doc.marc_856u" [href]="doc.marc_856u" target="_blank">Link do DK</a> |
-    <a [href]="doc.marc_998a" target="_blank">Zaznam z katalogu</a> |
-    <a (click)="showIdentifiers()">Identifikatory</a> |
-    <a *ngIf="state.logged" (click)="showHistory()">Historie zmen</a>
-  </div>
+  <mat-card-header>
+    <mat-card-title>
+      <mat-checkbox></mat-checkbox><span>{{ doc.title }}</span>
+    </mat-card-title>
+    <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  -->
+    <!-- <div class="app-badge">
+      <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>: {{ 'state.' + doc.marc_990a | translate }}<mat-icon [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info_outline</mat-icon>
+    </div>  -->
+    <!-- <mat-icon [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon> -->
+  </mat-card-content>
+  <mat-card-actions fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex fxFlexAlign="flex-end">
+      <ng-container *ngIf="doc.marc_856u">
+        <mat-icon>link</mat-icon><a [href]="doc.marc_856u" target="_blank">{{ 'desc.link_do_dk' | translate }}</a><span class="app-pipe"></span>
+      </ng-container>
+      <mat-icon>link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a><span class="app-pipe"></span>
+      <a (click)="showIdentifiers()">{{ 'desc.identifikatory' | translate }}</a><span class="app-pipe"></span>
+      <ng-container *ngIf="state.logged">
+        <a (click)="showHistory()">{{ 'desc.historie_zmen' | translate }}</a>
+      </ng-container>
+    </div>
+    <div>
+      <div class="app-badge">
+        <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  -->{{ 'state.' + doc.marc_990a | translate }}<mat-icon [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info_outline</mat-icon>
+      </div> 
+      <button mat-stroked-button *ngIf="state.logged" (click)="showStates()">{{ 'desc.zmena_stavu' | translate }}</button>
+    </div>
+  </mat-card-actions>
 </mat-card>

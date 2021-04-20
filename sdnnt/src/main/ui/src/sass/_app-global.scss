@@ -101,3 +101,61 @@ a {
 .app-font-bold {
   font-weight: 700;
 }
+
+.app-label {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-badge {
+  display: inline-flex;
+  padding: 0 8px;
+  border-radius: $app-border-radius;
+  border: 1px solid $app-primary-color;
+  color: $app-primary-color;
+  height: 32px;
+  align-items: center;
+
+  .mat-icon {
+    @include setIcon(16);
+    margin-right: 0;
+    margin-left: $app-gap-icon;
+  }
+}
+
+// material
+.mat-checkbox {
+  margin-right: $app-gap-half;
+
+  .mat-checkbox-frame {
+    border-color: $app-gray-5;
+  }
+}
+
+.mat-icon {
+  margin-right: $app-gap-icon;
+}
+
+.mat-card {
+  .mat-icon {
+    @include setIcon($size: 20, $position: bottom);
+  }
+  
+  .mat-card-header-text {
+    @extend .app-clean-mg;
+
+    .mat-card-title {
+      font-size: 16px;
+    }
+  }
+
+  .mat-card-content {
+    @extend .app-clean-mg;
+  }
+
+  .mat-card-actions {
+    padding: 8px;
+    margin-bottom: 0 !important;
+  }
+}

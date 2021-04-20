@@ -3,7 +3,7 @@
 @import '~@angular/material/theming';
 @include mat-core();
 
-$app-brand: "green";
+$app-brand: "blue";
 
 @function setBrandColor() {
   @if ($app-brand == "blue") {

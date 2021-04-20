@@ -19,7 +19,6 @@ app-navbar {
   .app-right {
     a {
       &.mat-stroked-button {
-        @extend .app-clean-radius;
         //color: $app-primary-color;
         border-color: transparent;
         margin: 0 4px;
@@ -31,7 +30,7 @@ app-navbar {
 
           &:hover {
             //color: $app-color-lightnes;
-            border: 1px solid $app-gray-3;
+            //border: 1px solid $app-gray-3;
           }
         }
 

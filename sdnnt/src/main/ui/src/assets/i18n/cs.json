@@ -51,6 +51,14 @@
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
     "022a": "ISSN"
+  },
+
+  "desc": {
+    "zmena_stavu": "Změna stavu",
+    "zaznam_z_katalogu": "Záznam z katalogu",
+    "identifikatory": "Identifikátory",
+    "link_do_dk": "Link do dk",
+    "historie_zmen": "Historie změn"
   }
 
 }
