@@ -3,7 +3,7 @@
 app-navbar {
   .mat-toolbar {
     box-shadow: 0 8px 8px 0 rgb(0 0 0 / 4%);
-    border-bottom: 1px solid $app-gray-3;
+    border-bottom: 1px solid $app-brand-border-color;
     height: $app-navbar-height;
     background-color: transparent;
   }
@@ -19,19 +19,12 @@ app-navbar {
   .app-right {
     a {
       &.mat-stroked-button {
-        //color: $app-primary-color;
         border-color: transparent;
         margin: 0 4px;
 
         &.app-active {
           color: $app-primary-color;
-          //border: 1px solid $app-primary-color;
           border-color: transparent;
-
-          &:hover {
-            //color: $app-color-lightnes;
-            //border: 1px solid $app-gray-3;
-          }
         }
 
         .mat-icon {
@@ -39,12 +32,6 @@ app-navbar {
             @include setIcon($size: 20, $position: sub);
           }
         }
-      }
-
-      &:hover {
-        /* background-color: $app-primary-color;
-        color: $app-color-lightnes; */
-        //border: 1px solid $app-gray-3;
       }
 
       &.app-active {

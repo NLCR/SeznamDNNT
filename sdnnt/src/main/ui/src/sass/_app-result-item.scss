@@ -3,7 +3,7 @@
 app-result-item {
   .mat-card {
     @extend .app-clean-bg, .mat-elevation-z0, .app-clean-radius;
-    border-bottom: 1px solid $app-card-border-color;
+    border-bottom: 1px solid $app-brand-border-color;
 
     .mat-card-title {
       display: flex;

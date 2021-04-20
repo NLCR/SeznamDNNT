@@ -9,7 +9,7 @@ app-searchbar {
     //background-color: $app-searchbar-field-bg;
     border-radius: $app-searchbar-field-height;
     color: $app-searchbar-field-color;
-    border: 1px solid $app-gray-3;
+    border: 1px solid $app-brand-border-color;
 
     &:focus-within {
       box-shadow: inset 0px 0px 32px -25px rgba(0,0,0,0.70);

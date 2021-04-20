@@ -118,13 +118,18 @@ a {
   align-items: center;
 
   .mat-icon {
-    @include setIcon(16);
     margin-right: 0;
     margin-left: $app-gap-icon;
   }
 }
 
-// material
+.app-text-icon {
+  .mat-icon {
+    @include setIcon($position: bottom);
+  }
+}
+
+// checkbox
 .mat-checkbox {
   margin-right: $app-gap-half;
 
@@ -133,13 +138,10 @@ a {
   }
 }
 
-.mat-icon {
-  margin-right: $app-gap-icon;
-}
-
+// card
 .mat-card {
   .mat-icon {
-    @include setIcon($size: 20, $position: bottom);
+    @include setIcon($size: 20);
   }
   
   .mat-card-header-text {
