@@ -150,7 +150,7 @@ a {
 // accordation
 .mat-accordion {
   .mat-expansion-panel {
-    @extend .app-clean-shadow, .app-clean-bg;
+    @extend .app-clean-shadow, .app-clean-bg, .app-clean-mg;
 
     .mat-expansion-panel-header {
       border-bottom: 1px solid $app-gray-3;
