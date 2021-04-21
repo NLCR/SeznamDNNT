@@ -69,6 +69,8 @@
     "num_found": "Number of records found",
     "vybrat_vse": "Select all",
     "hromadna_zmena_stavu": "Mass status change",
-    "export": "Export"
+    "export": "Export",
+    "stav": "State",
+    "zmena_stavu_pro": "Change status for"
   }
 }

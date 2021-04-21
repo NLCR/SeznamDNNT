@@ -15,6 +15,7 @@ export class StatesDialogComponent implements OnInit {
   newState;
   public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
+
   constructor(
     public dialogRef: MatDialogRef<StatesDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SolrDocument,

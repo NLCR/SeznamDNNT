@@ -64,7 +64,7 @@ export class ResultItemComponent implements OnInit {
 
   showStates() {
     const dialogRef = this.dialog.open(StatesDialogComponent, {
-      width: '700px',
+      width: '1150px',
       data: this.doc
     });
 
