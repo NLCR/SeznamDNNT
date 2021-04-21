@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ 'desc.zmena_stavu_pro' | translate }}: {{ data.title }}</h2>
+<h2 mat-dialog-title>{{ 'desc.zmena_stavu_pro' | translate }}: <span>{{ data.title }}</span></h2>
 <mat-form-field appearance="fill" class="app-full-width">
   <mat-label>{{ 'desc.stav' | translate }}</mat-label>
   <mat-select>
@@ -7,7 +7,8 @@
     </mat-option>
   </mat-select>
 </mat-form-field>
-<!-- <div>Current state: {{ 'state.' + data.marc_990a | translate }} <mat-icon [title]="'state.tooltip.'+ data.marc_990a | translate">info</mat-icon></div>
+<!-- old code from alberto 
+<div>Current state: {{ 'state.' + data.marc_990a | translate }} <mat-icon [title]="'state.tooltip.'+ data.marc_990a | translate">info</mat-icon></div>
 <div>Choose new state</div>
 <div mat-dialog-content>
   <mat-radio-group aria-label="Select new state" [(ngModel)]="newState">
@@ -15,6 +16,6 @@
   </mat-radio-group>
 </div> -->
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="newState" cdkFocusInitial>Ok</button>
-  <button mat-button mat-dialog-close >Cancel</button>
+  <button mat-button [mat-dialog-close]="newState" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
+  <button mat-button mat-dialog-close >{{ 'desc.zrusit' | translate }}</button>
 </div>

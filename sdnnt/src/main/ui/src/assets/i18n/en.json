@@ -71,6 +71,8 @@
     "hromadna_zmena_stavu": "Mass status change",
     "export": "Export",
     "stav": "State",
-    "zmena_stavu_pro": "Change status for"
+    "zmena_stavu_pro": "Change status for",
+    "zmenit_stav": "Změnit stav",
+    "zrusit": "Zrušit"
   }
 }

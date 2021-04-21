@@ -65,7 +65,8 @@ export class ResultItemComponent implements OnInit {
   showStates() {
     const dialogRef = this.dialog.open(StatesDialogComponent, {
       width: '1150px',
-      data: this.doc
+      data: this.doc,
+      panelClass: 'app-states-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {

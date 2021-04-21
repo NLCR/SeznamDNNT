@@ -71,7 +71,9 @@
     "hromadna_zmena_stavu": "Hromadná změna stavu",
     "export": "Export",
     "stav": "Stav",
-    "zmena_stavu_pro": "Změna stavu pro"
+    "zmena_stavu_pro": "Změna stavu pro",
+    "zmenit_stav": "Změnit stav",
+    "zrusit": "Zrušit"
   }
 
 }
