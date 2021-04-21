@@ -33,8 +33,8 @@ export class ResultItemComponent implements OnInit {
 
   showIdentifiers() {
     const data = {
-      title: 'Identifikatory zaznamu ' + this.doc.title,
-      items: []
+      title: this.doc.title,
+      items: [],
     }
 
     this.config.identifiers.forEach(f => {
@@ -46,14 +46,16 @@ export class ResultItemComponent implements OnInit {
 
     const dialogRef = this.dialog.open(DataDialogComponent, {
         width: '750px',
-        data
+        data,
+        panelClass: 'app-data-dialog'
       });
   }
 
   showHistory() {
     const dialogRef = this.dialog.open(HistoryDialogComponent, {
         width: '750px',
-        data: this.doc
+        data: this.doc,
+        panelClass: 'app-history-dialog'
       });
     
 

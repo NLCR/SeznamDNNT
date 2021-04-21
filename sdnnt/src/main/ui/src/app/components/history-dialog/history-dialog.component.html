@@ -1,27 +1,27 @@
-<h1 mat-dialog-title>History for {{data.title}}</h1>
+<h1 mat-dialog-title>{{ 'desc.historie_zmen' | translate }}: <span>{{ data.title }}</span></h1>
 <div mat-dialog-content>
   <mat-tab-group>
     <mat-tab label="Historie stavu">
-      <table mat-table [dataSource]="stavy" class="mat-elevation-z8">
+      <table mat-table [dataSource]="stavy" class="mat-elevation-z0">
         <ng-container matColumnDef="indextime">
-          <th mat-header-cell *matHeaderCellDef> Datum </th>
-          <td mat-cell *matCellDef="let element"> {{element.indextime | date : 'dd.MM.yyyy'}} </td>
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.indextime | date : 'dd.MM.yyyy' }}</td>
         </ng-container>
         <ng-container matColumnDef="user">
-          <th mat-header-cell *matHeaderCellDef> Kdo </th>
-          <td mat-cell *matCellDef="let element"> {{element.user}} </td>
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.kdo' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.user }}</td>
         </ng-container>
         <ng-container matColumnDef="from">
-          <th mat-header-cell *matHeaderCellDef> Ze stavu </th>
-          <td mat-cell *matCellDef="let element"> {{element.changes.backward_patch[0].value}} </td>
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.ze_stavu' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.changes.backward_patch[0].value }}</td>
         </ng-container>
         <ng-container matColumnDef="to">
-          <th mat-header-cell *matHeaderCellDef> Na stav </th>
-          <td mat-cell *matCellDef="let element"> {{element.changes.forward_patch[0].value}} </td>
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_stav' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.changes.forward_patch[0].value }}</td>
         </ng-container>
         <ng-container matColumnDef="poznamka">
-          <th mat-header-cell *matHeaderCellDef> Type </th>
-          <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>
+          <td mat-cell *matCellDef="let element">{{ element.type }}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -39,5 +39,5 @@
   
 </div>
 <div mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial>Ok</button>
+  <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
 </div>

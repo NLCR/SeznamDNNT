@@ -64,6 +64,7 @@
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",
+    "identifikatory_zaznamu": "Identifikátory záznamu",
     "link_do_dk": "Link do dk",
     "historie_zmen": "Historie změn",
     "num_found": "Počet nalezených záznamů",
@@ -73,7 +74,12 @@
     "stav": "Stav",
     "zmena_stavu_pro": "Změna stavu pro",
     "zmenit_stav": "Změnit stav",
-    "zrusit": "Zrušit"
+    "zrusit": "Zrušit",
+    "zavrit": "Zavřít",
+    "datum": "Datum",
+    "kdo": "Kdo",
+    "ze_stavu": "Ze stavu",
+    "na_stav": "Na stav",
+    "typ": "Typ"
   }
-
 }

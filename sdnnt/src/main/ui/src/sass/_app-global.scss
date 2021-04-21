@@ -203,3 +203,20 @@ a {
     @include setIcon($size: 20);
   }
 }
+
+// dialog
+.mat-dialog-container {
+  .mat-dialog-title {
+    font-size: 18px;
+
+    span {
+      font-weight: normal;
+      color: $app-gray-7;
+    }
+  }
+}
+
+// table
+.mat-table {
+  @extend .app-full-width;
+}

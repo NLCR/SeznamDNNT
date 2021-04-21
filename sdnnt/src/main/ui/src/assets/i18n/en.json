@@ -64,6 +64,7 @@
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",
+    "identifikatory_zaznamu": "Record identifiers",
     "link_do_dk": "Link to dk",
     "historie_zmen": "History of changes",
     "num_found": "Number of records found",
@@ -73,6 +74,12 @@
     "stav": "State",
     "zmena_stavu_pro": "Change status for",
     "zmenit_stav": "Change status",
-    "zrusit": "Cancel"
+    "zrusit": "Cancel",
+    "zavrit": "Close",
+    "datum": "Date",
+    "kdo": "Who",
+    "ze_stavu": "From the state",
+    "na_stav": "At the state",
+    "typ": "Type"
   }
 }
