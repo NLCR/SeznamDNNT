@@ -31,7 +31,7 @@ header {
 main {
   height: calc(100% - #{$app-navbar-height});
   overflow: auto;
-  background-color: $app-gray-0;
+  background-color: $app-color-lightnes;
   position: relative;
   z-index: -1;
 
