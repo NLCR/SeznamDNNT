@@ -114,8 +114,9 @@ a {
   border-radius: $app-border-radius;
   border: 1px solid $app-primary-color;
   color: $app-primary-color;
-  height: 32px;
+  height: $app-badge-height;
   align-items: center;
+  border-radius: $app-badge-height;
 
   .mat-icon {
     margin-right: 0;
