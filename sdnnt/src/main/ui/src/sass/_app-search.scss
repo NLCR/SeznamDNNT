@@ -1,11 +1,17 @@
 // --- SEARCH ---
 
 app-search {
-  .app-results-wrapper {
-    @import "app-result-item";
+  .app-left {
+    padding-top: 12px;
+  }
 
-    border-width: 1px 1px 0 1px;
-    border-style: solid;
-    border-color: $app-brand-border-color;
+  .app-right {
+    .app-results-wrapper {
+      @import "app-result-item";
+  
+      border-width: 1px 1px 0 1px;
+      border-style: solid;
+      border-color: $app-brand-border-color;
+    }
   }
 }

@@ -1,11 +1,9 @@
 <div class="app-container">
-  <div fxLayout="row" fxLayoutGap="16px">
+  <div fxLayout="row" fxLayoutGap="32px">
     <div fxFlex="350px" class="app-left">
-      <ng-container *ngIf="facets">
-        <app-facets [facet_fields]="facets"></app-facets>
-      </ng-container>
+      <app-facets *ngIf="facets" [facet_fields]="facets"></app-facets>
     </div>
-    <div fxFlex>
+    <div fxFlex class="app-right">
       <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
         <div fxFlex>
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>

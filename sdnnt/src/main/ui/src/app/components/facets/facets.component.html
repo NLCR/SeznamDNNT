@@ -1,31 +1,12 @@
 <mat-accordion multi>
-  <mat-expansion-panel [expanded]="false">
+  <mat-expansion-panel *ngFor="let facet of facets" [expanded]="true">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>
-        Facet 1
+        {{ 'field.' + facet | translate }}
       </mat-panel-title>
     </mat-expansion-panel-header>
-    Content
-  </mat-expansion-panel>
-  <mat-expansion-panel>
-    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-      <mat-panel-title>
-        Facet 2
-      </mat-panel-title>
-    </mat-expansion-panel-header>
-    Content
+    <div *ngFor="let f of facet_fields[facet]">
+      {{ 'field.' + f.name | translate }} <span class="app-count">({{ f.value }})</span>
+    </div>
   </mat-expansion-panel>
 </mat-accordion>
-
-<div>
-  <ul>
-    <li *ngFor="let facet of facets">
-      {{ facet }}
-      <ul>
-        <li *ngFor="let f of facet_fields[facet]">
-          {{f.name}}
-        </li>
-      </ul>
-    </li>
-  </ul>
-</div>

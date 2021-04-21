@@ -153,9 +153,18 @@ a {
     @extend .app-clean-shadow, .app-clean-bg, .app-clean-mg;
 
     .mat-expansion-panel-header {
-      border-bottom: 1px solid $app-gray-3;
+      border-bottom: 1px solid $app-brand-border-color;
       .mat-expansion-panel-header-title {
         font-weight: 500;
+      }
+    }
+
+    .mat-expansion-panel-body {
+      padding-top: $app-gap;
+
+      .app-count {
+        color: $app-gray-5;
+        font-size: 13px;
       }
     }
   }

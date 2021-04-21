@@ -50,7 +50,14 @@
   "field": {
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
-    "022a": "ISSN"
+    "022a": "ISSN",
+    "m": "Monograph",
+    "s": "Serial",
+    "i": "Musi se doplnit",
+    "a": "Taky se musi",
+
+    "item_type": "Document type",
+    "marc_990a": "Document status"
   },
 
   "desc": {
