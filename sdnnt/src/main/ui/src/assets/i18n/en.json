@@ -72,7 +72,7 @@
     "export": "Export",
     "stav": "State",
     "zmena_stavu_pro": "Change status for",
-    "zmenit_stav": "Změnit stav",
-    "zrusit": "Zrušit"
+    "zmenit_stav": "Change status",
+    "zrusit": "Cancel"
   }
 }
