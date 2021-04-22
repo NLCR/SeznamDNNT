@@ -19,12 +19,12 @@
     </mat-tab>
     <mat-tab [label]="'desc.role' | translate">
       <mat-tab-group class="app-role">
-        <mat-tab label="Prehled roli">
+        <mat-tab [label]="'Prehled roli' | translate">
           <mat-list role="list">
             <mat-list-item role="listitem" *ngFor="let role of config.role">{{ role }}</mat-list-item>
           </mat-list>
         </mat-tab>
-        <mat-tab label="Formular">Nejaky formular</mat-tab>
+        <mat-tab [label]="'Formular' | translate">Nejaky formular</mat-tab>
       </mat-tab-group>
     </mat-tab>
   </mat-tab-group>
