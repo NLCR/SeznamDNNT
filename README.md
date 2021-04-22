@@ -10,4 +10,5 @@ Předpokládaný harmonogram
 | Produkční verze  | srpen | - 
 
 Ukončení aktuálního provozu NDK Covid Krameria 31.6.2021
+
 Publikování SDNNT dle smlouvy 1.8.2021
