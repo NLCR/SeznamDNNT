@@ -1,0 +1,26 @@
+// --- ADMIN ---
+
+app-admin {
+  .mat-list {
+    @extend .app-clean-pd;
+    border: 1px solid $app-brand-border-color;
+
+    .mat-list-item {
+      @extend .app-cursor-pointer;
+      height: 36px;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid $app-brand-border-color;
+      }
+
+      &:hover {
+        background-color: $app-gray-0; 
+      }
+
+      &.active {
+        background-color: $app-gray-2;
+        font-weight: bold;
+      }
+    }
+  }
+}

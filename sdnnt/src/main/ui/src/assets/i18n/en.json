@@ -10,7 +10,6 @@
   "register": {
     "button": "Login/register using NDK"
   },
-  "save": "save",
   "home": {
     "news": "News",
     "about": "About", 
@@ -80,6 +79,9 @@
     "kdo": "Who",
     "ze_stavu": "From the state",
     "na_stav": "At the state",
-    "typ": "Type"
+    "typ": "Type",
+    "editace_stranek": "Editing pages",
+    "role": "Role",
+    "ulozit": "Save"
   }
 }

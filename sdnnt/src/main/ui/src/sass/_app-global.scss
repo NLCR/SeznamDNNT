@@ -220,3 +220,13 @@ a {
 .mat-table {
   @extend .app-full-width;
 }
+
+// tabs
+.mat-tab-group {
+  .mat-tab-body-wrapper {
+
+    .mat-tab-body {
+      padding: $app-gap-double;
+    } 
+  }
+}

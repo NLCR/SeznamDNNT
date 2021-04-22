@@ -10,7 +10,6 @@
   "register": {
     "button": "Přihlásit/registrovat se přes NDK"
   },
-  "save": "ulozit",
   "home": {
     "news": "Aktuality",
     "about": "O DNNT", 
@@ -80,6 +79,9 @@
     "kdo": "Kdo",
     "ze_stavu": "Ze stavu",
     "na_stav": "Na stav",
-    "typ": "Typ"
+    "typ": "Typ",
+    "editace_stranek": "Editace stránek",
+    "role": "Role",
+    "ulozit": "Uložit"
   }
 }
