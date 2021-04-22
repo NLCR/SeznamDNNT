@@ -116,11 +116,12 @@ a {
   display: inline-flex;
   padding: 0 8px;
   border-radius: $app-border-radius;
-  border: 1px solid $app-primary-color;
-  color: $app-primary-color;
+  border: 1px solid;
   height: $app-badge-height;
   align-items: center;
   border-radius: $app-badge-height;
+
+  @include setStateColor();
 
   .mat-icon {
     margin-right: 0;

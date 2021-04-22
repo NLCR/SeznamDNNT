@@ -19,6 +19,20 @@ $app-gray-7: mat-color($mat-gray, 700) !default;
 $app-gray-8: mat-color($mat-gray, 800) !default;
 $app-gray-9: mat-color($mat-gray, 900) !default;
 
+// state colors
+$state_shade: 600 !default;
+$states: (
+  "undefined": mat-color($mat-pink, $state_shade),
+  "PA": mat-color($mat-purple, $state_shade),
+  "A": mat-color($mat-indigo, $state_shade),
+  "VS": mat-color($mat-cyan, $state_shade),
+  "VN": mat-color($mat-teal, $state_shade),
+  "N": mat-color($mat-green, $state_shade),
+  "NZN": mat-color($mat-blue-gray, $state_shade),
+  "VVN": mat-color($mat-orange, $state_shade),
+  "VVS": mat-color($mat-brown, $state_shade)
+);
+
 // layout
 $app-gap: 16px !default;
 $app-gap-half: calc(#{$app-gap} / 2) !default;

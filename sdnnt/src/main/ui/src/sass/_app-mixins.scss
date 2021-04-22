@@ -28,14 +28,26 @@
   }
 }
 
-
-
-
 // set link color
 @mixin setLinkColor($color, $opacity: .7) {
   color: $color;
 
   &:hover {
     color: rgba($color, $opacity);
+  }
+}
+
+// set state color
+@mixin setStateColor() {
+  @each $state, $color in $states {
+    @if($state) {
+      &.#{$state} {
+        color: $color;
+        border-color: $color;
+      }
+    } @else {
+      color: $app-primary-color;
+      border-color: $color;
+    }
   }
 }
