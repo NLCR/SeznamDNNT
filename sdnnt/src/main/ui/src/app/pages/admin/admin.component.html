@@ -1,5 +1,5 @@
 <div class="app-container">
-  <mat-tab-group mat-align-tabs="center">
+  <mat-tab-group>
     <mat-tab [label]="'desc.editace_stranek' | translate">
       <div fxLayout="row" fxLayoutGap="32px">
         <div fxFlex="350px">
@@ -18,7 +18,7 @@
       </div>
     </mat-tab>
     <mat-tab [label]="'desc.role' | translate">
-      <mat-tab-group>
+      <mat-tab-group class="app-role">
         <mat-tab label="Prehled roli">
           <mat-list role="list">
             <mat-list-item role="listitem" *ngFor="let role of config.role">{{ role }}</mat-list-item>

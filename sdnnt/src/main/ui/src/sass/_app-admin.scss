@@ -23,4 +23,26 @@ app-admin {
       }
     }
   }
+
+  .mat-tab-group {
+    &.app-role {
+      .mat-tab-header {
+        @extend .app-clean-border;
+
+        .mat-tab-label {
+          &.mat-tab-label-active {
+            background-color: $app-gray-2;
+          }
+        }
+
+        .mat-ink-bar {
+          @extend .app-dn;
+        }
+      }
+
+      .mat-tab-body {
+        padding: $app-gap-double 0;
+      }
+    }
+  }
 }
