@@ -40,13 +40,11 @@
 // set state color
 @mixin setStateColor() {
   @each $state, $color in $states {
-    @if($state) {
-      &.#{$state} {
-        color: $color;
-        border-color: $color;
-      }
-    } @else {
-      color: $app-primary-color;
+    color: $app-gray-6;
+    border-color: $app-gray-6;
+
+    &.#{$state} {
+      color: $color;
       border-color: $color;
     }
   }
