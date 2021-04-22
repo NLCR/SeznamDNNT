@@ -87,7 +87,7 @@ public class UserServlet extends HttpServlet {
       }
     },
     LOGOUT {
-      @Override
+      @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject ret = new JSONObject();
         req.getSession().invalidate();

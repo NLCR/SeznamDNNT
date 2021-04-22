@@ -64,7 +64,7 @@ export class ResultItemComponent implements OnInit {
     // });
   }
 
-  showStates() {
+  public showStates() {
     const dialogRef = this.dialog.open(StatesDialogComponent, {
       width: '1150px',
       data: this.doc,
@@ -89,13 +89,11 @@ export class ResultItemComponent implements OnInit {
           }
         }
 
-
         this.doc.raw.dataFields['990'] = [dataField];
         this.service.saveRecord(this.doc.identifier, this.doc.raw).subscribe(res => {
           console.log(res);
         });
       }
-      console.log(this.doc)
        
      });
   }

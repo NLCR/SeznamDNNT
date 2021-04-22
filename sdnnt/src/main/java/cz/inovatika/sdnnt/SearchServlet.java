@@ -163,6 +163,20 @@ public class SearchServlet extends HttpServlet {
 
         return ret; 
       }
+    },
+    XSERVER {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        try {
+          ret = XServer.find(req.getParameter("sysno"));
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
     };
 
     abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;

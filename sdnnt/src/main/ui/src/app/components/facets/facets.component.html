@@ -6,7 +6,7 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div *ngFor="let f of facet_fields[facet]">
-      {{ 'field.' + f.name | translate }} <span class="app-count">({{ f.value }})</span>
+      <a (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>&#160;<span class="app-count">({{ f.value }})</span>
     </div>
   </mat-expansion-panel>
 </mat-accordion>

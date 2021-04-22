@@ -1,4 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
@@ -13,7 +14,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 export class StatesDialogComponent implements OnInit {
 
   newState;
-  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public dntStates: string[] = ['undefined', 'PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
 
   constructor(
@@ -24,8 +25,8 @@ export class StatesDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
+    this.newState = this.data.marc_990a ? this.data.marc_990a : 'undefined';
     this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
-    this.newState = this.data.marc_990a;
   }
 
 }

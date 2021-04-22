@@ -55,7 +55,7 @@
     
     
    <field name="identifier" type="string" indexed="true" stored="true"  />
-   <field name="changes" type="text_big" indexed="true" stored="true"  />
+   <field name="changes" type="text_big" indexed="false" stored="true"  />
    <field name="type" type="string" indexed="true" stored="true"  />
    <field name="user" type="string" indexed="false" stored="true"  />
   
