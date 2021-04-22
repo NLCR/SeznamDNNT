@@ -6,9 +6,8 @@ Předpokládaný harmonogram
 | ------------- | ------------- | ------------- |
 | Analýza funkčních a technických požadavků, datového podkladu a upřesnění harmonogramu realizace  | duben  | zpracováváno
 | POC - sběr podnětů, zobrazování dat  | duben | probíhá
-| UI - základní uživatelské rozhraní
-Synchronizace datových a metadatových zdrojů
- | přelom duben/květen | probíhá
-| Produkční verze  | srpen |
+| UI - základní uživatelské rozhraní / Synchronizace datových a metadatových zdrojů  | přelom duben/květen | probíhá
+| Produkční verze  | srpen | - 
 
 Ukončení aktuálního provozu NDK Covid Krameria 31.6.2021
+Akceptace dle smlouvy 8.2021
