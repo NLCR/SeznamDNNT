@@ -98,6 +98,11 @@ a {
   margin-left: $app-gap-icon;
 }
 
+// utility
+.app-mb-n16 {
+  margin-bottom: -#{$app-gap};
+}
+
 .app-full-width {
   width: 100% !important;
 }
