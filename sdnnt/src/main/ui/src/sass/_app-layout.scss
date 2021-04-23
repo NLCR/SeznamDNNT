@@ -38,6 +38,7 @@ main {
   .app-page-wrapper {
     padding: $app-gap-double $app-gap;
 
+    @import "app-facets";
     @import "app-home";
     @import "app-search";
     @import "app-admin";

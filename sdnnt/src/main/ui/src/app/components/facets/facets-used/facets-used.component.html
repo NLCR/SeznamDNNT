@@ -1,0 +1,16 @@
+<mat-list>
+  <h3 matSubheader fxLayout="row">
+    <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
+    <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
+  </h3>
+  <div class="app-list-content-wrapper">
+    <mat-list-item>
+      <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above"><mat-icon>clear</mat-icon></a>
+      <div><span>Typ dokumentu:</span> Monografie</div>
+    </mat-list-item>
+    <mat-list-item>
+      <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above"><mat-icon>clear</mat-icon></a>
+      <div><span>Stav dokumentu:</span> Extra dlouhy text aby se vedelo</div>
+    </mat-list-item>
+  </div>
+</mat-list>

@@ -82,6 +82,9 @@
     "typ": "Type",
     "editace_stranek": "Editing pages",
     "role": "Role",
-    "ulozit": "Save"
+    "ulozit": "Save",
+    "pouzite_filtry": "Used filters",
+    "odstranit_tento_filtr": "Remove this filter",
+    "odstranit_vsechny_filtry": "Odstranit všechny filtry"
   }
 }

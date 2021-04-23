@@ -82,6 +82,9 @@
     "typ": "Typ",
     "editace_stranek": "Editace stránek",
     "role": "Role",
-    "ulozit": "Uložit"
+    "ulozit": "Uložit",
+    "pouzite_filtry": "Použité filtry",
+    "odstranit_tento_filtr": "Odstranit tento filtr",
+    "odstranit_vsechny_filtry": "Odstranit všechny filtry"
   }
 }

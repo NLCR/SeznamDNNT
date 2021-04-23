@@ -11,7 +11,6 @@ export class FacetsComponent implements OnInit {
   @Input() facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
   facets: string[];
 
-
   constructor(
     private router: Router
   ) { }
