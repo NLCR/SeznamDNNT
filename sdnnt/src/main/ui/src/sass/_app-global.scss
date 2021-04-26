@@ -129,8 +129,7 @@ a {
   @include setStateColor();
 
   .mat-icon {
-    margin-right: 0;
-    margin-left: $app-gap-icon;
+    margin-right: $app-gap-icon;
   }
 }
 
