@@ -2,4 +2,14 @@
 
 app-facets {
   @import "app-facets-used";
+
+  .mat-accordion {
+    .mat-expansion-panel {
+      .mat-expansion-panel-body {
+        a {
+          color: $app-gray-6;
+        }
+      }
+    }
+  }
 }
