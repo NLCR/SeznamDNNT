@@ -1,9 +1,4 @@
 {
-  "Home": "Domu",
-  "Help": "Nápověda",
-  "Account": "Moje konto",
-  "Admin": "Administrace",
-  "NKP": "Národní knihovna České republiky",
   "q" : {
     "placeholder": "Zadejte dotaz ..."
   },
@@ -85,6 +80,11 @@
     "ulozit": "Uložit",
     "pouzite_filtry": "Použité filtry",
     "odstranit_tento_filtr": "Odstranit tento filtr",
-    "odstranit_vsechny_filtry": "Odstranit všechny filtry"
+    "odstranit_vsechny_filtry": "Odstranit všechny filtry",
+    "domu": "Domů",
+    "napoveda": "Nápověda",
+    "moje_konto": "Moje konto",
+    "administrace": "Administrace",
+    "nkp": "Národní knihovna České republiky"
   }
 }
