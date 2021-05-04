@@ -5,7 +5,7 @@ app-navbar {
     box-shadow: 0 8px 8px 0 rgb(0 0 0 / 4%);
     border-bottom: 1px solid $app-brand-border-color;
     height: $app-navbar-height;
-    background-color: transparent;
+    background-color: $app-color-lightnes;
   }
 
   .app-left {

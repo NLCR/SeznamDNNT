@@ -1,5 +1,5 @@
 <div class="app-container">
-  <mat-tab-group mat-align-tabs="center" (selectedTabChange)="selectTab($event)">
+  <mat-tab-group (selectedTabChange)="selectTab($event)"><!--mat-align-tabs="center"-->
     <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
       <div [innerHTML]="tabContent"></div>
     </mat-tab>

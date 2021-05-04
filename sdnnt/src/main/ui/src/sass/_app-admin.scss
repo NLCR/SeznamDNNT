@@ -39,10 +39,10 @@ app-admin {
           @extend .app-dn;
         }
       }
+    }
 
-      .mat-tab-body {
-        padding: $app-gap-double 0;
-      }
+    .mat-tab-body {
+      padding: $app-gap-double 0;
     }
   }
 }

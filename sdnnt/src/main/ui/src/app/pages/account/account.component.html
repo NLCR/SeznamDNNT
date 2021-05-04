@@ -1,19 +1,21 @@
 <div class="app-container">
-  <div fxLayout="row" >
-    <app-searchbar></app-searchbar>
-  </div>
-  <div fxLayout="row" >
-    <div fxFlex class="app-fx-left">{{ 'numFound' | translate }}: {{ numFound }}</div>
-    <div fxFlex class="app-fx-right"><app-paginator [numFound]="numFound"></app-paginator></div>
-  </div>
-  <div fxLayout="row" >
-    <div fxFlex class="app-fx-left">
-      <ng-container *ngIf="facets">
-        <app-facets [facet_fields]="facets"></app-facets>
-      </ng-container>
+  <div fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex="350px" class="app-left">
+      <app-facets *ngIf="facets" [facet_fields]="facets"></app-facets>
     </div>
-    <div fxFlex >
-      <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+    <div fxFlex class="app-right">
+      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+        <div fxFlex>
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+        </div>
+        <div>
+          <app-paginator [numFound]="numFound"></app-paginator>
+        </div>
+      </div>
+      <div class="app-results-wrapper">
+        <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+      </div>
+      <app-paginator [numFound]="numFound"></app-paginator>
     </div>
   </div>
 </div>

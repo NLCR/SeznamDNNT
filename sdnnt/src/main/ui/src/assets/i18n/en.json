@@ -1,9 +1,4 @@
 {
-  "Home": "Home",
-  "Help": "Help",
-  "Account": "Account",
-  "Admin": "Administration",
-  "NKP": "National Library of the Czech Republic",
   "q" : {
     "placeholder": "Set query ..."
   },
@@ -83,6 +78,13 @@
     "editace_stranek": "Editing pages",
     "role": "Role",
     "ulozit": "Save",
-    "usedFilters": "Used filters"
+    "pouzite_filtry": "Used filters",
+    "odstranit_tento_filtr": "Remove this filter",
+    "odstranit_vsechny_filtry": "Odstranit všechny filtry",
+    "domu": "Home",
+    "napoveda": "Help",
+    "moje_konto": "My account",
+    "administrace": "Administration",
+    "nkp": "Národní knihovna České republiky"
   }
 }

@@ -98,6 +98,11 @@ a {
   margin-left: $app-gap-icon;
 }
 
+// utility
+.app-mb-n16 {
+  margin-bottom: -#{$app-gap};
+}
+
 .app-full-width {
   width: 100% !important;
 }
@@ -124,8 +129,7 @@ a {
   @include setStateColor();
 
   .mat-icon {
-    margin-right: 0;
-    margin-left: $app-gap-icon;
+    margin-right: $app-gap-icon;
   }
 }
 
@@ -228,14 +232,4 @@ a {
 // table
 .mat-table {
   @extend .app-full-width;
-}
-
-// tabs
-.mat-tab-group {
-  .mat-tab-body-wrapper {
-
-    .mat-tab-body {
-      padding: $app-gap-double;
-    } 
-  }
 }

@@ -4,7 +4,7 @@ Devel
 Předpokládaný harmonogram
 | etapa  | termín | stav
 | ------------- | ------------- | ------------- |
-| Analýza funkčních a technických požadavků, datového podkladu a upřesnění harmonogramu realizace  | duben  | zpracováváno
+| Analýza funkčních a technických požadavků, datového podkladu a upřesnění harmonogramu realizace  | duben/kveten  | zpracováváno
 | POC - sběr podnětů, zobrazování dat  | duben | probíhá
 | UI - základní uživatelské rozhraní / Synchronizace datových a metadatových zdrojů  | přelom duben/květen | probíhá
 | Produkční verze  | srpen | - 
