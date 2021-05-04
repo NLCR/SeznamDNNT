@@ -12,7 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject; 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONObject;
 
 /**
  *
@@ -74,8 +79,16 @@ public class IndexerServlet extends HttpServlet {
         JSONObject json = new JSONObject();
         try {
           OAIHarvester oai = new OAIHarvester();
-          json.put("indexed", oai.full(req.getParameter("set"), req.getParameter("core")));
-
+          String set = "SKC";
+          String core = "catalog";
+          if (req.getParameter("set") != null) {
+            set = req.getParameter("set");
+          }
+          if (req.getParameter("core") != null) {
+            core = req.getParameter("core");
+          }
+          json.put("indexed", oai.full(set, core, Boolean.parseBoolean(req.getParameter("merge"))));
+          
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
@@ -89,7 +102,15 @@ public class IndexerServlet extends HttpServlet {
         JSONObject json = new JSONObject();
         try {
           OAIHarvester oai = new OAIHarvester();
-          json.put("indexed", oai.update(req.getParameter("set"), req.getParameter("core")));
+          String set = "SKC";
+          String core = "catalog";
+          if (req.getParameter("set") != null) {
+            set = req.getParameter("set");
+          }
+          if (req.getParameter("core") != null) {
+            core = req.getParameter("core");
+          }
+          json.put("indexed", oai.update(set, core, Boolean.parseBoolean(req.getParameter("merge"))));
 
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
@@ -110,6 +131,31 @@ public class IndexerServlet extends HttpServlet {
           json.put("error", ex.toString());
         }
         return json;
+      }
+    },
+    FINDID {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host", "http://localhost:8983/solr/")).build()) {
+
+          SolrQuery q = new SolrQuery("*").setRows(1)
+                  .addFilterQuery("identifier:\"" + req.getParameter("id") + "\"")
+                  .setFields("raw");
+
+          SolrDocumentList docs = solr.query("sdnnt", q).getResults();
+          if (docs.getNumFound() == 0) {
+            ret.put("error", "Record not found in sndt");
+            return ret;
+          }
+          SolrDocument docDnt = docs.get(0);
+          String jsDnt = (String) docDnt.getFirstValue("raw");
+          ret.append("docs", Indexer.find(jsDnt));
+        } catch (Exception ex) { 
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex.toString());
+        }
+        return ret;
       }
     },
     MERGEID {
@@ -146,7 +192,7 @@ public class IndexerServlet extends HttpServlet {
         JSONObject json = new JSONObject();
         try {
           Indexer indexer = new Indexer();
-          json = indexer.mergeCore("sdnnt", "testUser",req.getParameter("from"));
+          json = indexer.mergeCore("sdnnt", "testUser", req.getParameter("from"));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
@@ -159,11 +205,11 @@ public class IndexerServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         JSONObject user = (JSONObject) req.getSession().getAttribute("user");
-          if (user == null) {
-            json.put("error", "Not logged");
-            user = new JSONObject().put("name", "testUser");
-            // return json;
-          }
+        if (user == null) {
+          json.put("error", "Not logged");
+          user = new JSONObject().put("name", "testUser");
+          // return json;
+        }
         try {
           Indexer indexer = new Indexer();
           JSONObject inputJs;

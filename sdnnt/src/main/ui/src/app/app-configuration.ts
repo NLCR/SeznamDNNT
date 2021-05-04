@@ -38,6 +38,10 @@ import { AppState } from './app.state';
     public get role() {
         return this.config.role;
     }
+    
+    public get filterFields() {
+        return this.config.filterFields;
+    }
 
     /**
      * List the files holding section configuration in assets/configs folder

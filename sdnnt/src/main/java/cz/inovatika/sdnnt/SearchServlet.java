@@ -87,6 +87,13 @@ public class SearchServlet extends HttpServlet {
                   .setFacet(true).addFacetField("item_type","marc_990a")
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
+          for (Object o : opts.getClientConf().getJSONArray("filterFields")){
+            String field = (String)o;
+            if (req.getParameter(field) != null) {
+              query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
+            }
+          }
+          
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");

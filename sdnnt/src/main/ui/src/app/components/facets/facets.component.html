@@ -1,4 +1,14 @@
 <mat-accordion multi>
+  <mat-expansion-panel [expanded]="true">
+    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+      <mat-panel-title>
+        {{ 'desc.usedFilters' | translate }}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div *ngFor="let f of state.usedFilters">
+      <a (click)="removeFilter(f)">{{ 'field.' + f.field | translate }}: {{ f.value }}</a>
+    </div>
+  </mat-expansion-panel>
   <mat-expansion-panel *ngFor="let facet of facets" [expanded]="true">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>

@@ -32,6 +32,7 @@ import { StatesDialogComponent } from './components/states-dialog/states-dialog.
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { DataDialogComponent } from './components/data-dialog/data-dialog.component';
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
+import { UsedFiltersComponent } from './components/used-filters/used-filters.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -66,7 +67,8 @@ const providers: any[] =[
     StatesDialogComponent,
     LoginDialogComponent,
     DataDialogComponent,
-    SidenavListComponent
+    SidenavListComponent,
+    UsedFiltersComponent
   ],
   imports: [
     BrowserModule,

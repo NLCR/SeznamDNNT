@@ -30,6 +30,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 
 /**
@@ -41,14 +42,20 @@ public class OAIHarvester {
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
   JSONObject ret = new JSONObject();
   String collection = "catalog";
+  boolean merge;
   List<SolrInputDocument> recs = new ArrayList();
   List<String> toDelete = new ArrayList();
   int indexed = 0;
   int deleted = 0;
   int batchSize = 1000;
 
-  public JSONObject full(String set, String core) {
+  long reqTime = 0;
+  long procTime = 0;
+  long solrTime = 0;
+
+  public JSONObject full(String set, String core, boolean merge) {
     collection = core;
+    this.merge = merge;
     long start = new Date().getTime();
     Options opts = Options.getInstance();
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
@@ -73,7 +80,10 @@ public class OAIHarvester {
       TimeZone tz = TimeZone.getTimeZone("UTC");
       DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
       df.setTimeZone(tz);
-      last = df.format((Date) solr.query(collection, q).getResults().get(0).getFirstValue("datestamp"));
+      SolrDocumentList docs = solr.query(collection, q).getResults();
+      if (docs.getNumFound() > 0) {
+        last = df.format((Date) docs.get(0).getFirstValue("datestamp"));
+      }
       solr.close();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -82,11 +92,15 @@ public class OAIHarvester {
     return last;
   }
 
-  public JSONObject update(String set, String core) {
+  public JSONObject update(String set, String core, boolean merge) {
     collection = core;
+    this.merge = merge;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
     String from = lastIndexDate(set);// "2021-03-14T00:00:00Z";
+    if (from == null) {
+      return full(set, core, merge);
+    }
     TimeZone tz = TimeZone.getTimeZone("UTC");
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
     df.setTimeZone(tz);
@@ -104,8 +118,9 @@ public class OAIHarvester {
     return ret;
   }
 
-  public JSONObject updateFrom(String set, String core, String from) {
+  public JSONObject updateFrom(String set, String core, String from, boolean merge) {
     collection = core;
+    this.merge = merge;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
     TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -122,25 +137,35 @@ public class OAIHarvester {
     ret.put("deleted", deleted);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
     ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}", new Object[]{ellapsed, indexed});
+    LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}. reqTime: {2}. procTime: {3}. solrTime: {4}", new Object[]{
+                    indexed,
+                    ellapsed,
+                    DurationFormatUtils.formatDurationHMS(reqTime),
+                    DurationFormatUtils.formatDurationHMS(procTime), 
+                    DurationFormatUtils.formatDurationHMS(solrTime)});
     return ret;
   }
 
-  private void getRecords(String url) {
+  private void getRecords(String url) { 
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
     Options opts = Options.getInstance();
     String resumptionToken = null;
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host")).build()) {
       try {
+        long start = new Date().getTime();
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet(url);
         try (CloseableHttpResponse response1 = client.execute(httpGet)) {
           final HttpEntity entity = response1.getEntity();
           if (entity != null) {
             try (InputStream is = entity.getContent()) {
+              reqTime += new Date().getTime() - start;
+              start = new Date().getTime();
               resumptionToken = readFromXML(is);
+              procTime += new Date().getTime() - start;
+              start = new Date().getTime();
               if (!recs.isEmpty()) {
-                solr.add(collection, recs);
+                Indexer.add(collection, recs, merge, "harvester");
                 indexed += recs.size();
                 recs.clear();
               }
@@ -149,23 +174,36 @@ public class OAIHarvester {
                 deleted += toDelete.size();
                 toDelete.clear();
               }
+              solrTime += new Date().getTime() - start;
               is.close();
             }
           }
         }
 
         while (resumptionToken != null) {
+          start = new Date().getTime();
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
+          LOGGER.log(Level.INFO, "Getting {0}...", resumptionToken);
+          ret.put("resumptionToken", resumptionToken);
           httpGet = new HttpGet(url);
           try (CloseableHttpResponse response1 = client.execute(httpGet)) {
             final HttpEntity entity = response1.getEntity();
             if (entity != null) {
               try (InputStream is = entity.getContent()) {
+                reqTime += new Date().getTime() - start;
+                start = new Date().getTime();
                 resumptionToken = readFromXML(is);
+                procTime += new Date().getTime() - start;
+                start = new Date().getTime();
                 if (recs.size() > batchSize) {
-                  solr.add(collection, recs);
+                  Indexer.add(collection, recs, merge, "harvester");
                   indexed += recs.size();
-                  LOGGER.log(Level.INFO, "Current indexed: {0}", indexed);
+                  solrTime += new Date().getTime() - start;
+                  LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                    indexed,
+                    DurationFormatUtils.formatDurationHMS(reqTime),
+                    DurationFormatUtils.formatDurationHMS(procTime),
+                    DurationFormatUtils.formatDurationHMS(solrTime)});
                   recs.clear();
                 }
                 is.close();
@@ -174,9 +212,9 @@ public class OAIHarvester {
           }
 
         }
-
+        start = new Date().getTime();
         if (!recs.isEmpty()) {
-          solr.add(collection, recs);
+          Indexer.add(collection, recs, merge, "harvester");
           indexed += recs.size();
           recs.clear();
         }
@@ -186,6 +224,7 @@ public class OAIHarvester {
           deleted += toDelete.size();
           toDelete.clear();
         }
+        solrTime += new Date().getTime() - start;
       } catch (XMLStreamException | IOException exc) {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
@@ -198,7 +237,7 @@ public class OAIHarvester {
     }
   }
 
-  public String readFromXML(InputStream is) throws XMLStreamException {
+  private String readFromXML(InputStream is) throws XMLStreamException {
 
     XMLInputFactory inputFactory = XMLInputFactory.newInstance();
     XMLStreamReader reader = null;

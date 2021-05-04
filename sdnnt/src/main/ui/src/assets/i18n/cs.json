@@ -29,6 +29,7 @@
     "VS": "vyřazeno - dílo bylo na seznamu (A)",
     "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
     "N": "nezařazeno",
+    "NZ": "Licence pro terminál na místě samém",
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
     "VVS": "výzva k vyřazení",
@@ -40,6 +41,7 @@
       "VS": "vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "VN": "vyřazeno – dílo bylo na Návrhu seznamu (PA), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "N": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "NZ": "Licence pro terminál na místě samém",
       "NZN": "návrh k zařazení do Návrhu seznamu (interní stav administrace)",
       "VVN": "výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
       "VVS": "výzva k vyřazení ze Seznamu (interní stav administrace)"
@@ -56,7 +58,18 @@
     "a": "Taky se musi",
 
     "item_type": "Typ dokumentu",
-    "marc_990a": "Stav dokumentu"
+    "marc_990a": "Stav dokumentu",
+
+    "undefined": "nezařazeno",
+    "PA": "PA: dílo publikováno jako návrh",
+    "A": "A: zařazeno",
+    "VS": "VS: vyřazeno - dílo bylo na seznamu (A)",
+    "VN": "VN: vyřazeno – dílo bylo na návrhu seznamu (PA)",
+    "N": "N: nezařazeno",
+    "NZ": "NZ: Licence pro terminál na místě samém",
+    "NZN": "NZN: návrh k zařazení",
+    "VVN": "VVN: výzva k vyřazení",
+    "VVS": "VVS: výzva k vyřazení"
   },
 
   "desc": {
@@ -82,6 +95,7 @@
     "typ": "Typ",
     "editace_stranek": "Editace stránek",
     "role": "Role",
-    "ulozit": "Uložit"
+    "ulozit": "Uložit",
+    "usedFilters": "Použité filtry"
   }
 }

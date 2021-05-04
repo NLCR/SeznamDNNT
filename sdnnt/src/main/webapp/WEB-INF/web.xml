@@ -20,6 +20,10 @@
     <servlet-mapping>
         <servlet-name>StaticServlet</servlet-name>
         <url-pattern>/home</url-pattern>
+        <url-pattern>/help</url-pattern>
+        <url-pattern>/account</url-pattern>
+        <url-pattern>/admin</url-pattern>
+        <url-pattern>/search</url-pattern>
         <url-pattern>/admin/*</url-pattern>
     </servlet-mapping>
     <servlet>

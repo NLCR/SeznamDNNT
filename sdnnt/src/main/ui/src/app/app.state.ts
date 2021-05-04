@@ -2,6 +2,7 @@ import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Params, ParamMap } from '@angular/router';
 import { Configuration, Sort } from './shared/configuration';
 import { User } from './shared/user';
+import { Filter } from './shared/filter';
 
 export class AppState {
 
@@ -33,6 +34,8 @@ export class AppState {
   public logged = false;
   // public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
+  public usedFilters: Filter[] = [];
+
   setConfig(cfg: Configuration) {
     this.config = cfg;
     this.currentLang = cfg.lang;
@@ -40,14 +43,18 @@ export class AppState {
   }
 
   processParams(searchParams: ParamMap) {
+    this.usedFilters = [];
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       if (p === 'q') {
         this.q = param;
       } else {
-        //this.addFilter(p, param, null, false);
+        if (this.config.filterFields.includes(p)) {
+          this.usedFilters.push({field: p, value: param});
+        }
       }
     });
+    console.log(this.usedFilters);
     this._paramsProcessed.next();
   }
 

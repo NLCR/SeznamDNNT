@@ -5,5 +5,7 @@
 /solr/filestore/
 /solr/userfiles/
 /sdnnt/target/
-sdnnt/nb-configuration.xml
+/sdnnt/nb-configuration.xml
 sdnnt/src/main/webapp/index.html
+sdnnt/src/main/.DS_Store
+

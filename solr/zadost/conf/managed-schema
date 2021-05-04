@@ -45,37 +45,26 @@
     that avoids logging every request
 -->
 
-<schema name="catalog" version="1.6">
+<schema name="zadost" version="1.6">
   
-    <field name="identifier" type="string" indexed="true" stored="true" docValues="true" />
+    <field name="id" type="string" indexed="true" stored="true" docValues="true" />
     <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
-    <field name="dedup_fields" type="string" indexed="true" stored="true" multiValued="false" />
     
-   <field name="datestamp" type="date" indexed="true" stored="true"  />
-   <field name="setSpec" type="string" indexed="true" stored="true"  />
-   <field name="leader" type="string" indexed="true" stored="true"  />
-   <field name="item_type" type="string" indexed="true" stored="true"  />
+    <field name="identifier" type="string" indexed="true" stored="true" multiValued="true"  />
+    <field name="typ" type="string" indexed="true" stored="true"  />
+    <field name="user" type="string" indexed="true" stored="true"  />
    
-   <field name="raw" type="text_big" indexed="false" stored="true"  />
-   
-   
-   <field name="title" type="lowercase" indexed="true" stored="true" multiValued="true"  />
-   <field name="author" type="lowercase" indexed="true" stored="true" multiValued="true"  />
-   <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
-   <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
-   <field name="datumvydani" type="lowercase" indexed="true" stored="true"  />
-   
-   <field name="stav" type="string" indexed="true" stored="true"  />
-   <field name="historie_stavu" type="string" indexed="true" stored="true"  />
-   
-   <dynamicField name="controlfield_*" type="string" indexed="true" stored="true" multiValued="true" />
-   <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="stav" type="string" indexed="true" stored="true"  />
+    <field name="poznamka" type="string" indexed="false" stored="true"  />
+    <field name="pozadavek" type="string" indexed="false" stored="true"  />
+    <field name="datum_zadani" type="date" indexed="true" stored="true" />
+    <field name="datum_vyrizeni" type="date" indexed="true" stored="true" />
+    <field name="formular" type="text_big" indexed="false" stored="true"  />
   
-   <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -89,12 +78,8 @@
     <!-- Field to use to determine and enforce document uniqueness.
       Unless this field is marked with required="false", it will be a required field
     -->
-    <uniqueKey>identifier</uniqueKey>
+    <uniqueKey>id</uniqueKey>
     
-    <copyField source="marc_245a" dest="title"/>
-    <copyField source="marc_100a" dest="author"/>
-    <copyField source="marc_260b" dest="nakladatel"/>
-    <copyField source="marc_*" dest="fullText"/>
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
@@ -488,29 +473,6 @@
       </analyzer>
     </fieldType>
     
-    <!-- Czech -->
-    <dynamicField name="*_txt_cz" type="text_cs"  indexed="true"  stored="true"/>
-    <dynamicField name="*_cze" type="text_cs"  indexed="true"  stored="true"/>
-    <fieldType name="text_cs" class="solr.TextField" positionIncrementGap="100">
-      <analyzer type="index">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"  />
-        <!-- in this example, we will only use synonyms at query time
-        <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
-        -->
-        <filter class="solr.HunspellStemFilterFactory" dictionary="hunspell/cs_CZ.dic" affix="hunspell/cs_CZ.aff" ignoreCase="true" />
-        <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-      <analyzer type="query">
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"  />
-        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
-        <filter class="solr.HunspellStemFilterFactory" dictionary="hunspell/cs_CZ.dic" affix="hunspell/cs_CZ.aff" ignoreCase="true" />
-        <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-      </analyzer>
-    </fieldType>
 
     <!-- Similarity is the scoring routine for each document vs. a query.
        A custom Similarity or SimilarityFactory may be specified here, but 

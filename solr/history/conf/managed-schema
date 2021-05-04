@@ -57,16 +57,8 @@
    <field name="identifier" type="string" indexed="true" stored="true"  />
    <field name="changes" type="text_big" indexed="false" stored="true"  />
    <field name="type" type="string" indexed="true" stored="true"  />
-   <field name="user" type="string" indexed="false" stored="true"  />
+   <field name="user" type="string" indexed="true" stored="true"  />
   
-
-    <!-- uncomment the following to ignore any fields that don't already match an existing 
-        field name or dynamic field, rather than reporting them as an error. 
-        alternately, change the type="ignored" to some other type e.g. "text" if you want 
-        unknown fields indexed and/or stored by default 
-        
-        NB: use of "*" dynamic fields will disable field type guessing and adding
-        unknown fields to the schema. --> 
     <!--dynamicField name="*" type="ignored" multiValued="true" /-->
 
     <!-- Field to use to determine and enforce document uniqueness.

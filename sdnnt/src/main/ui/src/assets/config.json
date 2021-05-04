@@ -8,5 +8,6 @@
     "admin": ["undefined", "PA", "A", "VS", "VN", "N", "NZN", "VVN", "VVS"],
     "user": ["undefined","PA", "N"]
   },
-  "identifiers": ["015a", "020a", "022a"]
+  "identifiers": ["015a", "020a", "022a"],
+  "filterFields": ["marc_990a", "item_type"]
 }

@@ -16,4 +16,7 @@ export interface Configuration {
 
   // Seznam poli identifikatoru
   identifiers: string[];
+
+  // Seznam poli, ktere se zpracuju v url jako filter
+  filterFields: string[];
 }

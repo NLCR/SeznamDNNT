@@ -82,6 +82,7 @@
     "typ": "Type",
     "editace_stranek": "Editing pages",
     "role": "Role",
-    "ulozit": "Save"
+    "ulozit": "Save",
+    "usedFilters": "Used filters"
   }
 }
