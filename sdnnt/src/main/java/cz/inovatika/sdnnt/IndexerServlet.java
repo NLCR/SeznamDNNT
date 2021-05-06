@@ -1,9 +1,12 @@
 package cz.inovatika.sdnnt;
 
-import cz.inovatika.sdnnt.indexer.Indexer;
-import cz.inovatika.sdnnt.indexer.OAIHarvester;
+import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.index.OAIHarvester;
+import cz.inovatika.sdnnt.index.XMLImporter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -119,6 +122,21 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    IMPORTXML {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          XMLImporter imp = new XMLImporter();
+          json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     COMPARE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -145,12 +163,30 @@ public class IndexerServlet extends HttpServlet {
 
           SolrDocumentList docs = solr.query("sdnnt", q).getResults();
           if (docs.getNumFound() == 0) {
-            ret.put("error", "Record not found in sndt");
+            ret.put("error", "Record not found in sdnnt");
             return ret;
           }
           SolrDocument docDnt = docs.get(0);
           String jsDnt = (String) docDnt.getFirstValue("raw");
-          ret.append("docs", Indexer.find(jsDnt));
+          SolrDocumentList catDocs = Indexer.find(jsDnt);
+          
+          if (catDocs.getNumFound() == 0) {
+            ret.put("error", "Record not found in catalog");
+            return ret;
+          } else if (catDocs.getNumFound() > 1) {
+            ret.put("error", "Found " + catDocs.getNumFound() + " records in catalog");
+            
+            List<JSONObject> diffs = new ArrayList<>();
+            for (SolrDocument doc : catDocs) {
+              diffs.add(Indexer.compare(jsDnt, (String) doc.getFirstValue("raw")));
+            }
+            for (int i = 0; i < diffs.size()-1; i++) {
+              ret.append("diffs", Indexer.compare(diffs.get(i).toString(), diffs.get(i+1).toString()));
+            }
+            ret.put("records", diffs);
+          } else {
+            ret.append("docs", catDocs);
+          }
         } catch (Exception ex) { 
           LOGGER.log(Level.SEVERE, null, ex);
           ret.put("error", ex.toString());

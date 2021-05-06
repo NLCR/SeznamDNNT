@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.DataField;

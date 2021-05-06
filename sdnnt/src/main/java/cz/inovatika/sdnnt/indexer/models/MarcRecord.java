@@ -7,9 +7,9 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.inovatika.sdnnt.indexer.ISBN;
-import cz.inovatika.sdnnt.indexer.MD5;
-import cz.inovatika.sdnnt.indexer.RomanNumber;
+import cz.inovatika.sdnnt.index.ISBN;
+import cz.inovatika.sdnnt.index.MD5;
+import cz.inovatika.sdnnt.index.RomanNumber;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +52,7 @@ public class MarcRecord {
   public Map<String, List<DataField>> dataFields = new HashMap();
   public SolrInputDocument sdoc = new SolrInputDocument();
 
-  final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "250", "260", "856", "990", "992", "998", "956", "911");
+  final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "246", "250", "260", "264", "856", "990", "992", "998", "956", "911");
 
   
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {
@@ -184,7 +184,10 @@ public class MarcRecord {
         (String) sdoc.getFieldValue("marc_111a"),
         (String) sdoc.getFieldValue("marc_260a"),
         (String) sdoc.getFieldValue("marc_260b"),
-        onlyLeadNumbers((String) sdoc.getFieldValue("marc_260c"))
+        onlyLeadNumbers((String) sdoc.getFieldValue("marc_260c")),
+        (String) sdoc.getFieldValue("marc_264a"),
+        (String) sdoc.getFieldValue("marc_264b"),
+        onlyLeadNumbers((String) sdoc.getFieldValue("marc_264c"))
       });
       return uniqueCode;
     } catch (Exception ex) {

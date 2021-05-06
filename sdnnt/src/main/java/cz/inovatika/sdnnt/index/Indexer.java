@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cz.inovatika.sdnnt.indexer;
+package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,14 +26,11 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
-import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -46,6 +43,8 @@ public class Indexer {
   public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
 
   static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/998", "/dataFields/956", "/dataFields/856");
+  static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec", 
+          "/controlFields/001", "/controlFields/003", "/controlFields/005", "/controlFields/008");
 
   JSONObject ret = new JSONObject();
 
@@ -128,10 +127,10 @@ public class Indexer {
       JsonNode target = mapper.readTree(jsTarget);
 
       JsonNode fwPatch = JsonDiff.asJson(source, target);
-      removeReplaceOpsForIgnoredFields(fwPatch);
+      removeOpsForNotDNTFields(fwPatch);
       if (new JSONArray(fwPatch.toString()).length() > 0) {
         JsonNode bwPatch = JsonDiff.asJson(target, source);
-        removeReplaceOpsForIgnoredFields(bwPatch);
+        removeOpsForNotDNTFields(bwPatch);
 
         historyDoc.setField("identifier", docCat.getFirstValue("identifier"));
         historyDoc.setField("user", user);
@@ -282,7 +281,7 @@ public class Indexer {
 
       JsonNode patch = JsonDiff.asJson(source, target);
       ret.put("diff", new JSONArray(patch.toString()));
-      removeReplaceOpsForIgnoredFields(patch);
+      removeOpsForNotDNTFields(patch);
       ret.put("catalog", new JSONObject(jsCat));
       ret.put("sdnnt", new JSONObject(jsDnt));
       ret.put("patch", new JSONArray(patch.toString()));
@@ -290,6 +289,32 @@ public class Indexer {
       ret.put("catalog_new", new JSONObject(JsonPatch.apply(patch, source).toString()));
       solr.close();
     } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
+  /**
+   * Compares two records
+   *
+   * @param sourceRaw
+   * @param targetRaw
+   * @return
+   */
+  public static JSONObject compare(String sourceRaw, String targetRaw) {
+    JSONObject ret = new JSONObject();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      JsonNode source = mapper.readTree(sourceRaw);
+      JsonNode target = mapper.readTree(targetRaw);
+
+      JsonNode patch = JsonDiff.asJson(source, target);
+      removeOpsForIdenfiersFields(patch);
+      ret.put("diff", new JSONArray(patch.toString()));
+      // ret.put("patch", new JSONArray(patch.toString()));
+
+    } catch (IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
@@ -341,9 +366,9 @@ public class Indexer {
         // As target the sdnnt record
         JsonNode target = mapper.readTree(jsDnt);
         JsonNode fwPatch = JsonDiff.asJson(source, target);
-        removeReplaceOpsForIgnoredFields(fwPatch);
+        removeOpsForNotDNTFields(fwPatch);
         JsonNode bwPatch = JsonDiff.asJson(target, source);
-        removeReplaceOpsForIgnoredFields(bwPatch);
+        removeOpsForNotDNTFields(bwPatch);
 
         ret.put("forward_patch", new JSONArray(fwPatch.toString()));
         ret.put("backward_patch", new JSONArray(bwPatch.toString()));
@@ -497,9 +522,9 @@ public class Indexer {
       JsonNode target = mapper.readTree(jsDnt);
 
       JsonNode fwPatch = JsonDiff.asJson(source, target);
-      removeReplaceOpsForIgnoredFields(fwPatch);
+      removeOpsForNotDNTFields(fwPatch);
       JsonNode bwPatch = JsonDiff.asJson(target, source);
-      removeReplaceOpsForIgnoredFields(bwPatch);
+      removeOpsForNotDNTFields(bwPatch);
 
 //      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
 //      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
@@ -520,7 +545,7 @@ public class Indexer {
     }
   }
 
-  private static void removeReplaceOpsForIgnoredFields(Iterable jsonPatch) {
+  private static void removeOpsForNotDNTFields(Iterable jsonPatch) {
     Iterator<JsonNode> patchIterator = jsonPatch.iterator();
     while (patchIterator.hasNext()) {
       JsonNode patchOperation = patchIterator.next();
@@ -528,6 +553,19 @@ public class Indexer {
       JsonNode pathName = patchOperation.get("path");
       // if (operationType.asText().equals("replace") && ignoredFields.contains(pathName.asText())) {
       if (!dntSetFields.contains(pathName.asText())) {
+        patchIterator.remove();
+      }
+    }
+  }
+
+  private static void removeOpsForIdenfiersFields(Iterable jsonPatch) {
+    Iterator<JsonNode> patchIterator = jsonPatch.iterator();
+    while (patchIterator.hasNext()) {
+      JsonNode patchOperation = patchIterator.next();
+      JsonNode operationType = patchOperation.get("op");
+      JsonNode pathName = patchOperation.get("path");
+      // if (operationType.asText().equals("replace") && ignoredFields.contains(pathName.asText())) {
+      if (identifierFields.contains(pathName.asText())) {
         patchIterator.remove();
       }
     }

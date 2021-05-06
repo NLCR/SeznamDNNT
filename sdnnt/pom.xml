@@ -13,7 +13,7 @@
     <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <skipNg>false</skipNg>
-    <context.name>sdnnt/</context.name>
+    <context.name>sdnnt</context.name>
   </properties>
     
   <dependencies>
@@ -153,7 +153,7 @@
                 </replacement> 
                 <replacement> 
                   <token>base href="/"</token> 
-                  <value>base href="/${context.name}"</value> 
+                  <value>base href="/${context.name}/"</value> 
                 </replacement> 
               </replacements> 
             </configuration> 
