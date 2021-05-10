@@ -85,9 +85,10 @@ public class MarcRecord {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
     if (leader != null) {
-      sdoc.setField("item_type", leader.substring(7, 8));
+      sdoc.setField("item_type", leader.substring(7, 8)); 
     }
     addDedup();
+    addEAN();
     return sdoc;
   }
 
@@ -102,6 +103,15 @@ public class MarcRecord {
       }
     }
     addDedup();
+    addEAN();
+  }
+  
+  private void addEAN() {
+    if (sdoc.containsKey("marc_020a")) {
+      for (Object s: sdoc.getFieldValues("marc_020a")){
+        sdoc.addField("ean", ((String)s).replaceAll("-", "")); 
+      }
+    }
   }
   
   public void addDedup() {

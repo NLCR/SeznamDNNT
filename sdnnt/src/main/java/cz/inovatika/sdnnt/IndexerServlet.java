@@ -76,6 +76,20 @@ public class IndexerServlet extends HttpServlet {
   }
 
   enum Actions {
+    REINDEX {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          json.put("indexed", Indexer.reindex(req.getParameter("id")));
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     FULL {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

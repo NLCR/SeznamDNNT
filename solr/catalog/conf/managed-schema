@@ -64,6 +64,7 @@
    
    
    <field name="title" type="lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="ean" type="string" indexed="true" stored="true" multiValued="true"  />
    <field name="author" type="lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
    <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />

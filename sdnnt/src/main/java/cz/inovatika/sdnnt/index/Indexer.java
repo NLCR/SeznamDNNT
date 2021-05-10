@@ -253,6 +253,38 @@ public class Indexer {
   }
 
   /**
+   * Save record in catalog. Generates diff path and index to history core We
+   * store the patch in both orders, forward and backwards
+   *
+   * @param id identifier in catalog
+   * @param newRaw JSON representation of the record
+   * @param user User
+   * @return
+   */
+  public static JSONObject reindex(String id) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = getClient();
+      SolrQuery q = new SolrQuery("*").setRows(1)
+              .addFilterQuery("identifier:\"" + id + "\"")
+              .setFields("raw");
+      SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
+      String oldRaw = (String) docOld.getFirstValue("raw");
+
+      // Update record in catalog
+      MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+      mr.fillSolrDoc();
+      solr.add("catalog", mr.toSolrDoc());
+      solr.commit("catalog");
+      ret = mr.toJSON();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
+  /**
    * Compares record from DNT-ALL set (in sdnnt core) with SKC record (catalog
    * core)
    *

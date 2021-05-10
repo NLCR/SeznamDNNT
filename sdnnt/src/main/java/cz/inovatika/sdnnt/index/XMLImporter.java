@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLInputFactory;
@@ -37,6 +39,13 @@ public class XMLImporter {
   public static final Logger LOGGER = Logger.getLogger(XMLImporter.class.getName());
   JSONObject ret = new JSONObject();
   String collection = "catalog";
+  
+  Map<String, String> fieldsMap = Map.ofEntries(
+  new AbstractMap.SimpleEntry<String, String>("name", "John"),
+  new AbstractMap.SimpleEntry<String, String>("city", "budapest"),
+  new AbstractMap.SimpleEntry<String, String>("zip", "000000"),
+  new AbstractMap.SimpleEntry<String, String>("home", "1231231231")
+  );
 
   public JSONObject fromUrl(String url) {
     readUrl(url);
@@ -121,7 +130,7 @@ public class XMLImporter {
           break;
       }
     }
-    throw new XMLStreamException("Premature end of file");
+    // throw new XMLStreamException("Premature end of file");
   }
   
   private void readShop(XMLStreamReader reader) throws XMLStreamException, IOException {
@@ -140,7 +149,7 @@ public class XMLImporter {
           break;
       }
     }
-    throw new XMLStreamException("Premature end of file");
+    // throw new XMLStreamException("Premature end of file");
   }
 
   private void readItem(XMLStreamReader reader) throws XMLStreamException, IOException {
@@ -177,27 +186,29 @@ public class XMLImporter {
     <INTERPRETER />
   </ITEM>
      */
-
+    
     SolrInputDocument idoc = new SolrInputDocument();
     while (reader.hasNext()) {
       int eventType = reader.next();
       switch (eventType) {
         case XMLStreamReader.START_ELEMENT:
           String elementName = reader.getLocalName();
-          // System.out.println(elementName);
-          idoc.addField(elementName, reader.getElementText());
-          if (elementName.equals("header")) {
-
-          } else {
-            skipElement(reader, elementName);
-          }
+          String val = reader.getElementText();
+//          System.out.println(elementName);
+//          System.out.println(val);
+          idoc.addField(elementName, val);
+          
           break;
         case XMLStreamReader.END_ELEMENT:
-          return;
+          elementName = reader.getLocalName();
+          if (elementName.equals("ITEM")) {
+            ret.append("items", idoc);
+            return;
+          }
       }
     }
-    ret.append("items", idoc);
-    throw new XMLStreamException("Premature end of item");
+    
+    // throw new XMLStreamException("Premature end of item"); 
   }
 
   private void skipElement(XMLStreamReader reader, String name) throws XMLStreamException {
