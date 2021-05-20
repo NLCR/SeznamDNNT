@@ -6,13 +6,15 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
-import static cz.inovatika.sdnnt.index.OAIHarvester.LOGGER;
+import static cz.inovatika.sdnnt.index.Indexer.LOGGER;
+import static cz.inovatika.sdnnt.index.Indexer.getClient;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,8 +27,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
@@ -41,10 +45,10 @@ public class XMLImporter {
   String collection = "catalog";
   
   Map<String, String> fieldsMap = Map.ofEntries(
-  new AbstractMap.SimpleEntry<String, String>("name", "John"),
-  new AbstractMap.SimpleEntry<String, String>("city", "budapest"),
-  new AbstractMap.SimpleEntry<String, String>("zip", "000000"),
-  new AbstractMap.SimpleEntry<String, String>("home", "1231231231")
+  new AbstractMap.SimpleEntry<>("name", "John"),
+  new AbstractMap.SimpleEntry<>("city", "budapest"),
+  new AbstractMap.SimpleEntry<>("zip", "000000"),
+  new AbstractMap.SimpleEntry<>("home", "1231231231")
   );
 
   public JSONObject fromUrl(String url) {
@@ -187,7 +191,7 @@ public class XMLImporter {
   </ITEM>
      */
     
-    SolrInputDocument idoc = new SolrInputDocument();
+    Map<String, String> item = new HashMap<>();
     while (reader.hasNext()) {
       int eventType = reader.next();
       switch (eventType) {
@@ -196,19 +200,48 @@ public class XMLImporter {
           String val = reader.getElementText();
 //          System.out.println(elementName);
 //          System.out.println(val);
-          idoc.addField(elementName, val);
+          item.put(elementName, val);
           
           break;
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();
           if (elementName.equals("ITEM")) {
-            ret.append("items", idoc);
+            addDedup(item);
+            findInCatalog(item);
+            ret.append("items", item);
             return;
           }
       }
     }
-    
-    // throw new XMLStreamException("Premature end of item"); 
+  }
+  
+  private void addDedup(Map item) {
+    // 
+  }
+  
+  public SolrDocumentList findInCatalog(Map item) {
+    // JSONObject ret = new JSONObject();
+    try {
+
+      String q = "marc_020a:\"" + item.get("EAN") + "\""
+              + " OR dedup_fields:\"" + item.get("dedup_fields") + "\"";
+
+      SolrQuery query = new SolrQuery(q)
+              .setRows(20)
+              .setFields("*,score");
+      return getClient().query("catalog", query).getResults();
+//      QueryRequest qreq = new QueryRequest(query);
+//      NoOpResponseParser rParser = new NoOpResponseParser();
+//      rParser.setWriterType("json");
+//      qreq.setResponseParser(rParser);
+//      NamedList<Object> qresp = solr.request(qreq, "catalog");
+//      return new JSONObject((String) qresp.get("response"));
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
+    // return ret;
   }
 
   private void skipElement(XMLStreamReader reader, String name) throws XMLStreamException {
