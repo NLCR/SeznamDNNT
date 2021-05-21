@@ -54,7 +54,6 @@ export class AppState {
         }
       }
     });
-    console.log(this.usedFilters);
     this._paramsProcessed.next();
   }
 

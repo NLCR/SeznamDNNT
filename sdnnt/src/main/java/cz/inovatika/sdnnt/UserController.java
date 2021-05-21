@@ -102,11 +102,9 @@ public class UserController {
 
   public static JSONObject save(String js) {
 
-          System.out.println(js);
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       User user = User.fromJSON(js);
       
-          System.out.println(user.id);
       solr.addBean("users", user);
       solr.commit("users");
       solr.close();

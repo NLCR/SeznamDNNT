@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -115,21 +116,20 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
-        JSONObject user = (JSONObject) req.getSession().getAttribute("user");
+        User user = UserController.getUser(req);
         if (user == null) {
           json.put("error", "Not logged");
-          user = new JSONObject().put("name", "testUser");
-          // return json;
+          // user = new JSONObject().put("name", "testUser");
+          return json;
         }
         try {
-          Indexer indexer = new Indexer();
-          JSONObject inputJs;
+          String inputJs;
           if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
           } else {
-            inputJs = new JSONObject(req.getParameter("json"));
+            inputJs = req.getParameter("json");
           }
-          json = indexer.save(req.getParameter("id"), inputJs, user.getString("name"));
+          json = Zadost.save(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
