@@ -4,14 +4,16 @@
       <div fxLayout="row" fxLayoutGap="32px">
         <div fxFlex="350px">
           <mat-list role="list">
-            <mat-list-item role="listitem" *ngFor="let t of config.homeTabs" (click)="selectText(t)" [class.active]="t === selected">
+            <mat-list-item role="listitem" *ngFor="let t of config.homeTabs" (click)="selectText(t)"
+              [class.active]="t === selected">
               {{ 'home.' + t | translate }}
             </mat-list-item>
           </mat-list>
         </div>
         <div>
           <div class="app-row-gap-16">
-            <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig"></angular-editor>
+            <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig">
+            </angular-editor>
           </div>
           <button mat-stroked-button (click)="save()">{{ 'desc.ulozit' | translate }}</button>
         </div>
@@ -27,5 +29,28 @@
         <mat-tab [label]="'Formular' | translate">Nejaky formular</mat-tab>
       </mat-tab-group>
     </mat-tab>
+
+
+    <mat-tab [label]="'desc.usersAdmin' | translate">
+
+      <div fxLayout="row" fxLayoutGap="32px">
+        <div fxFlex="350px">
+          <mat-list role="list">
+            <mat-list-item role="listitem" *ngFor="let u of users" (click)="selectUser(u)"
+              [class.active]="u === selUser">
+              {{ u.jmeno }} {{ u.prijmeni }}
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div>
+          <div class="app-row-gap-16">
+            <app-user-form [user]="selUser"></app-user-form>
+          </div>
+          <button mat-stroked-button (click)="saveUser()">{{ 'desc.ulozit' | translate }}</button>
+        </div>
+      </div>
+    </mat-tab>
+
+
   </mat-tab-group>
 </div>

@@ -1,5 +1,7 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -9,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -22,10 +25,10 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
-@WebServlet(value = "/search/*")
-public class SearchServlet extends HttpServlet {
+@WebServlet(value = "/account/*")
+public class AccountServlet extends HttpServlet {
 
-  public static final Logger LOGGER = Logger.getLogger(SearchServlet.class.getName());
+  public static final Logger LOGGER = Logger.getLogger(AccountServlet.class.getName());
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -71,7 +74,7 @@ public class SearchServlet extends HttpServlet {
   }
 
   enum Actions {
-    CATALOG {
+    SEARCH {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject ret = new JSONObject();
@@ -81,45 +84,7 @@ public class SearchServlet extends HttpServlet {
           if (q == null) {
             q = "*";
           }
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a")
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
-          for (Object o : opts.getClientConf().getJSONArray("filterFields")){
-            String field = (String)o;
-            if (req.getParameter(field) != null) {
-              query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
-            }
-          }
-          
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
-
-        return ret; 
-      }
-    },
-    ACCOUNT {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
-          }
-          JSONObject user = (JSONObject) req.getSession().getAttribute("user");
+          User user = UserController.getUser(req);
           if (user == null) {
             ret.put("error", "Not logged");
             return ret;
@@ -127,15 +92,15 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
                   .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a")
-                  .addFilterQuery("{!join fromIndex=history from=identifier to=identifier} user:" + user.getString("name"))
+                  .setFacet(true).addFacetField("typ","state","new_stav")
+                  .addFilterQuery("user:" + user.username)
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
+          NamedList<Object> qresp = solr.request(qreq, "zadost"); 
           solr.close();
           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {
@@ -146,43 +111,30 @@ public class SearchServlet extends HttpServlet {
         return ret; 
       }
     },
-    HISTORY {
+    ADD {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery query = new SolrQuery("*")
-                  .setRows(100)
-                  .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-                  .setFields("*,changes:[json]");
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "history"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+        JSONObject json = new JSONObject();
+        JSONObject user = (JSONObject) req.getSession().getAttribute("user");
+        if (user == null) {
+          json.put("error", "Not logged");
+          user = new JSONObject().put("name", "testUser");
+          // return json;
         }
-
-        return ret; 
-      }
-    },
-    XSERVER {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
         try {
-          ret = XServer.find(req.getParameter("sysno"));
+          Indexer indexer = new Indexer();
+          JSONObject inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+          } else {
+            inputJs = new JSONObject(req.getParameter("json"));
+          }
+          json = indexer.save(req.getParameter("id"), inputJs, user.getString("name"));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+          json.put("error", ex.toString());
         }
-
-        return ret; 
+        return json;
       }
     };
 

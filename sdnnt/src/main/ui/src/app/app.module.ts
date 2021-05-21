@@ -33,6 +33,9 @@ import { LoginDialogComponent } from './components/login-dialog/login-dialog.com
 import { DataDialogComponent } from './components/data-dialog/data-dialog.component';
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 import { FacetsUsedComponent } from './components/facets/facets-used/facets-used.component';
+import { AccountItemComponent } from './components/account-item/account-item.component';
+import { UserFormComponent } from './components/user-form/user-form.component';
+import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -68,7 +71,10 @@ const providers: any[] =[
     LoginDialogComponent,
     DataDialogComponent,
     SidenavListComponent,
-    FacetsUsedComponent
+    FacetsUsedComponent,
+    AccountItemComponent,
+    UserFormComponent,
+    UserDialogComponent
   ],
   imports: [
     BrowserModule,

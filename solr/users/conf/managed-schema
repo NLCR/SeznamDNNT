@@ -45,7 +45,7 @@
     that avoids logging every request
 -->
 
-<schema name="zadost" version="1.6">
+<schema name="users" version="1.6">
   
     <field name="id" type="string" indexed="true" stored="true" docValues="true" />
     <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
@@ -54,19 +54,25 @@
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
     
-    <field name="identifiers" type="string" indexed="true" stored="true" multiValued="true"  />
-    <field name="typ" type="string" indexed="true" stored="true"  />
-    <field name="user" type="string" indexed="true" stored="true"  />
+    <field name="username" type="string" indexed="true" stored="true" />
+    <field name="role" type="string" indexed="true" stored="true"  />
     <field name="state" type="string" indexed="true" stored="true"  />
+    <field name="typ" type="string" indexed="true" stored="true"  />
     
-    <field name="new_stav" type="string" indexed="true" stored="true"  />
-    <field name="poznamka" type="string" indexed="false" stored="true"  />
-    <field name="pozadavek" type="string" indexed="false" stored="true"  />
-    <field name="datum_zadani" type="date" indexed="true" stored="true" />
-    <field name="datum_vyrizeni" type="date" indexed="true" stored="true" />
-    <field name="formular" type="text_big" indexed="false" stored="true"  />
-  
-
+    <field name="jmeno" type="string" indexed="true" stored="true"  />
+    <field name="prijmeni" type="string" indexed="false" stored="true"  />
+    <field name="titul" type="string" indexed="true" stored="true"  />
+    <field name="ico" type="string" indexed="true" stored="true"  />
+    <field name="adresa" type="string" indexed="true" stored="true"  />
+    <field name="psc" type="string" indexed="true" stored="true"  />
+    <field name="mesto" type="string" indexed="true" stored="true"  />
+    <field name="telefon" type="string" indexed="true" stored="true"  />
+    <field name="email" type="string" indexed="true" stored="true"  />
+    <field name="kontaktni" type="string" indexed="true" stored="true"  />
+    <field name="nositel" type="string" indexed="true" stored="true"  />
+    
+    <field name="poznamka" type="text_lowercase" indexed="true" stored="true"  />
+    
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
         alternately, change the type="ignored" to some other type e.g. "text" if you want 

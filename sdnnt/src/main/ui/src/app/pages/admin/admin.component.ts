@@ -3,6 +3,7 @@ import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { User } from 'src/app/shared/user';
 
 @Component({
   selector: 'app-admin',
@@ -16,26 +17,26 @@ export class AdminComponent implements OnInit {
 
   editorConfig: AngularEditorConfig = {
     editable: true,
-      spellcheck: true,
-      height: 'auto',
-      minHeight: '0',
-      maxHeight: 'auto',
-      width: 'auto',
-      minWidth: '0',
-      translate: 'yes',
-      enableToolbar: true,
-      showToolbar: true,
-      placeholder: 'Enter text here...',
-      defaultParagraphSeparator: '',
-      defaultFontName: '',
-      defaultFontSize: '',
-      fonts: [
-        {class: 'arial', name: 'Arial'},
-        {class: 'times-new-roman', name: 'Times New Roman'},
-        {class: 'calibri', name: 'Calibri'},
-        {class: 'comic-sans-ms', name: 'Comic Sans MS'}
-      ],
-      customClasses: [
+    spellcheck: true,
+    height: 'auto',
+    minHeight: '0',
+    maxHeight: 'auto',
+    width: 'auto',
+    minWidth: '0',
+    translate: 'yes',
+    enableToolbar: true,
+    showToolbar: true,
+    placeholder: 'Enter text here...',
+    defaultParagraphSeparator: '',
+    defaultFontName: '',
+    defaultFontSize: '',
+    fonts: [
+      { class: 'arial', name: 'Arial' },
+      { class: 'times-new-roman', name: 'Times New Roman' },
+      { class: 'calibri', name: 'Calibri' },
+      { class: 'comic-sans-ms', name: 'Comic Sans MS' }
+    ],
+    customClasses: [
       {
         name: 'quote',
         class: 'quote',
@@ -58,7 +59,10 @@ export class AdminComponent implements OnInit {
       /* ['bold', 'italic'],
       ['fontSize'] */
     ]
-};
+  };
+
+  public users: User[];
+  selUser : User;
 
   constructor(
     public config: AppConfiguration,
@@ -68,6 +72,10 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.activePage = 'Admin';
+    this.service.getUsers().subscribe(res => {
+      this.users = res.docs;
+      this.selUser = this.users[0];
+    });
     this.service.getText(this.selected).subscribe(text => this.htmlContent = text);
   }
 
@@ -76,8 +84,16 @@ export class AdminComponent implements OnInit {
     this.service.getText(id).subscribe(text => this.htmlContent = text);
   }
 
+  selectUser(user: User) {
+    this.selUser = user;
+  }
+
   save() {
     this.service.saveText(this.selected, this.htmlContent).subscribe();
+  }
+
+  saveUser() {
+    this.service.saveUser(this.selUser).subscribe();
   }
 
 }

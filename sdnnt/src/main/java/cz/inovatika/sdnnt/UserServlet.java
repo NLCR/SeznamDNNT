@@ -15,13 +15,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
-import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
 /**
@@ -79,19 +72,32 @@ public class UserServlet extends HttpServlet {
     LOGIN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        JSONObject json = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-        ret.put("name", json.getString("user")).put("role", "admin");
-        req.getSession(true).setAttribute("user", ret);
-        return ret; 
+        return UserController.login(req);
       }
     },
     LOGOUT {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        req.getSession().invalidate();
-        return ret; 
+        return UserController.logout(req);
+      }
+    },
+    SAVE {
+      @Override 
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+        return UserController.save(inputJs);
+      }
+    },
+    ALL {
+      @Override 
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        
+        return UserController.getAll(req);
       }
     };
 

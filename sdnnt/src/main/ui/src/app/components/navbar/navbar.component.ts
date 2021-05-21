@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
+import { UserDialogComponent } from '../user-dialog/user-dialog.component';
 
 @Component({
   selector: 'app-navbar',
@@ -31,6 +32,14 @@ export class NavbarComponent implements OnInit {
 
   showLogin() {
     this.dialog.open(LoginDialogComponent, {
+      width: '450px',
+      panelClass: 'app-login-dialog',
+      data: null
+    });
+  }
+
+  showUser() {
+    this.dialog.open(UserDialogComponent, {
       width: '450px',
       panelClass: 'app-login-dialog',
       data: null

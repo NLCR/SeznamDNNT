@@ -127,15 +127,15 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
                   .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a")
-                  .addFilterQuery("{!join fromIndex=history from=identifier to=identifier} user:" + user.getString("name"))
+                  .setFacet(true).addFacetField("typ","old_stav","new_stav")
+                  .addFilterQuery("user:" + user.getString("name"))
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
+          NamedList<Object> qresp = solr.request(qreq, "zadost"); 
           solr.close();
           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {

@@ -14,7 +14,7 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 export class AccountComponent implements OnInit {
 
   loading: boolean;
-  docs: SolrDocument[];
+  items: SolrDocument[];
   searchResponse: SolrResponse;
   facets;
   numFound: number;
@@ -36,12 +36,12 @@ export class AccountComponent implements OnInit {
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
-    this.docs = [];
+    this.items = [];
     this.searchResponse = null;
     this.facets = null;
     this.service.searchAccount(p as HttpParams).subscribe((resp: SolrResponse) => {
       this.searchResponse = resp;
-      this.docs = resp.response.docs;
+      this.items = resp.response.docs;
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;
