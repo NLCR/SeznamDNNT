@@ -8,6 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { User } from './shared/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppConfiguration } from './app-configuration';
+import { Zadost } from './shared/zadost';
 
 @Injectable()
 export class AppService {
@@ -70,6 +71,11 @@ export class AppService {
   saveRecord(id: string, raw: any): Observable<string> {
     let url = '/index/save?id=' + id;
     return this.post(url, raw);
+  }
+
+  saveZadost(zadost: Zadost): Observable<string> {
+    let url = '/account/save_zadost';
+    return this.post(url, zadost);
   }
 
   getText(id: string): Observable<string> {

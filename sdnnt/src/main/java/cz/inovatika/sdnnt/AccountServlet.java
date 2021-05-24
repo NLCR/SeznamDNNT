@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt;
 
-import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
@@ -87,8 +86,9 @@ public class AccountServlet extends HttpServlet {
           }
           User user = UserController.getUser(req);
           if (user == null) {
-            ret.put("error", "Not logged");
-            return ret;
+            user = UserController.dummy("incad@incad.cz");
+//            ret.put("error", "Not logged");
+//            return ret;
           }
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
@@ -112,7 +112,33 @@ public class AccountServlet extends HttpServlet {
         return ret; 
       }
     },
-    ADD {
+    SAVE_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        User user = UserController.getUser(req);
+        try {
+          String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+          if (user == null) {
+            json.put("error", "Not logged");
+            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
+            // user = new JSONObject().put("name", "testUser");
+            // return json;
+          }
+          json = Zadost.save(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    ADD_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
@@ -123,13 +149,8 @@ public class AccountServlet extends HttpServlet {
           return json;
         }
         try {
-          String inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
-          } else {
-            inputJs = req.getParameter("json");
-          }
-          json = Zadost.save(inputJs, user.username);
+          
+          // json = Zadost.save(req.getParameter("id"), req.getParameter("identifier"), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

@@ -5,6 +5,7 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { Zadost } from 'src/app/shared/zadost';
 import { DataDialogComponent } from '../data-dialog/data-dialog.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
@@ -96,6 +97,16 @@ export class ResultItemComponent implements OnInit {
       }
        
      });
+  }
+
+  addToZadost() {
+    if (!this.state.currentZadost) {
+      this.state.currentZadost = new Zadost(new Date().getTime() + '', this.state.user.username);
+    }
+    this.state.currentZadost.identifiers.push(this.doc.identifier);
+    this.service.saveZadost(this.state.currentZadost).subscribe(res => {
+      console.log(res);
+    });
   }
 
 }

@@ -13,7 +13,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class StatesDialogComponent implements OnInit {
 
-  newState;
+  newState: string;
   public dntStates: string[] = ['undefined', 'PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
 

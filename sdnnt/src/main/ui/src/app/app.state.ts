@@ -3,6 +3,7 @@ import { Params, ParamMap } from '@angular/router';
 import { Configuration, Sort } from './shared/configuration';
 import { User } from './shared/user';
 import { Filter } from './shared/filter';
+import { Zadost } from './shared/zadost';
 
 export class AppState {
 
@@ -36,10 +37,12 @@ export class AppState {
 
   public usedFilters: Filter[] = [];
 
+  // Aktualni zadost kam se pridavaji navrhy
+  currentZadost: Zadost;
+
   setConfig(cfg: Configuration) {
     this.config = cfg;
     this.currentLang = cfg.lang;
-    
   }
 
   processParams(searchParams: ParamMap) {
@@ -65,6 +68,7 @@ export class AppState {
     } else {
       this.logged = true;
       this.user = res;
+      this.currentZadost = res.zadost;
     }
     this.loggedSubject.next(changed === this.logged);
   }

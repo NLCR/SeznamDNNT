@@ -5,6 +5,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
   selector: 'app-account',
@@ -18,6 +19,10 @@ export class AccountComponent implements OnInit {
   searchResponse: SolrResponse;
   facets;
   numFound: number;
+
+  displayedColumns = ['datum_zadani','stav','datum_vyrizeni','count', 'pozadavek','actions'];
+  zadosti: Zadost[] = [];
+
 
   constructor(
     private route: ActivatedRoute,
@@ -39,14 +44,29 @@ export class AccountComponent implements OnInit {
     this.items = [];
     this.searchResponse = null;
     this.facets = null;
-    this.service.searchAccount(p as HttpParams).subscribe((resp: SolrResponse) => {
-      this.searchResponse = resp;
-      this.items = resp.response.docs;
-      this.numFound = resp.response.numFound;
-      this.facets = resp.facet_counts.facet_fields;
+    this.service.searchAccount(p as HttpParams).subscribe((resp: any) => {
+      if (!resp.error) {
+      this.zadosti = resp.response.docs;
       this.loading = false;
+      }
     });
 
   }
 
+  setStav(stav: string) {
+    
+  }
+
+
+  setStavZadosti(stav: string) {
+    
+  }
+
+  showInfo(zadost: Zadost) {
+    
+  }
+
+  send(zadost: Zadost) {
+    
+  }
 }

@@ -10,7 +10,7 @@
   <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate">{{ 'Account' | translate }}</a>
   <a mat-list-item *ngIf="state.user" (click)="logout(); onSidenavClose()" [title]="'Logout' | translate">{{ 'Logout' | translate }}</a>
   <a mat-list-item *ngIf="state.user && state.user.role === 'admin'" (click)="onSidenavClose()" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate">{{ 'Admin' | translate }}</a>
-  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active">{{ state.user.name }} {{ now | date : 'dd.MM.yyyy' }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active">{{ state.user.jmeno }} {{ state.user.prijmeni }}</a>
   <mat-divider></mat-divider>
   <a mat-list-item *ngIf="state.currentLang !== 'en'" (click)="changeLang('en'); onSidenavClose()" [title]="'EN' | translate">{{ 'EN' | translate }}</a>
   <a mat-list-item *ngIf="state.currentLang !== 'cs'" (click)="changeLang('cs'); onSidenavClose()" [title]="'CS' | translate">{{ 'CS' | translate }}</a>

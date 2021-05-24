@@ -24,37 +24,37 @@ import org.json.JSONObject;
 public class Zadost {
   
   @Field
-  String id;
+  public String id;
   
   @Field
-  List<String> identifiers;
+  public List<String> identifiers;
   
   @Field
-  String typ;
+  public String typ;
   
   @Field
-  String user;
+  public String user;
   
   @Field
-  String state;
+  public String state;
   
   @Field
-  String new_stav;
+  public String new_stav;
   
   @Field
-  String poznamka;
+  public String poznamka;
   
   @Field
-  String pozadavek;
+  public String pozadavek;
   
   @Field
-  Date datum_zadani;
+  public Date datum_zadani;
   
   @Field
-  Date datum_vyrizeni;
+  public Date datum_vyrizeni;
   
   @Field
-  String formular;
+  public String formular;
   
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();

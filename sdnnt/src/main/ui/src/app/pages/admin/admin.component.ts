@@ -88,7 +88,7 @@ export class AdminComponent implements OnInit {
     this.selUser = user;
   }
 
-  save() {
+  saveText() {
     this.service.saveText(this.selected, this.htmlContent).subscribe();
   }
 

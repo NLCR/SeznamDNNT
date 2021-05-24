@@ -16,11 +16,12 @@ export class NavbarComponent implements OnInit {
   // sidenav
   @Output() public sidenavToggle = new EventEmitter();
 
+  now = new Date();
+
   constructor(
     private dialog: MatDialog,
     private service: AppService,
-    public state: AppState,
-    private overlay: Overlay
+    public state: AppState
     ) { }
 
   ngOnInit(): void {

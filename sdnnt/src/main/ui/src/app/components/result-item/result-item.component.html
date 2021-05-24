@@ -20,8 +20,11 @@
       <div [class]="'app-badge ' + doc.marc_990a">
         <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  --><mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
       </div> 
-      <button mat-stroked-button *ngIf="state.logged" (click)="showStates()">
+      <!-- <button mat-stroked-button *ngIf="state.logged" (click)="showStates()">
         <mat-icon>check</mat-icon> {{ 'desc.zmena_stavu' | translate }}
+      </button> -->
+      <button mat-stroked-button *ngIf="state.logged" (click)="addToZadost()">
+        <mat-icon>check</mat-icon> {{ 'desc.pridat_k_zadosti' | translate }}
       </button>
     </div>
   </mat-card-actions>
