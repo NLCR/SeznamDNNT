@@ -5,7 +5,6 @@
  */
 package cz.inovatika.sdnnt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.List;

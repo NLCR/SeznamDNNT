@@ -8,7 +8,8 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div *ngFor="let f of facet_fields[facet]">
-      <a (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+      <a *ngIf="facet === 'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+      <a *ngIf="facet !== 'marc_990a'" (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
     </div>
   </mat-expansion-panel>
 </mat-accordion>

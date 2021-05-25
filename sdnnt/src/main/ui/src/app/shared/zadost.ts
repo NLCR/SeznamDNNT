@@ -5,6 +5,7 @@ export class Zadost {
   state: string;
   datum_vyrizeni: Date;
   pozadavek: string;
+  new_stav: string;
   poznamka: string;
   identifiers: string[];
 

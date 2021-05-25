@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.indexer.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.logging.Level;
@@ -11,10 +12,9 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
+  @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
   
-  @Field
-  public String id;
   
   @Field
   public String username;
@@ -24,6 +24,9 @@ public class User {
   
   @Field
   public String state;
+  
+  @Field
+  public boolean isActive;
 
   @Field
   public String typ;

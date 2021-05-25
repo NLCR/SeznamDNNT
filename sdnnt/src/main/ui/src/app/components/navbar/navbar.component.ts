@@ -5,6 +5,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 import { UserDialogComponent } from '../user-dialog/user-dialog.component';
+import { User } from 'src/app/shared/user';
 
 @Component({
   selector: 'app-navbar',
@@ -40,11 +41,27 @@ export class NavbarComponent implements OnInit {
   }
 
   showUser() {
-    this.dialog.open(UserDialogComponent, {
+    const d = this.dialog.open(UserDialogComponent, {
       width: '450px',
       panelClass: 'app-login-dialog',
-      data: null
+      data: {isRegister: false}
     });
+
+    // d.afterClosed().subscribe((result: User) => {
+    //   if (result) {
+    //     // result je user
+    //     result.isActive = false;
+    //     this.service.saveUser(result).subscribe((res: User) => {
+    //       if (res.error) {
+    //         this.service.showSnackBar('user_saving_error', res.error, true);
+    //       } else {
+    //         this.service.showSnackBar('Ulozeni probehlo v poradku', '', false);
+    //         this.state.user = JSON.parse(JSON.stringify(result));
+    //       }
+    //     });
+    //   }
+       
+    //  });
   }
 
   logout() {
@@ -56,7 +73,27 @@ export class NavbarComponent implements OnInit {
   }
 
   register() {
-    // some method
+    
+    const d = this.dialog.open(UserDialogComponent, {
+      width: '450px',
+      panelClass: 'app-login-dialog',
+      data: {isRegister: true}
+    });
+
+    // d.afterClosed().subscribe((result: User) => {
+    //   if (result) {
+    //     // result je user
+    //     result.isActive = false;
+    //     this.service.saveUser(result).subscribe((res: User) => {
+    //       if (res.error) {
+    //         this.service.showSnackBar('user_saving_error', res.error, true);
+    //       } else {
+    //         this.service.showSnackBar('registrace uspesna', '', false);
+    //       }
+    //     });
+    //   }
+       
+    //  });
   }
 
   // sidenav fuction

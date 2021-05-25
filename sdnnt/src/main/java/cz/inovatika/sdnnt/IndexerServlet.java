@@ -90,6 +90,20 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    REINDEX_FILTER {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          json.put("indexed", Indexer.reindexFilter(req.getParameter("filter")));
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     FULL {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

@@ -3,7 +3,8 @@
     "placeholder": "Zadejte dotaz ..."
   },
   "register": {
-    "button": "Přihlásit/registrovat se přes NDK"
+    "button_old": "Přihlásit/registrovat se přes NDK",
+    "button": "Registrovat se"
   },
   "home": {
     "news": "Aktuality",

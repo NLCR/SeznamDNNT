@@ -52,7 +52,7 @@ public class MarcRecord {
   public Map<String, List<DataField>> dataFields = new HashMap();
   public SolrInputDocument sdoc = new SolrInputDocument();
 
-  final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "246", "250", "260", "264", "856", "990", "992", "998", "956", "911");
+  final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "246", "250", "260", "264", "856", "990", "992", "998", "956", "911", "910");
 
   
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {

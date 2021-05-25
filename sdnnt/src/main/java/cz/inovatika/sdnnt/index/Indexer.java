@@ -43,7 +43,7 @@ public class Indexer {
   public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
 
   static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/998", "/dataFields/956", "/dataFields/856");
-  static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec", 
+  static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec",
           "/controlFields/001", "/controlFields/003", "/controlFields/005", "/controlFields/008");
 
   JSONObject ret = new JSONObject();
@@ -95,7 +95,7 @@ public class Indexer {
                 cDocs.add(cDoc);
               }
             }
- 
+
             if (!hDocs.isEmpty()) {
               getClient().add("history", hDocs);
               getClient().add("catalog", cDocs);
@@ -252,15 +252,53 @@ public class Indexer {
     return ret;
   }
 
-  /**
-   * Save record in catalog. Generates diff path and index to history core We
-   * store the patch in both orders, forward and backwards
-   *
-   * @param id identifier in catalog
-   * @param newRaw JSON representation of the record
-   * @param user User
-   * @return
-   */
+  public static JSONObject reindexFilter(String filter) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = getClient();
+
+      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+      SolrQuery q = new SolrQuery("*").setRows(1000)
+              .setSort("identifier", SolrQuery.ORDER.asc)
+              .addFilterQuery(filter)
+              .setFields("raw");
+      List<SolrInputDocument> idocs = new ArrayList<>();
+      boolean done = false;
+      while (!done) {
+        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+        QueryResponse qr = solr.query("catalog", q);
+        String nextCursorMark = qr.getNextCursorMark();
+        SolrDocumentList docs = qr.getResults();
+        for (SolrDocument doc : docs) {
+          String oldRaw = (String) doc.getFirstValue("raw");
+
+          // Update record in catalog
+          MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+          mr.fillSolrDoc();
+          idocs.add(mr.toSolrDoc());
+//          solr.add("catalog", mr.toSolrDoc());
+//          solr.commit("catalog");
+          ret = mr.toJSON();
+        }
+
+        if (!idocs.isEmpty()) {
+          solr.add("catalog", idocs);
+          solr.commit("catalog");
+          idocs.clear();
+        }
+        if (cursorMark.equals(nextCursorMark)) {
+          done = true;
+        }
+        cursorMark = nextCursorMark;
+      }
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
   public static JSONObject reindex(String id) {
     JSONObject ret = new JSONObject();
     try {

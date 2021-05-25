@@ -7,7 +7,7 @@
       </mat-form-field>
       <mat-form-field class="app-full-width">
         <mat-label>Login</mat-label>
-        <input matInput [(ngModel)]="user.username" name="login" placeholder="Login" disabled />
+        <input matInput [(ngModel)]="user.username" name="login" placeholder="Login" [disabled]="!isRegister" />
       </mat-form-field>
       <div fxLayout="row" fxLayoutGap="16px" class="app-field-group">
         <mat-form-field fxFlex class="app-full-width">
@@ -43,6 +43,7 @@
         <mat-label>Adresa</mat-label>
         <input matInput name="adresa" placeholder="Adresa" [(ngModel)]="user.adresa" />
       </mat-form-field>
+      <mat-checkbox *ngIf="state.user?.role === 'admin'" name="isactive" [(ngModel)]="user.isActive">{{ 'isactive' | translate }}</mat-checkbox>
     </div>
   </div>
   <div fxLayout="row">

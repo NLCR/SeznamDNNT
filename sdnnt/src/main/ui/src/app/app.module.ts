@@ -36,6 +36,8 @@ import { FacetsUsedComponent } from './components/facets/facets-used/facets-used
 import { AccountItemComponent } from './components/account-item/account-item.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
+import { ZadostInfoDialogComponent } from './components/zadost-info-dialog/zadost-info-dialog.component';
+import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -74,7 +76,9 @@ const providers: any[] =[
     FacetsUsedComponent,
     AccountItemComponent,
     UserFormComponent,
-    UserDialogComponent
+    UserDialogComponent,
+    ZadostInfoDialogComponent,
+    ZadostSendDialogComponent
   ],
   imports: [
     BrowserModule,

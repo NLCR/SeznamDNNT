@@ -3,6 +3,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 export class User {
   username: string;
   role: string;
+  isActive: boolean;
 
   typ: string; //pravnicka/fyzicka osoba
   titul: string;

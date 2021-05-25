@@ -94,6 +94,7 @@ public class AccountServlet extends HttpServlet {
                   .setRows(20)
                   .setParam("df", "fullText")
                   .setFacet(true).addFacetField("typ","state","new_stav")
+                  .setSort(SolrQuery.SortClause.desc("indextime"))
                   .addFilterQuery("user:" + user.username)
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
@@ -102,6 +103,43 @@ public class AccountServlet extends HttpServlet {
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
           NamedList<Object> qresp = solr.request(qreq, "zadost"); 
+          solr.close();
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
+    },
+    GET_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          
+          User user = UserController.getUser(req);
+          if (user == null) {
+            user = UserController.dummy("incad@incad.cz");
+//            ret.put("error", "Not logged");
+//            return ret;
+          }
+          System.out.println(req.getParameter("identifiers"));
+          String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
+          System.out.println(q);
+          SolrQuery query = new SolrQuery("identifier:" + q)
+                  .setRows(100)
+                  // .setFacet(true).addFacetField("typ","state","new_stav")
+                  //.addFilterQuery("user:" + user.username)
+                  //.setParam("json.nl", "arrntv")
+                  .setFields("*,raw:[json]");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
           solr.close();
           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {

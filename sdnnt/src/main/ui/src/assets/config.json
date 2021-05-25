@@ -9,5 +9,5 @@
     "user": ["undefined","PA", "N"]
   },
   "identifiers": ["015a", "020a", "022a"],
-  "filterFields": ["marc_990a", "item_type", "marc_856a"]
+  "filterFields": ["marc_990a", "marc_910a", "item_type", "marc_856a", "nakladatel"]
 }

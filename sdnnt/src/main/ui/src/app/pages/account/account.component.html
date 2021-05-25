@@ -9,7 +9,7 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div>
-            <a (click)="setStavZadosti('active')">{{ 'Ne odeslano' | translate }}</a>
+            <a (click)="setStavZadosti('open')">{{ 'Ne odeslano' | translate }}</a>
           </div>
           <div>
             <a (click)="setStavZadosti('waiting')">{{ 'Ceka na posouzeni' | translate }}</a>
@@ -52,9 +52,13 @@
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_zadani' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.datum_zadani | date : 'dd.MM.yyyy' }}</td>
           </ng-container>
-          <ng-container matColumnDef="stav">
+          <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.state }}</td>
+          </ng-container>
+          <ng-container matColumnDef="new_stav">
+            <th mat-header-cell *matHeaderCellDef>{{ 'navhr na stav' | translate }}</th>
+            <td mat-cell *matCellDef="let element">{{ element.new_stav }}</td>
           </ng-container>
           <ng-container matColumnDef="datum_vyrizeni">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_vyrizeni' | translate }}</th>
@@ -72,7 +76,7 @@
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
             <td mat-cell *matCellDef="let element">
               <button mat-icon-button (click)="showInfo(element)"><mat-icon>info</mat-icon></button>&#160;
-              <button mat-icon-button (click)="send(element)"><mat-icon>done</mat-icon></button>
+              <button *ngIf="element.state === 'open'" mat-icon-button (click)="send(element)"><mat-icon>send</mat-icon></button>
             </td>
           </ng-container>
   

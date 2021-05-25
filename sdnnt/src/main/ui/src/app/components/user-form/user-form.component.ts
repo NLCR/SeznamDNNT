@@ -12,6 +12,7 @@ import { User } from 'src/app/shared/user';
 export class UserFormComponent implements OnInit {
 
   @Input() user: User;
+  @Input() isRegister: boolean;
 
   constructor(
     public state: AppState,

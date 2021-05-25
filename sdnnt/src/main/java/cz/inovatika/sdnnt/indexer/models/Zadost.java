@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.inovatika.sdnnt.indexer.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
@@ -21,6 +17,7 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
+  @JsonIgnoreProperties(ignoreUnknown = true)
 public class Zadost {
   
   @Field
@@ -58,7 +55,7 @@ public class Zadost {
   
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    Zadost o = objectMapper.readValue(json, Zadost.class);
+    Zadost o = objectMapper.readValue(json, Zadost.class); 
     return o;
   }
   
