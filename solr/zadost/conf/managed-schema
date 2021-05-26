@@ -58,6 +58,7 @@
     <field name="typ" type="string" indexed="true" stored="true"  />
     <field name="user" type="string" indexed="true" stored="true"  />
     <field name="state" type="string" indexed="true" stored="true"  />
+    <field name="kurator" type="string" indexed="true" stored="true"  />
     
     <field name="new_stav" type="string" indexed="true" stored="true"  />
     <field name="poznamka" type="string" indexed="false" stored="true"  />

@@ -7,8 +7,10 @@
     
     <div fxLayout="row">{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}
       <div [class]="'app-badge ' + doc.marc_990a">
-        <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  --><mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
       </div> 
+      <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.new_stav" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
+              
   </div>
 </div>
 <div mat-dialog-actions>

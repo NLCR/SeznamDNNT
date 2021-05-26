@@ -12,7 +12,7 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
-  @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
   
   

@@ -13,7 +13,8 @@ export class ZadostSendDialogComponent implements OnInit {
   newState: string;
   poznamka: string;
   pozadavek: string;
-  public dntStates: string[] = ['undefined', 'PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  // public dntStates: string[] = ['undefined', 'PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public dntStates: string[] = ['NZN', 'VVN'];
 
   constructor(
     public dialogRef: MatDialogRef<ZadostSendDialogComponent>,

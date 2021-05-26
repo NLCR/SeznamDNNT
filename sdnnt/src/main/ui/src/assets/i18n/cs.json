@@ -54,7 +54,9 @@
     "a": "Taky se musi",
 
     "item_type": "Typ dokumentu",
+    "nakladatel": "Nakladatel",
     "marc_990a": "Stav dokumentu",
+    "marc_910a": "Sigla",
 
     "undefined": "nezařazeno",
     "PA": "PA: dílo publikováno jako návrh",

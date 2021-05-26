@@ -6,6 +6,7 @@ import { AppState } from 'src/app/app.state';
 import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
 import { UserDialogComponent } from '../user-dialog/user-dialog.component';
 import { User } from 'src/app/shared/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,7 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
+    private router: Router,
     private service: AppService,
     public state: AppState
     ) { }
@@ -69,6 +71,7 @@ export class NavbarComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
+      this.router.navigate(['/']);
     });
   }
 

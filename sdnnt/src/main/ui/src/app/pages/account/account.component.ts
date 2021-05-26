@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { ZadostInfoDialogComponent } from 'src/app/components/zadost-info-dialog/zadost-info-dialog.component';
@@ -23,19 +23,24 @@ export class AccountComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['datum_zadani','state', 'new_stav','datum_vyrizeni','count', 'pozadavek','actions'];
+  displayedColumns = ['datum_zadani','user', 'state', 'new_stav','datum_vyrizeni','count', 'pozadavek','actions'];
   zadosti: Zadost[] = [];
 
 
   constructor(
     public dialog: MatDialog,
     private route: ActivatedRoute,
+    private router: Router,
     private service: AppService,
     public state: AppState
     ) { }
 
 
   ngOnInit(): void {
+    if (!this.state.user) {
+      this.router.navigate(['/']);
+      return;
+    }
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
@@ -45,6 +50,9 @@ export class AccountComponent implements OnInit {
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
+    
+    // Docasne pro testovani
+    p.user = this.state.user.username;
     this.items = [];
     this.searchResponse = null;
     this.facets = null;
@@ -66,7 +74,7 @@ export class AccountComponent implements OnInit {
     
   }
 
-  showInfo(zadost: Zadost) {
+  showRecords(zadost: Zadost) {
     const dialogRef = this.dialog.open(ZadostInfoDialogComponent, {
       width: '1150px',
       data: zadost,
@@ -82,5 +90,11 @@ export class AccountComponent implements OnInit {
       panelClass: 'app-states-dialog'
     });
     
+  }
+
+  process(zadost: Zadost) {
+    this.service.processZadost(zadost).subscribe(res => {
+
+    });
   }
 }

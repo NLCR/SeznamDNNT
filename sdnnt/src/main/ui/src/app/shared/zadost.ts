@@ -1,6 +1,7 @@
 export class Zadost {
   id: string;
   user: string;
+  kurator: string;
   datum_zadani: Date;
   state: string;
   datum_vyrizeni: Date;

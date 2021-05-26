@@ -15,12 +15,12 @@
           <input matInput name="phone" placeholder="Telefonní číslo" [(ngModel)]="user.telefon" />
         </mat-form-field>
       </div>
-      <mat-form-field class="app-full-width">
+      <mat-form-field class="app-full-width" *ngIf="state.user?.role === 'admin'">
         <mat-label>Role</mat-label>
-        <input matInput name="role" placeholder="Role" [(ngModel)]="user.role" />
-        <!-- <mat-select name="budova"  [(ngModel)]="user.budova">
-          <mat-option *ngFor="let budova of state.budovy" [value]="budova.cs">{{ budova.cs }}</mat-option>
-        </mat-select> -->
+        <!-- <input matInput name="role" placeholder="Role" [(ngModel)]="user.role" /> -->
+        <mat-select name="role"  [(ngModel)]="user.role">
+          <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
+        </mat-select>
       </mat-form-field>
     </div>
     <div fxFlex>

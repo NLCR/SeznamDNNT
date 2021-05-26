@@ -86,7 +86,7 @@ public class AccountServlet extends HttpServlet {
           }
           User user = UserController.getUser(req);
           if (user == null) {
-            user = UserController.dummy("incad@incad.cz");
+            user = UserController.dummy(req.getParameter("user"));
 //            ret.put("error", "Not logged");
 //            return ret;
           }
@@ -94,10 +94,18 @@ public class AccountServlet extends HttpServlet {
                   .setRows(20)
                   .setParam("df", "fullText")
                   .setFacet(true).addFacetField("typ","state","new_stav")
-                  .setSort(SolrQuery.SortClause.desc("indextime"))
-                  .addFilterQuery("user:" + user.username)
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
+          
+          if ("kurator".equals(user.role)) {
+            query.addFilterQuery("-state:open");
+            query.addSort(SolrQuery.SortClause.desc("state"));
+            query.addSort(SolrQuery.SortClause.asc("indextime"));
+          } else {
+            query.addFilterQuery("user:" + user.username);
+            query.addSort(SolrQuery.SortClause.asc("state"));
+            query.addSort(SolrQuery.SortClause.desc("datum_zadani"));
+          }
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
@@ -169,6 +177,32 @@ public class AccountServlet extends HttpServlet {
             // return json;
           }
           json = Zadost.save(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    PROCESS_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        User user = UserController.getUser(req);
+        try {
+          String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+          if (user == null) {
+            json.put("error", "Not logged");
+            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
+            // user = new JSONObject().put("name", "testUser");
+            // return json;
+          }
+          json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

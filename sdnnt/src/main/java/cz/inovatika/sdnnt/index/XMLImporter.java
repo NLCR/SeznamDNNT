@@ -6,9 +6,7 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
-import static cz.inovatika.sdnnt.index.Indexer.LOGGER;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,7 +29,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
 /**

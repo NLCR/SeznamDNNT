@@ -20,7 +20,12 @@ export class UserDialogComponent implements OnInit {
     private service: AppService) { }
 
   ngOnInit(): void {
-    this.user = Object.assign(new User(), this.state.user);
+    if (this.data.isRegister) {
+      this.user = new User();
+    } else {
+      this.user = JSON.parse(JSON.stringify(this.state.user));
+    }
+    
   }
 
   save() {
