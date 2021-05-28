@@ -42,10 +42,10 @@ public class UserController {
       req.getSession(true).setAttribute("user", user);
       
       ret = user.toJSONObject();
-      // Pridat aktivni zadost pokud existuje stav=open
+      // Pridat aktivni zadosti pokud existujou stav=open
       JSONArray docs = UserController.getZadost(username);
       if (docs != null && !docs.isEmpty()) {
-        ret.put("zadost", docs.getJSONObject(0));
+        ret.put("zadost", docs);
       }
       return ret;
     } catch (IOException ex) {
@@ -140,7 +140,7 @@ public class UserController {
       SolrQuery query = new SolrQuery("user:\"" + username + "\"")
               .addFilterQuery("state:open")
               .setFields("id","identifiers","typ","user","state","new_stav","poznamka","pozadavek","datum_zadani","datum_vyrizeni","formular")
-              .setRows(1);
+              .setRows(2);
       QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");

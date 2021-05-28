@@ -38,7 +38,7 @@ export class AppState {
   public usedFilters: Filter[] = [];
 
   // Aktualni zadost kam se pridavaji navrhy
-  currentZadost: Zadost;
+  currentZadost: {VVS: Zadost, NZN: Zadost} = {VVS: null, NZN: null};
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
@@ -68,7 +68,17 @@ export class AppState {
     } else {
       this.logged = true;
       this.user = res;
-      this.currentZadost = res.zadost;
+      if (res.zadost) {
+        // res.zadost je Array max 2 elementy. Muze mit new_stav=NZN nebo new_stav=VVS
+        res.zadost.forEach(z => {
+          if (z.new_stav === 'NZN') {
+            this.currentZadost.NZN = z;
+          }else if (z.new_stav === 'VVS') {
+            this.currentZadost.VVS = z;
+          }
+        }); 
+        
+      }
     }
     this.loggedSubject.next(changed === this.logged);
   }

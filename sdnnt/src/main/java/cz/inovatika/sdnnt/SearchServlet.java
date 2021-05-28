@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.CatalogSearcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -74,40 +75,8 @@ public class SearchServlet extends HttpServlet {
     CATALOG {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
-          }
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("item_type","marc_990a","marc_910a","nakladatel")
-                  .setFacetMinCount(1)
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
-          for (Object o : opts.getClientConf().getJSONArray("filterFields")){
-            String field = (String)o;
-            if (req.getParameter(field) != null) {
-              query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
-            }
-          }
-          
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
-        }
-
-        return ret; 
+        CatalogSearcher searcher = new CatalogSearcher();
+        return searcher.search(req);
       }
     },
     ACCOUNT {

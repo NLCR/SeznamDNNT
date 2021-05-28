@@ -20,6 +20,8 @@ export class ResultItemComponent implements OnInit {
   @Input() doc: SolrDocument;
 
   newState = new FormControl();
+  isZarazeno: boolean;
+  hasNavhr: boolean;
 
   constructor(
     public dialog: MatDialog,
@@ -30,6 +32,8 @@ export class ResultItemComponent implements OnInit {
 
   ngOnInit(): void {
     this.newState.setValue(this.doc.marc_990a);
+    this.isZarazeno = this.doc.marc_990a?.includes('A');
+    this.hasNavhr = this.doc.zadost.length > 0;
   }
 
   showIdentifiers() {
@@ -100,11 +104,14 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-    if (!this.state.currentZadost) {
-      this.state.currentZadost = new Zadost(new Date().getTime() + '', this.state.user.username);
+    const new_stav = this.isZarazeno ? 'VVS' : 'NZN'
+    if (!this.state.currentZadost[new_stav]) {
+      const z = new Zadost(new Date().getTime() + '', this.state.user.username);
+      z.new_stav = new_stav;
+      this.state.currentZadost[new_stav] = z;
     }
-    this.state.currentZadost.identifiers.push(this.doc.identifier);
-    this.service.saveZadost(this.state.currentZadost).subscribe(res => {
+    this.state.currentZadost[new_stav].identifiers.push(this.doc.identifier);
+    this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe(res => {
       console.log(res);
     });
   }
