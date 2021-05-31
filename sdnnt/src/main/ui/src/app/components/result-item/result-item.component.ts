@@ -33,7 +33,7 @@ export class ResultItemComponent implements OnInit {
   ngOnInit(): void {
     this.newState.setValue(this.doc.marc_990a);
     this.isZarazeno = this.doc.marc_990a?.includes('A');
-    this.hasNavhr = this.doc.zadost.length > 0;
+    this.hasNavhr = !!this.doc.zadost;
   }
 
   showIdentifiers() {
@@ -111,8 +111,12 @@ export class ResultItemComponent implements OnInit {
       this.state.currentZadost[new_stav] = z;
     }
     this.state.currentZadost[new_stav].identifiers.push(this.doc.identifier);
-    this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe(res => {
-      console.log(res);
+    this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('add_to_zadost_error', res.error, true);
+      } else {
+        this.service.showSnackBar('add_to_zadost_uspesna', '', false);
+      }
     });
   }
 

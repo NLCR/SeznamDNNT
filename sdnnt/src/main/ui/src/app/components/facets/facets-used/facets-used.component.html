@@ -1,7 +1,7 @@
-<mat-list>
+<mat-list *ngIf="state.usedFilters.length > 0">
   <h3 matSubheader fxLayout="row">
     <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
-    <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
+    <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAll()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
   </h3>
   <div class="app-list-content-wrapper">
     <mat-list-item *ngFor="let f of state.usedFilters">

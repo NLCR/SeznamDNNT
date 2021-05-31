@@ -46,11 +46,17 @@ export class AppState {
   }
 
   processParams(searchParams: ParamMap) {
+    this.rows = this.config.rows;
+    this.page = 0;
     this.usedFilters = [];
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       if (p === 'q') {
         this.q = param;
+      } else if (p === 'rows') {
+        this.rows = parseInt(param);
+      } else if (p === 'page') {
+        this.page = parseInt(param);
       } else {
         if (this.config.filterFields.includes(p)) {
           this.usedFilters.push({field: p, value: param});

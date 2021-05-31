@@ -1,12 +1,12 @@
 <h1 mat-dialog-title>{{ 'desc.send_zadost' | translate }}</h1>
-<mat-form-field appearance="fill" class="app-full-width">
+<!-- <mat-form-field appearance="fill" class="app-full-width">
   <mat-label>{{ 'Navrh na zmenu stavu na' | translate }}</mat-label>
   <mat-select name="newState" [(ngModel)]="newState">
     <mat-option *ngFor="let stav of dntStates" [value]="stav">
       {{ stav }} - {{ 'state.tooltip.' + stav | translate }}
     </mat-option>
   </mat-select>
-</mat-form-field>
+</mat-form-field> -->
 <div fxLayout="row" fxLayoutGap="16px" class="app-mb-n16">
   <mat-form-field fxFlex appearance="fill">
     <mat-label>{{'pozadavek' | translate}}</mat-label>

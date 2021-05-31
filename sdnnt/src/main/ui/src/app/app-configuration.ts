@@ -22,6 +22,10 @@ import { AppState } from './app.state';
     public get snackDuration() {
         return this.config.snackDuration;
     }
+
+    public get snackRows() {
+        return this.config.rows;
+    }
     
     public get homeTabs() {
         return this.config.homeTabs;

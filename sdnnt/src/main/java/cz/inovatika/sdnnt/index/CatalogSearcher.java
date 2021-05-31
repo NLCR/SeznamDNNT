@@ -48,11 +48,10 @@ public class CatalogSearcher {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
-
     return ret;
   }
 
-  private JSONArray findZadost(String identifier) {
+  private JSONObject findZadost(String identifier) {
     try {
       SolrClient solr = Indexer.getClient();
       SolrQuery query = new SolrQuery("identifiers:\"" + identifier + "\"")
@@ -62,7 +61,12 @@ public class CatalogSearcher {
       rParser.setWriterType("json");
       qreq.setResponseParser(rParser);
       NamedList<Object> qresp = solr.request(qreq, "zadost");
-      return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
+      JSONArray docs = (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
+      if (docs.isEmpty()) {
+        return null;
+      } else {
+        return docs.optJSONObject(0);
+      }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return null;
@@ -74,14 +78,19 @@ public class CatalogSearcher {
     if (q == null) {
       q = "*";
     }
+    Options opts = Options.getInstance();
+    int rows = opts.getClientConf().getInt("rows"); 
+    if (req.getParameter("rows") != null) {
+      rows = Integer.parseInt(req.getParameter("rows"));
+    }
     SolrQuery query = new SolrQuery(q)
-            .setRows(20)
+            .setRows(rows)
             .setParam("df", "fullText")
             .setFacet(true).addFacetField("item_type", "marc_990a", "marc_910a", "nakladatel")
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
             .setFields("*,raw:[json]");
-    for (Object o : Options.getInstance().getClientConf().getJSONArray("filterFields")) {
+    for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
       if (req.getParameter(field) != null) {
         query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");

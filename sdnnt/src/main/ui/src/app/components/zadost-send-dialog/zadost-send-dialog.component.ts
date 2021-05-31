@@ -26,7 +26,6 @@ export class ZadostSendDialogComponent implements OnInit {
 
   send() {
     this.data.datum_zadani = new Date();
-    this.data.new_stav = this.newState;
     this.data.pozadavek = this.pozadavek;
     this.data.poznamka = this.poznamka;
     this.data.state = 'waiting';

@@ -19,13 +19,23 @@ export class FacetsUsedComponent implements OnInit {
 
   removeFilter(filter: Filter) {
     const q: any = {};
-    if (this.state.page > 0){
-      q.page = 0;
+    if (this.state.page > 0) {
       this.state.page = 0;
     }
     q[filter.field] = null;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
-  
+
+  removeAll() {
+    const q: any = {};
+    this.state.page = 0;
+    this.state.usedFilters.forEach(f => {
+      q[f.field] = null;
+    });
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+
+  }
+
 }
