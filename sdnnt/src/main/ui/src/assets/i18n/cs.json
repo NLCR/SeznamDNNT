@@ -102,6 +102,14 @@
     "napoveda": "Nápověda",
     "moje_konto": "Moje konto",
     "administrace": "Administrace",
-    "nkp": "Národní knihovna České republiky"
+    "nkp": "Národní knihovna České republiky",
+    "prihlaseni_uzivatele": "Přihlášení uživatele",
+    "prihlasovaci_jmeno": "Přihlašovací jméno",
+    "heslo": "Heslo",
+    "spatne_prihlasovaci_udaje": "Špatné přihlašovací údaje",
+    "prihlaseny_uzivatel": "Přihlášený uživatel",
+    "prihlasit_uzivatele": "Přihlásit uživatele",
+    "zapomeli_jste_heslo": "Zapomněli jste heslo",
+    "odhlasit": "Odhlásit"
   }
 }
