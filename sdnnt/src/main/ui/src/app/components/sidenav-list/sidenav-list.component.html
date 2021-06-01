@@ -1,17 +1,18 @@
 <mat-nav-list>
   <a mat-list-item routerLink="home" (click)="onSidenavClose()" routerLinkActive="app-active" [title]="'Home' | translate">
-    <mat-icon>home</mat-icon> {{ 'Home' | translate }}
+    <mat-icon>home</mat-icon> {{ 'desc.domu' | translate }}
   </a>
   <a mat-list-item routerLink="help" (click)="onSidenavClose()" routerLinkActive="app-active" [title]="'help' | translate ">
-    <mat-icon>help_outline</mat-icon> {{ 'help' | translate }}
+    <mat-icon>help_outline</mat-icon> {{ 'desc.napoveda' | translate }}
   </a>
   <mat-divider></mat-divider>
-  <a mat-list-item *ngIf="!state.user" (click)="showLogin(); onSidenavClose()" [title]="'Login' | translate">{{ 'Login' | translate }}</a>
-  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate">{{ 'Account' | translate }}</a>
-  <a mat-list-item *ngIf="state.user" (click)="logout(); onSidenavClose()" [title]="'Logout' | translate">{{ 'Logout' | translate }}</a>
-  <a mat-list-item *ngIf="state.user && state.user.role === 'admin'" (click)="onSidenavClose()" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate">{{ 'Admin' | translate }}</a>
-  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active">{{ state.user.jmeno }} {{ state.user.prijmeni }}</a>
+  <a mat-list-item *ngIf="!state.user" (click)="register(); onSidenavClose()" [title]="'register.button' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'register.button' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
+  <a mat-list-item *ngIf="state.user && state.user.role === 'admin'" (click)="onSidenavClose()" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="showUser(); onSidenavClose()" routerLinkActive="app-active" ><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }} {{ now | date : 'dd.MM.yyyy' }}</a>
+  <a mat-list-item *ngIf="!state.user" (click)="showLogin(); onSidenavClose()" [title]="'Login' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="logout(); onSidenavClose()" title="logout"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a>
   <mat-divider></mat-divider>
-  <a mat-list-item *ngIf="state.currentLang !== 'en'" (click)="changeLang('en'); onSidenavClose()" [title]="'EN' | translate">{{ 'EN' | translate }}</a>
-  <a mat-list-item *ngIf="state.currentLang !== 'cs'" (click)="changeLang('cs'); onSidenavClose()" [title]="'CS' | translate">{{ 'CS' | translate }}</a>
+  <a mat-list-item *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate }}</a>
+  <a mat-list-item *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate }}</a>
 </mat-nav-list>

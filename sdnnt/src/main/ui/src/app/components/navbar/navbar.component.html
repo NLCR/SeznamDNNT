@@ -24,8 +24,8 @@
       <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user" (click)="showUser()" routerLinkActive="app-active" ><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }} {{ now | date : 'dd.MM.yyyy' }}</a>
-      <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'Login' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'Login' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" (click)="logout()" title="logout"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'Logout' | translate }}</a>
+      <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'Login' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" (click)="logout()" title="logout"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a>
       <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate }}</a>
       <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate }}</a>
     </div>

@@ -28,7 +28,7 @@
 <div mat-dialog-actions>
   <ng-container *ngIf="!state.logged">
     <button mat-button (click)="login()">{{ 'desc.prihlasit_uzivatele' | translate }}</button>
-    <a mat-button href="http://api.archeologickamapa.cz/password_request/0/">{{ 'desc.zapomeli_jste_heslo' | translate }}</a>
+    <a mat-button href="#">{{ 'desc.zapomeli_jste_heslo' | translate }}</a>
   </ng-container>
   <ng-container *ngIf="state.logged">
     <button mat-button (click)="logout()">{{ 'desc.odhlasit' | translate }}</button>
