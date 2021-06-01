@@ -139,6 +139,12 @@ a {
   }
 }
 
+.app-pa {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 // checkbox
 .mat-checkbox {
   margin-right: $app-gap-half;

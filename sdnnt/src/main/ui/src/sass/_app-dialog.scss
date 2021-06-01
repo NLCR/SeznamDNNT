@@ -1,2 +1,11 @@
 // --- DIALOG ---
 
+.app-login-dialog {
+  .mat-dialog-container {
+    position: relative;
+
+    .mat-progress-bar {
+      @extend .app-pa;
+    }
+  }
+}
