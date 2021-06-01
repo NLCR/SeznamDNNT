@@ -88,18 +88,18 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
-  approveNavrh(doc: SolrDocument, new_stav: string): Observable<string> {
+  approveNavrh(identifier: string, zadost: Zadost): Observable<string> {
     let url = '/account/approve_navrh';
     const params: HttpParams = new HttpParams()
     .set('user', this.state.user.username);
-    return this.post(url, {doc, new_stav}, params);
+    return this.post(url, {identifier, zadost}, params);
   }
 
-  rejectNavrh(doc: SolrDocument, new_stav: string): Observable<string> {
+  rejectNavrh(identifier: string, zadost: Zadost): Observable<string> {
     let url = '/account/reject_navrh';
     const params: HttpParams = new HttpParams()
     .set('user', this.state.user.username);
-    return this.post(url, {doc, new_stav}, params);
+    return this.post(url, {identifier, zadost}, params);
   }
 
   getZadost(id: string[]): Observable<any> {

@@ -15,6 +15,7 @@ export class ZadostInfoDialogComponent implements OnInit {
 
   docs: SolrDocument[];
   action: string;
+  process: {[key: string]: string};
 
   constructor(
     public dialogRef: MatDialogRef<ZadostInfoDialogComponent>,
@@ -27,24 +28,41 @@ export class ZadostInfoDialogComponent implements OnInit {
       this.docs = resp.response.docs;
       this.action = this.data.new_stav;
     });
+    this.process = this.data.process ? JSON.parse(this.data.process) : {};
   }
 
   approve(doc: SolrDocument) {
-    this.service.approveNavrh(doc, this.data.new_stav).subscribe((res: any) => {
+    this.service.approveNavrh(doc.identifier, this.data).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('approve_navrh_error', res.error, true);
       } else {
         this.service.showSnackBar('approve_navrh_success', '', false);
+        this.data = res; 
+        this.process = this.data.process ? JSON.parse(this.data.process) : {};
+      }
+    });
+  }
+
+  approveLib(doc: SolrDocument) {
+    this.service.approveNavrh(doc.identifier, this.data).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('approve_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.data = res; 
+        this.process = this.data.process ? JSON.parse(this.data.process) : {};
       }
     });
   }
 
   reject(doc: SolrDocument) {
-    this.service.rejectNavrh(doc, this.data.new_stav).subscribe((res: any) => {
+    this.service.rejectNavrh(doc.identifier, this.data).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('approve_navrh_error', res.error, true);
+        this.service.showSnackBar('reject_navrh_error', res.error, true);
       } else {
-        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.service.showSnackBar('reject_navrh_success', '', false);
+        this.data = res;
+        this.process = this.data.process ? JSON.parse(this.data.process) : {};
       }
     });
   }

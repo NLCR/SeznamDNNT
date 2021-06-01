@@ -32,7 +32,7 @@ export class ResultItemComponent implements OnInit {
 
   ngOnInit(): void {
     this.newState.setValue(this.doc.marc_990a);
-    this.isZarazeno = this.doc.marc_990a?.includes('A');
+    this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
     this.hasNavhr = !!this.doc.zadost;
   }
 

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -58,6 +59,9 @@ public class Zadost {
   @Field
   public String formular;
   
+  @Field
+  public String process;
+  
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     Zadost o = objectMapper.readValue(json, Zadost.class); 
@@ -67,7 +71,9 @@ public class Zadost {
   public JSONObject toJSON() {
     try {
       ObjectMapper mapper = new ObjectMapper();
-      return new JSONObject(mapper.writeValueAsString(this));
+      JSONObject ret = new JSONObject(mapper.writeValueAsString(this));
+      // ret.put("process", new JSONObject(this.process));
+      return ret;
     } catch (JsonProcessingException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
@@ -100,13 +106,44 @@ public class Zadost {
     }
   }
   
+  public static JSONObject approve(String identifier, String js, String username) {
+    try {
+      Zadost zadost = Zadost.fromJSON(js);
+      JSONObject p = new JSONObject();
+      if (zadost.process != null) {
+        p = new JSONObject(zadost.process);
+      }
+      p.put(identifier, "approved");
+      zadost.process = p.toString();
+      return save(zadost);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
+  public static JSONObject reject(String identifier, String js, String username) {
+    try {
+      Zadost zadost = Zadost.fromJSON(js);
+      JSONObject p = new JSONObject();
+      if (zadost.process != null) {
+        p = new JSONObject(zadost.process);
+      }
+      p.put(identifier, "rejected");
+      zadost.process = p.toString();
+      return save(zadost);
+    } catch (JsonProcessingException | JSONException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
   public static JSONObject save(Zadost zadost) {
-
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       solr.addBean("zadost", zadost);
       solr.commit("zadost");
       solr.close();
-      return new JSONObject(zadost.toJSON());
+      return zadost.toJSON();
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);

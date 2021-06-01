@@ -199,6 +199,61 @@ public class Indexer {
     return ret;
   }
 
+  public static JSONObject changeStav(String identifier, String navrh, String user) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = getClient();
+      SolrQuery q = new SolrQuery("*").setRows(1)
+              .addFilterQuery("identifier:\"" + identifier + "\"")
+              .setFields("raw, marc_990a");
+      SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
+      String oldRaw = (String) docOld.getFirstValue("raw");
+      String oldStav = (String) docOld.getFirstValue("marc_990a");
+      System.out.println(oldStav);
+      ObjectMapper mapper = new ObjectMapper();
+      
+      MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+      if (navrh.equals("VVS")) {
+        if (oldStav.equals("A")) {
+          mr.setStav("VS");
+        } else if (oldStav.equals("PA")) {
+          mr.setStav("VN");
+        }
+        
+      } else if (navrh.equals("NZN")){
+        mr.setStav("A");
+      }
+      
+      JsonNode source = mapper.readTree(oldRaw);
+      JsonNode target = mapper.readTree(mr.toJSON().toString());
+
+      JsonNode fwPatch = JsonDiff.asJson(source, target);
+      JsonNode bwPatch = JsonDiff.asJson(target, source);
+      
+      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
+      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
+
+      // Insert in history
+      SolrInputDocument idoc = new SolrInputDocument();
+      idoc.setField("identifier", identifier);
+      idoc.setField("user", user);
+      idoc.setField("type", "app");
+      idoc.setField("changes", ret.toString());
+      solr.add("history", idoc);
+      solr.commit("history");
+
+      // Update record in catalog
+      mr.fillSolrDoc();
+      solr.add("catalog", mr.toSolrDoc());
+      solr.commit("catalog");
+      
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
   /**
    * Save record in catalog. Generates diff path and index to history core We
    * store the patch in both orders, forward and backwards

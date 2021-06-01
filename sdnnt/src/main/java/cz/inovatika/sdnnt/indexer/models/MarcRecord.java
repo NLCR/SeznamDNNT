@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.index.ISBN;
 import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +91,23 @@ public class MarcRecord {
     addDedup();
     addEAN();
     return sdoc;
+  }
+  
+  public void setStav(String new_stav) {
+    if (!dataFields.containsKey("990")) {
+      List<DataField> ldf = new ArrayList<>();
+      DataField df = new DataField("990", " ", " ");
+      SubField sf = new SubField("a", new_stav);
+      List<SubField> lsf = new ArrayList<>();
+      lsf.add(sf);
+      df.subFields.put("a", lsf);
+      ldf.add(df);
+      dataFields.put("990", ldf);
+    } else {
+      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
+    }
+    
+    
   }
 
   public void fillSolrDoc() {

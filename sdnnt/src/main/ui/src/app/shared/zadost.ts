@@ -9,6 +9,7 @@ export class Zadost {
   new_stav: string;
   poznamka: string;
   identifiers: string[];
+  process: string;
 
   constructor(timestamp: string, user: string) {
     this.id = user + timestamp;

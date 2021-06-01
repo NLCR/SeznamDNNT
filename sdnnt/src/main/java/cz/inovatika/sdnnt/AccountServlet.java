@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
@@ -207,14 +208,37 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          String inputJs;
+          JSONObject inputJs;
           if (req.getMethod().equals("POST")) {
-            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
           } else {
-            inputJs = req.getParameter("json");
+            inputJs = new JSONObject(req.getParameter("json"));
           }
-          System.out.println(inputJs);
+          Indexer.changeStav(inputJs.getString("identifier"), 
+                  inputJs.getJSONObject("zadost").getString("new_stav"), user.username);
+          return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
           // json = Zadost.markAsProcessed(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    REJECT_NAVRH {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          JSONObject inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+          } else {
+            inputJs = new JSONObject(req.getParameter("json"));
+          }
+          Indexer.changeStav(inputJs.getString("identifier"), 
+                  inputJs.getJSONObject("zadost").getString("new_stav"), user.username);
+          return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
