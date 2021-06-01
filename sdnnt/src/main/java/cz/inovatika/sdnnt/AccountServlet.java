@@ -49,11 +49,16 @@ public class AccountServlet extends HttpServlet {
     try {
       String actionNameParam = request.getPathInfo().substring(1);
       if (actionNameParam != null) {
+      User user = null;  
+          if (user == null) {
+            user = UserController.dummy(request.getParameter("user"));
+            // out.print("{\"error\": \"Not logged\"}");
+            // return;
+          }
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(request, response);
+        JSONObject json = actionToDo.doPerform(request, response, user);
         out.println(json.toString(2));
       } else {
-
         out.print("actionNameParam -> " + actionNameParam);
       }
     } catch (IOException e1) {
@@ -76,7 +81,7 @@ public class AccountServlet extends HttpServlet {
   enum Actions {
     SEARCH {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
@@ -84,12 +89,7 @@ public class AccountServlet extends HttpServlet {
           if (q == null) {
             q = "*";
           }
-          User user = UserController.getUser(req);
-          if (user == null) {
-            user = UserController.dummy(req.getParameter("user"));
-//            ret.put("error", "Not logged");
-//            return ret;
-          }
+          
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
                   .setParam("df", "fullText")
@@ -123,17 +123,11 @@ public class AccountServlet extends HttpServlet {
     },
     GET_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           
-          User user = UserController.getUser(req);
-          if (user == null) {
-            user = UserController.dummy("incad@incad.cz");
-//            ret.put("error", "Not logged");
-//            return ret;
-          }
           System.out.println(req.getParameter("identifiers"));
           String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
           System.out.println(q);
@@ -160,9 +154,8 @@ public class AccountServlet extends HttpServlet {
     },
     SAVE_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
-        User user = UserController.getUser(req);
         try {
           String inputJs;
           if (req.getMethod().equals("POST")) {
@@ -186,9 +179,8 @@ public class AccountServlet extends HttpServlet {
     },
     PROCESS_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
-        User user = UserController.getUser(req);
         try {
           String inputJs;
           if (req.getMethod().equals("POST")) {
@@ -210,16 +202,30 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+    APPROVE_NAVRH {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+          System.out.println(inputJs);
+          // json = Zadost.markAsProcessed(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     ADD_ID {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
-        User user = UserController.getUser(req);
-        if (user == null) {
-          json.put("error", "Not logged");
-          // user = new JSONObject().put("name", "testUser");
-          return json;
-        }
         try {
           
           // json = Zadost.save(req.getParameter("id"), req.getParameter("identifier"), user.username);
@@ -231,7 +237,7 @@ public class AccountServlet extends HttpServlet {
       }
     };
 
-    abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response, User user) throws Exception;
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

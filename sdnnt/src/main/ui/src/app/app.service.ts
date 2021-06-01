@@ -9,6 +9,7 @@ import { User } from './shared/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppConfiguration } from './app-configuration';
 import { Zadost } from './shared/zadost';
+import { SolrDocument } from './shared/solr-document';
 
 @Injectable()
 export class AppService {
@@ -28,8 +29,8 @@ export class AppService {
     return this.http.get<T>(`api/${url}`, options);
   }
 
-  private post(url: string, obj: any) {
-    return this.http.post<any>(`api${url}`, obj);
+  private post(url: string, obj: any, params: HttpParams = new HttpParams()) {
+    return this.http.post<any>(`api${url}`, obj, {params});
   }
 
   getTranslation(s: string): string {
@@ -68,19 +69,37 @@ export class AppService {
     return this.get(url, params);
   }
 
-  saveRecord(id: string, raw: any): Observable<string> {
+  saveRecord(id: string, raw: any): Observable<any> {
     let url = '/index/save?id=' + id;
     return this.post(url, raw);
   }
 
-  saveZadost(zadost: Zadost): Observable<string> {
+  saveZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_zadost';
-    return this.post(url, zadost);
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, zadost, params);
   }
 
-  processZadost(zadost: Zadost): Observable<string> {
+  processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
-    return this.post(url, zadost);
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, zadost, params);
+  }
+
+  approveNavrh(doc: SolrDocument, new_stav: string): Observable<string> {
+    let url = '/account/approve_navrh';
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, {doc, new_stav}, params);
+  }
+
+  rejectNavrh(doc: SolrDocument, new_stav: string): Observable<string> {
+    let url = '/account/reject_navrh';
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, {doc, new_stav}, params);
   }
 
   getZadost(id: string[]): Observable<any> {

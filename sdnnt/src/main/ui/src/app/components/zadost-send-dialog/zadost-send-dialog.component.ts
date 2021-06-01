@@ -36,7 +36,7 @@ export class ZadostSendDialogComponent implements OnInit {
         this.service.showSnackBar('send_zadost_uspesna', '', false);
         this.dialogRef.close();
       }
-    })
+    });
   }
 
 }

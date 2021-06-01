@@ -30,7 +30,23 @@ export class ZadostInfoDialogComponent implements OnInit {
   }
 
   approve(doc: SolrDocument) {
+    this.service.approveNavrh(doc, this.data.new_stav).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('approve_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('approve_navrh_success', '', false);
+      }
+    });
+  }
 
+  reject(doc: SolrDocument) {
+    this.service.rejectNavrh(doc, this.data.new_stav).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('approve_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('approve_navrh_success', '', false);
+      }
+    });
   }
 
 }
