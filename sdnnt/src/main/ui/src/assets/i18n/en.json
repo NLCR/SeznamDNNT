@@ -95,6 +95,7 @@
     "prihlasit_uzivatele": "Log in user",
     "zapomeli_jste_heslo": "Did you forget the password",
     "odhlasit": "Logout",
-    "prihlasit": "Login"
+    "prihlasit": "Login",
+    "kontaktni_udaje": "Contact information"
   }
 }

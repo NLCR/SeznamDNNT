@@ -1,11 +1,8 @@
-<h1 mat-dialog-title>
-  <span class="app-pipe"></span>
-  Kontaktní údaje
-</h1>
+<h1 mat-dialog-title>{{ 'desc.kontaktni_udaje' | translate }}</h1>
 <div mat-dialog-content>
-    <app-user-form [user]="user" [isRegister]="data.isRegister"></app-user-form>
+  <app-user-form [user]="user" [isRegister]="data.isRegister"></app-user-form>
 </div>
 <div mat-dialog-actions>
-  <button mat-flat-button color="primary" (click)="save()">Uložit</button>
-  <button mat-button mat-dialog-close>Zavřít</button>
+  <button mat-flat-button color="primary" (click)="save()">{{ 'desc.ulozit' | translate }}</button>
+  <button mat-button mat-dialog-close>{{ 'desc.zavrit' | translate }}</button>
 </div>
