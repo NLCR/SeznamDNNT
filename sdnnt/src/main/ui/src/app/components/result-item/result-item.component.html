@@ -30,7 +30,7 @@
         <mat-icon>check</mat-icon> {{ 'desc.zmena_stavu' | translate }}
       </button> -->
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr" (click)="addToZadost()">
-        <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navhr_na_vyrazeni' : 'desc.navhr_na_zarazeni') | translate }}
+        <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navhr_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
     </div>
   </mat-card-actions>

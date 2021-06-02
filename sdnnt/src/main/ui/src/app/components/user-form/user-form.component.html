@@ -1,7 +1,7 @@
 <ng-container *ngIf="user">
   <div fxLayout="row wrap" class="app-register-wrapper" fxLayoutAlign="start baseline">
     <div fxFlex="50%">
-      <div class="app-mr-16">
+      <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.jmeno' | translate }}</mat-label>
           <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
@@ -17,7 +17,7 @@
       </div>
     </div>
     <div fxFlex="50%">
-      <div class="app-mr-16">
+      <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
           <input matInput [(ngModel)]="user.username" name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate" [disabled]="!isRegister" />
@@ -33,7 +33,7 @@
       </div>
     </div>
     <div fxFlex="50%">
-      <div class="app-mr-16">
+      <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
           <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" />
@@ -57,7 +57,7 @@
       </div>
     </div>
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
-      <div class="app-mr-16">
+      <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.role' | translate }}</mat-label>
           <mat-select name="role"  [(ngModel)]="user.role">

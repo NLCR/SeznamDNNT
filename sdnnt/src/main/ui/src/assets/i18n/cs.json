@@ -120,6 +120,21 @@
     "je_aktivni": "Je aktivní",
     "poznamka": "Poznámka",
     "prehled_roli": "Přehled rolí",
-    "formular": "Formulář"
+    "formular": "Formulář",
+    "navrh_na_zarazeni": "Návrh na zařazení",
+    "datum_zadani": "Datum zadání",
+    "uzivatel": "Uživatel",
+    "navhr_na_stav": "Návrh na stav",
+    "datum_vyrizeni": "Datum vyřízení",
+    "pocet_zadosti": "Počet žádostí",
+    "pozadavek": "Požadavek",
+    "stav_zadosti": "Stav žádosti",
+    "neodeslano": "Neodesláno",
+    "ceka_na_posouzeni": "Čeká na posouzení",
+    "zpracovano": "Zpracováno",
+    "typ_navrhu": "Typ návrhu",
+    "navrzeno_na_zarazeni": "Navrženo na zařazení",
+    "navrzeno_na_vyrazeni": "Navrženo na vyřazení",
+    "nedoreseno": "Nedořešeno"
   }
 }

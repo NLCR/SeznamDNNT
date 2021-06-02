@@ -23,7 +23,7 @@ export class AccountComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['datum_zadani','user', 'state', 'new_stav','datum_vyrizeni','count', 'pozadavek','actions'];
+  displayedColumns = ['datum_zadani','user', 'state', 'new_stav','datum_vyrizeni','count', 'pozadavek','poznamka','actions'];
   zadosti: Zadost[] = [];
 
 
