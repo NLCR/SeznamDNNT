@@ -3,7 +3,8 @@
     "placeholder": "Set query ..."
   },
   "register": {
-    "button": "Login/register using NDK"
+    "button_old": "Login/register using NDK",
+    "button": "To register"
   },
   "home": {
     "news": "News",
@@ -15,7 +16,7 @@
     "api": "API description"
   },
   "record": {
-    "state": "stav"
+    "state": "status"
   },
   "state": {
     "undefined": "unclassified",
@@ -24,6 +25,7 @@
     "VS": "discarded - work was on the list (A)",
     "VN": "discarded - the work was on the draft list (PA)",
     "N": "unclassified",
+    "NZ": "on-site terminal license",
     "NZN": "proposal for inclusion",
     "VVN": "call for decommissioning",
     "VVS": "call for decommissioning",
@@ -35,6 +37,7 @@
       "VS": "discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
       "VN": "discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
       "N": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
+      "NZ": "On-site terminal license",
       "NZN": "proposal for inclusion in the Draft List (internal state of administration)",
       "VVN": "request for exclusion from the List Design (internal state of administration)",
       "VVS": "request to be removed from the List (internal state of administration)"
@@ -42,16 +45,29 @@
   },
 
   "field": {
-    "015a": "Číslo nár.bibl.",
+    "015a": "Number nr.bibl.",
     "020a": "ISBN",
     "022a": "ISSN",
-    "m": "Monograph",
+    "m": "Monographs",
     "s": "Serial",
     "i": "Musi se doplnit",
     "a": "Taky se musi",
 
     "item_type": "Document type",
-    "marc_990a": "Document status"
+    "nakladatel": "Publisher",
+    "marc_990a": "Document status",
+    "marc_910a": "Sigla",
+
+    "undefined": "unclassified",
+    "PA": "PA: work published as a draft",
+    "A": "A: classified",
+    "VS": "VS: discarded - the work was on the list (A)",
+    "VN": "VN: discarded - the work was on the draft list (PA)",
+    "N": "N: unclassified",
+    "NZ": "NZ: On-site terminal license",
+    "NZN": "NZN: proposal for inclusion",
+    "VVN": "VVN: call for decommissioning",
+    "VVS": "VVS: call for decommissioning"
   },
 
   "desc": {
@@ -102,6 +118,8 @@
     "telefon": "Phone",
     "adresa": "Address",
     "je_aktivni": "Is active",
-    "poznamka": "Note"
+    "poznamka": "Note",
+    "prehled_roli": "Role overview",
+    "formular": "Form"
   }
 }
