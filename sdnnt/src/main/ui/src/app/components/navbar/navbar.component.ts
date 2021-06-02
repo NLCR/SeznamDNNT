@@ -79,7 +79,7 @@ export class NavbarComponent implements OnInit {
     
     const d = this.dialog.open(UserDialogComponent, {
       width: '450px',
-      panelClass: 'app-login-dialog',
+      panelClass: 'app-register-dialog',
       data: {isRegister: true}
     });
 

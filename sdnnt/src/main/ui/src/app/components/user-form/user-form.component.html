@@ -1,57 +1,83 @@
 <ng-container *ngIf="user">
-  <div fxLayout="row" fxLayoutGap="16px">
-    <div fxFlex>
-      <mat-form-field class="app-full-width">
-        <mat-label>Jméno</mat-label>
-        <input matInput cdkFocusInitial name="name" placeholder="Jméno" [(ngModel)]="user.jmeno" />
-      </mat-form-field>
-      <mat-form-field class="app-full-width">
-        <mat-label>Login</mat-label>
-        <input matInput [(ngModel)]="user.username" name="login" placeholder="Login" [disabled]="!isRegister" />
-      </mat-form-field>
-      <div fxLayout="row" fxLayoutGap="16px" class="app-field-group">
-        <mat-form-field fxFlex class="app-full-width">
+  <div fxLayout="row wrap" class="app-register-wrapper" fxLayoutAlign="start baseline">
+    <div fxFlex="50%">
+      <div class="app-mr-16">
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Jméno</mat-label>
+          <input matInput cdkFocusInitial name="name" placeholder="Jméno" [(ngModel)]="user.jmeno" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Příjmení</mat-label>
+          <input matInput name="surname" placeholder="Příjmení" [(ngModel)]="user.prijmeni" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%">
+      <div class="app-mr-16">
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Login</mat-label>
+          <input matInput [(ngModel)]="user.username" name="login" placeholder="Login" [disabled]="!isRegister" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Email</mat-label>
+          <input matInput name="email" placeholder="Email" [(ngModel)]="user.email" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%">
+      <div class="app-mr-16">
+        <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>Telefon</mat-label>
           <input matInput name="phone" placeholder="Telefonní číslo" [(ngModel)]="user.telefon" />
         </mat-form-field>
       </div>
-      <mat-form-field class="app-full-width" *ngIf="state.user?.role === 'admin'">
-        <mat-label>Role</mat-label>
-        <!-- <input matInput name="role" placeholder="Role" [(ngModel)]="user.role" /> -->
-        <mat-select name="role"  [(ngModel)]="user.role">
-          <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
-        </mat-select>
-      </mat-form-field>
     </div>
-    <div fxFlex>
-      <mat-form-field class="app-full-width">
-        <mat-label>Příjmení</mat-label>
-        <input matInput name="surname" placeholder="Příjmení" [(ngModel)]="user.prijmeni" />
-      </mat-form-field>
-      <mat-form-field class="app-full-width">
-        <mat-label>Email</mat-label>
-        <input matInput name="email" placeholder="Email" [(ngModel)]="user.email" />
-      </mat-form-field>
-      <mat-form-field class="app-full-width">
-        <mat-label>IČO</mat-label>
-        <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico" />
-        <!-- <mat-select name="organization" [(ngModel)]="user.instituce">
-          <mat-option *ngFor="let f of config.instituce" [value]="f">{{ translate('soud', f) }}</mat-option>
-        </mat-select> -->
-      </mat-form-field>
-      <mat-form-field class="app-full-width">
-        <mat-label>Adresa</mat-label>
-        <input matInput name="adresa" placeholder="Adresa" [(ngModel)]="user.adresa" />
-      </mat-form-field>
-      <mat-checkbox *ngIf="state.user?.role === 'admin'" name="isactive" [(ngModel)]="user.isActive">{{ 'isactive' | translate }}</mat-checkbox>
+    <div fxFlex="50%">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>IČO</mat-label>
+          <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico" />
+        </mat-form-field>
+      </div>
     </div>
-  </div>
-  <div fxLayout="row">
-    <div fxFlex>
-      <mat-form-field class="app-full-width">
-        <mat-label>Poznámka</mat-label>
-        <textarea matInput placeholder="Poznámka" name="poznamka" [(ngModel)]="user.poznamka"></textarea>
-      </mat-form-field>
+    <div fxFlex="100%">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Adresa</mat-label>
+          <input matInput name="adresa" placeholder="Adresa" [(ngModel)]="user.adresa" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
+      <div class="app-mr-16">
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Role</mat-label>
+          <mat-select name="role"  [(ngModel)]="user.role">
+            <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
+      <div>
+        <mat-checkbox name="isactive" [(ngModel)]="user.isActive" class="app-ml-8">{{ 'isactive' | translate }}</mat-checkbox>
+      </div>
+    </div>
+    <div fxFlex="100%">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>Poznámka</mat-label>
+          <textarea matInput placeholder="Poznámka" name="poznamka" [(ngModel)]="user.poznamka"></textarea>
+        </mat-form-field>
+      </div>
     </div>
   </div>
 </ng-container>
