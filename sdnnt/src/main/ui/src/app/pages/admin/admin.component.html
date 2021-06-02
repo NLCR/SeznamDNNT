@@ -11,7 +11,7 @@
           </mat-list>
         </div>
         <div>
-          <div class="app-row-gap-16">
+          <div class="app-mb-16">
             <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig"></angular-editor>
           </div>
           <button mat-stroked-button (click)="saveText()">{{ 'desc.ulozit' | translate }}</button>
@@ -39,9 +39,7 @@
           </mat-list>
         </div>
         <div fxFlex="1 1 auto">
-          <div class="app-row-gap-16">
-            <app-user-form [user]="selUser"></app-user-form>
-          </div>
+          <app-user-form [user]="selUser"></app-user-form>
           <button mat-stroked-button (click)="saveUser()">{{ 'desc.ulozit' | translate }}</button>
         </div>
       </div>

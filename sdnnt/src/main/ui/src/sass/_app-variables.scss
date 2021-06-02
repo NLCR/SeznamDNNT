@@ -33,6 +33,16 @@ $states: (
   "VVS": mat-color($mat-brown, $state_shade)
 );
 
+// gaps
+$gaps: (
+  "0": 0,
+  "1": 4,
+  "2": 8,
+  "3": 12,
+  "4": 16,
+  "5": 32
+);
+
 // layout
 $app-gap: 16px !default;
 $app-gap-half: calc(#{$app-gap} / 2) !default;
