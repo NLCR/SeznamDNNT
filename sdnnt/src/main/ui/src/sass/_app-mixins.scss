@@ -49,3 +49,42 @@
     }
   }
 }
+
+// set gap
+@mixin setGap() {
+  @each $gap, $val in $gaps {
+    // margin
+    .app-m-#{$gap} {
+      margin: #{$val}px !important;
+    }
+    .app-ml-#{$gap} {
+      margin-left: #{$val}px !important;
+    }
+    .app-mr-#{$gap} {
+      margin-right: #{$val}px !important;
+    }
+    .app-mt-#{$gap} {
+      margin-top: #{$val}px !important;
+    }
+    .app-mb-#{$gap} {
+      margin-bottom: #{$val}px !important;
+    }
+    
+    // padding
+    .app-p-#{$gap} {
+      padding: #{$val}px !important;
+    }
+    .app-pl-#{$gap} {
+      padding-left: #{$val}px !important;
+    }
+    .app-pr-#{$gap} {
+      padding-right: #{$val}px !important;
+    }
+    .app-pt-#{$gap} {
+      padding-top: #{$val}px !important;
+    }
+    .app-pb-#{$gap} {
+      padding-bottom: #{$val}px !important;
+    }
+  }
+}
