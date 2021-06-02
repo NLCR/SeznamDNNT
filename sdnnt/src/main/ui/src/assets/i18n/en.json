@@ -96,6 +96,12 @@
     "zapomeli_jste_heslo": "Did you forget the password",
     "odhlasit": "Logout",
     "prihlasit": "Login",
-    "kontaktni_udaje": "Contact information"
+    "kontaktni_udaje": "Contact information",
+    "jmeno": "Name",
+    "prijmeni": "Surname",
+    "telefon": "Phone",
+    "adresa": "Address",
+    "je_aktivni": "Is active",
+    "poznamka": "Note"
   }
 }

@@ -3,24 +3,24 @@
     <div fxFlex="50%">
       <div class="app-mr-16">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Jméno</mat-label>
-          <input matInput cdkFocusInitial name="name" placeholder="Jméno" [(ngModel)]="user.jmeno" />
+          <mat-label>{{ 'desc.jmeno' | translate }}</mat-label>
+          <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
     <div fxFlex="50%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Příjmení</mat-label>
-          <input matInput name="surname" placeholder="Příjmení" [(ngModel)]="user.prijmeni" />
+          <mat-label>{{ 'desc.prijmeni' | translate }}</mat-label>
+          <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
       </div>
     </div>
     <div fxFlex="50%">
       <div class="app-mr-16">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Login</mat-label>
-          <input matInput [(ngModel)]="user.username" name="login" placeholder="Login" [disabled]="!isRegister" />
+          <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
+          <input matInput [(ngModel)]="user.username" name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate" [disabled]="!isRegister" />
         </mat-form-field>
       </div>
     </div>
@@ -35,8 +35,8 @@
     <div fxFlex="50%">
       <div class="app-mr-16">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Telefon</mat-label>
-          <input matInput name="phone" placeholder="Telefonní číslo" [(ngModel)]="user.telefon" />
+          <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
+          <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" />
         </mat-form-field>
       </div>
     </div>
@@ -51,15 +51,15 @@
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Adresa</mat-label>
-          <input matInput name="adresa" placeholder="Adresa" [(ngModel)]="user.adresa" />
+          <mat-label>{{ 'desc.adresa' | translate }}</mat-label>
+          <input matInput name="adresa" [placeholder]="'desc.adresa' | translate" [(ngModel)]="user.adresa" />
         </mat-form-field>
       </div>
     </div>
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
       <div class="app-mr-16">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Role</mat-label>
+          <mat-label>{{ 'desc.role' | translate }}</mat-label>
           <mat-select name="role"  [(ngModel)]="user.role">
             <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
           </mat-select>
@@ -68,14 +68,14 @@
     </div>
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
       <div>
-        <mat-checkbox name="isactive" [(ngModel)]="user.isActive" class="app-ml-8">{{ 'isactive' | translate }}</mat-checkbox>
+        <mat-checkbox name="isactive" [(ngModel)]="user.isActive" class="app-ml-8">{{ 'desc.je_aktivni' | translate }}</mat-checkbox>
       </div>
     </div>
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Poznámka</mat-label>
-          <textarea matInput placeholder="Poznámka" name="poznamka" [(ngModel)]="user.poznamka"></textarea>
+          <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
+          <textarea matInput [placeholder]="'desc.poznamka' | translate" name="poznamka" [(ngModel)]="user.poznamka"></textarea>
         </mat-form-field>
       </div>
     </div>

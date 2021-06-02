@@ -112,6 +112,12 @@
     "zapomeli_jste_heslo": "Zapomněli jste heslo",
     "odhlasit": "Odhlásit",
     "prihlasit": "Přihlásit",
-    "kontaktni_udaje": "Kontaktní údaje"
+    "kontaktni_udaje": "Kontaktní údaje",
+    "jmeno": "Jméno",
+    "prijmeni": "Příjmení",
+    "telefon": "Telefon",
+    "adresa": "Adresa",
+    "je_aktivni": "Je aktivní",
+    "poznamka": "Poznámka"
   }
 }
