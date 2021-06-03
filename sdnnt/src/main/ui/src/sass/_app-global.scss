@@ -88,6 +88,10 @@ a {
   border-color: $app-brand-border-color;
 }
 
+.app-fx-facets {
+  padding-top: 12px;
+}
+
 // utility
 .app-font-bold {
   font-weight: 700;
@@ -168,6 +172,12 @@ a {
 
     .mat-expansion-panel-body {
       padding-top: $app-gap;
+
+      .app-fx-facets & {
+        a {
+          color: $app-gray-6;
+        }
+      }
 
       .app-count {
         color: $app-gray-5;

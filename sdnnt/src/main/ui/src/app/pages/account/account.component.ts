@@ -16,7 +16,7 @@ import { Zadost } from 'src/app/shared/zadost';
   styleUrls: ['./account.component.scss']
 })
 export class AccountComponent implements OnInit {
-
+  
   loading: boolean;
   items: SolrDocument[];
   searchResponse: SolrResponse;

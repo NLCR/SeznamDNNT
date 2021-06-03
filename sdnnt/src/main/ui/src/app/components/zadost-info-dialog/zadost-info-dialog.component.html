@@ -5,6 +5,10 @@
   <div class="app-results-wrapper">
     <mat-card *ngFor="let doc of docs">
       <mat-card-header fxLayout="row" fxLayoutGap="16px">
+        <div *ngIf="imgSrc">
+          <img [src]="imgSrc" />
+          <!-- <img src="https://kramerius.army.cz/search/api/v5.0/item/uuid:cd2f0ca9-4e72-4b93-b2c0-10ca07fdb087/thumb" /> -->
+        </div>
         <div>
           <mat-card-title><span>{{ doc.title }}</span></mat-card-title>
           <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</mat-card-subtitle>
