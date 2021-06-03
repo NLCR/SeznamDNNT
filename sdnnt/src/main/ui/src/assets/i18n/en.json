@@ -150,6 +150,8 @@
     "dedic_autorskych_prav": "Heir to copyright",
     "jiny_nositel": "Another copyright holder / executor",
     "nakladatel_vydavatel": "Publisher",
-    "podminky": "Conditions"
+    "podminky": "Conditions",
+    "kontaktni_osoba_jmeno": "Contact person - name",
+    "kontaktni_osoba_prijmeni": "Contact person - surname"
   }
 }

@@ -1,6 +1,6 @@
 <ng-container *ngIf="user">
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-    <div fxFlex="100%" class="app-mb-4">
+    <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
       <mat-radio-group [(ngModel)]="formTypeSelected">
         <mat-radio-button [value]="1">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
         <mat-radio-button [value]="2">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
@@ -67,6 +67,22 @@
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.adresa' | translate }}</mat-label>
           <input matInput name="adresa" [placeholder]="'desc.adresa' | translate" [(ngModel)]="user.adresa" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%" *ngIf="formTypeSelected === 2">
+      <div class="app-mr-4">
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}</mat-label>
+          <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%" *ngIf="formTypeSelected === 2">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}</mat-label>
+          <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
       </div>
     </div>

@@ -150,6 +150,8 @@
     "dedic_autorskych_prav": "Dědic autorských práv",
     "jiny_nositel": "Jiný nositel / vykonavatel autorských práv",
     "nakladatel_vydavatel": "Nakladatel / vydavatel",
-    "podminky": "Podmínky"
+    "podminky": "Podmínky",
+    "kontaktni_osoba_jmeno": "Kontaktní osoba - jméno",
+    "kontaktni_osoba_prijmeni": "Kontaktní osoba - příjmení"
   }
 }
