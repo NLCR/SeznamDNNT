@@ -71,7 +71,9 @@ $app-searchbar-field-color: $app-color-darknes !default;
 $app-searchbar-field-bg: $app-gray-2 !default;
 $app-searchbar-field-icon-gap: calc(#{$app-gap-icon} * 2) !default;
 
-
 // footer
 $app-footer-bg: $app-gray-9 !default;
 $app-footer-color: rgba($app-color-lightnes, .6) !default;
+
+// mat radio button
+$app-mat-radio-button-size: 16px !default

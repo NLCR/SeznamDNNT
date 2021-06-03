@@ -135,6 +135,9 @@
     "typ_navrhu": "Design type",
     "navrzeno_na_zarazeni": "Designed for inclusion",
     "navrzeno_na_vyrazeni": "Designed to be discarded",
-    "nedoreseno": "Unresolved"
+    "nedoreseno": "Unresolved",
+    "fyzicka_osoba": "Individual",
+    "pravnicka_osoba": "Legal entity",
+    "nazev_spolecnosti": "Company name"
   }
 }

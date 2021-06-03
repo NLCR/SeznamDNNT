@@ -135,6 +135,9 @@
     "typ_navrhu": "Typ návrhu",
     "navrzeno_na_zarazeni": "Navrženo na zařazení",
     "navrzeno_na_vyrazeni": "Navrženo na vyřazení",
-    "nedoreseno": "Nedořešeno"
+    "nedoreseno": "Nedořešeno",
+    "fyzicka_osoba": "Fyzická osoba",
+    "pravnicka_osoba": "Právnická osoba",
+    "nazev_spolecnosti": "Název společností"
   }
 }

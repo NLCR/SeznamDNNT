@@ -14,7 +14,9 @@ export class UserFormComponent implements OnInit {
 
   @Input() user: User;
   @Input() isRegister: boolean;
-
+  
+  formTypeSelected: number = 1;
+  
   constructor(
     public config: AppConfiguration,
     public state: AppState,

@@ -78,7 +78,7 @@ export class NavbarComponent implements OnInit {
   register() {
     
     const d = this.dialog.open(UserDialogComponent, {
-      width: '450px',
+      width: '600px',
       panelClass: 'app-register-dialog',
       data: {isRegister: true}
     });

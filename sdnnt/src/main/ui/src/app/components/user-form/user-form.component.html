@@ -1,6 +1,12 @@
 <ng-container *ngIf="user">
-  <div fxLayout="row wrap" class="app-register-wrapper" fxLayoutAlign="start baseline">
-    <div fxFlex="50%">
+  <div fxLayout="row wrap" fxLayoutAlign="start baseline">
+    <div fxFlex="100%" class="app-mb-4">
+      <mat-radio-group [(ngModel)]="formTypeSelected">
+        <mat-radio-button [value]="1">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
+        <mat-radio-button [value]="2">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.jmeno' | translate }}</mat-label>
@@ -8,11 +14,19 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%">
+    <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.prijmeni' | translate }}</mat-label>
           <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="100%" *ngIf="formTypeSelected === 2">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}</mat-label>
+          <input matInput name="surname" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
@@ -79,5 +93,39 @@
         </mat-form-field>
       </div>
     </div>
+  </div>
+  <div class="app-mb-4">
+    <section>
+      <div class="app-label">Role v systému</div>
+      <mat-checkbox>autor</mat-checkbox><br />
+      <mat-checkbox>dědic autorských práv</mat-checkbox><br />
+      <mat-checkbox>jiný nositel / vykonavatel autorských práv</mat-checkbox><br />
+      <mat-checkbox>nakladatel / vydavatel</mat-checkbox>
+    </section>
+  </div>
+  <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
+  <div class="app-mb-4" *ngIf="isRegister">
+    <div class="app-label">Podminky</div>
+    <p>
+      <mat-checkbox>
+        Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nositeli autorských práv</strong> umožněno vyřadit 
+        díla ze Seznamu děl nedostupných na trhu nebo Návrhů na zařazení do Seznamu děl nedostupných na trhu ve smyslu ustanovení § 97f odst. 5 zákona č. 121/2000 Sb., 
+        autorského zákona, v platném znění.
+      </mat-checkbox>
+    </p>
+    <p>
+      <mat-checkbox>
+        Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nakladateli / vydavateli</strong> umožněno omezit způsob 
+        zpřístupňování díla nedostupného na trhu vydaného v letech 2001 až 2007 na zobrazení na terminálu knihovny (na místě samém)
+      </mat-checkbox>
+    </p>
+    <p>
+      <mat-checkbox>
+        Souhlasím se zpracováním osobních údajů. Národní knihovna České republiky (dále jen "NK") se v oblasti zajištění ochrany fyzických osob v souvislosti 
+        se zpracováním jejich osobních údajů na pracovištích NK řídí ustanoveními Nařízení Evropského parlamentu a Rady (EU) 2016/679 ze dne 27. dubna 2016 
+        o ochraně fyzických osob v souvislosti se zpracováním osobních údajů a o volném pohybu těchto údajů a o zrušení směrnice 95/46/ES (obecné nařízení 
+        o ochraně osobních údajů), známého jako GDPR a zákona č. 110/2019 Sb., o zpracování osobních údajů.
+      </mat-checkbox>
+    </p>
   </div>
 </ng-container>
