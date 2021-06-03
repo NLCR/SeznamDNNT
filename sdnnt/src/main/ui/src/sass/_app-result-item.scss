@@ -1,5 +1,11 @@
 // --- RESULT ITEM ---
 
 app-result-item {
-
+  .mat-card {
+    .mat-card-header {
+      img {
+        width: 80px;
+      }
+    }
+  }
 }
