@@ -64,6 +64,10 @@ a {
   color: $app-color-fav !important;
 }
 
+.app-color-metadata {
+  color: $app-gray-5;
+}
+
 // common
 .app-pipe {
   border-left: 1px solid $app-gray-4;
@@ -76,6 +80,12 @@ a {
 
 .app-cursor-pointer {
   cursor: pointer;
+}
+
+.app-results-wrapper {
+  border-width: 1px 1px 0 1px;
+  border-style: solid;
+  border-color: $app-brand-border-color;
 }
 
 // utility
@@ -116,6 +126,8 @@ a {
   left: 0;
   top: 0;
 }
+
+// --- material components override ---
 
 // checkbox
 .mat-checkbox {

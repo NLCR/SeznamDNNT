@@ -1,21 +1,32 @@
 <h1 mat-dialog-title>
-  Info {{data.datum_zadani}}
+  {{ 'desc.prehled_zadosti' | translate }}<span class="app-pipe"></span><small class="app-color-metadata">{{ data.datum_zadani }}</small>
 </h1>
 <div mat-dialog-content>
-  <div *ngFor="let doc of docs" [ngClass]="process[doc.identifier]">
-    <div>{{ doc.title }}</div>
-    <div fxLayout="row">{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}
-      <span class="app-text-icon"><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a></span><span class="app-pipe"></span>
-      
-      <div [class]="'app-badge ' + doc.marc_990a">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
-      </div> 
-      <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.new_stav" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
-      <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu POUZE v knihovne ' + data.new_stav" (click)="approveLib(doc)"><mat-icon>local_library</mat-icon></button>&#160;
-      <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Odmitnout zmenu stavu na ' + data.new_stav" (click)="reject(doc)"><mat-icon>close</mat-icon></button>&#160;
-               
+  <div class="app-results-wrapper">
+    <mat-card *ngFor="let doc of docs">
+      <mat-card-header fxLayout="row" fxLayoutGap="16px">
+        <div>
+          <mat-card-title><span>{{ doc.title }}</span></mat-card-title>
+          <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</mat-card-subtitle>
+        </div>
+      </mat-card-header>
+      <mat-card-actions fxLayout="row" fxLayoutGap="32px">
+        <div fxFlex fxFlexAlign="flex-end">
+          <span class="app-text-icon"><mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a></span><span class="app-pipe"></span>
+        </div>
+        <div fxLayout="row">
+          <div [class]="'app-badge ' + doc.marc_990a">
+            <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
+          </div> 
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.new_stav" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu POUZE v knihovne ' + data.new_stav" (click)="approveLib(doc)"><mat-icon>local_library</mat-icon></button>&#160;
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Odmitnout zmenu stavu na ' + data.new_stav" (click)="reject(doc)"><mat-icon>close</mat-icon></button>&#160;
+        </div>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>
+
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close>Zavřít</button>
 </div>
