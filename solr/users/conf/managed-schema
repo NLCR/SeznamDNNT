@@ -48,11 +48,12 @@
 <schema name="users" version="1.6">
   
     <field name="username" type="string" indexed="true" stored="true" docValues="true" />
-    <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
+    
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
+    <field name="pwd" type="string" indexed="true" stored="true"  />
     <field name="role" type="string" indexed="true" stored="true"  />
     <field name="state" type="string" indexed="true" stored="true"  />
     <field name="isActive" type="boolean" indexed="true" stored="true"  />

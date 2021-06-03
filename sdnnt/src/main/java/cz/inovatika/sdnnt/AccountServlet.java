@@ -97,7 +97,12 @@ public class AccountServlet extends HttpServlet {
                   .setFacet(true).addFacetField("typ","state","new_stav")
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
-          
+          if (req.getParameter("state") != null) {
+            query.addFilterQuery("state:" + req.getParameter("state"));
+          }
+          if (req.getParameter("new_stav") != null) {
+            query.addFilterQuery("new_stav:" + req.getParameter("new_stav"));
+          }
           if ("kurator".equals(user.role)) {
             query.addFilterQuery("-state:open");
             query.addSort(SolrQuery.SortClause.desc("state"));

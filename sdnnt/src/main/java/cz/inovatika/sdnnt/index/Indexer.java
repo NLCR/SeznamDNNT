@@ -209,7 +209,6 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
       String oldStav = (String) docOld.getFirstValue("marc_990a");
-      System.out.println(oldStav);
       ObjectMapper mapper = new ObjectMapper();
       
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);

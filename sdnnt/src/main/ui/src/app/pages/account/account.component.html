@@ -10,12 +10,15 @@
           </mat-expansion-panel-header>
           <div>
             <a (click)="setStavZadosti('open')">{{ 'desc.neodeslano' | translate }}</a>
+            <mat-icon *ngIf="stateFilter === 'open'">done</mat-icon>
           </div>
           <div>
             <a (click)="setStavZadosti('waiting')">{{ 'desc.ceka_na_posouzeni' | translate }}</a>
+            <mat-icon *ngIf="stateFilter === 'waiting'">done</mat-icon>
           </div>
           <div>
             <a (click)="setStavZadosti('processed')">{{ 'desc.zpracovano' | translate }}</a>
+            <mat-icon *ngIf="stateFilter === 'processed'">done</mat-icon>
           </div>
         </mat-expansion-panel>
         <mat-expansion-panel [expanded]="true">
@@ -25,13 +28,12 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div>
-            <a (click)="setStav('navrh')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
+            <a (click)="setStav('NZN')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
+            <mat-icon *ngIf="newStavFilter === 'NZN'">done</mat-icon>
           </div>
           <div>
-            <a (click)="setStav('navrh')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
-          </div>
-          <div>
-            <a (click)="setStav('navrh')">{{ 'desc.nedoreseno' | translate }}</a>
+            <a (click)="setStav('VVS')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
+            <mat-icon *ngIf="newStavFilter === 'VVS'">done</mat-icon>
           </div>
         </mat-expansion-panel>
       </mat-accordion>

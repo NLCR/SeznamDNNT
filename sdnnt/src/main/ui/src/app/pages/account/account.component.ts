@@ -26,6 +26,9 @@ export class AccountComponent implements OnInit {
   displayedColumns = ['datum_zadani','user', 'state', 'new_stav','datum_vyrizeni','count', 'pozadavek','poznamka','actions'];
   zadosti: Zadost[] = [];
 
+  stateFilter: string;
+  newStavFilter: string;
+
 
   constructor(
     public dialog: MatDialog,
@@ -44,6 +47,8 @@ export class AccountComponent implements OnInit {
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
+      this.newStavFilter = val.new_stav;
+      this.stateFilter = val.state;
     });
   }
 
@@ -65,13 +70,24 @@ export class AccountComponent implements OnInit {
 
   }
 
-  setStav(stav: string) {
-    
+  setStav(new_stav: string) {
+    const q: any = {};
+    q.new_stav = new_stav;
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
 
-  setStavZadosti(stav: string) {
+  setStavZadosti(state: string) {
+    const q: any = {};
+    if (this.stateFilter === state) {
+      q.state = null;
+    } else {
+      q.state = state;
+    }
     
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
   showRecords(zadost: Zadost) {
