@@ -5,7 +5,7 @@
       <img *ngIf="imgSrc" width="100" [src]="imgSrc" />
       <span>{{ doc.title }}</span>
     </mat-card-title>
-    <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</mat-card-subtitle>
+    <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
