@@ -5,13 +5,15 @@
   <div *ngFor="let doc of docs" [ngClass]="process[doc.identifier]">
     <div>{{ doc.title }}</div>
     <div fxLayout="row">{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}
+      <span class="app-text-icon"><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a></span><span class="app-pipe"></span>
+      
       <div [class]="'app-badge ' + doc.marc_990a">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
       </div> 
       <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.new_stav" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
       <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu POUZE v knihovne ' + data.new_stav" (click)="approveLib(doc)"><mat-icon>local_library</mat-icon></button>&#160;
       <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Odmitnout zmenu stavu na ' + data.new_stav" (click)="reject(doc)"><mat-icon>close</mat-icon></button>&#160;
-              
+               
   </div>
 </div>
 <div mat-dialog-actions>
