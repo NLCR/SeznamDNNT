@@ -1,7 +1,11 @@
 <footer>
   <div fxLayout="row">
     <div fxFlex class="app-left">
-      {{'SDNNT' | translate }} © {{ currentYear }}.
+      {{'SDNNT' | translate }} © {{ currentYear }}<span class="app-pipe"></span>
+      <a href="https://www.nkp.cz/" [title]="'desc.narodni_knihovna_ceske_republiky' | translate" target="_blank">
+        <img src="assets/img/logo-nk.jpeg" [alt]="'desc.narodni_knihovna_ceske_republiky' | translate" />
+        {{ 'desc.narodni_knihovna_ceske_republiky' | translate }}
+      </a>
     </div>
     <div class="app-right">
       Created by 

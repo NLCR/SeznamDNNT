@@ -6,6 +6,18 @@ app-footer {
   background-color: $app-footer-bg;
   padding: $app-gap;
 
+  .app-left {
+    a {
+      @extend .app-ml-1;
+      
+      img {
+        @extend .app-mr-2;
+        max-height: 20px;
+        vertical-align: bottom;
+      }
+    }
+  }
+
   .app-right {
     .app-logo {
       height: $app-gap;
