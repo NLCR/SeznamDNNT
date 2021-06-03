@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -147,6 +148,25 @@ public class SearchServlet extends HttpServlet {
         JSONObject ret = new JSONObject();
         try {
           ret = XServer.find(req.getParameter("sysno"));
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
+    },
+    GOOGLEBOOKS {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        try {
+          String url = "https://books.google.com/books?jscmd=viewapi&callback=display_google&bibkeys="+ req.getParameter("id");
+          
+          String jsonp = org.apache.commons.io.IOUtils.toString(new URL(url), "UTF-8");
+          String json = jsonp.substring("display_google(".length(), jsonp.length()-2);
+          System.out.println(json);
+          ret = new JSONObject(json);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           ret.put("error", ex);

@@ -22,6 +22,7 @@ export class ResultItemComponent implements OnInit {
   newState = new FormControl();
   isZarazeno: boolean;
   hasNavhr: boolean;
+  imgSrc: string;
 
   constructor(
     public dialog: MatDialog,
@@ -34,6 +35,31 @@ export class ResultItemComponent implements OnInit {
     this.newState.setValue(this.doc.marc_990a);
     this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
     this.hasNavhr = !!this.doc.zadost;
+    if (this.doc.marc_956u) {
+      // Je to kramerius
+      const link: string = this.doc.marc_956u[0];
+        console.log(link);
+      // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
+      if (link.indexOf('handle') > -1) {
+        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
+      }
+      
+    } else if (this.doc.marc_856u) {
+      if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
+        // google books
+        const link: string = this.doc.marc_856u[0];
+        const id = link.substring( link.indexOf('vid=')+4 , link.indexOf('&'));
+        this.service.findGoogleBook(id).subscribe((res: any) => {
+          if (res[id]) {
+            this.imgSrc = res[id].thumbnail_url;
+          }
+          // this.imgSrc = res.items[0].volumeInfo.imageLinks.smallThumbnail;
+        });
+      } else {
+        this.imgSrc = this.doc.marc_856u;
+      }
+      
+    }
   }
 
   showIdentifiers() {

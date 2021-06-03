@@ -1,7 +1,9 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title>
-      <mat-checkbox></mat-checkbox><span>{{ doc.title }}</span>
+      <mat-checkbox></mat-checkbox>
+      <img *ngIf="imgSrc" width="100" [src]="imgSrc" />
+      <span>{{ doc.title }}</span>
     </mat-card-title>
     <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }}</mat-card-subtitle>
   </mat-card-header>

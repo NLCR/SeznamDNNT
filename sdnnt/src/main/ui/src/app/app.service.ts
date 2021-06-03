@@ -142,4 +142,20 @@ export class AppService {
     let url = '/user/save';
     return this.post(url, user);
   }
+
+  findGoogleBook(id: string): Observable<any> {
+    let url = 'search/googlebooks';
+    const params: HttpParams = new HttpParams().set('id', id);
+    // let url = 'https://www.googleapis.com/books/v1/volumes';
+
+    //let url = `https://books.google.com/books?jscmd=viewapi&bibkeys=${id},&callback=display_google`;
+    // const params: HttpParams = new HttpParams().set('q', id);
+    // const corsHeaders = new HttpHeaders({
+    //   'Content-Type': 'application/json',
+    //   'Accept': '*/*',
+    //   'Access-Control-Allow-Origin': 'http://localhost:4200/',
+    //   'sec-fetch-mode': 'no-cors'
+    // });
+    return this.get(url, params);
+  }
 }
