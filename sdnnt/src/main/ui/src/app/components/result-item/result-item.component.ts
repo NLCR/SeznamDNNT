@@ -56,7 +56,7 @@ export class ResultItemComponent implements OnInit {
           // this.imgSrc = res.items[0].volumeInfo.imageLinks.smallThumbnail;
         });
       } else {
-        this.imgSrc = this.doc.marc_856u;
+        // this.imgSrc = this.doc.marc_856u;
       }
       
     }
