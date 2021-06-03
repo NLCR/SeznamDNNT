@@ -70,6 +70,12 @@
     "VVS": "VVS: výzva k vyřazení"
   },
 
+  "registracni_podminky": {
+    "podminka_1": "Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nositeli autorských práv</strong> umožněno vyřadit díla ze Seznamu děl nedostupných na trhu nebo Návrhů na zařazení do Seznamu děl nedostupných na trhu ve smyslu ustanovení § 97f odst. 5 zákona č. 121/2000 Sb., autorského zákona, v platném znění.",
+    "podminka_2": "Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nakladateli / vydavateli</strong> umožněno omezit způsob zpřístupňování díla nedostupného na trhu vydaného v letech 2001 až 2007 na zobrazení na terminálu knihovny (na místě samém).",
+    "podminka_3": "Souhlasím se zpracováním osobních údajů. Národní knihovna České republiky (dále jen NK) se v oblasti zajištění ochrany fyzických osob v souvislosti se zpracováním jejich osobních údajů na pracovištích NK řídí ustanoveními Nařízení Evropského parlamentu a Rady (EU) 2016/679 ze dne 27. dubna 2016 o ochraně fyzických osob v souvislosti se zpracováním osobních údajů a o volném pohybu těchto údajů a o zrušení směrnice 95/46/ES (obecné nařízení o ochraně osobních údajů), známého jako GDPR a zákona č. 110/2019 Sb., o zpracování osobních údajů."
+  },
+
   "desc": {
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
@@ -138,6 +144,12 @@
     "nedoreseno": "Nedořešeno",
     "fyzicka_osoba": "Fyzická osoba",
     "pravnicka_osoba": "Právnická osoba",
-    "nazev_spolecnosti": "Název společností"
+    "nazev_spolecnosti": "Název společností",
+    "role_v_systemu": "Role v systému",
+    "autor": "Autor",
+    "dedic_autorskych_prav": "Dědic autorských práv",
+    "jiny_nositel": "Jiný nositel / vykonavatel autorských práv",
+    "nakladatel_vydavatel": "Nakladatel / vydavatel",
+    "podminky": "Podmínky"
   }
 }

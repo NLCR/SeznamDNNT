@@ -70,6 +70,12 @@
     "VVS": "VVS: call for decommissioning"
   },
 
+  "registracni_podminky": {
+    "podminka_1": "I acknowledge that, upon registration, a registered entity - <strong> copyright holder </strong> is allowed to exclude works from the List of Works Unavailable on the Market or Proposals for inclusion in the List of Works Unavailable on the Market pursuant to Section 97f (5) of the Act No. 121/2000 Coll., Copyright Act, as amended.",
+    "podminka_2": "I acknowledge that upon registration, a registered entity - <strong> publisher / publisher </strong> - is allowed to restrict the manner in which a work unavailable on the market published between 2001 and 2007 is made available for display on a library terminal (on-site).",
+    "podminka_3": "I agree to the processing of personal data. The National Library of the Czech Republic (hereinafter referred to as the National Library) in the area of ensuring the protection of natural persons in connection with the processing of their personal data at NK workplaces is governed by the provisions of Regulation (EU) 2016/679 of the European Parliament and the Council of 27 April 2016 in connection with the processing of personal data and on the free movement of such data and on the repeal of Directive 95/46 / EC (General Regulation on the Protection of Personal Data), known as the GDPR and Act No. 110/2019 Coll., on the processing of personal data."
+  },
+
   "desc": {
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
@@ -138,6 +144,12 @@
     "nedoreseno": "Unresolved",
     "fyzicka_osoba": "Individual",
     "pravnicka_osoba": "Legal entity",
-    "nazev_spolecnosti": "Company name"
+    "nazev_spolecnosti": "Company name",
+    "role_v_systemu": "Roles in the system",
+    "autor": "Author",
+    "dedic_autorskych_prav": "Heir to copyright",
+    "jiny_nositel": "Another copyright holder / executor",
+    "nakladatel_vydavatel": "Publisher",
+    "podminky": "Conditions"
   }
 }
