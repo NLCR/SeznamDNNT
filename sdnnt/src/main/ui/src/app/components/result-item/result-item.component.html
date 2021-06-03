@@ -1,7 +1,7 @@
 <mat-card>
   <mat-card-header fxLayout="row" fxLayoutGap="16px">
-    <div>
-      <img *ngIf="imgSrc" width="100" [src]="imgSrc" />
+    <div *ngIf="imgSrc">
+      <img [src]="imgSrc" />
       <!-- <img src="https://kramerius.army.cz/search/api/v5.0/item/uuid:cd2f0ca9-4e72-4b93-b2c0-10ca07fdb087/thumb" /> -->
     </div>
     <div>
