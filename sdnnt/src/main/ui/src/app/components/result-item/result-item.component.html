@@ -51,6 +51,7 @@
       </button>
 
       <ng-container *ngIf="state.user && inZadost">
+        <h3>{{ processed }}</h3>
         <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
           [title]="'Schvalit zmenu stavu na ' + zadost.new_stav" (click)="approve(doc)">
           <mat-icon>done</mat-icon>

@@ -1,6 +1,9 @@
 <ng-container *ngIf="zadost">
   <h1>
-    {{ 'desc.prehled_zadosti' | translate }}<ng-container *ngIf="zadost.datum_zadani"><span class="app-pipe"></span><small class="app-color-metadata">{{ zadost.datum_zadani }}</small></ng-container>
+    {{ 'desc.prehled_zadosti' | translate }}
+    <ng-container *ngIf="zadost.datum_zadani"><span class="app-pipe"></span><small class="app-color-metadata">{{ zadost.datum_zadani }}</small>
+    {{ zadost.user }} {{ zadost.state }} {{ zadost.new_stav }}
+    </ng-container>
   </h1>
   <div>
     <mat-slide-toggle>{{'Skryt zpracovane' | translate}}</mat-slide-toggle>

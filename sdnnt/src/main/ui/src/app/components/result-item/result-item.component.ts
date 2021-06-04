@@ -25,7 +25,7 @@ export class ResultItemComponent implements OnInit {
   isZarazeno: boolean;
   hasNavhr: boolean;
   imgSrc: string;
-  process: {[key: string]: string};
+  processed: string;
 
   constructor(
     public dialog: MatDialog,
@@ -38,20 +38,23 @@ export class ResultItemComponent implements OnInit {
     this.newState.setValue(this.doc.marc_990a);
     this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
     this.hasNavhr = !!this.doc.zadost;
+    if (this.zadost?.process) {
+      this.processed = JSON.parse(this.zadost.process)[this.doc.identifier];
+    }
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];
-        console.log(link);
+      console.log(link);
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
       }
-      
+
     } else if (this.doc.marc_856u) {
       if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
         // google books
         const link: string = this.doc.marc_856u[0];
-        const id = link.substring( link.indexOf('vid=')+4 , link.indexOf('&'));
+        const id = link.substring(link.indexOf('vid=') + 4, link.indexOf('&'));
         this.service.findGoogleBook(id).subscribe((res: any) => {
           if (res[id]) {
             this.imgSrc = res[id].thumbnail_url;
@@ -61,7 +64,7 @@ export class ResultItemComponent implements OnInit {
       } else {
         // this.imgSrc = this.doc.marc_856u;
       }
-      
+
     }
   }
 
@@ -73,25 +76,25 @@ export class ResultItemComponent implements OnInit {
 
     this.config.identifiers.forEach(f => {
       if (this.doc['marc_' + f]) {
-        data.items.push({label: 'field.'+f, value: this.doc['marc_' + f]})
+        data.items.push({ label: 'field.' + f, value: this.doc['marc_' + f] })
       }
     });
-    
+
 
     const dialogRef = this.dialog.open(DataDialogComponent, {
-        width: '750px',
-        data,
-        panelClass: 'app-data-dialog'
-      });
+      width: '750px',
+      data,
+      panelClass: 'app-data-dialog'
+    });
   }
 
   showHistory() {
     const dialogRef = this.dialog.open(HistoryDialogComponent, {
-        width: '750px',
-        data: this.doc,
-        panelClass: 'app-history-dialog'
-      });
-    
+      width: '750px',
+      data: this.doc,
+      panelClass: 'app-history-dialog'
+    });
+
 
     // dialogRef.afterClosed().subscribe(result => {
     //   console.log('The dialog was closed', result);
@@ -108,7 +111,7 @@ export class ResultItemComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.doc.marc_990a = result;
-        const dataField = 
+        const dataField =
         {
           "ind2": " ",
           "ind1": " ",
@@ -128,8 +131,8 @@ export class ResultItemComponent implements OnInit {
           console.log(res);
         });
       }
-       
-     });
+
+    });
   }
 
   addToZadost() {
@@ -155,8 +158,8 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('approve_navrh_error', res.error, true);
       } else {
         this.service.showSnackBar('approve_navrh_success', '', false);
-        this.zadost = res; 
-        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+        this.zadost = res;
+        this.processed = 'approved';
       }
     });
   }
@@ -167,8 +170,8 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('approve_navrh_error', res.error, true);
       } else {
         this.service.showSnackBar('approve_navrh_success', '', false);
-        this.zadost = res; 
-        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+        this.zadost = res;
+        this.processed = 'approveLib';
       }
     });
   }
@@ -180,7 +183,7 @@ export class ResultItemComponent implements OnInit {
       } else {
         this.service.showSnackBar('reject_navrh_success', '', false);
         this.zadost = res;
-        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+        this.processed = 'rejected';
       }
     });
   }
