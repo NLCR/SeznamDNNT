@@ -4,5 +4,6 @@
 </div>
 <div mat-dialog-actions>
   <button mat-flat-button color="primary" (click)="save()">{{ 'desc.ulozit' | translate }}</button>
+  <button mat-flat-button color="primary" *ngIf="!data.isRegister" (click)="resetPwd()">{{ 'reset_password' | translate }}</button>
   <button mat-button mat-dialog-close>{{ 'desc.zavrit' | translate }}</button>
 </div>

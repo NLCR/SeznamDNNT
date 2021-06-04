@@ -20,6 +20,9 @@ public class User {
   public String username;
   
   @Field
+  public String pwd;
+  
+  @Field
   public String role;
   
   @Field

@@ -51,8 +51,8 @@ export class LoginDialogComponent implements OnInit {
     this.service.logout().subscribe(res => {
       this.state.setLogged(res);
       this.state.logged = false;
-      localStorage.removeItem('user');
       this.state.user = null;
+      localStorage.removeItem('user');
       this.dialogRef.close();
     });
   }

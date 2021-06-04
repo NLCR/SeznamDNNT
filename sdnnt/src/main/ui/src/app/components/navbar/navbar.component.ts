@@ -71,6 +71,7 @@ export class NavbarComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
+      localStorage.removeItem('user');
       this.router.navigate(['/']);
     });
   }

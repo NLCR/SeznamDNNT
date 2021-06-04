@@ -144,9 +144,19 @@ export class AppService {
     return this.get(url);
   }
 
+  registerUser(user: User): Observable<User> {
+    let url = '/user/register';
+    return this.post(url, user);
+  }
+
   saveUser(user: User): Observable<User> {
     let url = '/user/save';
     return this.post(url, user);
+  }
+
+  resetPwd(user: string): Observable<User> {
+    let url = '/user/reset_pwd';
+    return this.post(url, {username:user});
   }
 
   findGoogleBook(id: string): Observable<any> {

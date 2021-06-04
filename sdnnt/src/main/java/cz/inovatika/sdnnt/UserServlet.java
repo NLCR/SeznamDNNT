@@ -81,6 +81,18 @@ public class UserServlet extends HttpServlet {
         return UserController.logout(req);
       }
     },
+    RESET_PWD {
+      @Override 
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+        return UserController.resetPwd(req, inputJs);
+      }
+    },
     SAVE {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -91,6 +103,18 @@ public class UserServlet extends HttpServlet {
             inputJs = req.getParameter("json");
           }
         return UserController.save(inputJs);
+      }
+    },
+    REGISTER {
+      @Override 
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+        return UserController.register(inputJs);
       }
     },
     ALL {
