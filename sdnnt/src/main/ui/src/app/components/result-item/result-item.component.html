@@ -47,26 +47,23 @@
         <mat-icon>check</mat-icon> {{ 'desc.zmena_stavu' | translate }}
       </button> -->
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr && !inZadost" (click)="addToZadost()">
-        <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navhr_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
+        <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
 
       <ng-container *ngIf="state.user && inZadost">
-        <h3>{{ processed }}</h3>
-        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
-          [title]="'Schvalit zmenu stavu na ' + zadost.new_stav" (click)="approve(doc)">
-          <mat-icon>done</mat-icon>
-        </button>&#160;
-        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
-          [title]="'Schvalit zmenu POUZE v knihovne ' + zadost.new_stav" (click)="approveLib(doc)">
-          <mat-icon>local_library</mat-icon>
-        </button>&#160;
-        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
-          [title]="'Odmitnout zmenu stavu na ' + zadost.new_stav" (click)="reject(doc)">
-          <mat-icon>close</mat-icon>
-        </button>&#160;
+        <!-- <h3>{{ processed }}</h3> -->
+        <mat-button-toggle-group class="app-ml-3">
+          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="approve(doc)" [matTooltip]="'Schvalit zmenu stavu na ' + zadost.new_stav" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">check</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="approveLib(doc)" [matTooltip]="'Schvalit zmenu pouze v knihovne ' + zadost.new_stav" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">local_library</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="reject(doc)" [matTooltip]="'Odmitnout zmenu stavu na ' + zadost.new_stav" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">not_interested</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </ng-container>
-
-
     </div>
   </mat-card-actions>
 </mat-card>
