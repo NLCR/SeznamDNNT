@@ -38,6 +38,7 @@ import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 import { ZadostInfoDialogComponent } from './components/zadost-info-dialog/zadost-info-dialog.component';
 import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
+import { ZadostComponent } from './pages/zadost/zadost.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -78,7 +79,8 @@ const providers: any[] =[
     UserFormComponent,
     UserDialogComponent,
     ZadostInfoDialogComponent,
-    ZadostSendDialogComponent
+    ZadostSendDialogComponent,
+    ZadostComponent
   ],
   imports: [
     BrowserModule,

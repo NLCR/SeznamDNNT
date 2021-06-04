@@ -15,6 +15,7 @@ export class LoginDialogComponent implements OnInit {
   pwd: string;
   loginError: boolean;
   loading: boolean;
+  keepLogged: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<LoginDialogComponent>,
@@ -37,6 +38,9 @@ export class LoginDialogComponent implements OnInit {
         this.loginError = false;
         this.user = '';
         this.pwd = '';
+        if (this.keepLogged) {
+          localStorage.setItem('user', JSON.stringify(this.state.user));
+        }
         this.loading = false;
         this.dialogRef.close();
       }
@@ -47,6 +51,7 @@ export class LoginDialogComponent implements OnInit {
     this.service.logout().subscribe(res => {
       this.state.setLogged(res);
       this.state.logged = false;
+      localStorage.removeItem('user');
       this.state.user = null;
       this.dialogRef.close();
     });

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { Configuration } from './shared/configuration';
 import { AppState } from './app.state';
+import { User } from './shared/user';
 
 @Injectable({
     providedIn: 'root'
@@ -26,23 +27,23 @@ import { AppState } from './app.state';
     public get snackRows() {
         return this.config.rows;
     }
-    
+
     public get homeTabs() {
         return this.config.homeTabs;
     }
-    
+
     public get dntStates() {
         return this.config.dntStates;
     }
-    
+
     public get identifiers() {
         return this.config.identifiers;
     }
-    
+
     public get role() {
         return this.config.role;
     }
-    
+
     public get filterFields() {
         return this.config.filterFields;
     }
@@ -68,8 +69,25 @@ import { AppState } from './app.state';
             .then(cfg => {
                 this.config = cfg as Configuration;
                 this.state.setConfig(this.config);
+            }).then(() => {
+                return this.login();
             });
         return promise;
+    }
+
+    private login() {
+        const url = 'api/user/login';
+        const user: User = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            return this.http.post(url, { user: user.username, pwd: user.pwd })
+                .toPromise()
+                .then((res: any) => {
+                    this.state.setLogged(res);
+                    localStorage.setItem('user', JSON.stringify(this.state.user));
+                });
+        } else {
+            return;
+        }
     }
 
 }

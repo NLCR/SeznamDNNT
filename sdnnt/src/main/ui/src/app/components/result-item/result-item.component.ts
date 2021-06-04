@@ -18,11 +18,14 @@ import { StatesDialogComponent } from '../states-dialog/states-dialog.component'
 export class ResultItemComponent implements OnInit {
 
   @Input() doc: SolrDocument;
+  @Input() inZadost: boolean;
+  @Input() zadost: Zadost;
 
   newState = new FormControl();
   isZarazeno: boolean;
   hasNavhr: boolean;
   imgSrc: string;
+  process: {[key: string]: string};
 
   constructor(
     public dialog: MatDialog,
@@ -142,6 +145,42 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('add_to_zadost_error', res.error, true);
       } else {
         this.service.showSnackBar('add_to_zadost_uspesna', '', false);
+      }
+    });
+  }
+
+  approve(doc: SolrDocument) {
+    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('approve_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.zadost = res; 
+        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+      }
+    });
+  }
+
+  approveLib(doc: SolrDocument) {
+    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('approve_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.zadost = res; 
+        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+      }
+    });
+  }
+
+  reject(doc: SolrDocument) {
+    this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('reject_navrh_error', res.error, true);
+      } else {
+        this.service.showSnackBar('reject_navrh_success', '', false);
+        this.zadost = res;
+        this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
       }
     });
   }

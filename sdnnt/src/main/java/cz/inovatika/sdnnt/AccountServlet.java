@@ -133,10 +133,31 @@ public class AccountServlet extends HttpServlet {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("id:" + req.getParameter("id"))
+                  .setRows(1);
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "zadost"); 
+          solr.close();
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
+    },
+    GET_ZADOST_RECORDS {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           
-          System.out.println(req.getParameter("identifiers"));
           String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
-          System.out.println(q);
           SolrQuery query = new SolrQuery("identifier:" + q)
                   .setRows(100)
                   // .setFacet(true).addFacetField("typ","state","new_stav")

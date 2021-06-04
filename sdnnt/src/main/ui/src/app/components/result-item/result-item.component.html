@@ -6,18 +6,28 @@
     </div>
     <div>
       <mat-card-title><span>{{ doc.title }}</span></mat-card-title>
-      <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}</mat-card-subtitle>
+      <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}
+      </mat-card-subtitle>
     </div>
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
       <ng-container *ngIf="doc.marc_856u">
-        <span class="app-text-icon"><mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_856u" target="_blank">{{ 'desc.link_do_dk' | translate }}</a></span><span class="app-pipe"></span>
+        <span class="app-text-icon">
+          <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_856u" target="_blank">{{ 'desc.link_do_dk' |
+            translate }}</a>
+        </span><span class="app-pipe"></span>
       </ng-container>
       <ng-container *ngIf="doc.marc_911u">
-        <span class="app-text-icon"><mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_911u" target="_blank">{{ 'desc.link_do_dk' | translate }}</a></span><span class="app-pipe"></span>
+        <span class="app-text-icon">
+          <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_911u" target="_blank">{{ 'desc.link_do_dk' |
+            translate }}</a>
+        </span><span class="app-pipe"></span>
       </ng-container>
-      <span class="app-text-icon"><mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a></span><span class="app-pipe"></span>
+      <span class="app-text-icon">
+        <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu'
+          | translate }}</a>
+      </span><span class="app-pipe"></span>
       <a (click)="showIdentifiers()">{{ 'desc.identifikatory' | translate }}</a><span class="app-pipe"></span>
       <ng-container *ngIf="state.logged">
         <a (click)="showHistory()">{{ 'desc.historie_zmen' | translate }}</a>
@@ -25,17 +35,37 @@
     </div>
     <div fxLayout="row">
       <div [class]="'app-badge ' + doc.marc_990a">
-        <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  --><mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
-      </div> 
-      <div *ngIf="hasNavhr" [class]="'app-badge ' + doc.zadost.new_stav" class="app-ml-2">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.new_stav | translate">info</mat-icon>{{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.new_stav}} 
-      </div> 
+        <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  -->
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info
+        </mat-icon>{{ 'state.' + doc.marc_990a | translate }}
+      </div>
+      <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.new_stav" class="app-ml-2">
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.new_stav | translate">info
+        </mat-icon>{{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.new_stav}}
+      </div>
       <!-- <button mat-stroked-button *ngIf="state.logged" (click)="showStates()">
         <mat-icon>check</mat-icon> {{ 'desc.zmena_stavu' | translate }}
       </button> -->
-      <button mat-stroked-button *ngIf="state.logged && !hasNavhr" (click)="addToZadost()">
+      <button mat-stroked-button *ngIf="state.logged && !hasNavhr && !inZadost" (click)="addToZadost()">
         <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navhr_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
+
+      <ng-container *ngIf="state.user && inZadost">
+        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
+          [title]="'Schvalit zmenu stavu na ' + zadost.new_stav" (click)="approve(doc)">
+          <mat-icon>done</mat-icon>
+        </button>&#160;
+        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
+          [title]="'Schvalit zmenu POUZE v knihovne ' + zadost.new_stav" (click)="approveLib(doc)">
+          <mat-icon>local_library</mat-icon>
+        </button>&#160;
+        <button *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" mat-icon-button
+          [title]="'Odmitnout zmenu stavu na ' + zadost.new_stav" (click)="reject(doc)">
+          <mat-icon>close</mat-icon>
+        </button>&#160;
+      </ng-container>
+
+
     </div>
   </mat-card-actions>
 </mat-card>

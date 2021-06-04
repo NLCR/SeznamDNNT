@@ -11,6 +11,7 @@
           <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
           <input matInput #loginpwd type="password" [(ngModel)]="pwd" (keyup.enter)="login()">
         </mat-form-field> 
+        <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'Zustat prihlasen' | translate}}</mat-checkbox>
       </div> 
       <div class="app-color-warning" *ngIf="loginError">
         {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.

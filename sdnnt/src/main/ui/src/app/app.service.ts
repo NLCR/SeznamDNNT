@@ -102,8 +102,14 @@ export class AppService {
     return this.post(url, {identifier, zadost}, params);
   }
 
-  getZadost(id: string[]): Observable<any> {
+  getZadost(id: string): Observable<any> {
     let url = 'account/get_zadost';
+    const params: HttpParams = new HttpParams().set('id', id);
+    return this.get(url, params);
+  }
+
+  getZadostRecords(id: string[]): Observable<any> {
+    let url = 'account/get_zadost_records';
     const params: HttpParams = new HttpParams().set('identifiers', JSON.stringify(id));
     return this.get(url, params);
   }

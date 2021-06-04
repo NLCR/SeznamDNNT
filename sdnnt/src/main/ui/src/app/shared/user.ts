@@ -2,6 +2,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 
 export class User {
   username: string;
+  pwd: string;
   role: string;
   isActive: boolean;
 

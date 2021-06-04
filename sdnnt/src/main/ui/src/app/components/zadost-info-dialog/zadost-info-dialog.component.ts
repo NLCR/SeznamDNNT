@@ -16,6 +16,7 @@ export class ZadostInfoDialogComponent implements OnInit {
   docs: SolrDocument[];
   action: string;
   process: {[key: string]: string};
+  imgSrc: string;
 
   constructor(
     public dialogRef: MatDialogRef<ZadostInfoDialogComponent>,
@@ -24,7 +25,7 @@ export class ZadostInfoDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    this.service.getZadost(this.data.identifiers).subscribe((resp: SolrResponse) => {
+    this.service.getZadostRecords(this.data.identifiers).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
       this.action = this.data.new_stav;
     });

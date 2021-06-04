@@ -1,0 +1,16 @@
+<ng-container *ngIf="zadost">
+  <h1>
+    {{ 'desc.prehled_zadosti' | translate }}<ng-container *ngIf="zadost.datum_zadani"><span class="app-pipe"></span><small class="app-color-metadata">{{ zadost.datum_zadani }}</small></ng-container>
+  </h1>
+  <div>
+    <mat-slide-toggle>{{'Skryt zpracovane' | translate}}</mat-slide-toggle>
+    <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-icon-button [title]="'mark_as_processed' | translate" (click)="process()"><mat-icon>done</mat-icon></button>
+  </div>
+  <div >
+    <div class="app-results-wrapper">
+      <app-result-item *ngFor="let doc of docs" [doc]="doc" [inZadost]="true" [zadost]="zadost"></app-result-item>
+    </div>
+  </div>
+
+</ng-container>
+

@@ -91,12 +91,12 @@ export class AccountComponent implements OnInit {
   }
 
   showRecords(zadost: Zadost) {
-    const dialogRef = this.dialog.open(ZadostInfoDialogComponent, {
-      width: '1150px',
-      data: zadost,
-      panelClass: 'app-states-dialog'
-    });
-
+    // const dialogRef = this.dialog.open(ZadostInfoDialogComponent, {
+    //   width: '1150px',
+    //   data: zadost,
+    //   panelClass: 'app-states-dialog'
+    // });
+    this.router.navigate(['zadost', zadost.id], {});
   }
 
   send(zadost: Zadost) {

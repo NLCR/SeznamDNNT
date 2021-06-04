@@ -5,11 +5,13 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { HelpComponent } from './pages/help/help.component';
 import { HomeComponent } from './pages/home/home.component';
 import { SearchComponent } from './pages/search/search.component';
+import { ZadostComponent } from './pages/zadost/zadost.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'help', component: HelpComponent },
   { path: 'account', component: AccountComponent },
+  { path: 'zadost/:id', component: ZadostComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'search', component: SearchComponent},
   { path: '', redirectTo: 'home', pathMatch: 'full' }
