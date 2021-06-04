@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>
-  {{ 'desc.prehled_zadosti' | translate }}<span class="app-pipe"></span><small class="app-color-metadata">{{ data.datum_zadani }}</small>
+  {{ 'desc.prehled_zadosti' | translate }}<ng-container *ngIf="data.datum_zadani"><span class="app-pipe"></span><small class="app-color-metadata">{{ data.datum_zadani }}</small></ng-container>
 </h1>
 <div mat-dialog-content>
   <div class="app-results-wrapper">
