@@ -6,12 +6,14 @@
     </ng-container>
   </h1>
   <div>
-    <mat-slide-toggle>{{'Skryt zpracovane' | translate}}</mat-slide-toggle>
+    <mat-slide-toggle [(ngModel)]="hideProcessed">{{'Skryt zpracovane' | translate}}</mat-slide-toggle>
     <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-icon-button [title]="'mark_as_processed' | translate" (click)="process()"><mat-icon>done</mat-icon></button>
   </div>
   <div >
     <div class="app-results-wrapper">
-      <app-result-item *ngFor="let doc of docs" [doc]="doc" [inZadost]="true" [zadost]="zadost"></app-result-item>
+      <ng-container *ngFor="let doc of docs" >
+        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" [inZadost]="true" [zadost]="zadost"></app-result-item>
+      </ng-container>
     </div>
   </div>
 

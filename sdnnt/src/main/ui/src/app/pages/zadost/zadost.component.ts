@@ -16,8 +16,7 @@ export class ZadostComponent implements OnInit {
   zadost: Zadost;
   docs: SolrDocument[];
   action: string;
-  // process: {[key: string]: string};
-  imgSrc: string;
+  hideProcessed: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +43,10 @@ export class ZadostComponent implements OnInit {
 
     this.service.getZadostRecords(this.zadost.identifiers).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
+      const process = JSON.parse(this.zadost.process);
+      this.docs.map(doc => {
+        doc.isProcessed = process && process[doc.identifier];
+      });
       this.action = this.zadost.new_stav;
     });
     // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
