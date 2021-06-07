@@ -175,6 +175,8 @@
     "hromadny_navrh": "Hromadný návrh",
     "oznacit_jako_zpracovane": "Označit jako zpracované",
     "zpracovani_zadosti": "Zpracování žádostí",
-    "reset_hesla": "Reset hesla"
+    "reset_hesla": "Reset hesla",
+    "poslat_zadost": "Poslat žádost",
+    "send": "Poslat"
   }
 }

@@ -175,6 +175,8 @@
     "hromadny_navrh": "Bulk proposal",
     "oznacit_jako_zpracovane": "Mark as processed",
     "zpracovani_zadosti": "Processing of applications",
-    "reset_hesla": "Password reset"
+    "reset_hesla": "Password reset",
+    "poslat_zadost": "Send a request",
+    "poslat": "Send"
   }
 }
