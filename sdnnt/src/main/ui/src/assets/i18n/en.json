@@ -159,6 +159,7 @@
     "skryt_zpracovane": "Hide processed",
     "hromadny_navrh": "Bulk proposal",
     "oznacit_jako_zpracovane": "Mark as processed",
-    "zpracovani_zadosti": "Processing of applications"
+    "zpracovani_zadosti": "Processing of applications",
+    "reset_hesla": "Password reset"
   }
 }

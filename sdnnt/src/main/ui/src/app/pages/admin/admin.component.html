@@ -40,8 +40,8 @@
         </div>
         <div fxFlex="1 1 auto">
           <app-user-form [user]="selUser"></app-user-form>
-          <button mat-stroked-button (click)="saveUser()">{{ 'desc.ulozit' | translate }}</button>
-          <button mat-stroked-button (click)="resetPwd()">{{ 'reset_password' | translate }}</button>
+          <button mat-stroked-button (click)="saveUser()" class="app-mr-2">{{ 'desc.ulozit' | translate }}</button>
+          <button mat-stroked-button (click)="resetPwd()">{{ 'desc.reset_hesla' | translate }}</button>
         </div>
       </div>
     </mat-tab>
