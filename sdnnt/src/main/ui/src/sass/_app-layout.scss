@@ -39,6 +39,7 @@ main {
     padding: $app-gap-double $app-gap;
 
     @import "app-facets";
+    @import "app-facets-used";
     @import "app-home";
     @import "app-search";
     @import "app-admin";

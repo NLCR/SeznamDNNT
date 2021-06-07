@@ -10,12 +10,24 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
 
+
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']
 })
 export class AccountComponent implements OnInit {
+
+  filterState = [
+    {id: "open", val: "neodeslano"},
+    {id: "waiting", val: "ceka_na_posouzeni"},
+    {id: "processed", val: "zpracovano"}
+  ];
+
+  filterType = [
+    {id: "NZN", val: "navrzeno_na_zarazeni"},
+    {id: "VVS", val: "navrzeno_na_vyrazeni"}
+  ];
   
   loading: boolean;
   items: SolrDocument[];
@@ -72,7 +84,16 @@ export class AccountComponent implements OnInit {
 
   setStav(new_stav: string) {
     const q: any = {};
-    q.new_stav = new_stav;
+    // added by peter
+    if (this.newStavFilter === new_stav) {
+      q.new_stav = null;
+    } else {
+      q.new_stav = new_stav;
+    }
+    // end added by peter
+
+    //q.new_stav = new_stav;  original
+
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
@@ -86,6 +107,14 @@ export class AccountComponent implements OnInit {
       q.state = state;
     }
     
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
+  removeAllFilters() {
+    const q: any = {};
+    q.new_stav = null;
+    q.state = null;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
