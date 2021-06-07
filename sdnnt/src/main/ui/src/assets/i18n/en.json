@@ -76,6 +76,15 @@
     "podminka_3": "I agree to the processing of personal data. The National Library of the Czech Republic (hereinafter referred to as the National Library) in the area of ensuring the protection of natural persons in connection with the processing of their personal data at NK workplaces is governed by the provisions of Regulation (EU) 2016/679 of the European Parliament and the Council of 27 April 2016 in connection with the processing of personal data and on the free movement of such data and on the repeal of Directive 95/46 / EC (General Regulation on the Protection of Personal Data), known as the GDPR and Act No. 110/2019 Coll., on the processing of personal data."
   },
 
+  "alert": {
+    "ulozeni_zadosti_success": "The request was saved successfully.",
+    "ulozeni_zadosti_error": "Error saving request.",
+    "schvalit_navrh_success": "The approval of the proposal was successful.",
+    "schvalit_navrh_error": "Error approving design.",
+    "zamitnout_navrh_success": "The proposal was rejected successfully.",
+    "zamitnout_navrh_error": "Error rejecting proposal."
+  },
+
   "desc": {
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",

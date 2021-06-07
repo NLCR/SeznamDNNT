@@ -145,9 +145,9 @@ export class ResultItemComponent implements OnInit {
     this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
     this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('add_to_zadost_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
-        this.service.showSnackBar('add_to_zadost_uspesna', '', false);
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
     });
   }
@@ -155,9 +155,9 @@ export class ResultItemComponent implements OnInit {
   approve(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('approve_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvalit_navrh_error', res.error, true);
       } else {
-        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvalit_navrh_success', '', false);
         this.zadost = res;
         this.processed = 'approved';
       }
@@ -167,9 +167,9 @@ export class ResultItemComponent implements OnInit {
   approveLib(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('approve_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvalit_navrh_error', res.error, true);
       } else {
-        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvalit_navrh_success', '', false);
         this.zadost = res;
         this.processed = 'approveLib';
       }
@@ -179,9 +179,9 @@ export class ResultItemComponent implements OnInit {
   reject(doc: SolrDocument) {
     this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('reject_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.zamitnout_navrh_error', res.error, true);
       } else {
-        this.service.showSnackBar('reject_navrh_success', '', false);
+        this.service.showSnackBar('alert.zamitnout_navrh_success', '', false);
         this.zadost = res;
         this.processed = 'rejected';
       }

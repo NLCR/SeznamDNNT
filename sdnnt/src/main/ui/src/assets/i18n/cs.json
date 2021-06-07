@@ -76,6 +76,15 @@
     "podminka_3": "Souhlasím se zpracováním osobních údajů. Národní knihovna České republiky (dále jen NK) se v oblasti zajištění ochrany fyzických osob v souvislosti se zpracováním jejich osobních údajů na pracovištích NK řídí ustanoveními Nařízení Evropského parlamentu a Rady (EU) 2016/679 ze dne 27. dubna 2016 o ochraně fyzických osob v souvislosti se zpracováním osobních údajů a o volném pohybu těchto údajů a o zrušení směrnice 95/46/ES (obecné nařízení o ochraně osobních údajů), známého jako GDPR a zákona č. 110/2019 Sb., o zpracování osobních údajů."
   },
 
+  "alert": {
+    "ulozeni_zadosti_success": "Uložení žádosti proběhlo úspěšně.",
+    "ulozeni_zadosti_error": "Chyba při uložení žádosti.",
+    "schvalit_navrh_success": "Schválení návrhu proběhlo úspěšně.",
+    "schvalit_navrh_error": "Chyba při schválení návrhu.",
+    "zamitnout_navrh_success": "Zamítnutí návrhu proběhlo úspěšně.",
+    "zamitnout_navrh_error": "Chyba při zamítnutí návrhu."
+  },
+
   "desc": {
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
