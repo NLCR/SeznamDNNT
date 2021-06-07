@@ -131,6 +131,18 @@ a {
   top: 0;
 }
 
+.app-text-left {
+  text-align: left;
+}
+
+.app-text-right {
+  text-align: right;
+}
+
+.app-text-center {
+  text-align: center;
+}
+
 // --- material components override ---
 
 // checkbox
@@ -239,6 +251,26 @@ a {
 // table
 .mat-table {
   @extend .app-w-100;
+
+  tbody {
+    td {
+      &.app-cell-action {
+        @extend .app-p-0;
+        height:100%;
+
+        .mat-button-toggle-group {
+          @extend .app-clean-radius;
+          border-width: 0 0 0 1px;
+
+          .mat-button-toggle-button {
+            .mat-button-toggle-label-content {
+              line-height: 38px;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 // radio group

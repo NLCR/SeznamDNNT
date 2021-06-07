@@ -157,6 +157,7 @@
     "zaznam_ma_navrh": "The record has a proposal",
     "prehled_zadosti": "Overview of applications",
     "skryt_zpracovane": "Hide processed",
-    "hromadny_navrh": "Bulk proposal"
+    "hromadny_navrh": "Bulk proposal",
+    "oznacit_jako_zpracovane": "Mark as processed"
   }
 }
