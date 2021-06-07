@@ -143,6 +143,12 @@ a {
   text-align: center;
 }
 
+.app-text-cutter {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 // --- material components override ---
 
 // checkbox
@@ -252,9 +258,20 @@ a {
 .mat-table {
   @extend .app-w-100;
 
+  th, td {
+    &:first-of-type {
+      @extend .app-pl-4;
+    }
+
+    &:last-of-type {
+      @extend .app-pr-4;
+    }
+  }
+
+
   tbody {
     td {
-      &.app-cell-btn-action {
+      &.mat-column-actions {
         @extend .app-p-0;
         height:100%;
 
@@ -267,6 +284,18 @@ a {
               line-height: 38px;
             }
           }
+        }
+      }
+
+      &.mat-column-pozadavek {
+        .app-text-cutter {
+          max-width: 80px;
+        }
+      }
+
+      &.mat-column-poznamka {
+        .app-text-cutter {
+          width: 80px;
         }
       }
     }

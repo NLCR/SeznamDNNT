@@ -77,15 +77,23 @@
           </ng-container>
           <ng-container matColumnDef="pozadavek">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.pozadavek' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.pozadavek }}</td>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.pozadavek" matTooltipPosition="above">
+              <div class="app-text-cutter">
+                {{ element.pozadavek }}
+              </div>
+            </td>
           </ng-container>
           <ng-container matColumnDef="poznamka">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.poznamka }}</td>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.poznamka" matTooltipPosition="above">
+              <div class="app-text-cutter">
+                {{ element.poznamka }}
+              </div>
+            </td>
           </ng-container>
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" class="app-text-right app-cell-btn-action">
+            <td mat-cell *matCellDef="let element" class="app-text-right">
               <mat-button-toggle-group>
                 <mat-button-toggle (click)="showRecords(element)" [matTooltip]="state.user.role === 'kurator' && element.state === 'waiting' ? ('desc.zpracovani_zadosti' | translate) : ('desc.prehled_zadosti' | translate)" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">{{ state.user.role === 'kurator' && element.state === 'waiting' ? 'rule' : 'visibility' }}</mat-icon>
