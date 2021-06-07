@@ -31,9 +31,9 @@ export class ZadostSendDialogComponent implements OnInit {
     this.data.state = 'waiting';
     this.service.saveZadost(this.data).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('send_zadost_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
-        this.service.showSnackBar('send_zadost_uspesna', '', false);
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
         this.dialogRef.close();
       }
     });

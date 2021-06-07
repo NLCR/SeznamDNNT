@@ -79,10 +79,16 @@
   "alert": {
     "ulozeni_zadosti_success": "The request was saved successfully.",
     "ulozeni_zadosti_error": "Error saving request.",
-    "schvalit_navrh_success": "The approval of the proposal was successful.",
-    "schvalit_navrh_error": "Error approving design.",
-    "zamitnout_navrh_success": "The proposal was rejected successfully.",
-    "zamitnout_navrh_error": "Error rejecting proposal."
+    "schvaleni_navrhu_success": "The approval of the proposal was successful.",
+    "schvaleni_navrhu_error": "Error approving design.",
+    "zamitnuti_navrhu_success": "The proposal was rejected successfully.",
+    "zamitnuti_navrhu_error": "Error rejecting proposal.",
+    "reset_hesla_success": "Password reset was successful.",
+    "reset_hesla_error": "Error resetting password.",
+    "registrace_uzivatele_success": "User registration was successful.",
+    "registrace_uzivatele_error": "Error registering user.",
+    "ulozeni_uzivatele_success": "User saved successfully",
+    "ulozeni_uzivatele_error": "Error saving user."
   },
 
   "desc": {

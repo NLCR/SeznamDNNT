@@ -56,9 +56,9 @@ export class ZadostComponent implements OnInit {
   approve(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('approve_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res; 
         // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
       }
@@ -68,9 +68,9 @@ export class ZadostComponent implements OnInit {
   approveLib(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('approve_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('approve_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res; 
         // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
       }
@@ -80,9 +80,9 @@ export class ZadostComponent implements OnInit {
   reject(doc: SolrDocument) {
     this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('reject_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('reject_navrh_success', '', false);
+        this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
         this.zadost = res;
         // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
       }

@@ -78,9 +78,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.state.currentZadost[new_stav].identifiers = this.state.currentZadost[new_stav].identifiers.concat(this.docs.map(doc => doc.identifier));
     this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('add_to_zadost_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
-        this.service.showSnackBar('add_to_zadost_uspesna', '', false);
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
     });
   }

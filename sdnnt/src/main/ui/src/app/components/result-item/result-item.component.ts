@@ -155,9 +155,9 @@ export class ResultItemComponent implements OnInit {
   approve(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.schvalit_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('alert.schvalit_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res;
         this.processed = 'approved';
       }
@@ -167,9 +167,9 @@ export class ResultItemComponent implements OnInit {
   approveLib(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.schvalit_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('alert.schvalit_navrh_success', '', false);
+        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res;
         this.processed = 'approveLib';
       }
@@ -179,9 +179,9 @@ export class ResultItemComponent implements OnInit {
   reject(doc: SolrDocument) {
     this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.zamitnout_navrh_error', res.error, true);
+        this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
       } else {
-        this.service.showSnackBar('alert.zamitnout_navrh_success', '', false);
+        this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
         this.zadost = res;
         this.processed = 'rejected';
       }

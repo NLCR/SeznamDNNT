@@ -31,9 +31,9 @@ export class UserDialogComponent implements OnInit {
   resetPwd() {
     this.service.resetPwd(null).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('resetPwd_error', res.error, true);
+        this.service.showSnackBar('alert.reset_hesla_error', res.error, true);
       } else {
-        this.service.showSnackBar('resetPwd_uspesna', '', false);
+        this.service.showSnackBar('alert.reset_hesla_success', '', false);
         this.dialogRef.close();
       }
     });
@@ -46,18 +46,18 @@ export class UserDialogComponent implements OnInit {
       
       this.service.registerUser(this.user).subscribe((res: User) => {
         if (res.error) {
-          this.service.showSnackBar('user_register_error', res.error, true);
+          this.service.showSnackBar('alert.registrace_uzivatele_error', res.error, true);
         } else {
-          this.service.showSnackBar('registrace_uspesna', '', false);
+          this.service.showSnackBar('alert.registrace_uzivatele_success', '', false);
           this.dialogRef.close();
         }
       });
     } else {
       this.service.saveUser(this.user).subscribe((res: User) => {
       if (res.error) {
-        this.service.showSnackBar('user_saving_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', res.error, true);
       } else {
-        this.service.showSnackBar('ulozeni_uspesne', '', false);
+        this.service.showSnackBar('alert.ulozeni_uzivatele_success', '', false);
         JSON.parse(JSON.stringify(this.user));
         this.dialogRef.close();
       }

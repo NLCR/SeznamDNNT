@@ -79,10 +79,16 @@
   "alert": {
     "ulozeni_zadosti_success": "Uložení žádosti proběhlo úspěšně.",
     "ulozeni_zadosti_error": "Chyba při uložení žádosti.",
-    "schvalit_navrh_success": "Schválení návrhu proběhlo úspěšně.",
-    "schvalit_navrh_error": "Chyba při schválení návrhu.",
-    "zamitnout_navrh_success": "Zamítnutí návrhu proběhlo úspěšně.",
-    "zamitnout_navrh_error": "Chyba při zamítnutí návrhu."
+    "schvaleni_navrhu_success": "Schválení návrhu proběhlo úspěšně.",
+    "schvaleni_navrhu_error": "Chyba při schválení návrhu.",
+    "zamitnuti_navrhu_success": "Zamítnutí návrhu proběhlo úspěšně.",
+    "zamitnuti_navrhu_error": "Chyba při zamítnutí návrhu.",
+    "reset_hesla_success": "Reset hesla proběhl úspěšně.",
+    "reset_hesla_error": "Chyba při resetu hesla.",
+    "registrace_uzivatele_success": "Registrace uživatele proběhla úspěšně.",
+    "registrace_uzivatele_error": "Chyba při registraci uživatele.",
+    "ulozeni_uzivatele_success": "Uložení uživatele proběhlo úspěšně.",
+    "ulozeni_uzivatele_error": "Chyba při uložení uživatele."
   },
 
   "desc": {
