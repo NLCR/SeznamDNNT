@@ -98,7 +98,7 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
                   .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("typ","old_stav","new_stav")
+                  .setFacet(true).addFacetField("typ","old_stav","navrh")
                   .addFilterQuery("user:" + user.getString("name"))
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");

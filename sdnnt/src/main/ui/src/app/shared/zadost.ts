@@ -6,7 +6,7 @@ export class Zadost {
   state: string;
   datum_vyrizeni: Date;
   pozadavek: string;
-  new_stav: string;
+  navrh: string;
   poznamka: string;
   identifiers: string[];
   process: string;

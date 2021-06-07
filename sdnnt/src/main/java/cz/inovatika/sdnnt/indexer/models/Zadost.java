@@ -42,7 +42,7 @@ public class Zadost {
   public String kurator;
   
   @Field
-  public String new_stav;
+  public String navrh;
   
   @Field
   public String poznamka;

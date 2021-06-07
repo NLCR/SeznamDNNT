@@ -94,14 +94,14 @@ public class AccountServlet extends HttpServlet {
           SolrQuery query = new SolrQuery(q)
                   .setRows(20)
                   .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("typ","state","new_stav")
+                  .setFacet(true).addFacetField("typ","state","navrh")
                   .setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
           if (req.getParameter("state") != null) {
             query.addFilterQuery("state:" + req.getParameter("state"));
           }
-          if (req.getParameter("new_stav") != null) {
-            query.addFilterQuery("new_stav:" + req.getParameter("new_stav"));
+          if (req.getParameter("navrh") != null) {
+            query.addFilterQuery("navrh:" + req.getParameter("navrh"));
           }
           if ("kurator".equals(user.role)) {
             query.addFilterQuery("-state:open");
@@ -157,10 +157,12 @@ public class AccountServlet extends HttpServlet {
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           
-          String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
-          SolrQuery query = new SolrQuery("identifier:" + q)
+          // String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
+          // SolrQuery query = new SolrQuery("identifier:" + q)
+          SolrQuery query = new SolrQuery("*:*")
                   .setRows(100)
-                  // .setFacet(true).addFacetField("typ","state","new_stav")
+                  .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + req.getParameter("id"))
+                  
                   //.addFilterQuery("user:" + user.username)
                   //.setParam("json.nl", "arrntv")
                   .setFields("*,raw:[json]");
@@ -241,7 +243,7 @@ public class AccountServlet extends HttpServlet {
             inputJs = new JSONObject(req.getParameter("json"));
           }
           Indexer.changeStav(inputJs.getString("identifier"), 
-                  inputJs.getJSONObject("zadost").getString("new_stav"), user.username);
+                  inputJs.getJSONObject("zadost").getString("navrh"), user.username);
           return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
           // json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {
@@ -263,7 +265,7 @@ public class AccountServlet extends HttpServlet {
             inputJs = new JSONObject(req.getParameter("json"));
           }
           Indexer.changeStav(inputJs.getString("identifier"), 
-                  inputJs.getJSONObject("zadost").getString("new_stav"), user.username);
+                  inputJs.getJSONObject("zadost").getString("navrh"), user.username);
           return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

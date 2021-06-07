@@ -71,7 +71,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     const new_stav = isZarazeno ? 'VVS' : 'NZN'
     if (!this.state.currentZadost[new_stav]) {
       const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-      z.new_stav = new_stav;
+      z.navrh = new_stav;
       z.identifiers = [];
       this.state.currentZadost[new_stav] = z;
     }

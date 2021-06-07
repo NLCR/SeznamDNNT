@@ -136,14 +136,14 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-    const new_stav = this.isZarazeno ? 'VVS' : 'NZN'
-    if (!this.state.currentZadost[new_stav]) {
+    const navrh = this.isZarazeno ? 'VVS' : 'NZN'
+    if (!this.state.currentZadost[navrh]) {
       const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-      z.new_stav = new_stav;
-      this.state.currentZadost[new_stav] = z;
+      z.navrh = navrh;
+      this.state.currentZadost[navrh] = z;
     }
-    this.state.currentZadost[new_stav].identifiers.push(this.doc.identifier);
-    this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe((res: any) => {
+    this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+    this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('add_to_zadost_error', res.error, true);
       } else {

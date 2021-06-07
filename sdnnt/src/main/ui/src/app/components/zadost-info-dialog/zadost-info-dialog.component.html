@@ -22,9 +22,9 @@
           <div [class]="'app-badge ' + doc.marc_990a">
             <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>{{ 'state.' + doc.marc_990a | translate }}
           </div>
-          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.new_stav" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
-          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu POUZE v knihovne ' + data.new_stav" (click)="approveLib(doc)"><mat-icon>local_library</mat-icon></button>&#160;
-          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Odmitnout zmenu stavu na ' + data.new_stav" (click)="reject(doc)"><mat-icon>close</mat-icon></button>&#160;
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu stavu na ' + data.navrh" (click)="approve(doc)"><mat-icon>done</mat-icon></button>&#160;
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Schvalit zmenu POUZE v knihovne ' + data.navrh" (click)="approveLib(doc)"><mat-icon>local_library</mat-icon></button>&#160;
+          <button *ngIf="state.user.role === 'kurator' && data.state === 'waiting'" mat-icon-button [title]="'Odmitnout zmenu stavu na ' + data.navrh" (click)="reject(doc)"><mat-icon>close</mat-icon></button>&#160;
         </div>
       </mat-card-actions>
     </mat-card>

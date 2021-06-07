@@ -25,9 +25,9 @@ export class ZadostInfoDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    this.service.getZadostRecords(this.data.identifiers).subscribe((resp: SolrResponse) => {
+    this.service.getZadostRecords(this.data.id).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
-      this.action = this.data.new_stav;
+      this.action = this.data.navrh;
     });
     this.process = this.data.process ? JSON.parse(this.data.process) : {};
   }

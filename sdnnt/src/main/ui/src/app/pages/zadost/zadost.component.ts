@@ -14,8 +14,9 @@ import { Zadost } from 'src/app/shared/zadost';
 export class ZadostComponent implements OnInit {
 
   zadost: Zadost;
+  numFound: number;
   docs: SolrDocument[];
-  action: string;
+  // action: string;
   hideProcessed: boolean;
 
   constructor(
@@ -33,7 +34,7 @@ export class ZadostComponent implements OnInit {
 
     this.service.getZadost(id).subscribe((resp: any) => {
       this.zadost = resp.response.docs[0];
-      this.action = this.zadost.new_stav;
+      // this.action = this.zadost.new_stav;
       this.getDocs();
     });
 
@@ -41,15 +42,15 @@ export class ZadostComponent implements OnInit {
 
   getDocs() {
 
-    this.service.getZadostRecords(this.zadost.identifiers).subscribe((resp: SolrResponse) => {
+    this.service.getZadostRecords(this.zadost.id).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
-      const process = JSON.parse(this.zadost.process);
+      const process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+      this.numFound = resp.response.numFound;
       this.docs.map(doc => {
         doc.isProcessed = process && process[doc.identifier];
       });
-      this.action = this.zadost.new_stav;
+      // this.action = this.zadost.new_stav;
     });
-    // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
   }
 
   approve(doc: SolrDocument) {

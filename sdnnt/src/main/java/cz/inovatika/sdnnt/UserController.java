@@ -205,7 +205,7 @@ public class UserController {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       SolrQuery query = new SolrQuery("user:\"" + username + "\"")
               .addFilterQuery("state:open")
-              .setFields("id", "identifiers", "typ", "user", "state", "new_stav", "poznamka", "pozadavek", "datum_zadani", "datum_vyrizeni", "formular")
+              .setFields("id", "identifiers", "typ", "user", "state", "navrh", "poznamka", "pozadavek", "datum_zadani", "datum_vyrizeni", "formular")
               .setRows(2);
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();

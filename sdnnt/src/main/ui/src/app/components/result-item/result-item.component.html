@@ -51,15 +51,18 @@
       </button>
 
       <ng-container *ngIf="state.user && inZadost">
-        <!-- <h3>{{ processed }}</h3> -->
-        <mat-button-toggle-group class="app-ml-3">
-          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="approve(doc)" [matTooltip]="'Schvalit zmenu stavu na ' + zadost.new_stav" matTooltipPosition="above">
+        <h3>{{ processed }}</h3>
+        <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'">
+          <mat-button-toggle *ngIf="zadost.navrh === 'NZN'" (click)="approve(doc)" [checked]="processed === 'approved'" [matTooltip]="'Schvalit zmenu stavu na A'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="approveLib(doc)" [matTooltip]="'Schvalit zmenu pouze v knihovne ' + zadost.new_stav" matTooltipPosition="above">
+          <mat-button-toggle *ngIf="zadost.navrh === 'VVS'" (click)="approve(doc)" [checked]="processed === 'approved'" [matTooltip]="'Schvalit zmenu stavu na VS'" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">check</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle *ngIf="zadost.navrh === 'VVS'" (click)="approveLib(doc)" [matTooltip]="'Schvalit zmenu pouze v knihovne '" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">local_library</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="reject(doc)" [matTooltip]="'Odmitnout zmenu stavu na ' + zadost.new_stav" matTooltipPosition="above">
+          <mat-button-toggle *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" [checked]="processed === 'rejected'" (click)="reject(doc)" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">not_interested</mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>
