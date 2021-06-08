@@ -8,6 +8,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
 import { DataDialogComponent } from '../data-dialog/data-dialog.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
+import { RejectDialogComponent } from '../reject-dialog/reject-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
 
 @Component({
@@ -25,7 +26,7 @@ export class ResultItemComponent implements OnInit {
   isZarazeno: boolean;
   hasNavhr: boolean;
   imgSrc: string;
-  processed: string;
+  processed: { date: Date, state: string, user: string, reason?: string };
 
   constructor(
     public dialog: MatDialog,
@@ -39,7 +40,7 @@ export class ResultItemComponent implements OnInit {
     this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
     this.hasNavhr = !!this.doc.zadost;
     if (this.zadost?.process) {
-      this.processed = JSON.parse(this.zadost.process)[this.doc.identifier];
+      this.processed = this.zadost.process[this.doc.identifier];
     }
     if (this.doc.marc_956u) {
       // Je to kramerius
@@ -159,7 +160,7 @@ export class ResultItemComponent implements OnInit {
       } else {
         this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res;
-        this.processed = 'approved';
+        this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
       }
     });
   }
@@ -171,22 +172,32 @@ export class ResultItemComponent implements OnInit {
       } else {
         this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
         this.zadost = res;
-        this.processed = 'approveLib';
+        this.processed = { date: new Date(), state: 'approvedLib', user: this.state.user.username };
       }
     });
   }
 
   reject(doc: SolrDocument) {
-    this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
-        this.zadost = res;
-        this.processed = 'rejected';
+    const dialogRef = this.dialog.open(RejectDialogComponent, {
+      width: '700px',
+      data: this.doc,
+      panelClass: 'app-register-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.service.rejectNavrh(doc.identifier, this.zadost, result).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
+            this.zadost = res;
+            this.processed = { date: new Date(), state: 'rejected', user: this.state.user.username };
+          }
+        });
       }
     });
-  }
 
+  }
 }
 

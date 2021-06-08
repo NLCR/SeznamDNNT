@@ -36,9 +36,9 @@ import { FacetsUsedComponent } from './components/facets/facets-used/facets-used
 import { AccountItemComponent } from './components/account-item/account-item.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
-import { ZadostInfoDialogComponent } from './components/zadost-info-dialog/zadost-info-dialog.component';
 import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
+import { RejectDialogComponent } from './components/reject-dialog/reject-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -78,9 +78,9 @@ const providers: any[] =[
     AccountItemComponent,
     UserFormComponent,
     UserDialogComponent,
-    ZadostInfoDialogComponent,
     ZadostSendDialogComponent,
-    ZadostComponent
+    ZadostComponent,
+    RejectDialogComponent
   ],
   imports: [
     BrowserModule,

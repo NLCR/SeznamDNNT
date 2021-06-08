@@ -96,7 +96,7 @@ public class AccountServlet extends HttpServlet {
                   .setParam("df", "fullText")
                   .setFacet(true).addFacetField("typ","state","navrh")
                   .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
+                  .setFields("*,process:[json]");
           if (req.getParameter("state") != null) {
             query.addFilterQuery("state:" + req.getParameter("state"));
           }
@@ -134,7 +134,7 @@ public class AccountServlet extends HttpServlet {
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           SolrQuery query = new SolrQuery("id:" + req.getParameter("id"))
-                  .setRows(1);
+                  .setRows(1).setFields("*,process:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
@@ -162,9 +162,7 @@ public class AccountServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*:*")
                   .setRows(100)
                   .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + req.getParameter("id"))
-                  
-                  //.addFilterQuery("user:" + user.username)
-                  //.setParam("json.nl", "arrntv")
+                  .setSort(SolrQuery.SortClause.asc("identifier"))
                   .setFields("*,raw:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
@@ -266,7 +264,8 @@ public class AccountServlet extends HttpServlet {
           }
           Indexer.changeStav(inputJs.getString("identifier"), 
                   inputJs.getJSONObject("zadost").getString("navrh"), user.username);
-          return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
+          return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
+                  inputJs.getString("reason"), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.History;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -112,24 +116,39 @@ public class Zadost {
       JSONObject p = new JSONObject();
       if (zadost.process != null) {
         p = new JSONObject(zadost.process);
+      } else {
+        zadost.process = "{}";
       }
-      p.put(identifier, "approved");
+      JSONObject process = new JSONObject();
+      process.put("state", "approved");
+      process.put("user", username);
+      process.put("date", ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
+      p.put(identifier, process);
+      History.log(zadost.id, zadost.process, p.toString(), username, "zadost");
       zadost.process = p.toString();
       return save(zadost);
-    } catch (Exception ex) {
+    } catch (JsonProcessingException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
     }
   }
   
-  public static JSONObject reject(String identifier, String js, String username) {
+  public static JSONObject reject(String identifier, String js, String reason, String username) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       JSONObject p = new JSONObject();
       if (zadost.process != null) {
         p = new JSONObject(zadost.process);
+      } else {
+        zadost.process = "{}";
       }
-      p.put(identifier, "rejected");
+      JSONObject process = new JSONObject();
+      process.put("state", "rejected");
+      process.put("user", username);
+      process.put("date", ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
+      process.put("reason", reason);
+      p.put(identifier, process);
+      History.log(zadost.id, zadost.process, p.toString(), username, "zadost");
       zadost.process = p.toString();
       return save(zadost);
     } catch (JsonProcessingException | JSONException ex) {

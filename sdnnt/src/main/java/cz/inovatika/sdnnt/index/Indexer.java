@@ -209,8 +209,8 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
       String oldStav = (String) docOld.getFirstValue("marc_990a");
-      ObjectMapper mapper = new ObjectMapper();
       
+
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
       if (navrh.equals("VVS")) {
         if (oldStav.equals("A")) {
@@ -218,40 +218,26 @@ public class Indexer {
         } else if (oldStav.equals("PA")) {
           mr.setStav("VN");
         }
-        
-      } else if (navrh.equals("NZN")){
+
+      } else if (navrh.equals("NZN")) {
         mr.setStav("A");
       }
       
-      JsonNode source = mapper.readTree(oldRaw);
-      JsonNode target = mapper.readTree(mr.toJSON().toString());
-
-      JsonNode fwPatch = JsonDiff.asJson(source, target);
-      JsonNode bwPatch = JsonDiff.asJson(target, source);
-      
-      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
-      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
-
-      // Insert in history
-      SolrInputDocument idoc = new SolrInputDocument();
-      idoc.setField("identifier", identifier);
-      idoc.setField("user", user);
-      idoc.setField("type", "app");
-      idoc.setField("changes", ret.toString());
-      solr.add("history", idoc);
-      solr.commit("history");
+      History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
 
       // Update record in catalog
       mr.fillSolrDoc();
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
-      
+
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
     return ret;
   }
+
+  
 
   /**
    * Save record in catalog. Generates diff path and index to history core We
@@ -271,24 +257,7 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
 
-      ObjectMapper mapper = new ObjectMapper();
-      JsonNode source = mapper.readTree(oldRaw);
-      JsonNode target = mapper.readTree(newRaw.toString());
-
-      JsonNode fwPatch = JsonDiff.asJson(source, target);
-      JsonNode bwPatch = JsonDiff.asJson(target, source);
-
-      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
-      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
-
-      // Insert in history
-      SolrInputDocument idoc = new SolrInputDocument();
-      idoc.setField("identifier", id);
-      idoc.setField("user", user);
-      idoc.setField("type", "app");
-      idoc.setField("changes", ret.toString());
-      solr.add("history", idoc);
-      solr.commit("history");
+      History.log(id, oldRaw, newRaw.toString(), user, "catalog");
 
       // Update record in catalog
       MarcRecord mr = MarcRecord.fromJSON(newRaw.toString());
@@ -483,6 +452,8 @@ public class Indexer {
       } else {
         SolrDocument docCat = docsCat.get(0);
         String jsCat = (String) docCat.getFirstValue("raw");
+        
+        // addToHistory(id, jsCat, jsDnt, user, "app");
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode source = mapper.readTree(jsCat);

@@ -17,7 +17,15 @@
         </ng-container>
         <ng-container matColumnDef="to">
           <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_stav' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.changes.forward_patch[0].value }}</td>
+          <td mat-cell *matCellDef="let element">
+            <ng-container *ngIf="element.changes.forward_patch[0].op === 'replace'">
+              {{ element.changes.forward_patch[0].value }}
+            </ng-container>
+            <ng-container *ngIf="element.changes.forward_patch[0].op === 'add'">
+              added {{ element.changes.forward_patch[0].value[0].tag }}
+            </ng-container>
+            
+          </td>
         </ng-container>
         <ng-container matColumnDef="poznamka">
           <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>

@@ -44,48 +44,12 @@ export class ZadostComponent implements OnInit {
 
     this.service.getZadostRecords(this.zadost.id).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
-      const process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
+      const process = this.zadost.process;
       this.numFound = resp.response.numFound;
       this.docs.map(doc => {
         doc.isProcessed = process && process[doc.identifier];
       });
       // this.action = this.zadost.new_stav;
-    });
-  }
-
-  approve(doc: SolrDocument) {
-    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        this.zadost = res; 
-        // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
-      }
-    });
-  }
-
-  approveLib(doc: SolrDocument) {
-    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        this.zadost = res; 
-        // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
-      }
-    });
-  }
-
-  reject(doc: SolrDocument) {
-    this.service.rejectNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
-        this.zadost = res;
-        // this.process = this.zadost.process ? JSON.parse(this.zadost.process) : {};
-      }
     });
   }
 
