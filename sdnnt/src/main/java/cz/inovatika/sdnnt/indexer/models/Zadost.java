@@ -5,16 +5,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.History;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,7 +65,7 @@ public class Zadost {
   public String formular;
   
   @Field
-  public String process;
+  public Map<String, ZadostProcess> process;
   
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -113,19 +114,17 @@ public class Zadost {
   public static JSONObject approve(String identifier, String js, String username) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
-      JSONObject p = new JSONObject();
-      if (zadost.process != null) {
-        p = new JSONObject(zadost.process);
-      } else {
-        zadost.process = "{}";
+      if (zadost.process == null) {
+        zadost.process = new HashMap<>();
       }
-      JSONObject process = new JSONObject();
-      process.put("state", "approved");
-      process.put("user", username);
-      process.put("date", ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
-      p.put(identifier, process);
-      History.log(zadost.id, zadost.process, p.toString(), username, "zadost");
-      zadost.process = p.toString();
+      String oldProcess = new JSONObject().put("process", zadost.process).toString();
+      ZadostProcess zprocess = new ZadostProcess();
+      zprocess.state = "approved";
+      zprocess.user = username;
+      zprocess.date = new Date();
+      zadost.process.put(identifier, zprocess);
+      String newProcess = new JSONObject().put("process", zadost.process).toString();
+      History.log(zadost.id, oldProcess, newProcess, username, "zadost");
       return save(zadost);
     } catch (JsonProcessingException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -135,21 +134,20 @@ public class Zadost {
   
   public static JSONObject reject(String identifier, String js, String reason, String username) {
     try {
+      
       Zadost zadost = Zadost.fromJSON(js);
-      JSONObject p = new JSONObject();
-      if (zadost.process != null) {
-        p = new JSONObject(zadost.process);
-      } else {
-        zadost.process = "{}";
+      if (zadost.process == null) {
+        zadost.process = new HashMap<>();
       }
-      JSONObject process = new JSONObject();
-      process.put("state", "rejected");
-      process.put("user", username);
-      process.put("date", ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT));
-      process.put("reason", reason);
-      p.put(identifier, process);
-      History.log(zadost.id, zadost.process, p.toString(), username, "zadost");
-      zadost.process = p.toString();
+      String oldProcess = new JSONObject().put("process", zadost.process).toString();
+      ZadostProcess zprocess = new ZadostProcess();
+      zprocess.state = "rejected";
+      zprocess.user = username;
+      zprocess.reason = reason;
+      zprocess.date = new Date();
+      zadost.process.put(identifier, zprocess);
+      String newProcess = new JSONObject().put("process", zadost.process).toString();
+      History.log(zadost.id, oldProcess, newProcess, username, "zadost");
       return save(zadost);
     } catch (JsonProcessingException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -159,7 +157,13 @@ public class Zadost {
   
   public static JSONObject save(Zadost zadost) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-      solr.addBean("zadost", zadost);
+      DocumentObjectBinder dob = new DocumentObjectBinder();
+      SolrInputDocument idoc = dob.toSolrInputDocument(zadost);
+      ObjectMapper mapper = new ObjectMapper();
+      JSONObject p = new JSONObject(mapper.writeValueAsString(zadost.process));
+      idoc.setField("process", p.toString());
+      //solr.addBean("zadost", zadost);
+      solr.add("zadost", idoc);
       solr.commit("zadost");
       solr.close();
       return zadost.toJSON();

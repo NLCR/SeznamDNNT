@@ -88,6 +88,7 @@ public class MarcRecord {
     if (leader != null) {
       sdoc.setField("item_type", leader.substring(7, 8)); 
     }
+    sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     addDedup();
     addEAN();
     return sdoc;
@@ -120,6 +121,11 @@ public class MarcRecord {
         }
       }
     }
+    //if (sdoc.containsKey("marc_245a")) {
+    
+      sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+    //}
+    
     addDedup();
     addEAN();
   }

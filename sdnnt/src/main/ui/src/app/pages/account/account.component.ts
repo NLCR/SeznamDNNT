@@ -81,13 +81,13 @@ export class AccountComponent implements OnInit {
 
   }
 
-  setStav(new_stav: string) {
+  setStav(navrh: string) {
     const q: any = {};
     // added by peter
-    if (this.newStavFilter === new_stav) {
-      q.new_stav = null;
+    if (this.newStavFilter === navrh) {
+      q.navrh = null;
     } else {
-      q.new_stav = new_stav;
+      q.navrh = navrh;
     }
     // end added by peter
 
@@ -138,7 +138,10 @@ export class AccountComponent implements OnInit {
 
   process(zadost: Zadost) {
 
-    // if (zadost.identifiers.length > zadost.process)
+    if (zadost.identifiers.length > Object.keys(zadost.process).length) {
+      this.service.showSnackBar('alert.process_zadosti_error', 'Ne vsechny zaznamy jsou zpracovane', true);
+      return;
+    }
     this.service.processZadost(zadost).subscribe(res => {
 
     });

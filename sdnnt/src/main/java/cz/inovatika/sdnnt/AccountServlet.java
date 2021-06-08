@@ -162,7 +162,7 @@ public class AccountServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*:*")
                   .setRows(100)
                   .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + req.getParameter("id"))
-                  .setSort(SolrQuery.SortClause.asc("identifier"))
+                  .setSort(SolrQuery.SortClause.asc("title_sort"))
                   .setFields("*,raw:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
