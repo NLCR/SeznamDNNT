@@ -67,11 +67,10 @@
    <field name="author" type="lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
    <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
-   <field name="datumvydani" type="lowercase" indexed="true" stored="true"  />
+   <field name="rokvydani" type="pints" indexed="true" stored="true" />
    
    <field name="stav" type="string" indexed="true" stored="true"  />
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
-   
    
    <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
    

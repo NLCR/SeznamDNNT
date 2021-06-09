@@ -90,6 +90,9 @@ public class Zadost {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       zadost.user = username;
+      if (zadost.process == null) {
+        zadost.process = new HashMap<>();
+      }
       return save(zadost);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);

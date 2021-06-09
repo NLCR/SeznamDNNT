@@ -1,7 +1,7 @@
 <div class="app-container">
   <div fxLayout="row" fxLayoutGap="32px">
     <div fxFlex="350px" class="app-left app-fx-facets">
-      <app-facets *ngIf="facets" [facet_fields]="facets"></app-facets>
+      <app-facets *ngIf="facets" [facet_fields]="facets" [stats]="searchResponse.stats.stats_fields"></app-facets>
     </div>
     <div fxFlex class="app-right">
       <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">

@@ -9,8 +9,35 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
     <div *ngFor="let f of facet_fields[facet]">
-      <a *ngIf="facet === 'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
-      <a *ngIf="facet !== 'marc_990a'" (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+      <ng-container [ngSwitch]="facet">
+      <a *ngSwitchCase="'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+      <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+    </ng-container>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel *ngIf="rokod" [expanded]="true">
+    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+      <mat-panel-title>
+        {{ 'field.rokvydani' | translate }}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div>
+      <mat-form-field  >
+        <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'Rok od' | translate" hidden=true [readonly]="true"  >
+        <input matInput [(ngModel)]="rokod" [placeholder]="'Rok od' | translate" (click)="rok_od.open()" name="aa">
+        <mat-datepicker-toggle matSuffix [for]="rok_od"></mat-datepicker-toggle>
+        <mat-datepicker #rok_od startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_od, 'from')">
+        </mat-datepicker>
+      </mat-form-field>
+      <mat-form-field  >
+        <input matInput [matDatepicker]="rok_do" [value]="rokdodate.value" [placeholder]="'Rok do' | translate" hidden=true [readonly]="true">
+        <input matInput [(ngModel)]="rokdo" [placeholder]="'Rok do' | translate" (click)="rok_do.open()" name="bb">
+        <mat-datepicker-toggle matSuffix [for]="rok_do"></mat-datepicker-toggle>
+        <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">
+        </mat-datepicker>
+      </mat-form-field>
+    <button mat-button (click)="clickRokFacet()">go</button>
     </div>
   </mat-expansion-panel>
 </mat-accordion>

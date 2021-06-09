@@ -165,7 +165,6 @@ public class SearchServlet extends HttpServlet {
           
           String jsonp = org.apache.commons.io.IOUtils.toString(new URL(url), "UTF-8");
           String json = jsonp.substring("display_google(".length(), jsonp.length()-2);
-          System.out.println(json);
           ret = new JSONObject(json);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

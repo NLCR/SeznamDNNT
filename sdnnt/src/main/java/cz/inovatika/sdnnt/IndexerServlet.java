@@ -76,7 +76,7 @@ public class IndexerServlet extends HttpServlet {
   }
 
   enum Actions {
-    REINDEX {
+    REINDEX_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
