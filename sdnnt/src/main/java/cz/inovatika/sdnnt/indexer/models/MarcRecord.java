@@ -25,7 +25,7 @@ import org.json.JSONObject;
  * @author alberto
  */
 public class MarcRecord {
-  
+
   public static final Logger LOGGER = Logger.getLogger(MarcRecord.class.getName());
 
   // Header fields
@@ -55,7 +55,6 @@ public class MarcRecord {
 
   final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "246", "250", "260", "264", "856", "990", "992", "998", "956", "911", "910");
 
-  
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
@@ -86,14 +85,15 @@ public class MarcRecord {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
     if (leader != null) {
-      sdoc.setField("item_type", leader.substring(7, 8)); 
+      sdoc.setField("item_type", leader.substring(7, 8));
     }
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+    addRokVydani();
     addDedup();
     addEAN();
     return sdoc;
   }
-  
+
   public void setStav(String new_stav) {
     if (!dataFields.containsKey("990")) {
       List<DataField> ldf = new ArrayList<>();
@@ -107,8 +107,7 @@ public class MarcRecord {
     } else {
       dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
     }
-    
-    
+
   }
 
   public void fillSolrDoc() {
@@ -122,24 +121,71 @@ public class MarcRecord {
       }
     }
     //if (sdoc.containsKey("marc_245a")) {
-    
-      sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+
+    sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     //}
-    
+
     addDedup();
     addEAN();
   }
-  
-  private void addEAN() {
-    if (sdoc.containsKey("marc_020a")) {
-      for (Object s: sdoc.getFieldValues("marc_020a")){
-        sdoc.addField("ean", ((String)s).replaceAll("-", "")); 
+
+  private void addRokVydani() {
+    if (sdoc.containsKey("marc_260c")) {
+      for (Object s : sdoc.getFieldValues("marc_260c")) {
+        String val = (String) s;
+        val = val.replaceAll("\\[", "").replaceAll("\\]", "").trim();
+        try {
+          // je to integer. Pridame
+          int r = Math.abs(Integer.parseInt(val));
+          //Nechame jen 4
+          if ((r+"").length() > 3) {
+            String v = (r+"").substring(0, 4);
+            sdoc.addField("rokvydani", v);
+          }
+          
+          return;
+        } catch (NumberFormatException ex) {
+
+        }
+        // casto maji 'c' na zacatku c2001 
+        if (val.startsWith("c")) {
+          val = val.substring(1);
+          try {
+            // je to integer. Pridame
+            int r = Integer.parseInt(val);
+            sdoc.addField("rokvydani", r);
+            return;
+          } catch (NumberFormatException ex) {
+
+          }
+        }
+        // [před r. 1937]
+        if (val.startsWith("před r.")) {
+          val = val.substring(7).trim();
+          try {
+            // je to integer. Pridame
+            int r = Integer.parseInt(val);
+            sdoc.addField("rokvydani", r);
+            return;
+          } catch (NumberFormatException ex) {
+
+          }
+        }
+
       }
     }
   }
-  
+
+  private void addEAN() {
+    if (sdoc.containsKey("marc_020a")) {
+      for (Object s : sdoc.getFieldValues("marc_020a")) {
+        sdoc.addField("ean", ((String) s).replaceAll("-", ""));
+      }
+    }
+  }
+
   public void addDedup() {
-    sdoc.setField("dedup_fields", generateMD5()); 
+    sdoc.setField("dedup_fields", generateMD5());
   }
 
   private String generateMD5() {
@@ -181,12 +227,12 @@ public class MarcRecord {
           f245n = Integer.toString(rn.toInt());
         }
       }
- 
+
       //Pole 250 údaj o vydání (nechat pouze numerické znaky) (jen prvni cislice)
       String f250a = (String) sdoc.getFieldValue("marc_250a");
       if (f250a != null) {
         f250a = onlyLeadNumbers(f250a);
-      } 
+      }
 
       //Pole 100 autor – osobní jméno (ind1=1 →  prijmeni, jmeno; ind1=0 → jmeno, prijmeni.  
       //Obratit v pripade ind1=1, jinak nechat)

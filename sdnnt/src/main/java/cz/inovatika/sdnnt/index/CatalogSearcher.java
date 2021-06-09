@@ -89,11 +89,18 @@ public class CatalogSearcher {
             .setFacet(true).addFacetField("item_type", "marc_990a", "marc_910a", "nakladatel")
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
+            .setParam("stats", true)
+            .setParam("stats.field","rokvydani")
             .setFields("*,raw:[json]");
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
       if (req.getParameter(field) != null) {
-        query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
+        if (field.equals("rokvydani")) {
+          query.addFilterQuery(field + ":[" + req.getParameter(field).replace(",", " TO ") + "]");
+        } else {
+          query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
+        }
+        
       }
     }
     return query;

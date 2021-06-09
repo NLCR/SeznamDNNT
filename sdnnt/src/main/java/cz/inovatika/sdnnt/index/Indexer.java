@@ -277,6 +277,7 @@ public class Indexer {
 
   public static JSONObject reindexFilter(String filter) {
     JSONObject ret = new JSONObject();
+    int indexed = 0;
     try {
       SolrClient solr = getClient();
 
@@ -295,26 +296,26 @@ public class Indexer {
         for (SolrDocument doc : docs) {
           String oldRaw = (String) doc.getFirstValue("raw");
 
-          // Update record in catalog
           MarcRecord mr = MarcRecord.fromJSON(oldRaw);
           mr.fillSolrDoc();
           idocs.add(mr.toSolrDoc());
-//          solr.add("catalog", mr.toSolrDoc());
-//          solr.commit("catalog");
-          ret = mr.toJSON();
+          mr.toJSON();
         }
 
         if (!idocs.isEmpty()) {
           solr.add("catalog", idocs);
           solr.commit("catalog");
+          indexed += idocs.size();
           idocs.clear();
+          LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
         }
         if (cursorMark.equals(nextCursorMark)) {
           done = true;
         }
         cursorMark = nextCursorMark;
       }
-
+      LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
+      ret.put("reindex", indexed);
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);

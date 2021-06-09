@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
@@ -12,7 +13,13 @@ import { Filter } from 'src/app/shared/filter';
 export class FacetsComponent implements OnInit {
 
   @Input() facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
+  @Input() stats:{ [field: string]: {min: any, max: any, count: number, from: any, until: any}};
   facets: string[];
+
+    rokoddate = new FormControl(new Date());
+    rokod: number;
+    rokdodate = new FormControl(new Date());
+    rokdo: number;
 
   constructor(
     private router: Router,
@@ -28,6 +35,14 @@ export class FacetsComponent implements OnInit {
         this.facets.push(f);
       }
     });
+
+    if (this.stats) {
+      this.rokod = this.stats['rokvydani'].min;
+      this.rokdo = this.stats['rokvydani'].max;
+      this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
+      this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
+    }
+
   }
 
   addFilter(field: string, f:{name: string, type: string, value: number}) {
@@ -37,5 +52,26 @@ export class FacetsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+
+  chosenYearHandler(normalizedYear: Date, datepicker: any, field: string) {
+    console.log(normalizedYear)
+    if (field === 'from') {
+      this.rokod = normalizedYear.getFullYear();
+    } else {
+      this.rokdo = normalizedYear.getFullYear();
+    }
+
+    this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
+    this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
+    console.log(this.rokod, this.rokdo)
+    datepicker.close();
+  }
+
+  clickRokFacet() {
+    const params: any = {};
+    params['rokvydani'] = this.rokod + ',' + this.rokdo;
+    params.page = 0;
+    this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
+  }
 
 }
