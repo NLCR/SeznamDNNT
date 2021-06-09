@@ -175,7 +175,7 @@ export class ResultItemComponent implements OnInit {
   }
 
   approveLib(doc: SolrDocument) {
-    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
+    this.service.approveNavrhLib(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {

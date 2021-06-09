@@ -7,7 +7,9 @@
     <div>
       <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245c }}</span></mat-card-title>
       <mat-card-subtitle>
-        {{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}
+        <div>{{ doc.marc_250a }}</div>
+        <div>{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>
+        <div>{{ doc.marc_020a }}</div>
       </mat-card-subtitle>
     </div>
   </mat-card-header>

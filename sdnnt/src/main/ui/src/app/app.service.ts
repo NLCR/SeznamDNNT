@@ -95,6 +95,13 @@ export class AppService {
     return this.post(url, {identifier, zadost}, params);
   }
 
+  approveNavrhLib(identifier: string, zadost: Zadost): Observable<string> {
+    let url = '/account/approve_navrh_lib';
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, {identifier, zadost}, params);
+  }
+
   rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject_navrh';
     const params: HttpParams = new HttpParams()
