@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { ZadostInfoDialogComponent } from 'src/app/components/zadost-info-dialog/zadost-info-dialog.component';
 import { ZadostSendDialogComponent } from 'src/app/components/zadost-send-dialog/zadost-send-dialog.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
@@ -35,7 +34,7 @@ export class AccountComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['datum_zadani','user', 'state', 'new_stav','datum_vyrizeni','count', 'pozadavek','poznamka','actions'];
+  displayedColumns = ['datum_zadani','user', 'state', 'navrh','datum_vyrizeni','count', 'pozadavek','poznamka','actions'];
   zadosti: Zadost[] = [];
 
   stateFilter: string;
@@ -82,13 +81,13 @@ export class AccountComponent implements OnInit {
 
   }
 
-  setStav(new_stav: string) {
+  setStav(navrh: string) {
     const q: any = {};
     // added by peter
-    if (this.newStavFilter === new_stav) {
-      q.new_stav = null;
+    if (this.newStavFilter === navrh) {
+      q.navrh = null;
     } else {
-      q.new_stav = new_stav;
+      q.navrh = navrh;
     }
     // end added by peter
 
@@ -138,6 +137,11 @@ export class AccountComponent implements OnInit {
   }
 
   process(zadost: Zadost) {
+
+    if (zadost.identifiers.length > Object.keys(zadost.process).length) {
+      this.service.showSnackBar('alert.process_zadosti_error', 'Ne vsechny zaznamy jsou zpracovane', true);
+      return;
+    }
     this.service.processZadost(zadost).subscribe(res => {
 
     });

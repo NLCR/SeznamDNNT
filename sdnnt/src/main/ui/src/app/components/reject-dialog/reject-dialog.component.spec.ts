@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ZadostInfoDialogComponent } from './zadost-info-dialog.component';
+import { RejectDialogComponent } from './reject-dialog.component';
 
-describe('ZadostInfoDialogComponent', () => {
-  let component: ZadostInfoDialogComponent;
-  let fixture: ComponentFixture<ZadostInfoDialogComponent>;
+describe('RejectDialogComponent', () => {
+  let component: RejectDialogComponent;
+  let fixture: ComponentFixture<RejectDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ZadostInfoDialogComponent ]
+      declarations: [ RejectDialogComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ZadostInfoDialogComponent);
+    fixture = TestBed.createComponent(RejectDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -95,11 +95,11 @@ export class AppService {
     return this.post(url, {identifier, zadost}, params);
   }
 
-  rejectNavrh(identifier: string, zadost: Zadost): Observable<string> {
+  rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject_navrh';
     const params: HttpParams = new HttpParams()
     .set('user', this.state.user.username);
-    return this.post(url, {identifier, zadost}, params);
+    return this.post(url, {identifier, zadost, reason}, params);
   }
 
   getZadost(id: string): Observable<any> {

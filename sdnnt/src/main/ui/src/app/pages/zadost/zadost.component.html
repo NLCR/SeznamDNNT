@@ -19,7 +19,7 @@
             </ng-container>
           </div>
           <div>
-            <mat-slide-toggle [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
+            <mat-slide-toggle *ngIf="state.user.role === 'kurator'" [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
             <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-icon-button [title]="'mark_as_processed' | translate" (click)="process()"><mat-icon>done</mat-icon></button> -->
           </div>
         </div>

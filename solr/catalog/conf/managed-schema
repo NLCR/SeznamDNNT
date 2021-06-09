@@ -62,7 +62,6 @@
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    
-   
    <field name="title" type="lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="ean" type="string" indexed="true" stored="true" multiValued="true"  />
    <field name="author" type="lowercase" indexed="true" stored="true" multiValued="true"  />
@@ -72,6 +71,9 @@
    
    <field name="stav" type="string" indexed="true" stored="true"  />
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
+   
+   
+   <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
    
    <dynamicField name="controlfield_*" type="string" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
@@ -511,6 +513,9 @@
         <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
+    </fieldType>
+    
+    <fieldType name="icu_sort_cs" class="solr.ICUCollationField"  locale="cs" strength="tertiary">
     </fieldType>
 
     <!-- Similarity is the scoring routine for each document vs. a query.
