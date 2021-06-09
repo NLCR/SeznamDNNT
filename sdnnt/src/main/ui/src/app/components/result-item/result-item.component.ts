@@ -45,7 +45,16 @@ export class ResultItemComponent implements OnInit {
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];
-      console.log(link);
+      
+      // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
+      if (link.indexOf('handle') > -1) {
+        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
+      }
+
+    } else if (this.doc.marc_911u) {
+      // Je to kramerius
+      const link: string = this.doc.marc_911u[0];
+      
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';

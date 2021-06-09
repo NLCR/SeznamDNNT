@@ -1,6 +1,6 @@
 import { User } from "./user";
 
-export interface Sort { label: string; field: string; dir: string};
+export interface Sort { field: string; dir: string};
 
 export interface Configuration {
   context: string;
@@ -21,4 +21,7 @@ export interface Configuration {
 
   // Seznam poli, ktere se zpracuju v url jako filter
   filterFields: string[];
+  
+  // Seznam 
+  sorts: Sort[];
 }

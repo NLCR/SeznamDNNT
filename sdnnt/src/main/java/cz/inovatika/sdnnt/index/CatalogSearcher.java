@@ -92,6 +92,10 @@ public class CatalogSearcher {
             .setParam("stats", true)
             .setParam("stats.field","rokvydani")
             .setFields("*,raw:[json]");
+    
+    if (req.getParameter("sort") != null) {
+      query.setParam("sort", req.getParameter("sort"));
+    }
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
       if (req.getParameter(field) != null) {

@@ -20,10 +20,10 @@
     <mat-label>{{ 'Řazení' | translate }}</mat-label>
     <mat-select [(ngModel)]="state.sort">
       <mat-select-trigger>
-        {{state.sort ? ('sortBy.' + state.sort.label | translate) : ('' | translate)}}
+        {{state.sort ? ('sortBy.' + state.sort.field | translate) : ''}}
       </mat-select-trigger>
-      <mat-option *ngFor="let sort of state.sorts" (click)="sortBy(sort)" [value]="sort">
-        {{ 'sortBy.' + sort.label | translate }} <mat-icon>{{ sort.dir === 'desc' ? 'arrow_drop_down' : 'arrow_drop_up' }}</mat-icon>
+      <mat-option *ngFor="let sort of config.sorts" (click)="sortBy(sort)" [value]="sort">
+        {{ 'sortBy.' + sort.field | translate }} <mat-icon>{{ sort.dir === 'desc' ? 'arrow_drop_down' : 'arrow_drop_up' }}</mat-icon>
       </mat-option>
     </mat-select>
   </mat-form-field>

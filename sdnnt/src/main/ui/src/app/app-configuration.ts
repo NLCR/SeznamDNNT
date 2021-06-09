@@ -48,6 +48,10 @@ import { User } from './shared/user';
         return this.config.filterFields;
     }
 
+    public get sorts() {
+        return this.config.sorts;
+    }
+
     /**
      * List the files holding section configuration in assets/configs folder
      * ['search'] will look for /assets/configs/search.json

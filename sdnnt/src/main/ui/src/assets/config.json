@@ -10,5 +10,13 @@
     "user": ["undefined","PA", "N"]
   },
   "identifiers": ["015a", "020a", "022a"],
-  "filterFields": ["marc_990a", "item_type", "marc_910a", "marc_856a", "nakladatel", "rokvydani"]
+  "filterFields": ["marc_990a", "item_type", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
+  "sorts": [
+    {"field": "title_sort", "dir": "asc"},
+    {"field": "title_sort", "dir": "desc"},
+    {"field": "rokvydani", "dir": "asc"},
+    {"field": "rokvydani", "dir": "desc"},
+    {"field": "datestamp", "dir": "asc"},
+    {"field": "datestamp", "dir": "desc"}
+  ]
 }

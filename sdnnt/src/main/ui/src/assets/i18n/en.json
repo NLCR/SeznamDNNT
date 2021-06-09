@@ -57,6 +57,7 @@
     "nakladatel": "Publisher",
     "marc_990a": "Document status",
     "marc_910a": "Sigla",
+    "rokvydani": "Year of publication",
 
     "undefined": "unclassified",
     "PA": "PA: work published as a draft",
@@ -143,6 +144,7 @@
     "prehled_roli": "Role overview",
     "formular": "Form",
     "navrh_na_zarazeni": "Proposal for inclusion",
+    "navrh_na_vyrazeni": "Proposal  to be discarded",
     "datum_zadani": "Date entered",
     "uzivatel": "User",
     "navhr_na_stav": "Status proposal",

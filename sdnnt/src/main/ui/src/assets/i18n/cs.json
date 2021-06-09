@@ -57,6 +57,7 @@
     "nakladatel": "Nakladatel",
     "marc_990a": "Stav dokumentu",
     "marc_910a": "Sigla",
+    "rokvydani": "Rok vydání",
 
     "undefined": "nezařazeno",
     "PA": "PA: dílo publikováno jako návrh",
@@ -143,6 +144,7 @@
     "prehled_roli": "Přehled rolí",
     "formular": "Formulář",
     "navrh_na_zarazeni": "Návrh na zařazení",
+    "navrh_na_vyrazeni": "Návrh na vyřazení",
     "datum_zadani": "Datum zadání",
     "uzivatel": "Uživatel",
     "navhr_na_stav": "Návrh na stav",

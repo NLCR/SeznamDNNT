@@ -5,8 +5,9 @@
       <!-- <img src="https://kramerius.army.cz/search/api/v5.0/item/uuid:cd2f0ca9-4e72-4b93-b2c0-10ca07fdb087/thumb" /> -->
     </div>
     <div>
-      <mat-card-title><span>{{ doc.title }}</span></mat-card-title>
-      <mat-card-subtitle>{{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}
+      <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245c }}</span></mat-card-title>
+      <mat-card-subtitle>
+        {{ doc.author }} {{ doc.nakladatel }} {{ doc.marc_260c }} {{ doc.marc_020a }}
       </mat-card-subtitle>
     </div>
   </mat-card-header>
@@ -34,7 +35,7 @@
       </ng-container>
     </div>
     <div fxLayout="row">
-      <div [class]="'app-badge ' + doc.marc_990a">
+      <div [class]="'app-badge ' + doc.marc_990a" *ngIf="doc.marc_990a">
         <!-- <span class="app-label">{{ 'record.state' | translate }}</span><ng-container *ngIf="doc.marc_990a"> {{ doc.marc_990a }}</ng-container>:  -->
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info
         </mat-icon>{{ 'state.' + doc.marc_990a | translate }}
@@ -43,9 +44,6 @@
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.navrh | translate">info
         </mat-icon>{{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.navrh}}
       </div>
-      <!-- <button mat-stroked-button *ngIf="state.logged" (click)="showStates()">
-        <mat-icon>check</mat-icon> {{ 'desc.zmena_stavu' | translate }}
-      </button> -->
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost" (click)="addToZadost()">
         <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>

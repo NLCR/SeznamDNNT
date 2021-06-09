@@ -28,7 +28,6 @@ export class AppState {
   public page: number = 0;
   public rows: number = 20;
   public sort: Sort;
-  public sorts: Sort[];
 
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
@@ -49,6 +48,7 @@ export class AppState {
     this.rows = this.config.rows;
     this.page = 0;
     this.usedFilters = [];
+    this.sort = this.config.sorts[0];
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       if (p === 'q') {
@@ -57,6 +57,8 @@ export class AppState {
         this.rows = parseInt(param);
       } else if (p === 'page') {
         this.page = parseInt(param);
+      } else if (p === 'sort') {
+        this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
       } else {
         if (this.config.filterFields.includes(p)) {
           this.usedFilters.push({field: p, value: param});
