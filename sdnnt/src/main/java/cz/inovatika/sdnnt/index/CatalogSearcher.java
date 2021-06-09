@@ -83,8 +83,13 @@ public class CatalogSearcher {
     if (req.getParameter("rows") != null) {
       rows = Integer.parseInt(req.getParameter("rows"));
     }
+    int start = 0; 
+    if (req.getParameter("page") != null) {
+      start = Integer.parseInt(req.getParameter("page")) * rows;
+    }
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
+            .setStart(start) 
             .setParam("df", "fullText")
             .setFacet(true).addFacetField("item_type", "marc_990a", "marc_910a", "nakladatel")
             .setFacetMinCount(1)

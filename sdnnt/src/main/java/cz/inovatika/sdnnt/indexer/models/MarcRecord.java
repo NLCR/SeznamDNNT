@@ -147,8 +147,8 @@ public class MarcRecord {
         } catch (NumberFormatException ex) {
 
         }
-        // casto maji 'c' na zacatku c2001 
-        if (val.startsWith("c")) {
+        // casto maji 'c' nebo 'p' na zacatku c2001 
+        if (val.startsWith("c") || val.startsWith("p")) {
           val = val.substring(1);
           try {
             // je to integer. Pridame
