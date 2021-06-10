@@ -193,6 +193,7 @@
     "duvod_pro_odmitnuti": "Reason for rejection",
     "duvod": "Reason",
     "radit_podle": "Sort by",
-    "ne_vsechny_zaznamy_jsou_zpracovane": "Not all records are processed"
+    "ne_vsechny_zaznamy_jsou_zpracovane": "Not all records are processed",
+    "odstranit_z_zadosti": "Remove from application"
   }
 }

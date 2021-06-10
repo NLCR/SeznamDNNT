@@ -162,6 +162,10 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
+  removeFromZadost() {
+    // alberto doplnit
+  }
+
   approve(doc: SolrDocument) {
     this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {

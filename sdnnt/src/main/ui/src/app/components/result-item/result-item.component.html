@@ -49,6 +49,10 @@
         <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
 
+      <button mat-stroked-button *ngIf="state.logged && state.user.role !== 'kurator' && inZadost" (click)="removeFromZadost()">
+        <mat-icon>close</mat-icon> {{ 'desc.odstranit_z_zadosti' | translate }}
+      </button>
+
       <ng-container *ngIf="state.user && inZadost">
         <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" [value]="processed?.state">
           <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve(doc)" [matTooltip]="'Schvalit zmenu stavu na A'" matTooltipPosition="above">
