@@ -92,6 +92,12 @@
     "ulozeni_uzivatele_error": "Error saving user."
   },
 
+  "sort": {
+    "title_sort": "Title",
+    "rokvydani": "Year of issue",
+    "datestamp": "Date"
+  },
+
   "desc": {
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
@@ -181,6 +187,7 @@
     "poslat_zadost": "Send a request",
     "poslat": "Send",
     "duvod_pro_odmitnuti": "Reason for rejection",
-    "duvod": "Reason"
+    "duvod": "Reason",
+    "radit_podle": "Sort by"
   }
 }

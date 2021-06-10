@@ -92,6 +92,12 @@
     "ulozeni_uzivatele_error": "Chyba při uložení uživatele."
   },
 
+  "sort": {
+    "title_sort": "Titulku",
+    "rokvydani": "Roku vydání",
+    "datestamp": "Data"
+  },
+
   "desc": {
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
@@ -181,6 +187,7 @@
     "poslat_zadost": "Poslat žádost",
     "send": "Poslat",
     "duvod_pro_odmitnuti": "Důvod pro odmítnutí",
-    "duvod": "Důvod"
+    "duvod": "Důvod",
+    "radit_podle": "Řadit podle"
   }
 }

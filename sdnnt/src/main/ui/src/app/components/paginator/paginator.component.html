@@ -17,13 +17,14 @@
   </mat-form-field> -->
   
   <mat-form-field fxFlex="120px" class="app-sorting fxHide_md fxHide_sm fxHide_xs">
-    <mat-label>{{ 'Řazení' | translate }}</mat-label>
+    <mat-label>{{ 'desc.radit_podle' | translate }}</mat-label>
     <mat-select [(ngModel)]="state.sort">
       <mat-select-trigger>
-        {{state.sort ? ('sortBy.' + state.sort.field | translate) : ''}}
+        {{state.sort ? ('sort.' + state.sort.field | translate) : ''}}
       </mat-select-trigger>
-      <mat-option *ngFor="let sort of config.sorts" (click)="sortBy(sort)" [value]="sort">
-        {{ 'sortBy.' + sort.field | translate }} <mat-icon>{{ sort.dir === 'desc' ? 'arrow_drop_down' : 'arrow_drop_up' }}</mat-icon>
+      <mat-option *ngFor="let sort of config.sorts" (click)="sortBy(sort)" [value]="sort" fxLayout="row">
+        <span fxFlex>{{ 'sort.' + sort.field | translate }}</span>
+        <span><mat-icon class="app-m-0">{{ sort.dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon></span>
       </mat-option>
     </mat-select>
   </mat-form-field>
