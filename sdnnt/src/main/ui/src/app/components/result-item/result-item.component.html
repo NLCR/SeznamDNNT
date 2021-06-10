@@ -40,7 +40,7 @@
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>
         {{ 'state.' + doc.marc_990a | translate }}
       </div>
-      <div class="app-badge rejected app-ml-2" *ngIf="processed">
+      <div class="app-badge app-ml-2" *ngIf="processed" [class]="processed.state">
         <mat-icon class="material-icons-outlined" [matTooltip]="('desc.uzivatel' | translate) + ': ' + processed.user + '
         ' + ('desc.datum' | translate) + ': ' + (processed.date | date : 'dd.MM.yyyy') + '
         ' + ('desc.duvod' | translate) + ': ' + processed.reason">info</mat-icon>
