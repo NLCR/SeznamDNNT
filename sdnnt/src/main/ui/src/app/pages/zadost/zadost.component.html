@@ -28,7 +28,9 @@
         <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" [inZadost]="true" [zadost]="zadost"></app-result-item>
       </ng-container>
     </div>
-    <app-paginator [numFound]="numFound"></app-paginator>
+    <div class="app-mt-4">
+      <app-paginator [numFound]="numFound"></app-paginator>
+    </div>
   </ng-container>
 </div>
 
