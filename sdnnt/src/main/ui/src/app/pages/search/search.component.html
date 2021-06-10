@@ -28,7 +28,9 @@
         </mat-card>
         <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
       </div>
-      <app-paginator [numFound]="numFound"></app-paginator>
+      <div class="app-mt-4">
+        <app-paginator [numFound]="numFound"></app-paginator>
+      </div>
     </div>
   </div>
 </div>
