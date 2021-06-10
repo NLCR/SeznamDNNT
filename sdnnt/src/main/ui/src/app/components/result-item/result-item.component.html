@@ -48,7 +48,6 @@
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost" (click)="addToZadost()">
         <mat-icon>check</mat-icon> {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
-
       <button mat-stroked-button *ngIf="state.logged && state.user.role !== 'kurator' && inZadost" (click)="removeFromZadost()">
         <mat-icon>close</mat-icon> {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
