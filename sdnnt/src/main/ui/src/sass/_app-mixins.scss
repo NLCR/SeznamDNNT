@@ -38,14 +38,20 @@
 }
 
 // set state color
-@mixin setStateColor() {
+@mixin setStateColor($type: null) {
   @each $state, $color in $states {
-    color: $app-gray-6;
-    border-color: $app-gray-6;
+    @if ($type == "badge") {
+      color: $app-gray-6;
+      border-color: $app-gray-6;
 
-    &.#{$state} {
-      color: $color;
-      border-color: $color;
+      &.#{$state} {
+        color: $color;
+        border-color: $color;
+      }
+    } @else if ($type == "color") {
+      &.#{$state} {
+        color: $color;
+      }
     }
   }
 }

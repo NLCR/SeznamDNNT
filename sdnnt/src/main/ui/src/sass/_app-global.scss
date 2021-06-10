@@ -112,7 +112,7 @@ a {
   align-items: center;
   border-radius: $app-badge-height;
 
-  @include setStateColor();
+  @include setStateColor(badge);
 
   .mat-icon {
     margin-right: $app-gap-icon;
@@ -297,6 +297,10 @@ a {
         .app-text-cutter {
           width: 80px;
         }
+      }
+
+      &.mat-column-state {
+        @include setStateColor(color);
       }
     }
   }

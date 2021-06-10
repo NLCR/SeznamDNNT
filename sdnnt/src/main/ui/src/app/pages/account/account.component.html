@@ -82,7 +82,7 @@
           </ng-container>
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ 'state.' + element.state | translate }}</td>
+            <td mat-cell *matCellDef="let element" [class]="element.state">{{ 'state.' + element.state | translate }}</td>
           </ng-container>
           <ng-container matColumnDef="navrh">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.navhr_na_stav' | translate }}</th>
