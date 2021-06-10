@@ -347,3 +347,14 @@ a {
 .mat-tooltip  {
   white-space: pre-line !important;
 }
+
+// mat form field
+.mat-form-field {
+  &.mat-form-field-appearance-fill {
+    &.app-clean-bottom-gap {
+      .mat-form-field-wrapper {
+        margin-bottom: -1.34375em;
+      }
+    }
+  }
+}
