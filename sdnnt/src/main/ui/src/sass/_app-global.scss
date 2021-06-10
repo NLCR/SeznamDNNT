@@ -258,6 +258,12 @@ a {
 .mat-table {
   @extend .app-w-100;
 
+  tr {
+    &.mat-row {
+      height: auto;
+    }
+  }
+
   th, td {
     &:first-of-type {
       @extend .app-pl-4;

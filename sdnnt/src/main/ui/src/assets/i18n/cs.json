@@ -32,6 +32,7 @@
     "waiting": "Čeká na posouzení",
     "processed": "Zpracováno",
     "open": "Neodesláno",
+    "rejected": "Zamítnuto",
 
     "tooltip": {
       "undefined": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",

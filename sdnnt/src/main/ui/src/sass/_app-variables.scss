@@ -33,7 +33,8 @@ $states: (
   "VVS": mat-color($mat-brown, $state_shade),
   "open": mat-color($mat-blue, $state_shade),
   "waiting": mat-color($mat-orange, $state_shade),
-  "processed": mat-color($mat-light-green, $state_shade)
+  "processed": mat-color($mat-light-green, $state_shade),
+  "rejected": mat-color($mat-red, $state_shade)
 );
 
 // gaps
