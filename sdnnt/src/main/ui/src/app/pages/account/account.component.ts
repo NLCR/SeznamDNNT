@@ -139,7 +139,7 @@ export class AccountComponent implements OnInit {
   process(zadost: Zadost) {
 
     if (zadost.identifiers.length > Object.keys(zadost.process).length) {
-      this.service.showSnackBar('alert.process_zadosti_error', 'Ne vsechny zaznamy jsou zpracovane', true);
+      this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
       return;
     }
     this.service.processZadost(zadost).subscribe(res => {

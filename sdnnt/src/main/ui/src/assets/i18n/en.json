@@ -89,7 +89,8 @@
     "registrace_uzivatele_success": "User registration was successful.",
     "registrace_uzivatele_error": "Error registering user.",
     "ulozeni_uzivatele_success": "User saved successfully",
-    "ulozeni_uzivatele_error": "Error saving user."
+    "ulozeni_uzivatele_error": "Error saving user.",
+    "oznaceni_jako_zpracovane_error": "Error marking as processed."
   },
 
   "sort": {
@@ -188,6 +189,7 @@
     "poslat": "Send",
     "duvod_pro_odmitnuti": "Reason for rejection",
     "duvod": "Reason",
-    "radit_podle": "Sort by"
+    "radit_podle": "Sort by",
+    "ne_vsechny_zaznamy_jsou_zpracovane": "Not all records are processed"
   }
 }
