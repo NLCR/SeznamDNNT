@@ -29,9 +29,9 @@
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
     "VVS": "výzva k vyřazení",
-    "waiting": "čekající",
-    "processed": "zpracováno",
-    "open": "otevřeno",
+    "waiting": "Čeká na posouzení",
+    "processed": "Zpracováno",
+    "open": "Neodesláno",
 
     "tooltip": {
       "undefined": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",

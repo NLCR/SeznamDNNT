@@ -301,6 +301,14 @@ a {
 
       &.mat-column-state {
         @include setStateColor(color);
+
+        .mat-icon {
+          @include setIcon($position: middle);
+        }
+      }
+
+      .mat-icon {
+        @include setIcon(22);
       }
     }
   }
