@@ -1,5 +1,5 @@
 <h1 mat-dialog-title>
-  {{ 'Duvod pro odmitnuti' | translate }}
+  {{ 'desc.duvod_pro_odmitnuti' | translate }}
 </h1>
 <div mat-dialog-content>
   <div fxLayout="row wrap">
@@ -9,9 +9,8 @@
     </mat-form-field>
   </div>
 </div>
-
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="reason" cdkFocusInitial>{{ 'desc.ok' | translate }}</button>
-  <button mat-button mat-dialog-close>Zavřít</button>
+  <button mat-button [mat-dialog-close]="reason" cdkFocusInitial>{{ 'desc.ulozit' | translate }}</button>
+  <button mat-button mat-dialog-close>{{ 'desc.zavrit' | translate }}</button>
 </div>
 

@@ -179,6 +179,8 @@
     "zpracovani_zadosti": "Processing of applications",
     "reset_hesla": "Password reset",
     "poslat_zadost": "Send a request",
-    "poslat": "Send"
+    "poslat": "Send",
+    "duvod_pro_odmitnuti": "Reason for rejection",
+    "duvod": "Reason"
   }
 }

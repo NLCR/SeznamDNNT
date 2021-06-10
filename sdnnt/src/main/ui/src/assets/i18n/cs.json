@@ -179,6 +179,8 @@
     "zpracovani_zadosti": "Zpracování žádostí",
     "reset_hesla": "Reset hesla",
     "poslat_zadost": "Poslat žádost",
-    "send": "Poslat"
+    "send": "Poslat",
+    "duvod_pro_odmitnuti": "Důvod pro odmítnutí",
+    "duvod": "Důvod"
   }
 }
