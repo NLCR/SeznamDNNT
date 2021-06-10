@@ -79,7 +79,7 @@ public class Indexer {
           } else if (docs.getNumFound() > 1) {
             LOGGER.log(Level.WARNING, "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
             ret.append("errors", "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
-          } else {
+          } 
 
             List<SolrInputDocument> hDocs = new ArrayList();
             List<SolrInputDocument> cDocs = new ArrayList();
@@ -102,7 +102,7 @@ public class Indexer {
               hDocs.clear();
               cDocs.clear();
             }
-          }
+          
         }
       } else {
         getClient().add(collection, recs);
@@ -145,12 +145,13 @@ public class Indexer {
         mr.fillSolrDoc();
         return mr.toSolrDoc();
       } else {
-        LOGGER.log(Level.WARNING, "No changes detected in {0}", target.at("/identifier").asText());
+        LOGGER.log(Level.FINE, "No changes detected in {0}", target.at("/identifier").asText());
         return null;
       }
-    } catch (IOException ex) {
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, "error merging {0}", docCat.getFirstValue("identifier"));
       LOGGER.log(Level.SEVERE, null, ex);
-      ret.append("errors", ex);
+      ret.append("errors", "error merging " + docCat.getFirstValue("identifier"));
       return null;
     }
   }

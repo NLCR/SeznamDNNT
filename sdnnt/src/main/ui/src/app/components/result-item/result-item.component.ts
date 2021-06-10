@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
@@ -21,6 +21,7 @@ export class ResultItemComponent implements OnInit {
   @Input() doc: SolrDocument;
   @Input() inZadost: boolean;
   @Input() zadost: Zadost;
+  @Output() removeFromZadostEvent = new EventEmitter<string>();
 
   newState = new FormControl();
   isZarazeno: boolean;
@@ -163,11 +164,11 @@ export class ResultItemComponent implements OnInit {
   }
 
   removeFromZadost() {
-    // alberto doplnit
+    this.removeFromZadostEvent.emit(this.doc.identifier);
   }
 
-  approve(doc: SolrDocument) {
-    this.service.approveNavrh(doc.identifier, this.zadost).subscribe((res: any) => {
+  approve() {
+    this.service.approveNavrh(this.doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
@@ -178,8 +179,8 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
-  approveLib(doc: SolrDocument) {
-    this.service.approveNavrhLib(doc.identifier, this.zadost).subscribe((res: any) => {
+  approveLib() {
+    this.service.approveNavrhLib(this.doc.identifier, this.zadost).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
@@ -190,7 +191,7 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
-  reject(doc: SolrDocument) {
+  reject() {
     const dialogRef = this.dialog.open(RejectDialogComponent, {
       width: '700px',
       data: this.doc,
@@ -199,7 +200,7 @@ export class ResultItemComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.service.rejectNavrh(doc.identifier, this.zadost, result).subscribe((res: any) => {
+        this.service.rejectNavrh(this.doc.identifier, this.zadost, result).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
           } else {

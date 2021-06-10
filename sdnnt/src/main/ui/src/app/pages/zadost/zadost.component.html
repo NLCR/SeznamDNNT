@@ -15,7 +15,7 @@
             <strong>{{ 'desc.prehled_zadosti' | translate }}</strong>
             <ng-container *ngIf="zadost.datum_zadani">
               <span class="app-pipe"></span><span class="app-color-metadata">{{ zadost.datum_zadani }}</span>
-              <!-- {{ zadost.user }} {{ zadost.state }} {{ zadost.new_stav }} -->
+              <!-- {{ zadost.user }} {{ zadost.state }} {{ zadost.navrh }} -->
             </ng-container>
           </div>
           <div>
@@ -25,7 +25,7 @@
         </div>
       </mat-card>
       <ng-container *ngFor="let doc of docs">
-        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" [inZadost]="true" [zadost]="zadost"></app-result-item>
+        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" [inZadost]="true" [zadost]="zadost" (removeFromZadostEvent)="removeDoc($event)"></app-result-item>
       </ng-container>
     </div>
     <div class="app-mt-4">

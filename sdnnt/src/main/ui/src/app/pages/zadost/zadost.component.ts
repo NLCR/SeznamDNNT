@@ -34,7 +34,6 @@ export class ZadostComponent implements OnInit {
 
     this.service.getZadost(id).subscribe((resp: any) => {
       this.zadost = resp.response.docs[0];
-      // this.action = this.zadost.new_stav;
       this.getDocs();
     });
 
@@ -49,13 +48,25 @@ export class ZadostComponent implements OnInit {
       this.docs.map(doc => {
         doc.isProcessed = process && process[doc.identifier];
       });
-      // this.action = this.zadost.new_stav;
     });
   }
 
   process() {
     this.service.processZadost(this.zadost).subscribe(res => {
 
+    });
+  }
+
+  removeDoc(identifier: string) {
+    console.log(identifier);
+    this.zadost.identifiers = this.zadost.identifiers.filter(id => id !== identifier);
+    this.service.saveZadost(this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.getDocs();
+      }
     });
   }
 

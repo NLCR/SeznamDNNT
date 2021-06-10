@@ -58,7 +58,7 @@ export class AccountComponent implements OnInit {
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
-      this.newStavFilter = val.new_stav;
+      this.newStavFilter = val.navrh;
       this.stateFilter = val.state;
     });
   }
@@ -89,9 +89,7 @@ export class AccountComponent implements OnInit {
     } else {
       q.navrh = navrh;
     }
-    // end added by peter
-
-    //q.new_stav = new_stav;  original
+    
 
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
@@ -112,7 +110,7 @@ export class AccountComponent implements OnInit {
 
   removeAllFilters() {
     const q: any = {};
-    q.new_stav = null;
+    q.navrh = null;
     q.state = null;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });

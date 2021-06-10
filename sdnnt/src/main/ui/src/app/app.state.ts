@@ -77,11 +77,11 @@ export class AppState {
       this.logged = true;
       this.user = res;
       if (res.zadost) {
-        // res.zadost je Array max 2 elementy. Muze mit new_stav=NZN nebo new_stav=VVS
+        // res.zadost je Array max 2 elementy. Muze mit navrh=NZN nebo navrh=VVS
         res.zadost.forEach(z => {
-          if (z.new_stav === 'NZN') {
+          if (z.navrh === 'NZN') {
             this.currentZadost.NZN = z;
-          }else if (z.new_stav === 'VVS') {
+          }else if (z.navrh === 'VVS') {
             this.currentZadost.VVS = z;
           }
         }); 
