@@ -8,11 +8,13 @@
         {{ 'field.' + facet | translate }}
       </mat-panel-title>
     </mat-expansion-panel-header>
-    <div *ngFor="let f of facet_fields[facet]">
-      <ng-container [ngSwitch]="facet">
-      <a *ngSwitchCase="'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
-      <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
-    </ng-container>
+    <div class="app-facet-wrapper">
+      <div *ngFor="let f of facet_fields[facet]">
+        <ng-container [ngSwitch]="facet">
+          <a *ngSwitchCase="'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+          <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+        </ng-container>
+      </div>
     </div>
   </mat-expansion-panel>
 

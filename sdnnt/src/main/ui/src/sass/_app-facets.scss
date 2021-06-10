@@ -2,4 +2,8 @@
 
 app-facets {
   //@import "app-facets-used";
+  .app-facet-wrapper {
+    max-height: 250px;
+    overflow-y: auto;
+  }
 }
