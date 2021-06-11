@@ -64,9 +64,6 @@ a {
   color: $app-color-fav !important;
 }
 
-.app-color-metadata {
-  color: $app-gray-6;
-}
 
 // common
 .app-pipe {
@@ -91,6 +88,15 @@ a {
 .app-fx-facets {
   padding-top: 12px;
 }
+
+.app-metadata {
+  color: $app-gray-6;
+
+  .mat-icon {
+    @include setIcon($position: sub);
+  }
+}
+
 
 // utility
 .app-font-bold {
@@ -306,8 +312,6 @@ a {
       }
 
       &.mat-column-state {
-        @include setStateColor(color);
-
         .mat-icon {
           @include setIcon($position: middle);
         }
@@ -357,4 +361,9 @@ a {
       }
     }
   }
+}
+
+// mat icon
+.mat-icon {
+  @include setStateColor(color);
 }
