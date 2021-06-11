@@ -53,7 +53,11 @@ public class MarcRecord {
   public Map<String, List<DataField>> dataFields = new HashMap();
   public SolrInputDocument sdoc = new SolrInputDocument();
 
-  final public static List<String> tagsToIndex = Arrays.asList("015", "020", "022", "035", "040", "100", "245", "246", "250", "260", "264", "856", "990", "992", "998", "956", "911", "910");
+  final public static List<String> tagsToIndex = 
+          Arrays.asList("015", "020", "022", "035", "040", "100", "130", "240", 
+                  "245", "246", "250", "260", "264", 
+                  "700", "710", "711", "730",
+                  "856", "990", "992", "998", "956", "911", "910");
 
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -186,6 +190,25 @@ public class MarcRecord {
 
   public void addDedup() {
     sdoc.setField("dedup_fields", generateMD5());
+  }
+
+  public void addVyjadreni() {
+    // Podle 	Thomas Butler Hickey
+    // https://text.nkp.cz/o-knihovne/odborne-cinnosti/zpracovani-fondu/informativni-materialy/bibliograficky-popis-elektronickych-publikaci-v-siti-knihoven-cr
+    // strana 42
+    // https://www.nkp.cz/soubory/ostatni/vyda_cm26.pdf
+    
+    /*
+    Pole 130, 240 a 730 pro unifikovaný název a podpole názvových údajů v polích 700, 710 a
+711 umožní po doplnění formátu MARC 21 nebo zavedení nového formátu vygenerovat
+alespoň částečné údaje o díle a vyjádření.
+Nové pole 337 (společně s poli 336 a 338, která jsou součástí Minimálního záznamu)
+nahrazuje dosavadní podpole 245 $h.
+    
+    https://is.muni.cz/th/xvt2x/Studie_FRBR.pdf
+    strana 100
+    */
+   //  sdoc.setField("vyjadreni", generatjeMD5());
   }
 
   private String generateMD5() {

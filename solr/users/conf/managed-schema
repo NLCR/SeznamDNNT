@@ -54,6 +54,7 @@
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
     <field name="pwd" type="string" indexed="true" stored="true"  />
+    <field name="apikey" type="string" indexed="true" stored="true" multiValued="true"  />
     <field name="role" type="string" indexed="true" stored="true"  />
     <field name="state" type="string" indexed="true" stored="true"  />
     <field name="isActive" type="boolean" indexed="true" stored="true"  />
