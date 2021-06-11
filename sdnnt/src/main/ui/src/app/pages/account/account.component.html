@@ -82,8 +82,8 @@
           </ng-container>
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [class]="element.state" class="app-pr-2">
-              <mat-icon class="material-icons-outlined" [matTooltip]="'state.' + element.state | translate" matTooltip="above">
+            <td mat-cell *matCellDef="let element" class="app-pr-2">
+              <mat-icon class="material-icons-outlined" [class]="element.state" [matTooltip]="'state.' + element.state | translate" matTooltip="above">
                 <ng-container *ngIf="element.state === 'open'">lock_open</ng-container>
                 <ng-container *ngIf="element.state === 'waiting'">lock_clock</ng-container>
                 <ng-container *ngIf="element.state === 'processed'">lock</ng-container>
