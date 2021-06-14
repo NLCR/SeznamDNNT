@@ -53,9 +53,9 @@ public class MarcRecord {
   public Map<String, List<DataField>> dataFields = new HashMap();
   public SolrInputDocument sdoc = new SolrInputDocument();
 
-  final public static List<String> tagsToIndex = 
-          Arrays.asList("015", "020", "022", "035", "040", "100", "130", "240", 
-                  "245", "246", "250", "260", "264", 
+  final public static List<String> tagsToIndex
+          = Arrays.asList("015", "020", "022", "035", "040", "100", "130", "240", "243",
+                  "245", "246", "250", "260", "264",
                   "700", "710", "711", "730",
                   "856", "990", "992", "998", "956", "911", "910");
 
@@ -78,6 +78,9 @@ public class MarcRecord {
   }
 
   public SolrInputDocument toSolrDoc() {
+    if (sdoc.isEmpty()) {
+      fillSolrDoc();
+    }
     sdoc.setField("identifier", identifier);
     sdoc.setField("datestamp", datestamp);
     sdoc.setField("setSpec", setSpec);
@@ -89,12 +92,19 @@ public class MarcRecord {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
     if (leader != null) {
+      sdoc.setField("type_of_resource", leader.substring(6, 7));
       sdoc.setField("item_type", leader.substring(7, 8));
     }
+    
+    if (controlFields.containsKey("008")) {
+      sdoc.setField("language", controlFields.get("008").substring(35, 38));
+    }
+    
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     addRokVydani();
-    addDedup();
-    addEAN();
+//    addFRBR();
+//    addDedup();
+//    addEAN();
     return sdoc;
   }
 
@@ -114,7 +124,7 @@ public class MarcRecord {
 
   }
 
-  public void fillSolrDoc() {
+  private void fillSolrDoc() {
     for (String tag : tagsToIndex) {
       if (dataFields.containsKey(tag)) {
         for (DataField df : dataFields.get(tag)) {
@@ -124,12 +134,9 @@ public class MarcRecord {
         }
       }
     }
-    //if (sdoc.containsKey("marc_245a")) {
-
-    sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
-    //}
-
+    // sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     addDedup();
+    addFRBR();
     addEAN();
   }
 
@@ -142,11 +149,11 @@ public class MarcRecord {
           // je to integer. Pridame
           int r = Math.abs(Integer.parseInt(val));
           //Nechame jen 4
-          if ((r+"").length() > 3) {
-            String v = (r+"").substring(0, 4);
+          if ((r + "").length() > 3) {
+            String v = (r + "").substring(0, 4);
             sdoc.addField("rokvydani", v);
           }
-          
+
           return;
         } catch (NumberFormatException ex) {
 
@@ -192,12 +199,13 @@ public class MarcRecord {
     sdoc.setField("dedup_fields", generateMD5());
   }
 
-  public void addVyjadreni() {
+  public void addFRBR() {
     // Podle 	Thomas Butler Hickey
+    // https://www.oclc.org/content/dam/research/activities/frbralgorithm/2009-08.pdf
     // https://text.nkp.cz/o-knihovne/odborne-cinnosti/zpracovani-fondu/informativni-materialy/bibliograficky-popis-elektronickych-publikaci-v-siti-knihoven-cr
     // strana 42
     // https://www.nkp.cz/soubory/ostatni/vyda_cm26.pdf
-    
+
     /*
     Pole 130, 240 a 730 pro unifikovaný název a podpole názvových údajů v polích 700, 710 a
 711 umožní po doplnění formátu MARC 21 nebo zavedení nového formátu vygenerovat
@@ -207,8 +215,77 @@ nahrazuje dosavadní podpole 245 $h.
     
     https://is.muni.cz/th/xvt2x/Studie_FRBR.pdf
     strana 100
-    */
-   //  sdoc.setField("vyjadreni", generatjeMD5());
+    
+    FRBR Tool – příklad mapování entit a polí MARC21
+Author: Dreiser, Theodore, 1871 (Field 100) [Work]
+Work: Sister Carrie (Field 240 )
+Form: text - English LDR/06 + 008/35-37) [Expression]
+Edition: 2nd ed. (Field 250) [Manifestation]
+    
+     */
+    String frbr = "";
+    
+    //Ziskame title part
+    String title = getFieldPart("240", "adgknmpr") + getFieldPart("243", "adgknmpr") + getFieldPart("245", "adgknmpr");
+    String authorPart = getAuthorPart("100", "bcd") + getAuthorPart("110", "bcd") + getAuthorPart("111", "bcdnq");
+    
+    if (!authorPart.isBlank()) {
+      frbr = authorPart + "/" + title;
+    } else if (sdoc.containsKey("marc_130a")) {
+      //Else if a 130 exists then the title alone is a sufficient key
+      frbr = (String) sdoc.getFieldValue("marc_130a");
+    } else if (sdoc.containsKey("marc_700a") && !(sdoc.containsKey("marc_700t") || sdoc.containsKey("marc_700k"))) {
+      // Else if 7XX (700, 710, 711) fields exist then add the names to the title.
+      // Skip 7XX fields with subfields [tk]. Use subfields [abcdq] as the name 
+      frbr = "/" + title + "/" + getFieldPart("700", "abcdq");
+    } else if (sdoc.containsKey("marc_710a") && !(sdoc.containsKey("marc_710t") || sdoc.containsKey("marc_710k"))) {
+      // Else if 7XX (700, 710, 711) fields exist then add the names to the title.
+      // Skip 7XX fields with subfields [tk]. Use subfields [abcdq] as the name 
+      frbr = "/" + title + "/" + getFieldPart("710", "abcdq");
+    } else if (sdoc.containsKey("marc_711a") && !(sdoc.containsKey("marc_711t") || sdoc.containsKey("marc_711k"))) {
+      // Else if 7XX (700, 710, 711) fields exist then add the names to the title.
+      // Skip 7XX fields with subfields [tk]. Use subfields [abcdq] as the name 
+      frbr = "/" + title + "/" + getFieldPart("711", "abcdq");
+    } else {
+      // Else add the oclc number to the title to make the key unique
+      frbr = "/" + title + "/" + (String) sdoc.getFieldValue("controlfield_001");
+    }
+    sdoc.setField("frbr", MD5.normalize(frbr));
+  }
+  
+  private String getAuthorPart(String tag, String codes) {
+    String author = "";
+    if (sdoc.containsKey("marc_"+tag+"a")) {
+      // If an author exists, combine it with a title 
+      String ind1 = dataFields.get(tag).get(0).ind1;
+      String f = dataFields.get(tag).get(0).subFields.get("a").get(0).value;
+      if ("1".equals(ind1)) {
+        String[] split = f.split(",", 2);
+        if (split.length == 2) {
+          author = split[1] + split[0];
+        }
+      } else {
+        author = f;
+      }
+    }
+    for (char code : codes.toCharArray()) {
+      if (sdoc.containsKey("marc_"+tag+code)) {
+        author += "\\" + (String) sdoc.getFieldValue("marc_"+tag+code);
+      }
+    }
+    return author;
+  }
+  
+  private String getFieldPart(String tag, String codes) {
+    String s = "";
+    if (dataFields.containsKey(tag)) {
+      for (char code : codes.toCharArray()) {
+        if (sdoc.containsKey("marc_"+tag+code)) {
+          s += "\\" + (String) sdoc.getFieldValue("marc_"+tag+code);
+        }
+      }
+    }
+    return s;
   }
 
   private String generateMD5() {

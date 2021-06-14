@@ -118,7 +118,9 @@ public class IndexerServlet extends HttpServlet {
           if (req.getParameter("core") != null) {
             core = req.getParameter("core");
           }
-          json.put("indexed", oai.full(set, core, Boolean.parseBoolean(req.getParameter("merge"))));
+          json.put("indexed", oai.full(set, core, 
+                  Boolean.parseBoolean(req.getParameter("merge")),
+                  Boolean.parseBoolean(req.getParameter("allFields"))));
           
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
@@ -141,7 +143,9 @@ public class IndexerServlet extends HttpServlet {
           if (req.getParameter("core") != null) {
             core = req.getParameter("core");
           }
-          json.put("indexed", oai.update(set, core, Boolean.parseBoolean(req.getParameter("merge"))));
+          json.put("indexed", oai.update(set, core, 
+                  Boolean.parseBoolean(req.getParameter("merge")),
+                  Boolean.parseBoolean(req.getParameter("allFields"))));
 
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

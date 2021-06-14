@@ -43,6 +43,7 @@ public class OAIHarvester {
   JSONObject ret = new JSONObject();
   String collection = "catalog";
   boolean merge;
+  boolean allFields;
   List<SolrInputDocument> recs = new ArrayList();
   List<String> toDelete = new ArrayList();
   int indexed = 0;
@@ -53,9 +54,10 @@ public class OAIHarvester {
   long procTime = 0;
   long solrTime = 0;
 
-  public JSONObject full(String set, String core, boolean merge) {
+  public JSONObject full(String set, String core, boolean merge, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.allFields = allFields;
     long start = new Date().getTime();
     Options opts = Options.getInstance();
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
@@ -92,14 +94,15 @@ public class OAIHarvester {
     return last;
   }
 
-  public JSONObject update(String set, String core, boolean merge) {
+  public JSONObject update(String set, String core, boolean merge, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.allFields = allFields;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
     String from = lastIndexDate(set);// "2021-03-14T00:00:00Z";
     if (from == null) {
-      return full(set, core, merge);
+      return full(set, core, merge, allFields);
     }
     TimeZone tz = TimeZone.getTimeZone("UTC");
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -118,9 +121,10 @@ public class OAIHarvester {
     return ret;
   }
 
-  public JSONObject updateFrom(String set, String core, String from, boolean merge) {
+  public JSONObject updateFrom(String set, String core, String from, boolean merge, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.allFields = allFields;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
     TimeZone tz = TimeZone.getTimeZone("UTC");
@@ -416,7 +420,7 @@ public class OAIHarvester {
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();
             sfs.add(new SubField(code, val));
-            if (MarcRecord.tagsToIndex.contains(tag)) {
+            if (allFields || MarcRecord.tagsToIndex.contains(tag)) {
               mr.sdoc.addField("marc_" + tag + code, val);
             }
           }
