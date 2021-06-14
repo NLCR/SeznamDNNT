@@ -2,10 +2,6 @@
   "q" : {
     "placeholder": "Zadejte dotaz ..."
   },
-  "register": {
-    "button_old": "Přihlásit/registrovat se přes NDK",
-    "button": "Registrovat se"
-  },
   "home": {
     "news": "Aktuality",
     "about": "O DNNT", 
@@ -197,6 +193,8 @@
     "radit_podle": "Řadit podle",
     "ne_vsechny_zaznamy_jsou_zpracovane": "Ne všechny záznamy jsou zpracované",
     "odstranit_z_zadosti": "Odstranit z žádosti",
-    "pouzit": "Použít"
+    "pouzit": "Použít",
+    "en": "Anglický jazyk",
+    "registrovat_se": "Registrovat se"
   }
 }

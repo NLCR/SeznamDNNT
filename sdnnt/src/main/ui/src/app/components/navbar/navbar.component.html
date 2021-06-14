@@ -14,20 +14,20 @@
       </a>  
     </div>
     <div class="app-right" fxHide.sm fxHide.xs>
-      <a mat-stroked-button routerLink="home" routerLinkActive="app-active" [title]="'Home' | translate">
+      <!-- <a mat-stroked-button routerLink="home" routerLinkActive="app-active" [title]="'Home' | translate">
         <mat-icon class="material-icons-outlined">home</mat-icon> {{ 'desc.domu' | translate }}
-      </a>
-      <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'Help' | translate">
+      </a> -->
+      <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'desc.napoveda' | translate">
         <mat-icon class="material-icons-outlined">help_outline</mat-icon> {{ 'desc.napoveda' | translate }}
       </a>
-      <a mat-stroked-button *ngIf="!state.user" (click)="register()" [title]="'register.button' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'register.button' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'Account' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'Admin' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" (click)="showUser()" routerLinkActive="app-active" ><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }} {{ now | date : 'dd.MM.yyyy' }}</a>
-      <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'Login' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" (click)="logout()" title="logout"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')">{{ 'EN' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')">{{ 'CS' | translate }}</a>
+      <a mat-stroked-button *ngIf="!state.user" (click)="register()" [title]="'desc.registrovat_se' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'desc.registrovat_se' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_konto' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" (click)="showUser()" routerLinkActive="app-active" [title]="state.user.jmeno + ' ' + state.user.prijmeni + ' ' + (now | date : 'dd.MM.yyyy')"><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }} {{ now | date : 'dd.MM.yyyy' }}</a>
+      <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" (click)="logout()" [title]="'desc.odhlasit' | translate"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')" [title]="'desc.en' | translate">{{ 'EN' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')" [title]="'desc.cs' | translate">{{ 'CS' | translate }}</a>
     </div>
   </div>
 </mat-toolbar>
