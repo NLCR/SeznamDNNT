@@ -220,7 +220,7 @@ public class XMLImporter {
     // JSONObject ret = new JSONObject();
     try {
 
-      String q = "marc_020a:\"" + item.get("EAN") + "\""
+      String q = "ean:\"" + item.get("EAN") + "\""
               + " OR dedup_fields:\"" + item.get("dedup_fields") + "\"";
 
       SolrQuery query = new SolrQuery(q)

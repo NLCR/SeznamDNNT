@@ -69,6 +69,12 @@ export class AppService {
     return this.get(url, params);
   }
 
+  getExpression(frbr: string): Observable<any> {
+    let url = 'search/frbr';
+    const params: HttpParams = new HttpParams().set('frbr', frbr);
+    return this.get(url, params);
+  }
+
   saveRecord(id: string, raw: any): Observable<any> {
     let url = '/index/save?id=' + id;
     return this.post(url, raw);

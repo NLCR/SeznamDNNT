@@ -11,7 +11,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -21,6 +25,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -79,30 +88,30 @@ public class Indexer {
           } else if (docs.getNumFound() > 1) {
             LOGGER.log(Level.WARNING, "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
             ret.append("errors", "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
-          } 
+          }
 
-            List<SolrInputDocument> hDocs = new ArrayList();
-            List<SolrInputDocument> cDocs = new ArrayList();
-            for (SolrDocument doc : docs) {
-              SolrInputDocument hDoc = new SolrInputDocument();
+          List<SolrInputDocument> hDocs = new ArrayList();
+          List<SolrInputDocument> cDocs = new ArrayList();
+          for (SolrDocument doc : docs) {
+            SolrInputDocument hDoc = new SolrInputDocument();
 
-              SolrInputDocument cDoc = mergeWithHistory(
-                      (String) rec.getFieldValue("raw"),
-                      doc, hDoc,
-                      user, ret);
-              if (cDoc != null) {
-                hDocs.add(hDoc);
-                cDocs.add(cDoc);
-              }
+            SolrInputDocument cDoc = mergeWithHistory(
+                    (String) rec.getFieldValue("raw"),
+                    doc, hDoc,
+                    user, ret);
+            if (cDoc != null) {
+              hDocs.add(hDoc);
+              cDocs.add(cDoc);
             }
+          }
 
-            if (!hDocs.isEmpty()) {
-              getClient().add("history", hDocs);
-              getClient().add("catalog", cDocs);
-              hDocs.clear();
-              cDocs.clear();
-            }
-          
+          if (!hDocs.isEmpty()) {
+            getClient().add("history", hDocs);
+            getClient().add("catalog", cDocs);
+            hDocs.clear();
+            cDocs.clear();
+          }
+
         }
       } else {
         getClient().add(collection, recs);
@@ -142,7 +151,7 @@ public class Indexer {
 
         // Create record in catalog
         MarcRecord mr = MarcRecord.fromJSON(JsonPatch.apply(fwPatch, source).toString());
-        mr.fillSolrDoc();
+        // mr.fillSolrDoc();
         return mr.toSolrDoc();
       } else {
         LOGGER.log(Level.FINE, "No changes detected in {0}", target.at("/identifier").asText());
@@ -161,7 +170,7 @@ public class Indexer {
     try {
 
       MarcRecord mr = MarcRecord.fromJSON(source);
-      mr.fillSolrDoc();
+      mr.toSolrDoc();
       String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
               + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
               + " AND controlfield_008:\"" + mr.sdoc.getFieldValue("controlfield_008") + "\")"
@@ -210,9 +219,9 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
       String oldStav = (String) docOld.getFirstValue("marc_990a");
-      
 
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+      mr.toSolrDoc();
       if (navrh.equals("VVS")) {
         if (oldStav.equals("A")) {
           mr.setStav("VS");
@@ -223,12 +232,11 @@ public class Indexer {
       } else if (navrh.equals("NZN")) {
         mr.setStav("A");
       }
-      
+
       History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
 
       // Update record in catalog
-      mr.fillSolrDoc();
-      solr.add("catalog", mr.toSolrDoc());
+      solr.add("catalog", mr.sdoc);
       solr.commit("catalog");
 
     } catch (SolrServerException | IOException ex) {
@@ -237,8 +245,6 @@ public class Indexer {
     }
     return ret;
   }
-
-  
 
   /**
    * Save record in catalog. Generates diff path and index to history core We
@@ -262,13 +268,57 @@ public class Indexer {
 
       // Update record in catalog
       MarcRecord mr = MarcRecord.fromJSON(newRaw.toString());
-      mr.fillSolrDoc();
+      //mr.toSolrDoc();
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
 
       //ret.put("newRecord", new JSONObject(JsonPatch.apply(fwPatch, source).toString()));
       //ret.put("newRaw", mr.toJSON());
       solr.close();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
+  public static JSONObject reindex() {
+    JSONObject ret = new JSONObject();
+    int indexed = 0;
+    try {
+      // Directory index = new RAMDirectory();
+      Path p = Paths.get("c:\\Users\\alberto\\Projects\\SDNNT\\git\\SeznamDNNT\\solr\\catalog\\data\\index");
+      Directory index = FSDirectory.open(p);
+      IndexReader reader = DirectoryReader.open(index);
+      List<SolrInputDocument> idocs = new ArrayList<>();
+      SolrClient solr = getClient();
+      for (int i = 0; i < reader.maxDoc(); i++) {
+//        if (reader.isDeleted(i))
+//            continue;
+
+        Document doc = reader.document(i);
+        String oldRaw = doc.get("raw");
+
+        MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+        idocs.add(mr.toSolrDoc());
+        if (idocs.size() > 1000) {
+          solr.add("catalog", idocs);
+          solr.commit("catalog");
+          indexed += idocs.size();
+          idocs.clear();
+          LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
+        }
+
+      }
+      if (!idocs.isEmpty()) {
+        solr.add("catalog", idocs);
+        solr.commit("catalog");
+        indexed += idocs.size();
+        idocs.clear();
+        LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
+      }
+      LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
+      ret.put("reindex", indexed);
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -284,7 +334,7 @@ public class Indexer {
 
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
-              .setSort("identifier", SolrQuery.ORDER.asc)
+              .setSort("identifier", SolrQuery.ORDER.desc)
               .addFilterQuery(filter)
               .setFields("raw");
       List<SolrInputDocument> idocs = new ArrayList<>();
@@ -298,9 +348,8 @@ public class Indexer {
           String oldRaw = (String) doc.getFirstValue("raw");
 
           MarcRecord mr = MarcRecord.fromJSON(oldRaw);
-          mr.fillSolrDoc();
           idocs.add(mr.toSolrDoc());
-          mr.toJSON();
+          // mr.toJSON();
         }
 
         if (!idocs.isEmpty()) {
@@ -336,7 +385,6 @@ public class Indexer {
 
       // Update record in catalog
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
-      mr.fillSolrDoc();
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
       ret = mr.toJSON();
@@ -454,9 +502,8 @@ public class Indexer {
       } else {
         SolrDocument docCat = docsCat.get(0);
         String jsCat = (String) docCat.getFirstValue("raw");
-        
-        // addToHistory(id, jsCat, jsDnt, user, "app");
 
+        // addToHistory(id, jsCat, jsDnt, user, "app");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode source = mapper.readTree(jsCat);
 
@@ -632,7 +679,6 @@ public class Indexer {
 
       // Create record in catalog
       MarcRecord mr = MarcRecord.fromJSON(JsonPatch.apply(fwPatch, source).toString());
-      mr.fillSolrDoc();
       return mr.toSolrDoc();
 
     } catch (SolrServerException | IOException ex) {
@@ -683,7 +729,7 @@ public class Indexer {
       SolrDocument docDnt = docs.get(0);
       String json = (String) docDnt.getFirstValue("raw");
       MarcRecord mr = MarcRecord.fromJSON(json);
-      mr.fillSolrDoc();
+      // mr.fillSolrDoc();
 
       ObjectMapper mapper = new ObjectMapper();
       JsonNode source = mapper.readTree(json);

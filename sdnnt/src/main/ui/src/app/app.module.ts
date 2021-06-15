@@ -39,6 +39,7 @@ import { UserDialogComponent } from './components/user-dialog/user-dialog.compon
 import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 import { RejectDialogComponent } from './components/reject-dialog/reject-dialog.component';
+import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -80,7 +81,8 @@ const providers: any[] =[
     UserDialogComponent,
     ZadostSendDialogComponent,
     ZadostComponent,
-    RejectDialogComponent
+    RejectDialogComponent,
+    ExpressionDialogComponent
   ],
   imports: [
     BrowserModule,

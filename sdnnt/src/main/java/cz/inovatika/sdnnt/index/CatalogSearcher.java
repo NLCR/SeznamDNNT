@@ -27,6 +27,24 @@ public class CatalogSearcher {
 
   public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
 
+  public JSONObject frbr(String id) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = Indexer.getClient();
+      SolrQuery query = new SolrQuery("frbr:\"" + id + "\"");
+      QueryRequest qreq = new QueryRequest(query);
+      NoOpResponseParser rParser = new NoOpResponseParser();
+      rParser.setWriterType("json");
+      qreq.setResponseParser(rParser);
+      NamedList<Object> qresp = solr.request(qreq, "catalog");
+      ret = new JSONObject((String) qresp.get("response"));
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
   public JSONObject search(HttpServletRequest req) {
     JSONObject ret = new JSONObject();
     try {

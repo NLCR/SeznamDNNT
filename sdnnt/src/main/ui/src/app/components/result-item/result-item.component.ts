@@ -7,6 +7,7 @@ import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
 import { DataDialogComponent } from '../data-dialog/data-dialog.component';
+import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
 import { RejectDialogComponent } from '../reject-dialog/reject-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
@@ -28,6 +29,7 @@ export class ResultItemComponent implements OnInit {
   hasNavhr: boolean;
   imgSrc: string;
   processed: { date: Date, state: string, user: string, reason?: string };
+  processedTooltip: string;
 
   constructor(
     public dialog: MatDialog,
@@ -42,6 +44,17 @@ export class ResultItemComponent implements OnInit {
     this.hasNavhr = !!this.doc.zadost;
     if (this.zadost?.process) {
       this.processed = this.zadost.process[this.doc.identifier];
+      this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
+      ${this.service.getTranslation('desc.datum')} :${this.processed.date}`;
+
+      if (this.processed.reason) {
+        this.processedTooltip += `
+        ${this.service.getTranslation('desc.duvod')} :${this.processed.reason}`
+      }
+
+      // ('desc.uzivatel' | translate) + ': ' + processed.user + '
+      //   ' + ('desc.datum' | translate) + ': ' + (processed.date | date : 'dd.MM.yyyy') + '
+      //   ' + ('desc.duvod' | translate) + ': ' + processed.reason
     }
     if (this.doc.marc_956u) {
       // Je to kramerius
@@ -147,20 +160,53 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-    const navrh = this.isZarazeno ? 'VVS' : 'NZN'
-    if (!this.state.currentZadost[navrh]) {
-      const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-      z.navrh = navrh;
-      this.state.currentZadost[navrh] = z;
-    }
-    this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
-    this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
+
+    let onlyRecord = true;
+    let confirm = true;
+
+    this.service.getExpression(this.doc.frbr).subscribe((res: any) => {
+      console.log(res.response);
       if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        this.service.showSnackBar('', res.error, true);
       } else {
-        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        if (res.response.numFound > 1) {
+          // Je vice zaznamu pro toto vyjadreni. Zeptame se
+          const dialogRef = this.dialog.open(ExpressionDialogComponent, {
+            width: '750px',
+            data: res.response,
+            panelClass: 'app-data-dialog'
+          });
+      
+          dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+              onlyRecord = result === 'onlyRecord';
+            } else {
+              confirm = false;
+            }
+      
+          });
+
+        }
       }
     });
+    
+    if (confirm) {
+      const navrh = this.isZarazeno ? 'VVS' : 'NZN'
+      if (!this.state.currentZadost[navrh]) {
+        const z = new Zadost(new Date().getTime() + '', this.state.user.username);
+        z.navrh = navrh;
+        this.state.currentZadost[navrh] = z;
+      }
+      this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+      this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
+        if (res.error) {
+          this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        } else {
+          this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        }
+      });
+    }
+    
   }
 
   removeFromZadost() {

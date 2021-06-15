@@ -41,9 +41,7 @@
         {{ 'state.' + doc.marc_990a | translate }}
       </div>
       <div class="app-badge app-ml-2" *ngIf="processed?.state" [class]="processed.state">
-        <mat-icon class="material-icons-outlined" [matTooltip]="('desc.uzivatel' | translate) + ': ' + processed.user + '
-        ' + ('desc.datum' | translate) + ': ' + (processed.date | date : 'dd.MM.yyyy') + '
-        ' + ('desc.duvod' | translate) + ': ' + processed.reason">info</mat-icon>
+        <mat-icon class="material-icons-outlined" [matTooltip]="processedTooltip">info</mat-icon>
         {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-2">

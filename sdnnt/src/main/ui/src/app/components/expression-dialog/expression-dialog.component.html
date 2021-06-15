@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Existuje vice zaznamu pro toto vyjadreni {{ data.numFound }}</h1>
+<div mat-dialog-content>
+  <mat-list role="list">
+    <mat-list-item role="listitem" *ngFor="let doc of data.docs">{{ doc.marc_245n }} {{ doc.marc_250a }}</mat-list-item>
+  </mat-list>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="'onlyRecord'">{{ 'jenom tenhle zaznam' | translate }}</button>
+  <button mat-button [mat-dialog-close]="'allRecords'">{{ 'vsechny zaznamy toho vyjadreni' | translate }}</button>
+  <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zrusit' | translate }}</button>
+</div>

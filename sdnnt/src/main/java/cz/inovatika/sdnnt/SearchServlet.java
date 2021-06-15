@@ -80,6 +80,13 @@ public class SearchServlet extends HttpServlet {
         return searcher.search(req);
       }
     },
+    FRBR {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        CatalogSearcher searcher = new CatalogSearcher();
+        return searcher.frbr(req.getParameter("frbr"));
+      }
+    },
     ACCOUNT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

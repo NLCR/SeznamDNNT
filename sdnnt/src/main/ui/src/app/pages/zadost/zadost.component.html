@@ -16,7 +16,7 @@
             <ng-container *ngIf="zadost.datum_zadani">
               <span class="app-pipe"></span>
               <span class="app-metadata">
-                <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani }}<span class="app-pipe"></span></ng-container>
+                <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
                 <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container>
                 <ng-container *ngIf="zadost.state">
                   <mat-icon class="material-icons-outlined" [class]="zadost.state" [matTooltip]="'state.' + zadost.state | translate" matTooltip="above">

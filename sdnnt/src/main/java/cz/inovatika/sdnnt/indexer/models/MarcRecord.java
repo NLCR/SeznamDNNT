@@ -96,7 +96,7 @@ public class MarcRecord {
       sdoc.setField("item_type", leader.substring(7, 8));
     }
     
-    if (controlFields.containsKey("008")) {
+    if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
       sdoc.setField("language", controlFields.get("008").substring(35, 38));
     }
     
@@ -226,7 +226,13 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     String frbr = "";
     
     //Ziskame title part
-    String title = getFieldPart("240", "adgknmpr") + getFieldPart("243", "adgknmpr") + getFieldPart("245", "adgknmpr");
+    String title = getFieldPart("240", "adgknmpr");
+    if (title.isBlank()) {
+      title = getFieldPart("245", "adgknmpr");
+    }
+    if (title.isBlank()) {
+      title = getFieldPart("246", "adgknmpr");
+    }
     String authorPart = getAuthorPart("100", "bcd") + getAuthorPart("110", "bcd") + getAuthorPart("111", "bcdnq");
     
     if (!authorPart.isBlank()) {
@@ -270,7 +276,7 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     }
     for (char code : codes.toCharArray()) {
       if (sdoc.containsKey("marc_"+tag+code)) {
-        author += "\\" + (String) sdoc.getFieldValue("marc_"+tag+code);
+        author += "|" + (String) sdoc.getFieldValue("marc_"+tag+code);
       }
     }
     return author;
@@ -281,7 +287,7 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     if (dataFields.containsKey(tag)) {
       for (char code : codes.toCharArray()) {
         if (sdoc.containsKey("marc_"+tag+code)) {
-          s += "\\" + (String) sdoc.getFieldValue("marc_"+tag+code);
+          s += "|" + (String) sdoc.getFieldValue("marc_"+tag+code);
         }
       }
     }
@@ -353,8 +359,8 @@ Edition: 2nd ed. (Field 250) [Manifestation]
 
       //vyber poli
       String uniqueCode = MD5.generate(new String[]{
-        (String) sdoc.getFieldValue("marc_245a"),
-        (String) sdoc.getFieldValue("marc_245b"),
+        (String) sdoc.getFieldValue("marc_245a"),  // main title
+        (String) sdoc.getFieldValue("marc_245b"), // subtitle
         //map.get("245c"),
         f245n,
         (String) sdoc.getFieldValue("marc_245p"),
