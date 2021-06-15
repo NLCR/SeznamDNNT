@@ -87,7 +87,7 @@ import { User } from './shared/user';
                 .toPromise()
                 .then((res: any) => {
                     this.state.setLogged(res);
-                    localStorage.setItem('user', JSON.stringify(this.state.user));
+                    localStorage.setItem('user', JSON.stringify({ user: user.username, pwd: user.pwd }));
                 });
         } else {
             return;

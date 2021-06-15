@@ -36,11 +36,11 @@ export class LoginDialogComponent implements OnInit {
         this.loginError = true;
       } else {
         this.loginError = false;
+        if (this.keepLogged) {
+          localStorage.setItem('user', JSON.stringify({user: this.user, pwd: this.pwd}));
+        }
         this.user = '';
         this.pwd = '';
-        if (this.keepLogged) {
-          localStorage.setItem('user', JSON.stringify(this.state.user));
-        }
         this.loading = false;
         this.dialogRef.close();
       }
