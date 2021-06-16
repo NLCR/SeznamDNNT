@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.History;
+import cz.inovatika.sdnnt.index.Indexer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,9 +14,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,6 +97,29 @@ public class Zadost {
       zadost.user = username;
       if (zadost.process == null) {
         zadost.process = new HashMap<>();
+      }
+      return save(zadost);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
+  public static JSONObject saveWithFRBR(String js, String username, String frbr) {
+
+    try {
+      Zadost zadost = Zadost.fromJSON(js);
+      zadost.user = username;
+      if (zadost.process == null) {
+        zadost.process = new HashMap<>();
+      }
+      SolrClient solr = Indexer.getClient();
+      SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
+              .setFields("identifier")
+              .setRows(10000);
+      SolrDocumentList docs = solr.query("catalog", query).getResults();
+      for (SolrDocument doc : docs) {
+        zadost.identifiers.add((String) doc.getFirstValue("identifier"));
       }
       return save(zadost);
     } catch (Exception ex) {

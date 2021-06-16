@@ -13,7 +13,7 @@
         <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
           <div fxFlex>
             <strong>{{ 'desc.prehled_zadosti' | translate }}</strong>
-            <ng-container *ngIf="zadost.datum_zadani">
+            <ng-container >
               <span class="app-pipe"></span>
               <span class="app-metadata">
                 <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>

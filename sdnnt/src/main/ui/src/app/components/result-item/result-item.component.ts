@@ -41,25 +41,25 @@ export class ResultItemComponent implements OnInit {
   ngOnInit(): void {
     this.newState.setValue(this.doc.marc_990a);
     this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
-    this.hasNavhr = !!this.doc.zadost;
-    if (this.zadost?.process) {
-      this.processed = this.zadost.process[this.doc.identifier];
-      this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
-      ${this.service.getTranslation('desc.datum')} :${this.processed.date}`;
+    
+    const z = this.inZadost ? this.zadost : this.doc.zadost;
+    if (z?.process) {
+      this.processed = z.process[this.doc.identifier];
+      if (this.processed) {
+        this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
+          ${this.service.getTranslation('desc.datum')} :${this.processed.date}`;
 
-      if (this.processed.reason) {
-        this.processedTooltip += `
-        ${this.service.getTranslation('desc.duvod')} :${this.processed.reason}`
+        if (this.processed.reason) {
+          this.processedTooltip += `
+            ${this.service.getTranslation('desc.duvod')} :${this.processed.reason}`
+        }
       }
-
-      // ('desc.uzivatel' | translate) + ': ' + processed.user + '
-      //   ' + ('desc.datum' | translate) + ': ' + (processed.date | date : 'dd.MM.yyyy') + '
-      //   ' + ('desc.duvod' | translate) + ': ' + processed.reason
     }
+    this.hasNavhr = !!this.doc.zadost && !this.processed;
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];
-      
+
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
@@ -68,7 +68,7 @@ export class ResultItemComponent implements OnInit {
     } else if (this.doc.marc_911u) {
       // Je to kramerius
       const link: string = this.doc.marc_911u[0];
-      
+
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
@@ -160,12 +160,16 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-
+    const navrh = this.isZarazeno ? 'VVS' : 'NZN';
+    if (!this.state.currentZadost[navrh]) {
+      const z = new Zadost(new Date().getTime() + '', this.state.user.username);
+      z.navrh = navrh;
+      this.state.currentZadost[navrh] = z;
+    }
     let onlyRecord = true;
-    let confirm = true;
 
     this.service.getExpression(this.doc.frbr).subscribe((res: any) => {
-      console.log(res.response);
+
       if (res.error) {
         this.service.showSnackBar('', res.error, true);
       } else {
@@ -176,37 +180,48 @@ export class ResultItemComponent implements OnInit {
             data: res.response,
             panelClass: 'app-data-dialog'
           });
-      
+
           dialogRef.afterClosed().subscribe(result => {
-            if (result) {
+            console.log(result);
+            if (result !== '') {
               onlyRecord = result === 'onlyRecord';
-            } else {
-              confirm = false;
+              if (onlyRecord) {
+                this.saveZadost(navrh);
+              } else {
+                this.addFRBRToZadost(navrh);
+              }
             }
-      
+
           });
 
+        } else {
+          this.saveZadost(navrh);
         }
+      }
+
+    });
+
+  }
+
+  saveZadost(navrh: string) {
+    this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+    this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
     });
-    
-    if (confirm) {
-      const navrh = this.isZarazeno ? 'VVS' : 'NZN'
-      if (!this.state.currentZadost[navrh]) {
-        const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-        z.navrh = navrh;
-        this.state.currentZadost[navrh] = z;
+  }
+
+  addFRBRToZadost(navrh: string) {
+    this.service.addFRBRToZadost(this.state.currentZadost[navrh], this.doc.frbr).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
-      this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
-      this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
-        if (res.error) {
-          this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
-        } else {
-          this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-        }
-      });
-    }
-    
+    });
   }
 
   removeFromZadost() {

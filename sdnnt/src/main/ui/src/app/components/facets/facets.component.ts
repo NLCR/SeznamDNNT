@@ -52,6 +52,13 @@ export class FacetsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+  onlyInSnndt() {
+    const q: any = {};
+    q['marc_990a'] = '-NNN';
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
 
   chosenYearHandler(normalizedYear: Date, datepicker: any, field: string) {
     console.log(normalizedYear)

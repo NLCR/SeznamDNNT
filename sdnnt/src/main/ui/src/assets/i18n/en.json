@@ -17,6 +17,7 @@
   "state": {
     "undefined": "unclassified",
     "PA": "work published as draft",
+    "NNN": "Not in List",
     "A": "included",
     "VS": "discarded - work was on the list (A)",
     "VN": "discarded - the work was on the draft list (PA)",
@@ -33,6 +34,7 @@
 
     "tooltip": {
       "undefined": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
+      "NNN": "Not in List",
       "PA": "work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
       "A": "included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
       "VS": "discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
@@ -61,6 +63,7 @@
     "rokvydani": "Year of publication",
 
     "undefined": "unclassified",
+    "NNN": "Not in List",
     "PA": "PA: work published as a draft",
     "A": "A: classified",
     "VS": "VS: discarded - the work was on the list (A)",

@@ -73,7 +73,7 @@ public class CatalogSearcher {
     try {
       SolrClient solr = Indexer.getClient();
       SolrQuery query = new SolrQuery("identifiers:\"" + identifier + "\"")
-              .addFilterQuery("state:waiting");
+              .setFields("*,process:[json]");
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
       rParser.setWriterType("json");
@@ -124,6 +124,8 @@ public class CatalogSearcher {
       if (req.getParameter(field) != null) {
         if (field.equals("rokvydani")) {
           query.addFilterQuery(field + ":[" + req.getParameter(field).replace(",", " TO ") + "]");
+        } else if (field.equals("marc_990a") && req.getParameter(field).startsWith("-")) {
+          query.addFilterQuery("-marc_990a:" + req.getParameter(field).replace("-", ""));
         } else {
           query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
         }

@@ -87,6 +87,13 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
+  addFRBRToZadost(zadost: Zadost, frbr: string): Observable<any> {
+    let url = '/account/add_frbr_to_zadost';
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username).set('frbr', frbr);
+    return this.post(url, zadost, params);
+  }
+
   processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
     const params: HttpParams = new HttpParams()

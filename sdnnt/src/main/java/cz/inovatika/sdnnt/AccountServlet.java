@@ -204,6 +204,31 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+    ADD_FRBR_TO_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          String inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+          } else {
+            inputJs = req.getParameter("json");
+          }
+          if (user == null) {
+            json.put("error", "Not logged");
+            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
+            // user = new JSONObject().put("name", "testUser");
+            // return json;
+          }
+          json = Zadost.saveWithFRBR(inputJs, user.username, req.getParameter("frbr"));
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     PROCESS_ZADOST {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
