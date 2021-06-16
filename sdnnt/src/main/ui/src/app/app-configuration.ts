@@ -52,6 +52,10 @@ import { User } from './shared/user';
         return this.config.sorts;
     }
 
+    public get loginTimeOut() {
+        return this.config.loginTimeOut;
+    }
+
     /**
      * List the files holding section configuration in assets/configs folder
      * ['search'] will look for /assets/configs/search.json
@@ -81,13 +85,29 @@ import { User } from './shared/user';
 
     private login() {
         const url = 'api/user/login';
-        const user: User = JSON.parse(localStorage.getItem('user'));
+        const user: any = JSON.parse(localStorage.getItem('user'));
         if (user) {
+            const now = Date.now();
+            const lastLogged = new Date(user.timeStamp).getTime();
+            const isTimeOut = (now - lastLogged)/60000 > this.config.loginTimeOut;
+            if (isTimeOut) {
+                localStorage.removeItem('user');
+                return;
+            }
             return this.http.post(url, { user: user.username, pwd: user.pwd })
                 .toPromise()
                 .then((res: any) => {
                     this.state.setLogged(res);
-                    localStorage.setItem('user', JSON.stringify({ user: user.username, pwd: user.pwd }));
+                    if (res.error) {
+                        localStorage.removeItem('user');
+                    } else {
+                        localStorage.setItem('user', JSON.stringify({ username: user.username, pwd: user.pwd, timeStamp: Date.now() }));
+                    }
+                    
+                })
+                .catch(res => {
+                    console.log(res);
+                    localStorage.removeItem('user');
                 });
         } else {
             return;

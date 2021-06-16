@@ -16,6 +16,7 @@
   },
   "state": {
     "undefined": "nezařazeno",
+    "NNN": "Není na Seznamu",
     "PA": "dílo publikováno jako návrh",
     "A": "zařazeno",
     "VS": "vyřazeno - dílo bylo na seznamu (A)",
@@ -33,6 +34,7 @@
 
     "tooltip": {
       "undefined": "nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "NNN": "Není na Seznamu",
       "PA": "dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
       "A": "zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
       "VS": "vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
@@ -61,6 +63,7 @@
     "rokvydani": "Rok vydání",
 
     "undefined": "nezařazeno",
+    "NNN": "Není na Seznamu",
     "PA": "PA: dílo publikováno jako návrh",
     "A": "A: zařazeno",
     "VS": "VS: vyřazeno - dílo bylo na seznamu (A)",

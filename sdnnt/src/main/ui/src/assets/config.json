@@ -18,5 +18,6 @@
     {"field": "rokvydani", "dir": "desc"},
     {"field": "datestamp", "dir": "asc"},
     {"field": "datestamp", "dir": "desc"}
-  ]
+  ],
+  "loginTimeOut" : 240
 }

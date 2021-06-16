@@ -37,7 +37,7 @@ export class LoginDialogComponent implements OnInit {
       } else {
         this.loginError = false;
         if (this.keepLogged) {
-          localStorage.setItem('user', JSON.stringify({user: this.user, pwd: this.pwd}));
+          localStorage.setItem('user', JSON.stringify({username: this.user, pwd: this.pwd, timeStamp: Date.now()}));
         }
         this.user = '';
         this.pwd = '';

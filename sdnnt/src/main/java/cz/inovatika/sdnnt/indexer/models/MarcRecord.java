@@ -134,7 +134,10 @@ public class MarcRecord {
         }
       }
     }
-    // sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+    if (!sdoc.containsKey("marc_990a")) {
+      // Nastavime stav na 'NNN' jako Nikdy NeZarazeno
+      sdoc.setField("marc_990a", "NNN");
+    }
     addDedup();
     addFRBR();
     addEAN();
@@ -196,7 +199,94 @@ public class MarcRecord {
   }
 
   public void addDedup() {
-    sdoc.setField("dedup_fields", generateMD5());
+    
+    try {
+
+      //ISBN
+      String pole = (String) sdoc.getFieldValue("marc_020a");
+      ISBN val = new ISBN();
+
+      if (pole != null && !pole.equals("")) {
+        //pole = pole.toUpperCase().substring(0, Math.min(13, pole.length()));
+        if (!"".equals(pole) && val.isValid(pole)) {
+          sdoc.setField("dedup_fields", MD5.generate(new String[]{pole}));
+        }
+      }
+
+      //ISSN
+      pole = (String) sdoc.getFieldValue("marc_022a");
+      if (pole != null && !pole.equals("")) {
+        //pole = pole.toUpperCase().substring(0, Math.min(13, pole.length()));
+        if (!"".equals(pole) && val.isValid(pole)) {
+          sdoc.setField("dedup_fields", MD5.generate(new String[]{pole}));
+        }
+      }
+
+      //ccnb
+      pole = (String) sdoc.getFieldValue("marc_015a");
+      //logger.log(Level.INFO, "ccnb: {0}", pole);
+      if (pole != null && !"".equals(pole)) {
+        sdoc.setField("dedup_fields", MD5.generate(new String[]{pole}));
+      }
+
+      //Check 245n číslo části 
+      String f245n = "";
+      String f245nraw = (String) sdoc.getFieldValue("marc_245n");
+      if (f245nraw != null) {
+        RomanNumber rn = new RomanNumber(f245nraw);
+        if (rn.isValid()) {
+          f245n = Integer.toString(rn.toInt());
+        }
+      }
+
+      //Pole 250 údaj o vydání (nechat pouze numerické znaky) (jen prvni cislice)
+      String f250a = (String) sdoc.getFieldValue("marc_250a");
+      if (f250a != null) {
+        f250a = onlyLeadNumbers(f250a);
+      }
+
+      //Pole 100 autor – osobní jméno (ind1=1 →  prijmeni, jmeno; ind1=0 → jmeno, prijmeni.  
+      //Obratit v pripade ind1=1, jinak nechat)
+      String f100a = (String) sdoc.getFieldValue("marc_100a");
+      if (dataFields.containsKey("100") && f100a != null) {
+        String ind1 = dataFields.get("100").get(0).ind1;
+        if ("1".equals(ind1) && !"".equals(f100a)) {
+          String[] split = f100a.split(",", 2);
+          if (split.length == 2) {
+            f100a = split[1] + split[0];
+          }
+        }
+      }
+
+      if ("".equals(f100a)) {
+        f100a = (String) sdoc.getFieldValue("marc_245c");
+      }
+
+      //vyber poli
+      String uniqueCode = MD5.generate(new String[]{
+        (String) sdoc.getFieldValue("marc_245a"),  // main title
+        (String) sdoc.getFieldValue("marc_245b"), // subtitle
+        //map.get("245c"),
+        f245n,
+        (String) sdoc.getFieldValue("marc_245p"),
+        f250a,
+        f100a,
+        (String) sdoc.getFieldValue("marc_110a"),
+        (String) sdoc.getFieldValue("marc_111a"),
+        (String) sdoc.getFieldValue("marc_260a"),
+        (String) sdoc.getFieldValue("marc_260b"),
+        onlyLeadNumbers((String) sdoc.getFieldValue("marc_260c")),
+        (String) sdoc.getFieldValue("marc_264a"),
+        (String) sdoc.getFieldValue("marc_264b"),
+        onlyLeadNumbers((String) sdoc.getFieldValue("marc_264c"))
+      });
+      sdoc.setField("dedup_fields", uniqueCode);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
+    
+    
+    
   }
 
   public void addFRBR() {
@@ -258,7 +348,7 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     }
     sdoc.setField("frbr", MD5.normalize(frbr));
   }
-  
+   
   private String getAuthorPart(String tag, String codes) {
     String author = "";
     if (sdoc.containsKey("marc_"+tag+"a")) {
@@ -292,95 +382,6 @@ Edition: 2nd ed. (Field 250) [Manifestation]
       }
     }
     return s;
-  }
-
-  private String generateMD5() {
-    try {
-
-      //ISBN
-      String pole = (String) sdoc.getFieldValue("marc_020a");
-      ISBN val = new ISBN();
-
-      if (pole != null && !pole.equals("")) {
-        //pole = pole.toUpperCase().substring(0, Math.min(13, pole.length()));
-        if (!"".equals(pole) && val.isValid(pole)) {
-          return MD5.generate(new String[]{pole});
-        }
-      }
-
-      //ISSN
-      pole = (String) sdoc.getFieldValue("marc_022a");
-      if (pole != null && !pole.equals("")) {
-        //pole = pole.toUpperCase().substring(0, Math.min(13, pole.length()));
-        if (!"".equals(pole) && val.isValid(pole)) {
-          return MD5.generate(new String[]{pole});
-        }
-      }
-
-      //ccnb
-      pole = (String) sdoc.getFieldValue("marc_015a");
-      //logger.log(Level.INFO, "ccnb: {0}", pole);
-      if (pole != null && !"".equals(pole)) {
-        return MD5.generate(new String[]{pole});
-      }
-
-      //Check 245n číslo části 
-      String f245n = "";
-      String f245nraw = (String) sdoc.getFieldValue("marc_245n");
-      if (f245nraw != null) {
-        RomanNumber rn = new RomanNumber(f245nraw);
-        if (rn.isValid()) {
-          f245n = Integer.toString(rn.toInt());
-        }
-      }
-
-      //Pole 250 údaj o vydání (nechat pouze numerické znaky) (jen prvni cislice)
-      String f250a = (String) sdoc.getFieldValue("marc_250a");
-      if (f250a != null) {
-        f250a = onlyLeadNumbers(f250a);
-      }
-
-      //Pole 100 autor – osobní jméno (ind1=1 →  prijmeni, jmeno; ind1=0 → jmeno, prijmeni.  
-      //Obratit v pripade ind1=1, jinak nechat)
-      String f100a = (String) sdoc.getFieldValue("marc_100a");
-      if (dataFields.containsKey("100") && f100a != null) {
-        String ind1 = dataFields.get("100").get(0).ind1;
-        if ("1".equals(ind1) && !"".equals(f100a)) {
-          String[] split = f100a.split(",", 2);
-          if (split.length == 2) {
-            f100a = split[1] + split[0];
-          }
-        }
-      }
-
-      if ("".equals(f100a)) {
-        f100a = (String) sdoc.getFieldValue("marc_245c");
-      }
-
-      //vyber poli
-      String uniqueCode = MD5.generate(new String[]{
-        (String) sdoc.getFieldValue("marc_245a"),  // main title
-        (String) sdoc.getFieldValue("marc_245b"), // subtitle
-        //map.get("245c"),
-        f245n,
-        (String) sdoc.getFieldValue("marc_245p"),
-        f250a,
-        f100a,
-        (String) sdoc.getFieldValue("marc_110a"),
-        (String) sdoc.getFieldValue("marc_111a"),
-        (String) sdoc.getFieldValue("marc_260a"),
-        (String) sdoc.getFieldValue("marc_260b"),
-        onlyLeadNumbers((String) sdoc.getFieldValue("marc_260c")),
-        (String) sdoc.getFieldValue("marc_264a"),
-        (String) sdoc.getFieldValue("marc_264b"),
-        onlyLeadNumbers((String) sdoc.getFieldValue("marc_264c"))
-      });
-      return uniqueCode;
-    } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-
   }
 
   private static String onlyLeadNumbers(String s) {

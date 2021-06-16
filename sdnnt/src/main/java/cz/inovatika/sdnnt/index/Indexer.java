@@ -11,11 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -25,11 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -282,56 +273,11 @@ public class Indexer {
     return ret;
   }
 
-  public static JSONObject reindex() {
-    JSONObject ret = new JSONObject();
-    int indexed = 0;
-    try {
-      // Directory index = new RAMDirectory();
-      Path p = Paths.get("c:\\Users\\alberto\\Projects\\SDNNT\\git\\SeznamDNNT\\solr\\catalog\\data\\index");
-      Directory index = FSDirectory.open(p);
-      IndexReader reader = DirectoryReader.open(index);
-      List<SolrInputDocument> idocs = new ArrayList<>();
-      SolrClient solr = getClient();
-      for (int i = 0; i < reader.maxDoc(); i++) {
-//        if (reader.isDeleted(i))
-//            continue;
-
-        Document doc = reader.document(i);
-        String oldRaw = doc.get("raw");
-
-        MarcRecord mr = MarcRecord.fromJSON(oldRaw);
-        idocs.add(mr.toSolrDoc());
-        if (idocs.size() > 1000) {
-          solr.add("catalog", idocs);
-          solr.commit("catalog");
-          indexed += idocs.size();
-          idocs.clear();
-          LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
-        }
-
-      }
-      if (!idocs.isEmpty()) {
-        solr.add("catalog", idocs);
-        solr.commit("catalog");
-        indexed += idocs.size();
-        idocs.clear();
-        LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
-      }
-      LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
-      ret.put("reindex", indexed);
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
-    }
-    return ret;
-  }
-
-  public static JSONObject reindexFilter(String filter) {
+  public static JSONObject reindex(String filter) {
     JSONObject ret = new JSONObject();
     int indexed = 0;
     try {
       SolrClient solr = getClient();
-
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
               .setSort("identifier", SolrQuery.ORDER.desc)
@@ -373,7 +319,7 @@ public class Indexer {
     return ret;
   }
 
-  public static JSONObject reindex(String id) {
+  public static JSONObject reindexId(String id) {
     JSONObject ret = new JSONObject();
     try {
       SolrClient solr = getClient();

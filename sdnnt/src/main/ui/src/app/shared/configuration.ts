@@ -24,4 +24,7 @@ export interface Configuration {
   
   // Seznam 
   sorts: Sort[];
+
+  // loginTimeOut in minutes
+  loginTimeOut: number;
 }

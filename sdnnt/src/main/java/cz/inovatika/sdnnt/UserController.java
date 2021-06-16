@@ -53,7 +53,7 @@ public class UserController {
         ret.put("zadost", docs);
       }
       return ret;
-    } catch (IOException ex) {
+    } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
