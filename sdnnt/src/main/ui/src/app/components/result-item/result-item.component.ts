@@ -31,6 +31,8 @@ export class ResultItemComponent implements OnInit {
   processed: { date: Date, state: string, user: string, reason?: string };
   processedTooltip: string;
 
+  dkLinks: string[] = [];
+
   constructor(
     public dialog: MatDialog,
     public config: AppConfiguration,
@@ -56,6 +58,10 @@ export class ResultItemComponent implements OnInit {
       }
     }
     this.hasNavhr = !!this.doc.zadost && !this.processed;
+    this.dkLinks = this.dkLinks.concat(this.doc.marc_956u ? this.doc.marc_956u : []);
+    this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
+    this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
+    console.log(this.dkLinks);
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];
@@ -75,6 +81,7 @@ export class ResultItemComponent implements OnInit {
       }
 
     } else if (this.doc.marc_856u) {
+      
       if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
         // google books
         const link: string = this.doc.marc_856u[0];

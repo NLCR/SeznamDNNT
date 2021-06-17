@@ -14,13 +14,15 @@
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
-      
+
       <ng-container *ngIf="dkLinks.length > 1">
-        <button mat-button [matMenuTriggerFor]="menu">{{ 'desc.link_do_dk' | translate }}</button>
-        <mat-menu #menu="matMenu">
-          <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
-        </mat-menu>
-      <span class="app-pipe"></span>
+        <span class="app-text-icon">
+          <mat-icon class="app-mr-1">link</mat-icon><a mat-button [matMenuTriggerFor]="menu">{{ 'desc.links_do_dk' | translate }}</a>
+          <mat-menu #menu="matMenu">
+            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
+          </mat-menu>
+        </span>
+        <span class="app-pipe"></span>
       </ng-container>
       <ng-container *ngIf="dkLinks.length === 1">
         <span class="app-text-icon">
@@ -28,19 +30,6 @@
             translate }}</a>
         </span><span class="app-pipe"></span>
       </ng-container>
-
-      <!-- <ng-container *ngIf="doc.marc_856u">
-        <span class="app-text-icon">
-          <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_856u" target="_blank">{{ 'desc.link_do_dk' |
-            translate }}</a>
-        </span><span class="app-pipe"></span>
-      </ng-container>
-      <ng-container *ngIf="doc.marc_911u">
-        <span class="app-text-icon">
-          <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_911u" target="_blank">{{ 'desc.link_do_dk' |
-            translate }}</a>
-        </span><span class="app-pipe"></span>
-      </ng-container> -->
       <span class="app-text-icon">
         <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu'
           | translate }}</a>
@@ -52,7 +41,8 @@
     </div>
     <div fxLayout="row">
       <div [class]="'app-badge ' + doc.marc_990a" *ngIf="doc.marc_990a">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info
+        </mat-icon>
         {{ 'state.' + doc.marc_990a | translate }}
       </div>
       <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state">
@@ -60,30 +50,39 @@
         {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-2">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.navrh | translate">info</mat-icon>
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.navrh | translate">info
+        </mat-icon>
         {{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.navrh}}
       </div>
-      <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost" (click)="addToZadost()">
+      <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost"
+        (click)="addToZadost()">
         <mat-icon>check</mat-icon>
         {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
-      <button mat-stroked-button *ngIf="state.logged && state.user.role !== 'kurator' && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
+      <button mat-stroked-button
+        *ngIf="state.logged && state.user.role !== 'kurator' && inZadost && (zadost.state === 'open')"
+        (click)="removeFromZadost()">
         <mat-icon>close</mat-icon>
         {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
 
       <ng-container *ngIf="state.user && inZadost">
-        <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" [value]="processed?.state">
-          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na A'" matTooltipPosition="above">
+        <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
+          [value]="processed?.state">
+          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()"
+            [matTooltip]="'Schvalit zmenu stavu na A'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'VVS'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na VS'" matTooltipPosition="above">
+          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'VVS'" (click)="approve()"
+            [matTooltip]="'Schvalit zmenu stavu na VS'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="approvedLib" *ngIf="zadost.navrh === 'VVS'" (click)="approveLib()" [matTooltip]="'Schvalit zmenu pouze v knihovne '" matTooltipPosition="above">
+          <mat-button-toggle value="approvedLib" *ngIf="zadost.navrh === 'VVS'" (click)="approveLib()"
+            [matTooltip]="'Schvalit zmenu pouze v knihovne '" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">local_library</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="rejected" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'" (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
+          <mat-button-toggle value="rejected" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
+            (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">not_interested</mat-icon>
           </mat-button-toggle>
         </mat-button-toggle-group>

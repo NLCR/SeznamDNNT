@@ -54,7 +54,7 @@ export class FacetsComponent implements OnInit {
 
   onlyInSnndt() {
     const q: any = {};
-    q['marc_990a'] = '-NNN';
+    q['onlySnndt'] = this.state.onlySnndt;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
