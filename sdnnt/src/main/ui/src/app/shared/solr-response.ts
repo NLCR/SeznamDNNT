@@ -20,6 +20,7 @@ export class SolrResponse {
   stats: {
     stats_fields: { [field: string]: {min: any, max: any, count: number, from: any, until: any}}
   };
+  zadosti?: any[];
   error?: any;
 }
 

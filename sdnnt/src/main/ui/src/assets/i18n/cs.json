@@ -57,6 +57,7 @@
     "a": "Taky se musi",
 
     "item_type": "Typ dokumentu",
+    "language": "Jazyk dokumentu",
     "nakladatel": "Nakladatel",
     "marc_990a": "Stav dokumentu",
     "marc_910a": "Sigla",

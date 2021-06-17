@@ -57,6 +57,7 @@
     "a": "Taky se musi",
 
     "item_type": "Document type",
+    "language": "Document language",
     "nakladatel": "Publisher",
     "marc_990a": "Document status",
     "marc_910a": "Sigla",

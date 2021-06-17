@@ -7,6 +7,9 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -58,15 +61,41 @@ public class CatalogSearcher {
       ret = new JSONObject((String) qresp.get("response"));
 
       // Pridame info z zadosti
+      List<String> ids = new ArrayList<>();
       for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
         JSONObject doc = (JSONObject) o;
-        doc.put("zadost", findZadost(doc.getString("identifier")));
+        ids.add("\""+doc.getString("identifier")+"\"");
+        //doc.put("zadost", findZadost(doc.getString("identifier")));
       }
+      
+      JSONArray zadosti = findZadosti(ids);
+      ret.put("zadosti", zadosti);
+      
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
     return ret;
+  }
+
+  private JSONArray findZadosti(List<String> identifiers) {
+    try {
+      SolrClient solr = Indexer.getClient();
+      String q = identifiers.toString().replace("[", "(").replace("]", ")").replaceAll(",", "");
+           SolrQuery query = new SolrQuery("identifiers:" + q)
+      //SolrQuery query = new SolrQuery("identifiers:\"" + identifier + "\"")
+              .setFields("*,process:[json]");
+  
+      QueryRequest qreq = new QueryRequest(query);
+      NoOpResponseParser rParser = new NoOpResponseParser();
+      rParser.setWriterType("json");
+      qreq.setResponseParser(rParser);
+      NamedList<Object> qresp = solr.request(qreq, "zadost");
+      return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
   }
 
   private JSONObject findZadost(String identifier) {
@@ -109,7 +138,7 @@ public class CatalogSearcher {
             .setRows(rows)
             .setStart(start) 
             .setParam("df", "fullText")
-            .setFacet(true).addFacetField("item_type", "marc_990a", "marc_910a", "nakladatel")
+            .setFacet(true).addFacetField("item_type", "language", "marc_990a", "marc_910a", "nakladatel")
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
             .setParam("stats", true)

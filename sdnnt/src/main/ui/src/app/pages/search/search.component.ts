@@ -55,6 +55,16 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       this.searchResponse = resp;
       this.docs = resp.response.docs;
+      if (resp.zadosti) {
+        this.docs.forEach(doc => {
+          const identifier = doc.identifier;
+          resp.zadosti.forEach(z => {
+            if (z.identifiers.includes(identifier)) {
+              doc.zadost = z;
+            }
+          });
+        });
+      }
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;
