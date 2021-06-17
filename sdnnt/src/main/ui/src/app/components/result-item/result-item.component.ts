@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,6 +35,7 @@ export class ResultItemComponent implements OnInit {
   dkLinks: string[] = [];
 
   constructor(
+    private datePipe: DatePipe,
     public dialog: MatDialog,
     public config: AppConfiguration,
     public state: AppState,
@@ -49,11 +51,11 @@ export class ResultItemComponent implements OnInit {
       this.processed = z.process[this.doc.identifier];
       if (this.processed) {
         this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
-          ${this.service.getTranslation('desc.datum')} :${this.processed.date}`;
+          ${this.service.getTranslation('desc.datum')}: ${this.datePipe.transform(this.processed.date, 'dd.MM.yyyy')}`;
 
         if (this.processed.reason) {
           this.processedTooltip += `
-            ${this.service.getTranslation('desc.duvod')} :${this.processed.reason}`
+            ${this.service.getTranslation('desc.duvod')}: ${this.processed.reason}`
         }
       }
     }
@@ -61,7 +63,6 @@ export class ResultItemComponent implements OnInit {
     this.dkLinks = this.dkLinks.concat(this.doc.marc_956u ? this.doc.marc_956u : []);
     this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
     this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
-    console.log(this.dkLinks);
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];
