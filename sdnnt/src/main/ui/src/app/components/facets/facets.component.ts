@@ -52,9 +52,9 @@ export class FacetsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
-  onlyInSnndt() {
+  onlyInSdnnt() {
     const q: any = {};
-    q['onlySnndt'] = this.state.onlySnndt;
+    q['onlySdnnt'] = this.state.onlySdnnt;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }

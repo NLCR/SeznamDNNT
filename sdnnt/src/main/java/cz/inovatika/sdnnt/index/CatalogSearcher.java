@@ -137,7 +137,6 @@ public class CatalogSearcher {
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
             .setStart(start) 
-            .setParam("df", "fullText")
             .setFacet(true).addFacetField("item_type", "language", "marc_990a", "marc_910a", "nakladatel")
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
@@ -145,16 +144,21 @@ public class CatalogSearcher {
             .setParam("stats.field","rokvydani")
             .setFields("*,raw:[json]");
     
+    if (req.getParameter("q") != null) {
+      query.setParam("df", "fullText");
+    }
     if (req.getParameter("sort") != null) {
       query.setParam("sort", req.getParameter("sort"));
+    }
+    if (Boolean.parseBoolean(req.getParameter("onlySdnnt"))) {
+      query.addFilterQuery("-marc_990a:NNN");
+      query.addFilterQuery("marc_990a:*");
     }
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
       if (req.getParameter(field) != null) {
         if (field.equals("rokvydani")) {
           query.addFilterQuery(field + ":[" + req.getParameter(field).replace(",", " TO ") + "]");
-        } else if (field.equals("marc_990a") && req.getParameter(field).startsWith("-")) {
-          query.addFilterQuery("-marc_990a:" + req.getParameter(field).replace("-", ""));
         } else {
           query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
         }
