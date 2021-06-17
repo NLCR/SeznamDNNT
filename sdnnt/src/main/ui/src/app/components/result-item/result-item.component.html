@@ -14,7 +14,22 @@
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
-      <ng-container *ngIf="doc.marc_856u">
+      
+      <ng-container *ngIf="dkLinks.length > 1">
+        <button mat-button [matMenuTriggerFor]="menu">{{ 'desc.link_do_dk' | translate }}</button>
+        <mat-menu #menu="matMenu">
+          <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
+        </mat-menu>
+      <span class="app-pipe"></span>
+      </ng-container>
+      <ng-container *ngIf="dkLinks.length === 1">
+        <span class="app-text-icon">
+          <mat-icon class="app-mr-1">link</mat-icon><a [href]="dkLinks[0]" target="_blank">{{ 'desc.link_do_dk' |
+            translate }}</a>
+        </span><span class="app-pipe"></span>
+      </ng-container>
+
+      <!-- <ng-container *ngIf="doc.marc_856u">
         <span class="app-text-icon">
           <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_856u" target="_blank">{{ 'desc.link_do_dk' |
             translate }}</a>
@@ -25,7 +40,7 @@
           <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_911u" target="_blank">{{ 'desc.link_do_dk' |
             translate }}</a>
         </span><span class="app-pipe"></span>
-      </ng-container>
+      </ng-container> -->
       <span class="app-text-icon">
         <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu'
           | translate }}</a>
