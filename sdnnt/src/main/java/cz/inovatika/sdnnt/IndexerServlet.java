@@ -159,7 +159,9 @@ public class IndexerServlet extends HttpServlet {
         JSONObject json = new JSONObject();
         try {
           XMLImporter imp = new XMLImporter();
-          json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
+          // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
+          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
+          json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml", "albatros");
           
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

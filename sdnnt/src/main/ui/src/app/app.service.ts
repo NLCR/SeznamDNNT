@@ -63,6 +63,17 @@ export class AppService {
     return this.get(url, params);
   }
 
+  searchImports(params: HttpParams): Observable<any> {
+    let url = 'search/imports';
+    return this.get(url, params);
+  }
+
+  getImport(id: string): Observable<any> {
+    let url = 'search/import';
+    const params: HttpParams = new HttpParams().set('id', id);
+    return this.get(url, params);
+  }
+
   getHistory(identifier: string): Observable<any> {
     let url = 'search/history';
     const params: HttpParams = new HttpParams().set('identifier', identifier);

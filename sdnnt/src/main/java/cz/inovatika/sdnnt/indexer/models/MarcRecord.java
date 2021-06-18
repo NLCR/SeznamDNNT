@@ -285,8 +285,6 @@ public class MarcRecord {
       LOGGER.log(Level.SEVERE, null, ex);
     }
     
-    
-    
   }
 
   public void addFRBR() {

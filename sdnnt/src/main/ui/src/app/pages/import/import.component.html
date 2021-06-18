@@ -1,0 +1,38 @@
+<div class="app-container">  
+  <ng-container *ngIf="docs && docs.length > 0">
+    <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+      <div fxFlex>
+        {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+      </div>
+      <div>
+        <app-paginator [numFound]="numFound"></app-paginator>
+      </div>
+    </div>
+    <div class="app-results-wrapper">
+      <mat-card>
+        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+          <div fxFlex>
+            <strong>{{ 'desc.Vysledek importu' | translate }}</strong>
+            <ng-container >
+              <span class="app-pipe"></span>
+              <span class="app-metadata">
+                <ng-container>{{ docs[0].import_date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
+                <ng-container>{{ docs[0].import_uri }}<span class="app-pipe"></span></ng-container>
+                <ng-container>{{ docs[0].import_origin }}<span class="app-pipe"></span></ng-container>
+              </span>
+            </ng-container>
+          </div>
+        </div>
+      </mat-card>
+      <ng-container *ngFor="let doc of docs">
+        <mat-card>
+          {{ doc.name }} | {{ doc.author }} | {{ doc.num_hits }} | {{ doc.ean }}
+        </mat-card>
+      </ng-container>
+    </div>
+    <div class="app-mt-4">
+      <app-paginator [numFound]="numFound"></app-paginator>
+    </div>
+  </ng-container>
+</div>
+

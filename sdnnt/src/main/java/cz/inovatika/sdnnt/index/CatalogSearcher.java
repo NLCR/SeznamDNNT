@@ -59,17 +59,17 @@ public class CatalogSearcher {
       qreq.setResponseParser(rParser);
       NamedList<Object> qresp = solr.request(qreq, "catalog");
       ret = new JSONObject((String) qresp.get("response"));
-
-      // Pridame info z zadosti
-      List<String> ids = new ArrayList<>();
-      for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
-        JSONObject doc = (JSONObject) o;
-        ids.add("\""+doc.getString("identifier")+"\"");
-        //doc.put("zadost", findZadost(doc.getString("identifier")));
+      if (ret.getJSONObject("response").getInt("numFound") > 0) {
+        // Pridame info z zadosti
+        List<String> ids = new ArrayList<>();
+        for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
+          JSONObject doc = (JSONObject) o;
+          ids.add("\""+doc.getString("identifier")+"\"");
+          //doc.put("zadost", findZadost(doc.getString("identifier")));
+        }
+        JSONArray zadosti = findZadosti(ids);
+        ret.put("zadosti", zadosti);
       }
-      
-      JSONArray zadosti = findZadosti(ids);
-      ret.put("zadosti", zadosti);
       
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);

@@ -149,6 +149,60 @@ public class SearchServlet extends HttpServlet {
         return ret; 
       }
     },
+    IMPORT {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("*")
+                  .setRows(100)
+                  .addFilterQuery("import_id:" + req.getParameter("id"))
+                  .setFields("*,catalog:[json],item:[json]");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "imports"); 
+          solr.close();
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
+    },
+    IMPORTS {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("*")
+                  .setRows(100)
+                  .addFilterQuery("{!collapse field=import_id}")
+                  .setParam("expand", true)
+//                  .setParam("group", true)
+//                  .setParam("group.field", "import_id")
+//                  .setParam("group.ngroups", true)
+                  .setFields("*");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "imports"); 
+          solr.close();
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex);
+        }
+
+        return ret; 
+      }
+    },
     XSERVER {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
