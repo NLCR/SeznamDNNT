@@ -15,6 +15,9 @@ export class ImportComponent implements OnInit {
   numFound: number;
   docs: SolrDocument[];
   hideProcessed: boolean;
+  na_vyrazeni: number;
+
+  importId: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -27,11 +30,20 @@ export class ImportComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
-    const id = this.route.snapshot.paramMap.get('id');
+    this.importId = this.route.snapshot.paramMap.get('id');
+    this.getDocs(false);
+  }
 
-    this.service.getImport(id).subscribe((resp: any) => {
+  onlyA(e) {
+    console.log(e);
+    this.getDocs(e.checked);
+  }
+
+  getDocs(onlyA: boolean) {
+    this.service.getImport(this.importId, onlyA).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
+      this.na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
     });
 
   }

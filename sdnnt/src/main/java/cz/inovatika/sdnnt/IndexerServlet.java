@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.OAIHarvester;
 import cz.inovatika.sdnnt.index.XMLImporter;
+import cz.inovatika.sdnnt.index.XMLImporter1;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -158,10 +159,11 @@ public class IndexerServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          XMLImporter imp = new XMLImporter();
+          XMLImporter1 imp = new XMLImporter1();
           // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
           // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
-          json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml", "albatros");
+          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml", "albatros");
+          json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
           
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

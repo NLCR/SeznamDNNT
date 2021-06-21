@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
@@ -191,13 +192,20 @@ public class MarcRecord {
   }
 
   private void addEAN() {
+    ISBNValidator isbn = ISBNValidator.getInstance();
     if (sdoc.containsKey("marc_020a")) {
       for (Object s : sdoc.getFieldValues("marc_020a")) {
-        sdoc.addField("ean", ((String) s).replaceAll("-", ""));
+        String ean = ((String) s);
+        ean = isbn.validate(ean);
+        if (ean != null) {
+          // ean.replaceAll("-", "")
+          // ean = ISBN.convertTo13(ean);
+          sdoc.addField("ean", ean);
+        }
       }
     }
   }
-
+  
   public void addDedup() {
     
     try {

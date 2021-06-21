@@ -158,7 +158,12 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*")
                   .setRows(100)
                   .addFilterQuery("import_id:" + req.getParameter("id"))
+                  .setParam("stats", true)
+                  .setParam("stats.field","na_vyrazeni")
                   .setFields("*,catalog:[json],item:[json]");
+          if (Boolean.parseBoolean(req.getParameter("onlyA"))) {
+            query.addFilterQuery("na_vyrazeni:*");
+          }
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");

@@ -191,7 +191,7 @@ export class ResultItemComponent implements OnInit {
 
           dialogRef.afterClosed().subscribe(result => {
             console.log(result);
-            if (result !== '') {
+            if (result && result !== '') {
               onlyRecord = result === 'onlyRecord';
               if (onlyRecord) {
                 this.saveZadost(navrh);

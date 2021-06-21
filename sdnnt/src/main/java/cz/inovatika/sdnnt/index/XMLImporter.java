@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -43,6 +46,10 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -100,13 +107,7 @@ public class XMLImporter {
     } catch (XMLStreamException | SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
-    } finally {
-      try {
-        solr.close();
-      } catch (IOException ex) {
-        LOGGER.log(Level.SEVERE, null, ex);
-      }
-    }
+    } 
     return ret;
   }
 
@@ -149,9 +150,74 @@ public class XMLImporter {
       }
     }
   }
+  
+  public JSONObject fromFile2(String uri, String origin, String itemName) {
+    LOGGER.log(Level.INFO, "Processing {0}", uri);
+    try {
+      long start = new Date().getTime();
+      // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+      solr = getClient();
+      ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+      import_date = now.format(DateTimeFormatter.ISO_INSTANT);
+      import_url = uri;
+      import_origin = origin;
+      import_id = now.toEpochSecond() + "";
+      File f = new File(uri);
+      InputStream is = new FileInputStream(f);
+      readXML2(is, itemName);
+      solr.commit(collection);
+      // solr.close();
+      ret.put("indexed", indexed);
+      ret.put("file", uri);
+      ret.put("origin", origin);
+      String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
+      ret.put("ellapsed", ellapsed);
+      LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+    } catch (XMLStreamException | SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    } finally {
+      try {
+        solr.close();
+      } catch (IOException ex) {
+        LOGGER.log(Level.SEVERE, null, ex);
+      }
+    }
+    return ret;
+  }
+
+  private void readXML2(InputStream is, String itemName) throws XMLStreamException {
+
+    try {
+      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      Document doc = dBuilder.parse(is);
+      NodeList nodes = doc.getElementsByTagName(itemName);
+      for (int i = 0; i < nodes.getLength(); i++) {
+        Node node = nodes.item(i); 
+        NodeList fields = node.getChildNodes();
+        for (int j = 0; j < fields.getLength(); j++) {
+          Node field = fields.item(j);
+          Map<String, String> item = new HashMap<>();
+          if (field.getNodeType() == Node.ELEMENT_NODE) {
+//            System.out.println(field.getNodeType() + " -> " 
+//                  + field.getNodeName() + " -> " + field.getTextContent());
+            item.put(field.getNodeName(), field.getTextContent());
+          
+            addDedup(item);
+            addFrbr(item);
+            findInCatalog(item);
+            toIndex(item);
+          }
+        }
+      }
+    } catch (ParserConfigurationException | SAXException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
+  }
 
   /**
-   * Reads OAI XML document
+   * Reads SHOP XML document
    *
    * @param reader
    * @return resuptionToken or null
@@ -281,8 +347,7 @@ public class XMLImporter {
       idoc.setField("num_hits", item.get("num_hits"));
       idoc.setField("hit_type", item.get("hit_type"));
       idoc.setField("item", new JSONObject(item).toString());
-
-      
+  
       solr.add("imports", idoc);
       
       indexed++;
@@ -321,7 +386,8 @@ public class XMLImporter {
               + title;
       
       SolrQuery query = new SolrQuery(q)
-              .setRows(20)
+              .setRows(100)
+              .setParam("q.op", "AND")
               // .setFields("*,score");
               .setFields("identifier,title,score,ean,frbr,marc_990a");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
@@ -340,18 +406,21 @@ public class XMLImporter {
       boolean isEAN = false;
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
-        if (doc.optString("marc_990a").equals("A")) {
-          na_vyrazeni.add(doc.getString("identifier"));
-        }
 
         if (doc.has("ean")) {
           List<Object> eans = doc.getJSONArray("ean").toList();
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
+            if (doc.optString("marc_990a").equals("A")) {
+              na_vyrazeni.add(doc.getString("identifier"));
+            }
             identifiers.add(doc.getString("identifier"));
           }
         }
         if (!isEAN) {
+          if (doc.optString("marc_990a").equals("A")) {
+            na_vyrazeni.add(doc.getString("identifier"));
+          }
           identifiers.add(doc.getString("identifier"));
         }
 
