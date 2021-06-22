@@ -16,33 +16,34 @@ import { Zadost } from 'src/app/shared/zadost';
 })
 export class ImportsComponent implements OnInit {
   filterState = [
-    {id: "open", val: "neodeslano"},
-    {id: "waiting", val: "ceka_na_posouzeni"},
-    {id: "processed", val: "zpracovano"}
+    { id: "open", val: "neodeslano" },
+    { id: "waiting", val: "ceka_na_posouzeni" },
+    { id: "processed", val: "zpracovano" }
   ];
 
   filterType = [
-    {id: "NZN", val: "navrzeno_na_zarazeni"},
-    {id: "VVS", val: "navrzeno_na_vyrazeni"}
+    { id: "NZN", val: "navrzeno_na_zarazeni" },
+    { id: "VVS", val: "navrzeno_na_vyrazeni" }
   ];
-  
+
   loading: boolean;
   searchResponse: SolrResponse;
   facets;
   numFound: number;
 
-  displayedColumns = ['import_id','import_date', 'import_url', 'import_origin', 'total','actions'];
+  displayedColumns = ['import_id', 'import_date', 'import_url', 'import_origin', 'total', 'na_vyrazeni', 'actions'];
   imports: Import[] = [];
+  stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 
   stateFilter: string;
   newStavFilter: string;
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
     public state: AppState
-    ) { }
+  ) { }
 
   ngOnInit(): void {
     if (!this.state.user) {
@@ -60,7 +61,7 @@ export class ImportsComponent implements OnInit {
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
-    
+
     // Docasne pro testovani
     p.user = this.state.user.username;
     this.imports = [];
@@ -69,8 +70,18 @@ export class ImportsComponent implements OnInit {
     this.service.searchImports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
         this.searchResponse = resp;
-      this.imports = resp.response.docs;
-      this.loading = false;
+        //this.imports = resp.response.docs;
+        this.imports = [];
+        resp.grouped.import_id.groups.forEach(g => {
+          this.imports.push(g.doclist.docs[0]);
+          
+        });
+
+        resp.facets.import_id.buckets.forEach(b => {
+          this.stats[b.val] = {total: b.count, na_vyrazeni: b.hits_na_vyrazeni};
+        });
+        
+        this.loading = false;
       }
     });
 
@@ -83,7 +94,7 @@ export class ImportsComponent implements OnInit {
     } else {
       q.navrh = navrh;
     }
-    
+
 
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
@@ -97,7 +108,7 @@ export class ImportsComponent implements OnInit {
     } else {
       q.state = state;
     }
-    
+
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }

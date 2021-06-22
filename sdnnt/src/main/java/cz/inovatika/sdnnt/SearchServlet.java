@@ -17,6 +17,9 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
+import org.apache.solr.client.solrj.request.json.TermsFacetMap;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
@@ -158,11 +161,17 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*")
                   .setRows(100)
                   .addFilterQuery("import_id:" + req.getParameter("id"))
+                  .setFacet(true)
+                  .addFacetField("hit_type")
+                  .setParam("json.nl", "map")
                   .setParam("stats", true)
                   .setParam("stats.field","na_vyrazeni")
                   .setFields("*,catalog:[json],item:[json]");
           if (Boolean.parseBoolean(req.getParameter("onlyA"))) {
             query.addFilterQuery("na_vyrazeni:*");
+          }
+          if (Boolean.parseBoolean(req.getParameter("onlyNoEAN"))) {
+            query.addFilterQuery("hit_type:noean");
           }
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
@@ -185,21 +194,37 @@ public class SearchServlet extends HttpServlet {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery query = new SolrQuery("*")
-                  .setRows(100)
-                  .addFilterQuery("{!collapse field=import_id}")
-                  .setParam("expand", true)
+//          SolrQuery query = new SolrQuery("*")
+//                  .setRows(100)
+////                  .addFilterQuery("{!collapse field=import_id}")
+////                  .setParam("expand", true)
 //                  .setParam("group", true)
 //                  .setParam("group.field", "import_id")
 //                  .setParam("group.ngroups", true)
-                  .setFields("*");
-          QueryRequest qreq = new QueryRequest(query);
+//                  .setFields("*");
+          
+//          QueryResponse qresp = request.process(solr, "imports");
+//          QueryRequest qreq = new QueryRequest(query);
+//          qreq.setResponseParser(rParser);
+//          NamedList<Object> qresp = solr.request(qreq, "imports"); 
+
+          final TermsFacetMap categoryFacet = new TermsFacetMap("import_id")
+                  .setLimit(100)
+                  .withStatSubFacet( "hits_na_vyrazeni", "sum(hits_na_vyrazeni)");
+          final JsonQueryRequest request = new JsonQueryRequest()
+              .setQuery("*:*")
+                  .setLimit(100)
+                  .returnFields("import_id", "import_date", "import_url", "import_origin")
+                  .withParam("group", true)
+                  .withParam("group.field", "import_id")
+                  .withParam("group.ngroups", true)
+              .withFacet("import_id", categoryFacet);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "imports"); 
+          request.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(request, "imports"); 
           solr.close();
-          return new JSONObject((String) qresp.get("response"));
+           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           ret.put("error", ex);

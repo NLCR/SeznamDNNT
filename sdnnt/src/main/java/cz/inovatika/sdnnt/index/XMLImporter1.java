@@ -148,7 +148,7 @@ public class XMLImporter1 {
       idoc.setField("import_url", import_url);
       idoc.setField("import_origin", import_origin);
 
-      idoc.setField("id", import_id + "_" + item.get("EAN"));
+      idoc.setField("id", import_id + "_" + item.get("ITEM_ID"));
       idoc.setField("ean", item.get("EAN"));
       idoc.setField("name", item.get(fieldsMap.get("NAME")));
       if (item.containsKey(fieldsMap.get("AUTHOR"))) {

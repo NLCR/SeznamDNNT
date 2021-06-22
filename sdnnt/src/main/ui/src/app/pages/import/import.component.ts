@@ -13,11 +13,17 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 export class ImportComponent implements OnInit {
 
   numFound: number;
-  docs: SolrDocument[];
-  hideProcessed: boolean;
+  docs: SolrDocument[] = [];
+  onlyA: boolean;
+  onlyNoEAN: boolean;
   na_vyrazeni: number;
+  noean: number;
 
   importId: string;
+  date: Date;
+  origin: string;
+  uri: string;
+  initialized = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -31,20 +37,41 @@ export class ImportComponent implements OnInit {
       return;
     }
     this.importId = this.route.snapshot.paramMap.get('id');
-    this.getDocs(false);
+    this.getDocs();
   }
 
-  onlyA(e) {
-    console.log(e);
-    this.getDocs(e.checked);
+  onlyAChange(e) {
+    this.onlyA = e.checked;
+    this.getDocs();
   }
 
-  getDocs(onlyA: boolean) {
-    this.service.getImport(this.importId, onlyA).subscribe((resp: any) => {
+  onlyNoEANChange(e) {
+    this.onlyNoEAN = e.checked;
+    this.getDocs();
+  }
+
+  getDocs() {
+    this.docs = [];
+    this.service.getImport(this.importId, this.onlyA, this.onlyNoEAN).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
       this.na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
+      this.noean = resp.facet_counts.facet_fields.hit_type.noean;
+      if (!this.initialized) {
+        this.date = this.docs[0].import_date;
+        this.uri = this.docs[0].import_uri;
+        this.origin = this.docs[0].import_origin;
+      }
+      this.initialized = true;
     });
+
+  }
+
+  checkHits(doc) {
+
+  }
+
+  approve(doc) {
 
   }
 

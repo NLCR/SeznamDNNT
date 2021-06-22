@@ -68,9 +68,10 @@ export class AppService {
     return this.get(url, params);
   }
 
-  getImport(id: string, onlyA: boolean): Observable<any> {
+  getImport(id: string, onlyA: boolean, onlyNoEAN: boolean): Observable<any> {
     let url = 'search/import';
-    const params: HttpParams = new HttpParams().set('id', id).set('onlyA', onlyA+'');
+    const params: HttpParams = new HttpParams().set('id', id)
+    .set('onlyA', onlyA+'').set('onlyNoEAN', onlyNoEAN+'');
     return this.get(url, params);
   }
 

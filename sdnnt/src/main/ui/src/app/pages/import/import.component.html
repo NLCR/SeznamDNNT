@@ -1,5 +1,5 @@
 <div class="app-container">  
-  <ng-container *ngIf="docs && docs.length > 0">
+  <ng-container>
     <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
       <div fxFlex>
         {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
@@ -16,13 +16,15 @@
             <ng-container >
               <span class="app-pipe"></span>
               <span class="app-metadata">
-                <ng-container>{{ docs[0].import_date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
-                <ng-container>{{ docs[0].import_uri }}<span class="app-pipe"></span></ng-container>
-                {{ docs[0].import_origin }}<span class="app-pipe"></span>
-                Na vyrazeni: {{ na_vyrazeni }} 
-                <ng-container *ngIf="na_vyrazeni > 0">
-                  <mat-slide-toggle (change)="onlyA($event)">{{ 'Zobrazit jen na vyrazeni' | translate }}</mat-slide-toggle>
-                </ng-container>
+                <ng-container>{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
+                <ng-container>{{ uri }}<span class="app-pipe"></span></ng-container>
+                {{ origin }}<span class="app-pipe"></span>
+                
+                
+                <mat-slide-toggle (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>
+                
+                <mat-slide-toggle (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>
+                  
               </span>
             </ng-container>
           </div>
@@ -30,7 +32,9 @@
       </mat-card>
       <ng-container *ngFor="let doc of docs">
         <mat-card>
-          {{ doc.name }} | {{ doc.author }} | {{ doc.num_hits }} | {{ doc.ean }} | {{ doc.na_vyrazeni ? 'NA VYRAZENI' : '' }}
+          {{ doc.name }} | {{ doc.author }} | {{ doc.num_hits }} | {{ doc.ean }} 
+          <ng-container *ngIf="doc.hit_type === 'noean'"><button mat-icon-button title="Zkontrolovat shody" (click)="checkHits(doc)"><mat-icon>manage_search</mat-icon></button></ng-container>
+          <button *ngIf="doc.na_vyrazeni" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc)"><mat-icon>done</mat-icon></button>
         </mat-card>
       </ng-container>
     </div>
