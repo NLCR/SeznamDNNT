@@ -142,6 +142,7 @@ public class CatalogSearcher {
             .setParam("json.nl", "arrntv")
             .setParam("stats", true)
             .setParam("stats.field","rokvydani")
+            .setParam("q.op", "AND")
             .setFields("*,raw:[json]");
     
     if (req.getParameter("q") != null) {

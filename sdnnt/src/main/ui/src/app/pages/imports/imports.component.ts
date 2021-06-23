@@ -31,7 +31,7 @@ export class ImportsComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['import_id', 'import_date', 'import_url', 'import_origin', 'total', 'na_vyrazeni', 'actions'];
+  displayedColumns = ['import_date', 'import_url', 'import_origin', 'total', 'na_vyrazeni', 'actions'];
   imports: Import[] = [];
   stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 

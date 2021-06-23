@@ -20,7 +20,6 @@
                 <ng-container>{{ uri }}<span class="app-pipe"></span></ng-container>
                 {{ origin }}<span class="app-pipe"></span>
                 
-                
                 <mat-slide-toggle (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>
                 
                 <mat-slide-toggle (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>
@@ -32,7 +31,9 @@
       </mat-card>
       <ng-container *ngFor="let doc of docs">
         <mat-card>
-          {{ doc.name }} | {{ doc.author }} | {{ doc.num_hits }} | {{ doc.ean }} 
+          <div>{{ doc.name }} | {{ doc.author }} | {{ doc.ean }} | {{ doc.num_hits }} </div>
+          <div *ngFor="let id of doc.identifiers"><a [href]="link(id)" target="_blank">{{ id }}</a></div>
+          
           <ng-container *ngIf="doc.hit_type === 'noean'"><button mat-icon-button title="Zkontrolovat shody" (click)="checkHits(doc)"><mat-icon>manage_search</mat-icon></button></ng-container>
           <button *ngIf="doc.na_vyrazeni" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc)"><mat-icon>done</mat-icon></button>
         </mat-card>

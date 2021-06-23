@@ -154,16 +154,32 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
-    IMPORTXML {
+    IMPORT_DISTRI {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          XMLImporter imp = new XMLImporter();
+          // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
+          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
+          // "C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml"
+          json = imp.fromFile(req.getParameter("url"), "distri.cz");
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    IMPORT_HEUREKA {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
           XMLImporter1 imp = new XMLImporter1();
-          // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
-          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
-          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml", "albatros");
-          json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
+          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
+          json = imp.fromFile(req.getParameter("url"), "heureka");
           
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

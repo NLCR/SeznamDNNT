@@ -102,6 +102,17 @@ public class MarcRecord {
     }
     
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+    String nazev = "";
+    if (sdoc.containsKey("marc_245a")) {
+      nazev += sdoc.getFieldValue("marc_245a") + " ";
+    }
+    if (sdoc.containsKey("marc_245b")) {
+      nazev += sdoc.getFieldValue("marc_245b") + " ";
+    }
+    if (sdoc.containsKey("marc_245c")) {
+      nazev += sdoc.getFieldValue("marc_245c") + " ";
+    }
+    sdoc.setField("nazev", nazev.trim());
     addRokVydani();
 //    addFRBR();
 //    addDedup();

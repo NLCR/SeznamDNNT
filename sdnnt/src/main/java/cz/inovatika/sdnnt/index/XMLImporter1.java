@@ -73,7 +73,7 @@ public class XMLImporter1 {
           new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
   List<String> elements = Arrays.asList("NAME", "EAN");
 
-  public JSONObject fromFile(String uri, String origin, String itemName) {
+  public JSONObject fromFile(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
       long start = new Date().getTime();
@@ -85,7 +85,7 @@ public class XMLImporter1 {
       import_id = now.toEpochSecond() + "";
       File f = new File(uri);
       InputStream is = new FileInputStream(f);
-      readXML(is, itemName);
+      readXML(is, "SHOPITEM");
       getClient().commit(collection);
       // solr.close();
       ret.put("indexed", indexed);
@@ -189,15 +189,10 @@ public class XMLImporter1 {
   public void findInCatalog(Map item) {
     // JSONObject ret = new JSONObject();
     try {
-      String title = "title:(" + ClientUtils.escapeQueryChars((String) item.get(fieldsMap.get("NAME"))) + ")";
-      if (item.containsKey(fieldsMap.get("AUTHOR")) && !((String) item.get(fieldsMap.get("AUTHOR"))).isBlank()) {
-        title = " OR (" + title + " AND author:(" + ClientUtils.escapeQueryChars((String) item.get(fieldsMap.get("AUTHOR"))) + "))";
-      } else {
-        title = " OR " + title;
-      }
+      String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
+      String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
+      
       String q = "ean:\"" + item.get("EAN") + "\""
-              + " OR dedup_fields:\"" + item.get("dedup_fields") + "\""
-      //        + " OR frbr:\"" + item.get("frbr") + "\""
               + title;
 
       SolrQuery query = new SolrQuery(q)
@@ -219,6 +214,9 @@ public class XMLImporter1 {
       List<String> identifiers = new ArrayList<>();
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
+      if (docs.length() == 0) {
+        System.out.println(title);
+      }
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
 

@@ -75,4 +75,8 @@ export class ImportComponent implements OnInit {
 
   }
 
+  link(id: string) {
+    return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-')+1);
+  }
+
 }

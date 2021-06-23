@@ -65,9 +65,10 @@
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    
-   <field name="title" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="ean" type="string" indexed="true" stored="true" multiValued="true"  />
+   <field name="title" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="author" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="nazev" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
    <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="rokvydani" type="pints" indexed="true" stored="true" />
