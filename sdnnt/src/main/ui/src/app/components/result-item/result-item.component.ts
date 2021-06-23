@@ -24,6 +24,7 @@ export class ResultItemComponent implements OnInit {
   @Input() inZadost: boolean;
   @Input() zadost: Zadost;
   @Output() removeFromZadostEvent = new EventEmitter<string>();
+  @Output() processZadostEvent = new EventEmitter<{type: string, identifier: string}>();
 
   newState = new FormControl();
   isZarazeno: boolean;
@@ -237,15 +238,7 @@ export class ResultItemComponent implements OnInit {
   }
 
   approve() {
-    this.service.approveNavrh(this.doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        this.zadost = res;
-        this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
-      }
-    });
+    this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier});
   }
 
   approveLib() {

@@ -141,7 +141,12 @@ export class AccountComponent implements OnInit {
       return;
     }
     this.service.processZadost(zadost).subscribe(res => {
-
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        zadost.state = 'processed';
+      }
     });
   }
 }

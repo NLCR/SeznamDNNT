@@ -58,7 +58,6 @@ export class ZadostComponent implements OnInit {
   }
 
   removeDoc(identifier: string) {
-    console.log(identifier);
     this.zadost.identifiers = this.zadost.identifiers.filter(id => id !== identifier);
     this.service.saveZadost(this.zadost).subscribe((res: any) => {
       if (res.error) {
@@ -66,6 +65,20 @@ export class ZadostComponent implements OnInit {
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
         this.getDocs();
+      }
+    });
+  }
+
+  
+  processNavrh(data: {type: string, identifier: string}) {
+    this.service.approveNavrh(data.identifier, this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+        this.zadost = res;
+        this.getDocs();
+        // this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
       }
     });
   }

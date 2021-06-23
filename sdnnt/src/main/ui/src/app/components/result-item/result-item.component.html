@@ -45,8 +45,8 @@
         </mat-icon>
         {{ 'state.' + doc.marc_990a | translate }}
       </div>
-      <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state">
-        <mat-icon class="material-icons-outlined" [matTooltip]="processedTooltip">info</mat-icon>
+      <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
+        <mat-icon class="material-icons-outlined">info</mat-icon>
         {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-2">
