@@ -173,6 +173,9 @@ public class SearchServlet extends HttpServlet {
           if (Boolean.parseBoolean(req.getParameter("onlyNoEAN"))) {
             query.addFilterQuery("hit_type:noean");
           }
+          if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {
+            query.addFilterQuery("num_hits:0");
+          }
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");

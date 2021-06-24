@@ -96,7 +96,11 @@ public class IndexerServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          json.put("indexed", Indexer.reindex(req.getParameter("filter")));
+          String dest = "http://localhost:8983/solr";
+          if (req.getParameter("dest") != null) {
+            dest = req.getParameter("dest"); 
+          }
+          json.put("indexed", Indexer.reindex(dest, req.getParameter("filter")));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

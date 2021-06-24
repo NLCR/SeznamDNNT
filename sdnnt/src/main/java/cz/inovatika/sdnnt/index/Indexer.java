@@ -273,11 +273,10 @@ public class Indexer {
     return ret;
   }
 
-  public static JSONObject reindex(String filter) {
+  public static JSONObject reindex(String dest, String filter) {
     JSONObject ret = new JSONObject();
-    int indexed = 0;
-    try {
-      SolrClient solr = getClient();
+    int indexed = 0; 
+    try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(dest).build()) {
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
               .setSort("identifier", SolrQuery.ORDER.desc)
@@ -287,7 +286,7 @@ public class Indexer {
       boolean done = false;
       while (!done) {
         q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-        QueryResponse qr = solr.query("catalog", q);
+        QueryResponse qr = getClient().query("catalog", q);
         String nextCursorMark = qr.getNextCursorMark();
         SolrDocumentList docs = qr.getResults();
         for (SolrDocument doc : docs) {
@@ -310,6 +309,8 @@ public class Indexer {
         }
         cursorMark = nextCursorMark;
       }
+      solr.commit();
+      solr.close();
       LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
       ret.put("reindex", indexed);
     } catch (SolrServerException | IOException ex) {

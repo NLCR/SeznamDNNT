@@ -151,9 +151,9 @@ public class CatalogSearcher {
     if (req.getParameter("sort") != null) {
       query.setParam("sort", req.getParameter("sort"));
     }
-    if (Boolean.parseBoolean(req.getParameter("onlySdnnt"))) {
+    if (!"false".equals(req.getParameter("onlySdnnt"))) {
+      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       query.addFilterQuery("-marc_990a:NNN");
-      query.addFilterQuery("marc_990a:*");
     }
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;

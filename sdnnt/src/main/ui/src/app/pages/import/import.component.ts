@@ -16,6 +16,7 @@ export class ImportComponent implements OnInit {
   docs: SolrDocument[] = [];
   onlyA: boolean;
   onlyNoEAN: boolean;
+  onlyNoHits: boolean;
   na_vyrazeni: number;
   noean: number;
 
@@ -50,9 +51,14 @@ export class ImportComponent implements OnInit {
     this.getDocs();
   }
 
+  onlyNoHitsChange(e) {
+    this.onlyNoHits = e.checked;
+    this.getDocs();
+  }
+
   getDocs() {
     this.docs = [];
-    this.service.getImport(this.importId, this.onlyA, this.onlyNoEAN).subscribe((resp: any) => {
+    this.service.getImport(this.importId, this.onlyA, this.onlyNoEAN, this.onlyNoHits).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
       this.na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
