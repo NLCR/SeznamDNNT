@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
+import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -193,6 +194,31 @@ public class Indexer {
 
       solr.commit("sdnnt");
       solr.close();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+  
+  public static JSONObject approveInImport(String identifier, String newRaw, String user) {
+    JSONObject ret = new JSONObject();
+    try {
+      Import impNew = Import.fromJSON(newRaw);
+      SolrClient solr = getClient();
+      SolrQuery q = new SolrQuery("*").setRows(1)
+              .addFilterQuery("id:\"" + impNew.id + "\"");
+      
+      
+      Import impOld = solr.query("imports", q).getBeans(Import.class).get(0);
+      
+
+      History.log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import");
+
+      // Update record in imports
+      solr.addBean("imports", impNew);
+      solr.commit("imports");
+
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);

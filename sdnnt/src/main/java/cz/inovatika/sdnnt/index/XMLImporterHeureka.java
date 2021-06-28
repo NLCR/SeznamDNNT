@@ -6,6 +6,7 @@
 package cz.inovatika.sdnnt.index;
 
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -55,9 +56,9 @@ import org.xml.sax.SAXException;
  *
  * @author alberto
  */
-public class XMLImporter1 {
+public class XMLImporterHeureka {
 
-  public static final Logger LOGGER = Logger.getLogger(XMLImporter1.class.getName());
+  public static final Logger LOGGER = Logger.getLogger(XMLImporterHeureka.class.getName());
   JSONObject ret = new JSONObject();
   String collection = "imports";
 
@@ -73,6 +74,8 @@ public class XMLImporter1 {
           new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
   List<String> elements = Arrays.asList("NAME", "EAN");
 
+  // https://www.palmknihy.cz/heureka.xml
+  
   public JSONObject fromFile(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
@@ -83,9 +86,24 @@ public class XMLImporter1 {
       import_url = uri;
       import_origin = origin;
       import_id = now.toEpochSecond() + "";
-      File f = new File(uri);
-      InputStream is = new FileInputStream(f);
-      readXML(is, "SHOPITEM");
+      
+      CloseableHttpClient client = HttpClients.createDefault();
+      HttpGet httpGet = new HttpGet(uri);
+      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+        final HttpEntity entity = response1.getEntity();
+        if (entity != null) {
+          try (InputStream is = entity.getContent()) {
+            readXML(is, "SHOPITEM");
+          }
+        }
+      } catch (XMLStreamException | IOException exc) {
+        LOGGER.log(Level.SEVERE, null, exc);
+        ret.put("error", exc);
+      }
+      
+//      File f = new File(uri);
+//      InputStream is = new FileInputStream(f);
+//      readXML(is, "SHOPITEM");
       getClient().commit(collection);
       // solr.close();
       ret.put("indexed", indexed);
@@ -94,7 +112,7 @@ public class XMLImporter1 {
       String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
       ret.put("ellapsed", ellapsed);
       LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
-    } catch (XMLStreamException | SolrServerException | IOException ex) {
+    } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     } 
@@ -128,7 +146,9 @@ public class XMLImporter1 {
           ean = isbn.validate(ean);
           if (ean != null) {
             item.put("EAN", ean);
-          }  
+          }  else {
+            item.put("EAN", item.get("ISBN"));
+          }
         }
         addDedup(item);
         addFrbr(item);
@@ -199,7 +219,7 @@ public class XMLImporter1 {
               .setRows(100)
               .setParam("q.op", "AND")
               // .setFields("*,score");
-              .setFields("identifier,title,score,ean,frbr,marc_990a");
+              .setFields("identifier,nazev,score,ean,marc_990a,rokvydani");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }
@@ -215,7 +235,7 @@ public class XMLImporter1 {
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
       if (docs.length() == 0) {
-        System.out.println(title);
+        // System.out.println(title);
       }
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
@@ -225,24 +245,28 @@ public class XMLImporter1 {
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
             
-            if (doc.has("marc_990a") && doc.getJSONArray("marc_990a").toList().contains("A")) {
-              na_vyrazeni.add(doc.getString("identifier"));
+            if (doc.has("marc_990a")){
+              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+              if (stavy.contains("A") || stavy.contains("PA")) {
+                na_vyrazeni.add(doc.getString("identifier"));
+              }
             }
-            identifiers.add(doc.getString("identifier"));
+            identifiers.add(doc.toString());
           }
         }
         if (!isEAN) {
-          if (doc.optString("marc_990a").equals("A")) {
-            na_vyrazeni.add(doc.getString("identifier"));
+          if (doc.has("marc_990a")){
+              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+              if (stavy.contains("A") || stavy.contains("PA")) {
+                na_vyrazeni.add(doc.getString("identifier"));
+              }
           }
-          identifiers.add(doc.getString("identifier"));
+          identifiers.add(doc.toString());
         }
 
       }
       item.put("hit_type", isEAN ? "ean" : "noean");
-
       item.put("num_hits", isEAN ? identifiers.size() : jresp.getInt("numFound"));
-
       item.put("identifiers", identifiers);
       item.put("na_vyrazeni", na_vyrazeni);
       item.put("hits_na_vyrazeni", na_vyrazeni.size());

@@ -68,11 +68,19 @@ export class AppService {
     return this.get(url, params);
   }
 
-  getImport(id: string, onlyA: boolean, onlyNoEAN: boolean, onlyNoHits: boolean): Observable<any> {
+  // getImport(id: string, onlyA: boolean, onlyNoEAN: boolean, onlyNoHits: boolean): Observable<any> {
+  getImport(params: HttpParams): Observable<any> {
     let url = 'search/import';
-    const params: HttpParams = new HttpParams().set('id', id)
-    .set('onlyA', onlyA+'').set('onlyNoEAN', onlyNoEAN+'').set('onlyNoHits', onlyNoHits+'');
+    // const params: HttpParams = new HttpParams().set('id', id)
+    // .set('onlyA', onlyA+'').set('onlyNoEAN', onlyNoEAN+'').set('onlyNoHits', onlyNoHits+'');
     return this.get(url, params);
+  }
+
+  approveNavrhInImport(identifier: string, importId: string): Observable<any> {
+    let url = '/account/approve_navrh_in_import';
+    const params: HttpParams = new HttpParams()
+    .set('user', this.state.user.username);
+    return this.post(url, {identifier, importId}, params);
   }
 
   getHistory(identifier: string): Observable<any> {

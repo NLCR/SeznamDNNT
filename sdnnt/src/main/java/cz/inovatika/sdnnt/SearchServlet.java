@@ -157,21 +157,33 @@ public class SearchServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
+          
+        int rows = opts.getClientConf().getInt("rows"); 
+        if (req.getParameter("rows") != null) {
+          rows = Integer.parseInt(req.getParameter("rows"));
+        }
+        int start = 0; 
+        if (req.getParameter("page") != null) {
+          start = Integer.parseInt(req.getParameter("page")) * rows;
+        } 
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           SolrQuery query = new SolrQuery("*")
-                  .setRows(100)
+                  .setRows(rows)
+                  .setStart(start) 
                   .addFilterQuery("import_id:" + req.getParameter("id"))
                   .setFacet(true)
                   .addFacetField("hit_type")
+                  .addFacetField("num_hits")
                   .setParam("json.nl", "map")
                   .setParam("stats", true)
                   .setParam("stats.field","na_vyrazeni")
-                  .setFields("*,catalog:[json],item:[json]");
+                  .setFields("*,identifiers:[json],catalog:[json],item:[json]");
           if (Boolean.parseBoolean(req.getParameter("onlyA"))) {
             query.addFilterQuery("na_vyrazeni:*");
           }
           if (Boolean.parseBoolean(req.getParameter("onlyNoEAN"))) {
             query.addFilterQuery("hit_type:noean");
+            query.addFilterQuery("-num_hits:0");
           }
           if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {
             query.addFilterQuery("num_hits:0");

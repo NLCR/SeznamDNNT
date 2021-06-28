@@ -22,7 +22,9 @@
                 
                 <mat-slide-toggle (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>&#160;
                 
-                <mat-slide-toggle (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>
+                <mat-slide-toggle (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>&#160;
+                
+                <mat-slide-toggle (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
                   
               </span>
             </ng-container>
@@ -31,10 +33,14 @@
       </mat-card>
       <ng-container *ngFor="let doc of docs">
         <mat-card>
-          <div>{{ doc.name }} | {{ doc.author }} | {{ doc.ean }} | {{ doc.num_hits }} </div>
-          <div *ngFor="let id of doc.identifiers"><a [href]="link(id)" target="_blank">{{ id }}</a></div>
-          <ng-container *ngIf="doc.hit_type === 'noean'"><button mat-icon-button title="Zkontrolovat shody" (click)="checkHits(doc)"><mat-icon>manage_search</mat-icon></button></ng-container>
-          <button *ngIf="doc.na_vyrazeni" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc)"><mat-icon>done</mat-icon></button>
+          <h3>{{ doc.name }} | {{ doc.author }} | {{ doc.ean }} | {{ doc.num_hits }} | {{ doc.hit_type }} </h3>
+          <ng-container *ngFor="let id of doc.identifiers">
+            <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')">
+              <a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a> {{ id.nazev }} {{ id.marc_990a }} {{ id.ean }}
+              <button *ngIf="id.marc_990a.includes('A') || id.marc_990a.includes('PA')" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc, id.identifier)"><mat-icon>done</mat-icon></button>
+            </div>
+          </ng-container>
+          
         </mat-card>
       </ng-container>
     </div>

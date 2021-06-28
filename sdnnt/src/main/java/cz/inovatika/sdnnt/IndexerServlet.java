@@ -2,8 +2,8 @@ package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.OAIHarvester;
-import cz.inovatika.sdnnt.index.XMLImporter;
-import cz.inovatika.sdnnt.index.XMLImporter1;
+import cz.inovatika.sdnnt.index.XMLImporterDistri;
+import cz.inovatika.sdnnt.index.XMLImporterHeureka;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -163,7 +163,7 @@ public class IndexerServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          XMLImporter imp = new XMLImporter();
+          XMLImporterDistri imp = new XMLImporterDistri();
           // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
           // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
           // "C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml"
@@ -181,7 +181,7 @@ public class IndexerServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          XMLImporter1 imp = new XMLImporter1();
+          XMLImporterHeureka imp = new XMLImporterHeureka();
           // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
           json = imp.fromFile(req.getParameter("url"), "heureka");
           
