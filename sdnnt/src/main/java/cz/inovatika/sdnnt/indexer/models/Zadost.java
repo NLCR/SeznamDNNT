@@ -74,6 +74,9 @@ public class Zadost {
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     Zadost o = objectMapper.readValue(json, Zadost.class); 
+      if (o.process == null) {
+        o.process = new HashMap<>();
+      }
     return o;
   }
   
@@ -94,9 +97,6 @@ public class Zadost {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       zadost.user = username;
-      if (zadost.process == null) {
-        zadost.process = new HashMap<>();
-      }
       return save(zadost);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -109,9 +109,6 @@ public class Zadost {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       zadost.user = username;
-      if (zadost.process == null) {
-        zadost.process = new HashMap<>();
-      }
       SolrClient solr = Indexer.getClient();
       SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
               .setFields("identifier")
@@ -144,9 +141,6 @@ public class Zadost {
   public static JSONObject approve(String identifier, String js, String username) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
-      if (zadost.process == null) {
-        zadost.process = new HashMap<>();
-      }
       String oldProcess = new JSONObject().put("process", zadost.process).toString();
       ZadostProcess zprocess = new ZadostProcess();
       zprocess.state = "approved";

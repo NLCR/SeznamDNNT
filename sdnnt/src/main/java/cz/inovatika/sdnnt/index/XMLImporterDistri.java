@@ -254,9 +254,6 @@ public class XMLImporterDistri {
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();
           if (elementName.equals("ITEM")) {
-            addDedup(item);
-            addFrbr(item);
-            findInCatalog(item);
             toIndex(item);
             // ret.append("items", item);
             return;
@@ -279,11 +276,16 @@ public class XMLImporterDistri {
       if (item.containsKey("AUTHOR")) {
         idoc.setField("author", item.get("AUTHOR"));
       }
+      
+      
+            addDedup(item);
+            addFrbr(item);
+            findInCatalog(item);
 
       idoc.setField("identifiers", item.get("identifiers"));
       idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
       idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
-      idoc.setField("catalog", item.get("catalog"));
+      // idoc.setField("catalog", item.get("catalog"));
       idoc.setField("num_hits", item.get("num_hits"));
       idoc.setField("hit_type", item.get("hit_type"));
       idoc.setField("item", new JSONObject(item).toString());
@@ -340,7 +342,7 @@ public class XMLImporterDistri {
       NamedList<Object> qresp = getClient().request(qreq, "catalog");
       JSONObject jresp = (new JSONObject((String) qresp.get("response"))).getJSONObject("response");
       JSONArray docs = jresp.getJSONArray("docs");
-      item.put("catalog", docs.toString());
+      // item.put("catalog", docs.toString());
       List<String> identifiers = new ArrayList<>();
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;

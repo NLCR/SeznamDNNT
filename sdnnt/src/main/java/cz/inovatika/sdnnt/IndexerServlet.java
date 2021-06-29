@@ -183,6 +183,7 @@ public class IndexerServlet extends HttpServlet {
         try {
           XMLImporterHeureka imp = new XMLImporterHeureka();
           // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
+          // https://www.palmknihy.cz/heureka.xml
           json = imp.fromFile(req.getParameter("url"), "heureka");
           
         } catch (Exception ex) {

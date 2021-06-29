@@ -43,6 +43,9 @@ export class ImportComponent implements OnInit, OnDestroy {
     }
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.importId = this.route.snapshot.paramMap.get('id');
+      this.onlyNoEAN = !!this.route.snapshot.queryParamMap.get('onlyNoEAN');
+      this.onlyNoHits = !!this.route.snapshot.queryParamMap.get('onlyNoHits');
+      this.onlyA = !!this.route.snapshot.queryParamMap.get('onlyA');
       this.getDocs(val);
     }));
   }
@@ -97,6 +100,7 @@ export class ImportComponent implements OnInit, OnDestroy {
         this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+        doc = res;
       }
     });
   }

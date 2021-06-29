@@ -205,19 +205,15 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     try {
       Import impNew = Import.fromJSON(newRaw);
-      SolrClient solr = getClient();
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("id:\"" + impNew.id + "\"");
-      
-      
-      Import impOld = solr.query("imports", q).getBeans(Import.class).get(0);
+      Import impOld = getClient().query("imports", q).getBeans(Import.class).get(0);
       
 
       History.log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import");
 
       // Update record in imports
-      solr.addBean("imports", impNew);
-      solr.commit("imports");
+      ret = Import.approve(impNew, identifier, user);
 
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -250,6 +246,7 @@ public class Indexer {
         mr.setStav("A");
       }
 
+      mr.toSolrDoc();
       History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
 
       // Update record in catalog

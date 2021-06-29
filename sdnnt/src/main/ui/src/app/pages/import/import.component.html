@@ -20,11 +20,11 @@
                 <ng-container>{{ uri }}<span class="app-pipe"></span></ng-container>
                 {{ origin }}<span class="app-pipe"></span>
                 
-                <mat-slide-toggle (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>&#160;
+                <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>&#160;
                 
-                <mat-slide-toggle (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>&#160;
+                <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>&#160;
                 
-                <mat-slide-toggle (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
+                <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
                   
               </span>
             </ng-container>
@@ -37,7 +37,8 @@
           <ng-container *ngFor="let id of doc.identifiers">
             <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')">
               <a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a> {{ id.nazev }} {{ id.marc_990a }} {{ id.ean }}
-              <button *ngIf="id.marc_990a.includes('A') || id.marc_990a.includes('PA')" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc, id.identifier)"><mat-icon>done</mat-icon></button>
+              {{ id.approved ? 'APPROVED ' + id.approved_user : '' }}
+              <button *ngIf="!id.approved && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc, id.identifier)"><mat-icon>done</mat-icon></button>
             </div>
           </ng-container>
           

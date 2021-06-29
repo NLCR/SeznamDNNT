@@ -75,7 +75,6 @@ public class XMLImporterHeureka {
   List<String> elements = Arrays.asList("NAME", "EAN");
 
   // https://www.palmknihy.cz/heureka.xml
-  
   public JSONObject fromFile(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
@@ -86,7 +85,7 @@ public class XMLImporterHeureka {
       import_url = uri;
       import_origin = origin;
       import_id = now.toEpochSecond() + "";
-      
+
       CloseableHttpClient client = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(uri);
       try (CloseableHttpResponse response1 = client.execute(httpGet)) {
@@ -100,7 +99,7 @@ public class XMLImporterHeureka {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
-      
+
 //      File f = new File(uri);
 //      InputStream is = new FileInputStream(f);
 //      readXML(is, "SHOPITEM");
@@ -115,7 +114,7 @@ public class XMLImporterHeureka {
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
-    } 
+    }
     return ret;
   }
 
@@ -139,20 +138,6 @@ public class XMLImporterHeureka {
 
           }
         }
-        if (item.containsKey("ISBN")) {
-
-          ISBNValidator isbn = ISBNValidator.getInstance();
-          String ean = item.get("ISBN");
-          ean = isbn.validate(ean);
-          if (ean != null) {
-            item.put("EAN", ean);
-          }  else {
-            item.put("EAN", item.get("ISBN"));
-          }
-        }
-        addDedup(item);
-        addFrbr(item);
-        findInCatalog(item);
         toIndex(item);
       }
     } catch (ParserConfigurationException | SAXException | IOException ex) {
@@ -160,7 +145,7 @@ public class XMLImporterHeureka {
     }
   }
 
-  private void toIndex(Map item) {
+  private void toIndex(Map<String, String> item) {
     try {
       SolrInputDocument idoc = new SolrInputDocument();
       idoc.setField("import_id", import_id);
@@ -169,6 +154,25 @@ public class XMLImporterHeureka {
       idoc.setField("import_origin", import_origin);
 
       idoc.setField("id", import_id + "_" + item.get("ITEM_ID"));
+
+      if (item.containsKey("ISBN")) {
+
+        ISBNValidator isbn = ISBNValidator.getInstance();
+        String ean = item.get("ISBN");
+        ean = isbn.validate(ean);
+        if (ean != null) {
+          item.put("EAN", ean);
+        } else {
+          item.put("EAN", item.get("ISBN"));
+        }
+      }
+
+      idoc.setField("item", new JSONObject(item).toString());
+
+      addDedup(item);
+      addFrbr(item);
+      findInCatalog(item);
+
       idoc.setField("ean", item.get("EAN"));
       idoc.setField("name", item.get(fieldsMap.get("NAME")));
       if (item.containsKey(fieldsMap.get("AUTHOR"))) {
@@ -181,7 +185,6 @@ public class XMLImporterHeureka {
       idoc.setField("catalog", item.get("catalog"));
       idoc.setField("num_hits", item.get("num_hits"));
       idoc.setField("hit_type", item.get("hit_type"));
-      idoc.setField("item", new JSONObject(item).toString());
 
       getClient().add("imports", idoc);
 
@@ -211,7 +214,7 @@ public class XMLImporterHeureka {
     try {
       String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
       String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
-      
+
       String q = "ean:\"" + item.get("EAN") + "\""
               + title;
 
@@ -230,7 +233,7 @@ public class XMLImporterHeureka {
       NamedList<Object> qresp = getClient().request(qreq, "catalog");
       JSONObject jresp = (new JSONObject((String) qresp.get("response"))).getJSONObject("response");
       JSONArray docs = jresp.getJSONArray("docs");
-      item.put("catalog", docs.toString());
+      // item.put("catalog", docs.toString());
       List<String> identifiers = new ArrayList<>();
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
@@ -244,8 +247,8 @@ public class XMLImporterHeureka {
           List<Object> eans = doc.getJSONArray("ean").toList();
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
-            
-            if (doc.has("marc_990a")){
+
+            if (doc.has("marc_990a")) {
               List<Object> stavy = doc.getJSONArray("marc_990a").toList();
               if (stavy.contains("A") || stavy.contains("PA")) {
                 na_vyrazeni.add(doc.getString("identifier"));
@@ -255,11 +258,11 @@ public class XMLImporterHeureka {
           }
         }
         if (!isEAN) {
-          if (doc.has("marc_990a")){
-              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
-              if (stavy.contains("A") || stavy.contains("PA")) {
-                na_vyrazeni.add(doc.getString("identifier"));
-              }
+          if (doc.has("marc_990a")) {
+            List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+            if (stavy.contains("A") || stavy.contains("PA")) {
+              na_vyrazeni.add(doc.getString("identifier"));
+            }
           }
           identifiers.add(doc.toString());
         }
