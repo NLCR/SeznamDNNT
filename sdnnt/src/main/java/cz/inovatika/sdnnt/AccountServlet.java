@@ -309,7 +309,6 @@ public class AccountServlet extends HttpServlet {
           } else {
             inputJs = new JSONObject(req.getParameter("json"));
           }
-          Indexer.changeStav(inputJs.getString("identifier"), "VVS", user.username);
           return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

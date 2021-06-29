@@ -121,7 +121,7 @@ public class MarcRecord {
   }
 
   public void setStav(String new_stav) {
-    if (!dataFields.containsKey("990")) {
+//    if (!dataFields.containsKey("990")) {
       List<DataField> ldf = new ArrayList<>();
       DataField df = new DataField("990", " ", " ");
       SubField sf = new SubField("a", new_stav);
@@ -130,9 +130,9 @@ public class MarcRecord {
       df.subFields.put("a", lsf);
       ldf.add(df);
       dataFields.put("990", ldf);
-    } else {
-      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
-    }
+//    } else {
+//      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
+//    }
 
   }
 
