@@ -1,118 +1,52 @@
 <div class="app-container">
-  <div fxLayout="row" fxLayoutGap="32px">
-    <div fxFlex="10px" class="app-left app-fx-facets">
-      <!-- <div class="app-facets-used">
-        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length">
-          <h3 matSubheader fxLayout="row">
-            <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
-            <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
-          </h3>
-          <div class="app-list-content-wrapper">
-            <ng-container *ngFor="let filter of filterState">
-              <mat-list-item *ngIf="stateFilter === filter.id">
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStavZadosti(filter.id)"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.stav_zadosti' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
-                </div>
-              </mat-list-item>
-            </ng-container>
-            <ng-container *ngFor="let filter of filterType">
-              <mat-list-item *ngIf="newStavFilter === filter.id">
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStav(filter.id)"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.typ_navrhu' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
-                </div>
-              </mat-list-item>
-            </ng-container>  
-          </div>
-        </mat-list>
-      </div>
-
-      <mat-accordion multi>
-        <mat-expansion-panel [expanded]="true">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.stav_zadosti' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngIf="stateFilter !== 'open'">
-            <a (click)="setStavZadosti('open')">{{ 'desc.neodeslano' | translate }}</a>
-          </div>
-          <div *ngIf="stateFilter !== 'waiting'">
-            <a (click)="setStavZadosti('waiting')">{{ 'desc.ceka_na_posouzeni' | translate }}</a>
-          </div>
-          <div *ngIf="stateFilter !== 'processed'">
-            <a (click)="setStavZadosti('processed')">{{ 'desc.zpracovano' | translate }}</a>
-          </div>
-        </mat-expansion-panel>
-        <mat-expansion-panel [expanded]="true">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.typ_navrhu' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngIf="newStavFilter !== 'NZN'">
-            <a (click)="setStav('NZN')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
-          </div>
-          <div *ngIf="newStavFilter !== 'VVS'">
-            <a (click)="setStav('VVS')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
-          </div>
-        </mat-expansion-panel>
-      </mat-accordion> -->
+  <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+    <div fxFlex>
+      {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
     </div>
+    <div>
+      <app-paginator [numFound]="numFound"></app-paginator>
+    </div>
+  </div>
+  <div class="app-results-wrapper">
+    <table mat-table [dataSource]="imports" class="mat-elevation-z0">
+      <ng-container matColumnDef="import_date">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_importu' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ element.import_date | date : 'dd.MM.yyyy HH:mm' }}</td>
+      </ng-container>
+      <ng-container matColumnDef="import_url">
+        <th mat-header-cell *matHeaderCellDef>{{ 'URL' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ element.import_url }}</td>
+      </ng-container>
+      <ng-container matColumnDef="import_origin">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ element.import_origin }}</td>
+      </ng-container>
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.celkem' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ stats[element.import_id].total }}</td>
+      </ng-container>
+      <ng-container matColumnDef="na_vyrazeni">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_vyrazeni' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ stats[element.import_id].na_vyrazeni }}</td>
+      </ng-container>
+      
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" class="app-text-right">
+          <mat-button-toggle-group>
+            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.prehled_importu' | translate" matTooltipPosition="above">
+              <mat-icon class="material-icons-outlined">visibility</mat-icon>
+            </mat-button-toggle>        
+          </mat-button-toggle-group>
+        </td>
+      </ng-container>
 
-    <div fxFlex class="app-right">
-      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-        <div fxFlex>
-          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
-        </div>
-        <div>
-          <app-paginator [numFound]="numFound"></app-paginator>
-        </div>
-      </div>
-      <div class="app-results-wrapper">
-        <table mat-table [dataSource]="imports" class="mat-elevation-z0">
-          <ng-container matColumnDef="import_date">
-            <th mat-header-cell *matHeaderCellDef>{{ 'Datum importu' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.import_date | date : 'dd.MM.yyyy HH:mm' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="import_url">
-            <th mat-header-cell *matHeaderCellDef>{{ 'URL' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.import_url }}</td>
-          </ng-container>
-          <ng-container matColumnDef="import_origin">
-            <th mat-header-cell *matHeaderCellDef>{{ 'Typ' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.import_origin }}</td>
-          </ng-container>
-          <ng-container matColumnDef="total">
-            <th mat-header-cell *matHeaderCellDef>{{ 'Total' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ stats[element.import_id].total }}</td>
-          </ng-container>
-          <ng-container matColumnDef="na_vyrazeni">
-            <th mat-header-cell *matHeaderCellDef>{{ 'Na vyrazeni' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ stats[element.import_id].na_vyrazeni }}</td>
-          </ng-container>
-          
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" class="app-text-right">
-              <mat-button-toggle-group>
-                <mat-button-toggle (click)="showImport(element)" [matTooltip]="state.user.role === 'kurator' && element.state === 'waiting' ? ('desc.zpracovani_zadosti' | translate) : ('desc.prehled_zadosti' | translate)" matTooltipPosition="above">
-                  <mat-icon class="material-icons-outlined">{{ state.user.role === 'kurator' && element.state === 'waiting' ? 'rule' : 'visibility' }}</mat-icon>
-                </mat-button-toggle>
-                
-              </mat-button-toggle-group>
-            </td>
-          </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
   
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-
-      </div>
-      <div class="app-mt-4">
-        <app-paginator [numFound]="numFound"></app-paginator>
-      </div>
-    </div>
+  <div class="app-mt-4">
+    <app-paginator [numFound]="numFound"></app-paginator>
   </div>
 </div>

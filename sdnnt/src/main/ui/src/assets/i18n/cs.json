@@ -202,6 +202,10 @@
     "pouzit": "Použít",
     "en": "Anglický jazyk",
     "registrovat_se": "Registrovat se",
-    "pouze_zaznamy_na_seznamu": "Pouze záznamy na seznamu"
+    "pouze_zaznamy_na_seznamu": "Pouze záznamy na seznamu",
+    "datum_importu": "Datum importu",
+    "celkem": "Celkem",
+    "na_vyrazeni": "Na vyřazení",
+    "prehled_importu": "Přehled importů"
   }
 }

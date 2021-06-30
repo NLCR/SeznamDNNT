@@ -202,6 +202,10 @@
     "pouzit": "Apply",
     "cs": "Český jazyk",
     "registrovat_se": "To register",
-    "pouze_zaznamy_na_seznamu": "Only entries in the list"
+    "pouze_zaznamy_na_seznamu": "Only entries in the list",
+    "datum_importu": "Date of import",
+    "celkem": "Total",
+    "na_vyrazeni": "For elimination",
+    "prehled_importu": "Imports overview"
   }
 }
