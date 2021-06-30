@@ -1,7 +1,6 @@
 <app-facets-used></app-facets-used>
 
 <mat-accordion multi>
-  <mat-checkbox (change)="onlyInSdnnt()" [(ngModel)]="state.onlySdnnt">pouze zaznamy na seznamu</mat-checkbox>
   <mat-expansion-panel *ngFor="let facet of facets" [expanded]="true">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>

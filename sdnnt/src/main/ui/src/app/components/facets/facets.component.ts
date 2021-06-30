@@ -52,14 +52,6 @@ export class FacetsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
-  onlyInSdnnt() {
-    const q: any = {};
-    q['onlySdnnt'] = this.state.onlySdnnt;
-    q.page = null;
-    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
-  }
-
-
   chosenYearHandler(normalizedYear: Date, datepicker: any, field: string) {
     console.log(normalizedYear)
     if (field === 'from') {

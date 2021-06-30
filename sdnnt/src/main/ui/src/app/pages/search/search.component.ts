@@ -1,6 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
@@ -26,6 +26,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private service: AppService,
     public state: AppState
   ) { }
@@ -93,6 +94,13 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
     });
+  }
+
+  onlyInSdnnt() {
+    const q: any = {};
+    q['onlySdnnt'] = this.state.onlySdnnt;
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
 }
