@@ -7,6 +7,14 @@
   <mat-sidenav-content>
     <header>
       <app-navbar (sidenavToggle)="sidenav.toggle()"></app-navbar>
+      <!-- <div class="app-container" style="padding-top: 32px;" fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="center center">
+        <div fxFlex>
+          <app-searchbar></app-searchbar>
+        </div>
+        <div>
+          <mat-checkbox [(ngModel)]="state.onlySdnnt">{{ 'desc.pouze_zaznamy_na_seznamu' | translate }}</mat-checkbox>
+        </div>
+      </div> -->
     </header>
     <main fxLayout="column">
       <!-- <div class="app-loading">
