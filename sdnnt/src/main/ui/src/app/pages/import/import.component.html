@@ -20,16 +20,16 @@
             </span>
           </div>
           <div>
-            <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)" class="app-mr-3">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)" class="app-mr-3">{{ 'Zobrazit jen na vyrazeni' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'Zobrazit jen nepresne shody' | translate }} <span class="app-metadata">({{noean}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} <span class="app-metadata">({{noHits}})</span></mat-slide-toggle>
           </div>
         </div>
       </mat-card>
       <ng-container *ngFor="let doc of docs">
         <mat-card>
           <mat-card-header>
-            <mat-card-title fxLayoutAlign="unset">
+            <mat-card-title fxLayoutAlign="unset" class="app-mb-0">
               <ng-container *ngIf="doc.name">{{ doc.name }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
@@ -37,7 +37,7 @@
               <ng-container *ngIf="doc.hit_type">{{ doc.hit_type }}<span class="app-pipe"></span></ng-container>
             </mat-card-title>
           </mat-card-header>
-          <mat-card-actions>
+          <mat-card-actions *ngIf="doc.identifiers?.length > 0">
             <ng-container *ngFor="let id of doc.identifiers; let idx = index">
               <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')" fxLayout="row" fxLayoutGap="32px" [class.app-mt-1]="idx >= 1">
                 <div fxFlex fxFlexAlign="flex-end">
