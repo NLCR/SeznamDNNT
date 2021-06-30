@@ -206,6 +206,9 @@
     "datum_importu": "Datum importu",
     "celkem": "Celkem",
     "na_vyrazeni": "Na vyřazení",
-    "prehled_importu": "Přehled importů"
+    "prehled_importu": "Přehled importů",
+    "vysledek_importu": "Výsledek importu",
+    "schvalit_zmenu_na_vyrazeni": "Schválit změnu / na vyřazení",
+    "schvaleno": "Schváleno"
   }
 }

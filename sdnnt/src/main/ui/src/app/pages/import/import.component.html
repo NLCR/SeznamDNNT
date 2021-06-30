@@ -12,36 +12,52 @@
       <mat-card>
         <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
           <div fxFlex>
-            <strong>{{ 'desc.Vysledek importu' | translate }}</strong>
-            <ng-container >
-              <span class="app-pipe"></span>
-              <span class="app-metadata">
-                <ng-container>{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
-                <ng-container>{{ uri }}<span class="app-pipe"></span></ng-container>
-                {{ origin }}<span class="app-pipe"></span>
-                
-                <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>&#160;
-                
-                <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>&#160;
-                
-                <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
-                  
-              </span>
-            </ng-container>
+            <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
+            <span class="app-metadata">
+              <ng-container *ngIf="date">{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="uri">{{ uri }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="origin">{{ origin }}<span class="app-pipe"></span></ng-container>
+            </span>
+          </div>
+          <div>
+            <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)" class="app-mr-3">{{ 'Zobrazit jen na vyrazeni' | translate }} ({{na_vyrazeni}})</mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'Zobrazit jen nepresne shody' | translate }} ({{noean}})</mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} ({{noHits}})</mat-slide-toggle>
           </div>
         </div>
       </mat-card>
       <ng-container *ngFor="let doc of docs">
         <mat-card>
-          <h3>{{ doc.name }} | {{ doc.author }} | {{ doc.ean }} | {{ doc.num_hits }} | {{ doc.hit_type }} </h3>
-          <ng-container *ngFor="let id of doc.identifiers">
-            <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')">
-              <a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a> {{ id.nazev }} {{ id.marc_990a }} {{ id.ean }}
-              {{ id.approved ? 'APPROVED ' + id.approved_user : '' }}
-              <button *ngIf="!id.approved && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" mat-icon-button title="Schvalit zmenu (na vyrazeni)" (click)="approve(doc, id.identifier)"><mat-icon>done</mat-icon></button>
-            </div>
-          </ng-container>
-          
+          <mat-card-header>
+            <mat-card-title fxLayoutAlign="unset">
+              <ng-container *ngIf="doc.name">{{ doc.name }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.hit_type">{{ doc.hit_type }}<span class="app-pipe"></span></ng-container>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-actions>
+            <ng-container *ngFor="let id of doc.identifiers; let idx = index">
+              <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')" fxLayout="row" fxLayoutGap="32px" [class.app-mt-1]="idx >= 1">
+                <div fxFlex fxFlexAlign="flex-end">
+                  <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="id.marc_990a">{{ id.marc_990a }}<span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="id.ean">{{ id.ean }}<span class="app-pipe"></span></ng-container>
+                </div>
+                <div>
+                <div *ngIf="id.approved" class="app-badge approved">
+                  {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
+                </div>
+                <button mat-stroked-button *ngIf="!id.approved && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" (click)="approve(doc, id.identifier)">
+                  <mat-icon>done</mat-icon>
+                  {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
+                </button>
+                </div>
+              </div>
+            </ng-container>
+          </mat-card-actions>
         </mat-card>
       </ng-container>
     </div>

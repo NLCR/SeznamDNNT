@@ -206,6 +206,9 @@
     "datum_importu": "Date of import",
     "celkem": "Total",
     "na_vyrazeni": "For elimination",
-    "prehled_importu": "Imports overview"
+    "prehled_importu": "Imports overview",
+    "vysledek_importu": "Import result",
+    "schvalit_zmenu_na_vyrazeni": "Approve the change / for elimination",
+    "schvaleno": "Approved"
   }
 }
