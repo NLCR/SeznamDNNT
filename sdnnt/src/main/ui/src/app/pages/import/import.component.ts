@@ -100,7 +100,7 @@ export class ImportComponent implements OnInit, OnDestroy {
         this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        doc = res;
+        doc.identifiers = res.identifiers;
       }
     });
   }
