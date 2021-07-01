@@ -97,6 +97,49 @@ a {
   }
 }
 
+table {
+  &.app-table-import {
+    @extend .app-w-100;
+    $app-tbc: $app-gray-3;
+    border-width: 1px 0 0 1px;
+    border-style: solid;
+    border-color: $app-tbc;
+  
+    tbody {
+      tr {
+        &:hover {
+          td {
+            background-color: $app-gray-2;
+          }
+        }
+  
+        td {
+          @include setStateColor(bglight);
+          border-width: 0 1px 1px 0;
+          border-style: solid;
+          border-color: $app-tbc;
+          background-color: $app-gray-1;
+          padding: 4px 8px;
+  
+          span {
+            @include setStateColor(color);
+          }
+  
+          &.app-cell-action {
+            @include setStateColor(color);
+            width: 180px;
+            font-weight: 500;
+  
+            a {
+              color: initial;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 
 // utility
 .app-font-bold {

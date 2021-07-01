@@ -52,6 +52,10 @@
       &.#{$state} {
         color: $color;
       }
+    } @else if ($type == "bglight") {
+      &.#{$state} {
+        background-color: rgba($color, .07);
+      }
     }
   }
 }
