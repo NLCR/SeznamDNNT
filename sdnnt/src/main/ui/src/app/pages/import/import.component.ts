@@ -17,7 +17,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   subs: Subscription[] = [];
   numFound: number;
   docs: SolrDocument[] = [];
-  onlyA: boolean;
+  fullCatalog: boolean;
   onlyNoEAN: boolean;
   onlyNoHits: boolean;
   na_vyrazeni: number;
@@ -45,7 +45,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.importId = this.route.snapshot.paramMap.get('id');
       this.onlyNoEAN = !!this.route.snapshot.queryParamMap.get('onlyNoEAN');
       this.onlyNoHits = !!this.route.snapshot.queryParamMap.get('onlyNoHits');
-      this.onlyA = !!this.route.snapshot.queryParamMap.get('onlyA');
+      this.fullCatalog = !!this.route.snapshot.queryParamMap.get('fullCatalog');
       this.getDocs(val);
     }));
   }
@@ -54,10 +54,10 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.subs.forEach(s => s.unsubscribe());
   }
 
-  onlyAChange(e) {
-    this.onlyA = e.checked;
+  fullCatalogChange(e) {
+    this.fullCatalog = e.checked;
     const params: any = {};
-    params.onlyA = e.checked;
+    params.fullCatalog = e.checked;
     params.page = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
 

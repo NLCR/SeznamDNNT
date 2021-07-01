@@ -20,7 +20,7 @@
             </span>
           </div>
           <div>
-            <mat-slide-toggle [checked]="onlyA" (change)="onlyAChange($event)" class="app-mr-3">{{ 'Zobrazit jen na vyrazeni' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'Zobrazit shody z celeho katalogu (nejen na vyrazeni)' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
             <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'Zobrazit jen nepresne shody' | translate }} <span class="app-metadata">({{noean}})</span></mat-slide-toggle>
             <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} <span class="app-metadata">({{noHits}})</span></mat-slide-toggle>
           </div>
@@ -39,7 +39,7 @@
           </mat-card-header>
           <mat-card-actions *ngIf="doc.identifiers?.length > 0">
             <ng-container *ngFor="let id of doc.identifiers; let idx = index">
-              <div *ngIf="!onlyA || id.marc_990a.includes('A') || id.marc_990a.includes('PA')" fxLayout="row" fxLayoutGap="32px" [class.app-mt-1]="idx >= 1">
+              <div *ngIf="fullCatalog || id.marc_990a.includes('A') || id.marc_990a.includes('PA')" fxLayout="row" fxLayoutGap="32px" [class.app-mt-1]="idx >= 1">
                 <div fxFlex fxFlexAlign="flex-end">
                   <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
                   <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>

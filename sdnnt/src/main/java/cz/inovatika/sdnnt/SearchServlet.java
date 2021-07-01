@@ -179,7 +179,9 @@ public class SearchServlet extends HttpServlet {
                   .setParam("stats", true)
                   .setParam("stats.field","na_vyrazeni")
                   .setFields("*,identifiers:[json],catalog:[json],item:[json]");
-          if (Boolean.parseBoolean(req.getParameter("onlyA"))) {
+          if (Boolean.parseBoolean(req.getParameter("fullCatalog"))) {
+            
+          } else {
             query.addFilterQuery("na_vyrazeni:*");
           }
           if (Boolean.parseBoolean(req.getParameter("onlyNoEAN"))) {
