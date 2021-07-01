@@ -17,7 +17,7 @@
   "state": {
     "undefined": "unclassified",
     "PA": "work published as draft",
-    "NNN": "Not in List",
+    "NNN": "not in List",
     "A": "included",
     "VS": "discarded - work was on the list (A)",
     "VN": "discarded - the work was on the draft list (PA)",
@@ -35,15 +35,15 @@
     "tooltip": {
       "undefined": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
       "NNN": "Not in List",
-      "PA": "work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
-      "A": "included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
-      "VS": "discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
-      "VN": "discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
-      "N": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
+      "PA": "Work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
+      "A": "Included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
+      "VS": "Discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
+      "VN": "Discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
+      "N": "Unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
       "NZ": "On-site terminal license",
-      "NZN": "proposal for inclusion in the Draft List (internal state of administration)",
-      "VVN": "request for exclusion from the List Design (internal state of administration)",
-      "VVS": "request to be removed from the List (internal state of administration)"
+      "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
+      "VVN": "Request for exclusion from the List Design (internal state of administration)",
+      "VVS": "Request to be removed from the List (internal state of administration)"
       }
   },
 

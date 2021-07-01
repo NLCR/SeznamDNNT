@@ -45,17 +45,15 @@
     </div>
     <div fxLayout="row">
       <div [class]="'app-badge ' + doc.marc_990a[0]" *ngIf="doc.marc_990a">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info
-        </mat-icon>
-        {{ 'state.' + doc.marc_990a | translate }}
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info</mat-icon>
+        {{ 'state.' + doc.marc_990a[0] | translate }}
       </div>
       <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         <mat-icon class="material-icons-outlined">info</mat-icon>
         {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-2">
-        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.navrh | translate">info
-        </mat-icon>
+        <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.zadost.navrh | translate">info</mat-icon>
         {{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.navrh}}
       </div>
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost"
