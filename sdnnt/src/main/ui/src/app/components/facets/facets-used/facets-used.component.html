@@ -6,7 +6,13 @@
   <div class="app-list-content-wrapper">
     <mat-list-item *ngFor="let f of state.usedFilters">
       <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="removeFilter(f)"><mat-icon>clear</mat-icon></a>
-      <div><span>{{ 'field.' + f.field | translate }}:</span> {{ f.value }}</div>
+      <div>
+        <span>{{ 'field.' + f.field | translate }}: </span>
+        <ng-container [ngSwitch]="f.field">
+          <ng-container *ngSwitchCase="'marc_990a'">{{ 'state.' + f.value | translate }}</ng-container>
+          <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
+        </ng-container>
+      </div>
     </mat-list-item>
   </div>
 </mat-list>
