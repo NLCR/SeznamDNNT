@@ -44,7 +44,7 @@
       </ng-container>
     </div>
     <div fxLayout="row">
-      <div [class]="'app-badge ' + doc.marc_990a" *ngIf="doc.marc_990a">
+      <div [class]="'app-badge ' + doc.marc_990a[0]" *ngIf="doc.marc_990a">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.marc_990a | translate">info
         </mat-icon>
         {{ 'state.' + doc.marc_990a | translate }}
