@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -133,20 +134,21 @@ public class Import {
   public static JSONObject approve(Import o, String identifier, String user) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       DocumentObjectBinder dob = new DocumentObjectBinder();
-      SolrInputDocument idoc = dob.toSolrInputDocument(o);
       ObjectMapper mapper = new ObjectMapper();
       JSONObject p = new JSONObject(mapper.writeValueAsString(o.item));
-      idoc.setField("item", p.toString());
       JSONArray ids = new JSONArray(mapper.writeValueAsString(o.identifiers));
       
+      SolrInputDocument idoc = dob.toSolrInputDocument(o);
+      idoc.setField("item", p.toString());
       idoc.setField("identifiers", null);
+      o.identifiers = new ArrayList<>();
       for(int i =0; i< ids.length(); i++) {
         if (identifier.equals(ids.getJSONObject(i).getString("identifier"))) {
           ids.getJSONObject(i).put("approved", true).put("approved_user", user);
         } 
         idoc.addField("identifiers", ids.getJSONObject(i).toString());
+        o.identifiers.add(ids.getJSONObject(i).toMap());
       }
-      
       //solr.addBean("zadost", zadost);
       solr.add("imports", idoc);
       solr.commit("imports");

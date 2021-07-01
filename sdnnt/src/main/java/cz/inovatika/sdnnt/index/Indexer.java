@@ -228,7 +228,7 @@ public class Indexer {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("identifier:\"" + identifier + "\"")
               .setFields("raw, marc_990a");
-      SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
+      SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
       String oldStav = (String) docOld.getFirstValue("marc_990a");
 

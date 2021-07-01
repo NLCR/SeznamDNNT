@@ -170,7 +170,7 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*")
                   .setRows(rows)
                   .setStart(start) 
-                  .setSort("indextime", SolrQuery.ORDER.desc)
+                  .setSort("name", SolrQuery.ORDER.asc)
                   .addFilterQuery("import_id:" + req.getParameter("id"))
                   .setFacet(true)
                   .addFacetField("hit_type")
