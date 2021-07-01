@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-dialog',
@@ -17,7 +18,8 @@ export class UserDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<UserDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public state: AppState,
-    private service: AppService) { }
+    private service: AppService,
+    private router: Router) { }
 
   ngOnInit(): void {
     if (this.data.isRegister) {
@@ -64,6 +66,16 @@ export class UserDialogComponent implements OnInit {
     });
     }
     
+  }
+
+  logout() {
+    this.service.logout().subscribe(res => {
+      this.state.setLogged(res);
+      this.state.logged = false;
+      this.state.user = null;
+      localStorage.removeItem('user');
+      this.router.navigate(['/']);
+    });
   }
 
 }
