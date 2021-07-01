@@ -209,6 +209,9 @@
     "prehled_importu": "Imports overview",
     "vysledek_importu": "Import result",
     "schvalit_zmenu_na_vyrazeni": "Approve the change / for elimination",
-    "schvaleno": "Approved"
+    "schvaleno": "Approved",
+    "zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni": "Show matches from the entire catalog (not for exclusion)",
+    "zobrazit_jen_nepresne_shody": "Show only inaccurate matches",
+    "zobrazit_nenalezene": "Show not found"
   }
 }

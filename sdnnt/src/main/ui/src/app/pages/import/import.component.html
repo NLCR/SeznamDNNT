@@ -20,9 +20,9 @@
             </span>
           </div>
           <div>
-            <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'Zobrazit shody z celeho katalogu (nejen na vyrazeni)' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'Zobrazit jen nepresne shody' | translate }} <span class="app-metadata">({{noean}})</span></mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'Zobrazit NEnalezene' | translate }} <span class="app-metadata">({{noHits}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'desc.zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_nepresne_shody' | translate }} <span class="app-metadata">({{noean}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'desc.zobrazit_nenalezene' | translate }} <span class="app-metadata">({{noHits}})</span></mat-slide-toggle>
           </div>
         </div>
       </mat-card>
