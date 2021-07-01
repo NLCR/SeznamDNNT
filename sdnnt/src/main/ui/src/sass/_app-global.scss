@@ -123,6 +123,12 @@ table {
   
           span {
             @include setStateColor(color);
+
+            &.app-text-cutter {
+              max-width: 600px;
+              display: inline-block;
+              vertical-align: bottom;
+            }
           }
   
           &.app-cell-action {
