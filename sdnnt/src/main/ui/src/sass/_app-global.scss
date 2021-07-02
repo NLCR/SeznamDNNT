@@ -399,6 +399,11 @@ table {
 // tooltip
 .mat-tooltip  {
   white-space: pre-line !important;
+
+  &.app-ean {
+    word-break: break-all !important;
+    white-space: normal !important;
+  }
 }
 
 // mat form field

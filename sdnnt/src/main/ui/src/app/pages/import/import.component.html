@@ -66,7 +66,7 @@
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.marc_990a"><span [class]="id.marc_990a[0]">{{ id.marc_990a }}</span><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.ean">
-                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="above">{{ id.ean }}</span>
+                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-ean">{{ id.ean }}</span>
                         <span class="app-pipe"></span>
                       </ng-container>
                     </td>
