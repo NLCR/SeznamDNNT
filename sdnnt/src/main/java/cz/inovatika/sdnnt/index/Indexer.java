@@ -247,7 +247,7 @@ public class Indexer {
 
       mr.toSolrDoc();
       History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-
+      
       // Update record in catalog
       getClient().add("catalog", mr.sdoc);
       getClient().commit("catalog");

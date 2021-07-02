@@ -145,13 +145,18 @@ public class CatalogSearcher {
             .setParam("q.op", "AND")
             .setFields("*,raw:[json]");
     
+    if (!Boolean.parseBoolean(req.getParameter("onlyCzech"))) {
+      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
+      query.addFilterQuery("language:cze");
+    }
+    
     if (req.getParameter("q") != null) {
       query.setParam("df", "fullText");
     }
     if (req.getParameter("sort") != null) {
       query.setParam("sort", req.getParameter("sort"));
     }
-    if (!"false".equals(req.getParameter("onlySdnnt"))) {
+    if (Boolean.parseBoolean(req.getParameter("onlySdnnt"))) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       query.addFilterQuery("-marc_990a:NNN");
     }

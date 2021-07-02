@@ -12,11 +12,15 @@ import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
@@ -78,6 +82,45 @@ public class MarcRecord {
     return json;
   }
 
+  public String toXml(boolean onlyIdentifiers) {
+    StringBuilder xml = new StringBuilder();
+
+    if (!onlyIdentifiers) {
+
+      xml.append("<metadata>");
+      xml.append("<marc:record xmlns:marc=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\">");
+
+      xml.append("<marc:leader>").append(leader).append("</marc:leader>");
+      xml.append("<marc:controlfield tag=\"001\">").append(controlFields.get("001")).append("</marc:controlfield>");
+      xml.append("<marc:controlfield tag=\"003\">").append(controlFields.get("003")).append("</marc:controlfield>");
+      xml.append("<marc:controlfield tag=\"008\">").append(controlFields.get("008")).append("</marc:controlfield>");
+
+      ArrayList<String> keys = new ArrayList<String>(dataFields.keySet());
+      Collections.sort(keys);
+              
+      for (Object key : keys) {
+        for (DataField df : dataFields.get(key)) {
+          //DataField df = dataFields.get(key);
+          xml.append("<marc:datafield tag=\"" + key + "\" ind1=\"" + df.ind1 + "\" ind2=\"" + df.ind2 + "\">");
+          ArrayList<String> keys2 = new ArrayList<String>(df.subFields.keySet());
+          Collections.sort(keys2);
+          for (Object sk : keys2) {
+            for (SubField sf : df.subFields.get(sk)) {
+              xml.append("<marc:subfield code=\"" + sk + "\" >")
+                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
+            }
+          }
+          xml.append("</marc:datafield>");
+        }
+      }
+
+      xml.append("</marc:record>");
+      xml.append("</metadata>");
+    }
+
+    return xml.toString();
+  }
+
   public SolrInputDocument toSolrDoc() {
     if (sdoc.isEmpty()) {
       fillSolrDoc();
@@ -96,11 +139,11 @@ public class MarcRecord {
       sdoc.setField("type_of_resource", leader.substring(6, 7));
       sdoc.setField("item_type", leader.substring(7, 8));
     }
-    
+
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
       sdoc.setField("language", controlFields.get("008").substring(35, 38));
     }
-    
+
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     String nazev = "";
     if (sdoc.containsKey("marc_245a")) {
@@ -114,22 +157,20 @@ public class MarcRecord {
     }
     sdoc.setField("nazev", nazev.trim());
     addRokVydani();
-//    addFRBR();
-//    addDedup();
-//    addEAN();
+
     return sdoc;
   }
 
   public void setStav(String new_stav) {
 //    if (!dataFields.containsKey("990")) {
-      List<DataField> ldf = new ArrayList<>();
-      DataField df = new DataField("990", " ", " ");
-      SubField sf = new SubField("a", new_stav);
-      List<SubField> lsf = new ArrayList<>();
-      lsf.add(sf);
-      df.subFields.put("a", lsf);
-      ldf.add(df);
-      dataFields.put("990", ldf);
+    List<DataField> ldf = new ArrayList<>();
+    DataField df = new DataField("990", " ", " ");
+    SubField sf = new SubField("a", new_stav);
+    List<SubField> lsf = new ArrayList<>();
+    lsf.add(sf);
+    df.subFields.put("a", lsf);
+    ldf.add(df);
+    dataFields.put("990", ldf);
 //    } else {
 //      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
 //    }
@@ -216,9 +257,9 @@ public class MarcRecord {
       }
     }
   }
-  
+
   public void addDedup() {
-    
+
     try {
 
       //ISBN
@@ -283,7 +324,7 @@ public class MarcRecord {
 
       //vyber poli
       String uniqueCode = MD5.generate(new String[]{
-        (String) sdoc.getFieldValue("marc_245a"),  // main title
+        (String) sdoc.getFieldValue("marc_245a"), // main title
         (String) sdoc.getFieldValue("marc_245b"), // subtitle
         //map.get("245c"),
         f245n,
@@ -303,7 +344,7 @@ public class MarcRecord {
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     }
-    
+
   }
 
   public void addFRBR() {
@@ -331,7 +372,7 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     
      */
     String frbr = "";
-    
+
     //Ziskame title part
     String title = getFieldPart("240", "adgknmpr");
     if (title.isBlank()) {
@@ -341,7 +382,7 @@ Edition: 2nd ed. (Field 250) [Manifestation]
       title = getFieldPart("246", "adgknmpr");
     }
     String authorPart = getAuthorPart("100", "bcd") + getAuthorPart("110", "bcd") + getAuthorPart("111", "bcdnq");
-    
+
     if (!authorPart.isBlank()) {
       frbr = authorPart + "/" + title;
     } else if (sdoc.containsKey("marc_130a")) {
@@ -365,10 +406,10 @@ Edition: 2nd ed. (Field 250) [Manifestation]
     }
     sdoc.setField("frbr", MD5.normalize(frbr));
   }
-   
+
   private String getAuthorPart(String tag, String codes) {
     String author = "";
-    if (sdoc.containsKey("marc_"+tag+"a")) {
+    if (sdoc.containsKey("marc_" + tag + "a")) {
       // If an author exists, combine it with a title 
       String ind1 = dataFields.get(tag).get(0).ind1;
       String f = dataFields.get(tag).get(0).subFields.get("a").get(0).value;
@@ -382,19 +423,19 @@ Edition: 2nd ed. (Field 250) [Manifestation]
       }
     }
     for (char code : codes.toCharArray()) {
-      if (sdoc.containsKey("marc_"+tag+code)) {
-        author += "|" + (String) sdoc.getFieldValue("marc_"+tag+code);
+      if (sdoc.containsKey("marc_" + tag + code)) {
+        author += "|" + (String) sdoc.getFieldValue("marc_" + tag + code);
       }
     }
     return author;
   }
-  
+
   private String getFieldPart(String tag, String codes) {
     String s = "";
     if (dataFields.containsKey(tag)) {
       for (char code : codes.toCharArray()) {
-        if (sdoc.containsKey("marc_"+tag+code)) {
-          s += "|" + (String) sdoc.getFieldValue("marc_"+tag+code);
+        if (sdoc.containsKey("marc_" + tag + code)) {
+          s += "|" + (String) sdoc.getFieldValue("marc_" + tag + code);
         }
       }
     }
