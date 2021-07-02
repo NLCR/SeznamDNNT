@@ -37,7 +37,12 @@
               <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.hit_type">{{ doc.hit_type }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.hit_type">
+                <!-- {{ doc.hit_type }} -->
+                <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'" [matTooltip]="doc.hit_type === 'ean' ? 'Ean se shoduje!' : 'Ean se neshoduje!'">
+                  {{  doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
+                </mat-icon>
+                <span class="app-pipe"></span></ng-container>
             </mat-card-title>
           </mat-card-header>
           <mat-card-actions *ngIf="doc.identifiers?.length > 0">

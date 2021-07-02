@@ -64,6 +64,10 @@ a {
   color: $app-color-fav !important;
 }
 
+.app-color-success {
+  color: $app-color-success !important;
+}
+
 
 // common
 .app-pipe {
@@ -120,6 +124,7 @@ table {
           border-color: $app-tbc;
           background-color: $app-gray-1;
           padding: 4px 8px;
+          vertical-align: top;
   
           span {
             @include setStateColor(color);
