@@ -125,7 +125,6 @@ table {
             @include setStateColor(color);
 
             &.app-text-cutter {
-              max-width: 600px;
               display: inline-block;
               vertical-align: bottom;
             }
@@ -400,7 +399,7 @@ table {
 .mat-tooltip  {
   white-space: pre-line !important;
 
-  &.app-ean {
+  &.app-clean-truncated {
     word-break: break-all !important;
     white-space: normal !important;
   }

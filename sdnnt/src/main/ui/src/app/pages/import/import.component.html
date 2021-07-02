@@ -30,7 +30,10 @@
         <mat-card>
           <mat-card-header>
             <mat-card-title fxLayoutAlign="unset" class="app-mb-0">
-              <ng-container *ngIf="doc.name">{{ doc.name }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.name">
+                <span class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below" style="max-width: 950px;">{{ doc.name }}</span>
+                <span class="app-pipe"></span>
+              </ng-container>
               <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
               <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
@@ -66,7 +69,7 @@
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.marc_990a"><span [class]="id.marc_990a[0]">{{ id.marc_990a }}</span><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.ean">
-                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-ean">{{ id.ean }}</span>
+                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
                         <span class="app-pipe"></span>
                       </ng-container>
                     </td>
