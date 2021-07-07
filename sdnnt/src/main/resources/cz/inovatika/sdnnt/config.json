@@ -6,7 +6,8 @@
   "OAI": {
     "rowsPerPage": 100
   },
-  "textsDir": "texts"
+  "textsDir": "texts",
+  "resetPwdExpirationDays": 3
 }
 
 

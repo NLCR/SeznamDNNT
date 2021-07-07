@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.indexer.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.beans.Field;
@@ -69,6 +70,12 @@ public class User {
 
   @Field
   public String poznamka;
+  
+  @Field
+  public String resetPwdToken;
+  
+  @Field
+  public Date resetPwdExpiration;
   
   
   public JSONObject toJSONObject() {

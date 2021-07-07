@@ -7,7 +7,11 @@ package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +48,6 @@ public class UserController {
       //String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"))
       ret.put("username", username);
       User user = findUser(json.getString("user"));
-      req.getSession(true).setAttribute("user", user);
 
       ret = user.toJSONObject();
       // Pridat aktivni zadosti pokud existujou stav=open
@@ -52,12 +55,17 @@ public class UserController {
       if (docs != null && !docs.isEmpty()) {
         ret.put("zadost", docs);
       }
+      setSessionObject(req, user);
       return ret;
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
     return ret;
+  }
+  
+  private static void setSessionObject(HttpServletRequest req, User user) {
+      req.getSession(true).setAttribute("user", user);
   }
 
   public static User dummy(String name) {
@@ -156,6 +164,66 @@ public class UserController {
       save(user);
     }
     return new JSONObject().put("pwd", newPwd);
+  }
+
+  public static JSONObject setPwd(HttpServletRequest req, String newPwd) {
+    
+    User user = getUser(req);
+    if (user != null) {
+      // Ulozit user a nove heslo poslat mailem
+      user.pwd = DigestUtils.sha256Hex(newPwd);
+      save(user);
+      return user.toJSONObject();
+    } else {
+      return new JSONObject().put("error", "not logged");
+    }
+  }
+
+  public static JSONObject resetPwdLink(HttpServletRequest req, String email) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("email:\"" + email + "\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      solr.close();
+      if (users.isEmpty()) {
+        return new JSONObject().put("error", "Invalid token");
+      } else {
+        User user = users.get(0);
+        if (user.resetPwdExpiration.after(new Date())) {
+          // Logujeme uzivatel ?
+          // setSessionObject(req, user);
+          return user.toJSONObject();
+        } else {
+          return new JSONObject().put("error", "Expired");
+        }
+        
+      }
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+
+  public static String checkResetPwdLink(HttpServletRequest req) {
+    String token = RandomStringUtils.randomAlphanumeric(32);
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("resetPwdToken:\"" + req.getParameter("token") + "\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      solr.close();
+      if (users.isEmpty()) {
+        return null;
+      } else {
+        User user = users.get(0);
+        user.resetPwdToken = token;
+        user.resetPwdExpiration = java.util.Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
+        save(user);
+        return token;
+      }
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return ex.toString();
+    }
   }
 
   public static String generatePwd() {
