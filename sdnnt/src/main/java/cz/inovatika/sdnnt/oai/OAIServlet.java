@@ -39,17 +39,17 @@ public class OAIServlet extends HttpServlet {
         String xml = actionToDo.doPerform(request, response);
         out.println(xml);
       } else {
-        String xml = OAIRequest.headerOAI() + "<responseDate>" + OAIRequest.responseDate() + "</responseDate>\n"
-                + "<request>" + request.getRequestURL() + "</request>\n"
-                + "<error code=\"badVerb\">verb is absent</error>\n"
+        String xml = OAIRequest.headerOAI() + OAIRequest.responseDateTag()
+                + "<request>" + request.getRequestURL() + "</request>"
+                + "<error code=\"badVerb\">verb is absent</error>"
                 + "</OAI-PMH>";
         out.print(xml);
       }
     } catch (IllegalArgumentException e1) {
       LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-      String xml = OAIRequest.headerOAI() + "<responseDate>" + OAIRequest.responseDate() + "</responseDate>\n"
-              + "<request>" + request.getRequestURL() + "</request>\n"
-              + "<error code=\"badVerb\">Illegal OAI verb</error>\n"
+      String xml = OAIRequest.headerOAI() + OAIRequest.responseDateTag()
+              + "<request>" + request.getRequestURL() + "</request>"
+              + "<error code=\"badVerb\">Illegal OAI verb</error>"
               + "</OAI-PMH>";
       out.print(xml);
     } catch (SecurityException e1) {

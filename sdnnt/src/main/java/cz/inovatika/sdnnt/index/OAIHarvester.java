@@ -61,7 +61,7 @@ public class OAIHarvester {
     long start = new Date().getTime();
     Options opts = Options.getInstance();
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
-            opts.getJSONObject("OAI").getString("url"),
+            opts.getJSONObject("OAIHavest").getString("url"),
             set);
     getRecords(url);
     ret.put("indexed", indexed);
@@ -109,7 +109,7 @@ public class OAIHarvester {
     df.setTimeZone(tz);
     String until = df.format(new Date());
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
-            opts.getJSONObject("OAI").getString("url"),
+            opts.getJSONObject("OAIHavest").getString("url"),
             from,
             until,
             set);
@@ -132,7 +132,7 @@ public class OAIHarvester {
     df.setTimeZone(tz);
     String until = df.format(new Date());
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
-            opts.getJSONObject("OAI").getString("url"),
+            opts.getJSONObject("OAIHavest").getString("url"),
             from,
             until,
             set);

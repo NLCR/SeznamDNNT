@@ -1,7 +1,10 @@
 {
   "solr.host": "http://localhost:8983/solr/",
-  "OAI": {
+  "OAIHavest": {
     "url": "http://aleph.nkp.cz/OAI"
+  },
+  "OAI": {
+    "rowsPerPage": 100
   },
   "textsDir": "texts"
 }

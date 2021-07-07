@@ -38,39 +38,45 @@ public class OAIRequest {
     return "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n";
   }
 
-  public static String responseDate() {
-    return ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_INSTANT);
+  public static String responseDateTag() {
+    return "<responseDate>" + ZonedDateTime.now(ZoneOffset.UTC).truncatedTo(ChronoUnit.SECONDS).format(DateTimeFormatter.ISO_INSTANT) + "</responseDate>";
+  }
+
+  public static String requestTag(HttpServletRequest req) {
+    StringBuilder ret = new StringBuilder();
+    ret.append("<request ");
+    for (String p : req.getParameterMap().keySet()) {
+      ret.append(p).append("=\"").append(req.getParameter(p)).append("\" ");
+    }
+    ret.append(">").append(req.getRequestURL()).append("</request>");
+    return ret.toString();
   }
 
   public static String identify(HttpServletRequest req) {
-    String xml = headerOAI()
-            + "<responseDate>" + responseDate() + "</responseDate>\n"
-            + "<request>" + req.getRequestURL() + "</request>\n"
-            + "<Identify>\n"
-            + "<repositoryName>Seznam děl nedostupných na trhu</repositoryName>\n"
-            + "<baseURL>" + req.getRequestURL() + "</baseURL>\n"
-            + "<protocolVersion>2.0</protocolVersion>\n"
-            + "<adminEmail>sdnnt@nkp.cz</adminEmail>\n"
-            + "<earliestDatestamp>2012-06-30T22:26:40Z</earliestDatestamp>\n"
-            + "<deletedRecord>transient</deletedRecord>\n"
-            + "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
-            + "<description>\n"
-            + "<oai-identifier xmlns=\"http://www.openarchives.org/OAI/2.0/oai-identifier\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd\">\n"
-            + "<scheme>oai</scheme>\n"
-            + "<repositoryIdentifier>aleph-nkp.cz</repositoryIdentifier>\n"
-            + "<delimiter>:</delimiter>\n"
-            + "<sampleIdentifier>oai:aleph-nkp.cz:NKC01-000000001</sampleIdentifier>\n"
-            + "</oai-identifier>\n"
+    String xml = headerOAI() + responseDateTag() + requestTag(req)
+            + "<Identify>"
+            + "<repositoryName>Seznam děl nedostupných na trhu</repositoryName>"
+            + "<baseURL>" + req.getRequestURL() + "</baseURL>"
+            + "<protocolVersion>2.0</protocolVersion>"
+            + "<adminEmail>sdnnt@nkp.cz</adminEmail>"
+            + "<earliestDatestamp>2012-06-30T22:26:40Z</earliestDatestamp>"
+            + "<deletedRecord>transient</deletedRecord>"
+            + "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>"
+            + "<description>"
+            + "<oai-identifier xmlns=\"http://www.openarchives.org/OAI/2.0/oai-identifier\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd\">"
+            + "<scheme>oai</scheme>"
+            + "<repositoryIdentifier>aleph-nkp.cz</repositoryIdentifier>"
+            + "<delimiter>:</delimiter>"
+            + "<sampleIdentifier>oai:aleph-nkp.cz:NKC01-000000001</sampleIdentifier>"
+            + "</oai-identifier>"
             + "</description>"
-            + "</Identify>\n"
+            + "</Identify>"
             + "</OAI-PMH>";
     return xml;
   }
 
   public static String listSets(HttpServletRequest req) {
-    String xml = headerOAI()
-            + "<responseDate>" + responseDate() + "</responseDate>\n"
-            + "<request verb=\"ListSets\">" + req.getRequestURL() + "</request>\n"
+    String xml = headerOAI() + responseDateTag() + requestTag(req)
             + "<ListSets>"
             + "<set><setSpec>SDNNT-ALL</setSpec><setName>Seznam děl nedostupných na trhu (všechny stavy)</setName></set>"
             + "<set><setSpec>SDNNT-A</setSpec><setName>Seznam děl nedostupných na trhu (zařazeno)</setName></set>"
@@ -81,9 +87,7 @@ public class OAIRequest {
   }
 
   public static String metadataFormats(HttpServletRequest req) {
-    String xml = headerOAI()
-            + "<responseDate>" + responseDate() + "</responseDate>\n"
-            + "<request verb=\"ListMetadataFormats\">" + req.getRequestURL() + "</request>\n"
+    String xml = headerOAI() + responseDateTag() + requestTag(req)
             + "<ListMetadataFormats>"
             + "<metadataFormat><metadataPrefix>marc21</metadataPrefix><schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>"
             + "<metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>"
@@ -94,13 +98,13 @@ public class OAIRequest {
   }
 
   public static String listRecords(HttpServletRequest req, boolean onlyIdentifiers) {
+    String verb = onlyIdentifiers ? "ListIdentifiers" : "ListRecords";
     Options opts = Options.getInstance();
     StringBuilder ret = new StringBuilder();
-    int rows = 100;
+    int rows = opts.getJSONObject("OAI").getInt("rowsPerPage");
     ret.append(headerOAI())
-            .append("<responseDate>" + responseDate() + "</responseDate>")
-            .append("<request verb=\"ListRecords\" metadataPrefix=\"marc21\" set=\"SDNNT\">" + req.getRequestURL() + "</request>")
-            .append("<ListRecords>");
+            .append(responseDateTag())
+            .append(requestTag(req));
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
 
       SolrQuery query = new SolrQuery("*")
@@ -129,40 +133,47 @@ public class OAIRequest {
         String rt = req.getParameter("resumptionToken");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]");
-        
+
         LocalDateTime d = LocalDateTime.parse(rt, formatter);
         ZonedDateTime zonedDateTime = ZonedDateTime.of(d, ZoneId.systemDefault());
         query.addFilterQuery(SORT_FIELD + ":{" + zonedDateTime.format(DateTimeFormatter.ISO_INSTANT) + " TO *]");
       }
 
       SolrDocumentList docs = solr.query("catalog", query).getResults();
-      for (SolrDocument doc : docs) {
+      if (docs.getNumFound() == 0) {
+        ret.append("<error code=\"noRecordsMatch\">no record match the search criteria</error>");
+      } else {
+        ret.append("<" + verb + ">");
 
-        Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
-        ret.append("<record>");
-        ret.append("<header>");
-        ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
-        ret.append("<datestamp>")
-                .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
-                .append("</datestamp>");
-        ret.append("<setSpec>").append(set).append("</setSpec>");
-        ret.append("</header>");
+        for (SolrDocument doc : docs) {
 
-        String raw = (String) doc.getFirstValue("raw");
-        MarcRecord mr = MarcRecord.fromJSON(raw);
-        ret.append(mr.toXml(onlyIdentifiers));
+          Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
+          ret.append("<record>");
+          ret.append("<header>");
+          ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
+          ret.append("<datestamp>")
+                  .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
+                  .append("</datestamp>");
+          ret.append("<setSpec>").append(set).append("</setSpec>");
+          ret.append("</header>");
 
-        ret.append("</record>");
+          String raw = (String) doc.getFirstValue("raw");
+          MarcRecord mr = MarcRecord.fromJSON(raw);
+          ret.append(mr.toXml(onlyIdentifiers));
+
+          ret.append("</record>");
+        }
+        solr.close();
+        if (docs.size() == rows) {
+          Date last = (Date) docs.get(docs.size() - 1).getFieldValue(SORT_FIELD);
+
+          ret.append("<resumptionToken completeListSize=\"" + docs.getNumFound() + "\">")
+                  .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
+                  .append("</resumptionToken>");
+        }
+        ret.append("</" + verb + ">");
       }
-      solr.close();
-      if (docs.size() == rows) {
-        Date last = (Date) docs.get(docs.size() - 1).getFieldValue(SORT_FIELD);
-
-        ret.append("<resumptionToken completeListSize=\"" + docs.getNumFound() + "\">")
-                .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
-                .append("</resumptionToken>");
-      }
-      ret.append("</ListRecords></OAI-PMH>");
+      ret.append("</OAI-PMH>");
       return ret.toString();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -173,17 +184,15 @@ public class OAIRequest {
   public static String getRecord(HttpServletRequest req) {
     Options opts = Options.getInstance();
     StringBuilder ret = new StringBuilder();
-    int rows = 100;
     ret.append(headerOAI())
-            .append("<responseDate>" + responseDate() + "</responseDate>")
-            .append("<request verb=\"getRecord\" metadataPrefix=\"marc21\" set=\"SDNNT\">" + req.getRequestURL() + "</request>")
-            .append("<GetRecord>");
+            .append(responseDateTag())
+            .append(requestTag(req));
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
 
       SolrQuery query = new SolrQuery("*")
               .setRows(1)
               .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-              .setFields("datestamp,raw");
+              .setFields(SORT_FIELD, "identifier,raw");
 
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
@@ -195,26 +204,33 @@ public class OAIRequest {
       }
 
       SolrDocumentList docs = solr.query("catalog", query).getResults();
-      for (SolrDocument doc : docs) {
+      if (docs.getNumFound() == 0) {
+        ret.append("<error code=\"idDoesNotExist\">No matching identifier</error>");
+      } else {
+        ret.append("<GetRecord>");
+        for (SolrDocument doc : docs) {
 
-        Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
+          Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
 
-        ret.append("<record>");
-        ret.append("<header>");
-        ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
-        ret.append("<datestamp>")
-                .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
-                .append("</datestamp>");
-        ret.append("<setSpec>").append(set).append("</setSpec>");
-        ret.append("</header>");
-        String raw = (String) doc.getFirstValue("raw");
-        MarcRecord mr = MarcRecord.fromJSON(raw);
-        ret.append(mr.toXml(false));
-        ret.append("</record>");
+          ret.append("<record>");
+          ret.append("<header>");
+          ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
+          ret.append("<datestamp>")
+                  // .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
+                  .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
+                  .append("</datestamp>");
+          ret.append("<setSpec>").append(set).append("</setSpec>");
+          ret.append("</header>");
+          String raw = (String) doc.getFirstValue("raw");
+          MarcRecord mr = MarcRecord.fromJSON(raw);
+          ret.append(mr.toXml(false));
+          ret.append("</record>");
+        }
+        ret.append("</GetRecord>");
       }
+      ret.append("</OAI-PMH>");
       solr.close();
 
-      ret.append("</GetRecord></OAI-PMH>");
       return ret.toString();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
