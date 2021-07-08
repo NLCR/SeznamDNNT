@@ -147,7 +147,7 @@ public class CatalogSearcher {
     
     if (!Boolean.parseBoolean(req.getParameter("onlyCzech"))) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
-      query.addFilterQuery("language:cze");
+      // query.addFilterQuery("language:cze");
     }
     
     if (req.getParameter("q") != null) {

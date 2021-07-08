@@ -184,8 +184,8 @@ public class SearchServlet extends HttpServlet {
           } else {
             query.addFilterQuery("na_vyrazeni:*");
           }
-          if (Boolean.parseBoolean(req.getParameter("onlyNoEAN"))) {
-            query.addFilterQuery("hit_type:noean");
+          if (Boolean.parseBoolean(req.getParameter("onlyEAN"))) {
+            query.addFilterQuery("hit_type:ean");
             query.addFilterQuery("-num_hits:0");
           }
           if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {

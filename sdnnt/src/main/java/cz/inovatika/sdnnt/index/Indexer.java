@@ -47,8 +47,6 @@ public class Indexer {
   static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec",
           "/controlFields/001", "/controlFields/003", "/controlFields/005", "/controlFields/008");
 
-  JSONObject ret = new JSONObject();
-
   private static SolrClient solr;
 
   public static SolrClient getClient() {
@@ -188,18 +186,6 @@ public class Indexer {
     // return ret;
   }
 
-  public JSONObject updateByQuery(String query, String newValue) {
-    Options opts = Options.getInstance();
-    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
-
-      solr.commit("sdnnt");
-      solr.close();
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
-    }
-    return ret;
-  }
   
   public static JSONObject approveInImport(String identifier, String newRaw, String user) {
     JSONObject ret = new JSONObject();
@@ -270,6 +256,7 @@ public class Indexer {
    */
   public JSONObject save(String id, JSONObject newRaw, String user) {
     Options opts = Options.getInstance();
+    JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("identifier:\"" + id + "\"")
@@ -285,8 +272,7 @@ public class Indexer {
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
 
-      //ret.put("newRecord", new JSONObject(JsonPatch.apply(fwPatch, source).toString()));
-      //ret.put("newRaw", mr.toJSON());
+      ret = new JSONObject(newRaw);
       solr.close();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -373,6 +359,7 @@ public class Indexer {
    */
   public JSONObject compare(String id) {
     Options opts = Options.getInstance();
+    JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("identifier:" + id)
@@ -443,6 +430,7 @@ public class Indexer {
    */
   public JSONObject mergeId(String sourceCore, String id, String user) {
     Options opts = Options.getInstance();
+    JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("identifier:" + id)
@@ -524,6 +512,7 @@ public class Indexer {
   public JSONObject mergeCore(String sourceCore, String user, String from) {
     long start = new Date().getTime();
     Options opts = Options.getInstance();
+    JSONObject ret = new JSONObject();
     List<SolrInputDocument> hDocs = new ArrayList();
     List<SolrInputDocument> cDocs = new ArrayList();
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
@@ -685,6 +674,7 @@ public class Indexer {
 
   public JSONObject test(String sourceCore, String id) {
     Options opts = Options.getInstance();
+    JSONObject ret = new JSONObject();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("identifier:" + id)

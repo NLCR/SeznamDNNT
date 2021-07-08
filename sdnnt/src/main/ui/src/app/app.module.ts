@@ -42,6 +42,7 @@ import { RejectDialogComponent } from './components/reject-dialog/reject-dialog.
 import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
 import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -86,7 +87,8 @@ const providers: any[] =[
     RejectDialogComponent,
     ExpressionDialogComponent,
     ImportsComponent,
-    ImportComponent
+    ImportComponent,
+    ResetPasswordComponent
   ],
   imports: [
     BrowserModule,

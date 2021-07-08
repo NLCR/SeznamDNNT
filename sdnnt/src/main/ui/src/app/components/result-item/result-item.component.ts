@@ -61,9 +61,20 @@ export class ResultItemComponent implements OnInit {
       }
     }
     this.hasNavhr = !!this.doc.zadost && !this.processed;
-    this.dkLinks = this.dkLinks.concat(this.doc.marc_956u ? this.doc.marc_956u : []);
-    this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
-    this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
+    this.dkLinks = [];
+    const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
+    tags.forEach(t => {
+      if (this.doc[t]) {
+        this.doc[t].forEach(l => {
+          if (!this.dkLinks.includes(l)) {
+            this.dkLinks.push(l);
+          }
+        });
+      }
+    });
+    
+    // this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
+    // this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
     if (this.doc.marc_956u) {
       // Je to kramerius
       const link: string = this.doc.marc_956u[0];

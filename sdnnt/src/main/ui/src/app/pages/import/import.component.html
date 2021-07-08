@@ -21,7 +21,7 @@
           </div>
           <div>
             <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'desc.zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni' | translate }} <span class="app-metadata">({{na_vyrazeni}})</span></mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoEAN" (change)="onlyNoEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_nepresne_shody' | translate }} <span class="app-metadata">({{noean}})</span></mat-slide-toggle>
+            <mat-slide-toggle [checked]="onlyEAN" (change)="onlyEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_presne_shody' | translate }} <span class="app-metadata">({{ean}})</span></mat-slide-toggle>
             <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'desc.zobrazit_nenalezene' | translate }} <span class="app-metadata">({{noHits}})</span></mat-slide-toggle>
           </div>
         </div>
@@ -43,6 +43,8 @@
                   {{  doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
                 </mat-icon>
                 <span class="app-pipe"></span></ng-container>
+                
+              <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank">{{ doc.item.URL }}</a><span class="app-pipe"></span></ng-container>
             </mat-card-title>
           </mat-card-header>
           <mat-card-actions *ngIf="doc.identifiers?.length > 0">

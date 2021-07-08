@@ -1,5 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
@@ -18,10 +19,10 @@ export class ImportComponent implements OnInit, OnDestroy {
   numFound: number;
   docs: SolrDocument[] = [];
   fullCatalog: boolean;
-  onlyNoEAN: boolean;
+  onlyEAN: boolean;
   onlyNoHits: boolean;
   na_vyrazeni: number;
-  noean: number;
+  ean: number;
   noHits: number;
 
   importId: string;
@@ -31,6 +32,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   initialized = false;
 
   constructor(
+    private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
@@ -43,7 +45,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     }
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.importId = this.route.snapshot.paramMap.get('id');
-      this.onlyNoEAN = !!this.route.snapshot.queryParamMap.get('onlyNoEAN');
+      this.onlyEAN = !!this.route.snapshot.queryParamMap.get('onlyNoEAN');
       this.onlyNoHits = !!this.route.snapshot.queryParamMap.get('onlyNoHits');
       this.fullCatalog = !!this.route.snapshot.queryParamMap.get('fullCatalog');
       this.getDocs(val);
@@ -64,8 +66,14 @@ export class ImportComponent implements OnInit, OnDestroy {
     // this.getDocs();
   }
 
-  onlyNoEANChange(e) {
-    this.onlyNoEAN = e.checked;
+  onlyEANChange(e) {
+    this.onlyEAN = e.checked;
+    
+    const params: any = {};
+    params.onlyEAN = e.checked;
+    params.page = 0;
+    this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
+
     //this.getDocs();
   }
 
@@ -82,7 +90,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
       this.na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
-      this.noean = resp.facet_counts.facet_fields.hit_type.noean;
+      this.ean = resp.facet_counts.facet_fields.hit_type.ean;
       this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
       if (!this.initialized) {
         this.date = this.docs[0].import_date;
@@ -108,5 +116,9 @@ export class ImportComponent implements OnInit, OnDestroy {
   link(id: string) {
     return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-')+1);
   }
+
+  sanitize(url:string){
+    return this.sanitizer.bypassSecurityTrustUrl(url);
+}
 
 }
