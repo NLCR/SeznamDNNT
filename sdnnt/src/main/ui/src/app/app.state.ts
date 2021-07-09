@@ -23,6 +23,7 @@ export class AppState {
 
   public currentLang: string;
   public activePage: string;
+  public loading: boolean = true;
 
   public q: string;
   public page: number = 0;

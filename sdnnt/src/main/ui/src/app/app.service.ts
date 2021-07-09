@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 import { AppState } from './app.state';
 import { TranslateService } from '@ngx-translate/core';
@@ -10,27 +11,64 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppConfiguration } from './app-configuration';
 import { Zadost } from './shared/zadost';
 import { SolrDocument } from './shared/solr-document';
+import { Overlay } from '@angular/cdk/overlay';
+import { ComponentPortal } from '@angular/cdk/portal';
+import { MatSpinner } from '@angular/material/progress-spinner';
+
 
 @Injectable()
 export class AppService {
 
-  // basefolder: string = '/home/kudela/.ntk/balicky/';
+  private spinnerTopRef = this.cdkSpinnerCreate();
+
   constructor(
     private http: HttpClient,
     private translate: TranslateService,
     private snackBar: MatSnackBar,
+    private overlay: Overlay,
     private config: AppConfiguration,
     private state: AppState) { }
 
 
-  private get<T>(url: string, params: HttpParams = new HttpParams(), responseType?): Observable<T> {
+  private get<T>(url: string, params: HttpParams = new HttpParams(), showingLoading: boolean = true, responseType?): Observable<T> {
     // const r = re ? re : 'json';
+    if (showingLoading) {
+      this.showLoading();
+    }
     const options = { params, responseType, withCredentials: true };
-    return this.http.get<T>(`api/${url}`, options);
+    return this.http.get<T>(`api/${url}`, options).pipe(
+      finalize(() => this.stopLoading())
+    );
   }
 
-  private post(url: string, obj: any, params: HttpParams = new HttpParams()) {
-    return this.http.post<any>(`api${url}`, obj, {params});
+  private post(url: string, obj: any, params: HttpParams = new HttpParams(), showingLoading: boolean = true) {
+    if (showingLoading) {
+      this.showLoading();
+    }
+    return this.http.post<any>(`api${url}`, obj, { params }).pipe(
+      finalize(() => this.stopLoading())
+    );
+  }
+
+  private cdkSpinnerCreate() {
+    return this.overlay.create({
+      hasBackdrop: true,
+      // backdropClass: 'dark-backdrop',
+      positionStrategy: this.overlay.position()
+        .global()
+        .centerHorizontally()
+        .centerVertically()
+    })
+  }
+
+  showLoading() {
+    this.spinnerTopRef.attach(new ComponentPortal(MatSpinner))
+  }
+
+  stopLoading() {
+    if (this.spinnerTopRef.hasAttached()) {
+      this.spinnerTopRef.detach();
+    }
   }
 
   getTranslation(s: string): string {
@@ -79,8 +117,8 @@ export class AppService {
   approveNavrhInImport(identifier: string, importId: string): Observable<any> {
     let url = '/account/approve_navrh_in_import';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
-    return this.post(url, {identifier, importId}, params);
+      .set('user', this.state.user.username);
+    return this.post(url, { identifier, importId }, params);
   }
 
   getHistory(identifier: string): Observable<any> {
@@ -103,43 +141,43 @@ export class AppService {
   saveZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_zadost';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
+      .set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
 
   addFRBRToZadost(zadost: Zadost, frbr: string): Observable<any> {
     let url = '/account/add_frbr_to_zadost';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username).set('frbr', frbr);
+      .set('user', this.state.user.username).set('frbr', frbr);
     return this.post(url, zadost, params);
   }
 
   processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
+      .set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
 
   approveNavrh(identifier: string, zadost: Zadost): Observable<string> {
     let url = '/account/approve_navrh';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
-    return this.post(url, {identifier, zadost}, params);
+      .set('user', this.state.user.username);
+    return this.post(url, { identifier, zadost }, params);
   }
 
   approveNavrhLib(identifier: string, zadost: Zadost): Observable<string> {
     let url = '/account/approve_navrh_lib';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
-    return this.post(url, {identifier, zadost}, params);
+      .set('user', this.state.user.username);
+    return this.post(url, { identifier, zadost }, params);
   }
 
   rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject_navrh';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username);
-    return this.post(url, {identifier, zadost, reason}, params);
+      .set('user', this.state.user.username);
+    return this.post(url, { identifier, zadost, reason }, params);
   }
 
   getZadost(id: string): Observable<any> {
@@ -158,7 +196,7 @@ export class AppService {
     let url = '/texts/read';
     const params: HttpParams = new HttpParams()
       .set('id', id).set('lang', this.state.currentLang);
-    return this.get(url, params, 'plain/text');
+    return this.get(url, params, true, 'plain/text');
   }
 
   saveText(id: string, text: string): Observable<string> {
@@ -196,7 +234,7 @@ export class AppService {
 
   resetPwd(user: string): Observable<User> {
     let url = '/user/reset_pwd';
-    return this.post(url, {username:user});
+    return this.post(url, { username: user });
   }
 
   findGoogleBook(id: string): Observable<any> {
@@ -212,6 +250,6 @@ export class AppService {
     //   'Access-Control-Allow-Origin': 'http://localhost:4200/',
     //   'sec-fetch-mode': 'no-cors'
     // });
-    return this.get(url, params);
+    return this.get(url, params, false);
   }
 }

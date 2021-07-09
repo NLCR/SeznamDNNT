@@ -48,6 +48,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   search(params: Params) {
     this.loading = true;
+    // this.service.showLoading();
     const p = Object.assign({}, params);
     this.docs = [];
     this.searchResponse = null;
@@ -69,6 +70,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;
+      // this.service.stopLoading();
     });
 
   }
