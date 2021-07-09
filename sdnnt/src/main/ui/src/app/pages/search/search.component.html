@@ -16,7 +16,7 @@
         <mat-card *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
-              <mat-checkbox (change)="onlyInSdnnt()" [(ngModel)]="state.onlySdnnt">{{ 'desc.pouze_zaznamy_na_seznamu' | translate }}</mat-checkbox>
+              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_cely_katalog' | translate }}</mat-checkbox>
             </div>
             <div>
               <mat-button-toggle-group>

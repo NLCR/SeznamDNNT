@@ -37,7 +37,7 @@ export class AppState {
 
   public usedFilters: Filter[] = [];
 
-  public onlySdnnt: boolean;
+  public fullCatalog: boolean;
 
   // Aktualni zadost kam se pridavaji navrhy
   currentZadost: {VVS: Zadost, NZN: Zadost} = {VVS: null, NZN: null};
@@ -52,7 +52,7 @@ export class AppState {
     this.page = 0;
     this.usedFilters = [];
     this.sort = this.config.sorts[0];
-    this.onlySdnnt = true;
+    this.fullCatalog = false;
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       if (p === 'q') {
@@ -61,8 +61,8 @@ export class AppState {
         this.rows = parseInt(param);
       } else if (p === 'page') {
         this.page = parseInt(param);
-      } else if (p === 'onlySdnnt') {
-        this.onlySdnnt = param === 'true';
+      } else if (p === 'fullCatalog') {
+        this.fullCatalog = param === 'true';
       } else if (p === 'sort') {
         this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
       } else {

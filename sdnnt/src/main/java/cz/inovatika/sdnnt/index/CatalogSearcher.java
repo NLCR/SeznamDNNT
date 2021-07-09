@@ -6,6 +6,8 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.UserController;
+import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,8 +158,10 @@ public class CatalogSearcher {
     if (req.getParameter("sort") != null) {
       query.setParam("sort", req.getParameter("sort"));
     }
-    if (Boolean.parseBoolean(req.getParameter("onlySdnnt"))) {
+    User user = UserController.getUser(req);
+    if (!Boolean.parseBoolean(req.getParameter("fullCatalog")) || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
+      // Z UI a podle user role
       query.addFilterQuery("-marc_990a:NNN");
     }
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {

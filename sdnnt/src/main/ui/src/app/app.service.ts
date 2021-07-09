@@ -20,6 +20,7 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 export class AppService {
 
   private spinnerTopRef = this.cdkSpinnerCreate();
+  private numLoading: number = 0;
 
   constructor(
     private http: HttpClient,
@@ -62,11 +63,15 @@ export class AppService {
   }
 
   showLoading() {
-    this.spinnerTopRef.attach(new ComponentPortal(MatSpinner))
+    this.numLoading++;
+    if (!this.spinnerTopRef.hasAttached()) {
+      this.spinnerTopRef.attach(new ComponentPortal(MatSpinner))
+    }
   }
 
   stopLoading() {
-    if (this.spinnerTopRef.hasAttached()) {
+    this.numLoading--;
+    if (this.numLoading === 0 && this.spinnerTopRef.hasAttached()) {
       this.spinnerTopRef.detach();
     }
   }

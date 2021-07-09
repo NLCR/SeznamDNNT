@@ -317,7 +317,7 @@ public class Indexer {
         }
         cursorMark = nextCursorMark;
       }
-      solr.commit();
+      solr.commit("catalog");
       solr.close();
       LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
       ret.put("reindex", indexed);

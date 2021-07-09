@@ -67,6 +67,7 @@ public class XMLImporterDistri {
   List<String> elements = Arrays.asList("NAME", "EAN", "AUTHOR");
 
   public JSONObject fromUrl(String url) {
+    // https://www.distri.cz/xml-full/dd9ec6ef7f074bba90ee96edc1f72f62/
     //https://cdn.albatrosmedia.cz/Files/Secured/?token=1C7F915175139E5AF1A726FBB33F5EA4
     readUrl(url);
     return ret;
@@ -95,7 +96,7 @@ public class XMLImporterDistri {
     }
 
   }
-  
+
   public JSONObject fromFile(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
@@ -106,7 +107,7 @@ public class XMLImporterDistri {
       import_url = uri;
       import_origin = origin;
       import_id = now.toEpochSecond() + "";
-      
+
       CloseableHttpClient client = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(uri);
       try (CloseableHttpResponse response1 = client.execute(httpGet)) {
@@ -120,7 +121,7 @@ public class XMLImporterDistri {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
-      
+
 //      File f = new File(uri);
 //      InputStream is = new FileInputStream(f);
 //      readXML(is, "SHOPITEM");
@@ -135,7 +136,7 @@ public class XMLImporterDistri {
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
-    } 
+    }
     return ret;
   }
 
@@ -154,7 +155,6 @@ public class XMLImporterDistri {
       }
     }
   }
-  
 
   /**
    * Reads SHOP XML document
@@ -276,11 +276,13 @@ public class XMLImporterDistri {
       if (item.containsKey("AUTHOR")) {
         idoc.setField("author", item.get("AUTHOR"));
       }
-      
-      
-            addDedup(item);
-            addFrbr(item);
-            findInCatalog(item);
+      if (!item.containsKey("URL")) {
+        item.put("URL", "https://www.distri.cz/Search/Result/?Text=" + item.get("EAN"));
+      }
+
+      addDedup(item);
+      addFrbr(item);
+      findInCatalog(item);
 
       idoc.setField("identifiers", item.get("identifiers"));
       idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
@@ -289,9 +291,9 @@ public class XMLImporterDistri {
       idoc.setField("num_hits", item.get("num_hits"));
       idoc.setField("hit_type", item.get("hit_type"));
       idoc.setField("item", new JSONObject(item).toString());
-  
+
       getClient().add("imports", idoc);
-      
+
       indexed++;
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -326,7 +328,7 @@ public class XMLImporterDistri {
               //+ " OR dedup_fields:\"" + item.get("dedup_fields") + "\""
               //+ " OR frbr:\"" + item.get("frbr") + "\""
               + title;
-      
+
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
@@ -356,8 +358,8 @@ public class XMLImporterDistri {
           List<Object> eans = doc.getJSONArray("ean").toList();
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
-            
-            if (doc.has("marc_990a")){
+
+            if (doc.has("marc_990a")) {
               List<Object> stavy = doc.getJSONArray("marc_990a").toList();
               if (stavy.contains("A") || stavy.contains("PA")) {
                 na_vyrazeni.add(doc.getString("identifier"));
@@ -367,11 +369,11 @@ public class XMLImporterDistri {
           }
         }
         if (!isEAN) {
-          if (doc.has("marc_990a")){
-              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
-              if (stavy.contains("A") || stavy.contains("PA")) {
-                na_vyrazeni.add(doc.getString("identifier"));
-              }
+          if (doc.has("marc_990a")) {
+            List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+            if (stavy.contains("A") || stavy.contains("PA")) {
+              na_vyrazeni.add(doc.getString("identifier"));
+            }
           }
           identifiers.add(doc.toString());
         }

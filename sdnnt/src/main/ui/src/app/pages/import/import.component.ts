@@ -21,7 +21,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   fullCatalog: boolean;
   onlyEAN: boolean;
   onlyNoHits: boolean;
-  na_vyrazeni: number;
+  nejen_na_vyrazeni: number;
   ean: number;
   noHits: number;
 
@@ -79,7 +79,10 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   onlyNoHitsChange(e) {
     this.onlyNoHits = e.checked;
-    //this.getDocs();
+    const params: any = {};
+    params.onlyNoHits = e.checked;
+    params.page = 0;
+    this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }
 
   getDocs(params: Params) {
@@ -89,7 +92,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.service.getImport(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
-      this.na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
+      this.nejen_na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
       this.ean = resp.facet_counts.facet_fields.hit_type.ean;
       this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
       if (!this.initialized) {

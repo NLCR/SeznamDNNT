@@ -98,9 +98,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
   }
 
-  onlyInSdnnt() {
+  viewFullCatalog() {
     const q: any = {};
-    q['onlySdnnt'] = this.state.onlySdnnt;
+    q['fullCatalog'] = this.state.fullCatalog;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
