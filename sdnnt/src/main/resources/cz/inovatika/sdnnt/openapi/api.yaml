@@ -14,17 +14,13 @@ info:
   version: 1.0.0
 
 externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
+  description: Find out more about SDNNT
+  url: 'https://sdnnt.nkp.cz'
 servers:
   - url: ../api/v1.0
 tags:
-
   - name: request
-    description: Podani zadosti
-    externalDocs:
-      description: Podani za
-      url: 'http://swagger.io'
+    description: Vse o zadostech
 
 paths:
 
