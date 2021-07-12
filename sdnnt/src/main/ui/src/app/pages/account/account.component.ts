@@ -134,6 +134,10 @@ export class AccountComponent implements OnInit {
     
   }
 
+  countProcessed(zadost: Zadost) {
+    return Object.keys(zadost.process).length;
+  }
+
   process(zadost: Zadost) {
 
     if (zadost.identifiers.length > Object.keys(zadost.process).length) {

@@ -164,18 +164,18 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
-  approveNavrh(identifier: string, zadost: Zadost): Observable<string> {
+  approveNavrh(identifier: string, zadost: Zadost, komentar: string): Observable<string> {
     let url = '/account/approve_navrh';
     const params: HttpParams = new HttpParams()
       .set('user', this.state.user.username);
-    return this.post(url, { identifier, zadost }, params);
+    return this.post(url, { identifier, zadost, komentar }, params);
   }
 
-  approveNavrhLib(identifier: string, zadost: Zadost): Observable<string> {
+  approveNavrhLib(identifier: string, zadost: Zadost, komentar: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
     const params: HttpParams = new HttpParams()
       .set('user', this.state.user.username);
-    return this.post(url, { identifier, zadost }, params);
+    return this.post(url, { identifier, zadost, komentar}, params);
   }
 
   rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {

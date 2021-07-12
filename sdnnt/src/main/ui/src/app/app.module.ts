@@ -38,7 +38,7 @@ import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
-import { RejectDialogComponent } from './components/reject-dialog/reject-dialog.component';
+import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component';
 import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
 import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
@@ -84,7 +84,7 @@ const providers: any[] =[
     UserDialogComponent,
     ZadostSendDialogComponent,
     ZadostComponent,
-    RejectDialogComponent,
+    PromptDialogComponent,
     ExpressionDialogComponent,
     ImportsComponent,
     ImportComponent,

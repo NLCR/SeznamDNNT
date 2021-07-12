@@ -10,7 +10,7 @@ import { Zadost } from 'src/app/shared/zadost';
 import { DataDialogComponent } from '../data-dialog/data-dialog.component';
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
-import { RejectDialogComponent } from '../reject-dialog/reject-dialog.component';
+import { PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
 
 @Component({
@@ -24,7 +24,7 @@ export class ResultItemComponent implements OnInit {
   @Input() inZadost: boolean;
   @Input() zadost: Zadost;
   @Output() removeFromZadostEvent = new EventEmitter<string>();
-  @Output() processZadostEvent = new EventEmitter<{type: string, identifier: string}>();
+  @Output() processZadostEvent = new EventEmitter<{type: string, identifier: string, komentar: string}>();
 
   newState = new FormControl();
   isZarazeno: boolean;
@@ -249,39 +249,50 @@ export class ResultItemComponent implements OnInit {
   }
 
   approve() {
-    this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier});
+    
+    const dialogRef = this.dialog.open(PromptDialogComponent, {
+      width: '700px',
+      data: {caption: 'komentar', label: 'komentar'},
+      panelClass: 'app-register-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== null) {
+        this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier, komentar: result});
+      }
+    });
+
+    // this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier});
   }
 
   approveLib() {
-    this.service.approveNavrhLib(this.doc.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        this.zadost = res;
-        this.processed = { date: new Date(), state: 'approvedLib', user: this.state.user.username };
-      }
-    });
-  }
-
-  reject() {
-    const dialogRef = this.dialog.open(RejectDialogComponent, {
+    
+    
+    const dialogRef = this.dialog.open(PromptDialogComponent, {
       width: '700px',
-      data: this.doc,
+      data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.service.rejectNavrh(this.doc.identifier, this.zadost, result).subscribe((res: any) => {
-          if (res.error) {
-            this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
-          } else {
-            this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
-            this.zadost = res;
-            this.processed = { date: new Date(), state: 'rejected', user: this.state.user.username };
-          }
-        });
+        this.processZadostEvent.emit({type: 'approveLib', identifier: this.doc.identifier, komentar: result});
+      }
+    });
+
+    
+  }
+
+  reject() {
+    const dialogRef = this.dialog.open(PromptDialogComponent, {
+      width: '700px',
+      data: {caption: 'duvod_pro_odmitnuti', label: 'duvod'},
+      panelClass: 'app-register-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.processZadostEvent.emit({type: 'reject', identifier: this.doc.identifier, komentar: result});
       }
     });
 

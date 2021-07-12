@@ -100,7 +100,7 @@
           </ng-container>
           <ng-container matColumnDef="count">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.pocet_zadosti' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.identifiers.length }}</td>
+            <td mat-cell *matCellDef="let element">{{ element.identifiers.length }} ({{ countProcessed(element) }})</td>
           </ng-container>
           <ng-container matColumnDef="pozadavek">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.pozadavek' | translate }}</th>

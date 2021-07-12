@@ -52,8 +52,18 @@ export class ZadostComponent implements OnInit {
   }
 
   process() {
-    this.service.processZadost(this.zadost).subscribe(res => {
 
+    if (this.zadost.identifiers.length > Object.keys(this.zadost.process).length) {
+      this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
+      return;
+    }
+    this.service.processZadost(this.zadost).subscribe(res => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.zadost.state = 'processed';
+      }
     });
   }
 
@@ -69,18 +79,48 @@ export class ZadostComponent implements OnInit {
     });
   }
 
-  
-  processNavrh(data: {type: string, identifier: string}) {
-    this.service.approveNavrh(data.identifier, this.zadost).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-        this.zadost = res;
-        this.getDocs();
-        // this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
-      }
-    });
+
+  processNavrh(data: { type: string, identifier: string, komentar: string }) {
+    switch (data.type) {
+      case 'approve': 
+        this.service.approveNavrh(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs();
+            // this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
+          }
+        });
+        break;
+      case 'approveLib': 
+        this.service.approveNavrhLib(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs();
+          }
+        });
+        break;
+      case 'reject': 
+        this.service.rejectNavrh(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs();
+            // this.processed = { date: new Date(), state: 'rejected', user: this.state.user.username };
+          }
+        });
+        break;
+    }
+
+
+
   }
 
 }
