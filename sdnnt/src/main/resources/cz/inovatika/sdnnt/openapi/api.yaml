@@ -1,0 +1,204 @@
+openapi: 3.0.2
+info:
+  title: SDNNT API
+  description: |-
+
+    POPIS API publikovaneho api
+
+  #  termsOfService: 'https://nkp.cz'
+  #  contact:
+  #    email: email@email.com
+  #  license:
+  #    name: Apache 2.0
+  #    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  - url: ../api/v1.0
+tags:
+
+  - name: request
+    description: Podani zadosti
+    externalDocs:
+      description: Podani za
+      url: 'http://swagger.io'
+
+paths:
+
+  /request/get:
+    get:
+      tags:
+        - request
+      summary: Vraci vsechny zadosti
+      description: Resi hromadnou zadost
+      operationId: requestGEt
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedRequest'
+      security:
+        - basic: []
+        - api_key: []
+
+
+  /request/batch:
+    put:
+      tags:
+        - request
+      summary: Hromadna zadost
+      description: Resi hromadnou zadost
+      operationId: requestBatch
+      requestBody:
+        description: Vytvoreni zadosti
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRequest'
+        required: true
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponse'
+        '400':
+          description: Invalid request
+        '404':
+          description: Identifiers not found
+        '405':
+          description: Validation exception; date, identifiers
+
+      security:
+        - basic: []
+        - api_key: []
+
+
+
+components:
+  schemas:
+
+    # Batch
+    BatchRequest:
+      type: object
+      properties:
+        batch:
+          type: array
+          items:
+            $ref: '#/components/schemas/Request'
+      example:
+        batch:
+          - datum_zadani: "2021-07-09T07:24:37.210Z"
+            identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+            pozadavek: "Pozadavek o zarazeni varky jedna"
+            poznamka: "Poznamka A"
+
+          - datum_zadani: "2021-07-09T07:24:37.210Z"
+            identifiers: ['oai:aleph-nkp.cz:SKC01-002225134']
+            pozadavek: "Pozadavek o zarazeni varky dva"
+            poznamka: "Poznamka B"
+
+
+    # Zadost
+    Request:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          items:
+            type: string
+        datum_zadani:
+          type: string
+          format: date-time
+        pozadavek:
+          type: string
+        poznamka:
+          type: string
+      example:
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+
+
+    # Not saved
+    NotSavedRequest:
+      allOf:
+        - $ref: '#/components/schemas/Request'
+        - type: object
+          properties:
+            id:
+              type: string
+            user:
+              type: string
+            state:
+              type: string
+            reason:
+              type: string
+      example:
+        user: 'admin'
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+        reason: 'Cannot find identifier oai:aleph-nkp.cz:SKC01-002839929'
+
+    # Ulozene zadosti
+    SavedRequest:
+      allOf:
+        - $ref: '#/components/schemas/Request'
+        - type: object
+          properties:
+            id:
+              type: string
+            indextime:
+              type: string
+              format: date-time
+            user:
+              type: string
+            state:
+              type: string
+      example:
+        user: 'admin'
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+        indextime: '2021-07-09T07:12:55.366Z'
+
+    # Ulozene zadosti
+    BatchResponse:
+      type: object
+      properties:
+        saved:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedRequest'
+        notsaved:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotSavedRequest'
+
+
+
+  securitySchemes:
+    basic:
+      type: http
+      scheme: basic
+
+    api_key:
+      type: apiKey
+      name: X-API-KEY
+      in: header

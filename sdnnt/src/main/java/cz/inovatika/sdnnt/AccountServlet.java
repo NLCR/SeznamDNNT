@@ -7,11 +7,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -30,6 +34,9 @@ import org.json.JSONObject;
 public class AccountServlet extends HttpServlet {
 
   public static final Logger LOGGER = Logger.getLogger(AccountServlet.class.getName());
+
+  private AccountService service;
+
 
   /**
    * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -57,7 +64,7 @@ public class AccountServlet extends HttpServlet {
             // return;
           }
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(request, response, user);
+        JSONObject json = actionToDo.doPerform(this.service, request, response, user);
         out.println(json.toString(2));
       } else {
         out.print("actionNameParam -> " + actionNameParam);
@@ -79,57 +86,43 @@ public class AccountServlet extends HttpServlet {
 
   }
 
+  @Override
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+    this.service = new AccountServiceImpl();
+  }
+
+  @Override
+  public void init() throws ServletException {
+    super.init();
+    this.service = new AccountServiceImpl();
+  }
+
   enum Actions {
+    // vyhledava zadosti
     SEARCH {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        String q = req.getParameter("q");
+        String state = req.getParameter("state");
+        String navrh = req.getParameter("navrh");
         JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
-          }
-          
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("typ","state","navrh")
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,process:[json]");
-          if (req.getParameter("state") != null) {
-            query.addFilterQuery("state:" + req.getParameter("state"));
-          }
-          if (req.getParameter("navrh") != null) {
-            query.addFilterQuery("navrh:" + req.getParameter("navrh"));
-          }
-          if ("kurator".equals(user.role)) {
-            query.addFilterQuery("-state:open");
-            query.addSort(SolrQuery.SortClause.desc("state"));
-            query.addSort(SolrQuery.SortClause.asc("indextime"));
-          } else {
-            query.addFilterQuery("user:" + user.username);
-            query.addSort(SolrQuery.SortClause.asc("state"));
-            query.addSort(SolrQuery.SortClause.desc("datum_zadani"));
-          }
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "zadost"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
+        try {
+          JSONObject qresp = service.search(q, state, navrh, user);
+          //ret =  new JSONObject((String) qresp.get("response"));
+          ret = service.search(q, state, navrh, user);
+          //ret = qresp.getJSONObject("response");
         } catch (SolrServerException | IOException ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           ret.put("error", ex);
         }
-
-        return ret; 
+        return ret;
       }
     },
+    // ziskani konkretni zadosti, vypisou se zaznamy
     GET_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
@@ -150,9 +143,10 @@ public class AccountServlet extends HttpServlet {
         return ret; 
       }
     },
+    // dotazovani do druheho indexu
     GET_ZADOST_RECORDS {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
@@ -179,9 +173,10 @@ public class AccountServlet extends HttpServlet {
         return ret; 
       }
     },
+    // ulozeni zadosti
     SAVE_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           String inputJs;
@@ -196,7 +191,8 @@ public class AccountServlet extends HttpServlet {
             // user = new JSONObject().put("name", "testUser");
             // return json;
           }
-          json = Zadost.save(inputJs, user.username);
+          json = service.saveRequest(inputJs, user);
+          //json = Zadost.save(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
@@ -204,9 +200,11 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+    // pridava vsechny zaznamy jednoho vyjadreni do zadosti
+    // dilo -> vyjadreni -> provedeni
     ADD_FRBR_TO_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           String inputJs;
@@ -229,9 +227,10 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+    // odznaci zadost jako zprocesovanou
     PROCESS_ZADOST {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           String inputJs;
@@ -254,9 +253,11 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+
+    // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
     APPROVE_NAVRH {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           JSONObject inputJs;
@@ -276,9 +277,10 @@ public class AccountServlet extends HttpServlet {
         return json;
       }
     },
+    // odmitnout navrh - pouze kurator - ne do api
     REJECT_NAVRH {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           JSONObject inputJs;
@@ -300,7 +302,7 @@ public class AccountServlet extends HttpServlet {
     },
     APPROVE_NAVRH_IN_IMPORT {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           JSONObject inputJs;
@@ -319,7 +321,7 @@ public class AccountServlet extends HttpServlet {
     },
     ADD_ID {
       @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
           
@@ -332,7 +334,7 @@ public class AccountServlet extends HttpServlet {
       }
     };
 
-    abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response, User user) throws Exception;
+    abstract JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response, User user) throws Exception;
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

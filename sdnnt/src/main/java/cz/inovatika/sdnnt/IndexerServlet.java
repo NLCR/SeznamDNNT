@@ -77,6 +77,7 @@ public class IndexerServlet extends HttpServlet {
   }
 
   enum Actions {
+    // pro interni ucely
     REINDEX_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -91,6 +92,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // pro interni ucely
     REINDEX {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -108,6 +110,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // plny harvest  skc katalogu - api operace - dostupne pouze pro admin
     FULL {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -133,6 +136,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // pokracovani harvestu - posledni zaznam from until
     UPDATE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -158,6 +162,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // import zaznamu z distri.cz - uzivatelske api
     IMPORT_DISTRI {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -176,6 +181,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // import zaznamu z palmknihy.cz - uzivatelske api
     IMPORT_HEUREKA {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -193,6 +199,7 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // pro interni ucely  - porovnani dvou zaznamu
     COMPARE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -207,6 +214,8 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // hleda a najde zaznam podle identifikatoru a vrati marc21
+    // api
     FINDID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

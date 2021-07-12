@@ -1,5 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+
+	<!--
+    <filter>
+        <filter-name>apikey</filter-name>
+        <filter-class>cz.inovatika.sdnnt.auths.ApiKeyAuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>apikey</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <filter>
+        <filter-name>basicauth</filter-name>
+        <filter-class>cz.inovatika.sdnnt.auths.BasicAuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>basicauth</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+	-->
+	
+    <filter>
+        <filter-name>ApiOriginFilter</filter-name>
+        <filter-class>cz.inovatika.sdnnt.openapi.endpoints.api.ApiOriginFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ApiOriginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <servlet>
+        <servlet-name>jersey</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>
+                io.swagger.v3.jaxrs2.integration.resources,
+                cz.inovatika.sdnnt.openapi.endpoints.api
+            </param-value>
+        </init-param>
+        <init-param>
+            <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>org.glassfish.jersey.media.multipart.MultiPartFeature</param-value>
+        </init-param>
+        <init-param>
+            <param-name>jersey.config.server.wadl.disableWadl</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>openApi.configuration.prettyPrint</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+
+    <servlet-mapping>
+        <servlet-name>jersey</servlet-name>
+        <url-pattern>/api/v1.0/*</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>InitServlet</servlet-name>
         <servlet-class>cz.inovatika.sdnnt.InitServlet</servlet-class>

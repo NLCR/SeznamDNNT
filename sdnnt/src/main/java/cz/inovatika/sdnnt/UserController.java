@@ -37,6 +37,25 @@ import org.json.JSONObject;
 public class UserController {
 
   public static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
+  public static final String AUTHENTICATED_USER = "user";
+
+  public static JSONObject loginByApiKey(HttpServletRequest req, String apiKey) {
+    User user = findUserByApiKey(apiKey);
+    if (user != null) {
+      setSessionObject(req, user);
+      return user.toJSONObject();
+    } else return null;
+  }
+
+  public static JSONObject loginByNameAndPassword(HttpServletRequest req, String lname, String pswd) {
+    User user = findUser(lname);
+    if (user != null) {
+      if (DigestUtils.sha256Hex(pswd).equals(user.pwd)) {
+        setSessionObject(req, user);
+        return user.toJSONObject();
+      } else return null;
+    } else return null;
+  }
 
   public static JSONObject login(HttpServletRequest req) {
     JSONObject ret = new JSONObject();
@@ -50,6 +69,7 @@ public class UserController {
       User user = findUser(json.getString("user"));
 
       ret = user.toJSONObject();
+      // ??
       // Pridat aktivni zadosti pokud existujou stav=open
       JSONArray docs = UserController.getZadost(username);
       if (docs != null && !docs.isEmpty()) {
@@ -65,7 +85,7 @@ public class UserController {
   }
   
   private static void setSessionObject(HttpServletRequest req, User user) {
-      req.getSession(true).setAttribute("user", user);
+      req.getSession(true).setAttribute(AUTHENTICATED_USER, user);
   }
 
   public static User dummy(String name) {
@@ -110,6 +130,24 @@ public class UserController {
       LOGGER.log(Level.SEVERE, null, ex);
       return null;
     }
+  }
+
+  public static User findUserByApiKey(String apikey) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("apikey:\"" + apikey + "\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      solr.close();
+      if (users.isEmpty()) {
+        return null;
+      } else {
+        return users.get(0);
+      }
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
+
   }
 
   public static User findUser(String username) {
