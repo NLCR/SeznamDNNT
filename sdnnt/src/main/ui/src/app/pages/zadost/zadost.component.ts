@@ -1,5 +1,7 @@
+import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
@@ -13,6 +15,7 @@ import { Zadost } from 'src/app/shared/zadost';
 })
 export class ZadostComponent implements OnInit {
 
+  subs: Subscription[] = [];
   zadost: Zadost;
   numFound: number;
   docs: SolrDocument[];
@@ -32,16 +35,23 @@ export class ZadostComponent implements OnInit {
     }
     const id = this.route.snapshot.paramMap.get('id');
 
-    this.service.getZadost(id).subscribe((resp: any) => {
-      this.zadost = resp.response.docs[0];
-      this.getDocs();
-    });
-
+    this.subs.push(this.route.queryParams.subscribe(val => {
+      this.service.getZadost(id).subscribe((resp: any) => {
+        this.zadost = resp.response.docs[0];
+        this.getDocs(val);
+      });
+    }));
   }
 
-  getDocs() {
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
 
-    this.service.getZadostRecords(this.zadost.id).subscribe((resp: SolrResponse) => {
+  getDocs(params: Params) {
+    this.docs = [];
+    const p = Object.assign({}, params);
+    p.id = this.zadost.id;
+    this.service.getZadostRecords(p as HttpParams).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
       const process = this.zadost.process;
       this.numFound = resp.response.numFound;
@@ -74,7 +84,7 @@ export class ZadostComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-        this.getDocs();
+        this.getDocs(this.route.snapshot.queryParams);
       }
     });
   }
@@ -89,7 +99,7 @@ export class ZadostComponent implements OnInit {
           } else {
             this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
             this.zadost = res;
-            this.getDocs();
+            this.getDocs(this.route.snapshot.queryParams);
             // this.processed = { date: new Date(), state: 'approved', user: this.state.user.username };
           }
         });
@@ -101,7 +111,7 @@ export class ZadostComponent implements OnInit {
           } else {
             this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
             this.zadost = res;
-            this.getDocs();
+            this.getDocs(this.route.snapshot.queryParams);
           }
         });
         break;
@@ -112,7 +122,7 @@ export class ZadostComponent implements OnInit {
           } else {
             this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
             this.zadost = res;
-            this.getDocs();
+            this.getDocs(this.route.snapshot.queryParams);
             // this.processed = { date: new Date(), state: 'rejected', user: this.state.user.username };
           }
         });

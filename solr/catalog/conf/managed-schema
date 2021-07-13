@@ -59,9 +59,16 @@
    <field name="datestamp" type="date" indexed="true" stored="true"  />
    <field name="setSpec" type="string" indexed="true" stored="true"  />
    <field name="leader" type="string" indexed="true" stored="true"  />
+   <field name="fmt" type="string" indexed="true" stored="true"  />
    <field name="item_type" type="string" indexed="true" stored="true"  />
    <field name="type_of_resource" type="string" indexed="true" stored="true"  />
    <field name="language" type="string" indexed="true" stored="true"  />
+   <field name="place_of_pub" type="string" indexed="true" stored="true"  />
+   <field name="type_of_date" type="string" indexed="true" stored="true"  />
+   <field name="date1" type="string" indexed="true" stored="true"  />
+   <field name="date2" type="string" indexed="true" stored="true"  />
+   <field name="date1_int" type="pint" indexed="true" stored="true" />
+   <field name="date2_int" type="pint" indexed="true" stored="true" />
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    

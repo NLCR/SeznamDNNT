@@ -15,6 +15,7 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -200,6 +201,7 @@ public class Indexer {
 
       // Update record in imports
       ret = Import.approve(impNew, identifier, user);
+      
 
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -216,14 +218,14 @@ public class Indexer {
               .setFields("raw, marc_990a");
       SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
-      String oldStav = (String) docOld.getFirstValue("marc_990a");
+      Collection<Object> oldStav =  docOld.getFieldValues("marc_990a");
 
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
       mr.toSolrDoc();
       if (navrh.equals("VVS")) {
-        if (oldStav.equals("A")) {
+        if (oldStav.contains("A")) {
           mr.setStav("VS");
-        } else if (oldStav.equals("PA")) {
+        } else if (oldStav.contains("PA")) {
           mr.setStav("VN");
         }
 
@@ -231,7 +233,7 @@ public class Indexer {
         mr.setStav("A");
       }
 
-      mr.toSolrDoc();
+      mr.toSolrDoc(true);
       History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
       
       // Update record in catalog

@@ -149,12 +149,20 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
+          
+        int rows = opts.getClientConf().getInt("rows"); 
+        if (req.getParameter("rows") != null) {
+          rows = Integer.parseInt(req.getParameter("rows"));
+        }
+        int start = 0; 
+        if (req.getParameter("page") != null) {
+          start = Integer.parseInt(req.getParameter("page")) * rows;
+        } 
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           
-          // String q = req.getParameter("identifiers").replace("[", "(").replace("]", ")");
-          // SolrQuery query = new SolrQuery("identifier:" + q)
           SolrQuery query = new SolrQuery("*:*")
-                  .setRows(100)
+                  .setRows(rows)
+                  .setStart(start) 
                   .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + req.getParameter("id"))
                   .setSort(SolrQuery.SortClause.asc("title_sort"))
                   .setFields("*,raw:[json]");

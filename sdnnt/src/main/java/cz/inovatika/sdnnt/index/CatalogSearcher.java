@@ -11,6 +11,8 @@ import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -158,12 +160,7 @@ public class CatalogSearcher {
     if (req.getParameter("sort") != null) {
       query.setParam("sort", req.getParameter("sort"));
     }
-    User user = UserController.getUser(req);
-    if (!Boolean.parseBoolean(req.getParameter("fullCatalog")) || user == null || "user".equals(user.role)) {
-      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
-      // Z UI a podle user role
-      query.addFilterQuery("-marc_990a:NNN");
-    }
+    
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
       if (req.getParameter(field) != null) {
@@ -175,6 +172,25 @@ public class CatalogSearcher {
         
       }
     }
+    
+
+      // Vseobecne filtry podle misto vydani (xr ) a roky
+      
+      // fq=fmt:BK%20AND%20place_of_pub:"xr%20"%20AND%20date1_int:%5B1910%20TO%202007%5D&fq=marc_338a:svazek&fq=-marc_245h:*&fq=marc_338b:nc&fq=marc_3382:rdacarrier
+      String bk = "(fmt:BK AND place_of_pub:\"xr \" AND date1_int:[1910 TO 2007] AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+      int year = Calendar.getInstance().get(Calendar.YEAR) - 10;
+      String se = "(fmt:SE AND place_of_pub:\"xr \" AND date1_int:[1910 TO "+year+"] AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+      query.addFilterQuery(bk + " OR " + se);
+      
+    // Filtry podle role
+    User user = UserController.getUser(req);
+    if (!Boolean.parseBoolean(req.getParameter("fullCatalog")) || user == null || "user".equals(user.role)) {
+      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
+      // Z UI a podle user role
+      query.addFilterQuery("-marc_990a:NNN");
+    } else {
+    }
+     
     return query;
   }
 

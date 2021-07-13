@@ -165,7 +165,7 @@ public class SearchServlet extends HttpServlet {
         int start = 0; 
         if (req.getParameter("page") != null) {
           start = Integer.parseInt(req.getParameter("page")) * rows;
-        } 
+        }  
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           SolrQuery query = new SolrQuery("*")
                   .setRows(rows)

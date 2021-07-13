@@ -57,8 +57,8 @@ public class MarcRecord {
   public SolrInputDocument sdoc = new SolrInputDocument();
 
   final public static List<String> tagsToIndex
-          = Arrays.asList("015", "020", "022", "035", "040", "100", "130", "240", "243",
-                  "245", "246", "250", "260", "264",
+          = Arrays.asList("015", "020", "022", "035", "040", "044", "100", "130", "240", "243",
+                  "245", "246", "250", "260", "264", "338",
                   "700", "710", "711", "730",
                   "856", "990", "992", "998", "956", "911", "910");
 
@@ -118,6 +118,11 @@ public class MarcRecord {
 
     return xml.toString();
   }
+  
+  public SolrInputDocument toSolrDoc(boolean force) {
+    sdoc.clear();
+    return toSolrDoc();
+  }
 
   public SolrInputDocument toSolrDoc() {
     if (sdoc.isEmpty()) {
@@ -133,13 +138,32 @@ public class MarcRecord {
     for (String cf : controlFields.keySet()) {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
-    if (leader != null) {
-      sdoc.setField("type_of_resource", leader.substring(6, 7));
-      sdoc.setField("item_type", leader.substring(7, 8));
-    }
+    
+    sdoc.setField("type_of_resource", leader.substring(6, 7));
+    sdoc.setField("item_type", leader.substring(7, 8));
+    
+    setFMT(leader.substring(6, 7), leader.substring(7, 8));
 
+    // https://www.loc.gov/marc/bibliographic/bd008a.html
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
       sdoc.setField("language", controlFields.get("008").substring(35, 38));
+      sdoc.setField("place_of_pub", controlFields.get("008").substring(15, 18));
+      sdoc.setField("type_of_date", controlFields.get("008").substring(6, 7));
+      String date1 = controlFields.get("008").substring(7, 11);
+      String date2 = controlFields.get("008").substring(11, 15);
+      sdoc.setField("date1", date1);
+      sdoc.setField("date2", date2);
+      try {
+        sdoc.setField("date1_int", Integer.parseInt(date1));
+      } catch (NumberFormatException ex) {
+        
+      }
+      try {
+        sdoc.setField("date2_int", Integer.parseInt(date2));
+      } catch (NumberFormatException ex) {
+        
+      }
+      
     }
 
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
@@ -158,6 +182,42 @@ public class MarcRecord {
 
     return sdoc;
   }
+  
+  private void setFMT(String type_of_resource, String item_type) {
+    // https://knowledge.exlibrisgroup.com/Primo/Product_Documentation/Primo/Technical_Guide/020Working_with_Normalization_Rules/100Validate_UNIMARC_FMT
+    String fmt = "BK";
+    switch(type_of_resource) {
+      case "a":
+        if ("s".equals(item_type)) {
+          fmt = "SE";
+        }
+        break;
+      case "c":
+      case "d":
+        fmt = "MU";
+        break;
+      case "e":
+      case "f":
+        fmt = "MP";
+        break;
+      case "g":
+      case "k":
+      case "r":
+        fmt = "VM";
+        break;
+      case "i":
+      case "j":
+        fmt = "AM";
+        break;
+      case "l":
+        fmt = "CF";
+        break;
+      case "m":
+        fmt = "MX";
+        break;
+    }
+    sdoc.setField("fmt", fmt);
+  }
 
   public void setStav(String new_stav) {
 //    if (!dataFields.containsKey("990")) {
@@ -172,7 +232,6 @@ public class MarcRecord {
 //    } else {
 //      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
 //    }
-
   }
 
   private void fillSolrDoc() {
