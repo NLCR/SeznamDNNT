@@ -177,9 +177,45 @@ public class CatalogSearcher {
       // Vseobecne filtry podle misto vydani (xr ) a roky
       
       // fq=fmt:BK%20AND%20place_of_pub:"xr%20"%20AND%20date1_int:%5B1910%20TO%202007%5D&fq=marc_338a:svazek&fq=-marc_245h:*&fq=marc_338b:nc&fq=marc_3382:rdacarrier
-      String bk = "(fmt:BK AND place_of_pub:\"xr \" AND date1_int:[1910 TO 2007] AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
-      int year = Calendar.getInstance().get(Calendar.YEAR) - 10;
-      String se = "(fmt:SE AND place_of_pub:\"xr \" AND date1_int:[1910 TO "+year+"] AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+      int year = Calendar.getInstance().get(Calendar.YEAR);
+      int fromYear = opts.getJSONObject("search").getInt("fromYear");
+      int yearsBK = opts.getJSONObject("search").getInt("yearsBK");
+      String bkDate = "((date1_int:["
+              + fromYear 
+              + " TO "
+              + (year - yearsBK) 
+              + "] AND -date2_int:*"
+              + ") OR " + "(date1_int:["
+              + fromYear 
+              + " TO "
+              + (year - yearsBK) 
+              + "] AND date2_int:["
+              + fromYear 
+              + " TO "
+              + (year - yearsBK) 
+              + "]))";
+      
+      String bk = "(fmt:BK AND place_of_pub:\"xr \" AND "
+              + bkDate 
+              + " AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+      
+      
+      int yearsSE = opts.getJSONObject("search").getInt("yearsSE");
+      String seDate = "((date1_int:["
+              + fromYear 
+              + " TO "
+              + (year - yearsSE) 
+              + "] AND date2_int:9999"
+              + ") OR " + "date2_int:["
+              + fromYear 
+              + " TO "
+              + (year - yearsSE) 
+              + "])";
+      String se = "(fmt:SE AND place_of_pub:\"xr \" AND "
+              + seDate 
+              + " AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+      
+      
       query.addFilterQuery(bk + " OR " + se);
       
     // Filtry podle role

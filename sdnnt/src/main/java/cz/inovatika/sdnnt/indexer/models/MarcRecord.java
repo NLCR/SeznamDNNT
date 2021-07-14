@@ -139,6 +139,7 @@ public class MarcRecord {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
     
+    sdoc.setField("record_status", leader.substring(5, 6));
     sdoc.setField("type_of_resource", leader.substring(6, 7));
     sdoc.setField("item_type", leader.substring(7, 8));
     
@@ -185,10 +186,11 @@ public class MarcRecord {
   
   private void setFMT(String type_of_resource, String item_type) {
     // https://knowledge.exlibrisgroup.com/Primo/Product_Documentation/Primo/Technical_Guide/020Working_with_Normalization_Rules/100Validate_UNIMARC_FMT
+    // Zmena POZOR. Podle url ai by mel byt BK, ale v alephu vidim SE
     String fmt = "BK";
     switch(type_of_resource) {
       case "a":
-        if ("s".equals(item_type)) {
+        if ("s".equals(item_type) || "i".equals(item_type)) {
           fmt = "SE";
         }
         break;

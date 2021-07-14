@@ -60,6 +60,7 @@
    <field name="setSpec" type="string" indexed="true" stored="true"  />
    <field name="leader" type="string" indexed="true" stored="true"  />
    <field name="fmt" type="string" indexed="true" stored="true"  />
+   <field name="record_status" type="string" indexed="true" stored="true"  />
    <field name="item_type" type="string" indexed="true" stored="true"  />
    <field name="type_of_resource" type="string" indexed="true" stored="true"  />
    <field name="language" type="string" indexed="true" stored="true"  />

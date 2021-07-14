@@ -7,7 +7,12 @@
     "rowsPerPage": 100
   },
   "textsDir": "texts",
-  "resetPwdExpirationDays": 3
+  "resetPwdExpirationDays": 3,
+  "search": {
+    "fromYear": 1911,
+    "yearsBK": 14,
+    "yearsSE": 10
+  }
 }
 
 
