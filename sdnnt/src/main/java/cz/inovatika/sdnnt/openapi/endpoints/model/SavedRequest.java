@@ -1,6 +1,6 @@
 /*
  * SDNNT API
- *  POPIS API publikovaneho api 
+ *  API umožnuje vzdáleně spravovat svoje žádosti, vytvářet nové, prohlížet již poslané a procházet katalog.
  *
  * OpenAPI spec version: 1.0.0
  * 
@@ -14,16 +14,21 @@ package cz.inovatika.sdnnt.openapi.endpoints.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 /**
  * SavedRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-09T09:07:54.515Z[GMT]")public class SavedRequest extends Request  {
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class SavedRequest extends Request  {
   @JsonProperty("id")
   private String id = null;
+
+  @JsonProperty("navrh")
+  private String navrh = null;
 
   @JsonProperty("indextime")
   private Date indextime = null;
@@ -51,6 +56,25 @@ import javax.validation.Valid;
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public SavedRequest navrh(String navrh) {
+    this.navrh = navrh;
+    return this;
+  }
+
+  /**
+   * Get navrh
+   * @return navrh
+   **/
+  @JsonProperty("navrh")
+  @Schema(description = "")
+  public String getNavrh() {
+    return navrh;
+  }
+
+  public void setNavrh(String navrh) {
+    this.navrh = navrh;
   }
 
   public SavedRequest indextime(Date indextime) {
@@ -122,6 +146,7 @@ import javax.validation.Valid;
     }
     SavedRequest savedRequest = (SavedRequest) o;
     return Objects.equals(this.id, savedRequest.id) &&
+        Objects.equals(this.navrh, savedRequest.navrh) &&
         Objects.equals(this.indextime, savedRequest.indextime) &&
         Objects.equals(this.user, savedRequest.user) &&
         Objects.equals(this.state, savedRequest.state) &&
@@ -130,7 +155,7 @@ import javax.validation.Valid;
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, indextime, user, state, super.hashCode());
+    return Objects.hash(id, navrh, indextime, user, state, super.hashCode());
   }
 
 
@@ -140,6 +165,7 @@ import javax.validation.Valid;
     sb.append("class SavedRequest {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    navrh: ").append(toIndentedString(navrh)).append("\n");
     sb.append("    indextime: ").append(toIndentedString(indextime)).append("\n");
     sb.append("    user: ").append(toIndentedString(user)).append("\n");
     sb.append("    state: ").append(toIndentedString(state)).append("\n");

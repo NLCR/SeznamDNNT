@@ -22,38 +22,38 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 /**
- * BatchRequest
+ * InlineResponse2001
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class BatchRequest   {
-  @JsonProperty("batch")
-  private List<Request> batch = null;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class InlineResponse2001   {
+  @JsonProperty("requests")
+  private List<SavedRequest> requests = null;
 
-  public BatchRequest batch(List<Request> batch) {
-    this.batch = batch;
+  public InlineResponse2001 requests(List<SavedRequest> requests) {
+    this.requests = requests;
     return this;
   }
 
-  public BatchRequest addBatchItem(Request batchItem) {
-    if (this.batch == null) {
-      this.batch = new ArrayList<Request>();
+  public InlineResponse2001 addRequestsItem(SavedRequest requestsItem) {
+    if (this.requests == null) {
+      this.requests = new ArrayList<SavedRequest>();
     }
-    this.batch.add(batchItem);
+    this.requests.add(requestsItem);
     return this;
   }
 
   /**
-   * Get batch
-   * @return batch
+   * Get requests
+   * @return requests
    **/
-  @JsonProperty("batch")
+  @JsonProperty("requests")
   @Schema(description = "")
   @Valid
-  public List<Request> getBatch() {
-    return batch;
+  public List<SavedRequest> getRequests() {
+    return requests;
   }
 
-  public void setBatch(List<Request> batch) {
-    this.batch = batch;
+  public void setRequests(List<SavedRequest> requests) {
+    this.requests = requests;
   }
 
 
@@ -65,22 +65,22 @@ import javax.validation.Valid;
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BatchRequest batchRequest = (BatchRequest) o;
-    return Objects.equals(this.batch, batchRequest.batch);
+    InlineResponse2001 inlineResponse2001 = (InlineResponse2001) o;
+    return Objects.equals(this.requests, inlineResponse2001.requests);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(batch);
+    return Objects.hash(requests);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BatchRequest {\n");
+    sb.append("class InlineResponse2001 {\n");
     
-    sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
+    sb.append("    requests: ").append(toIndentedString(requests)).append("\n");
     sb.append("}");
     return sb.toString();
   }

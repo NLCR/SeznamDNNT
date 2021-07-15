@@ -1,6 +1,6 @@
 /*
  * SDNNT API
- *  POPIS API publikovaneho api 
+ *  API umožnuje vzdáleně spravovat svoje žádosti, vytvářet nové, prohlížet již poslané a procházet katalog.
  *
  * OpenAPI spec version: 1.0.0
  * 
@@ -14,14 +14,21 @@ package cz.inovatika.sdnnt.openapi.endpoints.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import javax.validation.constraints.*;
+import javax.validation.Valid;
 
 /**
  * NotSavedRequest
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-09T09:07:54.515Z[GMT]")public class NotSavedRequest extends Request  {
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class NotSavedRequest extends Request  {
   @JsonProperty("id")
   private String id = null;
+
+  @JsonProperty("navrh")
+  private String navrh = null;
 
   @JsonProperty("user")
   private String user = null;
@@ -49,6 +56,25 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public NotSavedRequest navrh(String navrh) {
+    this.navrh = navrh;
+    return this;
+  }
+
+  /**
+   * Get navrh
+   * @return navrh
+   **/
+  @JsonProperty("navrh")
+  @Schema(description = "")
+  public String getNavrh() {
+    return navrh;
+  }
+
+  public void setNavrh(String navrh) {
+    this.navrh = navrh;
   }
 
   public NotSavedRequest user(String user) {
@@ -119,6 +145,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     }
     NotSavedRequest notSavedRequest = (NotSavedRequest) o;
     return Objects.equals(this.id, notSavedRequest.id) &&
+        Objects.equals(this.navrh, notSavedRequest.navrh) &&
         Objects.equals(this.user, notSavedRequest.user) &&
         Objects.equals(this.state, notSavedRequest.state) &&
         Objects.equals(this.reason, notSavedRequest.reason) &&
@@ -127,7 +154,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, user, state, reason, super.hashCode());
+    return Objects.hash(id, navrh, user, state, reason, super.hashCode());
   }
 
 
@@ -137,6 +164,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
     sb.append("class NotSavedRequest {\n");
     sb.append("    ").append(toIndentedString(super.toString())).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    navrh: ").append(toIndentedString(navrh)).append("\n");
     sb.append("    user: ").append(toIndentedString(user)).append("\n");
     sb.append("    state: ").append(toIndentedString(state)).append("\n");
     sb.append("    reason: ").append(toIndentedString(reason)).append("\n");

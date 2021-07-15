@@ -21,6 +21,7 @@ public class OpenApiDocServlet  extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/x-yaml");
         String s = IOUtils.toString(resource, "UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write(s);
     }
 }

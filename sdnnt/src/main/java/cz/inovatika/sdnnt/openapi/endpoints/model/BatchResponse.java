@@ -1,6 +1,6 @@
 /*
  * SDNNT API
- *  POPIS API publikovaneho api 
+ *  API umožnuje vzdáleně spravovat svoje žádosti, vytvářet nové, prohlížet již poslané a procházet katalog.
  *
  * OpenAPI spec version: 1.0.0
  * 
@@ -14,15 +14,17 @@ package cz.inovatika.sdnnt.openapi.endpoints.model;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 /**
  * BatchResponse
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-09T09:07:54.515Z[GMT]")public class BatchResponse   {
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class BatchResponse   {
   @JsonProperty("saved")
   private List<SavedRequest> saved = null;
 

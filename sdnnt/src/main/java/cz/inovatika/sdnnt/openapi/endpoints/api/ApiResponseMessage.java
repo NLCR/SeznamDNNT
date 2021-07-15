@@ -3,7 +3,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api;
 import javax.xml.bind.annotation.XmlTransient;
 
 @javax.xml.bind.annotation.XmlRootElement
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-09T09:07:54.515Z[GMT]")public class ApiResponseMessage {
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class ApiResponseMessage {
     public static final int ERROR = 1;
     public static final int WARNING = 2;
     public static final int INFO = 3;

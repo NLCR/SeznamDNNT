@@ -16,44 +16,55 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 /**
- * BatchRequest
+ * CatalogObjectBatch
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class BatchRequest   {
-  @JsonProperty("batch")
-  private List<Request> batch = null;
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class CatalogObjectBatch   {
+  @JsonProperty("id")
+  private String id = null;
 
-  public BatchRequest batch(List<Request> batch) {
-    this.batch = batch;
-    return this;
-  }
+  @JsonProperty("message")
+  private String message = null;
 
-  public BatchRequest addBatchItem(Request batchItem) {
-    if (this.batch == null) {
-      this.batch = new ArrayList<Request>();
-    }
-    this.batch.add(batchItem);
+  public CatalogObjectBatch id(String id) {
+    this.id = id;
     return this;
   }
 
   /**
-   * Get batch
-   * @return batch
+   * Get id
+   * @return id
    **/
-  @JsonProperty("batch")
+  @JsonProperty("id")
   @Schema(description = "")
-  @Valid
-  public List<Request> getBatch() {
-    return batch;
+  public String getId() {
+    return id;
   }
 
-  public void setBatch(List<Request> batch) {
-    this.batch = batch;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public CatalogObjectBatch message(String message) {
+    this.message = message;
+    return this;
+  }
+
+  /**
+   * Get message
+   * @return message
+   **/
+  @JsonProperty("message")
+  @Schema(description = "")
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 
 
@@ -65,22 +76,24 @@ import javax.validation.Valid;
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BatchRequest batchRequest = (BatchRequest) o;
-    return Objects.equals(this.batch, batchRequest.batch);
+    CatalogObjectBatch catalogObjectBatch = (CatalogObjectBatch) o;
+    return Objects.equals(this.id, catalogObjectBatch.id) &&
+        Objects.equals(this.message, catalogObjectBatch.message);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(batch);
+    return Objects.hash(id, message);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BatchRequest {\n");
+    sb.append("class CatalogObjectBatch {\n");
     
-    sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    message: ").append(toIndentedString(message)).append("\n");
     sb.append("}");
     return sb.toString();
   }

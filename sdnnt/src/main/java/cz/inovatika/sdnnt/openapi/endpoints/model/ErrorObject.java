@@ -16,28 +16,18 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 
 /**
- * BatchRequest
+ * ErrorObject
  */
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class BatchRequest   {
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-15T08:56:28.035Z[GMT]")public class ErrorObject   {
   @JsonProperty("batch")
-  private List<Request> batch = null;
+  private CatalogObjectBatch batch = null;
 
-  public BatchRequest batch(List<Request> batch) {
+  public ErrorObject batch(CatalogObjectBatch batch) {
     this.batch = batch;
-    return this;
-  }
-
-  public BatchRequest addBatchItem(Request batchItem) {
-    if (this.batch == null) {
-      this.batch = new ArrayList<Request>();
-    }
-    this.batch.add(batchItem);
     return this;
   }
 
@@ -48,11 +38,11 @@ import javax.validation.Valid;
   @JsonProperty("batch")
   @Schema(description = "")
   @Valid
-  public List<Request> getBatch() {
+  public CatalogObjectBatch getBatch() {
     return batch;
   }
 
-  public void setBatch(List<Request> batch) {
+  public void setBatch(CatalogObjectBatch batch) {
     this.batch = batch;
   }
 
@@ -65,8 +55,8 @@ import javax.validation.Valid;
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BatchRequest batchRequest = (BatchRequest) o;
-    return Objects.equals(this.batch, batchRequest.batch);
+    ErrorObject errorObject = (ErrorObject) o;
+    return Objects.equals(this.batch, errorObject.batch);
   }
 
   @Override
@@ -78,7 +68,7 @@ import javax.validation.Valid;
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class BatchRequest {\n");
+    sb.append("class ErrorObject {\n");
     
     sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
     sb.append("}");

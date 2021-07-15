@@ -9,11 +9,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -52,11 +48,13 @@ public class CatalogSearcher {
     }
     return ret;
   }
-  public JSONObject search(HttpServletRequest req) {
+
+
+  public JSONObject search(Map<String, String> req, User user) {
     JSONObject ret = new JSONObject();
     try {
       SolrClient solr = Indexer.getClient();
-      SolrQuery query = doQuery(req);
+      SolrQuery query = doQuery(req, user);
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
       rParser.setWriterType("json");
@@ -74,12 +72,23 @@ public class CatalogSearcher {
         JSONArray zadosti = findZadosti(ids);
         ret.put("zadosti", zadosti);
       }
-      
+
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
     return ret;
+  }
+
+
+  public JSONObject search(HttpServletRequest req) {
+    Map<String, String[]> parameterMap = req.getParameterMap();
+    Map<String, String>  resmap = new HashMap<>();
+    parameterMap.entrySet().stream().forEach(stringEntry -> {
+      resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+    });
+    User user = UserController.getUser(req);
+    return search(resmap, user);
   }
 
   private JSONArray findZadosti(List<String> identifiers) {
@@ -124,19 +133,32 @@ public class CatalogSearcher {
     }
   }
 
-  private SolrQuery doQuery(HttpServletRequest req) {
-    String q = req.getParameter("q");
+  //  "filterFields": ["marc_990a", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
+  private SolrQuery doQuery(HttpServletRequest req, User user) {
+    Map<String, String> map = new HashMap<>();
+    Enumeration<String> parameterNames = req.getParameterNames();
+    while(parameterNames.hasMoreElements()) {
+      String name = parameterNames.nextElement();
+      String[] vals = req.getParameterMap().get(name);
+      map.put(name, vals.length > 0 ? vals[0] : "");
+
+    }
+    return doQuery(map,user);
+  }
+
+  private SolrQuery doQuery(Map<String,String> req, User user) {
+    String q = req.containsKey("q") ? req.get("q") : null;
     if (q == null) {
       q = "*";
     }
     Options opts = Options.getInstance();
     int rows = opts.getClientConf().getInt("rows"); 
-    if (req.getParameter("rows") != null) {
-      rows = Integer.parseInt(req.getParameter("rows"));
+    if (req.containsKey("rows")) {
+      rows = Integer.parseInt(req.get("rows"));
     }
     int start = 0; 
-    if (req.getParameter("page") != null) {
-      start = Integer.parseInt(req.getParameter("page")) * rows;
+    if (req.containsKey("page")) {
+      start = Integer.parseInt(req.get("page")) * rows;
     }
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
@@ -149,27 +171,22 @@ public class CatalogSearcher {
             .setParam("q.op", "AND")
             .setFields("*,raw:[json]");
     
-    if (!Boolean.parseBoolean(req.getParameter("onlyCzech"))) {
-      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
-      // query.addFilterQuery("language:cze");
-    }
-    
-    if (req.getParameter("q") != null) {
+
+    if (req.containsKey("q")) {
       query.setParam("df", "fullText");
     }
-    if (req.getParameter("sort") != null) {
-      query.setParam("sort", req.getParameter("sort"));
+    if (req.containsKey("sort")) {
+      query.setParam("sort", req.get("sort"));
     }
     
     for (Object o : opts.getClientConf().getJSONArray("filterFields")) {
       String field = (String) o;
-      if (req.getParameter(field) != null) {
+      if (req.containsKey(field)) {
         if (field.equals("rokvydani")) {
-          query.addFilterQuery(field + ":[" + req.getParameter(field).replace(",", " TO ") + "]");
+          query.addFilterQuery(field + ":[" + req.get(field).replace(",", " TO ") + "]");
         } else {
-          query.addFilterQuery(field + ":\"" + req.getParameter(field) + "\"");
+          query.addFilterQuery(field + ":\"" + req.get(field) + "\"");
         }
-        
       }
     }
     
@@ -219,8 +236,8 @@ public class CatalogSearcher {
       query.addFilterQuery(bk + " OR " + se);
       
     // Filtry podle role
-    User user = UserController.getUser(req);
-    if (!Boolean.parseBoolean(req.getParameter("fullCatalog")) || user == null || "user".equals(user.role)) {
+    //User user = UserController.getUser(req);
+    if (!Boolean.parseBoolean(req.get("fullCatalog")) || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
       query.addFilterQuery("-marc_990a:NNN");
