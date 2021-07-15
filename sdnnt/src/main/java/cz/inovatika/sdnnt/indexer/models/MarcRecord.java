@@ -12,7 +12,9 @@ import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ public class MarcRecord {
   public String datestamp;
   public String setSpec;
   public String leader;
+  public Date datum_stavu;
 
   public boolean isDeleted = false;
 
@@ -133,6 +136,8 @@ public class MarcRecord {
     sdoc.setField("setSpec", setSpec);
     sdoc.setField("leader", leader);
     sdoc.setField("raw", toJSON().toString());
+    
+    sdoc.setField("datum_stavu", datum_stavu);
 
     // Control fields
     for (String cf : controlFields.keySet()) {
@@ -231,6 +236,7 @@ public class MarcRecord {
     df.subFields.put("a", lsf);
     ldf.add(df);
     dataFields.put("990", ldf);
+    datum_stavu = Calendar.getInstance().getTime();
 //    } else {
 //      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
 //    }

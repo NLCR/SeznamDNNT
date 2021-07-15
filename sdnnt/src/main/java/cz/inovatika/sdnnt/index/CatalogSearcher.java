@@ -79,8 +79,7 @@ public class CatalogSearcher {
     }
     return ret;
   }
-
-
+  
   public JSONObject search(HttpServletRequest req) {
     Map<String, String[]> parameterMap = req.getParameterMap();
     Map<String, String>  resmap = new HashMap<>();
@@ -89,6 +88,67 @@ public class CatalogSearcher {
     });
     User user = UserController.getUser(req);
     return search(resmap, user);
+  }
+  
+  public JSONObject getA(Map<String, String> req, User user) {
+    return getByStav(req, user, "A");
+  }
+
+  public JSONObject getA(HttpServletRequest req) {
+    Map<String, String[]> parameterMap = req.getParameterMap();
+    Map<String, String>  resmap = new HashMap<>();
+    parameterMap.entrySet().stream().forEach(stringEntry -> {
+      resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+    });
+    User user = UserController.getUser(req);
+    return getA(resmap, user);
+  }
+  
+  public JSONObject getPA(Map<String, String> req, User user) {
+    return getByStav(req, user, "PA");
+  }
+
+  public JSONObject getPA(HttpServletRequest req) {
+    Map<String, String[]> parameterMap = req.getParameterMap();
+    Map<String, String>  resmap = new HashMap<>();
+    parameterMap.entrySet().stream().forEach(stringEntry -> {
+      resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+    });
+    User user = UserController.getUser(req);
+    return getPA(resmap, user);
+  }
+  
+  private JSONObject getByStav(Map<String, String> req, User user, String stav) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = Indexer.getClient();
+      Options opts = Options.getInstance();
+      int rows = opts.getClientConf().getInt("rows"); 
+      if (req.containsKey("rows")) {
+        rows = Integer.parseInt(req.get("rows"));
+      }
+      int start = 0; 
+      if (req.containsKey("page")) {
+        start = Integer.parseInt(req.get("page")) * rows;
+      }
+      SolrQuery query = new SolrQuery("*")
+            .setRows(rows)
+            .setStart(start) 
+            .addFilterQuery("marc_990a:" + stav)
+            .setSort("identifier", SolrQuery.ORDER.asc)
+            .setFields("identifier,datum_stavu");
+      QueryRequest qreq = new QueryRequest(query);
+      NoOpResponseParser rParser = new NoOpResponseParser();
+      rParser.setWriterType("json");
+      qreq.setResponseParser(rParser);
+      NamedList<Object> qresp = solr.request(qreq, "catalog");
+      ret = new JSONObject((String) qresp.get("response"));
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
   }
 
   private JSONArray findZadosti(List<String> identifiers) {
@@ -105,28 +165,6 @@ public class CatalogSearcher {
       qreq.setResponseParser(rParser);
       NamedList<Object> qresp = solr.request(qreq, "zadost");
       return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-  }
-
-  private JSONObject findZadost(String identifier) {
-    try {
-      SolrClient solr = Indexer.getClient();
-      SolrQuery query = new SolrQuery("identifiers:\"" + identifier + "\"")
-              .setFields("*,process:[json]");
-      QueryRequest qreq = new QueryRequest(query);
-      NoOpResponseParser rParser = new NoOpResponseParser();
-      rParser.setWriterType("json");
-      qreq.setResponseParser(rParser);
-      NamedList<Object> qresp = solr.request(qreq, "zadost");
-      JSONArray docs = (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
-      if (docs.isEmpty()) {
-        return null;
-      } else {
-        return docs.optJSONObject(0);
-      }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return null;

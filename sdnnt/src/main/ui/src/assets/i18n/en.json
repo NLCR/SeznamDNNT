@@ -203,6 +203,7 @@
     "cs": "Český jazyk",
     "registrovat_se": "To register",
     "pouze_zaznamy_na_seznamu": "Only entries in the list",
+    "zobrazit_cely_katalog": "View records from whole catalog",
     "datum_importu": "Date of import",
     "celkem": "Total",
     "na_vyrazeni": "For elimination",
@@ -212,6 +213,7 @@
     "schvaleno": "Approved",
     "zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni": "Show matches from the entire catalog",
     "zobrazit_jen_nepresne_shody": "Show only inaccurate matches",
+    "zobrazit_jen_presne_shody": "Show only exact matches",
     "zobrazit_nenalezene": "Show not found"
   }
 }
