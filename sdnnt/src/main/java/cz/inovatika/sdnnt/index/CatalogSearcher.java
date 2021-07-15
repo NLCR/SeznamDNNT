@@ -252,7 +252,7 @@ public class CatalogSearcher {
       
       String bk = "(fmt:BK AND place_of_pub:\"xr \" AND "
               + bkDate 
-              + " AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR (-marc_245h:*)))";
       
       
       int yearsSE = opts.getJSONObject("search").getInt("yearsSE");
@@ -268,7 +268,7 @@ public class CatalogSearcher {
               + "])";
       String se = "(fmt:SE AND place_of_pub:\"xr \" AND "
               + seDate 
-              + " AND marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier AND -marc_245h:*)";
+              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR (-marc_245h:*)))";
       
       
       query.addFilterQuery(bk + " OR " + se);
