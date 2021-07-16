@@ -86,6 +86,11 @@ import { User } from './shared/user';
     private login() {
         if (this.config.user) {
             this.state.setLogged(this.config.user);
+            const user: any = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                localStorage.setItem('user', JSON.stringify({ username: this.config.user.username, pwd: this.config.user.pwd, timeStamp: Date.now() }));
+            }
+            return;
         }
         const url = 'api/user/login';
         const user: any = JSON.parse(localStorage.getItem('user'));
