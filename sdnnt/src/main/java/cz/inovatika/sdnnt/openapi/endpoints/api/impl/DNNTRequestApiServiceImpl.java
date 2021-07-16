@@ -2,37 +2,39 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
-import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
-import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.jvnet.hk2.annotations.Service;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaJerseyServerCodegen", date = "2021-07-09T09:07:54.515Z[GMT]")public class RequestApiServiceImpl extends RequestApiService {
+
+@Service
+public class DNNTRequestApiServiceImpl extends RequestApiService {
 
 
 
-    public static final Logger LOGGER = Logger.getLogger(RequestApiServiceImpl.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(DNNTRequestApiServiceImpl.class.getName());
 
     public static final String API_KEY_HEADER = "X-API-KEY";
 
@@ -48,30 +50,38 @@ import java.util.logging.Logger;
 
 
     @Override
-    public Response requestBatchNzn(ContainerRequestContext crc, BatchRequest body, SecurityContext securityContext) throws NotFoundException {
-        return request(crc, body, Navrh.VVS);
+    public Response requestBatchNzn(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, Navrh.NZN);
     }
 
     @Override
-    public Response requestBatchVvs(ContainerRequestContext crc, BatchRequest body, SecurityContext securityContext) throws NotFoundException {
-        return request(crc, body, Navrh.NZN);
+    public Response requestBatchVvs(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, Navrh.VVS);
     }
 
+
     @Override
-    public Response requestGet(ContainerRequestContext crc, String status, String navrh, SecurityContext securityContext) throws NotFoundException {
-        String headerString = crc.getHeaderString(API_KEY_HEADER);
+    public Response requestGet(String status, String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
         if (headerString != null) {
             User user = UserController.findUserByApiKey(headerString);
             if (user != null) {
-                AllRequestsResponse allRequestsResponse = new AllRequestsResponse();
+                BatchResponse allRequestsResponse = new BatchResponse();
                 try {
                     JSONObject search = accountService.search(null, status, navrh, user);
                     JSONObject response = search.getJSONObject("response");
                     JSONArray docs = response.getJSONArray("docs");
                     for (int i = 0, ll = docs.length();i<ll;i++) {
                         JSONObject jsonObject = docs.getJSONObject(i);
+
+                        // somehome user jackson provider
                         ObjectMapper objectMapper = new ObjectMapper();
                         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+                        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+                        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                        objectMapper.registerModule(new JavaTimeModule());
+                        objectMapper.setDateFormat(new RFC3339DateFormat());
 
                         SavedRequest savedRequest = objectMapper.readValue(jsonObject.toString(), SavedRequest.class);
                         allRequestsResponse.addSavedItem(savedRequest);
@@ -79,6 +89,7 @@ import java.util.logging.Logger;
                     return Response.ok().entity(allRequestsResponse).build();
 
                 } catch (SolrServerException | IOException e) {
+                    LOGGER.log(Level.SEVERE,e.getMessage());
                     return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
                 }
             } else {

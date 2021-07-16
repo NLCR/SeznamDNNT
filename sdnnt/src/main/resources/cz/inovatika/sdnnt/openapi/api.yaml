@@ -57,6 +57,7 @@ paths:
           required: false
 
 
+
       responses:
         '200':
           description: Záznamy z katalogu
@@ -82,10 +83,16 @@ paths:
       operationId: requestGet
       parameters:
         - in: query
-          name: state
+          name: status
           schema:
             type: string
             enum: ["open","waiting","processed","rejected","approved"]
+          required: false
+        - in: query
+          name: navrh
+          schema:
+            type: string
+            enum: ["NZN","VVS"]
           required: false
       responses:
         '200':
@@ -257,6 +264,8 @@ components:
           properties:
             id:
               type: string
+            navrh:
+              type: string
             user:
               type: string
             state:
@@ -279,12 +288,13 @@ components:
           properties:
             id:
               type: string
+            navrh:
+              type: string
             indextime:
               type: string
               format: date-time
             user:
               type: string
-
             state:
               type: string
       example:

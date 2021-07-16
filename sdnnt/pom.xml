@@ -21,40 +21,44 @@
 
     <junit-version>4.13.1</junit-version>
 
-
-
   </properties>
     
   <dependencies>
+
     <dependency>
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-solrj</artifactId>
       <version>8.8.0</version>
       <type>jar</type>
     </dependency>
+
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20190722</version>
       <type>jar</type>
     </dependency>
+
     <dependency>
       <groupId>com.flipkart.zjsonpatch</groupId>
       <artifactId>zjsonpatch</artifactId>
       <version>0.4.11</version>
     </dependency>
+
     <dependency>
       <groupId>commons-validator</groupId>
       <artifactId>commons-validator</artifactId>
       <version>1.4.0</version>
       <type>jar</type>
     </dependency>
+
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <version>1.14</version>
       <type>jar</type>
     </dependency>
+
     <dependency>
       <groupId>javax</groupId>
       <artifactId>javaee-web-api</artifactId>
@@ -74,11 +78,13 @@
       <artifactId>jersey-container-servlet-core</artifactId>
       <version>${jersey2-version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-multipart</artifactId>
       <version>${jersey2-version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
@@ -90,6 +96,12 @@
       <artifactId>jackson-jaxrs-json-provider</artifactId>
       <version>${jackson-version}</version>
     </dependency>
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+
     <dependency>
       <groupId>io.swagger.core.v3</groupId>
       <artifactId>swagger-jaxrs2</artifactId>
@@ -104,12 +116,24 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson-version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit-version}</version>
       <scope>test</scope>
     </dependency>
 
+
+    <dependency>
+      <groupId>cz.inovatika.sdnnt</groupId>
+      <artifactId>sdnnt-openapi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
 
@@ -189,14 +213,76 @@
               </resources>
             </configuration>
           </execution>
-          
     
         </executions>
         <configuration>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
-    
+
+    <!--
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>5.2.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <library>jersey2</library>
+              <inputSpec>${project.basedir}/src/main/resources/cz/inovatika/sdnnt/openapi/api.yaml</inputSpec>
+              <generatorName>java</generatorName>
+              <configOptions>
+                <sourceFolder>src/gen/java/main</sourceFolder>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      -->
+
+      <!--
+		<plugin>
+          <groupId>io.swagger.codegen.v3</groupId>
+          <artifactId>swagger-codegen-maven-plugin</artifactId>
+          <version>3.0.27</version>
+
+			<executions>
+				<execution>
+					<goals>
+						<goal>generate</goal>
+					</goals>
+					<configuration>
+						<inputSpec>${project.basedir}/src/main/resources/cz/inovatika/sdnnt/openapi/api.yaml</inputSpec>
+						<language>jaxrs-di</language>
+
+                      <configOptions>
+                        <dateLibrary>java8</dateLibrary>
+                        <interfaceOnly>true</interfaceOnly>
+                      </configOptions>
+
+
+                      <apiPackage>cz.inovatika.sdnnt.openapi.endpoints.api.n</apiPackage>
+                      <modelPackage>cz.inovatika.sdnnt.openapi.endpoints.model.n</modelPackage>
+
+                      <generateSupportingFiles>false</generateSupportingFiles>
+
+                      <environmentVariables>
+                        <dateLibrary>java8</dateLibrary>
+                        <library>jersey2</library>
+                        <models></models>
+                        <apis></apis>
+                        <supportingFiles>ApiException.java,ApiOriginFilter.java,ApiResponseMessage.java,JacksonJsonProvider.java,LocalDateProvider.java,LocalDateTimeProvider.java,NotFoundException.java,StringUtil.java,web.xml,ProfilesApi.java,ProfilesApiService.java,ProfilesApiServiceFactory.java</supportingFiles>
+                      </environmentVariables>
+
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+		-->
+
       <!-- Insert jsp pageEncoding tag to index.html -->
       <plugin> 
         <groupId>com.google.code.maven-replacer-plugin</groupId> 

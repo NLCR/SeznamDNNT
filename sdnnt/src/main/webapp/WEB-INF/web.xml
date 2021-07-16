@@ -1,27 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-	<!--
-    <filter>
-        <filter-name>apikey</filter-name>
-        <filter-class>cz.inovatika.sdnnt.auths.ApiKeyAuthenticationFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>apikey</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
-
-    <filter>
-        <filter-name>basicauth</filter-name>
-        <filter-class>cz.inovatika.sdnnt.auths.BasicAuthenticationFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>basicauth</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-	-->
-	
     <filter>
         <filter-name>ApiOriginFilter</filter-name>
         <filter-class>cz.inovatika.sdnnt.openapi.endpoints.api.ApiOriginFilter</filter-class>
@@ -39,7 +19,8 @@
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>
                 io.swagger.v3.jaxrs2.integration.resources,
-                cz.inovatika.sdnnt.openapi.endpoints.api
+                cz.inovatika.sdnnt.openapi.endpoints.api,
+                cz.inovatika.sdnnt.openapi.endpoints.api.impl
             </param-value>
         </init-param>
         <init-param>
@@ -54,6 +35,17 @@
             <param-name>openApi.configuration.prettyPrint</param-name>
             <param-value>true</param-value>
         </init-param>
+
+        <!-- override the default service api implementations -->
+        <init-param>
+            <param-name>RequestApi.implementation</param-name>
+            <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl</param-value>
+        </init-param>
+        <init-param>
+            <param-name>CatalogApi.implementation</param-name>
+            <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTCatalogApiServiceImpl</param-value>
+        </init-param>
+
         <load-on-startup>1</load-on-startup>
     </servlet>
 
