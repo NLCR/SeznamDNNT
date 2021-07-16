@@ -60,7 +60,7 @@ export class UserDialogComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_uzivatele_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_uzivatele_success', '', false);
-        JSON.parse(JSON.stringify(this.user));
+        this.state.user = JSON.parse(JSON.stringify(this.user));
         this.dialogRef.close();
       }
     });
