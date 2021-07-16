@@ -1,0 +1,328 @@
+openapi: 3.0.2
+info:
+  title: SDNNT API
+  description: |-
+
+    API umožnuje vzdáleně spravovat svoje žádosti, vytvářet nové, prohlížet již poslané a procházet katalog.
+
+  #  termsOfService: 'https://nkp.cz'
+  #  contact:
+  #    email: email@email.com
+  #  license:
+  #    name: Apache 2.0
+  #    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+
+externalDocs:
+  description: Find out more about SDNNT
+  url: 'https://sdnnt.nkp.cz'
+servers:
+  - url: ../api/v1.0
+tags:
+  - name: Požadavky
+    description: Endpoint, který řeší kompletně správu požadavků
+  - name: Katalog
+    description: Endpoint pro hledání v katalogu
+
+paths:
+
+  /catalog:
+    get:
+      tags:
+        - Katalog
+      summary: Základní funkcionalita pro nahlížení do katalogu
+      description: Poskytuje základní funkcionalitu pro nahlížení do katalogu
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: rows
+          schema:
+            type: integer
+            default: 20
+          required: false
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          required: false
+        - in: query
+          name: sort
+          schema:
+            type: string
+          required: false
+
+
+
+      responses:
+        '200':
+          description: Záznamy z katalogu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CatalogObject'
+      security:
+        - api_key: []
+
+
+  /request:
+    get:
+      tags:
+        - Požadavky
+      summary: Vrací všechny žádosti pro uživatele
+      description: Vrací všechny žádosti, případně filtrované dle stavu
+      operationId: requestGet
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: ["open","waiting","processed","rejected","approved"]
+          required: false
+        - in: query
+          name: navrh
+          schema:
+            type: string
+            enum: ["NZN","VVS"]
+          required: false
+      responses:
+        '200':
+          description: Všechny uložené žádosti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requests:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedRequest'
+      security:
+        - api_key: []
+
+
+  /request/batch/nzn:
+    put:
+      tags:
+        - Požadavky
+      summary: Umožňuje podávat hromadnou žádost
+      description: Řeší hromadnou žádost
+      operationId: requestBatchNzn
+      requestBody:
+        description: Vytvoření hromadné žádosti
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRequest'
+        required: true
+
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponse'
+        '400':
+          description: Špatný dotaz (syntaxe atd..)
+        '404':
+          description: Identifikátory nenalezen(y)
+        '405':
+          description: Chyba validace (datumy atd..)
+
+      security:
+        - api_key: []
+
+  /request/batch/vvs:
+    put:
+      tags:
+        - Požadavky
+      summary: Umožňuje podávat hromadnou žádost
+      description: Řeší hromadnou žádost
+      operationId: requestBatchVvs
+      requestBody:
+        description: Vytvoření hromadné žádosti
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchRequest'
+        required: true
+
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchResponse'
+        '400':
+          description: Špatný dotaz (syntaxe atd..)
+        '404':
+          description: Identifikátory nenalezen(y)
+        '405':
+          description: Chyba validace (datumy atd..)
+
+      security:
+        - api_key: []
+
+
+
+components:
+  schemas:
+
+    # Batch
+    BatchRequest:
+      type: object
+      properties:
+        batch:
+          type: array
+          items:
+            $ref: '#/components/schemas/Request'
+      example:
+        batch:
+          - datum_zadani: "2021-07-09T07:24:37.210Z"
+            identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+            pozadavek: "Pozadavek o zarazeni varky jedna"
+            poznamka: "Poznamka A"
+
+          - datum_zadani: "2021-07-09T07:24:37.210Z"
+            identifiers: ['oai:aleph-nkp.cz:SKC01-002225134']
+            pozadavek: "Pozadavek o zarazeni varky dva"
+            poznamka: "Poznamka B"
+
+    # Batch
+    CatalogObject:
+      type: object
+      properties:
+        batch:
+          type: object
+          properties:
+            id:
+              type: string
+            message:
+              type: string
+      example:
+        batch:
+          id: "admin-0123445"
+          message: "Cannot find batch 'admin-0123445'"
+
+
+    # Batch
+    ErrorObject:
+      type: object
+      properties:
+        batch:
+          type: object
+          properties:
+            id:
+              type: string
+            message:
+              type: string
+      example:
+        batch:
+          id: "admin-0123445"
+          message: "Cannot find batch 'admin-0123445'"
+
+
+
+    # Zadost
+    Request:
+      type: object
+      properties:
+        identifiers:
+          type: array
+          items:
+            type: string
+        datum_zadani:
+          type: string
+          format: date-time
+        pozadavek:
+          type: string
+        poznamka:
+          type: string
+      example:
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+
+
+    # Not saved
+    NotSavedRequest:
+      allOf:
+        - $ref: '#/components/schemas/Request'
+        - type: object
+          properties:
+            id:
+              type: string
+            navrh:
+              type: string
+            user:
+              type: string
+            state:
+              type: string
+            reason:
+              type: string
+      example:
+        user: 'admin'
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+        reason: 'Cannot find identifier oai:aleph-nkp.cz:SKC01-002839929'
+
+    # Ulozene zadosti
+    SavedRequest:
+      allOf:
+        - $ref: '#/components/schemas/Request'
+        - type: object
+          properties:
+            id:
+              type: string
+            navrh:
+              type: string
+            indextime:
+              type: string
+              format: date-time
+            user:
+              type: string
+            state:
+              type: string
+      example:
+        user: 'admin'
+        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+        datum_zadani: '2021-07-09T07:12:55.366Z'
+        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+        poznamka: 'Poznamka'
+        indextime: '2021-07-09T07:12:55.366Z'
+
+    # Ulozene zadosti
+    BatchResponse:
+      type: object
+      properties:
+        saved:
+          type: array
+          items:
+            $ref: '#/components/schemas/SavedRequest'
+        notsaved:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotSavedRequest'
+
+
+
+  securitySchemes:
+
+    api_key:
+      type: apiKey
+      name: X-API-KEY
+      in: header
