@@ -1,6 +1,7 @@
 
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -40,6 +41,11 @@ public class ConfigServlet extends HttpServlet {
       }
       PrintWriter out = response.getWriter();
       JSONObject js = Options.getInstance().getClientConf();
+      
+      User user = UserController.getUser(request);
+      if (user != null) {
+        js.put("user", user.toJSONObject());
+      }
 
       out.print(js.toString());
     } catch (IOException | JSONException ex) {
