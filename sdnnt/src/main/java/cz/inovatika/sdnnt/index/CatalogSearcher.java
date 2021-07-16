@@ -18,6 +18,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -188,6 +189,8 @@ public class CatalogSearcher {
     String q = req.containsKey("q") ? req.get("q") : null;
     if (q == null) {
       q = "*";
+    } else {
+      q = ClientUtils.escapeQueryChars(q);
     }
     Options opts = Options.getInstance();
     int rows = opts.getClientConf().getInt("rows"); 

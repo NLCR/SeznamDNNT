@@ -252,10 +252,10 @@ public class MarcRecord {
         }
       }
     }
-    if (!sdoc.containsKey("marc_990a")) {
-      // Nastavime stav na 'NNN' jako Nikdy NeZarazeno
-      sdoc.setField("marc_990a", "NNN");
-    }
+//    if (!sdoc.containsKey("marc_990a")) {
+//      // Nastavime stav na 'NNN' jako Nikdy NeZarazeno
+//      sdoc.setField("marc_990a", "NNN");
+//    }
     addDedup();
     addFRBR();
     addEAN();

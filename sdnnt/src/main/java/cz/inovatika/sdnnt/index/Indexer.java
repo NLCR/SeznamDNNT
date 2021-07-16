@@ -283,7 +283,7 @@ public class Indexer {
     return ret;
   }
 
-  public static JSONObject reindex(String dest, String filter) {
+  public static JSONObject reindex(String dest, String filter, String collection, boolean cleanStav) {
     JSONObject ret = new JSONObject();
     int indexed = 0; 
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(dest).build()) {
@@ -296,20 +296,23 @@ public class Indexer {
       boolean done = false;
       while (!done) {
         q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-        QueryResponse qr = getClient().query("catalog", q);
+        QueryResponse qr = getClient().query(collection, q);
         String nextCursorMark = qr.getNextCursorMark();
         SolrDocumentList docs = qr.getResults();
         for (SolrDocument doc : docs) {
           String oldRaw = (String) doc.getFirstValue("raw");
 
           MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+          if (cleanStav) {
+            mr.dataFields.remove("990");
+            mr.dataFields.remove("992");
+          }
           idocs.add(mr.toSolrDoc());
-          // mr.toJSON();
         }
 
         if (!idocs.isEmpty()) {
-          solr.add("catalog", idocs);
-          solr.commit("catalog");
+          solr.add(collection, idocs);
+          solr.commit(collection);
           indexed += idocs.size();
           idocs.clear();
           LOGGER.log(Level.INFO, "Curently reindexed: {0}", indexed);
@@ -319,7 +322,7 @@ public class Indexer {
         }
         cursorMark = nextCursorMark;
       }
-      solr.commit("catalog");
+      solr.commit(collection);
       solr.close();
       LOGGER.log(Level.INFO, "Reindex finished: {0}", indexed);
       ret.put("reindex", indexed);

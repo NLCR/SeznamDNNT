@@ -54,26 +54,43 @@
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
     <field name="dedup_fields" type="string" indexed="true" stored="true" multiValued="false" />
+    <field name="frbr" type="string" indexed="true" stored="true" multiValued="false" />
     
    <field name="datestamp" type="date" indexed="true" stored="true"  />
    <field name="setSpec" type="string" indexed="true" stored="true"  />
    <field name="leader" type="string" indexed="true" stored="true"  />
+   <field name="fmt" type="string" indexed="true" stored="true"  />
+   <field name="record_status" type="string" indexed="true" stored="true"  />
    <field name="item_type" type="string" indexed="true" stored="true"  />
+   <field name="type_of_resource" type="string" indexed="true" stored="true"  />
+   <field name="language" type="string" indexed="true" stored="true"  />
+   <field name="place_of_pub" type="string" indexed="true" stored="true"  />
+   <field name="type_of_date" type="string" indexed="true" stored="true"  />
+   <field name="date1" type="string" indexed="true" stored="true"  />
+   <field name="date2" type="string" indexed="true" stored="true"  />
+   <field name="date1_int" type="pint" indexed="true" stored="true" />
+   <field name="date2_int" type="pint" indexed="true" stored="true" />
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    
-   
-   <field name="title" type="lowercase" indexed="true" stored="true"  />
-   <field name="author" type="lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="ean" type="string" indexed="true" stored="true" multiValued="true"  />
+   <field name="title" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="author" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="nazev" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
-   <field name="nakladatel" type="lowercase" indexed="true" stored="true"  />
-   <field name="datumvydani" type="lowercase" indexed="true" stored="true"  />
+   <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="rokvydani" type="pints" indexed="true" stored="true" />
    
    <field name="stav" type="string" indexed="true" stored="true"  />
+   <field name="historie_stavu" type="string" indexed="true" stored="true"  />
+   <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
+   
+   <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
    
    <dynamicField name="controlfield_*" type="string" indexed="true" stored="true" multiValued="true" />
-   <dynamicField name="marc_*" type="lowercase" indexed="true" stored="true" multiValued="true" />
+   <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
   
+   <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -89,7 +106,13 @@
     -->
     <uniqueKey>identifier</uniqueKey>
     
-    <!--<copyField source="altLabel_eng" dest="key_tagger_eng"/>-->
+    <copyField source="marc_245a" dest="title"/>
+    <copyField source="marc_100a" dest="author"/>
+    <copyField source="marc_260b" dest="nakladatel"/>
+    <copyField source="marc_*" dest="fullText"/>
+    <copyField source="controlfield_*" dest="fullText"/>
+    <copyField source="ean" dest="fullText"/>
+    <copyField source="identifier" dest="fullText"/>
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
@@ -470,6 +493,7 @@
       <analyzer> 
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_cz.txt"  />
         <filter class="solr.ASCIIFoldingFilterFactory"/>       
       </analyzer>
     </fieldType>
@@ -505,6 +529,9 @@
         <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
+    </fieldType>
+    
+    <fieldType name="icu_sort_cs" class="solr.ICUCollationField"  locale="cs" strength="tertiary">
     </fieldType>
 
     <!-- Similarity is the scoring routine for each document vs. a query.

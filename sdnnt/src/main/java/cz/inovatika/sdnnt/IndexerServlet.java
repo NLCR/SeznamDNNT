@@ -92,17 +92,21 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
-    // pro interni ucely
+    // pro interni ucely 
     REINDEX {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          String dest = "http://localhost:8983/solr";
+          String dest = Options.getInstance().getString("solr.host");
+          String collection = "catalog";
           if (req.getParameter("dest") != null) {
             dest = req.getParameter("dest"); 
           }
-          json.put("indexed", Indexer.reindex(dest, req.getParameter("filter")));
+          if (req.getParameter("collection") != null) {
+            collection = req.getParameter("collection"); 
+          }
+          json.put("indexed", Indexer.reindex(dest, req.getParameter("filter"), collection, Boolean.parseBoolean(req.getParameter("cleanStav"))));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
