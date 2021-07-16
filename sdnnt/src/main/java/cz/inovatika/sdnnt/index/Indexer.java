@@ -44,7 +44,7 @@ public class Indexer {
 
   public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
 
-  static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/998", "/dataFields/956", "/dataFields/856");
+  static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/956", "/dataFields/856");
   static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec",
           "/controlFields/001", "/controlFields/003", "/controlFields/005", "/controlFields/008");
 
