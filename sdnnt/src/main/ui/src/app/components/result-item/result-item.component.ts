@@ -224,7 +224,10 @@ export class ResultItemComponent implements OnInit {
   }
 
   saveZadost(navrh: string) {
-    this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+    if (!this.state.currentZadost[navrh].identifiers.includes(this.doc.identifier)){
+      this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+    }
+    
     this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
