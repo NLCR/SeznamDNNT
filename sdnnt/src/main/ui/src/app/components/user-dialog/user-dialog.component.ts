@@ -74,6 +74,7 @@ export class UserDialogComponent implements OnInit {
       this.state.logged = false;
       this.state.user = null;
       localStorage.removeItem('user');
+      sessionStorage.clear();
       this.router.navigate(['/']);
     });
   }
