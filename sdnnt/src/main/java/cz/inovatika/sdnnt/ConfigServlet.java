@@ -40,7 +40,7 @@ public class ConfigServlet extends HttpServlet {
         Options.resetInstance();
       }
       PrintWriter out = response.getWriter();
-      JSONObject js = Options.getInstance().getClientConf();
+      JSONObject js = new JSONObject(Options.getInstance().getClientConf().toString());
       
       User user = UserController.getUser(request);
       if (user != null) {
