@@ -255,7 +255,7 @@ public class CatalogSearcher {
       
       String bk = "(fmt:BK AND place_of_pub:\"xr \" AND "
               + bkDate 
-              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR (-marc_245h:*)))";
+              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR -marc_245h:*))";
       
       
       int yearsSE = opts.getJSONObject("search").getInt("yearsSE");
@@ -271,16 +271,17 @@ public class CatalogSearcher {
               + "])";
       String se = "(fmt:SE AND place_of_pub:\"xr \" AND "
               + seDate 
-              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR (-marc_245h:*)))";
+              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR -marc_245h:*))";
       
       
       query.addFilterQuery(bk + " OR " + se);
       
     // Filtry podle role
-    //User user = UserController.getUser(req);
-    if (!Boolean.parseBoolean(req.get("fullCatalog")) || user == null || "user".equals(user.role)) {
+    // User user = UserController.getUser(req);
+    if (!Boolean.parseBoolean(req.get("fullCatalog")+"") || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
+      query.addFilterQuery("marc_990a:*");
       query.addFilterQuery("-marc_990a:NNN");
     } else {
     }
