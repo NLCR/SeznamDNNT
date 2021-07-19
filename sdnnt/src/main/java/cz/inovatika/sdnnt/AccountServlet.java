@@ -297,8 +297,6 @@ public class AccountServlet extends HttpServlet {
           } else {
             inputJs = new JSONObject(req.getParameter("json"));
           }
-          Indexer.changeStav(inputJs.getString("identifier"), 
-                  inputJs.getJSONObject("zadost").getString("navrh"), user.username);
           return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
                   inputJs.getString("reason"), user.username);
         } catch (Exception ex) {

@@ -520,7 +520,7 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     List<SolrInputDocument> hDocs = new ArrayList();
     List<SolrInputDocument> cDocs = new ArrayList();
-    try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
+    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       int indexed = 0;
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
@@ -553,9 +553,9 @@ public class Indexer {
           }
         }
 
-        if (!hDocs.isEmpty()) {
+        if (!cDocs.isEmpty()) {
 //          solr.add("history", hDocs);
-//          solr.add("catalog", cDocs);
+          solr.add("catalog", cDocs);
           hDocs.clear();
           cDocs.clear();
         }
@@ -566,7 +566,7 @@ public class Indexer {
         cursorMark = nextCursorMark;
         LOGGER.log(Level.INFO, "Current indexed: {0}", indexed);
       }
-      solr.commit("history");
+      // solr.commit("history");
       solr.commit("catalog");
       ret.put("indexed", indexed);
       String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);

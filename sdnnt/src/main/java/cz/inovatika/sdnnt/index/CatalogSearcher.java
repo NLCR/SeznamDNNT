@@ -274,7 +274,7 @@ public class CatalogSearcher {
               + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR -marc_245h:*))";
       
       
-      query.addFilterQuery(bk + " OR " + se);
+      query.addFilterQuery(bk + " OR " + se + " OR marc_990a:*");
       
     // Filtry podle role
     // User user = UserController.getUser(req);
@@ -283,7 +283,7 @@ public class CatalogSearcher {
       // Z UI a podle user role
       query.addFilterQuery("marc_990a:*");
       query.addFilterQuery("-marc_990a:NNN");
-    } else {
+    } else { 
     }
      
     return query;
