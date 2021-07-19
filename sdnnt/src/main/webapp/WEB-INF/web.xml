@@ -83,6 +83,7 @@
         <url-pattern>/admin/*</url-pattern>
         <url-pattern>/imports</url-pattern>
         <url-pattern>/import/*</url-pattern>
+        <url-pattern>/zadost/*</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>ConfigServlet</servlet-name>
