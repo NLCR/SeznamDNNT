@@ -276,7 +276,8 @@ public class AccountServlet extends HttpServlet {
           }
           Indexer.changeStav(inputJs.getString("identifier"), 
                   inputJs.getJSONObject("zadost").getString("navrh"), user.username);
-          return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), user.username);
+          return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
+                  inputJs.getString("reason"), user.username);
           // json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

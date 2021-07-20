@@ -63,7 +63,7 @@ public class MarcRecord {
           = Arrays.asList("015", "020", "022", "035", "040", "044", "100", "130", "240", "243",
                   "245", "246", "250", "260", "264", "338",
                   "700", "710", "711", "730",
-                  "856", "990", "992", "998", "956", "911", "910");
+                  "856", "990", "991", "992", "998", "956", "911", "910");
 
   public static MarcRecord fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
