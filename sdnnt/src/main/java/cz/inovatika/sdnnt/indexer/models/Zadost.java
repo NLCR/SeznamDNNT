@@ -138,13 +138,14 @@ public class Zadost {
     }
   }
   
-  public static JSONObject approve(String identifier, String js, String username) {
+  public static JSONObject approve(String identifier, String js, String komentar, String username) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       String oldProcess = new JSONObject().put("process", zadost.process).toString();
       ZadostProcess zprocess = new ZadostProcess();
       zprocess.state = "approved";
       zprocess.user = username;
+      zprocess.reason = komentar;
       zprocess.date = new Date();
       zadost.process.put(identifier, zprocess);
       String newProcess = new JSONObject().put("process", zadost.process).toString();
