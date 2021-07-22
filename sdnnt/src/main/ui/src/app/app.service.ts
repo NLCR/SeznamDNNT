@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError  } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 
 import { AppState } from './app.state';
 import { TranslateService } from '@ngx-translate/core';
@@ -48,8 +48,25 @@ export class AppService {
     }
     return this.http.post<any>(`api${url}`, obj, { params }).pipe(
       finalize(() => this.stopLoading())
-    );
+    ).pipe(catchError(this.handleError));
   }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.status === 0) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      console.error(
+        `Backend returned code ${error.status}, body was: `, error.error);
+    }
+    // Return an observable with a user-facing error message.
+    return throwError(
+      'Something bad happened; please try again later.');
+  }
+
+
 
   private cdkSpinnerCreate() {
     return this.overlay.create({
@@ -210,6 +227,7 @@ export class AppService {
 
   login(user: string, pwd: string): Observable<User> {
     const url = '/user/login';
+    // login fail 
     return this.post(url, { user, pwd });
     // return of({name: user, role: "user"});
     //return of({name: user, role: "admin"});

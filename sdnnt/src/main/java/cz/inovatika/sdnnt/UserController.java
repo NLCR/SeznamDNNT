@@ -17,9 +17,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+
+import cz.inovatika.sdnnt.services.MailService;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -57,6 +61,7 @@ public class UserController {
     } else return null;
   }
 
+
   public static JSONObject login(HttpServletRequest req) {
     JSONObject ret = new JSONObject();
     try {
@@ -64,19 +69,24 @@ public class UserController {
 
       // TODO Authentication. Ted prihlasime kazdeho
       String username = json.getString("user");
-      //String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"))
-      ret.put("username", username);
-      User user = findUser(json.getString("user"));
 
-      ret = user.toJSONObject();
-      // ??
-      // Pridat aktivni zadosti pokud existujou stav=open
-      JSONArray docs = UserController.getZadost(username);
-      if (docs != null && !docs.isEmpty()) {
-        ret.put("zadost", docs);
+
+      String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"));
+      ret.put("username", username);
+
+      User user = findUser(json.getString("user"));
+      if (user != null && user.pwd != null && user.pwd.equals(pwdHashed)) {
+        ret = user.toJSONObject();
+
+        JSONArray docs = UserController.getZadost(username);
+        if (docs != null && !docs.isEmpty()) {
+          ret.put("zadost", docs);
+        }
+        setSessionObject(req, user);
+        return ret;
+      } else {
+        return null;
       }
-      setSessionObject(req, user);
-      return ret;
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -168,16 +178,24 @@ public class UserController {
     }
   }
 
-  public static JSONObject register(String js) {
-
+  public static JSONObject register(MailService mailService, String js) {
     User old = findUser((new JSONObject(js)).getString("username"));
     if (old != null) {
       return new JSONObject().put("error", "username_exists");
     }
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       User user = User.fromJSON(js);
+
+      String newPwd = generatePwd();
+      user.pwd = DigestUtils.sha256Hex(newPwd);
+
       solr.addBean("users", user);
       solr.commit("users");
+
+      LOGGER.info(String.format("Sending mail with generated password to %s", user.email));
+      Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
+      mailService.sendRegistrationMail(userRecepient,newPwd);
+
       solr.close();
       return new JSONObject(js);
     } catch (Exception ex) {
@@ -186,20 +204,27 @@ public class UserController {
     }
   }
 
-  public static JSONObject resetPwd(HttpServletRequest req, String js) {
+  public static JSONObject resetPwd(MailService mailService, HttpServletRequest req, String js) throws IOException, EmailException {
     String newPwd = generatePwd();
-    String username = (new JSONObject(js)).optString("username", "null");
-    User user = getUser(req);
-    if (!"null".equals(username)) {
-      // Toto muze jen admin
-      if ("admin".equals(user.role)) {
-        user = findUser(username);
-      }
+    String username = (new JSONObject(js)).optString("username", "");
+    User sender = getUser(req);
+
+    User subject = null;
+
+    if (username != null && !username.equals("") && sender.role.equals("admin")) {
+      subject = findUser(username);
+    } else {
+      subject = sender;
     }
-    if (user != null) {
-      // Ulozit user a nove heslo poslat mailem
-      user.pwd = DigestUtils.sha256Hex(newPwd);
-      save(user);
+
+    if (subject != null) {
+      // password link ?
+      subject.pwd = DigestUtils.sha256Hex(newPwd);
+
+      mailService.sendResetPasswordMail(Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
+
+      save(subject);
+
     }
     return new JSONObject().put("pwd", newPwd);
   }
@@ -217,7 +242,7 @@ public class UserController {
     }
   }
 
-  public static JSONObject resetPwdLink(HttpServletRequest req, String email) {
+  public static JSONObject resetPwdLink(MailService mailService, HttpServletRequest req, String email) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       SolrQuery query = new SolrQuery("email:\"" + email + "\"")
               .setRows(1);
@@ -227,14 +252,16 @@ public class UserController {
         return new JSONObject().put("error", "Invalid token");
       } else {
         User user = users.get(0);
+        //Store reset token
+
         if (user.resetPwdExpiration.after(new Date())) {
           // Logujeme uzivatel ?
           // setSessionObject(req, user);
+
           return user.toJSONObject();
         } else {
           return new JSONObject().put("error", "Expired");
         }
-        
       }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -299,6 +326,8 @@ public class UserController {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       solr.addBean("users", user);
       solr.commit("users");
+
+
       solr.close();
       return user.toJSONObject();
     } catch (Exception ex) {

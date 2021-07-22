@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -66,7 +68,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         if (headerString != null) {
             User user = UserController.findUserByApiKey(headerString);
             if (user != null) {
-                BatchResponse allRequestsResponse = new BatchResponse();
+                InlineResponse2001 allRequestsResponse = new InlineResponse2001();
                 try {
                     JSONObject search = accountService.search(null, status, navrh, user);
                     JSONObject response = search.getJSONObject("response");
@@ -74,18 +76,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     for (int i = 0, ll = docs.length();i<ll;i++) {
                         JSONObject jsonObject = docs.getJSONObject(i);
 
-                        // somehome user jackson provider
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-                        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-                        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                        objectMapper.registerModule(new JavaTimeModule());
-                        objectMapper.setDateFormat(new RFC3339DateFormat());
+                        // use jackson provider
+                        ObjectMapper objectMapper = getObjectMapper();
 
                         SavedRequest savedRequest = objectMapper.readValue(jsonObject.toString(), SavedRequest.class);
-                        allRequestsResponse.addSavedItem(savedRequest);
+                        allRequestsResponse.addRequestsItem(savedRequest);
                     }
+
                     return Response.ok().entity(allRequestsResponse).build();
 
                 } catch (SolrServerException | IOException e) {
@@ -100,13 +97,25 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
+    private ObjectMapper getObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.setDateFormat(new RFC3339DateFormat());
+        return objectMapper;
+    }
 
 
     private Response request(ContainerRequestContext crc, BatchRequest body, Navrh navrh) {
         try {
             BatchResponse response = new BatchResponse();
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            ObjectMapper objectMapper = getObjectMapper();
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
@@ -161,6 +170,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     // verify identifiers
     private boolean verifyIndetifiers(List<String> identifiers) {
+        // must exists and must be in state
         for (String ident :  identifiers) {
             // if (cannotfind) return false;
             //catalogSearcher.search()

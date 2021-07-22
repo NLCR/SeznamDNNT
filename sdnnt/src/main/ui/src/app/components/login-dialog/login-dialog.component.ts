@@ -47,6 +47,15 @@ export class LoginDialogComponent implements OnInit {
     });
   }
 
+  resetPwd() {
+    console.log("Reset password .. send link ");
+    /*
+    this.service.logout().subscribe(res => {
+    });
+    */
+  }
+
+
   logout() {
     this.service.logout().subscribe(res => {
       this.state.setLogged(res);

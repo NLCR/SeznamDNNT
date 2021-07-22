@@ -17,7 +17,7 @@ public class OpenApiDocServlet  extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        InputStream resource = this.getClass().getResourceAsStream("api.yaml");
+        InputStream resource = this.getClass().getResourceAsStream("api.yaml.back");
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/x-yaml");
         String s = IOUtils.toString(resource, "UTF-8");

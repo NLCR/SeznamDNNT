@@ -77,7 +77,8 @@ public class User {
   @Field
   public Date resetPwdExpiration;
   
-  
+
+
   public JSONObject toJSONObject() {
     try {
       ObjectMapper mapper = new ObjectMapper();

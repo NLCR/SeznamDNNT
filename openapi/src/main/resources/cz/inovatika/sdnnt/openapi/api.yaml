@@ -3,7 +3,7 @@ info:
   title: SDNNT API
   description: |-
 
-    API umožnuje vzdáleně spravovat svoje žádosti, vytvářet nové, prohlížet již poslané a procházet katalog.
+   Zde bude popis API 
 
   #  termsOfService: 'https://nkp.cz'
   #  contact:
@@ -14,7 +14,7 @@ info:
   version: 1.0.0
 
 externalDocs:
-  description: Find out more about SDNNT
+  description: Odkaz na stranky sdnnt
   url: 'https://sdnnt.nkp.cz'
 servers:
   - url: ../api/v1.0
@@ -23,6 +23,8 @@ tags:
     description: Endpoint, který řeší kompletně správu požadavků
   - name: Katalog
     description: Endpoint pro hledání v katalogu
+  - name: SeznamyDNNT
+    description: Kompletní seznamy děl zařazených a děl vyřazených ze systému DNNT
 
 paths:
 
@@ -114,11 +116,11 @@ paths:
     put:
       tags:
         - Požadavky
-      summary: Umožňuje podávat hromadnou žádost
-      description: Řeší hromadnou žádost
+      summary: Podání jednoho nebo více návhrhů na zařazení do seznamu DNNT
+      description: Řeší hromadné podání navrhů na zařazení do seznamu DNNT
       operationId: requestBatchNzn
       requestBody:
-        description: Vytvoření hromadné žádosti
+        description: Hromadný návrh (jeden nebo více, identifikátory musí existovat a nesmí se opakovat)
         content:
           application/json:
             schema:
@@ -146,11 +148,11 @@ paths:
     put:
       tags:
         - Požadavky
-      summary: Umožňuje podávat hromadnou žádost
-      description: Řeší hromadnou žádost
+      summary: Požadavek případně více požadavků na vyřazení díla ze seznamu DNNT
+      description: Řeší hromadnou hroadný požadavek o vyřazení ze seznamu DNNT
       operationId: requestBatchVvs
       requestBody:
-        description: Vytvoření hromadné žádosti
+        description: Hromadný požadavek (jeden nebo více, identifikátory musí existovat a nesmí se opakovat)
         content:
           application/json:
             schema:
@@ -175,11 +177,94 @@ paths:
         - api_key: []
 
 
+  /lists/dnnt/enabled:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Aktuální seznam DNNT
+      description: Seznam děl zařazených na seznam sdnnt
+      operationId: listDNNTEnabled
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date-time
+            example: "2017-07-21T17:32:28Z"
+          required: false
+        - in: query
+          name: rows
+          schema:
+            type: integer
+            default: 20
+          required: false
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          required: false
+
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListsObject'
+            application/csv:
+              schema:
+                type: string
+                example: "PID\nuuid:xxxxx"
+
+
+
+  /lists/dnnt/disabled:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Aktuální seznam děl vyřazených ze seznamu DNNT
+      description: Seznam děl vyřazených se seznamu DNNT
+      operationId: listDNNTDisabled
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date-time
+            example: "2017-07-21T17:32:28Z"
+          required: false
+        - in: query
+          name: rows
+          schema:
+            type: integer
+            default: 20
+          required: false
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 0
+          required: false
+
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListsObject'
+            application/csv:
+              schema:
+                type: string
+                example: "PID\nuuid:xxxxx"
+
+
 
 components:
   schemas:
 
-    # Batch
+    # Davkovy pozadavek 
     BatchRequest:
       type: object
       properties:
@@ -199,7 +284,7 @@ components:
             pozadavek: "Pozadavek o zarazeni varky dva"
             poznamka: "Poznamka B"
 
-    # Batch
+    # Objekt repreyentujic zaznam v katalogu - vyuzito ve vyhledavani
     CatalogObject:
       type: object
       properties:
@@ -214,6 +299,18 @@ components:
         batch:
           id: "admin-0123445"
           message: "Cannot find batch 'admin-0123445'"
+
+    # Objekt repreyentujic zaznam v katalogu - vyuzito ve vyhledavani
+    ListsObject:
+      type: array
+      items:
+        type: object
+        properties:
+          pid:
+            type: string
+      example:
+        - pid: "uuid:xxxx"
+        - pid: "uuid:yyyy"
 
 
     # Batch
@@ -234,7 +331,7 @@ components:
 
 
 
-    # Zadost
+    # Zadost / Navrh na zarazeni a pozadavek na vyrazeni 
     Request:
       type: object
       properties:
@@ -256,7 +353,7 @@ components:
         poznamka: 'Poznamka'
 
 
-    # Not saved
+    # Neulozena zadost
     NotSavedRequest:
       allOf:
         - $ref: '#/components/schemas/Request'
@@ -280,7 +377,7 @@ components:
         poznamka: 'Poznamka'
         reason: 'Cannot find identifier oai:aleph-nkp.cz:SKC01-002839929'
 
-    # Ulozene zadosti
+    # Ulozena zadost
     SavedRequest:
       allOf:
         - $ref: '#/components/schemas/Request'
@@ -305,7 +402,7 @@ components:
         poznamka: 'Poznamka'
         indextime: '2021-07-09T07:12:55.366Z'
 
-    # Ulozene zadosti
+    # Odpoved z endpoitu pro davkove zpracovani
     BatchResponse:
       type: object
       properties:

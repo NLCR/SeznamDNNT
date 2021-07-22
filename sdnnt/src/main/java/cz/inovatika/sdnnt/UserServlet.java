@@ -14,6 +14,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 
@@ -90,7 +92,7 @@ public class UserServlet extends HttpServlet {
           } else {
             inputJs = req.getParameter("json");
           }
-        return UserController.resetPwd(req, inputJs);
+        return UserController.resetPwd(new MailServiceImpl(),req, inputJs);
       }
     },
     SAVE {
@@ -108,13 +110,15 @@ public class UserServlet extends HttpServlet {
     REGISTER {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        // TODO: MailService ?? Create? Inject ?
         String inputJs;
           if (req.getMethod().equals("POST")) {
             inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
           } else {
             inputJs = req.getParameter("json");
           }
-        return UserController.register(inputJs);
+
+        return UserController.register(new MailServiceImpl(), inputJs);
       }
     },
     ALL {
