@@ -131,6 +131,7 @@ public class IndexerServlet extends HttpServlet {
           }
           json.put("indexed", oai.full(set, core, 
                   Boolean.parseBoolean(req.getParameter("merge")),
+                  Boolean.parseBoolean(req.getParameter("keepDNTFields")),
                   Boolean.parseBoolean(req.getParameter("allFields"))));
           
         } catch (Exception ex) {
@@ -157,6 +158,35 @@ public class IndexerServlet extends HttpServlet {
           }
           json.put("indexed", oai.update(set, core, 
                   Boolean.parseBoolean(req.getParameter("merge")),
+                  true,
+                  Boolean.parseBoolean(req.getParameter("allFields"))));
+
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    // harvest s datum yyyy-MM-ddTHH:mm:ssZ 2021-01-31T10:19:09Z - posledni zaznam from until
+    UPDATE_FROM {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          OAIHarvester oai = new OAIHarvester();
+          String set = "SKC";
+          String core = "catalog";
+          if (req.getParameter("set") != null) {
+            set = req.getParameter("set");
+          }
+          if (req.getParameter("core") != null) {
+            core = req.getParameter("core");
+          }
+          json.put("indexed", oai.updateFrom(set, core, 
+                  req.getParameter("from"),
+                  Boolean.parseBoolean(req.getParameter("merge")),
+                  true,
                   Boolean.parseBoolean(req.getParameter("allFields"))));
 
         } catch (Exception ex) {

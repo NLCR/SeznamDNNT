@@ -43,6 +43,7 @@ public class OAIHarvester {
   JSONObject ret = new JSONObject();
   String collection = "catalog";
   boolean merge;
+  boolean update;
   boolean allFields;
   List<SolrInputDocument> recs = new ArrayList();
   List<String> toDelete = new ArrayList();
@@ -54,9 +55,10 @@ public class OAIHarvester {
   long procTime = 0;
   long solrTime = 0;
 
-  public JSONObject full(String set, String core, boolean merge, boolean allFields) {
+  public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.update = update;
     this.allFields = allFields;
     long start = new Date().getTime();
     Options opts = Options.getInstance();
@@ -94,15 +96,16 @@ public class OAIHarvester {
     return last;
   }
 
-  public JSONObject update(String set, String core, boolean merge, boolean allFields) {
+  public JSONObject update(String set, String core, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.update = update;
     this.allFields = allFields;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
     String from = lastIndexDate(set);// "2021-03-14T00:00:00Z";
     if (from == null) {
-      return full(set, core, merge, allFields);
+      return full(set, core, merge, update, allFields);
     }
     TimeZone tz = TimeZone.getTimeZone("UTC");
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
@@ -121,9 +124,10 @@ public class OAIHarvester {
     return ret;
   }
 
-  public JSONObject updateFrom(String set, String core, String from, boolean merge, boolean allFields) {
+  public JSONObject updateFrom(String set, String core, String from, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
+    this.update = update;
     this.allFields = allFields;
     Options opts = Options.getInstance();
     long start = new Date().getTime();
@@ -169,7 +173,7 @@ public class OAIHarvester {
               procTime += new Date().getTime() - start;
               start = new Date().getTime();
               if (!recs.isEmpty()) {
-                Indexer.add(collection, recs, merge, "harvester");
+                Indexer.add(collection, recs, merge, update, "harvester");
                 indexed += recs.size();
                 recs.clear();
               }
@@ -200,7 +204,7 @@ public class OAIHarvester {
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
-                  Indexer.add(collection, recs, merge, "harvester");
+                  Indexer.add(collection, recs, merge, update, "harvester");
                   indexed += recs.size();
                   solrTime += new Date().getTime() - start;
                   LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
@@ -218,7 +222,7 @@ public class OAIHarvester {
         }
         start = new Date().getTime();
         if (!recs.isEmpty()) {
-          Indexer.add(collection, recs, merge, "harvester");
+          Indexer.add(collection, recs, merge, update, "harvester");
           indexed += recs.size();
           recs.clear();
         }

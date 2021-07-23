@@ -1,21 +1,23 @@
 <app-facets-used></app-facets-used>
 
 <mat-accordion multi>
-  <mat-expansion-panel *ngFor="let facet of facets" [expanded]="true">
-    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-      <mat-panel-title>
-        {{ 'field.' + facet | translate }}
-      </mat-panel-title>
-    </mat-expansion-panel-header>
-    <div class="app-facet-wrapper">
-      <div *ngFor="let f of facet_fields[facet]">
-        <ng-container [ngSwitch]="facet">
-          <a *ngSwitchCase="'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
-          <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
-        </ng-container>
+  <ng-container *ngFor="let facet of facets">
+    <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="true">
+      <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+        <mat-panel-title>
+          {{ 'field.' + facet | translate }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div class="app-facet-wrapper">
+        <div *ngFor="let f of facet_fields[facet]">
+          <ng-container [ngSwitch]="facet">
+            <a *ngSwitchCase="'marc_990a'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+            <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+          </ng-container>
+        </div>
       </div>
-    </div>
-  </mat-expansion-panel>
+    </mat-expansion-panel>
+  </ng-container>
 
   <mat-expansion-panel *ngIf="rokod" [expanded]="true">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">

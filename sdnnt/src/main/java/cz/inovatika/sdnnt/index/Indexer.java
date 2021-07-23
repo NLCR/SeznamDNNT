@@ -65,10 +65,29 @@ public class Indexer {
     }
   }
 
-  public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, String user) {
+  public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user) {
     JSONObject ret = new JSONObject();
-    try {
-      if (merge) {
+    try { 
+      if (update) {
+        for (SolrInputDocument rec : recs) {
+          SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"));
+          if (docs.getNumFound() == 0) {
+            LOGGER.log(Level.FINE, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
+            getClient().add("catalog", rec);
+          } else {
+            SolrInputDocument hDoc = new SolrInputDocument();
+            SolrInputDocument cDoc = mergeWithHistory(
+                    (String) rec.getFieldValue("raw"),
+                    docs.get(0), hDoc,
+                    user, update, ret);
+            if (cDoc != null) {
+              getClient().add("catalog", cDoc);
+              getClient().add("history", hDoc);
+            }
+          }
+          
+        }
+      } else if (merge) {
         for (SolrInputDocument rec : recs) {
           SolrDocumentList docs = find((String) rec.getFieldValue("raw"));
           if (docs == null) {
@@ -89,7 +108,7 @@ public class Indexer {
             SolrInputDocument cDoc = mergeWithHistory(
                     (String) rec.getFieldValue("raw"),
                     doc, hDoc,
-                    user, ret);
+                    user, update, ret);
             if (cDoc != null) {
               hDocs.add(hDoc);
               cDocs.add(cDoc);
@@ -113,9 +132,11 @@ public class Indexer {
     return ret;
   }
 
+  // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
+  // keepDNTFields = true => zmena pouze DNT (990, 992) poli
   private static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
-          String user, JSONObject ret) {
+          String user, boolean keepDNTFields, JSONObject ret) {
 
     try {
       String jsCat = (String) docCat.getFirstValue("raw");
@@ -127,10 +148,10 @@ public class Indexer {
       JsonNode target = mapper.readTree(jsTarget);
 
       JsonNode fwPatch = JsonDiff.asJson(source, target);
-      removeOpsForNotDNTFields(fwPatch);
+      removeOpsForDNTFields(fwPatch, keepDNTFields);
       if (new JSONArray(fwPatch.toString()).length() > 0) {
         JsonNode bwPatch = JsonDiff.asJson(target, source);
-        removeOpsForNotDNTFields(bwPatch);
+        removeOpsForDNTFields(bwPatch, keepDNTFields);
 
         historyDoc.setField("identifier", docCat.getFirstValue("identifier"));
         historyDoc.setField("user", user);
@@ -154,6 +175,22 @@ public class Indexer {
       ret.append("errors", "error merging " + docCat.getFirstValue("identifier"));
       return null;
     }
+  }
+
+  public static SolrDocumentList findById(String identifier) {
+    // JSONObject ret = new JSONObject();
+    try {
+      SolrQuery query = new SolrQuery("*")
+              .addFilterQuery("identifier:\"" +identifier+ "\"")
+              .setRows(1)
+              .setFields("*");
+      return getClient().query("catalog", query).getResults();
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
+    // return ret;
   }
 
   public static SolrDocumentList find(String source) {
@@ -223,7 +260,7 @@ public class Indexer {
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
       mr.toSolrDoc();
       if (navrh.equals("VVS")) {
-        if (oldStav.contains("A")) {
+        if (oldStav == null || oldStav.contains("A")) {
           mr.setStav("VS");
         } else if (oldStav.contains("PA")) {
           mr.setStav("VN");
@@ -385,7 +422,7 @@ public class Indexer {
 
       JsonNode patch = JsonDiff.asJson(source, target);
       ret.put("diff", new JSONArray(patch.toString()));
-      removeOpsForNotDNTFields(patch);
+      removeOpsForDNTFields(patch, false);
       ret.put("catalog", new JSONObject(jsCat));
       ret.put("sdnnt", new JSONObject(jsDnt));
       ret.put("patch", new JSONArray(patch.toString()));
@@ -472,9 +509,9 @@ public class Indexer {
         // As target the sdnnt record
         JsonNode target = mapper.readTree(jsDnt);
         JsonNode fwPatch = JsonDiff.asJson(source, target);
-        removeOpsForNotDNTFields(fwPatch);
+        removeOpsForDNTFields(fwPatch, false);
         JsonNode bwPatch = JsonDiff.asJson(target, source);
-        removeOpsForNotDNTFields(bwPatch);
+        removeOpsForDNTFields(bwPatch, false);
 
         ret.put("forward_patch", new JSONArray(fwPatch.toString()));
         ret.put("backward_patch", new JSONArray(bwPatch.toString()));
@@ -520,7 +557,7 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     List<SolrInputDocument> hDocs = new ArrayList();
     List<SolrInputDocument> cDocs = new ArrayList();
-    try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
+    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/")).build()) {
       int indexed = 0;
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
@@ -553,9 +590,9 @@ public class Indexer {
           }
         }
 
-        if (!hDocs.isEmpty()) {
+        if (!cDocs.isEmpty()) {
 //          solr.add("history", hDocs);
-//          solr.add("catalog", cDocs);
+          solr.add("catalog", cDocs);
           hDocs.clear();
           cDocs.clear();
         }
@@ -566,7 +603,7 @@ public class Indexer {
         cursorMark = nextCursorMark;
         LOGGER.log(Level.INFO, "Current indexed: {0}", indexed);
       }
-      solr.commit("history");
+      // solr.commit("history");
       solr.commit("catalog");
       ret.put("indexed", indexed);
       String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
@@ -629,9 +666,9 @@ public class Indexer {
       JsonNode target = mapper.readTree(jsDnt);
 
       JsonNode fwPatch = JsonDiff.asJson(source, target);
-      removeOpsForNotDNTFields(fwPatch);
+      removeOpsForDNTFields(fwPatch, false);
       JsonNode bwPatch = JsonDiff.asJson(target, source);
-      removeOpsForNotDNTFields(bwPatch);
+      removeOpsForDNTFields(bwPatch, false);
 
 //      ret.put("forward_patch", new JSONArray(fwPatch.toString()));
 //      ret.put("backward_patch", new JSONArray(bwPatch.toString()));
@@ -651,14 +688,16 @@ public class Indexer {
     }
   }
 
-  private static void removeOpsForNotDNTFields(Iterable jsonPatch) {
+  private static void removeOpsForDNTFields(Iterable jsonPatch, boolean keep) {
     Iterator<JsonNode> patchIterator = jsonPatch.iterator();
     while (patchIterator.hasNext()) {
       JsonNode patchOperation = patchIterator.next();
-      JsonNode operationType = patchOperation.get("op");
+      // JsonNode operationType = patchOperation.get("op");
       JsonNode pathName = patchOperation.get("path");
       // if (operationType.asText().equals("replace") && ignoredFields.contains(pathName.asText())) {
-      if (!dntSetFields.contains(pathName.asText())) {
+      if (!dntSetFields.contains(pathName.asText()) && !keep) {
+        patchIterator.remove();
+      } else if (dntSetFields.contains(pathName.asText()) && keep) {
         patchIterator.remove();
       }
     }
