@@ -15,9 +15,13 @@ public interface MailService {
 
     public Session getSession(String name, String pswd);
 
+    public void sendResetPasswordRequest(Pair<String,String> recipient, String requestToken) throws IOException, EmailException;
+
     public void sendRegistrationMail(Pair<String,String> recipient, String generatedPswd) throws IOException, EmailException;
 
     public void sendResetPasswordMail(Pair<String, String> recpipient, String generatedPswd) throws  IOException, EmailException;
+
+
 
     public void sendHTMLEmail(Pair<String, String> from, List<Pair<String,String>> recipients, String subject, String text) throws ServerException, EmailException;
 

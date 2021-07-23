@@ -9,16 +9,18 @@ import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -39,6 +41,8 @@ import org.json.JSONObject;
  * @author alberto
  */
 public class UserController {
+
+
 
   public static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
   public static final String AUTHENTICATED_USER = "user";
@@ -192,7 +196,6 @@ public class UserController {
       solr.addBean("users", user);
       solr.commit("users");
 
-      LOGGER.info(String.format("Sending mail with generated password to %s", user.email));
       Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
       mailService.sendRegistrationMail(userRecepient,newPwd);
 
@@ -203,6 +206,8 @@ public class UserController {
       return new JSONObject().put("error", ex);
     }
   }
+
+
 
   public static JSONObject resetPwd(MailService mailService, HttpServletRequest req, String js) throws IOException, EmailException {
     String newPwd = generatePwd();
@@ -222,9 +227,7 @@ public class UserController {
       subject.pwd = DigestUtils.sha256Hex(newPwd);
 
       mailService.sendResetPasswordMail(Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
-
       save(subject);
-
     }
     return new JSONObject().put("pwd", newPwd);
   }
@@ -241,10 +244,46 @@ public class UserController {
       return new JSONObject().put("error", "not logged");
     }
   }
-
-  public static JSONObject resetPwdLink(MailService mailService, HttpServletRequest req, String email) {
+  public static JSONObject forgotPwd(MailServiceImpl mailService, HttpServletRequest req, String inputJs) {
+    String input = (new JSONObject(inputJs)).optString("username", "");
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-      SolrQuery query = new SolrQuery("email:\"" + email + "\"")
+      SolrQuery query = new SolrQuery("email:\"" + input + "\" OR username:\""+input+"\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      solr.close();
+      if (users.isEmpty()) {
+        return new JSONObject().put("error", "Cannot find user");
+      } else {
+        User user = users.get(0);
+        if (user.email != null) {
+
+          // generate token and store expiration
+          user.resetPwdToken = UUID.randomUUID().toString();
+          user.resetPwdExpiration = Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
+          save(user);
+
+          //save everything to user
+          mailService.sendResetPasswordRequest(Pair.of(user.email, user.jmeno +" "+user.prijmeni), user.resetPwdToken);
+          JSONObject object = new JSONObject();
+          object.put("token", user.resetPwdToken);
+          return object;
+
+        } else {
+          return new JSONObject().put("error", "Cannot find user");
+        }
+     }
+    } catch (SolrServerException | IOException |EmailException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+
+
+
+  public static JSONObject checkResetPwdLink(MailService mailService, HttpServletRequest req, String js ) {
+    String token = (new JSONObject(js)).optString("resetPwdToken", "");
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
               .setRows(1);
       List<User> users = solr.query("users", query).getBeans(User.class);
       solr.close();
@@ -252,42 +291,29 @@ public class UserController {
         return new JSONObject().put("error", "Invalid token");
       } else {
         User user = users.get(0);
-        //Store reset token
-
         if (user.resetPwdExpiration.after(new Date())) {
-          // Logujeme uzivatel ?
-          // setSessionObject(req, user);
+          String newPwd = generatePwd();
+          user.pwd = DigestUtils.sha256Hex(newPwd);
+          user.resetPwdToken = null;
+          user.resetPwdExpiration = null;
+          save(user);
 
-          return user.toJSONObject();
+          Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
+          mailService.sendResetPasswordMail(userRecepient,newPwd);
+
+          User retvalue = new User();
+          retvalue.jmeno = user.jmeno;
+          retvalue.prijmeni = user.prijmeni;
+          retvalue.username = user.username;
+
+          return retvalue.toJSONObject();
         } else {
           return new JSONObject().put("error", "Expired");
         }
       }
-    } catch (SolrServerException | IOException ex) {
+    } catch (SolrServerException | IOException  | EmailException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
-    }
-  }
-
-  public static String checkResetPwdLink(HttpServletRequest req) {
-    String token = RandomStringUtils.randomAlphanumeric(32);
-    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-      SolrQuery query = new SolrQuery("resetPwdToken:\"" + req.getParameter("token") + "\"")
-              .setRows(1);
-      List<User> users = solr.query("users", query).getBeans(User.class);
-      solr.close();
-      if (users.isEmpty()) {
-        return null;
-      } else {
-        User user = users.get(0);
-        user.resetPwdToken = token;
-        user.resetPwdExpiration = java.util.Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
-        save(user);
-        return token;
-      }
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return ex.toString();
+      return new JSONObject().put("error", ex.getMessage());
     }
   }
 
@@ -355,5 +381,6 @@ public class UserController {
       return null;
     }
   }
+
 
 }

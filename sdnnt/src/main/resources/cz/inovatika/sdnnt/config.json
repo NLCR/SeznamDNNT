@@ -12,7 +12,37 @@
     "fromYear": 1911,
     "yearsBK": 14,
     "yearsSE": 10
+  },
+
+
+
+  "mail": {
+    "from.user": "xxxx.xxx@gmail.com",
+    "from.name": "YYYY SSSS",
+    "smtp.user": "aaaaa@gmail.com",
+    "smtp.pass": "pswd",
+    "smtp.host" : "smtp.gmail.com",
+    "smtp.auth": true,
+    "smtp.starttls.enable": true,
+    "smtp.port":587
+  },
+
+  "registration": {
+    "subject": "Registrace uzivatele " ,
+    "content.html": true
+  },
+
+  "passwordreset": {
+    "subject": "Reset hesla" ,
+    "content.html": true
+  },
+
+  "resetlink": {
+    "subject": "Zadost o resetovani hesla" ,
+    "content.html": true
   }
+
+
 }
 
 

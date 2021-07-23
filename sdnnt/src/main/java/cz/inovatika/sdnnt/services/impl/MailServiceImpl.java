@@ -45,6 +45,20 @@ public class MailServiceImpl implements MailService  {
     }
 
 
+
+    @Override
+    public void sendResetPasswordRequest(Pair<String, String> recepient, String token) throws IOException, EmailException {
+        if (recepient != null) {
+            HashMap<String, String> scopes = new HashMap<String, String>();
+            scopes.put("user", recepient.getRight());
+            scopes.put("token", token);
+            String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_link";
+            LOGGER.info("Sending email: Reseting password request");
+            sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("resetlink"), scopes);
+        } else throw new EmailException("No recepient");
+
+    }
+
     @Override
     public void sendResetPasswordMail(Pair<String, String> recepient, String generatedPswd) throws IOException, EmailException {
         if (recepient != null) {
@@ -52,7 +66,8 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recepient.getRight());
             scopes.put("password", generatedPswd);
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_password";
-            sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("registration"), scopes);
+            LOGGER.info("Sending email: Reseted password");
+            sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("passwordreset"), scopes);
         } else throw new EmailException("No recepient");
 
     }
@@ -93,6 +108,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recipient.getRight());
             scopes.put("password", generatedPswd);
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_registration";
+            LOGGER.info("Sending email: Generated password for new created user");
             sendPeparedMail(recipient, path, Options.getInstance().getJSONObject("registration"),scopes );
         } else throw new EmailException("No recipient");
     }

@@ -3,6 +3,8 @@ import { AppState } from 'src/app/app.state';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-login-dialog',
@@ -22,7 +24,9 @@ export class LoginDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private config: AppConfiguration,
     public state: AppState,
-    private service: AppService
+    private service: AppService,
+    private router: Router
+
   ) { }
 
   ngOnInit(): void {
@@ -48,11 +52,16 @@ export class LoginDialogComponent implements OnInit {
   }
 
   resetPwd() {
-    console.log("Reset password .. send link ");
-    /*
-    this.service.logout().subscribe(res => {
+    this.dialogRef.close();
+
+    this.service.forgotPwd(this.user).subscribe((res:any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.forgot_password_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.forgot_password_success', '', false);
+      }
     });
-    */
+
   }
 
 

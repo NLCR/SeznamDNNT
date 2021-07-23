@@ -43,6 +43,7 @@ import { ExpressionDialogComponent } from './components/expression-dialog/expres
 import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { PasswordResetedComponent } from './pages/password-reseted/password-reseted.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -88,7 +89,8 @@ const providers: any[] =[
     ExpressionDialogComponent,
     ImportsComponent,
     ImportComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    PasswordResetedComponent,
   ],
   imports: [
     BrowserModule,

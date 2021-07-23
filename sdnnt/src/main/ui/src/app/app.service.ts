@@ -225,6 +225,14 @@ export class AppService {
     return this.post(url, text);
   }
 
+  activateToken(token: string): Observable<User> {
+    const url = '/user/activate_pwd_token';
+    // login fail 
+    return this.post(url, { "resetPwdToken":token });
+    // return of({name: user, role: "user"});
+    //return of({name: user, role: "admin"});
+  }
+
   login(user: string, pwd: string): Observable<User> {
     const url = '/user/login';
     // login fail 
@@ -256,6 +264,11 @@ export class AppService {
 
   resetPwd(user: string): Observable<User> {
     let url = '/user/reset_pwd';
+    return this.post(url, { username: user });
+  }
+
+  forgotPwd(user: string): Observable<User> {
+    let url = '/user/forgot_pwd';
     return this.post(url, { username: user });
   }
 

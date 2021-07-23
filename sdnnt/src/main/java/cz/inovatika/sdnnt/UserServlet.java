@@ -83,15 +83,43 @@ public class UserServlet extends HttpServlet {
         return UserController.logout(req);
       }
     },
+    // posle link uzivateli ze si ma vygenerovat heslo
+    FORGOT_PWD {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+        if (req.getMethod().equals("POST")) {
+          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+        } else {
+          inputJs = req.getParameter("json");
+        }
+        return UserController.forgotPwd(new MailServiceImpl(),req, inputJs);
+      }
+    },
+    // zruseni tokenu a generovani noveho hesla, poslani na
+    ACTIVATE_PWD_TOKEN {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+        if (req.getMethod().equals("POST")) {
+          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+        } else {
+          inputJs = req.getParameter("json");
+        }
+        return UserController.checkResetPwdLink(new MailServiceImpl(),req, inputJs);
+      }
+    },
+
+    // mail o resetovanem hesle - admin rozhrani
     RESET_PWD {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         String inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
-          } else {
-            inputJs = req.getParameter("json");
-          }
+        if (req.getMethod().equals("POST")) {
+          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+        } else {
+          inputJs = req.getParameter("json");
+        }
         return UserController.resetPwd(new MailServiceImpl(),req, inputJs);
       }
     },
@@ -107,6 +135,7 @@ public class UserServlet extends HttpServlet {
         return UserController.save(inputJs);
       }
     },
+    // registrace noveho uzivatele
     REGISTER {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
