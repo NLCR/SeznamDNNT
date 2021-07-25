@@ -45,6 +45,10 @@
             <param-name>CatalogApi.implementation</param-name>
             <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTCatalogApiServiceImpl</param-value>
         </init-param>
+        <init-param>
+            <param-name>ListsApi.implementation</param-name>
+            <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTCatalogApiServiceImpl</param-value>
+        </init-param>
 
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -84,6 +88,8 @@
         <url-pattern>/imports</url-pattern>
         <url-pattern>/import/*</url-pattern>
         <url-pattern>/zadost/*</url-pattern>
+        <url-pattern>/resetedpwd</url-pattern>
+        <url-pattern>/resetedpwd/*</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>ConfigServlet</servlet-name>

@@ -70,7 +70,10 @@ public class User {
 
   @Field
   public String poznamka;
-  
+
+  @Field
+  public String apikey;
+
   @Field
   public String resetPwdToken;
   

@@ -229,16 +229,11 @@ export class AppService {
     const url = '/user/activate_pwd_token';
     // login fail 
     return this.post(url, { "resetPwdToken":token });
-    // return of({name: user, role: "user"});
-    //return of({name: user, role: "admin"});
   }
 
   login(user: string, pwd: string): Observable<User> {
     const url = '/user/login';
-    // login fail 
     return this.post(url, { user, pwd });
-    // return of({name: user, role: "user"});
-    //return of({name: user, role: "admin"});
   }
 
   logout() {
@@ -271,6 +266,7 @@ export class AppService {
     let url = '/user/forgot_pwd';
     return this.post(url, { username: user });
   }
+
 
   findGoogleBook(id: string): Observable<any> {
     let url = 'search/googlebooks';

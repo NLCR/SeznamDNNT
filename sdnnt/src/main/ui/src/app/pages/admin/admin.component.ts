@@ -96,6 +96,7 @@ export class AdminComponent implements OnInit {
     this.service.saveUser(this.selUser).subscribe();
   }
 
+
   resetPwd() {
     this.service.resetPwd(this.selUser.username).subscribe((res: any) => {
       if (res.error) {

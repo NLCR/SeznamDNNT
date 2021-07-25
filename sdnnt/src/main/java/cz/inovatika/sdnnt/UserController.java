@@ -280,8 +280,7 @@ public class UserController {
 
 
 
-  public static JSONObject checkResetPwdLink(MailService mailService, HttpServletRequest req, String js ) {
-    String token = (new JSONObject(js)).optString("resetPwdToken", "");
+  public static JSONObject checkResetPwdLink(MailService mailService, HttpServletRequest req, String token ) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
               .setRows(1);
@@ -347,7 +346,7 @@ public class UserController {
     }
   }
 
-  private static JSONObject save(User user) {
+  public static JSONObject save(User user) {
 
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       solr.addBean("users", user);

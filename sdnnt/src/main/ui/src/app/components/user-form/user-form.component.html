@@ -1,4 +1,7 @@
+
 <ng-container *ngIf="user">
+  
+
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
     <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
       <mat-radio-group [(ngModel)]="formTypeSelected">
@@ -42,7 +45,7 @@
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>Email</mat-label>
-          <input matInput name="email" placeholder="Email" [(ngModel)]="user.email" />
+          <input matInput name="email" placeholder="Email" [(ngModel)]="user.email"   />
         </mat-form-field>
       </div>
     </div>
@@ -101,6 +104,33 @@
         <mat-checkbox name="isactive" [(ngModel)]="user.isActive" class="app-ml-8">{{ 'desc.je_aktivni' | translate }}</mat-checkbox>
       </div>
     </div>
+
+
+    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
+      <div class="app-mr-4">
+        <mat-form-field appearance="fill" class="app-w-100">
+          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
+      <div>
+        <mat-checkbox name="apienabled" [(ngModel)]="isApiEnabled" class="app-ml-8" (change)="switchEnableApi()">{{ 'desc.apienabled' | translate }}</mat-checkbox>
+      </div>
+    </div>
+
+    <!--    
+    <div fxFlex="100%" *ngIf="state.user?.role === 'admin'">
+      <div>
+        <mat-form-field appearance="fill" class="app-w-100">
+          <mat-label>{{ 'desc.apikey' | translate }}</mat-label>
+          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+  -->
+
+
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
@@ -109,6 +139,11 @@
         </mat-form-field>
       </div>
     </div>
+
+
+
+
+
   </div>
   <div class="app-mb-4">
     <section>
@@ -132,4 +167,6 @@
       <mat-checkbox><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
     </p>
   </div>
+
+
 </ng-container>

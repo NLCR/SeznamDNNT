@@ -3,7 +3,7 @@ info:
   title: SDNNT API
   description: |-
 
-   Zde bude popis API 
+    Zde bude popis API
 
   #  termsOfService: 'https://nkp.cz'
   #  contact:
@@ -177,21 +177,15 @@ paths:
         - api_key: []
 
 
-  /lists/dnnt/enabled:
+  # Seznamy del zarazenych na dnntt
+  /lists/dnntt:
     get:
       tags:
         - SeznamyDNNT
       summary: Aktuální seznam DNNT
       description: Seznam děl zařazených na seznam sdnnt
-      operationId: listDNNTEnabled
+      operationId: listDnntt
       parameters:
-        - in: query
-          name: date
-          schema:
-            type: string
-            format: date-time
-            example: "2017-07-21T17:32:28Z"
-          required: false
         - in: query
           name: rows
           schema:
@@ -219,21 +213,15 @@ paths:
 
 
 
-  /lists/dnnt/disabled:
+  # Seznamy del zarazenych na dnnto
+  /lists/dnnto:
     get:
       tags:
         - SeznamyDNNT
-      summary: Aktuální seznam děl vyřazených ze seznamu DNNT
-      description: Seznam děl vyřazených se seznamu DNNT
-      operationId: listDNNTDisabled
+      summary: Aktuální seznam DNNT
+      description: Seznam děl zařazených na seznam sdnnt
+      operationId: listDnnto
       parameters:
-        - in: query
-          name: date
-          schema:
-            type: string
-            format: date-time
-            example: "2017-07-21T17:32:28Z"
-          required: false
         - in: query
           name: rows
           schema:
@@ -258,6 +246,43 @@ paths:
               schema:
                 type: string
                 example: "PID\nuuid:xxxxx"
+
+
+  # Seznamy del zarazenych na dnntt
+  /lists/dnntt/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Aktuální seznam DNNT
+      description: Seznam děl zařazených na seznam sdnnt
+      operationId: listDnnttCsv
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/csv:
+              schema:
+                type: string
+                example: "PID\nuuid:xxxxx"
+
+  # Seznamy del zarazenych na dnntt
+  /lists/dnnto/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Aktuální seznam DNNT
+      description: Poda seznam del oznacenych labelem dnnto ve formatu csv. Nazev souboru je konstruovan 'xxx '
+      operationId: listDnntoCsv
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/csv:
+              schema:
+                type: string
+                example: "PID\nuuid:xxxxx"
+
+
 
 
 

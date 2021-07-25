@@ -28,6 +28,7 @@
         <mat-tab [label]="'desc.formular' | translate">Nejaky formular</mat-tab>
       </mat-tab-group>
     </mat-tab>
+
     <mat-tab [label]="'desc.usersAdmin' | translate">
       <div fxLayout="row" fxLayoutGap="32px">
         <div fxFlex="350px">
@@ -38,12 +39,13 @@
             </mat-list-item>
           </mat-list>
         </div>
-        <div fxFlex="1 1 auto">
+        <div fxFlex="2 2 auto">
           <app-user-form [user]="selUser"></app-user-form>
           <button mat-stroked-button (click)="saveUser()" class="app-mr-2">{{ 'desc.ulozit' | translate }}</button>
           <button mat-stroked-button (click)="resetPwd()">{{ 'desc.reset_hesla' | translate }}</button>
         </div>
       </div>
     </mat-tab>
+    
   </mat-tab-group>
 </div>

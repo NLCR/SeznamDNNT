@@ -46,6 +46,10 @@ export class PasswordResetedComponent implements OnInit {
         });
       } 
     });
+
+    setTimeout(()=> {
+      this.router.navigate(['/home'], {});
+    },5000)
   }
 
 }

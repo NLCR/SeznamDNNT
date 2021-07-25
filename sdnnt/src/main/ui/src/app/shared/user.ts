@@ -5,6 +5,7 @@ export class User {
   pwd: string;
   role: string;
   isActive: boolean;
+  //isApiEnabled:boolean;
 
   typ: string; //pravnicka/fyzicka osoba
   titul: string;
@@ -17,6 +18,7 @@ export class User {
   telefon: string;
   email: string;
   kontaktni: string;
+  apikey: string;
 
   nositel: string; // Nositel autorských práv k dílu: 
   poznamka: string;

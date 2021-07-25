@@ -106,7 +106,9 @@ public class UserServlet extends HttpServlet {
         } else {
           inputJs = req.getParameter("json");
         }
-        return UserController.checkResetPwdLink(new MailServiceImpl(),req, inputJs);
+
+        String token = (new JSONObject(inputJs)).optString("resetPwdToken", "");
+        return UserController.checkResetPwdLink(new MailServiceImpl(),req, token);
       }
     },
 
