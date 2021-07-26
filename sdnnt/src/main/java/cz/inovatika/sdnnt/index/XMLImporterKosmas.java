@@ -6,7 +6,6 @@
 package cz.inovatika.sdnnt.index;
 
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,9 +13,7 @@ import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,9 +23,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.http.HttpEntity;
@@ -36,10 +31,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -56,9 +49,9 @@ import org.xml.sax.SAXException;
  *
  * @author alberto
  */
-public class XMLImporterHeureka {
+public class XMLImporterKosmas {
 
-  public static final Logger LOGGER = Logger.getLogger(XMLImporterHeureka.class.getName());
+  public static final Logger LOGGER = Logger.getLogger(XMLImporterKosmas.class.getName());
   JSONObject ret = new JSONObject();
   String collection = "imports";
 
@@ -69,12 +62,11 @@ public class XMLImporterHeureka {
 
   int indexed;
 
-  Map<String, String> fieldsMap = Map.ofEntries(
-          new AbstractMap.SimpleEntry<>("NAME", "PRODUCTNAME"),
-          new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
-  List<String> elements = Arrays.asList("NAME", "EAN");
-
-  // https://www.palmknihy.cz/heureka.xml
+//  Map<String, String> fieldsMap = Map.ofEntries(
+//          new AbstractMap.SimpleEntry<>("NAME", "PRODUCTNAME"),
+//          new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
+//  List<String> elements = Arrays.asList("NAME", "AUTHOR", "EAN");
+  // https://www.kosmas.cz/atl_shop/nkp.xml
   public JSONObject fromFile(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
@@ -86,25 +78,30 @@ public class XMLImporterHeureka {
       import_origin = origin;
       import_id = now.toEpochSecond() + "";
 
-      CloseableHttpClient client = HttpClients.createDefault();
-      HttpGet httpGet = new HttpGet(uri);
-      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-        final HttpEntity entity = response1.getEntity();
-        if (entity != null) {
-          try (InputStream is = entity.getContent()) {
-            readXML(is, "SHOPITEM");
-          }
-        }
+//      CloseableHttpClient client = HttpClients.createDefault();
+//      HttpGet httpGet = new HttpGet(uri);
+//      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+//        final HttpEntity entity = response1.getEntity();
+//        if (entity != null) {
+//          try (InputStream is = entity.getContent()) {
+//            readXML(is, "ARTICLE");
+//          }
+//        }
+//      } catch (XMLStreamException | IOException exc) {
+//        LOGGER.log(Level.SEVERE, null, exc);
+//        ret.put("error", exc);
+//      }
+      try {
+        File f = new File(uri);
+        InputStream is = new FileInputStream(f);
+        readXML(is, "ARTICLE");
       } catch (XMLStreamException | IOException exc) {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
 
-//      File f = new File(uri);
-//      InputStream is = new FileInputStream(f);
-//      readXML(is, "SHOPITEM");
       getClient().commit(collection);
-      // solr.close();
+
       ret.put("indexed", indexed);
       ret.put("file", uri);
       ret.put("origin", origin);
@@ -153,19 +150,7 @@ public class XMLImporterHeureka {
       idoc.setField("import_url", import_url);
       idoc.setField("import_origin", import_origin);
 
-      idoc.setField("id", import_id + "_" + item.get("ITEM_ID"));
-
-      if (item.containsKey("ISBN")) {
-
-        ISBNValidator isbn = ISBNValidator.getInstance();
-        String ean = item.get("ISBN");
-        ean = isbn.validate(ean);
-        if (ean != null) {
-          item.put("EAN", ean);
-        } else {
-          item.put("EAN", item.get("ISBN"));
-        }
-      }
+      idoc.setField("id", import_id + "_" + item.get("EAN"));
 
       idoc.setField("item", new JSONObject(item).toString());
 
@@ -174,9 +159,9 @@ public class XMLImporterHeureka {
       findInCatalog(item);
 
       idoc.setField("ean", item.get("EAN"));
-      idoc.setField("name", item.get(fieldsMap.get("NAME")));
-      if (item.containsKey(fieldsMap.get("AUTHOR"))) {
-        idoc.setField("author", item.get(fieldsMap.get("AUTHOR")));
+      idoc.setField("name", item.get("NAME"));
+      if (item.containsKey("AUTHOR")) {
+        idoc.setField("author", item.get("AUTHOR"));
       }
 
       idoc.setField("identifiers", item.get("identifiers"));
@@ -200,11 +185,11 @@ public class XMLImporterHeureka {
 
   private void addFrbr(Map item) {
     String frbr = "";
-    if (item.containsKey(fieldsMap.get("AUTHOR"))) {
-      frbr += item.get(fieldsMap.get("AUTHOR"));
+    if (item.containsKey("AUTHOR")) {
+      frbr += item.get("AUTHOR");
     }
 
-    frbr += "/" + item.get(fieldsMap.get("NAME"));
+    frbr += "/" + item.get("NAME");
 
     item.put("frbr", MD5.normalize(frbr));
   }
@@ -212,7 +197,7 @@ public class XMLImporterHeureka {
   public void findInCatalog(Map item) {
     // JSONObject ret = new JSONObject();
     try {
-      String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
+      String name = ((String) item.get("NAME"));
       String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
 
       String q = "ean:\"" + item.get("EAN") + "\""
