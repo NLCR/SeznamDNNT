@@ -96,7 +96,8 @@
     "registrace_uzivatele_error": "Chyba při registraci uživatele.",
     "ulozeni_uzivatele_success": "Uložení uživatele proběhlo úspěšně.",
     "ulozeni_uzivatele_error": "Chyba při uložení uživatele.",
-    "oznaceni_jako_zpracovane_error": "Chyba při označení jako zpracované."
+    "oznaceni_jako_zpracovane_error": "Chyba při označení jako zpracované.",
+    "invalid_username": "Špatné přihlašovací jméno"
   },
 
   "sort": {

@@ -96,7 +96,8 @@
     "registrace_uzivatele_error": "Error registering user.",
     "ulozeni_uzivatele_success": "User saved successfully",
     "ulozeni_uzivatele_error": "Error saving user.",
-    "oznaceni_jako_zpracovane_error": "Error marking as processed."
+    "oznaceni_jako_zpracovane_error": "Error marking as processed.",
+    "invalid_username": "Invalid user name"
   },
 
   "sort": {
