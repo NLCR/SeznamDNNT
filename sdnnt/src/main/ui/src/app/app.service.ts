@@ -38,7 +38,11 @@ export class AppService {
     }
     const options = { params, responseType, withCredentials: true };
     return this.http.get<T>(`api/${url}`, options).pipe(
-      finalize(() => this.stopLoading())
+      finalize(() => {
+        if (showingLoading) {
+          this.stopLoading();
+        }
+      })
     );
   }
 
