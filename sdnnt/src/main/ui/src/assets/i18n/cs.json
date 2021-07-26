@@ -100,6 +100,7 @@
   },
 
   "sort": {
+    "score": "Relevance",
     "title_sort": "Titulku",
     "rokvydani": "Roku vydání",
     "date1_int": "Roku vydání",

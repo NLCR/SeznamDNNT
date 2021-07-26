@@ -100,6 +100,7 @@
   },
 
   "sort": {
+    "score": "Score",
     "title_sort": "Title",
     "rokvydani": "Year of issue",
     "date1_int": "Year of issue",
