@@ -102,6 +102,7 @@
   "sort": {
     "title_sort": "Titulku",
     "rokvydani": "Roku vydání",
+    "date1_int": "Roku vydání",
     "datestamp": "Data"
   },
 

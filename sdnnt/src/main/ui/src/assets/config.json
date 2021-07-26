@@ -14,8 +14,8 @@
   "sorts": [
     {"field": "title_sort", "dir": "asc"},
     {"field": "title_sort", "dir": "desc"},
-    {"field": "rokvydani", "dir": "asc"},
-    {"field": "rokvydani", "dir": "desc"},
+    {"field": "date1_int", "dir": "asc"},
+    {"field": "date1_int", "dir": "desc"},
     {"field": "datestamp", "dir": "asc"},
     {"field": "datestamp", "dir": "desc"}
   ],
