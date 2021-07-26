@@ -253,10 +253,7 @@ public class CatalogSearcher {
               + (year - yearsBK) 
               + "]))";
       
-      String bk = "(fmt:BK AND place_of_pub:\"xr \" AND "
-              + bkDate 
-              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR -marc_245h:*))";
-      
+      String bk = "(fmt:BK AND " + bkDate + ")";
       
       int yearsSE = opts.getJSONObject("search").getInt("yearsSE");
       String seDate = "((date1_int:["
@@ -269,12 +266,10 @@ public class CatalogSearcher {
               + " TO "
               + (year - yearsSE) 
               + "])";
-      String se = "(fmt:SE AND place_of_pub:\"xr \" AND "
-              + seDate 
-              + " AND ((marc_338a:svazek AND marc_338b:nc AND marc_3382:rdacarrier) OR -marc_245h:*))";
-      
+      String se = "(fmt:SE AND " + seDate + ")";
       
       query.addFilterQuery(bk + " OR " + se + " OR marc_990a:*");
+      
       
     // Filtry podle role
     // User user = UserController.getUser(req);

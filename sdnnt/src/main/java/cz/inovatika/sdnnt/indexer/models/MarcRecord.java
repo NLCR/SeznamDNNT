@@ -171,6 +171,8 @@ public class MarcRecord {
       }
       
     }
+    
+    setIsProposable();
 
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
     String nazev = "";
@@ -224,6 +226,25 @@ public class MarcRecord {
         break;
     }
     sdoc.setField("fmt", fmt);
+  }
+  
+  private void setIsProposable() {
+    
+    // Pole podle misto vydani (xr ) a 338 a 245h
+    boolean is_proposable = false;
+    
+    String place_of_pub = (String) sdoc.getFieldValue("place_of_pub");
+    if ("xr ".equals(place_of_pub)) {
+      if (sdoc.containsKey("marc_338a")) {
+        String marc_338a = (String) sdoc.getFieldValue("marc_338a");
+        String marc_338b = (String) sdoc.getFieldValue("marc_338b");
+        String marc_3382 = (String) sdoc.getFieldValue("marc_3382");
+        is_proposable = "svazek".equals(marc_338a) && "nc".equals(marc_338b) && "rdacarrier".equals(marc_3382);
+      }  else {
+        is_proposable = !sdoc.containsKey("marc_245h");
+      }
+    }
+    sdoc.setField("is_proposable", is_proposable);
   }
 
   public void setStav(String new_stav) {

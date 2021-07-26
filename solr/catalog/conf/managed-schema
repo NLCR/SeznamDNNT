@@ -70,6 +70,7 @@
    <field name="date2" type="string" indexed="true" stored="true"  />
    <field name="date1_int" type="pint" indexed="true" stored="true" />
    <field name="date2_int" type="pint" indexed="true" stored="true" />
+   <field name="is_proposable" type="boolean" indexed="true" stored="true"  />
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    
