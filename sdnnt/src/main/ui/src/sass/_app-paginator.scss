@@ -1,0 +1,16 @@
+// -- PAGINATOR --
+
+app-paginator {
+  .app-sorting {
+    .mat-select-arrow {
+      border: none !important;
+    }
+    .app-sort-trigger {
+      .mat-icon {
+        height: 10px;
+        line-height: 10px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
