@@ -44,7 +44,7 @@ public class Indexer {
 
   public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
 
-  static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/956", "/dataFields/856");
+  static List<String> dntSetFields = Arrays.asList("/dataFields/990", "/dataFields/992", "/dataFields/998");
   static List<String> identifierFields = Arrays.asList("/identifier", "/datestamp", "/setSpec",
           "/controlFields/001", "/controlFields/003", "/controlFields/005", "/controlFields/008");
 
@@ -115,7 +115,7 @@ public class Indexer {
             }
           }
 
-          if (!hDocs.isEmpty()) {
+          if (!cDocs.isEmpty()) {
             getClient().add("history", hDocs);
             getClient().add("catalog", cDocs);
             hDocs.clear();
@@ -133,7 +133,7 @@ public class Indexer {
   }
 
   // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
-  // keepDNTFields = true => zmena pouze DNT (990, 992) poli
+  // keepDNTFields = false => zmena pouze DNT (990, 992) poli
   private static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
           String user, boolean keepDNTFields, JSONObject ret) {
@@ -631,7 +631,7 @@ public class Indexer {
    * @param ret
    * @return doc for catalog
    */
-  public static SolrInputDocument mergeRaw(String jsDnt,
+  private static SolrInputDocument mergeRaw(String jsDnt,
           String identifier, String sysno, String sigla, String controlfield_008,
           String dedup,
           String user, SolrInputDocument historyDoc,
@@ -688,6 +688,8 @@ public class Indexer {
     }
   }
 
+  // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
+  // keepDNTFields = false => zmena pouze DNT (990, 992) poli
   private static void removeOpsForDNTFields(Iterable jsonPatch, boolean keep) {
     Iterator<JsonNode> patchIterator = jsonPatch.iterator();
     while (patchIterator.hasNext()) {

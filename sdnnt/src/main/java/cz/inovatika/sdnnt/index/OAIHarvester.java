@@ -49,7 +49,7 @@ public class OAIHarvester {
   List<String> toDelete = new ArrayList();
   int indexed = 0;
   int deleted = 0;
-  int batchSize = 1000;
+  int batchSize = 100;
 
   long reqTime = 0;
   long procTime = 0;
@@ -187,7 +187,7 @@ public class OAIHarvester {
             }
           }
         }
-
+        
         while (resumptionToken != null) {
           start = new Date().getTime();
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;

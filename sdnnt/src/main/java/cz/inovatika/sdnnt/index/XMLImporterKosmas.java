@@ -198,10 +198,13 @@ public class XMLImporterKosmas {
     // JSONObject ret = new JSONObject();
     try {
       String name = ((String) item.get("NAME"));
-      String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
+      String title = "nazev:(" + ClientUtils.escapeQueryChars(name);
+      if (item.containsKey("AUTHOR")) {
+        title += " " + ClientUtils.escapeQueryChars((String) item.get("AUTHOR"));
+      }
+      title += ")";
 
-      String q = "ean:\"" + item.get("EAN") + "\""
-              + title;
+      String q = "ean:\"" + item.get("EAN") + "\"^100.0 OR " + title;
 
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
@@ -225,6 +228,7 @@ public class XMLImporterKosmas {
       if (docs.length() == 0) {
         // System.out.println(title);
       }
+      
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
 
@@ -262,7 +266,7 @@ public class XMLImporterKosmas {
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     }
-    // return ret;
+    // return ret; 
   }
 
 }

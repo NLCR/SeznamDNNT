@@ -105,6 +105,12 @@ export class ImportComponent implements OnInit, OnDestroy {
       }
       this.docs.forEach(doc => {
         const f = doc.identifiers.filter(id => {
+          if (this.fullCatalog) {
+            return true;
+          }
+          if (!id.marc_990a) {
+            return false;
+          }
           if (!this.onlyEAN) {
             return true;
           }

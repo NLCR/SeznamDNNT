@@ -68,7 +68,7 @@
         {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
 
-      <ng-container *ngIf="state.user && inZadost">
+      <ng-container *ngIf="state.user && inZadost && !processed?.state">
         <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
           [value]="processed?.state">
           <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()"
@@ -83,7 +83,7 @@
             [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">local_library</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="rejected" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
+          <mat-button-toggle value="rejected"
             (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">not_interested</mat-icon>
           </mat-button-toggle>
