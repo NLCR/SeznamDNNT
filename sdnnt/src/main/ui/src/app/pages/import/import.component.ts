@@ -30,6 +30,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   origin: string;
   uri: string;
   initialized = false;
+  filteredIds: {[id: string]: any[]};
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -45,9 +46,10 @@ export class ImportComponent implements OnInit, OnDestroy {
     }
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.importId = this.route.snapshot.paramMap.get('id');
-      this.onlyEAN = !!this.route.snapshot.queryParamMap.get('onlyNoEAN');
-      this.onlyNoHits = !!this.route.snapshot.queryParamMap.get('onlyNoHits');
-      this.fullCatalog = !!this.route.snapshot.queryParamMap.get('fullCatalog');
+      this.onlyEAN = this.route.snapshot.queryParamMap.get('onlyEAN') === 'true';
+      this.onlyNoHits = this.route.snapshot.queryParamMap.get('onlyNoHits') === 'true';
+      this.fullCatalog = this.route.snapshot.queryParamMap.get('fullCatalog') === 'true';
+      
       this.getDocs(val);
     }));
   }
@@ -87,6 +89,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   getDocs(params: Params) {
     this.docs = [];
+    this.filteredIds = {};
     const p = Object.assign({}, params);
     p.id = this.importId;
     this.service.getImport(p as HttpParams).subscribe((resp: any) => {
@@ -100,6 +103,18 @@ export class ImportComponent implements OnInit, OnDestroy {
         this.uri = this.docs[0].import_uri;
         this.origin = this.docs[0].import_origin;
       }
+      this.docs.forEach(doc => {
+        const f = doc.identifiers.filter(id => {
+          if (!this.onlyEAN) {
+            return true;
+          }
+          if (!id.ean) {
+            return false;
+          }
+          return (id.ean && doc.ean && id.ean.includes(doc.ean.toString()));
+        });
+        this.filteredIds[doc.id] = f;
+      });
       this.initialized = true;
     });
 

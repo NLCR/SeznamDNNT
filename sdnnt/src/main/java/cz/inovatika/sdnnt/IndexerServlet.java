@@ -4,6 +4,7 @@ import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.OAIHarvester;
 import cz.inovatika.sdnnt.index.XMLImporterDistri;
 import cz.inovatika.sdnnt.index.XMLImporterHeureka;
+import cz.inovatika.sdnnt.index.XMLImporterKosmas;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -189,6 +190,23 @@ public class IndexerServlet extends HttpServlet {
                   true,
                   Boolean.parseBoolean(req.getParameter("allFields"))));
 
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    // import zaznamu z kosmas - uzivatelske api
+    IMPORT_KOSMAS {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          XMLImporterKosmas imp = new XMLImporterKosmas();
+          // https://www.kosmas.cz/atl_shop/nkp.xml
+          json = imp.fromFile(req.getParameter("url"), "kosmas");
+          
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

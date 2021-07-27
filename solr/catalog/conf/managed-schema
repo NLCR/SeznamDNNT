@@ -70,6 +70,7 @@
    <field name="date2" type="string" indexed="true" stored="true"  />
    <field name="date1_int" type="pint" indexed="true" stored="true" />
    <field name="date2_int" type="pint" indexed="true" stored="true" />
+   <field name="is_proposable" type="boolean" indexed="true" stored="true"  />
    
    <field name="raw" type="text_big" indexed="false" stored="true"  />
    
@@ -84,7 +85,7 @@
    <field name="stav" type="string" indexed="true" stored="true"  />
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
    <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
-   <field name="license" type="string" indexed="true" stored="true" multiValued="false" />
+   <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
    
    <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
    

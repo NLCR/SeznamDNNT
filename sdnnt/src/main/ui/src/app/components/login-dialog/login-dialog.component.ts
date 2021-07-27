@@ -34,7 +34,7 @@ export class LoginDialogComponent implements OnInit {
 
   login() {
     this.loading = true;
-    this.service.login(this.user, this.pwd).subscribe(res => {
+    this.service.login(this.user.trim(), this.pwd).subscribe(res => {
       this.state.setLogged(res);
       if (res.error) {
         this.loginError = true;

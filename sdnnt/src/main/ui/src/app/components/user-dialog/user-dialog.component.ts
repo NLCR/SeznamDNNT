@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 export class UserDialogComponent implements OnInit {
 
   user: User;
+  focus: string;
 
   constructor(
     public dialogRef: MatDialogRef<UserDialogComponent>,
@@ -43,6 +44,12 @@ export class UserDialogComponent implements OnInit {
 
   save() {
     if (this.data.isRegister) {
+      if (!this.user.username || this.user.username.trim() === '') {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_username', true);
+        this.focus = 'username';
+        return;
+      }
+      this.user.username = this.user.username.trim();
       this.user.isActive = false;
       this.user.role = 'user';
       

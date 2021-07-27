@@ -6,6 +6,8 @@ app-search {
   }
 
   .app-right {
+    @import "app-paginator";
+    
     .app-results-wrapper {
       @import "app-result-item";
     }

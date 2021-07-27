@@ -38,7 +38,11 @@ export class AppService {
     }
     const options = { params, responseType, withCredentials: true };
     return this.http.get<T>(`api/${url}`, options).pipe(
-      finalize(() => this.stopLoading())
+      finalize(() => {
+        if (showingLoading) {
+          this.stopLoading();
+        }
+      })
     );
   }
 
@@ -217,7 +221,7 @@ export class AppService {
     let url = '/texts/read';
     const params: HttpParams = new HttpParams()
       .set('id', id).set('lang', this.state.currentLang);
-    return this.get(url, params, true, 'plain/text');
+    return this.get(url, params, false, 'plain/text');
   }
 
   saveText(id: string, text: string): Observable<string> {
