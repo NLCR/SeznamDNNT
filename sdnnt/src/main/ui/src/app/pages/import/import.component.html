@@ -71,8 +71,8 @@
             </ng-container> -->
             <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
               <tbody>
-                <ng-container *ngFor="let id of doc.identifiers; let idx = index">
-                  <tr *ngIf="fullCatalog || id.marc_990a.includes('A') || id.marc_990a.includes('PA')">
+                <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
+                  <tr >
                     <td [class.approved]="id.approved">
                       <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
@@ -86,7 +86,7 @@
                       <ng-container *ngIf="id.approved">
                         {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
                       </ng-container>
-                      <a *ngIf="!id.approved && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" (click)="approve(doc, id.identifier)">
+                      <a *ngIf="!id.approved && id.marc_990a && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" (click)="approve(doc, id.identifier)">
                         {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
                       </a>
                     </td>

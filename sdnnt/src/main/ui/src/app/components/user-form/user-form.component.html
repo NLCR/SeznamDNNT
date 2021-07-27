@@ -140,18 +140,14 @@
       </div>
     </div>
 
-
-
-
-
   </div>
   <div class="app-mb-4">
     <section>
       <div class="app-label">{{ 'desc.role_v_systemu' | translate }}</div>
-      <mat-checkbox>{{ 'desc.autor' | translate }}</mat-checkbox><br />
-      <mat-checkbox>{{ 'desc.dedic_autorskych_prav' | translate }}</mat-checkbox><br />
-      <mat-checkbox>{{ 'desc.jiny_nositel' | translate }}</mat-checkbox><br />
-      <mat-checkbox>{{ 'desc.nakladatel_vydavatel' | translate }}</mat-checkbox>
+      <mat-checkbox name="autor" [(ngModel)]="autor" (change)="setNositel()">{{ 'desc.autor' | translate }}</mat-checkbox><br />
+      <mat-checkbox name="dedic" [(ngModel)]="dedic" (change)="setNositel()">{{ 'desc.dedic_autorskych_prav' | translate }}</mat-checkbox><br />
+      <mat-checkbox name="jiny" [(ngModel)]="jiny" (change)="setNositel()">{{ 'desc.jiny_nositel' | translate }}</mat-checkbox><br />
+      <mat-checkbox name="nakladatel" [(ngModel)]="nakladatel" (change)="setNositel()">{{ 'desc.nakladatel_vydavatel' | translate }}</mat-checkbox>
     </section>
   </div>
   <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>

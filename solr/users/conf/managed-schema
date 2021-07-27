@@ -70,7 +70,7 @@
     <field name="telefon" type="string" indexed="true" stored="true"  />
     <field name="email" type="string" indexed="true" stored="true"  />
     <field name="kontaktni" type="string" indexed="true" stored="true"  />
-    <field name="nositel" type="string" indexed="true" stored="true"  />
+    <field name="nositel" type="string" indexed="true" stored="true" multiValued="true"  />
     
     <field name="poznamka" type="text_lowercase" indexed="true" stored="true"  />
     

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.beans.Field;
@@ -66,7 +67,7 @@ public class User {
   public String kontaktni;
 
   @Field
-  public String nositel; // Nositel autorských práv k dílu: 
+  public List<String> nositel; // Nositel autorských práv k dílu: 
 
   @Field
   public String poznamka;

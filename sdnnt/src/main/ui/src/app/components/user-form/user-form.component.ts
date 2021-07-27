@@ -23,6 +23,11 @@ export class UserFormComponent implements OnInit, OnChanges {
   formTypeSelected: number = 1;
   isApiEnabled: boolean;
 
+  autor: boolean;
+  dedic: boolean;
+  jiny: boolean;
+  nakladatel: boolean;
+
   constructor(
     public config: AppConfiguration,
     public state: AppState,
@@ -30,14 +35,30 @@ export class UserFormComponent implements OnInit, OnChanges {
   
   
   ngOnChanges(changes: SimpleChanges): void {
-    this.isApiEnabled = this.user.apikey && this.user.apikey != null && this.user.apikey !== ""; 
+    this.isApiEnabled = this.user && this.user.apikey && this.user.apikey != null && this.user.apikey !== ""; 
+    if (this.user) {
+      this.autor = this.user.nositel?.includes('autor');
+      this.dedic = this.user.nositel?.includes('dedic');
+      this.jiny = this.user.nositel?.includes('jiny');
+      this.nakladatel = this.user.nositel?.includes('nakladatel');
+    }
     if (changes.focus && changes.focus.currentValue) {
       this.username.focus();
     }
-    console.log("Changed user "+this.user.username);
+    // console.log("Changed user "+this.user.username);
   }
 
   ngOnInit(): void {
+  }
+
+  setNositel() {
+    this.user.nositel = [];
+    if (this.autor) {
+      this.user.nositel.push('autor');
+    }
+    if (this.dedic) this.user.nositel.push('dedic');
+    if (this.jiny) this.user.nositel.push('jiny');
+    if (this.nakladatel) this.user.nositel.push('nakladatel');
   }
 
   switchEnableApi() {
