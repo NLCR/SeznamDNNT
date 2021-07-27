@@ -1,0 +1,15 @@
+# Davkvovy pozadavek
+type: object
+properties:
+    batch:
+      $ref: './ArrayOfRequest.yaml'
+example:
+    batch:
+      - identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+        pozadavek: "Pozadavek o zarazeni varky jedna"
+        poznamka: "Poznamka A"
+
+      - identifiers: ['oai:aleph-nkp.cz:SKC01-002225134']
+        pozadavek: "Pozadavek o zarazeni varky dva"
+        poznamka: "Poznamka B"
+

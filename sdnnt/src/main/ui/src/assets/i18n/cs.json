@@ -97,6 +97,9 @@
     "ulozeni_uzivatele_success": "Uložení uživatele proběhlo úspěšně.",
     "ulozeni_uzivatele_error": "Chyba při uložení uživatele.",
     "oznaceni_jako_zpracovane_error": "Chyba při označení jako zpracované.",
+    "forgot_password_error": "Nejde vyresetovat heslo, nemůžu najít účet.",
+    "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla."
+    "oznaceni_jako_zpracovane_error": "Chyba při označení jako zpracované.",
     "invalid_username": "Špatné přihlašovací jméno"
   },
 

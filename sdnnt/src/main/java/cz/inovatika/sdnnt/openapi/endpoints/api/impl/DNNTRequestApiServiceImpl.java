@@ -14,25 +14,36 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrServerException;
+//import org.apache.solr.common.util.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jvnet.hk2.annotations.Service;
 
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 @Service
 public class DNNTRequestApiServiceImpl extends RequestApiService {
+
+    static DateTimeFormatter FORMATTER =
+            DateTimeFormatter
+                    .ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
 
 
 
@@ -41,7 +52,51 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     public static final String API_KEY_HEADER = "X-API-KEY";
 
     public static enum Navrh {
-        NZN, VVS
+        A {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+        },
+        PA {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+        },
+        N {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+        },
+        VN {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+        },
+        VS {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+        },
+
+        NZN{
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return Arrays.asList(VN, VS, N);
+            }
+        },
+        VVS {
+            @Override
+            public List<Navrh> allowingPredecessor() {
+                return Arrays.asList(A, PA);
+            }
+        };
+
+        public abstract List<Navrh> allowingPredecessor();
     }
 
     // account service
@@ -68,7 +123,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         if (headerString != null) {
             User user = UserController.findUserByApiKey(headerString);
             if (user != null) {
-                InlineResponse2001 allRequestsResponse = new InlineResponse2001();
+                ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
+                //InlineResponse2001 allRequestsResponse = new InlineResponse2001();
                 try {
                     JSONObject search = accountService.search(null, status, navrh, user);
                     JSONObject response = search.getJSONObject("response");
@@ -79,11 +135,11 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                         // use jackson provider
                         ObjectMapper objectMapper = getObjectMapper();
 
-                        SavedRequest savedRequest = objectMapper.readValue(jsonObject.toString(), SavedRequest.class);
-                        allRequestsResponse.addRequestsItem(savedRequest);
+                        SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                        arrayOfSavedRequest.add(savedRequest);
                     }
 
-                    return Response.ok().entity(allRequestsResponse).build();
+                    return Response.ok().entity(arrayOfSavedRequest).build();
 
                 } catch (SolrServerException | IOException e) {
                     LOGGER.log(Level.SEVERE,e.getMessage());
@@ -115,6 +171,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     private Response request(ContainerRequestContext crc, BatchRequest body, Navrh navrh) {
         try {
             BatchResponse response = new BatchResponse();
+            response.setNotsaved(new ArrayOfFailedRequest());
+            response.setSaved(new ArrayOfSavedRequest());
+
             ObjectMapper objectMapper = getObjectMapper();
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
@@ -124,7 +183,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     List<Request> batch = body.getBatch();
                     for (Request req : batch) {
 
-                        if (verifyIndetifiers(req.getIdentifiers())) {
+                        try {
+                            verifyIdentifiers(navrh, req.getIdentifiers());
                             String s = objectMapper.writeValueAsString(req);
 
                             JSONObject rawObject = new JSONObject(s);
@@ -134,30 +194,40 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             rawObject.put("process",new JSONObject());
                             rawObject.put("state","waiting");
 
+                            rawObject.put("datum_zadani" , FORMATTER.format(Instant.now()));
+
                             try {
                                 JSONObject object = accountService.saveRequest(rawObject.toString(), user);
-                                response.addSavedItem(objectMapper.readValue(object.toString(), SavedRequest.class));
+                                response.getSaved().add(objectMapper.readValue(object.toString(), SuccessRequestSaved.class));
 
                             } catch (SolrServerException e) {
                                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
 
-                                NotSavedRequest ns = new NotSavedRequest();
+                                FailedRequestNotSaved ns = new FailedRequestNotSaved();
                                 ns.identifiers(req.getIdentifiers())
-                                        .datumZadani(req.getDatumZadani())
+                                        //.datumZadani(req.getDatumZadani())
                                         .pozadavek(req.getPozadavek())
                                         .poznamka(req.getPoznamka());
 
-                                response.addNotsavedItem(ns.reason(e.getMessage()));
+                                response.getNotsaved().add(ns.reason(e.getMessage()));
+
                             }
-                        } else {
-                            NotSavedRequest ns = new NotSavedRequest();
+                        } catch (NonExistentIdentifeirsException e) {
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
-                                    .datumZadani(req.getDatumZadani())
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
 
-                            response.addNotsavedItem(ns.reason("Cannot  find any of these identifiers "+req.getIdentifiers()));
+                            response.getNotsaved().add(ns.reason("Cannot find identifiers or records don't have 'states' field. Identifiers :"+e.getIdents()));
+                        } catch (InvalidIdentifiersException e) {
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+
+                            response.getNotsaved().add(ns.reason("Invalid state of these documents: "+e.getPids()));
                         }
+
                     }
                     return Response.ok().entity(response).build();
                 }
@@ -169,13 +239,56 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
     // verify identifiers
-    private boolean verifyIndetifiers(List<String> identifiers) {
-        // must exists and must be in state
-        for (String ident :  identifiers) {
-            // if (cannotfind) return false;
-            //catalogSearcher.search()
-        }
-        return true;
+    private void verifyIdentifiers(Navrh navrh, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException {
+        List<String> predecessor = navrh.allowingPredecessor().stream().map(Navrh::name).collect(Collectors.toList());
+
+        List<Pair<String, List<String>>>  identFromCatalog = catalogSearcher.existingIdentifiersAndStates(identifiers);
+
+        List<String> nonExistentIdentifiers = new ArrayList<>(identifiers);
+        List<String> invalidIdentifiers = new ArrayList<>();
+
+        identFromCatalog.stream().map(Pair::getLeft).forEach(nonExistentIdentifiers::remove);
+
+        identFromCatalog.forEach(pair-> {
+            boolean found = false;
+            List<String> documentStates = pair.getRight();
+            for (String docState : documentStates) {
+                if (predecessor.contains(docState)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                invalidIdentifiers.add(pair.getLeft());
+            }
+        });
+
+        if (!nonExistentIdentifiers.isEmpty()) throw new NonExistentIdentifeirsException(nonExistentIdentifiers);
+        if (!invalidIdentifiers.isEmpty()) throw new InvalidIdentifiersException(invalidIdentifiers);
+
     }
 
+    public static class NonExistentIdentifeirsException extends Exception {
+        private List<String> idents;
+
+        public NonExistentIdentifeirsException(List<String> pids) {
+            this.idents = pids;
+        }
+
+        public List<String> getIdents() {
+            return idents;
+        }
+    }
+
+    public static class InvalidIdentifiersException extends Exception {
+        private List<String> pids;
+
+        public InvalidIdentifiersException(List<String> pids) {
+            this.pids = pids;
+        }
+
+        public List<String> getPids() {
+            return pids;
+        }
+    }
 }

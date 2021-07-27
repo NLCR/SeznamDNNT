@@ -1,0 +1,4 @@
+# Array of saved request
+type: array
+items:
+  $ref: './CatalogItem.yaml'
