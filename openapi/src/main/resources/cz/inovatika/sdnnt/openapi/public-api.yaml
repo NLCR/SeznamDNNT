@@ -1,0 +1,73 @@
+openapi: 3.0.2
+info:
+  title: SDNNT API
+  description: |-
+    API umožňuje stahovat seznam děl nedostupných na trhu ale přístupných pod licencemi:
+      - DNNTO
+      - DNNTT
+
+    Pro jednotlivé dotazy není potřeba přihlášení.
+
+    Endpointy mohou v případech velkého zatížení vracet status 429 - Too many requests.
+
+  version: 1.0.0
+externalDocs:
+  description: Odkaz na str
+  url: 'https://sdnnt.nkp.cz'
+servers:
+  - url: ../api/v1.0
+tags:
+  - name: SeznamyDNNT
+    description: Exporty del uvedenych na seznamu dnnt
+paths:
+  # Seznamy del zarazenych na dnntt
+  /lists/dnntt/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Export dat pro přístupných na terminálech NK
+      description: Export dat
+      operationId: listDnnttCsv
+      parameters:
+        - in: query
+          name: institution
+          description: Instituce, pro kterou ma byt seznam vygenerovan
+          schema:
+            type: string
+            default: "ABA001"
+          required: false
+      responses:
+        '200':
+          description: Export byl vytvořen
+          content:
+            application/csv:
+              schema:
+                type: string
+        '429':
+          description: Server je plně vytížen, opakujte dotaz později
+
+  # Seznamy del zarazenych na dnntt
+  /lists/dnnto/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Aktuální seznam DNNT
+      description: Poda seznam del oznacenych labelem dnnto ve formatu csv. Nazev souboru je konstruovan 'xxx '
+      operationId: listDnntoCsv
+      parameters:
+        - in: query
+          name: institution
+          schema:
+            type: string
+            default: "ABA001"
+          required: false
+      responses:
+        '200':
+          description: Export byl vytvořen
+          content:
+            application/csv:
+              schema:
+                type: string
+        '429':
+          description: Server je plně vytížen, opakujte dotaz později
+

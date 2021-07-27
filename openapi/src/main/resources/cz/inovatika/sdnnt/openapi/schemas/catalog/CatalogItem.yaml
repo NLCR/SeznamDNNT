@@ -1,0 +1,45 @@
+type: object
+properties:
+    identifier:
+      type: string
+    catalog:
+      type: string
+    states:
+      type: array
+      items:
+        type: string
+    stateshistory:
+      type: array
+      items:
+        type: string
+    title:
+      type: array
+      items:
+        type: string
+    author:
+      type: array
+      items:
+        type: string
+    publisher:
+      type: array
+      items:
+        type: string
+    institutions:
+      type: array
+      items:
+        type: string
+    links:
+      type: array
+      items:
+        type: string
+    pids:
+      type: array
+      items:
+        type: string
+    license:
+      type: string
+
+example:
+  batch:
+    id: "admin-0123445"
+    message: "Cannot find batch 'admin-0123445'"

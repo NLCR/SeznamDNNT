@@ -3,14 +3,9 @@ info:
   title: SDNNT API
   description: |-
 
-    Zde bude popis API
-
-  #  termsOfService: 'https://nkp.cz'
-  #  contact:
-  #    email: email@email.com
-  #  license:
-  #    name: Apache 2.0
-  #    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    API přístupné pouze pro uživatele s vygenerovaným platným API-KEY.
+    Umožňuje spravovat nahlížet do katalogu, zobrazovat vlastní žádosti na vyřazení
+    nebo požadavky na zařazení díla na seznam DNNT
   version: 1.0.0
 
 externalDocs:
@@ -23,8 +18,6 @@ tags:
     description: Endpoint, který řeší kompletně správu požadavků
   - name: Katalog
     description: Endpoint pro hledání v katalogu
-  - name: SeznamyDNNT
-    description: Kompletní seznamy děl zařazených a děl vyřazených ze systému DNNT
 
 paths:
 
@@ -41,9 +34,23 @@ paths:
             type: string
           required: true
         - in: query
+          name: state
+          schema:
+            type: string
+            enum: ["PA","A","VS","VN","N","NZN","VVN","VVS","NZ"]
+          required: false
+        - in: query
+          name: license
+          schema:
+            type: string
+            enum: ["dnntt","dnnto"]
+          required: false
+        - in: query
           name: rows
           schema:
             type: integer
+            minimum: 1
+            maximum: 100
             default: 20
           required: false
         - in: query
@@ -52,12 +59,6 @@ paths:
             type: integer
             default: 0
           required: false
-        - in: query
-          name: sort
-          schema:
-            type: string
-          required: false
-
 
 
       responses:
@@ -71,7 +72,7 @@ paths:
                   requests:
                     type: array
                     items:
-                      $ref: '#/components/schemas/CatalogObject'
+                      $ref: './schemas/catalog/CatalogResponse.yaml'
       security:
         - api_key: []
 
@@ -102,12 +103,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  requests:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SavedRequest'
+                $ref: './schemas/requests/ArrayOfSavedRequest.yaml'
       security:
         - api_key: []
 
@@ -124,7 +120,8 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BatchRequest'
+              #$ref: '#/components/schemas/BatchRequest'
+              $ref: './schemas/requests/BatchRequest.yaml'
         required: true
 
       responses:
@@ -133,7 +130,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchResponse'
+                #$ref: '#/components/schemas/BatchResponse'
+                $ref: './schemas/requests/BatchResponse.yaml'
         '400':
           description: Špatný dotaz (syntaxe atd..)
         '404':
@@ -156,7 +154,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BatchRequest'
+              $ref: './schemas/requests/BatchRequest.yaml'
         required: true
 
       responses:
@@ -165,7 +163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BatchResponse'
+                $ref: './schemas/requests/BatchResponse.yaml'
         '400':
           description: Špatný dotaz (syntaxe atd..)
         '404':
@@ -176,274 +174,8 @@ paths:
       security:
         - api_key: []
 
-
-  # Seznamy del zarazenych na dnntt
-  /lists/dnntt:
-    get:
-      tags:
-        - SeznamyDNNT
-      summary: Aktuální seznam DNNT
-      description: Seznam děl zařazených na seznam sdnnt
-      operationId: listDnntt
-      parameters:
-        - in: query
-          name: rows
-          schema:
-            type: integer
-            default: 20
-          required: false
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 0
-          required: false
-
-      responses:
-        '200':
-          description: Žádost vytvořena a ve stavu waiting
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListsObject'
-            application/csv:
-              schema:
-                type: string
-                example: "PID\nuuid:xxxxx"
-
-
-
-  # Seznamy del zarazenych na dnnto
-  /lists/dnnto:
-    get:
-      tags:
-        - SeznamyDNNT
-      summary: Aktuální seznam DNNT
-      description: Seznam děl zařazených na seznam sdnnt
-      operationId: listDnnto
-      parameters:
-        - in: query
-          name: rows
-          schema:
-            type: integer
-            default: 20
-          required: false
-        - in: query
-          name: page
-          schema:
-            type: integer
-            default: 0
-          required: false
-
-      responses:
-        '200':
-          description: Žádost vytvořena a ve stavu waiting
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListsObject'
-            application/csv:
-              schema:
-                type: string
-                example: "PID\nuuid:xxxxx"
-
-
-  # Seznamy del zarazenych na dnntt
-  /lists/dnntt/csvexport:
-    get:
-      tags:
-        - SeznamyDNNT
-      summary: Aktuální seznam DNNT
-      description: Seznam děl zařazených na seznam sdnnt
-      operationId: listDnnttCsv
-      responses:
-        '200':
-          description: Žádost vytvořena a ve stavu waiting
-          content:
-            application/csv:
-              schema:
-                type: string
-                example: "PID\nuuid:xxxxx"
-
-  # Seznamy del zarazenych na dnntt
-  /lists/dnnto/csvexport:
-    get:
-      tags:
-        - SeznamyDNNT
-      summary: Aktuální seznam DNNT
-      description: Poda seznam del oznacenych labelem dnnto ve formatu csv. Nazev souboru je konstruovan 'xxx '
-      operationId: listDnntoCsv
-      responses:
-        '200':
-          description: Žádost vytvořena a ve stavu waiting
-          content:
-            application/csv:
-              schema:
-                type: string
-                example: "PID\nuuid:xxxxx"
-
-
-
-
-
 components:
-  schemas:
-
-    # Davkovy pozadavek 
-    BatchRequest:
-      type: object
-      properties:
-        batch:
-          type: array
-          items:
-            $ref: '#/components/schemas/Request'
-      example:
-        batch:
-          - datum_zadani: "2021-07-09T07:24:37.210Z"
-            identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
-            pozadavek: "Pozadavek o zarazeni varky jedna"
-            poznamka: "Poznamka A"
-
-          - datum_zadani: "2021-07-09T07:24:37.210Z"
-            identifiers: ['oai:aleph-nkp.cz:SKC01-002225134']
-            pozadavek: "Pozadavek o zarazeni varky dva"
-            poznamka: "Poznamka B"
-
-    # Objekt repreyentujic zaznam v katalogu - vyuzito ve vyhledavani
-    CatalogObject:
-      type: object
-      properties:
-        batch:
-          type: object
-          properties:
-            id:
-              type: string
-            message:
-              type: string
-      example:
-        batch:
-          id: "admin-0123445"
-          message: "Cannot find batch 'admin-0123445'"
-
-    # Objekt repreyentujic zaznam v katalogu - vyuzito ve vyhledavani
-    ListsObject:
-      type: array
-      items:
-        type: object
-        properties:
-          pid:
-            type: string
-      example:
-        - pid: "uuid:xxxx"
-        - pid: "uuid:yyyy"
-
-
-    # Batch
-    ErrorObject:
-      type: object
-      properties:
-        batch:
-          type: object
-          properties:
-            id:
-              type: string
-            message:
-              type: string
-      example:
-        batch:
-          id: "admin-0123445"
-          message: "Cannot find batch 'admin-0123445'"
-
-
-
-    # Zadost / Navrh na zarazeni a pozadavek na vyrazeni 
-    Request:
-      type: object
-      properties:
-        identifiers:
-          type: array
-          items:
-            type: string
-        datum_zadani:
-          type: string
-          format: date-time
-        pozadavek:
-          type: string
-        poznamka:
-          type: string
-      example:
-        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
-        datum_zadani: '2021-07-09T07:12:55.366Z'
-        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
-        poznamka: 'Poznamka'
-
-
-    # Neulozena zadost
-    NotSavedRequest:
-      allOf:
-        - $ref: '#/components/schemas/Request'
-        - type: object
-          properties:
-            id:
-              type: string
-            navrh:
-              type: string
-            user:
-              type: string
-            state:
-              type: string
-            reason:
-              type: string
-      example:
-        user: 'admin'
-        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929']
-        datum_zadani: '2021-07-09T07:12:55.366Z'
-        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
-        poznamka: 'Poznamka'
-        reason: 'Cannot find identifier oai:aleph-nkp.cz:SKC01-002839929'
-
-    # Ulozena zadost
-    SavedRequest:
-      allOf:
-        - $ref: '#/components/schemas/Request'
-        - type: object
-          properties:
-            id:
-              type: string
-            navrh:
-              type: string
-            indextime:
-              type: string
-              format: date-time
-            user:
-              type: string
-            state:
-              type: string
-      example:
-        user: 'admin'
-        identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
-        datum_zadani: '2021-07-09T07:12:55.366Z'
-        pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
-        poznamka: 'Poznamka'
-        indextime: '2021-07-09T07:12:55.366Z'
-
-    # Odpoved z endpoitu pro davkove zpracovani
-    BatchResponse:
-      type: object
-      properties:
-        saved:
-          type: array
-          items:
-            $ref: '#/components/schemas/SavedRequest'
-        notsaved:
-          type: array
-          items:
-            $ref: '#/components/schemas/NotSavedRequest'
-
-
-
   securitySchemes:
-
     api_key:
       type: apiKey
       name: X-API-KEY

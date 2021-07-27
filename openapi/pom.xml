@@ -114,8 +114,10 @@
           <version>3.0.27</version>
 
 			<executions>
+
 				<execution>
-					<goals>
+                    <id>protected</id>
+                    <goals>
 						<goal>generate</goal>
 					</goals>
 					<configuration>
@@ -140,18 +142,58 @@
                       <environmentVariables>
                         <dateLibrary>java8</dateLibrary>
                         <library>jersey2</library>
+
                         <models></models>
                         <apis></apis>
-						<!--
+                      <!--
                         <supportingFiles>ApiOriginFilter.java,ApiException.java,ApiResponseMessage.java,LocalDateProvider.java,LocalDateTimeProvider.java,NotFoundException.java,StringUtil.java</supportingFiles>
 						-->
-						
 	                    <supportingFiles>ApiException.java,ApiOriginFilter.java,ApiResponseMessage.java,JacksonJsonProvider.java,LocalDateProvider.java,LocalDateTimeProvider.java,NotFoundException.java,StringUtil.java,OffsetDateTimeProvider.java,RFC3339DateFormat.java</supportingFiles>
-						
+
                       </environmentVariables>
 
 					</configuration>
 				</execution>
+
+                <execution>
+                    <id>public</id>
+                    <goals>
+                        <goal>generate</goal>
+                    </goals>
+                    <configuration>
+                        <inputSpec>${project.basedir}/src/main/resources/cz/inovatika/sdnnt/openapi/public-api.yaml</inputSpec>
+                        <output>target/generated-sources</output>
+                        <language>jaxrs-jersey</language>
+
+                        <templateDirectory>${project.basedir}/src/main/templates</templateDirectory>
+
+
+                        <configOptions>
+                            <dateLibrary>java8</dateLibrary>
+                            <interfaceOnly>true</interfaceOnly>
+                        </configOptions>
+
+
+                        <apiPackage>cz.inovatika.sdnnt.openapi.endpoints.api</apiPackage>
+                        <modelPackage>cz.inovatika.sdnnt.openapi.endpoints.model</modelPackage>
+
+                        <generateSupportingFiles>false</generateSupportingFiles>
+
+                        <environmentVariables>
+                            <dateLibrary>java8</dateLibrary>
+                            <library>jersey2</library>
+
+                            <models></models>
+                            <apis></apis>
+                            <!--
+                              <supportingFiles>ApiOriginFilter.java,ApiException.java,ApiResponseMessage.java,LocalDateProvider.java,LocalDateTimeProvider.java,NotFoundException.java,StringUtil.java</supportingFiles>
+                              -->
+                            <supportingFiles>ApiException.java,ApiOriginFilter.java,ApiResponseMessage.java,JacksonJsonProvider.java,LocalDateProvider.java,LocalDateTimeProvider.java,NotFoundException.java,StringUtil.java,OffsetDateTimeProvider.java,RFC3339DateFormat.java</supportingFiles>
+
+                        </environmentVariables>
+
+                    </configuration>
+                </execution>
 			</executions>
 		</plugin>
         

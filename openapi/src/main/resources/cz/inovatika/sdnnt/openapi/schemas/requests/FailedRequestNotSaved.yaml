@@ -1,0 +1,22 @@
+# Objekt reprezentujici neulozeny pozadavek (nepodarilo se ho ulozit)
+allOf:
+  - $ref: './Request.yaml'
+  - type: object
+    properties:
+      id:
+        type: string
+      navrh:
+        type: string
+      user:
+        type: string
+      state:
+        type: string
+      reason:
+        type: string
+example:
+  user: 'admin'
+  identifiers: ['oai:aleph-nkp.cz:SKC01-002839929']
+  datum_zadani: '2021-07-09T07:12:55.366Z'
+  pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+  poznamka: 'Poznamka'
+  reason: 'Cannot find identifier oai:aleph-nkp.cz:SKC01-002839929'

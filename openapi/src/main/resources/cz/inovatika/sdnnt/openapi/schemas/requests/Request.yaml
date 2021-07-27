@@ -1,0 +1,19 @@
+# Jeden pozadavek, zakladni vlastnosti (identifikatory, datum_zadani, pozadavek, poznamka)
+type: object
+required:
+    - identifiers
+properties:
+  identifiers:
+    type: array
+    items:
+      type: string
+  pozadavek:
+    type: string
+  poznamka:
+    type: string
+
+example:
+    identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+    datum_zadani: '2021-07-09T07:12:55.366Z'
+    pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+    poznamka: 'Poznamka'

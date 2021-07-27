@@ -1,0 +1,26 @@
+# Pozadavek, ktery se podarilo ulozit
+allOf:
+  - $ref: './Request.yaml'
+  - type: object
+    properties:
+      id:
+        type: string
+      datum_zadani:
+        type: string
+        format: date-time
+      navrh:
+        type: string
+      indextime:
+        type: string
+        format: date-time
+      user:
+        type: string
+      state:
+        type: string
+example:
+  user: 'admin'
+  identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
+  datum_zadani: '2021-07-09T07:12:55.366Z'
+  pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
+  poznamka: 'Poznamka'
+  indextime: '2021-07-09T07:12:55.366Z'

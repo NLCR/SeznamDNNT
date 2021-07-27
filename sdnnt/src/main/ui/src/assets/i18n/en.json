@@ -96,7 +96,10 @@
     "registrace_uzivatele_error": "Error registering user.",
     "ulozeni_uzivatele_success": "User saved successfully",
     "ulozeni_uzivatele_error": "Error saving user.",
-    "oznaceni_jako_zpracovane_error": "Error marking as processed."
+    "oznaceni_jako_zpracovane_error": "Error marking as processed.",
+    "forgot_password_error": "Cannot change password. User account not found",
+    "forgot_password_success": "The reset password link has been sent."
+ 
   },
 
   "sort": {

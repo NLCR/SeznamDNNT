@@ -47,7 +47,7 @@
         </init-param>
         <init-param>
             <param-name>ListsApi.implementation</param-name>
-            <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTCatalogApiServiceImpl</param-value>
+            <param-value>cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTListApiServiceImpl</param-value>
         </init-param>
 
         <load-on-startup>1</load-on-startup>

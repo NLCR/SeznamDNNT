@@ -1,0 +1,8 @@
+type: object
+properties:
+  numFound:
+    type: integer
+  docs:
+    type: array
+    items:
+      $ref: './CatalogItem.yaml'

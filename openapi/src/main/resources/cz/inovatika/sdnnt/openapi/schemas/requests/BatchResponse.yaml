@@ -1,0 +1,7 @@
+# Odpoved pro
+type: object
+properties:
+  saved:
+    $ref: './ArrayOfSavedRequest.yaml'
+  notsaved:
+    $ref: './ArrayOfFailedRequest.yaml'

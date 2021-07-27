@@ -11,17 +11,27 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-@WebServlet(value = "/openapi/api.yaml")
+@WebServlet(value = "/openapi/*")
 public class OpenApiDocServlet  extends HttpServlet {
+
+    public static final Logger LOGGER = Logger.getLogger(OpenApiDocServlet.class.getName());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        InputStream resource = this.getClass().getResourceAsStream("api.yaml.back");
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType("application/x-yaml");
-        String s = IOUtils.toString(resource, "UTF-8");
-        resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write(s);
+        String spath =  req.getPathInfo().startsWith("/") ? req.getPathInfo().substring(1) : req.getPathInfo();
+        InputStream resource = this.getClass().getResourceAsStream(spath);
+        if( resource != null) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType("application/x-yaml");
+            String s = IOUtils.toString(resource, "UTF-8");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().write(s);
+        } else {
+            LOGGER.log(Level.SEVERE, String.format("Cannot find path %s", spath));
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 }

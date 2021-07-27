@@ -1,0 +1,4 @@
+# Array of failed requests
+type: array
+items:
+  $ref: './FailedRequestNotSaved.yaml'

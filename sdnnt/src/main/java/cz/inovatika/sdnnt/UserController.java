@@ -89,7 +89,7 @@ public class UserController {
         setSessionObject(req, user);
         return ret;
       } else {
-        return null;
+        ret.put("error", "Cannot find user or invalid password");
       }
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
