@@ -27,8 +27,8 @@ paths:
     get:
       tags:
         - SeznamyDNNT
-      summary: Export dat pro přístupných na terminálech NK
-      description: Export dat
+      summary: Export dat pro licenci dnntt
+      description: Export data, licence **DNNTT**
       operationId: listDnnttCsv
       parameters:
         - in: query
@@ -52,8 +52,8 @@ paths:
     get:
       tags:
         - SeznamyDNNT
-      summary: Aktuální seznam DNNT
-      description: Poda seznam del oznacenych labelem dnnto ve formatu csv. Nazev souboru je konstruovan 'xxx '
+      summary: Export dat pro licenci dnntto
+      description: Export dat, licence **DNNTO**
       operationId: listDnntoCsv
       parameters:
         - in: query
