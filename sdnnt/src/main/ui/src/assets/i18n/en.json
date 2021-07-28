@@ -99,9 +99,15 @@
     "oznaceni_jako_zpracovane_error": "Error marking as processed.",
     "forgot_password_error": "Cannot change password. User account not found",
     "forgot_password_success": "The reset password link has been sent.",
+<<<<<<< HEAD
     "invalid_username": "Invalid user name",
     "invalid_jmeno": "Invalid name",
     "invalid_email": "Invalid e-mail"
+=======
+
+    "oznaceni_jako_zpracovane_error": "Error marking as processed.",
+    "invalid_username": "Invalid user name"
+>>>>>>> 988110eff83bd9ea1eb6f71af6e33e646ff75b0d
   },
 
   "sort": {

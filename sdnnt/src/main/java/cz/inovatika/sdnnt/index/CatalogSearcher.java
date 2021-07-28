@@ -244,7 +244,7 @@ public class CatalogSearcher {
   }
 
   // dat to jinam
-  public List<Pair<String, List<String>>> existingIdentifiersAndStates(List<String> identifiers) {
+  public List<Pair<String, List<String>>> existingCatalogIdentifiersAndStates(List<String> identifiers) {
     try {
 
       List<Pair<String, List<String>>> retvals = new ArrayList<>();

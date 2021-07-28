@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONObject;
 
 /**
  *
@@ -53,12 +54,13 @@ public class OAIRequest {
   }
 
   public static String identify(HttpServletRequest req) {
+    JSONObject conf = Options.getInstance().getJSONObject("OAI");
     String xml = headerOAI() + responseDateTag() + requestTag(req)
             + "<Identify>"
-            + "<repositoryName>Seznam děl nedostupných na trhu</repositoryName>"
+            + "<repositoryName>" + conf.getString("repositoryName") + "</repositoryName>"
             + "<baseURL>" + req.getRequestURL() + "</baseURL>"
             + "<protocolVersion>2.0</protocolVersion>"
-            + "<adminEmail>sdnnt@nkp.cz</adminEmail>"
+            + "<adminEmail>" + conf.getString("adminEmail") + "</adminEmail>"
             + "<earliestDatestamp>2012-06-30T22:26:40Z</earliestDatestamp>"
             + "<deletedRecord>transient</deletedRecord>"
             + "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>"

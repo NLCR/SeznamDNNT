@@ -56,13 +56,13 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     @Override
     public Response listDnntoCsv(String instituion, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null && instituion.length() >3) ?  Arrays.asList("marc_911a:"+instituion, "marc_990a:A") :Arrays.asList("marc_990a:A");
-        return csv(instituion,"DNNTO",plusList, Arrays.asList("marc_990a:NZ"), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
+        List<String> plusList = (instituion != null) ?  Arrays.asList("marc_911a:"+instituion, "marc_990a:A") :Arrays.asList("marc_990a:A");
+        return csv(instituion,"dnnto",plusList, Arrays.asList("marc_990a:NZ"), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
     }
     @Override
     public Response listDnnttCsv(String instituion, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null && instituion.length() >3) ?  Arrays.asList("marc_911a:"+instituion, "marc_990a:A","marc_990a:NZ"): Arrays.asList("marc_990a:A","marc_990a:NZ");
-        return csv(instituion,"DNNTT",plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
+        List<String> plusList = (instituion != null) ?  Arrays.asList("marc_911a:"+instituion, "marc_990a:A","marc_990a:NZ"): Arrays.asList("marc_990a:A","marc_990a:NZ");
+        return csv(instituion,"dnntt",plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
     }
 
 
@@ -113,19 +113,28 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                             int selected = institutions.indexOf(selectedInstitution);
                             if (selected > -1 && selected < pids.size()) {
                                 try {
-                                    printer.printRecord( pids.get(selected), "dnntt",selectedInstitution ,nazev, identifier);
+                                    printer.printRecord( pids.get(selected), label, selectedInstitution ,nazev, identifier);
                                 } catch (IOException e) {
                                     LOGGER.log(Level.SEVERE,e.getMessage(),e);
                                 }
                             } else {
                                 for (int i = 0; i < pids.size(); i++) {
                                     try {
-                                        printer.printRecord(pids.get(i), "dnntt",krameirusLibraries.get(i) ,nazev, identifier);
+                                        printer.printRecord(pids.get(i), label, krameirusLibraries.get(i) ,nazev, identifier);
                                     } catch (IOException e) {
                                         LOGGER.log(Level.SEVERE,e.getMessage(),e);
                                     }
                                 }
                             }
+                        } else {
+                            for (int i = 0; i < pids.size(); i++) {
+                                try {
+                                    printer.printRecord(pids.get(i), label, krameirusLibraries.get(i) ,nazev, identifier);
+                                } catch (IOException e) {
+                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                                }
+                            }
+
                         }
                     }
                 });

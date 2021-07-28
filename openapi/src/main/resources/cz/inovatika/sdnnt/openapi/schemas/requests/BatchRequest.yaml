@@ -6,10 +6,9 @@ properties:
 example:
     batch:
       - identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
-        pozadavek: "Pozadavek o zarazeni varky jedna"
-        poznamka: "Poznamka A"
+        pozadavek: "Pozadavek cislo 0021"
+        poznamka: "Pozadavek resi navrh na zarazeni/vyzvu k vyrazeni cislo 0021"
 
       - identifiers: ['oai:aleph-nkp.cz:SKC01-002225134']
-        pozadavek: "Pozadavek o zarazeni varky dva"
-        poznamka: "Poznamka B"
-
+        pozadavek: "Pozadavek cislo 0022"
+        poznamka: "Pozadavek resi navrh na zarazeni/vyzvu k vyrazeni cislo 0022"

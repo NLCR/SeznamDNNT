@@ -1,0 +1,20 @@
+type: object
+properties:
+  identifiers:
+    type: array
+    items:
+      type: string
+  user:
+    type: string
+  navrh:
+    type: string
+  datum_zadani:
+    type: string
+    format: date-time
+  indextime:
+    type: string
+    format: date-time
+  poznamka:
+    type: string
+  pozadavek:
+    type: string

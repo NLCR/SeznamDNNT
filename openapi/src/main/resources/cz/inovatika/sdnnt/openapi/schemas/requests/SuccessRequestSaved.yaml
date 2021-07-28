@@ -21,6 +21,5 @@ example:
   user: 'admin'
   identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']
   datum_zadani: '2021-07-09T07:12:55.366Z'
-  pozadavek: 'Pozadavek o zarazeni do seznamu DNNT'
-  poznamka: 'Poznamka'
-  indextime: '2021-07-09T07:12:55.366Z'
+  pozadavek: "Pozadavek cislo 0023"
+  poznamka: "Pozadavek resi navrh na zarazeni/vyzvu k vyrazeni cislo 0023"

@@ -215,7 +215,7 @@ public class XMLImporterHeureka {
       String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
       String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
 
-      String q = "ean:\"" + item.get("EAN") + "\""
+      String q = "ean:\"" + item.get("EAN") + "\"^100.0"
               + title;
 
       SolrQuery query = new SolrQuery(q)

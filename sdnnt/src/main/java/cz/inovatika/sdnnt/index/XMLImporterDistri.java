@@ -318,16 +318,14 @@ public class XMLImporterDistri {
   public void findInCatalog(Map item) {
     // JSONObject ret = new JSONObject();
     try {
-      String title = "title:(" + ClientUtils.escapeQueryChars((String) item.get("NAME")) + ")";
-      if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
-        title = " OR (" + title + " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + "))";
-      } else {
-        title = " OR " + title;
+      
+      String title = "nazev:(" + ClientUtils.escapeQueryChars((String) item.get("NAME"));
+      if (item.containsKey("AUTHOR")) {
+        title += " " + ClientUtils.escapeQueryChars((String) item.get("AUTHOR"));
       }
-      String q = "ean:\"" + item.get("EAN") + "\"^10"
-              //+ " OR dedup_fields:\"" + item.get("dedup_fields") + "\""
-              //+ " OR frbr:\"" + item.get("frbr") + "\""
-              + title;
+      title += ")";
+
+      String q = "ean:\"" + item.get("EAN") + "\"^100.0 OR " + title;
 
       SolrQuery query = new SolrQuery(q)
               .setRows(100)

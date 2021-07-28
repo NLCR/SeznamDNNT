@@ -1,27 +1,29 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
+import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfAssociatedRequests;
+import cz.inovatika.sdnnt.openapi.endpoints.model.AssociatedRequest;
 import cz.inovatika.sdnnt.openapi.endpoints.model.CatalogItem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.CatalogResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
@@ -61,6 +63,50 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
         if (user != null) {
             JSONObject search = catalogSearcher.search(map, filters, user);
+
+            if(search.has("zadosti")) {
+                search.getJSONArray("zadosti");
+            }
+
+            ArrayOfAssociatedRequests associated = new ArrayOfAssociatedRequests();
+            if (search.has("zadosti")) {
+                JSONArray zadosti = search.getJSONArray("zadosti");
+                for (int j = 0; j < zadosti.length(); j++) {
+
+                    JSONObject zadost = zadosti.getJSONObject(j);
+                    String zadostState = zadost.optString("state");
+                    if (zadostState != null && zadostState.equals("waiting")) {
+                        AssociatedRequest associatedRequest = new AssociatedRequest();
+
+
+                        List<String> identifiers = new ArrayList<>();
+                        zadost.getJSONArray("identifiers").forEach(id-> { identifiers.add(id.toString());} );
+                        associatedRequest.setIdentifiers(identifiers);
+
+                        associatedRequest.setUser(zadost.getString("user"));
+
+                        if (zadost.has("datum_zadani")) {
+                            TemporalAccessor datumZadaniTA = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(zadost.getString("datum_zadani"));
+
+                            OffsetDateTime offsetDateTime = OffsetDateTime.ofInstant(Instant.from(datumZadaniTA), ZoneId.systemDefault());
+                            associatedRequest.setDatumZadani(offsetDateTime);
+                        }
+                        if (zadost.has("indextime")) {
+
+                            TemporalAccessor indexTimeTA = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(zadost.getString("indextime"));
+                            OffsetDateTime offsetIndexTime = OffsetDateTime.ofInstant(Instant.from(indexTimeTA), ZoneId.systemDefault());
+                            associatedRequest.setIndextime(offsetIndexTime);
+                        }
+
+                        associatedRequest.setPozadavek(zadost.optString("pozadavek"));
+                        associatedRequest.setPoznamka(zadost.optString("poznamka"));
+                        associatedRequest.setNavrh(zadost.optString("navrh"));
+                        associated.add(associatedRequest);
+                    }
+                }
+
+            }
+
 
             CatalogResponse response = new CatalogResponse();
             response.setNumFound(search.getJSONObject("response").getInt("numFound"));
@@ -124,7 +170,16 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                         .institutions(institutions)
                         .links(links)
                         .pids(pids)
+                        //.associatedRequests();
                         .license(resolveLicense(stavy));
+
+
+                ArrayOfAssociatedRequests associatedWithItem = new ArrayOfAssociatedRequests();
+                associated.stream().filter(associatedRequest -> {
+                    return associatedRequest.getIdentifiers().contains(ident);
+                }).forEach(associatedWithItem::add);
+
+                item.associatedRequests(associatedWithItem);
 
                 response.addDocsItem(item);
             }
