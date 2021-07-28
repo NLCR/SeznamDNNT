@@ -99,7 +99,9 @@
     "oznaceni_jako_zpracovane_error": "Chyba při označení jako zpracované.",
     "forgot_password_error": "Nejde vyresetovat heslo, nemůžu najít účet.",
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
-    "invalid_username": "Špatné přihlašovací jméno"
+    "invalid_username": "Špatné přihlašovací jméno",
+    "invalid_jmeno": "Špatné jméno",
+    "invalid_email": "email adresa není validní"
   },
 
   "sort": {

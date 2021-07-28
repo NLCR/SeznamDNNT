@@ -12,8 +12,8 @@
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>{{ 'desc.jmeno' | translate }}</mat-label>
-          <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
+          <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
+          <input matInput #jmeno="matInput" cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
@@ -28,15 +28,15 @@
     <div fxFlex="100%" *ngIf="formTypeSelected === 2">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}</mat-label>
-          <input matInput name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.jmeno" />
+          <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
+          <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
     <div fxFlex="50%">
       <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
+          <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}*</mat-label>
           <input #username="matInput" matInput [(ngModel)]="user.username" name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate" [disabled]="!isRegister" />
         </mat-form-field>
       </div>
@@ -44,8 +44,8 @@
     <div fxFlex="50%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>Email</mat-label>
-          <input matInput name="email" placeholder="Email" [(ngModel)]="user.email"   />
+          <mat-label>Email*</mat-label>
+          <input matInput #email="matInput" name="email" placeholder="Email" [(ngModel)]="user.email" type="email" email />
         </mat-form-field>
       </div>
     </div>

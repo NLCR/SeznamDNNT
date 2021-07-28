@@ -19,6 +19,10 @@ export class UserFormComponent implements OnInit, OnChanges {
   @Input() focus: string;
 
   @ViewChild('username') username: MatInput;
+  @ViewChild('email') email: MatInput;
+  @ViewChild('jmeno') jmeno: MatInput;
+
+  focusables: {[key: string] : MatInput};
   
   formTypeSelected: number = 1;
   isApiEnabled: boolean;
@@ -42,8 +46,13 @@ export class UserFormComponent implements OnInit, OnChanges {
       this.jiny = this.user.nositel?.includes('jiny');
       this.nakladatel = this.user.nositel?.includes('nakladatel');
     }
+    this.focusables = {
+      username: this.username,
+      email: this.email,
+      jmeno: this.jmeno
+    }
     if (changes.focus && changes.focus.currentValue) {
-      this.username.focus();
+      this.focusables[changes.focus.currentValue].focus();
     }
     // console.log("Changed user "+this.user.username);
   }

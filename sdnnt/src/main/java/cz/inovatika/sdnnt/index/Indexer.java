@@ -67,7 +67,7 @@ public class Indexer {
 
   public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user) {
     JSONObject ret = new JSONObject();
-    try { 
+    try {
       if (update) {
         for (SolrInputDocument rec : recs) {
           SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"));
@@ -85,7 +85,7 @@ public class Indexer {
               getClient().add("history", hDoc);
             }
           }
-          
+
         }
       } else if (merge) {
         for (SolrInputDocument rec : recs) {
@@ -181,7 +181,7 @@ public class Indexer {
     // JSONObject ret = new JSONObject();
     try {
       SolrQuery query = new SolrQuery("*")
-              .addFilterQuery("identifier:\"" +identifier+ "\"")
+              .addFilterQuery("identifier:\"" + identifier + "\"")
               .setRows(1)
               .setFields("*");
       return getClient().query("catalog", query).getResults();
@@ -224,11 +224,10 @@ public class Indexer {
     // return ret;
   }
 
-  
   public static JSONObject approveInImport(String identifier, String newRaw, String user) {
     JSONObject ret = new JSONObject();
     try {
-      
+
       Indexer.changeStav(identifier, "VVS", user);
       Import impNew = Import.fromJSON(newRaw);
       SolrQuery q = new SolrQuery("*").setRows(1)
@@ -238,7 +237,6 @@ public class Indexer {
 
       // Update record in imports
       ret = Import.approve(impNew, identifier, user);
-      
 
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -255,7 +253,7 @@ public class Indexer {
               .setFields("raw, marc_990a");
       SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
-      Collection<Object> oldStav =  docOld.getFieldValues("marc_990a");
+      Collection<Object> oldStav = docOld.getFieldValues("marc_990a");
 
       MarcRecord mr = MarcRecord.fromJSON(oldRaw);
       mr.toSolrDoc();
@@ -272,7 +270,7 @@ public class Indexer {
 
       mr.toSolrDoc(true);
       History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-      
+
       // Update record in catalog
       getClient().add("catalog", mr.sdoc);
       getClient().commit("catalog");
@@ -322,7 +320,7 @@ public class Indexer {
 
   public static JSONObject reindex(String dest, String filter, String collection, boolean cleanStav) {
     JSONObject ret = new JSONObject();
-    int indexed = 0; 
+    int indexed = 0;
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(dest).build()) {
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
@@ -562,40 +560,50 @@ public class Indexer {
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
               .setSort("identifier", SolrQuery.ORDER.asc)
-              .setFields("identifier,dedup_fields,marc_035a,marc_040a,controlfield_008,raw");
+              .setFields("identifier,raw");
       if (from != null) {
         q.addFilterQuery("datestamp:[" + from + " TO NOW]");
       }
       boolean done = false;
+      List<SolrInputDocument> idocs = new ArrayList<>();
       while (!done) {
         q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
         QueryResponse qr = solr.query(sourceCore, q);
         String nextCursorMark = qr.getNextCursorMark();
         SolrDocumentList docs = qr.getResults();
         for (SolrDocument doc : docs) {
-          if (doc.getFirstValue("marc_035a") != null) {
-            SolrInputDocument hDoc = new SolrInputDocument();
-            SolrInputDocument cDoc = mergeRaw(
-                    (String) doc.getFirstValue("raw"),
-                    (String) doc.getFirstValue("identifier"),
-                    (String) doc.getFirstValue("marc_035a"),
-                    (String) doc.getFirstValue("marc_040a"),
-                    (String) doc.getFirstValue("controlfield_008"),
-                    (String) doc.getFirstValue("dedup_fields"),
-                    user, hDoc, ret);
-            if (cDoc != null) {
-              hDocs.add(hDoc);
-              cDocs.add(cDoc);
-            }
+
+          SolrInputDocument idoc = new SolrInputDocument();
+
+          for (String name : doc.getFieldNames()) {
+            idoc.addField(name, doc.getFieldValue(name));
           }
+          idocs.add(idoc);
+
+//            String oldRaw = (String) doc.getFirstValue("raw");
+//            MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+//            idocs.add(mr.toSolrDoc());
         }
 
-        if (!cDocs.isEmpty()) {
-//          solr.add("history", hDocs);
-          solr.add("catalog", cDocs);
-          hDocs.clear();
-          cDocs.clear();
-        }
+        add("catalog", idocs, true, false, user);
+        idocs.clear();
+//        for (SolrDocument doc : docs) 
+//          // if (doc.getFirstValue("marc_035a") != null) {
+//            SolrInputDocument hDoc = new SolrInputDocument();
+//            SolrInputDocument cDoc = mergeWithHistory((String) doc.getFirstValue("raw"), doc, hDoc, user, false, ret);
+//            if (cDoc != null) {
+//              hDocs.add(hDoc);
+//              cDocs.add(cDoc);
+//            }
+//          // }
+//        }
+//
+//        if (!cDocs.isEmpty()) {
+////          solr.add("history", hDocs);
+//          solr.add("catalog", cDocs);
+//          hDocs.clear();
+//          cDocs.clear();
+//        }
         indexed += docs.size();
         if (cursorMark.equals(nextCursorMark)) {
           done = true;
@@ -631,7 +639,7 @@ public class Indexer {
    * @param ret
    * @return doc for catalog
    */
-  private static SolrInputDocument mergeRaw(String jsDnt,
+  private static SolrInputDocument mergeRaw2(String jsDnt,
           String identifier, String sysno, String sigla, String controlfield_008,
           String dedup,
           String user, SolrInputDocument historyDoc,

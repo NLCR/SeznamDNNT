@@ -49,6 +49,16 @@ export class UserDialogComponent implements OnInit {
         this.focus = 'username';
         return;
       }
+      if (!this.user.email || !this.user.email.trim().includes('@')) {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_email', true);
+        this.focus = 'email';
+        return;
+      }
+      if (!this.user.jmeno || this.user.jmeno.trim() === '') {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_jmeno', true);
+        this.focus = 'jmeno';
+        return;
+      }
       this.user.username = this.user.username.trim();
       this.user.isActive = false;
       this.user.role = 'user';
