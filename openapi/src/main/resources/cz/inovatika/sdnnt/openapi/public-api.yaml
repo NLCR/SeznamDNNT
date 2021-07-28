@@ -57,7 +57,8 @@ paths:
       operationId: listDnntoCsv
       parameters:
         - in: query
-          name: Sigla instituce. (ABA001, ABA007, atd...)
+          name: institution
+          description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
             type: string
           required: false
