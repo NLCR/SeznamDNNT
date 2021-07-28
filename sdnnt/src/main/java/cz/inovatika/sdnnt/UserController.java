@@ -7,12 +7,8 @@ package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -197,7 +193,7 @@ public class UserController {
       solr.commit("users");
 
       Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
-      mailService.sendRegistrationMail(userRecepient,newPwd);
+      mailService.sendRegistrationMail(user, userRecepient,newPwd);
 
       solr.close();
       return new JSONObject(js);
@@ -228,7 +224,7 @@ public class UserController {
         // password link ?
         subject.pwd = DigestUtils.sha256Hex(newPwd);
 
-        mailService.sendResetPasswordMail(Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
+        mailService.sendResetPasswordMail(subject, Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
         save(subject);
       }
       return new JSONObject().put("pwd", newPwd);
@@ -256,7 +252,7 @@ public class UserController {
           save(user);
 
           //save everything to user
-          mailService.sendResetPasswordRequest(Pair.of(user.email, user.jmeno +" "+user.prijmeni), user.resetPwdToken);
+          mailService.sendResetPasswordRequest(user, Pair.of(user.email, user.jmeno +" "+user.prijmeni), user.resetPwdToken);
           JSONObject object = new JSONObject();
           object.put("token", user.resetPwdToken);
           return object;
@@ -291,7 +287,7 @@ public class UserController {
           save(user);
 
           Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
-          mailService.sendResetPasswordMail(userRecepient,newPwd);
+          mailService.sendResetPasswordMail(user, userRecepient,newPwd);
 
           User retvalue = new User();
           retvalue.jmeno = user.jmeno;

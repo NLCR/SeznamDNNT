@@ -5,6 +5,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.services.MailService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -12,12 +13,9 @@ import org.apache.commons.mail.*;
 import org.json.JSONObject;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.rmi.ServerException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MailServiceImpl implements MailService  {
@@ -47,11 +45,15 @@ public class MailServiceImpl implements MailService  {
 
 
     @Override
-    public void sendResetPasswordRequest(Pair<String, String> recepient, String token) throws IOException, EmailException {
+    public void sendResetPasswordRequest(User user, Pair<String, String> recepient, String token) throws IOException, EmailException {
         if (recepient != null) {
             HashMap<String, String> scopes = new HashMap<String, String>();
             scopes.put("user", recepient.getRight());
             scopes.put("token", token);
+            if (user != null) {
+                scopes.put("username", user.username);
+            }
+
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_link";
             LOGGER.info("Sending email: Reseting password request to "+recepient.getLeft());
             sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("resetlink"), scopes);
@@ -60,11 +62,15 @@ public class MailServiceImpl implements MailService  {
     }
 
     @Override
-    public void sendResetPasswordMail(Pair<String, String> recepient, String generatedPswd) throws IOException, EmailException {
+    public void sendResetPasswordMail(User user, Pair<String, String> recepient, String generatedPswd) throws IOException, EmailException {
         if (recepient != null) {
             HashMap<String, String> scopes = new HashMap<String, String>();
             scopes.put("user", recepient.getRight());
             scopes.put("password", generatedPswd);
+            if (user != null) {
+                scopes.put("username", user.username);
+            }
+
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_password";
             LOGGER.info("Sending email: Reseted password to "+recepient.getLeft());
             sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("passwordreset"), scopes);
@@ -102,11 +108,14 @@ public class MailServiceImpl implements MailService  {
     }
 
     @Override
-    public void sendRegistrationMail(Pair<String, String> recipient, String generatedPswd) throws IOException, EmailException {
+    public void sendRegistrationMail(User user, Pair<String, String> recipient, String generatedPswd) throws IOException, EmailException {
         if (recipient != null) {
             HashMap<String, String> scopes = new HashMap<String, String>();
             scopes.put("user", recipient.getRight());
             scopes.put("password", generatedPswd);
+            if (user != null) {
+                scopes.put("username", user.username);
+            }
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_registration";
             LOGGER.info("Sending email: Generated password for new created user");
             sendPeparedMail(recipient, path, Options.getInstance().getJSONObject("registration"),scopes );
