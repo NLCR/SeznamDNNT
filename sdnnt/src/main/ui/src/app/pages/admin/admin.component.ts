@@ -93,7 +93,13 @@ export class AdminComponent implements OnInit {
   }
 
   saveUser() {
-    this.service.saveUser(this.selUser).subscribe();
+    this.service.saveUser(this.selUser).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.save_uzivatele_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.save_uzivatele_success', '', false);
+      }
+    });
   }
 
 

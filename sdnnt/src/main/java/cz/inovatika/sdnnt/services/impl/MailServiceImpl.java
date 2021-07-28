@@ -53,7 +53,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recepient.getRight());
             scopes.put("token", token);
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_link";
-            LOGGER.info("Sending email: Reseting password request");
+            LOGGER.info("Sending email: Reseting password request to "+recepient.getLeft());
             sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("resetlink"), scopes);
         } else throw new EmailException("No recepient");
 
@@ -66,7 +66,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recepient.getRight());
             scopes.put("password", generatedPswd);
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_password";
-            LOGGER.info("Sending email: Reseted password");
+            LOGGER.info("Sending email: Reseted password to "+recepient.getLeft());
             sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("passwordreset"), scopes);
         } else throw new EmailException("No recepient");
 
@@ -135,6 +135,7 @@ public class MailServiceImpl implements MailService  {
             email.setSSLOnConnect(mail.getBoolean("smtp.starttls.enable"));
         }
         for (Pair<String, String> recip : recipients) {
+            LOGGER.info("Adding recepient "+recip.getLeft());
             email.addTo(recip.getLeft(), recip.getRight());
         }
         email.setFrom(from.getLeft(), from.getRight());

@@ -38,8 +38,26 @@ properties:
         type: string
     license:
       type: string
+    associatedRequests:
+      $ref: './ArrayOfAssociatedRequests.yaml'
 
 example:
-  batch:
-    id: "admin-0123445"
-    message: "Cannot find batch 'admin-0123445'"
+  identifier: "oai:aleph-nkp.cz:DNT01-000173538"
+  catalog: "DNT01-000173538"
+  states": ["A","NZ"]
+  stateshistory: ["PA","NZ","A"]
+  title: [ "Diagnostický software ADT 4400. zpracovali P. Kučera ... [et al.]"]
+  author: []
+  publisher: ["SNTL"]
+  institutions: ["ABA001","ABA012","ABD013","ABD046"]
+  links: ["http://krameriusndk.nkp.cz/search/handle/uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
+  pids: ["uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
+  license: "dnntt"
+  associatedRequests:
+    - identifiers: ["oai:aleph-nkp.cz:DNT01-000173538"]
+      user: "admin"
+      navrh: "VVN"
+      datum_zadani: "2021-07-27T18:45:29.856+02:00"
+      indextime: "2021-07-27T18:45:29.862+02:00"
+      poznamka": "Poznamka datum 27.7.2021"
+      pozadavek: "Pozadavek o vyrazeni, zarazeni"

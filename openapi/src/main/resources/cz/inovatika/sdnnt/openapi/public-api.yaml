@@ -2,9 +2,11 @@ openapi: 3.0.2
 info:
   title: SDNNT API
   description: |-
-    API umožňuje stahovat seznam děl nedostupných na trhu ale přístupných pod licencemi:
-      - DNNTO
-      - DNNTT
+
+    API přístupné všem. Umožňuje získávat aktuální seznam děl označených licencí:
+
+      - **DNNTO**
+      - **DNNTT**
 
     Pro jednotlivé dotazy není potřeba přihlášení.
 
@@ -31,10 +33,9 @@ paths:
       parameters:
         - in: query
           name: institution
-          description: Instituce, pro kterou ma byt seznam vygenerovan
+          description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
             type: string
-            default: "ABA001"
           required: false
       responses:
         '200':
@@ -56,10 +57,9 @@ paths:
       operationId: listDnntoCsv
       parameters:
         - in: query
-          name: institution
+          name: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
             type: string
-            default: "ABA001"
           required: false
       responses:
         '200':

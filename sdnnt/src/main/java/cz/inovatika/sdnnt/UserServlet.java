@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
@@ -134,7 +135,12 @@ public class UserServlet extends HttpServlet {
           } else {
             inputJs = req.getParameter("json");
           }
-        return UserController.save(inputJs);
+        User sender = UserController.getUser(req);
+        if (sender !=null  && sender.role.equals("admin")) {
+          return UserController.save(inputJs);
+        } else {
+          return new JSONObject().put("error", "not authorized");
+        }
       }
     },
     // registrace noveho uzivatele

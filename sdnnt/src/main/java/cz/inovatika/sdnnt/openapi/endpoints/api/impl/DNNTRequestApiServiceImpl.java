@@ -26,10 +26,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,11 +38,6 @@ import java.util.stream.Collectors;
 @Service
 public class DNNTRequestApiServiceImpl extends RequestApiService {
 
-    static DateTimeFormatter FORMATTER =
-            DateTimeFormatter
-                    .ofPattern("yyyy-MM-dd'T'HH:mm:ssZ")
-                    .withLocale(Locale.getDefault())
-                    .withZone(ZoneId.systemDefault());
 
 
 
@@ -51,52 +45,101 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     public static final String API_KEY_HEADER = "X-API-KEY";
 
-    public static enum Navrh {
+    // Vytvorit workflow enums
+    private static enum DocumentState {
         A {
             @Override
-            public List<Navrh> allowingPredecessor() {
+            public List<DocumentState> allowingPredecessor() {
                 return new ArrayList<>();
             }
-        },
-        PA {
+
             @Override
-            public List<Navrh> allowingPredecessor() {
-                return new ArrayList<>();
+            public boolean acceptNonExistingState() {
+                return false;
             }
         },
         N {
             @Override
-            public List<Navrh> allowingPredecessor() {
+            public List<DocumentState> allowingPredecessor() {
                 return new ArrayList<>();
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return false;
+            }
+        },
+        PA {
+            @Override
+            public List<DocumentState> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return false;
             }
         },
         VN {
             @Override
-            public List<Navrh> allowingPredecessor() {
+            public List<DocumentState> allowingPredecessor() {
                 return new ArrayList<>();
             }
-        },
-        VS {
+
             @Override
-            public List<Navrh> allowingPredecessor() {
-                return new ArrayList<>();
+            public boolean acceptNonExistingState() {
+                return false;
             }
         },
 
-        NZN{
+        VS {
             @Override
-            public List<Navrh> allowingPredecessor() {
-                return Arrays.asList(VN, VS, N);
+            public List<DocumentState> allowingPredecessor() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return false;
             }
         },
         VVS {
             @Override
-            public List<Navrh> allowingPredecessor() {
-                return Arrays.asList(A, PA);
+            public List<DocumentState> allowingPredecessor() {
+                return Arrays.asList(A);
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return false;
+            }
+        },
+        VVN {
+            @Override
+            public List<DocumentState> allowingPredecessor() {
+                return Arrays.asList(PA);
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return false;
+            }
+        },
+        NZN {
+            @Override
+            public List<DocumentState> allowingPredecessor() {
+                return Arrays.asList(VN, VS, N);
+            }
+
+            @Override
+            public boolean acceptNonExistingState() {
+                return true;
             }
         };
 
-        public abstract List<Navrh> allowingPredecessor();
+        public abstract List<DocumentState> allowingPredecessor();
+
+        public abstract boolean acceptNonExistingState();
     }
 
     // account service
@@ -107,13 +150,18 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
 
     @Override
+    public Response requestBatchVvn(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, DocumentState.VVN);
+    }
+
+    @Override
     public Response requestBatchNzn(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        return request(containerRequestContext,  batchRequest, Navrh.NZN);
+        return request(containerRequestContext,  batchRequest, DocumentState.NZN);
     }
 
     @Override
     public Response requestBatchVvs(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        return request(containerRequestContext,  batchRequest, Navrh.VVS);
+        return request(containerRequestContext,  batchRequest, DocumentState.VVS);
     }
 
 
@@ -168,7 +216,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
 
-    private Response request(ContainerRequestContext crc, BatchRequest body, Navrh navrh) {
+    private Response request(ContainerRequestContext crc, BatchRequest body, DocumentState state) {
         try {
             BatchResponse response = new BatchResponse();
             response.setNotsaved(new ArrayOfFailedRequest());
@@ -184,17 +232,18 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     for (Request req : batch) {
 
                         try {
-                            verifyIdentifiers(navrh, req.getIdentifiers());
+                            verifyIdentifiers(state, req.getIdentifiers());
                             String s = objectMapper.writeValueAsString(req);
 
                             JSONObject rawObject = new JSONObject(s);
                             rawObject.put("id", user.username+ UUID.randomUUID().toString());
 
-                            rawObject.put("navrh",navrh.name());
+                            rawObject.put("navrh",state.name());
                             rawObject.put("process",new JSONObject());
                             rawObject.put("state","waiting");
 
-                            rawObject.put("datum_zadani" , FORMATTER.format(Instant.now()));
+                            String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(Instant.now().truncatedTo(ChronoUnit.MILLIS));
+                            rawObject.put("datum_zadani" , utc);
 
                             try {
                                 JSONObject object = accountService.saveRequest(rawObject.toString(), user);
@@ -238,13 +287,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    // verify identifiers
-    private void verifyIdentifiers(Navrh navrh, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException {
-        List<String> predecessor = navrh.allowingPredecessor().stream().map(Navrh::name).collect(Collectors.toList());
+    private void verifyIdentifiers(DocumentState navrh, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException {
+        List<String> predecessor = navrh.allowingPredecessor().stream().map(DocumentState::name).collect(Collectors.toList());
 
-        List<Pair<String, List<String>>>  identFromCatalog = catalogSearcher.existingIdentifiersAndStates(identifiers);
-
+        List<Pair<String, List<String>>>  identFromCatalog = catalogSearcher.existingCatalogIdentifiersAndStates(identifiers);
+        // neexistuji nebo nebo nemaji pole pro stavy ??
         List<String> nonExistentIdentifiers = new ArrayList<>(identifiers);
+        // identifikatory se spatnymi stavy
         List<String> invalidIdentifiers = new ArrayList<>();
 
         identFromCatalog.stream().map(Pair::getLeft).forEach(nonExistentIdentifiers::remove);
@@ -257,6 +306,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     found = true;
                     break;
                 }
+            }
+            if (navrh.acceptNonExistingState() && documentStates.isEmpty()) {
+                found = true;
             }
             if (!found) {
                 invalidIdentifiers.add(pair.getLeft());

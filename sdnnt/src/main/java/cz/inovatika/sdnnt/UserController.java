@@ -213,37 +213,30 @@ public class UserController {
     String newPwd = generatePwd();
     String username = (new JSONObject(js)).optString("username", "");
     User sender = getUser(req);
+    if (sender != null) {
+      User subject = null;
 
-    User subject = null;
+      if (username != null && !username.equals("") && sender.role.equals("admin")) {
+        LOGGER.info("Finding user :"+username);
+        subject = findUser(username);
+      } else {
+        LOGGER.info("Finding user :"+sender.username);
+        subject = sender;
+      }
 
-    if (username != null && !username.equals("") && sender.role.equals("admin")) {
-      subject = findUser(username);
+      if (subject != null && subject.email != null) {
+        // password link ?
+        subject.pwd = DigestUtils.sha256Hex(newPwd);
+
+        mailService.sendResetPasswordMail(Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
+        save(subject);
+      }
+      return new JSONObject().put("pwd", newPwd);
     } else {
-      subject = sender;
+      return new JSONObject().put("error", "not authorized");
     }
-
-    if (subject != null) {
-      // password link ?
-      subject.pwd = DigestUtils.sha256Hex(newPwd);
-
-      mailService.sendResetPasswordMail(Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
-      save(subject);
-    }
-    return new JSONObject().put("pwd", newPwd);
   }
 
-  public static JSONObject setPwd(HttpServletRequest req, String newPwd) {
-    
-    User user = getUser(req);
-    if (user != null) {
-      // Ulozit user a nove heslo poslat mailem
-      user.pwd = DigestUtils.sha256Hex(newPwd);
-      save(user);
-      return user.toJSONObject();
-    } else {
-      return new JSONObject().put("error", "not logged");
-    }
-  }
   public static JSONObject forgotPwd(MailServiceImpl mailService, HttpServletRequest req, String inputJs) {
     String input = (new JSONObject(inputJs)).optString("username", "");
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
@@ -351,7 +344,6 @@ public class UserController {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       solr.addBean("users", user);
       solr.commit("users");
-
 
       solr.close();
       return user.toJSONObject();
