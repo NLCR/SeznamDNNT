@@ -90,7 +90,7 @@ export class UserDialogComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
-      this.state.currentZadost = null;
+      this.state.currentZadost = {VVS: null, NZN: null};
       localStorage.removeItem('user');
       sessionStorage.clear();
       this.router.navigate(['/']);
