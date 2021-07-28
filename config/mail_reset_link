@@ -1,0 +1,6 @@
+Dobry den pane/pani {{user}}, 
+
+link pro reset hesla je: http://localhost:1234/resetedpwd/{{token}}
+
+
+S pozdravem
