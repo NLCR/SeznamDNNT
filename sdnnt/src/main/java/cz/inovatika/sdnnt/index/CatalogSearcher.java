@@ -313,7 +313,14 @@ public class CatalogSearcher {
       query.setParam("df", "fullText");
     }
     if (req.containsKey("sort")) {
-      query.setParam("sort", req.get("sort"));
+      if (req.get("sort").startsWith("date1")) {
+        String dir = req.get("sort").split(" ")[1];
+        query.addSort("date1_int", SolrQuery.ORDER.valueOf(dir));
+        query.addSort("date2_int", SolrQuery.ORDER.valueOf(dir));
+      } else {
+        query.setParam("sort", req.get("sort"));
+      }
+      
     }
 
     // specific filters given from arguments
