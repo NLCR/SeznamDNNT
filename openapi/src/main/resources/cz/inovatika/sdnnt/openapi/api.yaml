@@ -76,12 +76,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  requests:
-                    type: array
-                    items:
-                      $ref: './schemas/catalog/CatalogResponse.yaml'
+                $ref: './schemas/catalog/CatalogResponse.yaml'
       security:
         - api_key: []
 
@@ -224,3 +219,4 @@ components:
       type: apiKey
       name: X-API-KEY
       in: header
+      description: Přihlášení pomocí API klíče. Musí být přiděleno administrátorem.

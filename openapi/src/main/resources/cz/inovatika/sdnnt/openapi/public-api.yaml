@@ -36,6 +36,15 @@ paths:
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
             type: string
+            example: ABA001
+          required: false
+        - in: query
+          name: from
+          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          schema:
+            type: string
+            format: date-time
+            example: "2021-07-27T16:31:05.169Z"
           required: false
       responses:
         '200':
@@ -61,6 +70,15 @@ paths:
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
             type: string
+            example: ABA001
+          required: false
+        - in: query
+          name: from
+          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          schema:
+            type: string
+            format: date-time
+            example: "2021-07-27T16:31:05.169Z"
           required: false
       responses:
         '200':
