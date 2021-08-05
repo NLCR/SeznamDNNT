@@ -46,6 +46,13 @@ paths:
             format: date-time
             example: "2021-07-27T16:31:05.169Z"
           required: false
+        - in: query
+          name: removedup
+          description: Pokud je stejne uuid ve dvou institucich, objevi se ve vystupu pouze jednou (tedy zaznam z instituce, ktera je uvedena prvni v katalogu).
+          schema:
+            type: boolean
+            default: false
+          required: false
       responses:
         '200':
           description: Export byl vytvořen
@@ -79,6 +86,13 @@ paths:
             type: string
             format: date-time
             example: "2021-07-27T16:31:05.169Z"
+          required: false
+        - in: query
+          name: removedup
+          description: Pokud je stejne uuid ve dvou institucich, objevi se ve vystupu pouze jednou (tedy zaznam z instituce, ktera je uvedena prvni v katalogu).
+          schema:
+            type: boolean
+            default: false
           required: false
       responses:
         '200':
