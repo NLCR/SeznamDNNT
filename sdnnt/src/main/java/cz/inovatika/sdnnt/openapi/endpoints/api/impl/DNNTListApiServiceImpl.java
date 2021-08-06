@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
+import cz.inovatika.sdnnt.openapi.endpoints.api.StringUtil;
 import org.apache.commons.collections4.iterators.ArrayListIterator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -26,6 +27,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -84,26 +86,31 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
 
+    // TODO: Prodisktuovat instituce, marc911a,u, marc956u, marc856u a vazby na digitalni instance krameria
     private Response csv(String selectedInstitution,String label,Boolean onlyUniqPids, List<String> plusList, List<String> minusList, List<String> fields) {
         try {
             Set<String> uniqe = new HashSet<>();
 
             File csvFile = File.createTempFile("temp","csv");
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(csvFile), Charset.forName("UTF-8"));
-            try (CSVPrinter printer = new CSVPrinter(outputStreamWriter, CSVFormat.DEFAULT.withHeader("pid","label","institution","name","Aleph SKC identifier"))) {
+            try (CSVPrinter printer = new CSVPrinter(outputStreamWriter, CSVFormat.EXCEL.withHeader("pid","label","institution","name","Aleph SKC identifier"))) {
                 Map<String, String> map = new HashMap<>();
                 map.put("rows", "1000");
 
+
                 this.catalogSearcher.iterate(map, null, plusList, minusList,fields, (doc)->{
-                    // kody
+
+
                     Collection<Object> nazev = doc.getFieldValues("nazev");
                     String identifier = (String) doc.getFieldValue("identifier");
+
 
                     Collection<Object> mlinks911u = doc.getFieldValues("marc_911u");
                     Collection<Object> mlinks856u =  doc.getFieldValues("marc_856u");
                     Collection<Object> mlinks956u =  doc.getFieldValues("marc_956u");
 
                     Collection<Object> minstitutions911a = doc.getFieldValues("marc_911a");
+                    Collection<Object> minstitutions910a = doc.getFieldValues("marc_910a");
 
                     final List<String> links = new ArrayList<>();
                     if (mlinks911u != null && !mlinks911u.isEmpty()) {
@@ -114,56 +121,76 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                         mlinks956u.stream().map(Object::toString).forEach(links::add);
                     }
 
-                    final List<String> institutions = new ArrayList<>();
-                    if (minstitutions911a != null) { minstitutions911a.stream().map(Object::toString).forEach(institutions::add); }
-
                     if (!links.isEmpty()) {
-                        // ma link do digitalni knihovny
-                        List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
-                        List<Integer> indicies = krameriusLinks.stream().map(it-> links.indexOf(it)).collect(Collectors.toList());
-                        List<String> krameirusLibraries = indicies.stream().map(index -> {
-                            return (index >=0 && index < institutions.size()) ? institutions.get(index) : "";
-                        }).collect(Collectors.toList());
+                        /**
+                         * Pokud je pritomno pole 911a a 911u, pak je mapovani pid - instituce - Pokud ne, pak se neda rict komu patri - zadna instituce
+                         */
 
+
+                        // Vraci vsechny linky do krameriu -> filtruje jine
+                        List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
+                        // Z linku posbirane pidy pokud obsahuji subsgring uuid
                         List<String> pids = krameriusLinks.stream().map(it -> {
                             int i = it.indexOf("uuid:");
                             return it.substring(i);
                         }).collect(Collectors.toList());
 
-                        if (onlyUniqPids) {
-                            pids = pids.stream().filter(val ->  !uniqe.contains(val)).collect(Collectors.toList());
-                            pids.stream().forEach(uniqe::add);
-                        }
 
+                        if (mlinks911u != null && !mlinks911u.isEmpty() && minstitutions911a !=null && !minstitutions911a.isEmpty()) {
 
-                        if (selectedInstitution!= null) {
-                            int selected = institutions.indexOf(selectedInstitution);
-                            if (selected > -1 && selected < pids.size()) {
-                                try {
-                                    printer.printRecord( pids.get(selected), label, selectedInstitution ,nazev, identifier);
-                                } catch (IOException e) {
-                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
-                                }
-                            } else {
-                                for (int i = 0; i < pids.size(); i++) {
-                                    try {
-                                        printer.printRecord(pids.get(i), label, krameirusLibraries.get(i) ,nazev, identifier);
-                                    } catch (IOException e) {
-                                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                            List<String> institutions = new ArrayList(minstitutions911a);
+                            // indexy do puvodni pole linku
+                            List<Integer> indicies = krameriusLinks.stream().map(it-> links.indexOf(it)).collect(Collectors.toList());
+                            // Sigly knihoven podle linku
+                            List<String> siglas = indicies.stream().map(index -> {
+                                return (index >=0 && index < institutions.size()) ? institutions.get(index) : "";
+                            }).collect(Collectors.toList());
+
+                            // pokud neni vybrano, pro vsechny, pokud je vybrano, pouze pro tu jednu
+                            if (selectedInstitution != null && siglas.contains(selectedInstitution)) {
+                                int indexOf = siglas.indexOf(selectedInstitution);
+                                if (indexOf > -1 && indexOf< pids.size()) {
+                                    String pid = pids.get(indexOf);
+                                    if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
+                                        pidsForInstitution(selectedInstitution, label, printer, nazev, identifier, pid);
+                                        uniqe.add(pid);
                                     }
+                                } else {
+                                    LOGGER.log(Level.WARNING, String.format("Cannot find institution '%s' in record '%s'",selectedInstitution, identifier));
                                 }
+
+                            } else if (selectedInstitution == null ) {
+                                    // nevybrana instituce, bere vsechny
+                                    if (onlyUniqPids) {
+                                        for (int i = 0; i < pids.size(); i++) {
+                                            String s = i < siglas.size() ? siglas.get(i) : "";
+                                            if (!uniqe.contains( pids.get(i))) {
+                                                pidsForInstitution( s, label, printer, nazev, identifier, pids.get(i));
+                                                uniqe.add(pids.get(i));
+                                            }
+                                        }
+                                    } else {
+                                        for (int i = 0; i < pids.size(); i++) {
+                                            String s = i < siglas.size() ? siglas.get(i) : "";
+                                            pidsForInstitution( s, label, printer, nazev, identifier, pids.get(i));
+                                        }
+                                    }
                             }
                         } else {
-                            for (int i = 0; i < pids.size(); i++) {
-                                try {
-                                    printer.printRecord(pids.get(i), label, krameirusLibraries.get(i) ,nazev, identifier);
-                                } catch (IOException e) {
-                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                            // pid nepatri zadne instituci, uvedou se jenom pidy, je pritomno v reportu bez ohledu na vybranou knihovnu
+                            if (onlyUniqPids) {
+                                for (int i = 0; i < pids.size(); i++) {
+                                    if (!uniqe.contains( pids.get(i))) {
+                                        pidsForInstitution("", label, printer, nazev, identifier, pids.get(i));
+                                        uniqe.add(pids.get(i));
+                                    }
                                 }
+                            } else {
+                                pidsForInstitution("", label, printer, nazev, identifier, pids.toArray(new String[pids.size()]));
                             }
-
                         }
                     }
+
                 });
             }
 
@@ -182,6 +209,16 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         } catch (IOException e) {
             // todo
             throw new RuntimeException(e);
+        }
+    }
+
+    private void pidsForInstitution(String selectedInstitution, String label, CSVPrinter printer, Collection<Object> nazev, String identifier, String... pids) {
+        for (int i = 0; i < pids.length; i++) {
+            try {
+                printer.printRecord(pids[i], label, selectedInstitution ,nazev, identifier);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
         }
     }
 

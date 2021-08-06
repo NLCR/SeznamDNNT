@@ -139,7 +139,9 @@ public class MailServiceImpl implements MailService  {
         email.setHostName(mail.getString("smtp.host"));
         email.setSmtpPort(mail.getInt("smtp.port"));
         email.setCharset("utf-8");
-        email.setAuthenticator(new DefaultAuthenticator(mail.getString("smtp.user"), mail.getString("smtp.pass")));
+        if (mail.has("smtp.user") && mail.has("smtp.pass")) {
+            email.setAuthenticator(new DefaultAuthenticator(mail.getString("smtp.user"), mail.getString("smtp.pass")));
+        }
         if (mail.has("smtp.starttls.enable")) {
             email.setSSLOnConnect(mail.getBoolean("smtp.starttls.enable"));
         }
