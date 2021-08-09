@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.DntAlephImporter;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.OAIHarvester;
 import cz.inovatika.sdnnt.index.XMLImporterDistri;
@@ -190,6 +191,22 @@ public class IndexerServlet extends HttpServlet {
                   true,
                   Boolean.parseBoolean(req.getParameter("allFields"))));
 
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    // import info o stavu z Alephu DNT set
+    IMPORT_DNTSET {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          DntAlephImporter imp = new DntAlephImporter();
+          json = imp.run(req.getParameter("from"));
+          
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());

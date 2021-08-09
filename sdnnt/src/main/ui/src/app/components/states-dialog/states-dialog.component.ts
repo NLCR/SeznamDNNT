@@ -25,7 +25,7 @@ export class StatesDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    this.newState = this.data.marc_990a ? this.data.marc_990a : 'undefined';
+    this.newState = this.data.dntstav ? this.data.dntstav : 'undefined';
     this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
   }
 

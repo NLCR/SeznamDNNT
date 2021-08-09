@@ -108,7 +108,7 @@ export class ImportComponent implements OnInit, OnDestroy {
           if (this.fullCatalog) {
             return true;
           }
-          if (!id.marc_990a) {
+          if (!id.dntstav) {
             return false;
           }
           if (!this.onlyEAN) {

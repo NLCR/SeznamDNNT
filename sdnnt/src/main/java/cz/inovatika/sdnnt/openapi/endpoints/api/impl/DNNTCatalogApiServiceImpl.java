@@ -41,14 +41,14 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
         List<String> filters = new ArrayList<>();
         if (state != null && state.length()> 0) {
-            filters.add("marc_990a:"+state);
+            filters.add("dntstav:"+state);
         }
         if (license !=null  && license.length() > 0) {
             if (license.toLowerCase().equals("dnntt")) {
-                filters.add("marc_990a:A");
-                filters.add("marc_990a:NZ");
+                filters.add("dntstav:A");
+                filters.add("dntstav:NZ");
             } else {
-                filters.add("marc_990a:A");
+                filters.add("dntstav:A");
             }
         }
 
@@ -129,14 +129,14 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 if (doc.has("author")) {
                     doc.getJSONArray("author").forEach(o-> autor.add(o.toString()));
                 }
-                if (doc.has("marc_990a")) {
-                    doc.getJSONArray("marc_990a").forEach(o-> stavy.add(o.toString()));
+                if (doc.has("dntstav")) {
+                    doc.getJSONArray("dntstav").forEach(o-> stavy.add(o.toString()));
                 }
                 if (doc.has("nakladatel")) {
                     doc.getJSONArray("nakladatel").forEach(o-> nakladatel.add(o.toString()));
                 }
-                if (doc.has("marc_992s")) {
-                    doc.getJSONArray("marc_992s").forEach(o-> historieStavu.add(o.toString()));
+                if (doc.has("historie_stavu")) {
+                    doc.getJSONArray("historie_stavu").forEach(o-> historieStavu.add(o.toString()));
                 }
 
                 if (doc.has("marc_910a")) {

@@ -210,7 +210,7 @@ public class XMLImporterKosmas {
               .setRows(100)
               .setParam("q.op", "AND")
               // .setFields("*,score");
-              .setFields("identifier,nazev,score,ean,marc_990a,rokvydani");
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }
@@ -237,8 +237,8 @@ public class XMLImporterKosmas {
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
 
-            if (doc.has("marc_990a")) {
-              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+            if (doc.has("dntstav")) {
+              List<Object> stavy = doc.getJSONArray("dntstav").toList();
               if (stavy.contains("A") || stavy.contains("PA")) {
                 na_vyrazeni.add(doc.getString("identifier"));
               }
@@ -247,8 +247,8 @@ public class XMLImporterKosmas {
           }
         }
         if (!isEAN) {
-          if (doc.has("marc_990a")) {
-            List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+          if (doc.has("dntstav")) {
+            List<Object> stavy = doc.getJSONArray("dntstav").toList();
             if (stavy.contains("A") || stavy.contains("PA")) {
               na_vyrazeni.add(doc.getString("identifier"));
             }

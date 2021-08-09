@@ -60,7 +60,7 @@
     "item_type": "Typ dokumentu",
     "language": "Jazyk dokumentu",
     "nakladatel": "Nakladatel",
-    "marc_990a": "Stav dokumentu",
+    "dntstav": "Stav dokumentu",
     "marc_910a": "Sigla",
     "rokvydani": "Rok vydání",
 

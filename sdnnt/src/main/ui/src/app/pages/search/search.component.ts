@@ -38,7 +38,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.search(val);
     }));
     this.subs.push(this.state.paramsProcessed.subscribe(val => {
-      this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'marc_990a') > -1;
+      this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'dntstav') > -1;
     }));
   }
 
@@ -80,7 +80,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       return;
     }
     let isZarazeno = false;
-    isZarazeno = this.state.usedFilters.find(f => f.field === 'marc_990a').value.includes('A');
+    isZarazeno = this.state.usedFilters.find(f => f.field === 'dntstav').value.includes('A');
     const new_stav = isZarazeno ? 'VVS' : 'NZN'
     if (!this.state.currentZadost[new_stav]) {
       const z = new Zadost(new Date().getTime() + '', this.state.user.username);

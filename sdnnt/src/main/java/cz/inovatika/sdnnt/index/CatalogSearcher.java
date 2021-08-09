@@ -145,13 +145,12 @@ public class CatalogSearcher {
       SolrQuery query = new SolrQuery("*")
             .setRows(rows)
             .setStart(start) 
-            //.addFilterQuery("marc_990a:" + stav)
             .setSort("identifier", SolrQuery.ORDER.asc)
             .setFields("identifier,datum_stavu");
 
 
-      stavy.stream().map(it-> "marc_990a:"+it).forEach(query::addFilterQuery);
-      notStavy.stream().map(it-> "NOT marc_990a:"+it).forEach(query::addFilterQuery);
+      stavy.stream().map(it-> "dntstav:"+it).forEach(query::addFilterQuery);
+      notStavy.stream().map(it-> "NOT dntstav:"+it).forEach(query::addFilterQuery);
 
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
@@ -230,7 +229,7 @@ public class CatalogSearcher {
     }
   }
 
-  //  "filterFields": ["marc_990a", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
+  //  "filterFields": ["dntstav", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
   private SolrQuery doQuery(HttpServletRequest req, User user) {
     Map<String, String> map = new HashMap<>();
     Enumeration<String> parameterNames = req.getParameterNames();
@@ -253,8 +252,8 @@ public class CatalogSearcher {
 
       SolrQuery query = new SolrQuery("*")
               .addFilterQuery("identifier:"+q)
-              .addFilterQuery("marc_990a:*")
-              .addField("identifier").addField("marc_990a");
+              .addFilterQuery("dntstav:*")
+              .addField("identifier").addField("dntstav");
 
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
@@ -267,7 +266,7 @@ public class CatalogSearcher {
         String identifier = doc.getString("identifier");
         List<String> states = new ArrayList<>();
 
-        doc.getJSONArray("marc_990a").forEach(obj->{
+        doc.getJSONArray("dntstav").forEach(obj->{
           states.add(obj.toString());
         });
 
@@ -300,7 +299,7 @@ public class CatalogSearcher {
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
             .setStart(start) 
-            .setFacet(true).addFacetField("fmt", "language", "marc_990a", "marc_910a", "nakladatel")
+            .setFacet(true).addFacetField("fmt", "language", "dntstav", "marc_910a", "nakladatel")
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
             .setParam("stats", true)
@@ -374,7 +373,7 @@ public class CatalogSearcher {
               + "])";
       String se = "(fmt:SE AND " + seDate + ")";
       
-      query.addFilterQuery(bk + " OR " + se + " OR marc_990a:*");
+      query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
       
       
     // Filtry podle role
@@ -382,8 +381,8 @@ public class CatalogSearcher {
     if (!Boolean.parseBoolean(req.get("fullCatalog")+"") || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
-      query.addFilterQuery("marc_990a:*");
-      query.addFilterQuery("-marc_990a:NNN");
+      query.addFilterQuery("dntstav:*");
+      query.addFilterQuery("-dntstav:NNN");
     } else { 
     }
      

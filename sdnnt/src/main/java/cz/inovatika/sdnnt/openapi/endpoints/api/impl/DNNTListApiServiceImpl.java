@@ -66,23 +66,23 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     @Override
     public Response listDnntoCsv(String instituion, OffsetDateTime dateTime, Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "marc_990a:A")) :  new ArrayList<>(Arrays.asList("marc_990a:A"));
+        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "dntstav:A")) :  new ArrayList<>(Arrays.asList("dntstav:A"));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
-        return csv(instituion,"dnnto",uniq,plusList, Arrays.asList("marc_990a:NZ"), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
+        return csv(instituion,"dnnto",uniq,plusList, Arrays.asList("dntstav:NZ"), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
     }
 
 
     @Override
     public Response listDnnttCsv(String instituion, OffsetDateTime dateTime,Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "marc_990a:A","marc_990a:NZ")):  new ArrayList<>(Arrays.asList("marc_990a:A","marc_990a:NZ"));
+        List<String> plusList = (instituion != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "dntstav:A","dntstav:NZ")):  new ArrayList<>(Arrays.asList("dntstav:A","dntstav:NZ"));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
-        return csv(instituion,"dnntt", uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "marc_990a", "marc_992s", "marc_911u", "marc_910a","marc_911a"));
+        return csv(instituion,"dnntt", uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
     }
 
 

@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.index.ISBN;
+import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -22,7 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -38,7 +39,12 @@ public class MarcRecord {
   public String datestamp;
   public String setSpec;
   public String leader;
+
+  // Stav 
+  public List<String> stav = new ArrayList<>();
+  public JSONArray historie_stavu = new JSONArray();
   public Date datum_stavu;
+  public String license;
 
   public boolean isDeleted = false;
 
@@ -71,6 +77,21 @@ public class MarcRecord {
     return mr;
   }
 
+  public static MarcRecord fromIndex(String identifier) throws JsonProcessingException, SolrServerException, IOException {
+    SolrQuery q = new SolrQuery("*").setRows(1)
+            .addFilterQuery("identifier:\"" + identifier + "\"")
+            .setFields("raw, stav, historie_stavu, datum_stavu, license");
+    SolrDocument doc = Indexer.getClient().query("catalog", q).getResults().get(0);
+    String json = (String) doc.getFirstValue("raw");
+    ObjectMapper objectMapper = new ObjectMapper();
+    MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
+    mr.stav = Arrays.asList((String[]) doc.getFieldValues("stav").toArray());
+    mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
+    mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
+    mr.license = (String) doc.getFirstValue("license");
+    return mr;
+  }
+
   public JSONObject toJSON() {
     JSONObject json = new JSONObject();
     json.put("identifier", identifier);
@@ -98,7 +119,7 @@ public class MarcRecord {
 
       ArrayList<String> keys = new ArrayList<String>(dataFields.keySet());
       Collections.sort(keys);
-              
+
       for (Object key : keys) {
         for (DataField df : dataFields.get(key)) {
           //DataField df = dataFields.get(key);
@@ -121,7 +142,7 @@ public class MarcRecord {
 
     return xml.toString();
   }
-  
+
   public SolrInputDocument toSolrDoc(boolean force) {
     sdoc.clear();
     return toSolrDoc();
@@ -136,18 +157,21 @@ public class MarcRecord {
     sdoc.setField("setSpec", setSpec);
     sdoc.setField("leader", leader);
     sdoc.setField("raw", toJSON().toString());
-    
+
+    sdoc.setField("dntstav", stav);
+    sdoc.setField("historie_stavu", historie_stavu.toString());
+    sdoc.setField("license", license);
     sdoc.setField("datum_stavu", datum_stavu);
 
     // Control fields
     for (String cf : controlFields.keySet()) {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
-    
+
     sdoc.setField("record_status", leader.substring(5, 6));
     sdoc.setField("type_of_resource", leader.substring(6, 7));
     sdoc.setField("item_type", leader.substring(7, 8));
-    
+
     setFMT(leader.substring(6, 7), leader.substring(7, 8));
 
     // https://www.loc.gov/marc/bibliographic/bd008a.html
@@ -162,16 +186,16 @@ public class MarcRecord {
       try {
         sdoc.setField("date1_int", Integer.parseInt(date1));
       } catch (NumberFormatException ex) {
-        
+
       }
       try {
         sdoc.setField("date2_int", Integer.parseInt(date2));
       } catch (NumberFormatException ex) {
-        
+
       }
-      
+
     }
-    
+
     setIsProposable();
 
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
@@ -190,12 +214,12 @@ public class MarcRecord {
 
     return sdoc;
   }
-  
+
   private void setFMT(String type_of_resource, String item_type) {
     // https://knowledge.exlibrisgroup.com/Primo/Product_Documentation/Primo/Technical_Guide/020Working_with_Normalization_Rules/100Validate_UNIMARC_FMT
     // Zmena POZOR. Podle url ai by mel byt BK, ale v alephu vidim SE
     String fmt = "BK";
-    switch(type_of_resource) {
+    switch (type_of_resource) {
       case "a":
         if ("s".equals(item_type) || "i".equals(item_type)) {
           fmt = "SE";
@@ -227,12 +251,12 @@ public class MarcRecord {
     }
     sdoc.setField("fmt", fmt);
   }
-  
+
   private void setIsProposable() {
-    
+
     // Pole podle misto vydani (xr ) a 338 a 245h
     boolean is_proposable = false;
-    
+
     String place_of_pub = (String) sdoc.getFieldValue("place_of_pub");
     if ("xr ".equals(place_of_pub)) {
       if (sdoc.containsKey("marc_338a")) {
@@ -240,27 +264,37 @@ public class MarcRecord {
         String marc_338b = (String) sdoc.getFieldValue("marc_338b");
         String marc_3382 = (String) sdoc.getFieldValue("marc_3382");
         is_proposable = "svazek".equals(marc_338a) && "nc".equals(marc_338b) && "rdacarrier".equals(marc_3382);
-      }  else {
+      } else {
         is_proposable = !sdoc.containsKey("marc_245h");
       }
     }
     sdoc.setField("is_proposable", is_proposable);
   }
 
-  public void setStav(String new_stav) {
-//    if (!dataFields.containsKey("990")) {
-    List<DataField> ldf = new ArrayList<>();
-    DataField df = new DataField("990", " ", " ");
-    SubField sf = new SubField("a", new_stav);
-    List<SubField> lsf = new ArrayList<>();
-    lsf.add(sf);
-    df.subFields.put("a", lsf);
-    ldf.add(df);
-    dataFields.put("990", ldf);
+  public void setStav(String new_stav, String user) {
+//    List<DataField> ldf = new ArrayList<>();
+//    DataField df = new DataField("990", " ", " ");
+//    SubField sf = new SubField("a", new_stav);
+//    List<SubField> lsf = new ArrayList<>();
+//    lsf.add(sf);
+//    df.subFields.put("a", lsf);
+//    ldf.add(df);
+//    dataFields.put("990", ldf);
+//
+//    List<DataField> ldf2 = new ArrayList<>();
+//    DataField df2 = new DataField("992", " ", " ");
+//    SubField sf2 = new SubField("a", historie_stavu.toString());
+//    List<SubField> lsf2 = new ArrayList<>();
+//    lsf2.add(sf2);
+//    df2.subFields.put("a", lsf2);
+//    ldf2.add(df2);
+//    dataFields.put("992", ldf2);
+    
+    stav = new ArrayList<>();
+    stav.add(new_stav);
     datum_stavu = Calendar.getInstance().getTime();
-//    } else {
-//      dataFields.get("990").get(0).subFields.get("a").get(0).value = new_stav;
-//    }
+    JSONObject h = new JSONObject().put("stav", new_stav).put("date", datum_stavu).put("user", user);
+    historie_stavu.put(h.toString());
   }
 
   private void fillSolrDoc() {

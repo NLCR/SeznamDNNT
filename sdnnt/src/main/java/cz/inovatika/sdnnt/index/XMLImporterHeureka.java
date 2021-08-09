@@ -6,9 +6,6 @@
 package cz.inovatika.sdnnt.index;
 
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
@@ -26,9 +23,7 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.http.HttpEntity;
@@ -36,10 +31,8 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -222,7 +215,7 @@ public class XMLImporterHeureka {
               .setRows(100)
               .setParam("q.op", "AND")
               // .setFields("*,score");
-              .setFields("identifier,nazev,score,ean,marc_990a,rokvydani");
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }
@@ -248,8 +241,8 @@ public class XMLImporterHeureka {
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
 
-            if (doc.has("marc_990a")) {
-              List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+            if (doc.has("dntstav")) {
+              List<Object> stavy = doc.getJSONArray("dntstav").toList();
               if (stavy.contains("A") || stavy.contains("PA")) {
                 na_vyrazeni.add(doc.getString("identifier"));
               }
@@ -258,8 +251,8 @@ public class XMLImporterHeureka {
           }
         }
         if (!isEAN) {
-          if (doc.has("marc_990a")) {
-            List<Object> stavy = doc.getJSONArray("marc_990a").toList();
+          if (doc.has("dntstav")) {
+            List<Object> stavy = doc.getJSONArray("dntstav").toList();
             if (stavy.contains("A") || stavy.contains("PA")) {
               na_vyrazeni.add(doc.getString("identifier"));
             }

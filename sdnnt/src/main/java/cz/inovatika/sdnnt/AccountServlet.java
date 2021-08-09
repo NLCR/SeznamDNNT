@@ -262,6 +262,56 @@ public class AccountServlet extends HttpServlet {
       }
     },
 
+    // kurator schvali VVN. Vysledek N
+    // O nebo N - > (uživatel/korporace) -> NZN -> (kurátor) -> PA -> (běží lhůta, vstoupi do toho uživatel/korporace ) -> VVN -> (kurátor) -> N
+    APPROVE_VVN {
+      @Override
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          JSONObject inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+          } else {
+            inputJs = new JSONObject(req.getParameter("json"));
+          }
+          Indexer.changeStav(inputJs.getString("identifier"), 
+                  "VVNtoN", user.username);
+          return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
+                  inputJs.getString("reason"), user.username);
+          // json = Zadost.markAsProcessed(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+    // kurator neschvali VVN. Nemenime stav, zustava PA
+    // O nebo N - > (uživatel/korporace) -> NZN -> (kurátor) -> PA -> (běží lhůta, vstoupi do toho uživatel/korporace ) -> VVN -> (kurátor, opačné rozhodnutí) -> PA -> (6 měsíců)-> A
+    REJECT_VVN {
+      @Override
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          JSONObject inputJs;
+          if (req.getMethod().equals("POST")) {
+            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+          } else {
+            inputJs = new JSONObject(req.getParameter("json"));
+          }
+          Indexer.changeStav(inputJs.getString("identifier"), 
+                  "VVNtoPA", user.username);
+          return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
+                  inputJs.getString("reason"), user.username);
+          // json = Zadost.markAsProcessed(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
     APPROVE_NAVRH {
       @Override

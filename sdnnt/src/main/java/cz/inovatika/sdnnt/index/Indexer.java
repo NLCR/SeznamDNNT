@@ -248,24 +248,27 @@ public class Indexer {
   public static JSONObject changeStav(String identifier, String navrh, String user) {
     JSONObject ret = new JSONObject();
     try {
-      SolrQuery q = new SolrQuery("*").setRows(1)
-              .addFilterQuery("identifier:\"" + identifier + "\"")
-              .setFields("raw, marc_990a");
-      SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
-      String oldRaw = (String) docOld.getFirstValue("raw");
-      Collection<Object> oldStav = docOld.getFieldValues("marc_990a");
+//      SolrQuery q = new SolrQuery("*").setRows(1)
+//              .addFilterQuery("identifier:\"" + identifier + "\"")
+//              .setFields("raw, marc_990a");
+//      SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
+//      String oldRaw = (String) docOld.getFirstValue("raw");
 
-      MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+      MarcRecord mr = MarcRecord.fromIndex(identifier);
       mr.toSolrDoc();
+      String oldRaw = mr.toJSON().toString();
+      List<String> oldStav = mr.stav;
       if (navrh.equals("VVS")) {
         if (oldStav == null || oldStav.contains("A")) {
-          mr.setStav("VS");
+          mr.setStav("VS", user);
         } else if (oldStav.contains("PA")) {
-          mr.setStav("VN");
+          mr.setStav("VN", user);
         }
 
       } else if (navrh.equals("NZN")) {
-        mr.setStav("A");
+        mr.setStav("PA", user);
+      } else if (navrh.equals("VVNtoN")) {
+        mr.setStav("N", user);
       }
 
       mr.toSolrDoc(true);

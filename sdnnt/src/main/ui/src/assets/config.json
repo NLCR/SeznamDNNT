@@ -10,7 +10,7 @@
     "user": ["undefined","PA", "N"]
   },
   "identifiers": ["015a", "020a", "022a"],
-  "filterFields": ["marc_990a", "fmt", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
+  "filterFields": ["dntstav", "fmt", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
   "sorts": [
     {"field": "score", "dir": "asc"},
     {"field": "score", "dir": "desc"},

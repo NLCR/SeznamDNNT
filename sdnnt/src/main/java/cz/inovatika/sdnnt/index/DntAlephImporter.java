@@ -1,21 +1,19 @@
 package cz.inovatika.sdnnt.index;
 
-import cz.inovatika.sdnnt.Options;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONObject;
+import java.util.stream.Collectors;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -29,23 +27,26 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
+ * Importuje set DNT z Alephu pomoci OAI Hleda zaznam z SKC (catalog) a nastavi
+ * stav Info o stavu z pole 990 a 992
  *
  * @author alberto
  */
-public class OAIHarvester {
+public class DntAlephImporter {
 
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+
   JSONObject ret = new JSONObject();
   String collection = "catalog";
-  boolean merge;
-  boolean update;
-  boolean allFields;
-  List<SolrInputDocument> recs = new ArrayList();
+  List<MarcRecord> recs = new ArrayList();
   List<String> toDelete = new ArrayList();
   int indexed = 0;
   int deleted = 0;
@@ -55,110 +56,24 @@ public class OAIHarvester {
   long procTime = 0;
   long solrTime = 0;
 
-  public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
-    collection = core;
-    this.merge = merge;
-    this.update = update;
-    this.allFields = allFields;
-    long start = new Date().getTime();
-    Options opts = Options.getInstance();
-    String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
-            opts.getJSONObject("OAIHavest").getString("url"),
-            set);
-    getRecords(url);
-    ret.put("indexed", indexed);
-    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-    ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "full FINISHED. Indexed {0} in {1}", new Object[]{ellapsed, indexed});
+  public JSONObject run() {
+    getRecords("http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL");
     return ret;
   }
-
-  private String lastIndexDate(String set) {
-    String last = null;
-    Options opts = Options.getInstance();
-    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-      SolrQuery q = new SolrQuery("*").setRows(1)
-              .addFilterQuery("setSpec:" + set)
-              .setFields("datestamp")
-              .setSort("datestamp", SolrQuery.ORDER.desc);
-      TimeZone tz = TimeZone.getTimeZone("UTC");
-      DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-      df.setTimeZone(tz);
-      SolrDocumentList docs = solr.query(collection, q).getResults();
-      if (docs.getNumFound() > 0) {
-        last = df.format((Date) docs.get(0).getFirstValue("datestamp"));
-      }
-      solr.close();
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
+  
+  public JSONObject run(String from) {
+    String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL";
+    if (from != null) {
+      url += "&from=" + from;
     }
-    return last;
-  }
-
-  public JSONObject update(String set, String core, boolean merge, boolean update, boolean allFields) {
-    collection = core;
-    this.merge = merge;
-    this.update = update;
-    this.allFields = allFields;
-    Options opts = Options.getInstance();
-    long start = new Date().getTime();
-    String from = lastIndexDate(set);// "2021-03-14T00:00:00Z";
-    if (from == null) {
-      return full(set, core, merge, update, allFields);
-    }
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-    df.setTimeZone(tz);
-    String until = df.format(new Date());
-    String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
-            opts.getJSONObject("OAIHavest").getString("url"),
-            from,
-            until,
-            set);
     getRecords(url);
-    ret.put("indexed", indexed);
-    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-    ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}", new Object[]{ellapsed, indexed});
     return ret;
-  }
+  } 
 
-  public JSONObject updateFrom(String set, String core, String from, boolean merge, boolean update, boolean allFields) {
-    collection = core;
-    this.merge = merge;
-    this.update = update;
-    this.allFields = allFields;
-    Options opts = Options.getInstance();
-    long start = new Date().getTime();
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-    df.setTimeZone(tz);
-    String until = df.format(new Date());
-    String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
-            opts.getJSONObject("OAIHavest").getString("url"),
-            from,
-            until,
-            set);
-    getRecords(url);
-    ret.put("indexed", indexed);
-    ret.put("deleted", deleted);
-    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-    ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}. reqTime: {2}. procTime: {3}. solrTime: {4}", new Object[]{
-                    indexed,
-                    ellapsed,
-                    DurationFormatUtils.formatDurationHMS(reqTime),
-                    DurationFormatUtils.formatDurationHMS(procTime), 
-                    DurationFormatUtils.formatDurationHMS(solrTime)});
-    return ret;
-  }
-
-  private void getRecords(String url) { 
+  private void getRecords(String url) {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
-    Options opts = Options.getInstance();
     String resumptionToken = null;
-    try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host")).build()) {
+    try {
       try {
         long start = new Date().getTime();
         CloseableHttpClient client = HttpClients.createDefault();
@@ -173,21 +88,17 @@ public class OAIHarvester {
               procTime += new Date().getTime() - start;
               start = new Date().getTime();
               if (!recs.isEmpty()) {
-                Indexer.add(collection, recs, merge, update, "harvester");
+                addToCatalog(recs);
                 indexed += recs.size();
                 recs.clear();
               }
-              if (!toDelete.isEmpty()) {
-                solr.deleteById(collection, toDelete);
-                deleted += toDelete.size();
-                toDelete.clear();
-              }
+
               solrTime += new Date().getTime() - start;
               is.close();
             }
           }
         }
-        
+
         while (resumptionToken != null) {
           start = new Date().getTime();
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
@@ -204,7 +115,7 @@ public class OAIHarvester {
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
-                  Indexer.add(collection, recs, merge, update, "harvester");
+                  addToCatalog(recs);
                   indexed += recs.size();
                   solrTime += new Date().getTime() - start;
                   LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
@@ -222,27 +133,155 @@ public class OAIHarvester {
         }
         start = new Date().getTime();
         if (!recs.isEmpty()) {
-          Indexer.add(collection, recs, merge, update, "harvester");
+          addToCatalog(recs);
           indexed += recs.size();
           recs.clear();
         }
 
-        if (!toDelete.isEmpty()) {
-          solr.deleteById(collection, toDelete);
-          deleted += toDelete.size();
-          toDelete.clear();
-        }
         solrTime += new Date().getTime() - start;
+        ret.put("indexed", indexed);
       } catch (XMLStreamException | IOException exc) {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
-      solr.commit(collection);
-      solr.close();
+      Indexer.getClient().commit(collection);
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
+  }
+
+  private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
+    List<SolrInputDocument> idocs = new ArrayList<>();
+    for (MarcRecord rec : recs) {
+      SolrDocumentList docs = find(rec);
+      if (docs == null) {
+
+      } else if (docs.getNumFound() == 0) {
+        LOGGER.log(Level.WARNING, "Record " + rec.identifier + " not found in catalog");
+        ret.append("errors", "Record " + rec.identifier + " not found in catalog.");
+        idocs.add(rec.toSolrDoc());
+      } else if (docs.getNumFound() > 1) {
+        LOGGER.log(Level.WARNING, "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
+        // ret.append("errors", "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
+      }
+
+      for (SolrDocument doc : docs) {
+        SolrInputDocument idoc = new SolrInputDocument();
+        for (String name : doc.getFieldNames()) {
+          idoc.addField(name, doc.getFieldValue(name));
+        }
+        
+        idoc.removeField("stav");
+        idoc.removeField("dntstav");
+        idoc.removeField("indextime");
+        idoc.removeField("_version_");
+
+        // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
+        if (rec.dataFields.containsKey("990")) {
+          for (DataField df : rec.dataFields.get("990")) {
+            //JSONObject h = new JSONObject();
+            if (df.getSubFields().containsKey("a")) {
+              String stav = df.getSubFields().get("a").get(0).getValue();
+              //h.put("stav", stav);
+              idoc.addField("dntstav", stav); 
+              if ("NZ".equals(stav)) {
+                idoc.setField("license", "dnntt");
+              } else if ("A".equals(stav) && !idoc.containsKey("license")) {
+                idoc.setField("license", "dnnto");
+              }
+            }
+          }
+        }
+        // idoc.setField("stav", stav);
+        idoc.setField("datum_stavu", Calendar.getInstance().getTime());
+        JSONArray hs = new JSONArray();
+
+        if (rec.dataFields.containsKey("992")) {
+          for (DataField df : rec.dataFields.get("992")) {
+            JSONObject h = new JSONObject();
+            String stav = df.getSubFields().get("s").get(0).getValue();
+            if (df.getSubFields().containsKey("s")) {
+              h.put("stav", stav);
+            }
+            if (df.getSubFields().containsKey("a")) {
+              h.put("date", df.getSubFields().get("a").get(0).getValue());
+            }
+            if (df.getSubFields().containsKey("b")) {
+              h.put("user", df.getSubFields().get("b").get(0).getValue());
+            }
+            if ("NZ".equals(stav)) {
+              h.put("license", "dnntt");
+            } else if ("A".equals(stav) && !idoc.containsKey("license")) {
+              h.put("license", "dnnto");
+            }
+            // System.out.println(h);
+            hs.put(h);
+          }
+          idoc.setField("historie_stavu", hs.toString());
+        }
+
+//    datum_stavu = Calendar.getInstance().getTime();
+//    JSONObject h = new JSONObject().put("stav", new_stav).put("date", datum_stavu).put("user", user);
+//    historie_stavu.put(h.toString());
+//        idoc.setField("historie_stavu", h);
+        idocs.add(idoc);
+
+      }
+
+      if (!idocs.isEmpty()) {
+        Indexer.getClient().add("catalog", idocs);
+        idocs.clear();
+      }
+
+    }
+    if (!idocs.isEmpty()) {
+      Indexer.getClient().add("catalog", idocs);
+      idocs.clear();
+    }
+  }
+
+  private SolrDocumentList find(MarcRecord mr) {
+    // JSONObject ret = new JSONObject();
+    try {
+
+      // MarcRecord mr = MarcRecord.fromJSON(source);
+      mr.toSolrDoc();
+      String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
+              + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
+              + " AND controlfield_008:\"" + mr.sdoc.getFieldValue("controlfield_008") + "\")"
+              // + " OR marc_020a:\"" + mr.sdoc.getFieldValue("marc_020a") + "\""
+              + " OR marc_015a:\"" + mr.sdoc.getFieldValue("marc_015a") + "\""
+              + " OR dedup_fields:\"" + mr.sdoc.getFieldValue("dedup_fields") + "\"";
+      if (mr.dataFields.containsKey("020")) {
+        for (DataField df : mr.dataFields.get("020")) {
+          if (df.getSubFields().containsKey("a")) {
+              q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+            }
+        }
+      }
+      if (mr.dataFields.containsKey("902")) {
+        for (DataField df : mr.dataFields.get("902")) {
+          if (df.getSubFields().containsKey("a")) {
+              q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+            }
+        }
+      }
+
+      SolrQuery query = new SolrQuery(q)
+              .setRows(20)
+              .setFields("*");
+      SolrDocumentList docs = Indexer.getClient().query("catalog", query).getResults();
+      if (docs.getNumFound() == 0) {
+        LOGGER.log(Level.WARNING, "Query " + q + " not found in catalog");
+      }
+      return docs;
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
+    // return ret;
   }
 
   private String readFromXML(InputStream is) throws XMLStreamException {
@@ -310,7 +349,7 @@ public class OAIHarvester {
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);
             if (!mr.isDeleted) {
-              recs.add(mr.toSolrDoc());
+              recs.add(mr);
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
               toDelete.add(mr.identifier);
@@ -424,9 +463,7 @@ public class OAIHarvester {
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();
             sfs.add(new SubField(code, val));
-            if (allFields || MarcRecord.tagsToIndex.contains(tag)) {
-              mr.sdoc.addField("marc_" + tag + code, val);
-            }
+            mr.sdoc.addField("marc_" + tag + code, val); 
           }
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();
@@ -454,7 +491,4 @@ public class OAIHarvester {
     }
 //    throw new XMLStreamException("Premature end of file");
   }
-  
-  
-
 }

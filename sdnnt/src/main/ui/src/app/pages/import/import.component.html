@@ -50,25 +50,6 @@
             </mat-card-title>
           </mat-card-header>
           <mat-card-actions *ngIf="doc.identifiers?.length > 0">
-            <!-- <ng-container *ngFor="let id of doc.identifiers; let idx = index">
-              <div *ngIf="fullCatalog || id.marc_990a.includes('A') || id.marc_990a.includes('PA')" fxLayout="row" fxLayoutGap="32px" [class.app-mt-1]="idx >= 1">
-                <div fxFlex fxFlexAlign="flex-end">
-                  <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
-                  <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
-                  <ng-container *ngIf="id.marc_990a">{{ id.marc_990a }}<span class="app-pipe"></span></ng-container>
-                  <ng-container *ngIf="id.ean">{{ id.ean }}<span class="app-pipe"></span></ng-container>
-                </div>
-                <div>
-                <div *ngIf="id.approved" class="app-badge approved">
-                  {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
-                </div>
-                <button mat-stroked-button *ngIf="!id.approved && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" (click)="approve(doc, id.identifier)">
-                  <mat-icon>done</mat-icon>
-                  {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
-                </button>
-                </div>
-              </div>
-            </ng-container> -->
             <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
               <tbody>
                 <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
@@ -76,7 +57,7 @@
                     <td [class.approved]="id.approved">
                       <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
-                      <ng-container *ngIf="id.marc_990a"><span [class]="id.marc_990a[0]">{{ id.marc_990a }}</span><span class="app-pipe"></span></ng-container>
+                      <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.ean">
                         <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
                         <span class="app-pipe"></span>
@@ -86,7 +67,7 @@
                       <ng-container *ngIf="id.approved">
                         {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
                       </ng-container>
-                      <a *ngIf="!id.approved && id.marc_990a && (id.marc_990a.includes('A') || id.marc_990a.includes('PA'))" (click)="approve(doc, id.identifier)">
+                      <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
                         {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
                       </a>
                     </td>

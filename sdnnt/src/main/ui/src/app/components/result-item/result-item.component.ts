@@ -44,8 +44,8 @@ export class ResultItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.newState.setValue(this.doc.marc_990a);
-    this.isZarazeno = this.doc.marc_990a?.includes('A') || this.doc.marc_990a?.includes('PA');
+    this.newState.setValue(this.doc.dntstav);
+    this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA');
     
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
@@ -154,7 +154,7 @@ export class ResultItemComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.doc.marc_990a = result;
+        this.doc.dntstav = result;
         const dataField =
         {
           "ind2": " ",

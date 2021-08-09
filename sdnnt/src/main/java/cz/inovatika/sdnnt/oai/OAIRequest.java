@@ -124,11 +124,11 @@ public class OAIRequest {
 
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
-        query.addFilterQuery("marc_990a:A");
+        query.addFilterQuery("dntstav:A");
       } else if ("SDNNT-N".equals(set)) {
-        query.addFilterQuery("marc_990a:N");
+        query.addFilterQuery("dntstav:N");
       } else {
-        query.addFilterQuery("-marc_990a:NNN");
+        query.addFilterQuery("dntstav:*");
       }
 
       if (req.getParameter("resumptionToken") != null) {
@@ -198,11 +198,11 @@ public class OAIRequest {
 
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
-        query.addFilterQuery("marc_990a:A");
+        query.addFilterQuery("dntstav:A");
       } else if ("SDNNT-N".equals(set)) {
-        query.addFilterQuery("marc_990a:N");
+        query.addFilterQuery("dntstav:N");
       } else {
-        query.addFilterQuery("-marc_990a:NNN");
+        query.addFilterQuery("dntstav:*");
       }
 
       SolrDocumentList docs = solr.query("catalog", query).getResults();

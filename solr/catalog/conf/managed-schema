@@ -82,7 +82,7 @@
    <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="rokvydani" type="pints" indexed="true" stored="true" />
    
-   <field name="stav" type="string" indexed="true" stored="true"  />
+   <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
    <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
