@@ -47,8 +47,8 @@ paths:
             example: "2021-07-27T16:31:05.169Z"
           required: false
         - in: query
-          name: removedup
-          description: Pokud je stejne uuid ve dvou institucich, objevi se ve vystupu pouze jednou (tedy zaznam z instituce, ktera je uvedena prvni v katalogu).
+          name: removeduplicatesuuid
+          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
           schema:
             type: boolean
             default: false
@@ -88,8 +88,8 @@ paths:
             example: "2021-07-27T16:31:05.169Z"
           required: false
         - in: query
-          name: removedup
-          description: Pokud je stejne uuid ve dvou institucich, objevi se ve vystupu pouze jednou (tedy zaznam z instituce, ktera je uvedena prvni v katalogu).
+          name: removeduplicatesuuid
+          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich).
           schema:
             type: boolean
             default: false
