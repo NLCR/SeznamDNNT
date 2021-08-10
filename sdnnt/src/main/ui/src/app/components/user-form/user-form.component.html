@@ -109,7 +109,7 @@
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
       <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
-          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey"></textarea>
+          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey" disabled></textarea>
         </mat-form-field>
       </div>
     </div>

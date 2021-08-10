@@ -3,8 +3,6 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
-import cz.inovatika.sdnnt.openapi.endpoints.api.StringUtil;
-import org.apache.commons.collections4.iterators.ArrayListIterator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.FileUtils;
@@ -38,52 +36,46 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
+    static enum License {
+        dnnto, dnntt;
+    }
+
     // Catalogue searcher
     CatalogSearcher catalogSearcher = new CatalogSearcher();
 
-//    @Override
-//    public Response listDnnto(Integer integer, Integer integer1, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-//        //Response.ok().c
-//        Map<String,String> map = new HashMap<>();
-//        map.put("rows", integer.toString());
-//        map.put("size", integer1.toString());
-//        JSONObject a = catalogSearcher.getA(map, null);
-//        return Response.ok().entity(a.toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
-//    }
-//
-//    @Override
-//    public Response listDnntt(Integer integer, Integer integer1, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-//        //Response.ok().c
-//        Map<String,String> map = new HashMap<>();
-//        map.put("rows", integer.toString());
-//        map.put("size", integer1.toString());
-//        JSONObject a = catalogSearcher.getA(map, null);
-//        return Response.ok().entity(a.toString()).type(MediaType.APPLICATION_JSON_TYPE).build();
-//    }
-
-
-
 
     @Override
-    public Response listDnntoCsv(String instituion, OffsetDateTime dateTime, Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "dntstav:A")) :  new ArrayList<>(Arrays.asList("dntstav:A"));
+    public Response addedDnntoCsvExport(String instituion, OffsetDateTime dateTime, Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "license:"+License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
-        return csv(instituion,"dnnto",uniq,plusList, Arrays.asList("dntstav:NZ"), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
+        return csv(instituion,License.dnnto.name(),uniq,plusList,new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
     }
 
-
     @Override
-    public Response listDnnttCsv(String instituion, OffsetDateTime dateTime,Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        List<String> plusList = (instituion != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "dntstav:A","dntstav:NZ")):  new ArrayList<>(Arrays.asList("dntstav:A","dntstav:NZ"));
+    public Response addedDnnttCsvExport(String instituion, OffsetDateTime dateTime, Boolean uniq, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        List<String> plusList = (instituion != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
-        return csv(instituion,"dnntt", uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
+        return csv(instituion,License.dnntt.name(), uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
     }
+
+    @Override
+    public Response removedDnntoCsvExport(String s, OffsetDateTime offsetDateTime, Boolean aBoolean, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public Response removedDnnttCsvExport(String s, OffsetDateTime offsetDateTime, Boolean aBoolean, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return null;
+    }
+
+
+
 
 
     // TODO: Prodisktuovat instituce, marc911a,u, marc956u, marc856u a vazby na digitalni instance krameria

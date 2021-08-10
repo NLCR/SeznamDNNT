@@ -222,6 +222,8 @@
     "zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni": "Zobrazit shody z celého katalogu",
     "zobrazit_jen_nepresne_shody": "Zobrazit jen nepřesné shody",
     "zobrazit_jen_presne_shody": "Zobrazit jen přesné shody",
-    "zobrazit_nenalezene": "Zobrazit nenalezené"
+    "zobrazit_nenalezene": "Zobrazit nenalezené",
+    "apienabled": "Povolit API",
+    "apikey": "API klíč"
   }
 }

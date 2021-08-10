@@ -23,13 +23,13 @@ tags:
     description: Exporty del uvedenych na seznamu dnnt
 paths:
   # Seznamy del zarazenych na dnntt
-  /lists/dnntt/csvexport:
+  /lists/added/dnntt/csvexport:
     get:
       tags:
         - SeznamyDNNT
-      summary: Export dat pro licenci dnntt
-      description: Export data, licence **DNNTT**
-      operationId: listDnnttCsv
+      summary: Export objektů zařazených na seznam DNNTT
+      description: Export dat, licence **DNNTT**
+      operationId: addedDnnttCsvExport
       parameters:
         - in: query
           name: institution
@@ -64,13 +64,13 @@ paths:
           description: Server je plně vytížen, opakujte dotaz později
 
   # Seznamy del zarazenych na dnntt
-  /lists/dnnto/csvexport:
+  /lists/added/dnnto/csvexport:
     get:
       tags:
         - SeznamyDNNT
-      summary: Export dat pro licenci dnntto
+      summary: Export objektů zařazených na seznam DNNTO
       description: Export dat, licence **DNNTO**
-      operationId: listDnntoCsv
+      operationId: addedDnntoCsvExport
       parameters:
         - in: query
           name: institution
@@ -104,3 +104,84 @@ paths:
         '429':
           description: Server je plně vytížen, opakujte dotaz později
 
+
+  # Seznamy del zarazenych na dnntt
+  /lists/removed/dnntt/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Export objektů vyřazených z DNNTT
+      description: Export dat, licence **DNNTT**
+      operationId: removedDnnttCsvExport
+      parameters:
+        - in: query
+          name: institution
+          description: Sigla instituce. (ABA001, ABA007, atd...)
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
+          name: from
+          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          schema:
+            type: string
+            format: date-time
+            example: "2021-07-27T16:31:05.169Z"
+          required: false
+        - in: query
+          name: removeduplicatesuuid
+          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          schema:
+            type: boolean
+            default: false
+          required: false
+      responses:
+        '200':
+          description: Export byl vytvořen
+          content:
+            application/csv:
+              schema:
+                type: string
+        '429':
+          description: Server je plně vytížen, opakujte dotaz později
+
+  /lists/removed/dnnto/csvexport:
+    get:
+      tags:
+        - SeznamyDNNT
+      summary: Export objektů vyřazených ze seznamu DNNTO
+      description: Export dat, licence **DNNTO**
+      operationId: removedDnntoCsvExport
+      parameters:
+        - in: query
+          name: institution
+          description: Sigla instituce. (ABA001, ABA007, atd...)
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
+          name: from
+          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          schema:
+            type: string
+            format: date-time
+            example: "2021-07-27T16:31:05.169Z"
+          required: false
+        - in: query
+          name: removeduplicatesuuid
+          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich).
+          schema:
+            type: boolean
+            default: false
+          required: false
+      responses:
+        '200':
+          description: Export byl vytvořen
+          content:
+            application/csv:
+              schema:
+                type: string
+        '429':
+          description: Server je plně vytížen, opakujte dotaz později

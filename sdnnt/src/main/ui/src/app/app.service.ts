@@ -140,6 +140,11 @@ export class AppService {
     return this.get(url, params);
   }
 
+  getGitInfo(): Observable<any>{
+    let url = 'info/git';
+    return this.get(url);
+  }
+
   approveNavrhInImport(identifier: string, importId: string): Observable<any> {
     let url = '/account/approve_navrh_in_import';
     const params: HttpParams = new HttpParams()
