@@ -1,45 +1,14 @@
-type: object
-properties:
-    identifier:
-      type: string
-    catalog:
-      type: string
-    states:
-      type: array
-      items:
+# Plna polozka z katalog item
+allOf:
+  - $ref: './CatalogItemBase.yaml'
+  - type: object
+    properties:
+      frbr:
         type: string
-    stateshistory:
-      type: array
-      items:
-        type: string
-    title:
-      type: array
-      items:
-        type: string
-    author:
-      type: array
-      items:
-        type: string
-    publisher:
-      type: array
-      items:
-        type: string
-    institutions:
-      type: array
-      items:
-        type: string
-    links:
-      type: array
-      items:
-        type: string
-    pids:
-      type: array
-      items:
-        type: string
-    license:
-      type: string
-    associatedRequests:
-      $ref: './ArrayOfAssociatedRequests.yaml'
+      associatedItems:
+        $ref: './ArrayOfCatalogItemBase.yaml'
+      associatedRequests:
+        $ref: './ArrayOfAssociatedRequests.yaml'
 
 example:
   identifier: "oai:aleph-nkp.cz:DNT01-000173538"
@@ -53,6 +22,21 @@ example:
   links: ["http://krameriusndk.nkp.cz/search/handle/uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
   pids: ["uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
   license: "dnntt"
+  frbr: "/|diagnostickysoftwareadt4400.|testyprocesoru,testmoduluwcs,testdisplejeec7168,testdisplejeodi6310//|kucera,petr"
+  associatedItems:
+    - identifier: "oai:aleph-nkp.cz:DNT01-000173599"
+      catalog: "DNT01-000173599"
+      states": ["A","NZ"]
+      stateshistory: ["PA","NZ","A"]
+      title: [ "Diagnostický software ADT 4400. zpracovali P. Kučera ... [et al.]"]
+      author: []
+      publisher: ["SNTL"]
+      institutions: ["ABA001","ABA012","ABD013","ABD046"]
+      links: []
+      pids: []
+      license: "dnntt"
+      frbr: "/|diagnostickysoftwareadt4400.|testyprocesoru,testmoduluwcs,testdisplejeec7168,testdisplejeodi6310//|kucera,petr"
+
   associatedRequests:
     - identifiers: ["oai:aleph-nkp.cz:DNT01-000173538"]
       user: "admin"

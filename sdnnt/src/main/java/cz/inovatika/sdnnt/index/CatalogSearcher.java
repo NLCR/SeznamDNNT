@@ -44,6 +44,8 @@ public class CatalogSearcher {
     try {
       SolrClient solr = Indexer.getClient();
       SolrQuery query = new SolrQuery("frbr:\"" + id + "\"");
+      // 50 is a maximum
+      query.setRows(50);
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
       rParser.setWriterType("json");
@@ -166,46 +168,6 @@ public class CatalogSearcher {
     return ret;
   }
 
-  // iterate over index
-  public static void iterate(Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer) {
-//    Options opts = Options.getInstance();
-    int rows = 100;//opts.getClientConf().getInt("rows");
-    if (req.containsKey("rows")) {
-      rows = Integer.parseInt(req.get("rows"));
-    }
-    SolrClient solr = Indexer.getClient();
-
-    try {
-      SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc("identifier"));
-
-      plusFilter.stream().forEach(q::addFilterQuery);
-      minusFilter.stream().map(it-> "NOT "+it).forEach(q::addFilterQuery);
-
-      fields.stream().forEach(q::addField);
-
-      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-      boolean done = false;
-      while (! done) {
-        q.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-
-        QueryResponse rsp = solr.query("catalog",q);
-
-        String nextCursorMark = rsp.getNextCursorMark();
-        for (SolrDocument resultDoc: rsp.getResults()) {
-          consumer.accept(resultDoc);
-        }
-
-        if (cursorMark.equals(nextCursorMark)) {
-          done = true;
-        }
-        cursorMark = nextCursorMark;
-      }
-    } catch (SolrServerException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
 
   private JSONArray findZadosti(List<String> identifiers) {
     try {

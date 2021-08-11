@@ -1,0 +1,10 @@
+type: object
+properties:
+  numFound:
+    type: integer
+    example: 3334
+  items:
+    $ref: './ArrayOfListitem.yaml'
+  resumptiontoken:
+    type: string
+    example: "AoE/AW9haTphbGVwaC1ua3AuY3o6U0tDMDEtMDAwMDg2OTI4"

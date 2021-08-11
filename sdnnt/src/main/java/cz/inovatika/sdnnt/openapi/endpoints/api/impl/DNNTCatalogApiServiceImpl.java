@@ -1,13 +1,11 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.UserController;
+import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
-import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfAssociatedRequests;
-import cz.inovatika.sdnnt.openapi.endpoints.model.AssociatedRequest;
-import cz.inovatika.sdnnt.openapi.endpoints.model.CatalogItem;
-import cz.inovatika.sdnnt.openapi.endpoints.model.CatalogResponse;
+import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,27 +30,22 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
 
     @Override
-    public Response catalogGet(String query, String state, String license, Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
+    public Response catalogGet(String query, String state, String license,Boolean fullCatalog, Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
         Map<String,String> map = new HashMap<>();
         map.put("q", query);
         map.put("rows", integer.toString());
         map.put("page", integer1.toString());
-
+        if (fullCatalog) {
+            map.put("fullCatalog", Boolean.TRUE.toString());
+        }
 
         List<String> filters = new ArrayList<>();
         if (state != null && state.length()> 0) {
             filters.add("dntstav:"+state);
         }
         if (license !=null  && license.length() > 0) {
-            if (license.toLowerCase().equals("dnntt")) {
-                filters.add("dntstav:A");
-                filters.add("dntstav:NZ");
-            } else {
-                filters.add("dntstav:A");
-            }
+            filters.add("license:"+license.toLowerCase());
         }
-
-
 
 
         User user = null;
@@ -68,7 +61,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 search.getJSONArray("zadosti");
             }
 
-            ArrayOfAssociatedRequests associated = new ArrayOfAssociatedRequests();
+            List<AssociatedRequest> allRequests = new ArrayList<>();
             if (search.has("zadosti")) {
                 JSONArray zadosti = search.getJSONArray("zadosti");
                 for (int j = 0; j < zadosti.length(); j++) {
@@ -101,7 +94,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                         associatedRequest.setPozadavek(zadost.optString("pozadavek"));
                         associatedRequest.setPoznamka(zadost.optString("poznamka"));
                         associatedRequest.setNavrh(zadost.optString("navrh"));
-                        associated.add(associatedRequest);
+                        allRequests.add(associatedRequest);
                     }
                 }
 
@@ -111,78 +104,41 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
             CatalogResponse response = new CatalogResponse();
             response.setNumFound(search.getJSONObject("response").getInt("numFound"));
 
+            ArrayOfCatalogItem itemsArray = new ArrayOfCatalogItem();
             JSONArray jsonArray = search.getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject doc = jsonArray.getJSONObject(i);
-                String ident = doc.getString("identifier");
-                String catalog = doc.getJSONArray("marc_998a").optString(0);
-                List<String> stavy  = new ArrayList<>();
-                List<String> nazev  = new ArrayList<>();
-                List<String> autor  = new ArrayList<>();
-                List<String> nakladatel  = new ArrayList<>();
-                List<String> historieStavu  = new ArrayList<>();
-                List<String> institutions = new ArrayList<>();
-                List<String> links = new ArrayList<>();
-                List<String> pids = new ArrayList<>();
+                CatalogItem item = createcatalogItemFromJSON(doc);
 
-                doc.getJSONArray("nazev").forEach(o-> nazev.add(o.toString()));
-                if (doc.has("author")) {
-                    doc.getJSONArray("author").forEach(o-> autor.add(o.toString()));
+                String frbr = null;
+                if (doc.has("frbr")) {
+                    frbr = doc.getString("frbr");
+                    item.frbr(frbr);
+                    JSONObject frbrObjects = catalogSearcher.frbr(frbr);
+                    if (frbrObjects.has("response")) {
+                        if (frbrObjects.getJSONObject("response").has("docs")) {
+                            ArrayOfCatalogItemBase items = new ArrayOfCatalogItemBase();
+                            frbrObjects.getJSONObject("response").getJSONArray("docs").forEach((obj) -> {
+                                CatalogItem referencedItem = createcatalogItemFromJSON((JSONObject) obj);
+                                if (!referencedItem.getIdentifier().equals(item.getIdentifier())) {
+                                    items.add(createcatalogItemFromJSON((JSONObject)obj));
+                                }
+                            });
+                            item.associatedItems(items);
+                        }
+                    }
                 }
-                if (doc.has("dntstav")) {
-                    doc.getJSONArray("dntstav").forEach(o-> stavy.add(o.toString()));
-                }
-                if (doc.has("nakladatel")) {
-                    doc.getJSONArray("nakladatel").forEach(o-> nakladatel.add(o.toString()));
-                }
-                if (doc.has("historie_stavu")) {
-                    doc.getJSONArray("historie_stavu").forEach(o-> historieStavu.add(o.toString()));
-                }
-
-                if (doc.has("marc_910a")) {
-                    doc.getJSONArray("marc_910a").forEach(o-> institutions.add(o.toString()));
-                }
-
-                if (doc.has("marc_911u")) {
-                    doc.getJSONArray("marc_911u").forEach(o-> links.add(o.toString()));
-                }
-
-                if (links.isEmpty() && doc.has("marc_956u")) {
-                    doc.getJSONArray("marc_956u").forEach(o-> links.add(o.toString()));
-
-                }
-
-                links.stream().filter(str-> str.contains("uuid:")).map(str-> {
-                    int indexOf = str.indexOf("uuid:");
-                    if (indexOf > -1) {
-                        return str.substring(indexOf);
-                    } else return str;
-                }).forEach(pids::add);
-
-                CatalogItem item = new CatalogItem();
-                item.identifier(ident)
-                        .catalog(catalog)
-                        .title(nazev)
-                        .states(stavy)
-                        .author(autor)
-                        .stateshistory(historieStavu)
-                        .publisher(nakladatel)
-                        .institutions(institutions)
-                        .links(links)
-                        .pids(pids)
-                        //.associatedRequests();
-                        .license(resolveLicense(stavy));
-
 
                 ArrayOfAssociatedRequests associatedWithItem = new ArrayOfAssociatedRequests();
-                associated.stream().filter(associatedRequest -> {
-                    return associatedRequest.getIdentifiers().contains(ident);
+                allRequests.stream().filter(associatedRequest -> {
+                    return associatedRequest.getIdentifiers().contains(item.getIdentifier());
                 }).forEach(associatedWithItem::add);
 
                 item.associatedRequests(associatedWithItem);
+                itemsArray.add(item);
 
-                response.addDocsItem(item);
             }
+            response.docs(itemsArray);
             return Response.ok().entity(response).build();
 
         } else {
@@ -191,12 +147,75 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
     }
 
-    private String resolveLicense(List<String> stavy) {
-        if (stavy.contains("A")) {
-            return stavy.contains("NZ") ? "dnntt" : "dnnto";
-        } else return null;
-    }
+    private CatalogItem createcatalogItemFromJSON(JSONObject doc) {
+        String ident = doc.getString("identifier");
+        String catalog = doc.getJSONArray("marc_998a").optString(0);
+        List<String> licenses = new ArrayList<>();
+        List<String> stavy  = new ArrayList<>();
+        List<String> nazev  = new ArrayList<>();
+        List<String> autor  = new ArrayList<>();
+        List<String> nakladatel  = new ArrayList<>();
+        List<String> historieStavu  = new ArrayList<>();
+        List<String> institutions = new ArrayList<>();
+        List<String> links = new ArrayList<>();
+        List<String> pids = new ArrayList<>();
 
+
+        doc.getJSONArray("nazev").forEach(o-> nazev.add(o.toString()));
+        if (doc.has("author")) {
+            doc.getJSONArray("author").forEach(o-> autor.add(o.toString()));
+        }
+        if (doc.has("dntstav")) {
+            doc.getJSONArray("dntstav").forEach(o-> stavy.add(o.toString()));
+        }
+        if (doc.has("nakladatel")) {
+            doc.getJSONArray("nakladatel").forEach(o-> nakladatel.add(o.toString()));
+        }
+        if (doc.has("historie_stavu")) {
+            new JSONArray(doc.getString("historie_stavu")).forEach(o-> {
+                historieStavu.add(((JSONObject)o).getString("stav"));
+            });
+        }
+
+        if (doc.has("marc_910a")) {
+            doc.getJSONArray("marc_910a").forEach(o-> institutions.add(o.toString()));
+        }
+
+        if (doc.has("marc_911u")) {
+            doc.getJSONArray("marc_911u").forEach(o-> links.add(o.toString()));
+        }
+
+        if (links.isEmpty() && doc.has("marc_956u")) {
+            doc.getJSONArray("marc_956u").forEach(o-> links.add(o.toString()));
+
+        }
+
+        if (doc.has("license")) {
+             doc.getJSONArray("license").forEach(o -> licenses.add(o.toString()));
+        }
+
+
+        links.stream().filter(str-> str.contains("uuid:")).map(str-> {
+            int indexOf = str.indexOf("uuid:");
+            if (indexOf > -1) {
+                return str.substring(indexOf);
+            } else return str;
+        }).forEach(pids::add);
+
+        CatalogItem item = new CatalogItem();
+        item.identifier(ident)
+                .catalog(catalog)
+                .title(nazev)
+                .states(stavy)
+                .author(autor)
+                .stateshistory(historieStavu)
+                .publisher(nakladatel)
+                .institutions(institutions)
+                .links(links)
+                .pids(pids)
+                .license(licenses);
+        return item;
+    }
 
 
 }

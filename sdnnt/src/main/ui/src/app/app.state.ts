@@ -40,7 +40,7 @@ export class AppState {
   public fullCatalog: boolean;
 
   // Aktualni zadost kam se pridavaji navrhy
-  currentZadost: {VVS: Zadost, NZN: Zadost} = {VVS: null, NZN: null};
+  currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
@@ -83,12 +83,14 @@ export class AppState {
       this.logged = true;
       this.user = res;
       if (res.zadost) {
-        // res.zadost je Array max 2 elementy. Muze mit navrh=NZN nebo navrh=VVS
+        // res.zadost je Array max 3 elementy. Muze mit navrh=NZN nebo navrh=VVS 
         res.zadost.forEach(z => {
           if (z.navrh === 'NZN') {
             this.currentZadost.NZN = z;
           }else if (z.navrh === 'VVS') {
             this.currentZadost.VVS = z;
+          }else if (z.navrh === 'VVN') {
+            this.currentZadost.VVN = z;
           }
         }); 
         

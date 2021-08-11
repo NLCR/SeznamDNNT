@@ -46,13 +46,19 @@ paths:
           name: state
           schema:
             type: string
-            enum: ["PA","A","VS","VN","N","NZN","VVN","VVS","NZ"]
+            enum: ["A","PA","V","VS","VN","N","NZ"]
           required: false
         - in: query
           name: license
           schema:
             type: string
             enum: ["dnntt","dnnto"]
+          required: false
+        - in: query
+          name: fullCatalog
+          schema:
+            type: boolean
+            default: false
           required: false
         - in: query
           name: rows
