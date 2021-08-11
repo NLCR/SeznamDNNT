@@ -177,6 +177,40 @@ public class DntAlephImporter {
         idoc.removeField("indextime");
         idoc.removeField("_version_");
 
+        // idoc.setField("stav", stav);
+        JSONArray hs = new JSONArray();
+        if (rec.dataFields.containsKey("992")) {
+          String datum_stavu = "00000000";
+          for (DataField df : rec.dataFields.get("992")) {
+            JSONObject h = new JSONObject();
+            String stav = df.getSubFields().get("s").get(0).getValue();
+            if (df.getSubFields().containsKey("s")) {
+              h.put("stav", stav);
+            }
+            if (df.getSubFields().containsKey("a")) {
+              String ds = df.getSubFields().get("a").get(0).getValue();
+              h.put("date", ds);
+              if (ds.compareTo(datum_stavu) > 0) {
+                idoc.setField("datum_stavu", ds);
+                datum_stavu = ds;
+              }
+              
+            }
+            if (df.getSubFields().containsKey("b")) {
+              h.put("user", df.getSubFields().get("b").get(0).getValue());
+            }
+            if ("NZ".equals(stav)) {
+              h.put("license", "dnntt");
+            } else if ("A".equals(stav) && !idoc.containsKey("license")) {
+              h.put("license", "dnnto");
+            }
+            // System.out.println(h);
+            hs.put(h);
+          }
+          idoc.setField("historie_stavu", hs.toString());
+        }
+        
+        
         // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
         if (rec.dataFields.containsKey("990")) {
           for (DataField df : rec.dataFields.get("990")) {
@@ -192,33 +226,6 @@ public class DntAlephImporter {
               }
             }
           }
-        }
-        // idoc.setField("stav", stav);
-        idoc.setField("datum_stavu", Calendar.getInstance().getTime());
-        JSONArray hs = new JSONArray();
-
-        if (rec.dataFields.containsKey("992")) {
-          for (DataField df : rec.dataFields.get("992")) {
-            JSONObject h = new JSONObject();
-            String stav = df.getSubFields().get("s").get(0).getValue();
-            if (df.getSubFields().containsKey("s")) {
-              h.put("stav", stav);
-            }
-            if (df.getSubFields().containsKey("a")) {
-              h.put("date", df.getSubFields().get("a").get(0).getValue());
-            }
-            if (df.getSubFields().containsKey("b")) {
-              h.put("user", df.getSubFields().get("b").get(0).getValue());
-            }
-            if ("NZ".equals(stav)) {
-              h.put("license", "dnntt");
-            } else if ("A".equals(stav) && !idoc.containsKey("license")) {
-              h.put("license", "dnnto");
-            }
-            // System.out.println(h);
-            hs.put(h);
-          }
-          idoc.setField("historie_stavu", hs.toString());
         }
 
 //    datum_stavu = Calendar.getInstance().getTime();
