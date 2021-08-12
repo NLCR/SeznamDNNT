@@ -209,8 +209,11 @@ public class MarcRecord {
     if (sdoc.containsKey("marc_245c")) {
       nazev += sdoc.getFieldValue("marc_245c") + " ";
     }
+    if (sdoc.containsKey("marc_245p")) {
+      nazev += sdoc.getFieldValue("marc_245p") + " ";
+    }
     sdoc.setField("nazev", nazev.trim());
-    addRokVydani();
+    addRokVydani();  
 
     return sdoc;
   }

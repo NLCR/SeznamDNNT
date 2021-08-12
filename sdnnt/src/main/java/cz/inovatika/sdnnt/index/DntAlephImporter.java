@@ -6,6 +6,9 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -60,7 +63,7 @@ public class DntAlephImporter {
     getRecords("http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL");
     return ret;
   }
-  
+
   public JSONObject run(String from) {
     String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL";
     if (from != null) {
@@ -68,7 +71,7 @@ public class DntAlephImporter {
     }
     getRecords(url);
     return ret;
-  } 
+  }
 
   private void getRecords(String url) {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
@@ -153,6 +156,8 @@ public class DntAlephImporter {
 
   private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
     List<SolrInputDocument> idocs = new ArrayList<>();
+
+    DateFormat dformat = new SimpleDateFormat("yyyyMMdd");
     for (MarcRecord rec : recs) {
       SolrDocumentList docs = find(rec);
       if (docs == null) {
@@ -171,16 +176,16 @@ public class DntAlephImporter {
         for (String name : doc.getFieldNames()) {
           idoc.addField(name, doc.getFieldValue(name));
         }
-        
+
         idoc.removeField("stav");
         idoc.removeField("dntstav");
         idoc.removeField("indextime");
         idoc.removeField("_version_");
 
-        // idoc.setField("stav", stav);
         JSONArray hs = new JSONArray();
         if (rec.dataFields.containsKey("992")) {
-          String datum_stavu = "00000000";
+          Date datum_stavu = new Date();
+          datum_stavu.setTime(0);
           for (DataField df : rec.dataFields.get("992")) {
             JSONObject h = new JSONObject();
             String stav = df.getSubFields().get("s").get(0).getValue();
@@ -189,12 +194,17 @@ public class DntAlephImporter {
             }
             if (df.getSubFields().containsKey("a")) {
               String ds = df.getSubFields().get("a").get(0).getValue();
-              h.put("date", ds);
-              if (ds.compareTo(datum_stavu) > 0) {
-                idoc.setField("datum_stavu", ds);
-                datum_stavu = ds;
+              try {
+                Date d = dformat.parse(ds);
+                h.put("date", ds);
+                if (d.after(datum_stavu)) {
+                  idoc.setField("datum_stavu", d);
+                  datum_stavu = d;
+                }
+              } catch (ParseException pex) {
+
               }
-              
+
             }
             if (df.getSubFields().containsKey("b")) {
               h.put("user", df.getSubFields().get("b").get(0).getValue());
@@ -209,8 +219,7 @@ public class DntAlephImporter {
           }
           idoc.setField("historie_stavu", hs.toString());
         }
-        
-        
+
         // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
         if (rec.dataFields.containsKey("990")) {
           for (DataField df : rec.dataFields.get("990")) {
@@ -218,7 +227,7 @@ public class DntAlephImporter {
             if (df.getSubFields().containsKey("a")) {
               String stav = df.getSubFields().get("a").get(0).getValue();
               //h.put("stav", stav);
-              idoc.addField("dntstav", stav); 
+              idoc.addField("dntstav", stav);
               if ("NZ".equals(stav)) {
                 idoc.setField("license", "dnntt");
               } else if ("A".equals(stav) && !idoc.containsKey("license")) {
@@ -228,10 +237,6 @@ public class DntAlephImporter {
           }
         }
 
-//    datum_stavu = Calendar.getInstance().getTime();
-//    JSONObject h = new JSONObject().put("stav", new_stav).put("date", datum_stavu).put("user", user);
-//    historie_stavu.put(h.toString());
-//        idoc.setField("historie_stavu", h);
         idocs.add(idoc);
 
       }
@@ -263,15 +268,15 @@ public class DntAlephImporter {
       if (mr.dataFields.containsKey("020")) {
         for (DataField df : mr.dataFields.get("020")) {
           if (df.getSubFields().containsKey("a")) {
-              q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
-            }
+            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+          }
         }
       }
       if (mr.dataFields.containsKey("902")) {
         for (DataField df : mr.dataFields.get("902")) {
           if (df.getSubFields().containsKey("a")) {
-              q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
-            }
+            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+          }
         }
       }
 
@@ -470,7 +475,7 @@ public class DntAlephImporter {
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();
             sfs.add(new SubField(code, val));
-            mr.sdoc.addField("marc_" + tag + code, val); 
+            mr.sdoc.addField("marc_" + tag + code, val);
           }
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();
