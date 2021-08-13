@@ -29,8 +29,10 @@
     "waiting": "čeká na posouzení",
     "processed": "zpracováno",
     "open": "neodesláno",
+
     "rejected": "zamítnuto",
     "approved": "schváleno",
+    "approvedlib": "omezeno na terminál",
 
     "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",

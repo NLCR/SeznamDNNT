@@ -37,6 +37,7 @@ $states: (
   "waiting": mat-color($mat-orange, $state_shade),
   "processed": mat-color($mat-light-green, $state_shade),
   "rejected": mat-color($mat-red, $state_shade),
+  "approvedlib": mat-color($mat-amber, $state_shade),
   "approved": mat-color($mat-lime, 800)
 );
 

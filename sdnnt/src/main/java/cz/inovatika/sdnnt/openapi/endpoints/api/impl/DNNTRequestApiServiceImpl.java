@@ -45,7 +45,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     public static final String API_KEY_HEADER = "X-API-KEY";
 
-    // Vytvorit workflow enums
+    private static final int LIMIT = 10000;
+
+    // Stavy jsou uz vytvorene
     private static enum DocumentState {
         A {
             @Override
@@ -172,9 +174,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             User user = UserController.findUserByApiKey(headerString);
             if (user != null) {
                 ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
-                //InlineResponse2001 allRequestsResponse = new InlineResponse2001();
                 try {
-                    JSONObject search = accountService.search(null, status, navrh, user);
+                    // do it better
+                    JSONObject search = accountService.search(null, status, navrh, user, LIMIT, 0);
                     JSONObject response = search.getJSONObject("response");
                     JSONArray docs = response.getJSONArray("docs");
                     for (int i = 0, ll = docs.length();i<ll;i++) {

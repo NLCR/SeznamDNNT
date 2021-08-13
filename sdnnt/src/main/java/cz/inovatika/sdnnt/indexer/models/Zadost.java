@@ -138,12 +138,12 @@ public class Zadost {
     }
   }
   
-  public static JSONObject approve(String identifier, String js, String komentar, String username) {
+  public static JSONObject approve(String identifier, String js, String komentar, String username, String approvestate) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       String oldProcess = new JSONObject().put("process", zadost.process).toString();
       ZadostProcess zprocess = new ZadostProcess();
-      zprocess.state = "approved";
+      zprocess.state = approvestate != null ? approvestate : "approved";
       zprocess.user = username;
       zprocess.reason = komentar;
       zprocess.date = new Date();
@@ -156,7 +156,8 @@ public class Zadost {
       return new JSONObject().put("error", ex);
     }
   }
-  
+
+
   public static JSONObject reject(String identifier, String js, String reason, String username) {
     try {
       

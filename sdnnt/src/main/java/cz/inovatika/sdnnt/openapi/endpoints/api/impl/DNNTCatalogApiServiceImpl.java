@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ *  Catalog search service
+ */
 public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
     // Catalogue searcher
@@ -37,6 +40,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         map.put("page", integer1.toString());
         if (fullCatalog) {
             map.put("fullCatalog", Boolean.TRUE.toString());
+
         }
 
         List<String> filters = new ArrayList<>();

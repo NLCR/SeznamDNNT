@@ -20,8 +20,10 @@ import java.util.logging.Level;
 
 public class AccountServiceImpl implements AccountService {
 
+    private static final int DEFAULT_SEARCH_RESULT_SIZE = 20;
+
     @Override
-    public JSONObject search(String q, String state, String navrh, User user) throws SolrServerException, IOException {
+    public JSONObject search(String q, String state, String navrh, User user, int rows, int page) throws SolrServerException, IOException {
         NamedList<Object> qresp = null;
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
@@ -32,11 +34,15 @@ public class AccountServiceImpl implements AccountService {
             }
 
             SolrQuery query = new SolrQuery(q)
-                    .setRows(20)
                     .setParam("df", "fullText")
                     .setFacet(true).addFacetField("typ", "state", "navrh")
                     .setParam("json.nl", "arrntv")
                     .setFields("*,process:[json]");
+
+            if (rows >0 ) query.setRows(rows);  else query.setRows(DEFAULT_SEARCH_RESULT_SIZE);
+            if (page >= 0) query.setStart(rows*page);
+
+
             if (state != null) {
                 query.addFilterQuery("state:" + state);
             }

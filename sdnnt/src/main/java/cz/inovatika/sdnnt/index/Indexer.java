@@ -15,7 +15,6 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -245,15 +244,45 @@ public class Indexer {
     return ret;
   }
 
+  // zmeni viditelnost - musi but stav A nebo PA -> finalni stav A NZ
+  public static JSONObject reduceVisbilityState(String identifier, String navrh, String user) {
+
+    JSONObject ret = new JSONObject();
+    try {
+      MarcRecord mr = MarcRecord.fromIndex(identifier);
+      mr.toSolrDoc();
+      String oldRaw = mr.toJSON().toString();
+      List<String> oldStav = mr.stav;
+      if (navrh.equals("VVS") || navrh.equals("VVN")) {
+        if (navrh.equals("VVS")) {
+          if (oldStav == null) {
+            mr.enhanceState(Arrays.asList("A", "NZ"), user);
+          } else if (oldStav.contains("A")) {
+            mr.enhanceState("NZ", user);
+          } else if (oldStav.contains("PA")) {
+            mr.setStav(Arrays.asList("A","NZ"), user);
+          }
+        }
+
+        mr.toSolrDoc(true);
+        History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+
+        // Update record in catalog
+        getClient().add("catalog", mr.sdoc);
+        getClient().commit("catalog");
+
+      } else throw new IllegalStateException("Accepting only VVN or VVS requests");
+
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
   public static JSONObject changeStav(String identifier, String navrh, String user) {
     JSONObject ret = new JSONObject();
     try {
-//      SolrQuery q = new SolrQuery("*").setRows(1)
-//              .addFilterQuery("identifier:\"" + identifier + "\"")
-//              .setFields("raw, marc_990a");
-//      SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
-//      String oldRaw = (String) docOld.getFirstValue("raw");
-
       MarcRecord mr = MarcRecord.fromIndex(identifier);
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
@@ -264,10 +293,9 @@ public class Indexer {
         } else if (oldStav.contains("PA")) {
           mr.setStav("VN", user);
         }
-
       } else if (navrh.equals("NZN")) {
         mr.setStav("PA", user);
-      } else if (navrh.equals("VVNtoN")) {
+      } else if (navrh.equals("VVN")) {
         mr.setStav("N", user);
       }
 
