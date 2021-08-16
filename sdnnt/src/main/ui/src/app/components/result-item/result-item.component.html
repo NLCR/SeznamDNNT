@@ -67,6 +67,12 @@
         <mat-icon>close</mat-icon>
         {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
+      <button mat-stroked-button
+        *ngIf="state.logged"
+        (click)="follow()">
+        <mat-icon>notifications</mat-icon>
+        {{ 'desc.sledovat' | translate }}
+      </button>
 
       <ng-container *ngIf="state.user && inZadost && !processed?.state">
         <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"

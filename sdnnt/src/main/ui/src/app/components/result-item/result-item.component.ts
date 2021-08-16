@@ -300,5 +300,15 @@ export class ResultItemComponent implements OnInit {
     });
 
   }
+
+  follow() {
+    this.service.followRecord(this.doc.identifier).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.follow_zaznam_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.follow_zaznam_success', '', false);
+      }
+    });
+  }
 }
 

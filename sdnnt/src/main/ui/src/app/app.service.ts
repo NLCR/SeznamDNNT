@@ -211,6 +211,13 @@ export class AppService {
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
+  followRecord(identifier: string): Observable<string> {
+    let url = '/account/follow_record';
+    const params: HttpParams = new HttpParams()
+      .set('user', this.state.user.username);
+    return this.post(url, { identifier }, params);
+  }
+
   getZadost(id: string): Observable<any> {
     let url = 'account/get_zadost';
     const params: HttpParams = new HttpParams().set('id', id);
