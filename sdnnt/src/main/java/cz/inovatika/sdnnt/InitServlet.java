@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.sched.SchedulerMgr;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -8,10 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.HashMap;
-import java.util.Map;
-import org.json.JSONException;
+import org.quartz.SchedulerException;
 
 /**
  *
@@ -53,22 +51,28 @@ public class InitServlet extends HttpServlet {
   @Override
   public void init() throws ServletException {
 
-    if (getServletContext().getInitParameter("def_config_dir") != null) {
-      DEFAULT_CONFIG_DIR = getServletContext().getInitParameter("def_config_dir");
+    try {
+      if (getServletContext().getInitParameter("def_config_dir") != null) {
+        DEFAULT_CONFIG_DIR = getServletContext().getInitParameter("def_config_dir");
+      }
+      
+      DEFAULT_CONFIG_FILE = getServletContext().getRealPath(DEFAULT_CONFIG_DIR) + File.separator + DEFAULT_CONFIG_FILE;
+      
+      DEFAULT_I18N_DIR = getServletContext().getRealPath(DEFAULT_I18N_DIR);
+      
+      if (System.getProperty(APP_DIR_KEY) != null) {
+        CONFIG_DIR = System.getProperty(APP_DIR_KEY);
+      } else if (getServletContext().getInitParameter("app_dir") != null) {
+        CONFIG_DIR = getServletContext().getInitParameter("app_dir");
+      } else {
+        CONFIG_DIR = System.getProperty("user.home") + File.separator + CONFIG_DIR;
+      }
+      
+      SchedulerMgr.initJobs();
+      LOGGER.log(Level.INFO, "app dir is {0}", CONFIG_DIR);
+    } catch (SchedulerException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
     }
- 
-    DEFAULT_CONFIG_FILE = getServletContext().getRealPath(DEFAULT_CONFIG_DIR) + File.separator + DEFAULT_CONFIG_FILE;
-
-    DEFAULT_I18N_DIR = getServletContext().getRealPath(DEFAULT_I18N_DIR);
-
-    if (System.getProperty(APP_DIR_KEY) != null) {
-      CONFIG_DIR = System.getProperty(APP_DIR_KEY);
-    } else if (getServletContext().getInitParameter("app_dir") != null) {
-      CONFIG_DIR = getServletContext().getInitParameter("app_dir");
-    } else {
-      CONFIG_DIR = System.getProperty("user.home") + File.separator + CONFIG_DIR;
-    }
-    LOGGER.log(Level.INFO, "app dir is {0}", CONFIG_DIR);
 
   }
 

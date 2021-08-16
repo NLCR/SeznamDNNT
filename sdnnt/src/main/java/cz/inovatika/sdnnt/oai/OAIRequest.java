@@ -112,7 +112,7 @@ public class OAIRequest {
       SolrQuery query = new SolrQuery("*")
               .setRows(rows)
               .setSort(SORT_FIELD, SolrQuery.ORDER.asc)
-              .setFields(SORT_FIELD, "identifier,raw");
+              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu");
       if (req.getParameter("from") != null) {
         String from = req.getParameter("from");
         String until = "*";
@@ -160,7 +160,7 @@ public class OAIRequest {
           ret.append("</header>");
 
           String raw = (String) doc.getFirstValue("raw");
-          MarcRecord mr = MarcRecord.fromJSON(raw);
+          MarcRecord mr = MarcRecord.fromDoc(doc);
           ret.append(mr.toXml(onlyIdentifiers));
 
           ret.append("</record>");

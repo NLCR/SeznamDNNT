@@ -41,7 +41,7 @@ public class MarcRecord {
   public String leader;
 
   // Stav 
-  public List<String> stav = new ArrayList<>();
+  public List<String> dntstav = new ArrayList<>();
   public JSONArray historie_stavu = new JSONArray();
   public Date datum_stavu;
   public String license;
@@ -76,6 +76,16 @@ public class MarcRecord {
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
     return mr;
   }
+  
+  public static MarcRecord fromDoc(SolrDocument doc) throws JsonProcessingException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue("raw"), MarcRecord.class);
+    mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
+    mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
+    mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
+    mr.license = (String) doc.getFirstValue("license");
+    return mr;
+  }
 
   public static MarcRecord fromIndex(String identifier) throws JsonProcessingException, SolrServerException, IOException {
     SolrQuery q = new SolrQuery("*").setRows(1)
@@ -85,7 +95,7 @@ public class MarcRecord {
     String json = (String) doc.getFirstValue("raw");
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
-    mr.stav = Arrays.asList((String[]) doc.getFieldValues("stav").toArray());
+    mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
     mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
     mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
     mr.license = (String) doc.getFirstValue("license");
@@ -135,6 +145,14 @@ public class MarcRecord {
           xml.append("</marc:datafield>");
         }
       }
+      
+      // Pridame dnt pole
+      xml.append("<marc:datafield tag=\"990\" ind1=\" \" ind2=\" \">");
+      
+      for (String sk : dntstav) {
+          xml.append("<marc:subfield code=\"a\" >").append(sk).append("</marc:subfield>");
+      }
+      xml.append("</marc:datafield>");
 
       xml.append("</marc:record>");
       xml.append("</metadata>");
@@ -158,7 +176,7 @@ public class MarcRecord {
     sdoc.setField("leader", leader);
     sdoc.setField("raw", toJSON().toString());
 
-    sdoc.setField("dntstav", stav);
+    sdoc.setField("dntstav", dntstav);
     sdoc.setField("historie_stavu", historie_stavu.toString());
     sdoc.setField("license", license);
     sdoc.setField("datum_stavu", datum_stavu);
@@ -293,12 +311,12 @@ public class MarcRecord {
 //    ldf2.add(df2);
 //    dataFields.put("992", ldf2);
     
-    stav = new ArrayList<>();
-    stav.add(new_stav);
+    dntstav = new ArrayList<>();
+    dntstav.add(new_stav);
     datum_stavu = Calendar.getInstance().getTime();
     JSONObject h = new JSONObject().put("stav", new_stav).put("date", datum_stavu).put("user", user);
     historie_stavu.put(h.toString());
-  }
+  } 
 
   private void fillSolrDoc() {
     for (String tag : tagsToIndex) {

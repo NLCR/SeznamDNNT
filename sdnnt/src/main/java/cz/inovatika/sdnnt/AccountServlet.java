@@ -389,6 +389,24 @@ public class AccountServlet extends HttpServlet {
         }
         return json;
       }
+    },
+    FOLLOW_RECORD {
+      @Override
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          if (user == null) {
+            json.put("error", "not logged");
+          } else {
+            json = Indexer.followRecord(req.getParameter("identifier"), user.username);
+          }
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
     };
 
     abstract JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response, User user) throws Exception;

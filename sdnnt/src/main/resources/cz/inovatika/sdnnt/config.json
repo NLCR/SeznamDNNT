@@ -16,8 +16,6 @@
     "yearsSE": 10
   },
 
-
-
   "mail": {
     "from.user": "xxxx.xxx@gmail.com",
     "from.name": "YYYY SSSS",
@@ -42,8 +40,18 @@
   "resetlink": {
     "subject": "Zadost o resetovani hesla" ,
     "content.html": true
+  },  
+  
+  "jobs": {
+    "zadost": {
+      "type": "zadost",
+      "cron": "0 40 * * * ?"
+    },
+    "test": {
+      "type": "test",
+      "cron": "0 0 * * * ?"
+    }
   }
-
 
 }
 

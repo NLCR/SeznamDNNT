@@ -245,19 +245,78 @@ public class Indexer {
     return ret;
   }
 
+  /**
+   * Kontroluje stav podle nastavene lhuty (6 mesicu) a meni stav
+   *
+   * @return
+   */
+  public static JSONObject checkStav() {
+    JSONObject ret = new JSONObject();
+    String collection = "catalog";
+
+    int indexed = 0;
+    try {
+      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+      // Menime z PA -> A
+      SolrQuery q = new SolrQuery("*").setRows(1000)
+              .setSort("identifier", SolrQuery.ORDER.desc)
+              .addFilterQuery("dntstav:PA")
+              .addFilterQuery("datum_stavu:[* TO NOW/MONTH-6MONTHS]")
+              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
+      List<SolrInputDocument> idocs = new ArrayList<>();
+      boolean done = false;
+      while (!done) {
+        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+        QueryResponse qr = getClient().query(collection, q);
+        String nextCursorMark = qr.getNextCursorMark();
+        SolrDocumentList docs = qr.getResults();
+        for (SolrDocument doc : docs) {
+          String oldRaw = (String) doc.getFirstValue("raw");
+
+          MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+
+          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
+          mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
+          mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
+          mr.license = (String) doc.getFirstValue("license");
+          // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
+          mr.setStav("A", "scheduler");
+          History.log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
+
+          SolrInputDocument idoc = mr.toSolrDoc();
+          idocs.add(idoc);
+        }
+
+        if (!idocs.isEmpty()) {
+          getClient().add(collection, idocs);
+          getClient().commit(collection);
+          indexed += idocs.size();
+          idocs.clear();
+          LOGGER.log(Level.INFO, "Curently changed: {0}", indexed);
+        }
+        if (cursorMark.equals(nextCursorMark)) {
+          done = true;
+        }
+        cursorMark = nextCursorMark;
+      }
+      getClient().commit(collection);
+      LOGGER.log(Level.INFO, "checkStav finished: {0}", indexed);
+      ret.put("checkStav", indexed);
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
   public static JSONObject changeStav(String identifier, String navrh, String user) {
     JSONObject ret = new JSONObject();
     try {
-//      SolrQuery q = new SolrQuery("*").setRows(1)
-//              .addFilterQuery("identifier:\"" + identifier + "\"")
-//              .setFields("raw, marc_990a");
-//      SolrDocument docOld = getClient().query("catalog", q).getResults().get(0);
-//      String oldRaw = (String) docOld.getFirstValue("raw");
 
       MarcRecord mr = MarcRecord.fromIndex(identifier);
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
-      List<String> oldStav = mr.stav;
+      List<String> oldStav = mr.dntstav;
       if (navrh.equals("VVS")) {
         if (oldStav == null || oldStav.contains("A")) {
           mr.setStav("VS", user);
@@ -329,7 +388,7 @@ public class Indexer {
       SolrQuery q = new SolrQuery("*").setRows(1000)
               .setSort("identifier", SolrQuery.ORDER.desc)
               .addFilterQuery(filter)
-              .setFields("raw");
+              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
       List<SolrInputDocument> idocs = new ArrayList<>();
       boolean done = false;
       while (!done) {
@@ -341,11 +400,16 @@ public class Indexer {
           String oldRaw = (String) doc.getFirstValue("raw");
 
           MarcRecord mr = MarcRecord.fromJSON(oldRaw);
-          if (cleanStav) {
-            mr.dataFields.remove("990");
-            mr.dataFields.remove("992");
+          SolrInputDocument idoc = mr.toSolrDoc();
+          if (!cleanStav) {
+            idoc.addField("dntstav", doc.getFieldValue("dntstav"));
+            idoc.addField("datum_stavu", doc.getFieldValue("datum_stavu"));
+            idoc.addField("historie_stavu", doc.getFieldValue("historie_stavu"));
+            idoc.addField("license", doc.getFieldValue("license"));
+            idoc.addField("license_history", doc.getFieldValue("license_history"));
           }
-          idocs.add(mr.toSolrDoc());
+
+          idocs.add(idoc);
         }
 
         if (!idocs.isEmpty()) {
@@ -727,6 +791,20 @@ public class Indexer {
         patchIterator.remove();
       }
     }
+  }
+  
+  public static JSONObject followRecord(String identifier, String user) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrInputDocument idoc = new SolrInputDocument();
+      idoc.addField("identifier", identifier);
+      idoc.addField("user", user);
+      getClient().add("notifications", idoc, 10);
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
   }
 
   public JSONObject test(String sourceCore, String id) {
