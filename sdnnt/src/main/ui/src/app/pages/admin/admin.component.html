@@ -1,4 +1,4 @@
-<div class="app-container">
+<div class="app-container" *ngIf="state.user && state.user.role === 'admin'">
   <mat-tab-group>
     <mat-tab [label]="'desc.editace_stranek' | translate">
       <div fxLayout="row" fxLayoutGap="32px">

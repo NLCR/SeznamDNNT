@@ -9,6 +9,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfListitem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemResponse;
+import cz.inovatika.sdnnt.utils.License;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
@@ -45,9 +46,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
-    static enum License {
-        dnnto, dnntt;
-    }
 
 
     CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
@@ -55,7 +53,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response addedDnnto(String instituion, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "license:"+License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
+        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "license:"+ License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");

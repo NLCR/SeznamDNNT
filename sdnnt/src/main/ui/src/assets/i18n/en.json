@@ -31,6 +31,8 @@
     "open": "open",
     "rejected": "rejected",
     "approved": "approved",
+    "approvedlib": "approved for terminal",
+
 
     "tooltip": {
       "undefined": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",

@@ -17,6 +17,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cz.inovatika.sdnnt.utils.ServletsSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -382,12 +384,7 @@ public class IndexerServlet extends HttpServlet {
         }
         try {
           Indexer indexer = new Indexer();
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
           json = indexer.save(req.getParameter("id"), inputJs, user.getString("name"));
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);

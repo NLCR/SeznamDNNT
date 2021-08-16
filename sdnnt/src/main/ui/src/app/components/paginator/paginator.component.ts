@@ -13,6 +13,8 @@ import { AppConfiguration } from 'src/app/app-configuration';
 export class PaginatorComponent implements OnInit {
 
   @Input() numFound;
+  @Input() showSort: boolean ;
+  
   pageIndex: number;
 
   constructor(

@@ -15,7 +15,6 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -245,63 +244,35 @@ public class Indexer {
     return ret;
   }
 
-  /**
-   * Kontroluje stav podle nastavene lhuty (6 mesicu) a meni stav
-   *
-   * @return
-   */
-  public static JSONObject checkStav() {
+  // zmeni viditelnost - musi but stav A nebo PA -> finalni stav A NZ
+  public static JSONObject reduceVisbilityState(String identifier, String navrh, String user) {
+
     JSONObject ret = new JSONObject();
-    String collection = "catalog";
-
-    int indexed = 0;
     try {
-      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-      // Menime z PA -> A
-      SolrQuery q = new SolrQuery("*").setRows(1000)
-              .setSort("identifier", SolrQuery.ORDER.desc)
-              .addFilterQuery("dntstav:PA")
-              .addFilterQuery("datum_stavu:[* TO NOW/MONTH-6MONTHS]")
-              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
-      List<SolrInputDocument> idocs = new ArrayList<>();
-      boolean done = false;
-      while (!done) {
-        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-        QueryResponse qr = getClient().query(collection, q);
-        String nextCursorMark = qr.getNextCursorMark();
-        SolrDocumentList docs = qr.getResults();
-        for (SolrDocument doc : docs) {
-          String oldRaw = (String) doc.getFirstValue("raw");
-
-          MarcRecord mr = MarcRecord.fromJSON(oldRaw);
-
-          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
-          mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
-          mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
-          mr.license = (String) doc.getFirstValue("license");
-          // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
-          mr.setStav("A", "scheduler");
-          History.log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
-
-          SolrInputDocument idoc = mr.toSolrDoc();
-          idocs.add(idoc);
+      MarcRecord mr = MarcRecord.fromIndex(identifier);
+      mr.toSolrDoc();
+      String oldRaw = mr.toJSON().toString();
+      List<String> oldStav = mr.stav;
+      if (navrh.equals("VVS") || navrh.equals("VVN")) {
+        if (navrh.equals("VVS")) {
+          if (oldStav == null) {
+            mr.enhanceState(Arrays.asList("A", "NZ"), user);
+          } else if (oldStav.contains("A")) {
+            mr.enhanceState("NZ", user);
+          } else if (oldStav.contains("PA")) {
+            mr.setStav(Arrays.asList("A","NZ"), user);
+          }
         }
 
-        if (!idocs.isEmpty()) {
-          getClient().add(collection, idocs);
-          getClient().commit(collection);
-          indexed += idocs.size();
-          idocs.clear();
-          LOGGER.log(Level.INFO, "Curently changed: {0}", indexed);
-        }
-        if (cursorMark.equals(nextCursorMark)) {
-          done = true;
-        }
-        cursorMark = nextCursorMark;
-      }
-      getClient().commit(collection);
-      LOGGER.log(Level.INFO, "checkStav finished: {0}", indexed);
-      ret.put("checkStav", indexed);
+        mr.toSolrDoc(true);
+        History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+
+        // Update record in catalog
+        getClient().add("catalog", mr.sdoc);
+        getClient().commit("catalog");
+
+      } else throw new IllegalStateException("Accepting only VVN or VVS requests");
+
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -312,7 +283,6 @@ public class Indexer {
   public static JSONObject changeStav(String identifier, String navrh, String user) {
     JSONObject ret = new JSONObject();
     try {
-
       MarcRecord mr = MarcRecord.fromIndex(identifier);
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
@@ -323,10 +293,9 @@ public class Indexer {
         } else if (oldStav.contains("PA")) {
           mr.setStav("VN", user);
         }
-
       } else if (navrh.equals("NZN")) {
         mr.setStav("PA", user);
-      } else if (navrh.equals("VVNtoN")) {
+      } else if (navrh.equals("VVN")) {
         mr.setStav("N", user);
       }
 

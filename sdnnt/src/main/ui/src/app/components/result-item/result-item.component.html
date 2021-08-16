@@ -44,9 +44,9 @@
       </ng-container>
     </div>
     <div fxLayout="row">
-      <div [class]="'app-badge ' + doc.dntstav[0]" *ngIf="doc.dntstav">
+      <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.dntstav | translate">info</mat-icon>
-        {{ 'state.' + doc.dntstav[0] | translate }}
+        {{ 'state.' + doc.dntstav[doc.dntstav.length-1] | translate }}
       </div>
       <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         <mat-icon class="material-icons-outlined">info</mat-icon>
@@ -78,14 +78,14 @@
         <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
           [value]="processed?.state">
           <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()"
-            [matTooltip]="'Schvalit zmenu stavu na A'" matTooltipPosition="above">
+            [matTooltip]="'Schvalit zmenu stavu na PA'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'VVS'" (click)="approve()"
+          <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VVS' || zadost.navrh === 'VVN')" (click)="approve()"
             [matTooltip]="'Schvalit zmenu stavu na VS'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-          <mat-button-toggle value="approvedLib" *ngIf="zadost.navrh === 'VVS'" (click)="approveLib()"
+          <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VVS' || zadost.navrh === 'VVN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()"
             [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">local_library</mat-icon>
           </mat-button-toggle>

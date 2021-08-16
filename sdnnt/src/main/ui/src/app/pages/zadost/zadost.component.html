@@ -5,7 +5,7 @@
         {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
       </div>
       <div>
-        <app-paginator [numFound]="numFound"></app-paginator>
+        <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
       </div>
     </div>
     <div class="app-results-wrapper">
@@ -43,7 +43,7 @@
       </ng-container>
     </div>
     <div class="app-mt-4">
-      <app-paginator [numFound]="numFound"></app-paginator>
+      <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </ng-container>
 </div>

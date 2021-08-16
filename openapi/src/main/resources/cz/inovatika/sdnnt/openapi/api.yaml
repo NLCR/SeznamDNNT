@@ -99,7 +99,7 @@ paths:
           name: status
           schema:
             type: string
-            enum: ["open","waiting","processed","rejected","approved"]
+            enum: ["open","waiting","processed"]
           required: false
         - in: query
           name: navrh

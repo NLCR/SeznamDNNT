@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.utils.ServletsSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -106,11 +107,12 @@ public class AccountServlet extends HttpServlet {
         String q = req.getParameter("q");
         String state = req.getParameter("state");
         String navrh = req.getParameter("navrh");
+        String page = req.getParameter("page");
+        String rows = req.getParameter("rows");
+
         JSONObject ret = new JSONObject();
         try {
-          JSONObject qresp = service.search(q, state, navrh, user);
-          //ret =  new JSONObject((String) qresp.get("response"));
-          ret = service.search(q, state, navrh, user);
+          ret = service.search(q, state, navrh, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
           //ret = qresp.getJSONObject("response");
         } catch (SolrServerException | IOException ex) {
           LOGGER.log(Level.SEVERE, null, ex);
@@ -269,16 +271,11 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
           Indexer.changeStav(inputJs.getString("identifier"), 
                   "VVNtoN", user.username);
           return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
-                  inputJs.getString("reason"), user.username);
+                  inputJs.getString("reason"), user.username,null);
           // json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
@@ -294,17 +291,31 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
           Indexer.changeStav(inputJs.getString("identifier"), 
                   "VVNtoPA", user.username);
           return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
                   inputJs.getString("reason"), user.username);
           // json = Zadost.markAsProcessed(inputJs, user.username);
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
+
+    APPROVE_NAVRH_LIB{
+      @Override
+      JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response, User user) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          JSONObject inputJs = ServletsSupport.readInputJSON(request);
+          // todo: transactions (optimistic locking)
+          Indexer.reduceVisbilityState(inputJs.getString("identifier"),
+                  inputJs.getJSONObject("zadost").getString("navrh"), user.username);
+          return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(),
+                  inputJs.getString("reason"), user.username,"approvedlib");
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           json.put("error", ex.toString());
@@ -318,16 +329,12 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
+          // todo: transactions (optimistic locking)
           Indexer.changeStav(inputJs.getString("identifier"), 
                   inputJs.getJSONObject("zadost").getString("navrh"), user.username);
           return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
-                  inputJs.getString("reason"), user.username);
+                  inputJs.getString("reason"), user.username,null);
           // json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
@@ -342,12 +349,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
           return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(), 
                   inputJs.getString("reason"), user.username);
         } catch (Exception ex) {
@@ -362,12 +364,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response, User user) throws Exception {
         JSONObject json = new JSONObject();
         try {
-          JSONObject inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
-          } else {
-            inputJs = new JSONObject(req.getParameter("json"));
-          }
+          JSONObject inputJs = ServletsSupport.readInputJSON(req);
           return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.username);
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
