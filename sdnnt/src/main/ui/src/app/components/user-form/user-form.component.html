@@ -37,7 +37,9 @@
       <div class="app-mr-4">
         <mat-form-field appearance="fill" class="app-w-100">
           <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}*</mat-label>
-          <input #username="matInput" matInput [(ngModel)]="user.username" name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate" [disabled]="!isRegister" />
+          <input #username="matInput" matInput [(ngModel)]="user.username" 
+          name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate"
+          pattern="^\S+$" [disabled]="!isRegister" />
         </mat-form-field>
       </div>
     </div>

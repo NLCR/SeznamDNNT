@@ -44,7 +44,8 @@ export class UserDialogComponent implements OnInit {
 
   save() {
     if (this.data.isRegister) {
-      if (!this.user.username || this.user.username.trim() === '') {
+      const validUsername = this.user.username.trim() === this.user.username.trim().replace(/[^\S]/gi, '');
+      if (!this.user.username || this.user.username.trim() === '' ||!validUsername ) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_username', true);
         this.focus = 'username';
         return;
