@@ -211,11 +211,13 @@ export class AppService {
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
-  followRecord(identifier: string): Observable<string> {
+  followRecord(identifier: string, follow: boolean): Observable<string> {
     let url = '/account/follow_record';
     const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
-    return this.post(url, { identifier }, params);
+    .set('user', this.state.user.username)
+    .set('identifier', identifier)
+    .set('follow', follow+'');
+    return this.get(url, params);
   }
 
   getZadost(id: string): Observable<any> {

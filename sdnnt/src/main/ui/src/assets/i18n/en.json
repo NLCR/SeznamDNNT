@@ -226,6 +226,8 @@
     "zobrazit_jen_presne_shody": "Show only exact matches",
     "zobrazit_nenalezene": "Show not found",
     "apienabled": "Enable API",
-    "apikey": "API Key"
+    "apikey": "API Key",
+    "sledovat": "Follow record",
+    "ne_sledovat": "Unfollow record"
   }
 }

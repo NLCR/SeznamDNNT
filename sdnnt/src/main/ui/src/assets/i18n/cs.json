@@ -226,6 +226,8 @@
     "zobrazit_jen_presne_shody": "Zobrazit jen přesné shody",
     "zobrazit_nenalezene": "Zobrazit nenalezené",
     "apienabled": "Povolit API",
-    "apikey": "API klíč"
+    "apikey": "API klíč",
+    "sledovat": "Sledovat záznam",
+    "ne_sledovat": "Přestat sledovat záznam"
   }
 }

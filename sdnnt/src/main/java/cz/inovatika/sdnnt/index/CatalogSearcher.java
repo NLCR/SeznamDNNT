@@ -79,10 +79,13 @@ public class CatalogSearcher {
         for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
           JSONObject doc = (JSONObject) o;
           ids.add("\""+doc.getString("identifier")+"\"");
-          //doc.put("zadost", findZadost(doc.getString("identifier")));
         }
         JSONArray zadosti = findZadosti(ids);
         ret.put("zadosti", zadosti);
+        if (user != null) {
+          JSONArray notifications = findNotifications(ids, user.username);
+          ret.put("notifications", notifications);
+        }
       }
 
     } catch (SolrServerException | IOException ex) {
@@ -183,6 +186,28 @@ public class CatalogSearcher {
         rParser.setWriterType("json");
         qreq.setResponseParser(rParser);
         NamedList<Object> qresp = solr.request(qreq, "zadost");
+        return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
+      } else return new JSONArray();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return null;
+    }
+  }
+  
+  private JSONArray findNotifications(List<String> identifiers, String user) {
+    try {
+      if (!identifiers.isEmpty()) {
+        SolrClient solr = Indexer.getClient();
+        String q = identifiers.toString().replace("[", "(").replace("]", ")").replaceAll(",", "");
+        SolrQuery query = new SolrQuery("identifier:" + q)
+                .addFilterQuery("user:" + user)
+                .setFields("identifier");
+
+        QueryRequest qreq = new QueryRequest(query);
+        NoOpResponseParser rParser = new NoOpResponseParser();
+        rParser.setWriterType("json");
+        qreq.setResponseParser(rParser);
+        NamedList<Object> qresp = solr.request(qreq, "notifications");
         return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
       } else return new JSONArray();
     } catch (SolrServerException | IOException ex) {

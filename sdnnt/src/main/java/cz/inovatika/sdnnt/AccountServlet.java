@@ -395,7 +395,9 @@ public class AccountServlet extends HttpServlet {
           if (user == null) {
             json.put("error", "not logged");
           } else {
-            json = Indexer.followRecord(req.getParameter("identifier"), user.username);
+            json = Indexer.followRecord(req.getParameter("identifier"), 
+                    user.username, 
+                    "true".equals(req.getParameter("follow")));
           }
           
         } catch (Exception ex) {

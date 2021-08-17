@@ -826,14 +826,18 @@ public class Indexer {
     }
   }
   
-  public static JSONObject followRecord(String identifier, String user) {
+  public static JSONObject followRecord(String identifier, String user, boolean follow) {
     JSONObject ret = new JSONObject();
     try {
-      SolrInputDocument idoc = new SolrInputDocument();
-      idoc.addField("id", user + "_" + identifier);
-      idoc.addField("identifier", identifier);
-      idoc.addField("user", user);
-      getClient().add("notifications", idoc, 10);
+      if (follow) {
+        SolrInputDocument idoc = new SolrInputDocument();
+        idoc.addField("id", user + "_" + identifier);
+        idoc.addField("identifier", identifier);
+        idoc.addField("user", user);
+        getClient().add("notifications", idoc, 10);
+      } else {
+        getClient().deleteById("notifications", user + "_" + identifier, 10);
+      }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);

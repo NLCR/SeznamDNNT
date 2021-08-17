@@ -68,10 +68,16 @@
         {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
       <button mat-stroked-button
-        *ngIf="state.logged"
-        (click)="follow()">
+        *ngIf="state.logged && doc.hasNotifications"
+        (click)="unfollow()"
+        [title]="'desc.ne_sledovat' | translate">
+        <mat-icon>notifications_active</mat-icon>
+      </button>
+      <button mat-stroked-button
+        *ngIf="state.logged && !doc.hasNotifications"
+        (click)="follow()"
+        [title]="'desc.sledovat' | translate">
         <mat-icon>notifications</mat-icon>
-        {{ 'desc.sledovat' | translate }}
       </button>
 
       <ng-container *ngIf="state.user && inZadost && !processed?.state">
