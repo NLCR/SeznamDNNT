@@ -45,28 +45,17 @@
     that avoids logging every request
 -->
 
-<schema name="zadost" version="1.6">
+<schema name="notifications" version="1.6">
   
-    <field name="id" type="string" indexed="true" stored="true" docValues="true" />
+    <field name="id" type="string" indexed="true" stored="true" docValues="true" required="true" />
     <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
     <field name="_version_" type="long" indexed="false" stored="false"/>
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
     
-    <field name="identifiers" type="string" indexed="true" stored="true" multiValued="true"  />
-    <field name="typ" type="string" indexed="true" stored="true"  />
+    <field name="identifier" type="string" indexed="true" stored="true" />
     <field name="user" type="string" indexed="true" stored="true"  />
-    <field name="state" type="string" indexed="true" stored="true"  />
-    <field name="kurator" type="string" indexed="true" stored="true"  />
-    
-    <field name="navrh" type="string" indexed="true" stored="true"  />
-    <field name="poznamka" type="string" indexed="false" stored="true"  />
-    <field name="pozadavek" type="string" indexed="false" stored="true"  />
-    <field name="datum_zadani" type="date" indexed="true" stored="true" />
-    <field name="datum_vyrizeni" type="date" indexed="true" stored="true" />
-    <field name="formular" type="text_big" indexed="false" stored="true"  />
-    <field name="process" type="text_big" indexed="false" stored="true"  />
   
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 

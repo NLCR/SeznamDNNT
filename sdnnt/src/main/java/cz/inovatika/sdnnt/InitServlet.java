@@ -73,7 +73,16 @@ public class InitServlet extends HttpServlet {
     } catch (SchedulerException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     }
-
+  }
+  
+  @Override
+  public void destroy() {
+    LOGGER.log(Level.INFO, "Shutting down scheduler...");
+    try {
+      SchedulerMgr.getInstance().getScheduler().shutdown();
+    } catch (SchedulerException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

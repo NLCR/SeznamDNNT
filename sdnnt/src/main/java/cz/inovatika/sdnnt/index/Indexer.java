@@ -830,6 +830,7 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     try {
       SolrInputDocument idoc = new SolrInputDocument();
+      idoc.addField("id", user + "_" + identifier);
       idoc.addField("identifier", identifier);
       idoc.addField("user", user);
       getClient().add("notifications", idoc, 10);

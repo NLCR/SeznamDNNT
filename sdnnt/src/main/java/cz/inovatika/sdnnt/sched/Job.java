@@ -48,7 +48,6 @@ public class Job implements InterruptableJob {
     String action = jobData.getString("type");  
     Actions actionToDo = Actions.valueOf(action.toUpperCase());
     JSONObject ret = actionToDo.doPerform(jobData);
-    // LOGGER.log(Level.INFO, "[JOB] response={0} payload={1}", new String[]{ret.toString(), jobData.toString()});
     thread.interrupt();
     return ret;
   }
@@ -129,7 +128,7 @@ public class Job implements InterruptableJob {
         JSONObject ret = new JSONObject();
         try {
           ret = Indexer.checkStav();
-          LOGGER.log(Level.INFO, "ZADOST runnong");
+          LOGGER.log(Level.INFO, "CHECK_STAV finished");
         } catch (Exception ex) {
           LOGGER.log(Level.SEVERE, null, ex);
           ret.put("error", ex.toString());

@@ -95,10 +95,24 @@ public class MarcRecord {
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
 
-    mr.stav =  doc.getFieldValues(LEGACY_STAV_FIELD).stream().map(Object::toString).collect(Collectors.toList());
-    mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
-    mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
-    mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
+    if (doc.containsKey(LEGACY_STAV_FIELD)) {
+      mr.stav =  doc.getFieldValues(LEGACY_STAV_FIELD).stream().map(Object::toString).collect(Collectors.toList());
+    } else {
+      mr.stav = new ArrayList<>();
+    }
+    if (doc.containsKey(DATUM_STAVU_FIELD)) {
+      mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
+    }
+    if (doc.containsKey(HISTORIE_STAVU_FIELD)) {
+      mr.historie_stavu =  new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
+    } else {
+      mr.historie_stavu = new JSONArray();
+    }
+    if (doc.containsKey(LICENSE_FIELD)) {
+      mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
+    }
+    
+    
     mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
     return mr;
