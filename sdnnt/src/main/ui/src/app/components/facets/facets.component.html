@@ -9,12 +9,14 @@
         </mat-panel-title>
       </mat-expansion-panel-header>
       <div class="app-facet-wrapper">
-        <div *ngFor="let f of facet_fields[facet]">
-          <ng-container [ngSwitch]="facet">
-            <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
-            <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
-          </ng-container>
-        </div>
+        <ng-container *ngFor="let f of facet_fields[facet]">
+          <div *ngIf="f.name !== '   '">
+            <ng-container [ngSwitch]="facet">
+              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+              <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
+            </ng-container>
+          </div>
+        </ng-container>
       </div>
     </mat-expansion-panel>
   </ng-container>
