@@ -153,6 +153,13 @@
     </section>
   </div>
   <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
+  <label id="notifikace_interval_label">{{ 'desc.notifikace_interval' | translate }}</label>
+  <mat-radio-group aria-labelledby="notifikace_interval_label" [(ngModel)]="notifikace_interval">
+    <mat-radio-button value="den">{{ 'desc.den' | translate }}</mat-radio-button>
+    <mat-radio-button value="tyden">{{ 'desc.tyden' | translate }}</mat-radio-button>
+    <mat-radio-button value="mesic">{{ 'desc.mesic' | translate }}</mat-radio-button>
+  </mat-radio-group>
+  <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
   <div class="app-mb-4" *ngIf="isRegister">
     <div class="app-label">{{ 'desc.podminky' | translate }}</div>
     <p>

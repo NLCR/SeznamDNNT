@@ -31,6 +31,7 @@ export class UserFormComponent implements OnInit, OnChanges {
   dedic: boolean;
   jiny: boolean;
   nakladatel: boolean;
+  notifikace_interval: string = 'mesic';
 
   constructor(
     public config: AppConfiguration,

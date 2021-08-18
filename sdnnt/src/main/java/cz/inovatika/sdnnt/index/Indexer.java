@@ -12,12 +12,15 @@ import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -273,6 +276,77 @@ public class Indexer {
 
       } else throw new IllegalStateException("Accepting only VVN or VVS requests");
 
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+  
+  
+  /**
+   * Posila email o zmenu stavu zaznamu podle nastaveni uzivatelu
+   *
+   * @return
+   */
+  public static JSONObject checkNotifications(String interval) {
+    JSONObject ret = new JSONObject();
+    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-1DAY TO NOW]
+    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-7DAYS TO NOW]
+    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/MONTH-1MONTH TO NOW]
+    String fqCatalog;
+    String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} periodicity:" + interval;
+    switch(interval) {
+      case "den":
+        fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
+        break;
+      case "tyden":
+        fqCatalog = "datum_stavu:[NOW/DAY-7DAYS TO NOW]";
+        break;
+      default:
+        fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO NOW]";
+    }
+    try {
+      Map<String, String> mails = new HashMap<>();
+      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+      SolrQuery q = new SolrQuery("*").setRows(1000)
+              .setSort("identifier", SolrQuery.ORDER.desc)
+              .addFilterQuery(fqCatalog)
+              .addFilterQuery(fqJoin)
+              .setFields("identifier,datum_stavu,nazev,dntstav");
+      boolean done = false;
+      while (!done) {
+        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+        QueryResponse qr = getClient().query("catalog", q);
+        String nextCursorMark = qr.getNextCursorMark();
+        SolrDocumentList docs = qr.getResults();
+        for (SolrDocument doc : docs) {
+          String msg = "Zaznam " + (String) doc.getFirstValue("nazev") 
+                  + " byl zmenen na " + (String) doc.getFirstValue("dnstav")
+                  + " dne " + (Date) doc.getFirstValue("datum_stavu");
+          // Dotazujeme user
+          SolrQuery qUser = new SolrQuery("*").setRows(1)
+              .addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} identifier:\"" + doc.getFirstValue("identifier") + "\"");
+          List<User> users = getClient().query("catalog", qUser).getBeans(User.class);
+          for (User user : users) {
+            // Pridame udaje o zaznamu pro uzivatel
+            if (mails.containsKey(user.email)) {
+              mails.put(user.email, mails.get(user.email) + "\n\n" + msg);
+            } else {
+              mails.put(user.email, msg);
+            }
+            
+          }
+        }
+
+        
+        if (cursorMark.equals(nextCursorMark)) {
+          done = true;
+        }
+        cursorMark = nextCursorMark;
+      }
+      LOGGER.log(Level.INFO, "checkNotifications finished");
+      ret.put("status", "OK");
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -826,7 +900,7 @@ public class Indexer {
     }
   }
   
-  public static JSONObject followRecord(String identifier, String user, boolean follow) {
+  public static JSONObject followRecord(String identifier, String user, String interval, boolean follow) {
     JSONObject ret = new JSONObject();
     try {
       if (follow) {
@@ -834,6 +908,11 @@ public class Indexer {
         idoc.addField("id", user + "_" + identifier);
         idoc.addField("identifier", identifier);
         idoc.addField("user", user);
+        if (interval != null) {
+          idoc.addField("periodicity", interval);
+        } else {
+          idoc.addField("periodicity", "mesic");
+        }
         getClient().add("notifications", idoc, 10);
       } else {
         getClient().deleteById("notifications", user + "_" + identifier, 10);

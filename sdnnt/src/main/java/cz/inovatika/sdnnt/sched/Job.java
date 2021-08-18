@@ -136,6 +136,22 @@ public class Job implements InterruptableJob {
 
         return ret;
       }
+    },
+    // Posila email o zmenu stavu zaznamu podle nastaveni uzivatelu
+    NOTIFICATIONS {
+      @Override
+      JSONObject doPerform(JSONObject jobData) {
+        JSONObject ret = new JSONObject();
+        try {
+          ret = Indexer.checkNotifications(jobData.getString("interval"));
+          LOGGER.log(Level.INFO, "CHECK_STAV finished");
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          ret.put("error", ex.toString());
+        }
+
+        return ret;
+      }
     };
     abstract JSONObject doPerform(JSONObject jobData);
   }

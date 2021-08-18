@@ -301,24 +301,16 @@ export class ResultItemComponent implements OnInit {
 
   }
 
-  follow() {
-    this.service.followRecord(this.doc.identifier, true).subscribe((res: any) => {
+  setFollow(follow: boolean) {
+    this.service.followRecord(this.doc.identifier, follow).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.follow_zaznam_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.follow_zaznam_success', '', false);
+        this.doc.hasNotifications = follow;
       }
     });
   }
 
-  unfollow() {
-    this.service.followRecord(this.doc.identifier, false).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.follow_zaznam_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.follow_zaznam_success', '', false);
-      }
-    });
-  }
 }
 

@@ -397,6 +397,7 @@ public class AccountServlet extends HttpServlet {
           } else {
             json = Indexer.followRecord(req.getParameter("identifier"), 
                     user.username, 
+                    user.notifikace_interval,
                     "true".equals(req.getParameter("follow")));
           }
           

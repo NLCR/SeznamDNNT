@@ -45,7 +45,22 @@
   "jobs": {
     "zadost": {
       "type": "zadost",
-      "cron": "0 40 * * * ?"
+      "cron": "0 40 1 * * ?"
+    },
+    "notifikace_den": {
+      "type": "notifications",
+      "interval": "den",
+      "cron": "0 0 0 * * ?"
+    },
+    "notifikace_tyden": {
+      "type": "notifications",
+      "interval": "tyden",
+      "cron": "0 2 0 ? * MON"
+    },
+    "notifikace_mesic": {
+      "type": "notifications",
+      "interval": "mesic",
+      "cron": "0 5 0 1 * ?"
     },
     "test": {
       "type": "test",

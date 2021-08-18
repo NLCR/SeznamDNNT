@@ -56,6 +56,7 @@
     
     <field name="identifier" type="string" indexed="true" stored="true" />
     <field name="user" type="string" indexed="true" stored="true"  />
+    <field name="periodicity" type="string" indexed="true" stored="true"  />
   
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 

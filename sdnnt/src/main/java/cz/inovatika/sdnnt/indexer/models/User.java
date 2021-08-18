@@ -81,6 +81,9 @@ public class User {
   @Field
   public Date resetPwdExpiration;
   
+  @Field
+  public String notifikace_interval;
+  
 
 
   public JSONObject toJSONObject() {

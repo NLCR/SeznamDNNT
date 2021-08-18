@@ -69,13 +69,13 @@
       </button>
       <button mat-stroked-button
         *ngIf="state.logged && doc.hasNotifications"
-        (click)="unfollow()"
+        (click)="setFollow(false)"
         [title]="'desc.ne_sledovat' | translate">
         <mat-icon>notifications_active</mat-icon>
       </button>
       <button mat-stroked-button
         *ngIf="state.logged && !doc.hasNotifications"
-        (click)="follow()"
+        (click)="setFollow(true)"
         [title]="'desc.sledovat' | translate">
         <mat-icon>notifications</mat-icon>
       </button>
