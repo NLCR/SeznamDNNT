@@ -38,7 +38,8 @@ public class Job implements InterruptableJob {
   // JSONObject jobdata;
 
   public JSONObject fire(String jobName) {
-      return fire(Options.getInstance().getJSONObject("jobs").getJSONObject(jobName));
+    LOGGER.log(Level.INFO, "Job {0} fired", jobName);
+    return fire(Options.getInstance().getJSONObject("jobs").getJSONObject(jobName));
   }
 
   public JSONObject fire(JSONObject jobData) {

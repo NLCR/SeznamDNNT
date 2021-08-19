@@ -322,12 +322,12 @@ public class Indexer {
         SolrDocumentList docs = qr.getResults();
         for (SolrDocument doc : docs) {
           String msg = "Zaznam " + (String) doc.getFirstValue("nazev") 
-                  + " byl zmenen na " + (String) doc.getFirstValue("dnstav")
+                  + " byl zmenen na " + (String) doc.getFirstValue("dntstav")
                   + " dne " + (Date) doc.getFirstValue("datum_stavu");
           // Dotazujeme user
           SolrQuery qUser = new SolrQuery("*").setRows(1)
-              .addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} identifier:\"" + doc.getFirstValue("identifier") + "\"");
-          List<User> users = getClient().query("catalog", qUser).getBeans(User.class);
+              .addFilterQuery("{!join fromIndex=notifications from=user to=username} identifier:\"" + doc.getFirstValue("identifier") + "\"");
+          List<User> users = getClient().query("users", qUser).getBeans(User.class);
           for (User user : users) {
             // Pridame udaje o zaznamu pro uzivatel
             if (mails.containsKey(user.email)) {
@@ -335,7 +335,6 @@ public class Indexer {
             } else {
               mails.put(user.email, msg);
             }
-            
           }
         }
 
@@ -347,6 +346,7 @@ public class Indexer {
       }
       LOGGER.log(Level.INFO, "checkNotifications finished");
       ret.put("status", "OK");
+      ret.put("mails", mails);
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
