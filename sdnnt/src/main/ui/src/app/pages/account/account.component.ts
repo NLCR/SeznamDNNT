@@ -74,8 +74,9 @@ export class AccountComponent implements OnInit {
     this.facets = null;
     this.service.searchAccount(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
-      this.zadosti = resp.response.docs;
-      this.loading = false;
+        this.zadosti = resp.response.docs;
+        this.numFound = resp.response.numFound;
+        this.loading = false;
       }
     });
 
