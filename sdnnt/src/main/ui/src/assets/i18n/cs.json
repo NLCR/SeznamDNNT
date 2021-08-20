@@ -108,10 +108,10 @@
 
   "sort": {
     "score": "Relevance",
-    "title_sort": "Titulku",
+    "title_sort": "Názvu",
     "rokvydani": "Roku vydání",
     "date1_int": "Roku vydání",
-    "datestamp": "Data"
+    "datestamp": "Data změny"
   },
 
   "desc": {
