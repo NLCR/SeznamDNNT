@@ -16,10 +16,12 @@ export class FacetsComponent implements OnInit {
   @Input() stats:{ [field: string]: {min: any, max: any, count: number, from: any, until: any}};
   facets: string[];
 
-    rokoddate = new FormControl(new Date());
-    rokod: number;
-    rokdodate = new FormControl(new Date());
-    rokdo: number;
+  rokoddate = new FormControl(new Date());
+  rokod: number;
+  rokdodate = new FormControl(new Date());
+  rokdo: number;
+
+  showRoky: boolean;
 
   constructor(
     private router: Router,
@@ -41,6 +43,7 @@ export class FacetsComponent implements OnInit {
       this.rokdo = this.stats['rokvydani'].max;
       this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
       this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
+      this.showRoky = true;
     }
 
   }
