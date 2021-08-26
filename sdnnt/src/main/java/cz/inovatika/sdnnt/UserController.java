@@ -98,16 +98,6 @@ public class UserController {
       req.getSession(true).setAttribute(AUTHENTICATED_USER, user);
   }
 
-  public static User dummy(String name) {
-    JSONObject ret = new JSONObject();
-    try {
-      // TODO Authentication. Ted prihlasime kazdeho
-      return findUser(name);
-    } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-  }
 
   public static JSONObject logout(HttpServletRequest req) {
     JSONObject ret = new JSONObject();
@@ -268,7 +258,76 @@ public class UserController {
   }
 
 
+  public static boolean validatePwdToken(String token) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      return !users.isEmpty();
+    } catch (SolrServerException | IOException   ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return false;
+    }
+  }
 
+
+  public static JSONObject changePwdUser(HttpServletRequest req, String pwd ) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      User sender = getUser(req);
+      if (sender != null) {
+        sender.pwd  = DigestUtils.sha256Hex(pwd);
+        sender.resetPwdToken = null;
+        sender.resetPwdExpiration = null;
+        save(sender);
+        return retValueUser(sender);
+      } else {
+        return new JSONObject().put("error", "User is not logged");
+
+      }
+    } catch (IOException   ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex.getMessage());
+    }
+  }
+
+  public static JSONObject changePwdToken(HttpServletRequest req, String token, String pwd ) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
+              .setRows(1);
+      List<User> users = solr.query("users", query).getBeans(User.class);
+      solr.close();
+      if (users.isEmpty()) {
+        return new JSONObject().put("error", "Invalid token");
+      } else {
+        User user = users.get(0);
+        if (user.resetPwdExpiration.after(new Date())) {
+
+          user.pwd  = DigestUtils.sha256Hex(pwd);
+          user.resetPwdToken = null;
+          user.resetPwdExpiration = null;
+          save(user);
+
+          return retValueUser(user);
+        } else {
+          return new JSONObject().put("error", "Expired");
+        }
+      }
+    } catch (SolrServerException | IOException   ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex.getMessage());
+    }
+  }
+
+  private static JSONObject retValueUser(User user) {
+    User retvalue = new User();
+    retvalue.jmeno = user.jmeno;
+    retvalue.prijmeni = user.prijmeni;
+    retvalue.username = user.username;
+
+    return retvalue.toJSONObject();
+  }
+
+  //TODo: Delete
   public static JSONObject checkResetPwdLink(MailService mailService, HttpServletRequest req, String token ) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
@@ -289,12 +348,7 @@ public class UserController {
           Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
           mailService.sendResetPasswordMail(user, userRecepient,newPwd);
 
-          User retvalue = new User();
-          retvalue.jmeno = user.jmeno;
-          retvalue.prijmeni = user.prijmeni;
-          retvalue.username = user.username;
-
-          return retvalue.toJSONObject();
+          return retValueUser(user);
         } else {
           return new JSONObject().put("error", "Expired");
         }

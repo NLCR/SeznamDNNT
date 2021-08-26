@@ -114,7 +114,25 @@
     "datestamp": "Date modified"
   },
 
+
   "desc": {
+
+    "change": "Change",
+
+    "change_password": "Change password",
+    "password": "Password",
+    "password_confirmation": "Password confirmation",
+
+    "password_changed": "Password has been changed",
+    "password_changed_error":"Changing password failed",
+
+
+    "check_password_required": "Password is required",
+    "check_password_confirmation_required": "Password confirmation is required",
+    "check_password_confirmation_are_not_thesame": "Passwords are not the same",
+    "check_password_isnotvalid": "The password doesn't meet the criteria",
+
+
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",

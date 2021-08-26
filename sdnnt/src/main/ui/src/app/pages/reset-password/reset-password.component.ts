@@ -1,4 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
+import { Subscription } from 'rxjs';
+import { MatPasswordStrengthComponent } from '@angular-material-extensions/password-strength';
+import { Title } from '@angular/platform-browser';
+import { MatDialog } from '@angular/material/dialog';
+import { UserPswDialogComponent } from 'src/app/components/user-pswdialog/user-pswdialog.component';
+
+enum Tokenvalidation {
+  INVALID, VALID, NOT_FETCHED
+}
+
 
 @Component({
   selector: 'app-reset-password',
@@ -7,9 +20,49 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ResetPasswordComponent implements OnInit {
 
-  constructor() { }
+
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private service: AppService,
+    public state: AppState,
+    public dialog: MatDialog 
+
+  ) { }
+
+  tokenValidation: Tokenvalidation = Tokenvalidation.NOT_FETCHED;
 
   ngOnInit(): void {
+    this.route.paramMap.subscribe(val => {
+      if (val.has("token")) {
+        const token = val.get("token");
+        this.service.validateToken(token).subscribe((res:any) => {
+          if(res.valid) {
+            this.tokenValidation = Tokenvalidation.VALID;
+            const data = {"token":token};
+            const dialogRef = this.dialog.open(UserPswDialogComponent, {
+              width: '800px',
+              data,
+              panelClass: 'app-data-dialog'
+            });
+          } else {
+            this.tokenValidation = Tokenvalidation.INVALID;
+          }
+        });
+
+      } 
+    });
   }
+
+  
+  invalidToken(): boolean {
+    return this.tokenValidation === Tokenvalidation.INVALID;
+  }
+
+
+  // onStrengthChanged(strength: number) {
+  //   console.log('password strength = ', strength);
+  // }
 
 }

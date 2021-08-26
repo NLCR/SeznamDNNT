@@ -31,21 +31,22 @@ export class PasswordResetedComponent implements OnInit {
   userSurname: string;
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(val => {
-      if (val.has("token")) {
-        this.token = val.get("token");
-        this.service.activateToken(this.token) .subscribe((res:any) => {
-          if (res.error) {
-            this.tokenValidity = false;
-          } else {
-            this.tokenValidity = true;
-            this.userName = val.get("username");
-            this.userFirstname = val.get("jmeno");
-            this.userSurname = val.get("prijmeni");
-          }
-        });
-      } 
-    });
+    // no activate token 
+    // this.route.paramMap.subscribe(val => {
+    //   if (val.has("token")) {
+    //     this.token = val.get("token");
+    //     this.service.activateToken(this.token) .subscribe((res:any) => {
+    //       if (res.error) {
+    //         this.tokenValidity = false;
+    //       } else {
+    //         this.tokenValidity = true;
+    //         this.userName = val.get("username");
+    //         this.userFirstname = val.get("jmeno");
+    //         this.userSurname = val.get("prijmeni");
+    //       }
+    //     });
+    //   } 
+    // });
 
     setTimeout(()=> {
       this.router.navigate(['/home'], {});

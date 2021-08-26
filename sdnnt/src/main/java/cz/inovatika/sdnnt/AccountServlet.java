@@ -58,14 +58,8 @@ public class AccountServlet extends HttpServlet {
     try {
       String actionNameParam = request.getPathInfo().substring(1);
       if (actionNameParam != null) {
-      User user = null;  
-          if (user == null) {
-            user = UserController.dummy(request.getParameter("user"));
-            // out.print("{\"error\": \"Not logged\"}");
-            // return;
-          }
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(this.service, request, response, user);
+        JSONObject json = actionToDo.doPerform(this.service, request, response, null);
         out.println(json.toString(2));
       } else {
         out.print("actionNameParam -> " + actionNameParam);
@@ -197,9 +191,6 @@ public class AccountServlet extends HttpServlet {
           }
           if (user == null) {
             json.put("error", "Not logged");
-            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
-            // user = new JSONObject().put("name", "testUser");
-            // return json;
           }
           json = service.saveRequest(inputJs, user);
           //json = Zadost.save(inputJs, user.username);
@@ -225,9 +216,6 @@ public class AccountServlet extends HttpServlet {
           }
           if (user == null) {
             json.put("error", "Not logged");
-            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
-            // user = new JSONObject().put("name", "testUser");
-            // return json;
           }
           json = Zadost.saveWithFRBR(inputJs, user.username, req.getParameter("frbr"));
         } catch (Exception ex) {
@@ -248,12 +236,6 @@ public class AccountServlet extends HttpServlet {
             inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
           } else {
             inputJs = req.getParameter("json");
-          }
-          if (user == null) {
-            json.put("error", "Not logged");
-            user = UserController.dummy(new JSONObject(inputJs).getString("user"));
-            // user = new JSONObject().put("name", "testUser");
-            // return json;
           }
           json = Zadost.markAsProcessed(inputJs, user.username);
         } catch (Exception ex) {

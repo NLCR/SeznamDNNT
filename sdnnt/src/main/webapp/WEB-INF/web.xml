@@ -90,6 +90,8 @@
         <url-pattern>/zadost/*</url-pattern>
         <url-pattern>/resetedpwd</url-pattern>
         <url-pattern>/resetedpwd/*</url-pattern>
+        <url-pattern>/pswd</url-pattern>
+        <url-pattern>/pswd/*</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>ConfigServlet</servlet-name>

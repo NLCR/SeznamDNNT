@@ -104,7 +104,7 @@ export class AdminComponent implements OnInit {
 
 
   resetPwd() {
-    this.service.resetPwd(this.selUser.username).subscribe((res: any) => {
+    this.service.adminResetPwd(this.selUser.username).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.reset_hesla_error', res.error, true);
       } else {

@@ -1,0 +1,66 @@
+<h1 mat-dialog-title>{{ 'desc.change_password' | translate }}:</h1>
+<div mat-dialog-content>
+
+  
+          <!--password input filed-->
+          <mat-form-field appearance="outline"  style="width: 100%">
+            <mat-label>{{ 'desc.password' | translate }}</mat-label>
+            <mat-pass-toggle-visibility #toggle3 matSuffix></mat-pass-toggle-visibility>
+            <input matInput #passwordWithConfirmation
+                   [type]="toggle3.type"
+                   [formControl]="passwordComponentWithConfirmation.passwordFormControl"
+                   placeholder="Heslo" 
+                   required>
+
+            <!--password hint-->
+            <mat-hint align="end" aria-live="polite">
+              {{passwordWithConfirmation.value.length}} / {{passwordComponentWithConfirmation.max}}
+            </mat-hint>
+
+            <mat-error *ngIf="passwordComponentWithConfirmation.passwordFormControl.hasError('required')">
+              {{ 'desc.check_password_required' | translate }}
+            </mat-error>
+            <mat-error *ngIf="passwordComponentWithConfirmation.passwordFormControl.hasError('pattern')">
+              {{ 'desc.check_password_isnotvalid' | translate }}
+            </mat-error>
+
+          </mat-form-field>
+
+          <!--@angular-material-extensions/password-strength's main component-->
+          <mat-password-strength #passwordComponentWithConfirmation
+                                 (onStrengthChanged)="onStrengthChanged($event, passwordComponentWithConfirmation)"
+                                 [password]="passwordWithConfirmation.value">
+          </mat-password-strength>
+
+
+          <!--password input field for confirmation-->
+          <mat-form-field appearance="outline" class="mt-3" style="width: 100%">
+            <mat-label>{{ 'desc.password_confirmation' | translate }}</mat-label>
+            <mat-pass-toggle-visibility #toggleConfirmPassword matSuffix></mat-pass-toggle-visibility>
+            <input matInput #passwordToConfirm
+                   [type]="toggleConfirmPassword.type"
+                   [formControl]="passwordComponentWithConfirmation.passwordConfirmationFormControl"
+                   placeholder="Password">
+
+            <!-- password hint-->
+            <mat-hint align="end" aria-live="polite">
+              {{passwordToConfirm.value.length}} / {{passwordComponentWithConfirmation.max}}
+            </mat-hint>
+
+            <!-- password error msgs-->
+            <mat-error *ngIf="passwordComponentWithConfirmation.passwordConfirmationFormControl.hasError('required')">
+              {{ 'desc.check_password_confirmation_required' | translate }}
+            </mat-error>
+            <mat-error
+              *ngIf="passwordComponentWithConfirmation.passwordConfirmationFormControl.hasError('notConfirmed')">
+              {{ 'desc.check_password_confirmation_are_not_thesame' | translate }}
+            </mat-error>
+    
+          </mat-form-field>
+
+
+</div>
+<div mat-dialog-actions>
+  <button mat-flat-button mat-dialog-close  color="primary" [disabled]="passwordComponentWithConfirmation.passwordConfirmationFormControl.invalid" cdkFocusInitial   (click)="changePswd(passwordWithConfirmation)">{{ 'desc.change' | translate }}</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="close()">{{ 'desc.zavrit' | translate }}</button>
+</div>

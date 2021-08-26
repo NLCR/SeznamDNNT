@@ -115,6 +115,22 @@
   },
 
   "desc": {
+
+    "change": "Změna",
+    "change_password": "Změna hesla",
+    "password": "Heslo",
+    "password_confirmation": "Potvrzení hesla",
+    
+    "password_changed_error":"Heslo se nepodařilo změnit",
+
+
+    "check_password_required": "Heslo je požadováno",
+    "check_password_confirmation_required": "Potvrzení hesla je požadováno",
+    "check_password_confirmation_are_not_thesame": "Hesla se neshodují",
+    "check_password_isnotvalid": "Heslo musí splňovat kritéria",
+
+
+
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",

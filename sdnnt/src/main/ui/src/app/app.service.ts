@@ -243,11 +243,23 @@ export class AppService {
     return this.post(url, text);
   }
 
-  activateToken(token: string): Observable<User> {
-    const url = '/user/activate_pwd_token';
-    // login fail 
-    return this.post(url, { "resetPwdToken":token });
+ 
+
+  validateToken(token: string): Observable<User> {
+    const url = '/user/validate_pwd_token?token='+token;
+    return this.get(url);
   }
+
+  changePasswordByToken(token: string, pswd: string): Observable<User> {
+    const url = '/user/change_pwd_token';
+    return this.post(url, { "resetPwdToken":token, "pswd":pswd });
+  }
+
+  changePasswordByUser( pswd: string): Observable<User> {
+    const url = '/user/change_pwd_user';
+    return this.post(url, {  "pswd":pswd });
+  }
+
 
   login(user: string, pwd: string): Observable<User> {
     const url = '/user/login';
@@ -275,16 +287,15 @@ export class AppService {
     return this.post(url, user);
   }
 
-  resetPwd(user: string): Observable<User> {
-    let url = '/user/reset_pwd';
-    return this.post(url, { username: user });
-  }
-
   forgotPwd(user: string): Observable<User> {
     let url = '/user/forgot_pwd';
     return this.post(url, { username: user });
   }
-
+  
+  adminResetPwd(user: string): Observable<User> {
+    let url = '/user/reset_pwd';
+    return this.post(url, { username: user });
+  }
 
   findGoogleBook(id: string): Observable<any> {
     let url = 'search/googlebooks';

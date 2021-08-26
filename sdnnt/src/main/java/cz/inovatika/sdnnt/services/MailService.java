@@ -20,8 +20,6 @@ public interface MailService {
 
     public void sendResetPasswordMail(User user, Pair<String, String> recpipient, String generatedPswd) throws  IOException, EmailException;
 
-
-
     public void sendHTMLEmail(Pair<String, String> from, List<Pair<String,String>> recipients, String subject, String text) throws ServerException, EmailException;
 
     public  void sendMail(Pair<String, String> from, List<Pair<String, String>> recipients, String subject, String text) throws ServerException, EmailException;
@@ -43,8 +41,4 @@ public interface MailService {
             return new PasswordAuthentication(name, pass);
         }
     }
-
-
-
-
 }

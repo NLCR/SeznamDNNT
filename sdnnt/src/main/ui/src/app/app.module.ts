@@ -31,6 +31,8 @@ import { HistoryDialogComponent } from './components/history-dialog/history-dial
 import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { DataDialogComponent } from './components/data-dialog/data-dialog.component';
+import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdialog.component';
+
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 import { FacetsUsedComponent } from './components/facets/facets-used/facets-used.component';
 import { AccountItemComponent } from './components/account-item/account-item.component';
@@ -44,6 +46,7 @@ import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { PasswordResetedComponent } from './pages/password-reseted/password-reseted.component';
+import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -78,6 +81,8 @@ const providers: any[] =[
     StatesDialogComponent,
     LoginDialogComponent,
     DataDialogComponent,
+    UserPswDialogComponent,
+
     SidenavListComponent,
     FacetsUsedComponent,
     AccountItemComponent,
@@ -109,6 +114,7 @@ const providers: any[] =[
       }
     }),
     AppRoutingModule,
+    MatPasswordStrengthModule.forRoot(),
     BrowserAnimationsModule,
     AngularEditorModule
   ],

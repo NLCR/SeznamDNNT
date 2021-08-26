@@ -31,8 +31,16 @@ export class UserDialogComponent implements OnInit {
     
   }
 
+  // RESETOVANI HESLA Z UZIvATELSKEHO DIALOGU
   resetPwd() {
-    this.router.navigate(['/userpswd'], {});
+  //   this.service.adminResetPwd(null).subscribe((res: any) => {
+  //     if (res.error) {
+  //       this.service.showSnackBar('alert.reset_hesla_error', res.error, true);
+  //     } else {
+  //       this.service.showSnackBar('alert.reset_hesla_success', '', false);
+  //       this.dialogRef.close();
+  //     }
+  //   });
   }
 
   save() {

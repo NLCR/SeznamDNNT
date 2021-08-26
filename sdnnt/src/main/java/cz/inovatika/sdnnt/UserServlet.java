@@ -97,8 +97,8 @@ public class UserServlet extends HttpServlet {
         return UserController.forgotPwd(new MailServiceImpl(),req, inputJs);
       }
     },
-    // zruseni tokenu a generovani noveho hesla, poslani na
-    ACTIVATE_PWD_TOKEN {
+
+    CHANGE_PWD_USER {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         String inputJs;
@@ -107,14 +107,45 @@ public class UserServlet extends HttpServlet {
         } else {
           inputJs = req.getParameter("json");
         }
-
-        String token = (new JSONObject(inputJs)).optString("resetPwdToken", "");
-        return UserController.checkResetPwdLink(new MailServiceImpl(),req, token);
+        JSONObject object = new JSONObject(inputJs);
+        String pswd = object.optString("pswd", "");
+        return UserController.changePwdUser(req,  pswd);
       }
     },
 
+    CHANGE_PWD_TOKEN {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String inputJs;
+        if (req.getMethod().equals("POST")) {
+          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+        } else {
+          inputJs = req.getParameter("json");
+        }
+        JSONObject object = new JSONObject(inputJs);
+        String token = object.optString("resetPwdToken", "");
+        String pswd = object.optString("pswd", "");
+        return UserController.changePwdToken(req, token, pswd);
+      }
+    },
+
+    VALIDATE_PWD_TOKEN {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        String token = req.getParameter("token");
+        JSONObject retvalue = new JSONObject();
+        if (token != null) {
+          retvalue.put("valid", UserController.validatePwdToken(token));
+        } else {
+          retvalue.put("valid",false);
+        }
+        return retvalue;
+      }
+    },
+
+
     // mail o resetovanem hesle - admin rozhrani
-    RESET_PWD {
+    ADMIN_RESET_PWD {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         String inputJs;
@@ -126,6 +157,8 @@ public class UserServlet extends HttpServlet {
         return UserController.resetPwd(new MailServiceImpl(),req, inputJs);
       }
     },
+
+
     SAVE {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
