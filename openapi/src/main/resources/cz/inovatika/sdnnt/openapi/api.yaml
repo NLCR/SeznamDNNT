@@ -102,6 +102,13 @@ paths:
             enum: ["open","waiting","processed"]
           required: false
         - in: query
+          name: itemstatus
+          schema:
+            type: string
+            enum: ["approved","rejected"]
+          required: false
+
+        - in: query
           name: navrh
           schema:
             type: string

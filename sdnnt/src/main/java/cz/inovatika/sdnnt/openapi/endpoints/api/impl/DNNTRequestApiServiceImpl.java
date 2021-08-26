@@ -167,8 +167,10 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
 
+
+
     @Override
-    public Response requestGet(String status, String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response requestGet(String status, String internalStatus,String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
         if (headerString != null) {
             User user = UserController.findUserByApiKey(headerString);
@@ -180,13 +182,26 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     JSONObject response = search.getJSONObject("response");
                     JSONArray docs = response.getJSONArray("docs");
                     for (int i = 0, ll = docs.length();i<ll;i++) {
+
                         JSONObject jsonObject = docs.getJSONObject(i);
+                        if (internalStatus != null) {
+                            JSONObject process = jsonObject.getJSONObject("process");
 
-                        // use jackson provider
-                        ObjectMapper objectMapper = getObjectMapper();
+                            List<String> states = process.keySet().stream().map(key -> {
+                                JSONObject props = process.getJSONObject(key);
+                                return props.getString("state");
+                            }).collect(Collectors.toList());
 
-                        SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
-                        arrayOfSavedRequest.add(savedRequest);
+                            if (states.contains(internalStatus)) {
+                                ObjectMapper objectMapper = getObjectMapper();
+                                SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                                arrayOfSavedRequest.add(savedRequest);
+                            }
+                        } else {
+                            ObjectMapper objectMapper = getObjectMapper();
+                            SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                            arrayOfSavedRequest.add(savedRequest);
+                        }
                     }
 
                     return Response.ok().entity(arrayOfSavedRequest).build();
