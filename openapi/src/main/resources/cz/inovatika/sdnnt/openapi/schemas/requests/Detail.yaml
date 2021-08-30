@@ -1,0 +1,19 @@
+# Detail zadosti - identifier of object, state, reason, user
+type: object
+required:
+properties:
+  identifier:
+    type: string
+  reason:
+    type: string
+  user:
+    type: string
+  state:
+    type: string
+    enum: ["accepted","rejected"]
+
+example:
+  identifier: 'oai:aleph-nkp.cz:SKC01-002839929'
+  reason: "Povoleno"
+  state: "accepted"
+  user: "Kurator"

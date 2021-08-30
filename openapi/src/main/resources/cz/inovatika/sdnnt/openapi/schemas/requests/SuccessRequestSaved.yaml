@@ -17,6 +17,9 @@ allOf:
         type: string
       state:
         type: string
+      details:
+        $ref: './ArrayOfDetails.yaml'
+
 example:
   user: 'admin'
   identifiers: ['oai:aleph-nkp.cz:SKC01-002839929','oai:aleph-nkp.cz:SKC01-003240356']

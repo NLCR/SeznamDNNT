@@ -184,22 +184,23 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     for (int i = 0, ll = docs.length();i<ll;i++) {
 
                         JSONObject jsonObject = docs.getJSONObject(i);
-                        if (internalStatus != null) {
-                            JSONObject process = jsonObject.getJSONObject("process");
 
-                            List<String> states = process.keySet().stream().map(key -> {
-                                JSONObject props = process.getJSONObject(key);
-                                return props.getString("state");
-                            }).collect(Collectors.toList());
+                        ArrayOfDetails details = details(jsonObject);
+                        if (internalStatus != null) {
+                            List<String> states = details.stream().map(detail -> {
+                                return detail.getState() != null  ? detail.getState().toString() : null;
+                            }).filter(Objects::nonNull).collect(Collectors.toList());
 
                             if (states.contains(internalStatus)) {
                                 ObjectMapper objectMapper = getObjectMapper();
                                 SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                                savedRequest.setDetails(details);
                                 arrayOfSavedRequest.add(savedRequest);
                             }
                         } else {
                             ObjectMapper objectMapper = getObjectMapper();
                             SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                            savedRequest.setDetails(details);
                             arrayOfSavedRequest.add(savedRequest);
                         }
                     }
@@ -216,6 +217,22 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
         }
+    }
+
+    private ArrayOfDetails details(JSONObject jsonObject) {
+        JSONObject process = jsonObject.getJSONObject("process");
+        ArrayOfDetails details = new ArrayOfDetails();
+        process.keySet().stream().forEach(key -> {
+            JSONObject detailJSON = process.getJSONObject(key);
+            Detail detail =  new Detail()
+                    .identifier(key)
+                    .reason(detailJSON.optString("reason"))
+                    .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
+                    .user(detailJSON.optString("user"));
+
+            details.add(detail);
+        });
+        return details;
     }
 
     private ObjectMapper getObjectMapper() {
