@@ -120,7 +120,8 @@
     "change_password": "Změna hesla",
     "password": "Heslo",
     "password_confirmation": "Potvrzení hesla",
-    
+
+    "password_changed": "Heslo změněno",
     "password_changed_error":"Heslo se nepodařilo změnit",
 
 

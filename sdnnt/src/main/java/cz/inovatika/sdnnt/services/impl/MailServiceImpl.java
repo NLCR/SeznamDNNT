@@ -108,11 +108,12 @@ public class MailServiceImpl implements MailService  {
     }
 
     @Override
-    public void sendRegistrationMail(User user, Pair<String, String> recipient, String generatedPswd) throws IOException, EmailException {
+    public void sendRegistrationMail(User user, Pair<String, String> recipient, String generatedPswd, String requestToken) throws IOException, EmailException {
         if (recipient != null) {
             HashMap<String, String> scopes = new HashMap<String, String>();
             scopes.put("user", recipient.getRight());
             scopes.put("password", generatedPswd);
+            scopes.put("token", requestToken);
             if (user != null) {
                 scopes.put("username", user.username);
             }

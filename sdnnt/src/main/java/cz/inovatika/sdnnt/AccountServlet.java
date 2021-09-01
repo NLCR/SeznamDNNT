@@ -59,7 +59,7 @@ public class AccountServlet extends HttpServlet {
       String actionNameParam = request.getPathInfo().substring(1);
       if (actionNameParam != null) {
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(this.service, request, response, null);
+        JSONObject json = actionToDo.doPerform(this.service, request, response, UserController.getUser(request));
         out.println(json.toString(2));
       } else {
         out.print("actionNameParam -> " + actionNameParam);

@@ -10,7 +10,7 @@ properties:
     type: string
   state:
     type: string
-    enum: ["accepted","rejected"]
+    enum: ["approved","rejected"]
 
 example:
   identifier: 'oai:aleph-nkp.cz:SKC01-002839929'

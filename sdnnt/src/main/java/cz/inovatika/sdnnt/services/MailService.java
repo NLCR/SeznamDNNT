@@ -16,7 +16,7 @@ public interface MailService {
 
     public void sendResetPasswordRequest(User user, Pair<String, String> recipient, String requestToken) throws IOException, EmailException;
 
-    public void sendRegistrationMail(User user, Pair<String, String> recipient, String generatedPswd) throws IOException, EmailException;
+    public void sendRegistrationMail(User user, Pair<String, String> recipient, String generatedPswd, String requestToken) throws IOException, EmailException;
 
     public void sendResetPasswordMail(User user, Pair<String, String> recpipient, String generatedPswd) throws  IOException, EmailException;
 

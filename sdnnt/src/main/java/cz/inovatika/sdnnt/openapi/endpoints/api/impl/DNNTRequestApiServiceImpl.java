@@ -184,27 +184,14 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     for (int i = 0, ll = docs.length();i<ll;i++) {
 
                         JSONObject jsonObject = docs.getJSONObject(i);
-
-                        ArrayOfDetails details = details(jsonObject);
-                        if (internalStatus != null) {
-                            List<String> states = details.stream().map(detail -> {
-                                return detail.getState() != null  ? detail.getState().toString() : null;
-                            }).filter(Objects::nonNull).collect(Collectors.toList());
-
-                            if (states.contains(internalStatus)) {
-                                ObjectMapper objectMapper = getObjectMapper();
-                                SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
-                                savedRequest.setDetails(details);
-                                arrayOfSavedRequest.add(savedRequest);
-                            }
-                        } else {
+                        ArrayOfDetails details = details(jsonObject, internalStatus);
+                        if (!details.isEmpty()) {
                             ObjectMapper objectMapper = getObjectMapper();
                             SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
                             savedRequest.setDetails(details);
                             arrayOfSavedRequest.add(savedRequest);
                         }
                     }
-
                     return Response.ok().entity(arrayOfSavedRequest).build();
 
                 } catch (SolrServerException | IOException e) {
@@ -219,18 +206,20 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private ArrayOfDetails details(JSONObject jsonObject) {
+    private ArrayOfDetails details(JSONObject jsonObject, String intStatus) {
         JSONObject process = jsonObject.getJSONObject("process");
         ArrayOfDetails details = new ArrayOfDetails();
         process.keySet().stream().forEach(key -> {
             JSONObject detailJSON = process.getJSONObject(key);
-            Detail detail =  new Detail()
-                    .identifier(key)
-                    .reason(detailJSON.optString("reason"))
-                    .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
-                    .user(detailJSON.optString("user"));
-
-            details.add(detail);
+            Detail.StateEnum state = Detail.StateEnum.fromValue(detailJSON.optString("state"));
+            if (intStatus == null || (state != null && state.toString().equals(intStatus))) {
+                Detail detail =  new Detail()
+                        .identifier(key)
+                        .reason(detailJSON.optString("reason"))
+                        .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
+                        .user(detailJSON.optString("user"));
+                details.add(detail);
+            }
         });
         return details;
     }

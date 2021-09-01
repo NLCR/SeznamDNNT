@@ -179,11 +179,14 @@ public class UserController {
       String newPwd = generatePwd();
       user.pwd = DigestUtils.sha256Hex(newPwd);
 
-      solr.addBean("users", user);
-      solr.commit("users");
+      // generate token and store expiration
+      user.resetPwdToken = UUID.randomUUID().toString();
+      user.resetPwdExpiration = Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
+
+      save(user);
 
       Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
-      mailService.sendRegistrationMail(user, userRecepient,newPwd);
+      mailService.sendRegistrationMail(user, userRecepient,newPwd, user.resetPwdToken);
 
       solr.close();
       return new JSONObject(js);

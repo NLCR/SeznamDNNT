@@ -32,6 +32,7 @@ export class ResetPasswordComponent implements OnInit {
   ) { }
 
   tokenValidation: Tokenvalidation = Tokenvalidation.NOT_FETCHED;
+  content: string;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(val => {
@@ -48,6 +49,7 @@ export class ResetPasswordComponent implements OnInit {
             });
           } else {
             this.tokenValidation = Tokenvalidation.INVALID;
+            this.service.getText('invalid_token').subscribe(text => this.content = text);
           }
         });
 
@@ -60,6 +62,11 @@ export class ResetPasswordComponent implements OnInit {
     return this.tokenValidation === Tokenvalidation.INVALID;
   }
 
+
+
+  // getContent() {
+  //   this.service.getText('invalid_token').subscribe(text => this.content = text);
+  // }
 
   // onStrengthChanged(strength: number) {
   //   console.log('password strength = ', strength);
