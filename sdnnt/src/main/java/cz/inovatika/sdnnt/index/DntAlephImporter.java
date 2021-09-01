@@ -157,6 +157,19 @@ public class DntAlephImporter {
   private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
     List<SolrInputDocument> idocs = new ArrayList<>();
 
+    for (MarcRecord rec : recs) {
+        idocs.add(rec.toSolrDoc());
+    }
+    if (!idocs.isEmpty()) {
+      Indexer.getClient().add("catalog", idocs);
+      idocs.clear();
+    }
+  }
+
+
+  private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
+    List<SolrInputDocument> idocs = new ArrayList<>();
+
     DateFormat dformat = new SimpleDateFormat("yyyyMMdd");
     for (MarcRecord rec : recs) {
       SolrDocumentList docs = find(rec);
