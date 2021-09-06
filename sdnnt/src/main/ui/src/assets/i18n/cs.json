@@ -21,7 +21,7 @@
     "A": "zařazeno",
     "VS": "vyřazeno - dílo bylo na seznamu (A)",
     "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
-    "N": "nezařazeno",
+    "N": "vyřazeno",
     "NZ": "licence pro terminál na místě samém",
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
@@ -41,7 +41,7 @@
       "A": "Zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
       "VS": "Vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "VN": "Vyřazeno – dílo bylo na Návrhu seznamu (PA), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
-      "N": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "N": "Vyřazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
       "NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení do Návrhu seznamu (interní stav administrace)",
       "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
@@ -77,6 +77,11 @@
     "NZN": "NZN: návrh k zařazení",
     "VVN": "VVN: výzva k vyřazení",
     "VVS": "VVS: výzva k vyřazení"
+  },
+
+  "fmt": {
+    "BK": "Knihy",
+    "SE": "Seriály (periodika)"
   },
 
   "registracni_podminky": {
@@ -136,8 +141,8 @@
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",
     "identifikatory_zaznamu": "Identifikátory záznamu",
-    "odkaz_do_dk": "Odkaz do dk",
-    "odkazy_do_dk": "Odkazy do dk",
+    "odkaz_do_dk": "Odkaz na digitální dokument",
+    "odkazy_do_dk": "Odkazy na digitální dokument",
     "historie_zmen": "Historie změn",
     "num_found": "Počet nalezených záznamů",
     "vybrat_vse": "Vybrat vše",

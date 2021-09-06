@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError  } from 'rxjs';
+import { Observable, of, Subject, throwError  } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
 import { AppState } from './app.state';
@@ -21,6 +21,8 @@ export class AppService {
 
   private spinnerTopRef = this.cdkSpinnerCreate();
   private numLoading: number = 0;
+  private langSubject: Subject<boolean> = new Subject();
+  public langChanged: Observable<boolean> = this.langSubject.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -114,6 +116,7 @@ export class AppService {
   changeLang(lang: string) {
     this.translate.use(lang).subscribe(val => {
       this.state.currentLang = lang;
+      this.langSubject.next();
     });
   }
 

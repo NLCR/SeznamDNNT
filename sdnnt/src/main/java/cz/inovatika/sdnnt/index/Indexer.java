@@ -514,6 +514,13 @@ public class Indexer {
             idoc.addField("historie_stavu", doc.getFieldValue("historie_stavu"));
             idoc.addField("license", doc.getFieldValue("license"));
             idoc.addField("license_history", doc.getFieldValue("license_history"));
+          } else {
+            
+            idoc.removeField("dntstav");
+            idoc.removeField("datum_stavu");
+            idoc.removeField("historie_stavu");
+            idoc.removeField("license");
+            idoc.removeField("license_history");
           }
 
           idocs.add(idoc);

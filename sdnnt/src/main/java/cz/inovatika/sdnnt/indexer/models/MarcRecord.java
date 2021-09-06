@@ -23,6 +23,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -211,6 +214,7 @@ public class MarcRecord {
     sdoc.setField(ITEM_TYPE_FIELD, leader.substring(7, 8));
 
     setFMT(leader.substring(6, 7), leader.substring(7, 8));
+    addStavFromMarc();
 
     // https://www.loc.gov/marc/bibliographic/bd008a.html
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
@@ -385,13 +389,68 @@ public class MarcRecord {
         }
       }
     }
-//    if (!sdoc.containsKey("marc_990a")) {
-//      // Nastavime stav na 'NNN' jako Nikdy NeZarazeno
-//      sdoc.setField("marc_990a", "NNN");
-//    }
+    addStavFromMarc();
     addDedup();
     addFRBR();
     addEAN();
+  }
+  
+  private void addStavFromMarc() {
+    DateFormat dformat = new SimpleDateFormat("yyyyMMdd");
+    JSONArray hs = new JSONArray();
+        if (dataFields.containsKey("992")) {
+          Date datum_stavu = new Date();
+          datum_stavu.setTime(0);
+          for (DataField df : dataFields.get("992")) {
+            JSONObject h = new JSONObject();
+            String stav = df.getSubFields().get("s").get(0).getValue();
+            if (df.getSubFields().containsKey("s")) {
+              h.put("stav", stav);
+            }
+            if (df.getSubFields().containsKey("a")) {
+              String ds = df.getSubFields().get("a").get(0).getValue();
+              try {
+                Date d = dformat.parse(ds);
+                h.put("date", ds);
+                if (d.after(datum_stavu)) {
+                  sdoc.setField("datum_stavu", d);
+                  datum_stavu = d;
+                }
+              } catch (ParseException pex) {
+
+              }
+
+            }
+            if (df.getSubFields().containsKey("b")) {
+              h.put("user", df.getSubFields().get("b").get(0).getValue());
+            }
+            if ("NZ".equals(stav)) {
+              h.put("license", "dnntt");
+            } else if ("A".equals(stav) && !sdoc.containsKey("license")) {
+              h.put("license", "dnnto");
+            }
+            // System.out.println(h);
+            hs.put(h);
+          }
+          sdoc.setField("historie_stavu", hs.toString());
+        }
+
+        // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
+        if (dataFields.containsKey("990")) {
+          for (DataField df : dataFields.get("990")) {
+            //JSONObject h = new JSONObject();
+            if (df.getSubFields().containsKey("a")) {
+              String stav = df.getSubFields().get("a").get(0).getValue();
+              //h.put("stav", stav);
+              sdoc.addField("dntstav", stav);
+              if ("NZ".equals(stav)) {
+                sdoc.setField("license", "dnntt");
+              } else if ("A".equals(stav) && !sdoc.containsKey("license")) {
+                sdoc.setField("license", "dnnto");
+              }
+            }
+          }
+        }
   }
 
   private void addRokVydani() {

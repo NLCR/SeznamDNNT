@@ -1,3 +1,6 @@
+@angular-material-extensions/password-strength
+MIT
+
 @angular/animations
 MIT
 
