@@ -117,6 +117,7 @@ export class ResultItemComponent implements OnInit {
       title: this.doc.title,
       items: [],
     }
+    data.items.push({ label: 'Aleph identifier', value: this.doc['identifier'] })
 
     this.config.identifiers.forEach(f => {
       if (this.doc['marc_' + f]) {
