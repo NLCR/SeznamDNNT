@@ -11,6 +11,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
+import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -22,6 +26,11 @@ import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
+
+import static cz.inovatika.sdnnt.rights.Role.admin;
+import static cz.inovatika.sdnnt.rights.Role.kurator;
+import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 /**
  *
@@ -100,38 +109,39 @@ public class SearchServlet extends HttpServlet {
     ACCOUNT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          String q = req.getParameter("q");
-          if (q == null) {
-            q = "*";
+        if (new RightsResolver(req, new MustBeLogged()).permit()) {
+          JSONObject ret = new JSONObject();
+          Options opts = Options.getInstance();
+          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+            String q = req.getParameter("q");
+            if (q == null) {
+              q = "*";
+            }
+            JSONObject user = (JSONObject) req.getSession().getAttribute("user");
+            if (user == null) {
+              ret.put("error", "Not logged");
+              return ret;
+            }
+            SolrQuery query = new SolrQuery(q)
+                    .setRows(20)
+                    .setParam("df", "fullText")
+                    .setFacet(true).addFacetField("typ","old_stav","navrh")
+                    .addFilterQuery("user:" + user.getString("name"))
+                    .setParam("json.nl", "arrntv")
+                    .setFields("*,raw:[json]");
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, "zadost");
+            return new JSONObject((String) qresp.get("response"));
+          } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
           }
-          JSONObject user = (JSONObject) req.getSession().getAttribute("user");
-          if (user == null) {
-            ret.put("error", "Not logged");
-            return ret;
-          }
-          SolrQuery query = new SolrQuery(q)
-                  .setRows(20)
-                  .setParam("df", "fullText")
-                  .setFacet(true).addFacetField("typ","old_stav","navrh")
-                  .addFilterQuery("user:" + user.getString("name"))
-                  .setParam("json.nl", "arrntv")
-                  .setFields("*,raw:[json]");
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "zadost"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-
-        return ret; 
       }
     },
     HISTORY {
@@ -149,128 +159,116 @@ public class SearchServlet extends HttpServlet {
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
           NamedList<Object> qresp = solr.request(qreq, "history"); 
-          solr.close();
           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
         }
-
-        return ret; 
       }
+
     },
     IMPORT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-          
-        int rows = opts.getClientConf().getInt("rows"); 
-        if (req.getParameter("rows") != null) {
-          rows = Integer.parseInt(req.getParameter("rows"));
-        }
-        int start = 0; 
-        if (req.getParameter("page") != null) {
-          start = Integer.parseInt(req.getParameter("page")) * rows;
-        }  
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-          SolrQuery query = new SolrQuery("*")
-                  .setRows(rows)
-                  .setStart(start) 
-                  .setSort("name", SolrQuery.ORDER.asc)
-                  .addFilterQuery("import_id:" + req.getParameter("id"))
-                  .setFacet(true)
-                  .addFacetField("hit_type")
-                  .addFacetField("num_hits")
-                  .setParam("json.nl", "map")
-                  .setParam("stats", true)
-                  .setParam("stats.field","na_vyrazeni")
-                  .setFields("*,identifiers:[json],catalog:[json],item:[json]");
-          if (Boolean.parseBoolean(req.getParameter("fullCatalog"))) {
-            
-          } else {
-            query.addFilterQuery("na_vyrazeni:*");
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+          JSONObject ret = new JSONObject();
+          Options opts = Options.getInstance();
+
+          int rows = opts.getClientConf().getInt("rows");
+          if (req.getParameter("rows") != null) {
+            rows = Integer.parseInt(req.getParameter("rows"));
           }
-          if (Boolean.parseBoolean(req.getParameter("onlyEAN"))) {
-            query.addFilterQuery("hit_type:ean");
-            query.addFilterQuery("-num_hits:0");
+          int start = 0;
+          if (req.getParameter("page") != null) {
+            start = Integer.parseInt(req.getParameter("page")) * rows;
           }
-          if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {
-            query.addFilterQuery("num_hits:0");
+          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+            SolrQuery query = new SolrQuery("*")
+                    .setRows(rows)
+                    .setStart(start)
+                    .setSort("name", SolrQuery.ORDER.asc)
+                    .addFilterQuery("import_id:" + req.getParameter("id"))
+                    .setFacet(true)
+                    .addFacetField("hit_type")
+                    .addFacetField("num_hits")
+                    .setParam("json.nl", "map")
+                    .setParam("stats", true)
+                    .setParam("stats.field","na_vyrazeni")
+                    .setFields("*,identifiers:[json],catalog:[json],item:[json]");
+            if (Boolean.parseBoolean(req.getParameter("fullCatalog"))) {
+
+            } else {
+              query.addFilterQuery("na_vyrazeni:*");
+            }
+            if (Boolean.parseBoolean(req.getParameter("onlyEAN"))) {
+              query.addFilterQuery("hit_type:ean");
+              query.addFilterQuery("-num_hits:0");
+            }
+            if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {
+              query.addFilterQuery("num_hits:0");
+            }
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, "imports");
+
+            return new JSONObject((String) qresp.get("response"));
+          } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
           }
-          QueryRequest qreq = new QueryRequest(query);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "imports"); 
-          solr.close();
-          return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
 
-        return ret; 
+
+        //return ret;
       }
     },
     IMPORTS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        Options opts = Options.getInstance();
-        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-//          SolrQuery query = new SolrQuery("*")
-//                  .setRows(100)
-////                  .addFilterQuery("{!collapse field=import_id}")
-////                  .setParam("expand", true)
-//                  .setParam("group", true)
-//                  .setParam("group.field", "import_id")
-//                  .setParam("group.ngroups", true)
-//                  .setFields("*");
-          
-//          QueryResponse qresp = request.process(solr, "imports");
-//          QueryRequest qreq = new QueryRequest(query);
-//          qreq.setResponseParser(rParser);
-//          NamedList<Object> qresp = solr.request(qreq, "imports"); 
 
-          final TermsFacetMap categoryFacet = new TermsFacetMap("import_id")
-                  .setLimit(100)
-                  .withStatSubFacet( "hits_na_vyrazeni", "sum(hits_na_vyrazeni)");
-          final JsonQueryRequest request = new JsonQueryRequest()
-              .setQuery("*:*")
-                  .setLimit(100)
-                  .setSort("indextime desc")
-                  .returnFields("import_id", "import_date", "import_url", "import_origin")
-                  .withParam("group", true)
-                  .withParam("group.field", "import_id")
-                  .withParam("group.ngroups", true)
-              .withFacet("import_id", categoryFacet);
-          NoOpResponseParser rParser = new NoOpResponseParser();
-          rParser.setWriterType("json");
-          request.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(request, "imports"); 
-          solr.close();
-           return new JSONObject((String) qresp.get("response"));
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+          Options opts = Options.getInstance();
+          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+
+            final TermsFacetMap categoryFacet = new TermsFacetMap("import_id")
+                    .setLimit(100)
+                    .withStatSubFacet( "hits_na_vyrazeni", "sum(hits_na_vyrazeni)");
+            final JsonQueryRequest request = new JsonQueryRequest()
+                    .setQuery("*:*")
+                    .setLimit(100)
+                    .setSort("indextime desc")
+                    .returnFields("import_id", "import_date", "import_url", "import_origin")
+                    .withParam("group", true)
+                    .withParam("group.field", "import_id")
+                    .withParam("group.ngroups", true)
+                    .withFacet("import_id", categoryFacet);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            request.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(request, "imports");
+            return new JSONObject((String) qresp.get("response"));
+          } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-
-        return ret; 
       }
     },
     XSERVER {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
         try {
-          ret = XServer.find(req.getParameter("sysno"));
+          return  XServer.find(req.getParameter("sysno"));
         } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
         }
-
-        return ret; 
       }
     },
     GOOGLEBOOKS {
@@ -279,16 +277,13 @@ public class SearchServlet extends HttpServlet {
         JSONObject ret = new JSONObject();
         try {
           String url = "https://books.google.com/books?jscmd=viewapi&callback=display_google&bibkeys="+ req.getParameter("id");
-          
           String jsonp = org.apache.commons.io.IOUtils.toString(new URL(url), "UTF-8");
           String json = jsonp.substring("display_google(".length(), jsonp.length()-2);
-          ret = new JSONObject(json);
+          return new JSONObject(json);
         } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex);
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
         }
-
-        return ret; 
       }
     };
 

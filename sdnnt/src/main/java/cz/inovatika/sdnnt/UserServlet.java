@@ -16,9 +16,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
+import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
+
+import static cz.inovatika.sdnnt.rights.Role.admin;
+import static cz.inovatika.sdnnt.rights.Role.kurator;
+import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 /**
  *
@@ -88,13 +96,8 @@ public class UserServlet extends HttpServlet {
     FORGOT_PWD {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        String inputJs;
-        if (req.getMethod().equals("POST")) {
-          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
-        } else {
-          inputJs = req.getParameter("json");
-        }
-        return UserController.forgotPwd(new MailServiceImpl(),req, inputJs);
+        // nesmi byt prihlaseny
+        return UserController.forgotPwd(new MailServiceImpl(),req, readInputJSON(req));
       }
     },
 
@@ -116,13 +119,7 @@ public class UserServlet extends HttpServlet {
     CHANGE_PWD_TOKEN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        String inputJs;
-        if (req.getMethod().equals("POST")) {
-          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
-        } else {
-          inputJs = req.getParameter("json");
-        }
-        JSONObject object = new JSONObject(inputJs);
+        JSONObject object = readInputJSON(req);
         String token = object.optString("resetPwdToken", "");
         String pswd = object.optString("pswd", "");
         return UserController.changePwdToken(req, token, pswd);
@@ -148,13 +145,11 @@ public class UserServlet extends HttpServlet {
     ADMIN_RESET_PWD {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        String inputJs;
-        if (req.getMethod().equals("POST")) {
-          inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole( admin)).permit()) {
+          return UserController.resetPwd(new MailServiceImpl(),req, readInputJSON(req));
         } else {
-          inputJs = req.getParameter("json");
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return UserController.resetPwd(new MailServiceImpl(),req, inputJs);
       }
     },
 
@@ -162,17 +157,24 @@ public class UserServlet extends HttpServlet {
     SAVE {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        String inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
+
+        if (new RightsResolver(req, new MustBeLogged()).permit()) {
+          User sender = UserController.getUser(req);
+          JSONObject savingUser = readInputJSON(req);
+          if (sender.username.equals(savingUser.optString("username"))) {
+            // ok
+            return UserController.save(readInputJSON(req).toString());
           } else {
-            inputJs = req.getParameter("json");
+            // must be admin
+            if (new RightsResolver(req, new UserMustBeInRole(admin)).permit()) {
+              return UserController.save(readInputJSON(req).toString());
+            } else {
+              return errorJson(response, SC_FORBIDDEN, "not allowed");
+            }
           }
-        User sender = UserController.getUser(req);
-        if (sender !=null  && sender.role.equals("admin")) {
-          return UserController.save(inputJs);
         } else {
-          return new JSONObject().put("error", "not authorized");
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+
         }
       }
     },
@@ -181,21 +183,18 @@ public class UserServlet extends HttpServlet {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         // TODO: MailService ?? Create? Inject ?
-        String inputJs;
-          if (req.getMethod().equals("POST")) {
-            inputJs = IOUtils.toString(req.getInputStream(), "UTF-8");
-          } else {
-            inputJs = req.getParameter("json");
-          }
 
-        return UserController.register(new MailServiceImpl(), inputJs);
+        return UserController.register(new MailServiceImpl(), readInputJSON(req).toString());
       }
     },
     ALL {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        
-        return UserController.getAll(req);
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
+          return UserController.getAll(req);
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
       }
     };
 

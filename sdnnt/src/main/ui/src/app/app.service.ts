@@ -147,8 +147,8 @@ export class AppService {
 
   approveNavrhInImport(identifier: string, importId: string): Observable<any> {
     let url = '/account/approve_navrh_in_import';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, { identifier, importId }, params);
   }
 
@@ -171,50 +171,51 @@ export class AppService {
 
   saveZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_zadost';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
 
   addFRBRToZadost(zadost: Zadost, frbr: string): Observable<any> {
     let url = '/account/add_frbr_to_zadost';
     const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username).set('frbr', frbr);
+      //.set('user', this.state.user.username)
+      .set('frbr', frbr);
     return this.post(url, zadost, params);
   }
 
   processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
 
   approveNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
   approveNavrhLib(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason}, params);
   }
 
   rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject_navrh';
-    const params: HttpParams = new HttpParams()
-      .set('user', this.state.user.username);
+    const params: HttpParams = new HttpParams();
+      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
   followRecord(identifier: string, follow: boolean): Observable<string> {
     let url = '/account/follow_record';
     const params: HttpParams = new HttpParams()
-    .set('user', this.state.user.username)
+    //.set('user', this.state.user.username)
     .set('identifier', identifier)
     .set('follow', follow+'');
     return this.get(url, params);
