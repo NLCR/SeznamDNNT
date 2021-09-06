@@ -79,6 +79,11 @@
     "VVS": "VVS: call for decommissioning"
   },
 
+  "fmt": {
+    "BK": "Books",
+    "SE": "Serials"
+  },
+
   "registracni_podminky": {
     "podminka_1": "I acknowledge that, upon registration, a registered entity - <strong> copyright holder </strong> is allowed to exclude works from the List of Works Unavailable on the Market or Proposals for inclusion in the List of Works Unavailable on the Market pursuant to Section 97f (5) of the Act No. 121/2000 Coll., Copyright Act, as amended.",
     "podminka_2": "I acknowledge that upon registration, a registered entity - <strong> publisher / publisher </strong> - is allowed to restrict the manner in which a work unavailable on the market published between 2001 and 2007 is made available for display on a library terminal (on-site).",

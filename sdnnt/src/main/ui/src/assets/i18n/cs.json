@@ -79,6 +79,11 @@
     "VVS": "VVS: výzva k vyřazení"
   },
 
+  "fmt": {
+    "BK": "Knihy",
+    "SE": "Seriály (periodika)"
+  },
+
   "registracni_podminky": {
     "podminka_1": "Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nositeli autorských práv</strong> umožněno vyřadit díla ze Seznamu děl nedostupných na trhu nebo Návrhů na zařazení do Seznamu děl nedostupných na trhu ve smyslu ustanovení § 97f odst. 5 zákona č. 121/2000 Sb., autorského zákona, v platném znění.",
     "podminka_2": "Beru na vědomí, že na základě registrace je registrovanému subjektu - <strong>nakladateli / vydavateli</strong> umožněno omezit způsob zpřístupňování díla nedostupného na trhu vydaného v letech 2001 až 2007 na zobrazení na terminálu knihovny (na místě samém).",
