@@ -140,8 +140,13 @@ public class DntAlephImporter {
           indexed += recs.size();
           recs.clear();
         }
-
+        
         solrTime += new Date().getTime() - start;
+        LOGGER.log(Level.INFO, "FINISHED: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+          indexed,
+          DurationFormatUtils.formatDurationHMS(reqTime),
+          DurationFormatUtils.formatDurationHMS(procTime),
+          DurationFormatUtils.formatDurationHMS(solrTime)});
         ret.put("indexed", indexed);
       } catch (XMLStreamException | IOException exc) {
         LOGGER.log(Level.SEVERE, null, exc);
@@ -158,14 +163,13 @@ public class DntAlephImporter {
     List<SolrInputDocument> idocs = new ArrayList<>();
 
     for (MarcRecord rec : recs) {
-        idocs.add(rec.toSolrDoc());
+      idocs.add(rec.toSolrDoc());
     }
     if (!idocs.isEmpty()) {
       Indexer.getClient().add("catalog", idocs);
       idocs.clear();
     }
   }
-
 
   private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
     List<SolrInputDocument> idocs = new ArrayList<>();
