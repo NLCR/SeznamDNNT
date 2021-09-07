@@ -371,7 +371,6 @@ public class CatalogSearcher {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
       query.addFilterQuery("dntstav:*");
-      query.addFilterQuery("-dntstav:NNN");
     } else { 
     }
      

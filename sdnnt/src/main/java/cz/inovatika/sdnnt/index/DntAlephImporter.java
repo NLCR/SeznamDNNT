@@ -73,6 +73,12 @@ public class DntAlephImporter {
     return ret;
   }
 
+  public JSONObject resume(String token) {
+    String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + token;
+    getRecords(url);
+    return ret;
+  }
+
   private void getRecords(String url) {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
     String resumptionToken = null;

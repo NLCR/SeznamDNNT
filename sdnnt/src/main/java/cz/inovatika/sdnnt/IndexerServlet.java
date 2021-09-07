@@ -216,6 +216,22 @@ public class IndexerServlet extends HttpServlet {
         return json;
       }
     },
+    // import info o stavu z Alephu DNT set
+    RESUME_DNTSET {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject json = new JSONObject();
+        try {
+          DntAlephImporter imp = new DntAlephImporter();
+          json = imp.resume(req.getParameter("token"));
+          
+        } catch (Exception ex) {
+          LOGGER.log(Level.SEVERE, null, ex);
+          json.put("error", ex.toString());
+        }
+        return json;
+      }
+    },
     // import zaznamu z kosmas - uzivatelske api
     IMPORT_KOSMAS {
       @Override
