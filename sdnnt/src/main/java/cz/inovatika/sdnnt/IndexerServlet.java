@@ -18,14 +18,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONObject;
+
+import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
+
+import static javax.servlet.http.HttpServletResponse.*;
 
 /**
  *
@@ -85,135 +94,150 @@ public class IndexerServlet extends HttpServlet {
     REINDEX_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          json.put("indexed", Indexer.reindexId(req.getParameter("id")));
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            return new JSONObject().put("indexed", Indexer.reindexId(req.getParameter("id")));
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // pro interni ucely 
     REINDEX {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          String dest = Options.getInstance().getString("solr.host");
-          String collection = "catalog";
-          if (req.getParameter("dest") != null) {
-            dest = req.getParameter("dest"); 
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            String dest = Options.getInstance().getString("solr.host");
+            String collection = "catalog";
+            if (req.getParameter("dest") != null) {
+              dest = req.getParameter("dest");
+            }
+            if (req.getParameter("collection") != null) {
+              collection = req.getParameter("collection");
+            }
+            json.put("indexed", Indexer.reindex(dest, req.getParameter("filter"), collection, Boolean.parseBoolean(req.getParameter("cleanStav"))));
+            return json;
+          } catch (Exception ex) {
+            return errorJson(response, SC_FORBIDDEN, "not allowed");
           }
-          if (req.getParameter("collection") != null) {
-            collection = req.getParameter("collection"); 
-          }
-          json.put("indexed", Indexer.reindex(dest, req.getParameter("filter"), collection, Boolean.parseBoolean(req.getParameter("cleanStav"))));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // plny harvest  skc katalogu - api operace - dostupne pouze pro admin
     FULL {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          OAIHarvester oai = new OAIHarvester();
-          String set = "SKC";
-          String core = "catalog";
-          if (req.getParameter("set") != null) {
-            set = req.getParameter("set");
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            OAIHarvester oai = new OAIHarvester();
+            String set = "SKC";
+            String core = "catalog";
+            if (req.getParameter("set") != null) {
+              set = req.getParameter("set");
+            }
+            if (req.getParameter("core") != null) {
+              core = req.getParameter("core");
+            }
+            json.put("indexed", oai.full(set, core,
+                    Boolean.parseBoolean(req.getParameter("merge")),
+                    Boolean.parseBoolean(req.getParameter("keepDNTFields")),
+                    Boolean.parseBoolean(req.getParameter("allFields"))));
+
+            return json;
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
-          if (req.getParameter("core") != null) {
-            core = req.getParameter("core");
-          }
-          json.put("indexed", oai.full(set, core, 
-                  Boolean.parseBoolean(req.getParameter("merge")),
-                  Boolean.parseBoolean(req.getParameter("keepDNTFields")),
-                  Boolean.parseBoolean(req.getParameter("allFields"))));
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // pokracovani harvestu - posledni zaznam from until
     UPDATE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          OAIHarvester oai = new OAIHarvester();
-          String set = "SKC";
-          String core = "catalog";
-          if (req.getParameter("set") != null) {
-            set = req.getParameter("set");
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            OAIHarvester oai = new OAIHarvester();
+            String set = "SKC";
+            String core = "catalog";
+            if (req.getParameter("set") != null) {
+              set = req.getParameter("set");
+            }
+            if (req.getParameter("core") != null) {
+              core = req.getParameter("core");
+            }
+            json.put("indexed", oai.update(set, core,
+                    Boolean.parseBoolean(req.getParameter("merge")),
+                    true,
+                    Boolean.parseBoolean(req.getParameter("allFields"))));
+            return json;
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
-          if (req.getParameter("core") != null) {
-            core = req.getParameter("core");
-          }
-          json.put("indexed", oai.update(set, core, 
-                  Boolean.parseBoolean(req.getParameter("merge")),
-                  true,
-                  Boolean.parseBoolean(req.getParameter("allFields"))));
-
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // harvest s datum yyyy-MM-ddTHH:mm:ssZ 2021-01-31T10:19:09Z - posledni zaznam from until
     UPDATE_FROM {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          OAIHarvester oai = new OAIHarvester();
-          String set = "SKC";
-          String core = "catalog";
-          if (req.getParameter("set") != null) {
-            set = req.getParameter("set");
-          }
-          if (req.getParameter("core") != null) {
-            core = req.getParameter("core");
-          }
-          json.put("indexed", oai.updateFrom(set, core, 
-                  req.getParameter("from"),
-                  Boolean.parseBoolean(req.getParameter("merge")),
-                  true,
-                  Boolean.parseBoolean(req.getParameter("allFields"))));
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            OAIHarvester oai = new OAIHarvester();
+            String set = "SKC";
+            String core = "catalog";
+            if (req.getParameter("set") != null) {
+              set = req.getParameter("set");
+            }
+            if (req.getParameter("core") != null) {
+              core = req.getParameter("core");
+            }
+            json.put("indexed", oai.updateFrom(set, core,
+                    req.getParameter("from"),
+                    Boolean.parseBoolean(req.getParameter("merge")),
+                    true,
+                    Boolean.parseBoolean(req.getParameter("allFields"))));
 
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+            return json;
+
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // import info o stavu z Alephu DNT set
     IMPORT_DNTSET {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          DntAlephImporter imp = new DntAlephImporter();
-          json = imp.run(req.getParameter("from"));
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            DntAlephImporter imp = new DntAlephImporter();
+            return imp.run(req.getParameter("from"));
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // import info o stavu z Alephu DNT set
@@ -236,69 +260,71 @@ public class IndexerServlet extends HttpServlet {
     IMPORT_KOSMAS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          XMLImporterKosmas imp = new XMLImporterKosmas();
-          // https://www.kosmas.cz/atl_shop/nkp.xml
-          json = imp.fromFile(req.getParameter("url"), "kosmas");
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            XMLImporterKosmas imp = new XMLImporterKosmas();
+            // https://www.kosmas.cz/atl_shop/nkp.xml
+            return imp.fromFile(req.getParameter("url"), "kosmas");
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // import zaznamu z distri.cz - uzivatelske api
     IMPORT_DISTRI {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          XMLImporterDistri imp = new XMLImporterDistri();
-          // json.put("indexed", imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/albatros.xml"));
-          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedFull.xml", "albatros");
-          // "C:/Users/alberto/Projects/SDNNT/Docs/XmlFeedCompact.xml"
-          json = imp.fromFile(req.getParameter("url"), "distri.cz");
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            XMLImporterDistri imp = new XMLImporterDistri();
+            return imp.fromFile(req.getParameter("url"), "distri.cz");
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // import zaznamu z palmknihy.cz - uzivatelske api
     IMPORT_HEUREKA {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          XMLImporterHeureka imp = new XMLImporterHeureka();
-          // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
-          // https://www.palmknihy.cz/heureka.xml
-          json = imp.fromFile(req.getParameter("url"), "heureka");
-          
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            XMLImporterHeureka imp = new XMLImporterHeureka();
+            // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
+            // https://www.palmknihy.cz/heureka.xml
+            return imp.fromFile(req.getParameter("url"), "heureka");
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // pro interni ucely  - porovnani dvou zaznamu
     COMPARE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          Indexer indexer = new Indexer();
-          json = indexer.compare(req.getParameter("id"));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            JSONObject json = new JSONObject();
+            Indexer indexer = new Indexer();
+            return indexer.compare(req.getParameter("id"));
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     // hleda a najde zaznam podle identifikatoru a vrati marc21
@@ -306,107 +332,113 @@ public class IndexerServlet extends HttpServlet {
     FINDID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject ret = new JSONObject();
-        try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host", "http://localhost:8983/solr/")).build()) {
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          JSONObject ret = new JSONObject();
+          try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host", "http://localhost:8983/solr/")).build()) {
 
-          SolrQuery q = new SolrQuery("*").setRows(1)
-                  .addFilterQuery("identifier:\"" + req.getParameter("id") + "\"")
-                  .setFields("raw");
+            SolrQuery q = new SolrQuery("*").setRows(1)
+                    .addFilterQuery("identifier:\"" + req.getParameter("id") + "\"")
+                    .setFields("raw");
 
-          SolrDocumentList docs = solr.query("sdnnt", q).getResults();
-          if (docs.getNumFound() == 0) {
-            ret.put("error", "Record not found in sdnnt");
-            return ret;
-          }
-          SolrDocument docDnt = docs.get(0);
-          String jsDnt = (String) docDnt.getFirstValue("raw");
-          SolrDocumentList catDocs = Indexer.find(jsDnt);
-          
-          if (catDocs.getNumFound() == 0) {
-            ret.put("error", "Record not found in catalog");
-            return ret;
-          } else if (catDocs.getNumFound() > 1) {
-            ret.put("error", "Found " + catDocs.getNumFound() + " records in catalog");
-            
-            List<JSONObject> diffs = new ArrayList<>();
-            for (SolrDocument doc : catDocs) {
-              diffs.add(Indexer.compare(jsDnt, (String) doc.getFirstValue("raw")));
+            SolrDocumentList docs = solr.query("sdnnt", q).getResults();
+            if (docs.getNumFound() > 0) {
+              SolrDocument docDnt = docs.get(0);
+              String jsDnt = (String) docDnt.getFirstValue("raw");
+              SolrDocumentList catDocs = Indexer.find(jsDnt);
+
+              if (catDocs.getNumFound() == 0) {
+                ret.put("error", "Record not found in catalog");
+                return ret;
+              } else if (catDocs.getNumFound() > 1) {
+                ret.put("error", "Found " + catDocs.getNumFound() + " records in catalog");
+
+                List<JSONObject> diffs = new ArrayList<>();
+                for (SolrDocument doc : catDocs) {
+                  diffs.add(Indexer.compare(jsDnt, (String) doc.getFirstValue("raw")));
+                }
+                for (int i = 0; i < diffs.size()-1; i++) {
+                  ret.append("diffs", Indexer.compare(diffs.get(i).toString(), diffs.get(i+1).toString()));
+                }
+                ret.put("records", diffs);
+              } else {
+                ret.append("docs", catDocs);
+              }
+              return ret;
+            } else {
+              return errorJson("Record not found in sdnnt");
             }
-            for (int i = 0; i < diffs.size()-1; i++) {
-              ret.append("diffs", Indexer.compare(diffs.get(i).toString(), diffs.get(i+1).toString()));
-            }
-            ret.put("records", diffs);
-          } else {
-            ret.append("docs", catDocs);
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
-        } catch (Exception ex) { 
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex.toString());
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return ret;
       }
     },
     MERGEID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          Indexer indexer = new Indexer();
-          json = indexer.mergeId("sdnnt", req.getParameter("id"), "testUser");
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            Indexer indexer = new Indexer();
+            return indexer.mergeId("sdnnt", req.getParameter("id"), "testUser");
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     TEST {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          Indexer indexer = new Indexer();
-          json = indexer.test("sdnnt", req.getParameter("id"));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          try {
+            Indexer indexer = new Indexer();
+            return indexer.test("sdnnt", req.getParameter("id"));
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     MERGECORE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        try {
-          Indexer indexer = new Indexer();
-          json = indexer.mergeCore("sdnnt", "testUser", req.getParameter("from"));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+        if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+          JSONObject json = new JSONObject();
+          try {
+            Indexer indexer = new Indexer();
+            return indexer.mergeCore("sdnnt", "testUser", req.getParameter("from"));
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        return json;
       }
     },
     SAVE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        JSONObject json = new JSONObject();
-        JSONObject user = (JSONObject) req.getSession().getAttribute("user");
-        if (user == null) {
-          json.put("error", "Not logged");
-          user = new JSONObject().put("name", "testUser");
-          // return json;
+        if (new RightsResolver(req, new MustBeLogged()).permit()) {
+          User user = UserController.getUser(req);
+          try {
+            Indexer indexer = new Indexer();
+            JSONObject inputJs = ServletsSupport.readInputJSON(req);
+            return indexer.save(req.getParameter("id"), inputJs, user.username);
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
-        try {
-          Indexer indexer = new Indexer();
-          JSONObject inputJs = ServletsSupport.readInputJSON(req);
-          json = indexer.save(req.getParameter("id"), inputJs, user.getString("name"));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
-        }
-        return json;
       }
     };
 

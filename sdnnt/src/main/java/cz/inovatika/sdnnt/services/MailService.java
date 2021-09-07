@@ -10,9 +10,11 @@ import java.io.IOException;
 import java.rmi.ServerException;
 import java.util.List;
 
+/**
+ * Basic mail service which should cover all possible scenarios
+ */
 public interface MailService {
 
-    public Session getSession(String name, String pswd);
 
     public void sendResetPasswordRequest(User user, Pair<String, String> recipient, String requestToken) throws IOException, EmailException;
 
@@ -23,6 +25,7 @@ public interface MailService {
     public void sendHTMLEmail(Pair<String, String> from, List<Pair<String,String>> recipients, String subject, String text) throws ServerException, EmailException;
 
     public  void sendMail(Pair<String, String> from, List<Pair<String, String>> recipients, String subject, String text) throws ServerException, EmailException;
+
 
 
     public class SMTPAuthenticator extends javax.mail.Authenticator {

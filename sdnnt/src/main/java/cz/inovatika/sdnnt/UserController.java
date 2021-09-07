@@ -32,6 +32,8 @@ import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
+
 /**
  *
  * @author alberto
@@ -171,7 +173,7 @@ public class UserController {
   public static JSONObject register(MailService mailService, String js) {
     User old = findUser((new JSONObject(js)).getString("username"));
     if (old != null) {
-      return new JSONObject().put("error", "username_exists");
+      return errorJson("username_exists");
     }
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       User user = User.fromJSON(js);
@@ -188,19 +190,18 @@ public class UserController {
       Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
       mailService.sendRegistrationMail(user, userRecepient,newPwd, user.resetPwdToken);
 
-      solr.close();
       return new JSONObject(js);
     } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
 
 
-  public static JSONObject resetPwd(MailService mailService, HttpServletRequest req, String js) throws IOException, EmailException {
+  public static JSONObject resetPwd(MailService mailService, HttpServletRequest req, JSONObject js) throws IOException, EmailException {
     String newPwd = generatePwd();
-    String username = (new JSONObject(js)).optString("username", "");
+    String username = js.optString("username", "");
     User sender = getUser(req);
     if (sender != null) {
       User subject = null;
@@ -222,17 +223,16 @@ public class UserController {
       }
       return new JSONObject().put("pwd", newPwd);
     } else {
-      return new JSONObject().put("error", "not authorized");
+      return errorJson("not authorized");
     }
   }
 
-  public static JSONObject forgotPwd(MailServiceImpl mailService, HttpServletRequest req, String inputJs) {
-    String input = (new JSONObject(inputJs)).optString("username", "");
+  public static JSONObject forgotPwd(MailServiceImpl mailService, HttpServletRequest req, JSONObject inputJs) {
+    String input =inputJs.optString("username", "");
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       SolrQuery query = new SolrQuery("email:\"" + input + "\" OR username:\""+input+"\"")
               .setRows(1);
       List<User> users = solr.query("users", query).getBeans(User.class);
-      solr.close();
       if (users.isEmpty()) {
         return new JSONObject().put("error", "Cannot find user");
       } else {
@@ -251,12 +251,12 @@ public class UserController {
           return object;
 
         } else {
-          return new JSONObject().put("error", "Cannot find user");
+          return errorJson("Cannot find user");
         }
      }
     } catch (SolrServerException | IOException |EmailException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
@@ -268,7 +268,7 @@ public class UserController {
       List<User> users = solr.query("users", query).getBeans(User.class);
       return !users.isEmpty();
     } catch (SolrServerException | IOException   ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
       return false;
     }
   }
@@ -284,12 +284,11 @@ public class UserController {
         save(sender);
         return retValueUser(sender);
       } else {
-        return new JSONObject().put("error", "User is not logged");
-
+        return errorJson( "User is not logged");
       }
     } catch (IOException   ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex.getMessage());
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
@@ -312,12 +311,12 @@ public class UserController {
 
           return retValueUser(user);
         } else {
-          return new JSONObject().put("error", "Expired");
+          return errorJson( "Expired");
         }
       }
     } catch (SolrServerException | IOException   ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex.getMessage());
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
@@ -336,7 +335,6 @@ public class UserController {
       SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
               .setRows(1);
       List<User> users = solr.query("users", query).getBeans(User.class);
-      solr.close();
       if (users.isEmpty()) {
         return new JSONObject().put("error", "Invalid token");
       } else {
@@ -353,12 +351,12 @@ public class UserController {
 
           return retValueUser(user);
         } else {
-          return new JSONObject().put("error", "Expired");
+          return errorJson("Expired");
         }
       }
     } catch (SolrServerException | IOException  | EmailException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex.getMessage());
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
@@ -387,8 +385,8 @@ public class UserController {
       User user = User.fromJSON(js);
       return save(user);
     } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
     }
   }
 
@@ -397,12 +395,11 @@ public class UserController {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       solr.addBean("users", user);
       solr.commit("users");
-
-      solr.close();
       return user.toJSONObject();
     } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return errorJson(ex.getMessage());
+
     }
   }
 
@@ -417,12 +414,10 @@ public class UserController {
       rParser.setWriterType("json");
       qreq.setResponseParser(rParser);
       NamedList<Object> qresp = solr.request(qreq, "zadost");
-      solr.close();
       return new JSONObject((String) qresp.get("response")).getJSONObject("response").optJSONArray("docs");
-
     } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return new JSONArray();
     }
   }
 

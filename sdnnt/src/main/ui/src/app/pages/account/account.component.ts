@@ -66,9 +66,7 @@ export class AccountComponent implements OnInit {
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
-    
-    // Docasne pro testovani
-    p.user = this.state.user.username;
+
     this.items = [];
     this.searchResponse = null;
     this.facets = null;
