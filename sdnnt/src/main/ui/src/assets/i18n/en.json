@@ -22,6 +22,8 @@
     "VS": "discarded - work was on the list (A)",
     "VN": "discarded - the work was on the draft list (PA)",
     "N": "discarded",
+    "X": "free",
+    "PX": "probably free work",
     "NZ": "on-site terminal license",
     "NZN": "proposal for inclusion",
     "VVN": "call for decommissioning",
@@ -42,6 +44,8 @@
       "VS": "Discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
       "VN": "Discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
+      "X": "Free",
+      "PX": "Probably free work",
       "NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
       "VVN": "Request for exclusion from the List Design (internal state of administration)",
@@ -73,6 +77,8 @@
     "VS": "VS: discarded - the work was on the list (A)",
     "VN": "VN: discarded - the work was on the draft list (PA)",
     "N": "N: unclassified",
+    "X": "X: free",
+    "PX": "PX: probably free work",
     "NZ": "NZ: On-site terminal license",
     "NZN": "NZN: proposal for inclusion",
     "VVN": "VVN: call for decommissioning",
@@ -81,7 +87,9 @@
 
   "fmt": {
     "BK": "Books",
-    "SE": "Serials"
+    "SE": "Serials",
+    "MP": "Maps",
+    "MU": "Music"
   },
 
   "registracni_podminky": {

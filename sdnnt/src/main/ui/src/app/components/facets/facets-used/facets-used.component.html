@@ -10,6 +10,7 @@
         <span>{{ 'field.' + f.field | translate }}: </span>
         <ng-container [ngSwitch]="f.field">
           <ng-container *ngSwitchCase="'dntstav'">{{ 'state.' + f.value | translate }}</ng-container>
+          <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
         </ng-container>
       </div>

@@ -22,6 +22,8 @@
     "VS": "vyřazeno - dílo bylo na seznamu (A)",
     "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
     "N": "vyřazeno",
+    "X": "volné",
+    "PX": "pravděpodobná volná díla",
     "NZ": "licence pro terminál na místě samém",
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
@@ -42,6 +44,8 @@
       "VS": "Vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "VN": "Vyřazeno – dílo bylo na Návrhu seznamu (PA), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "N": "Vyřazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "X": "Volné",
+      "PX": "Pravděpodobná volná díla",
       "NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení do Návrhu seznamu (interní stav administrace)",
       "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
@@ -72,7 +76,9 @@
     "A": "A: zařazeno",
     "VS": "VS: vyřazeno - dílo bylo na seznamu (A)",
     "VN": "VN: vyřazeno – dílo bylo na návrhu seznamu (PA)",
-    "N": "N: nezařazeno",
+    "N": "N: vyřazeno",
+    "X": "X: volné",
+    "PX": "PX: pravděpodobná volné",
     "NZ": "NZ: Licence pro terminál na místě samém",
     "NZN": "NZN: návrh k zařazení",
     "VVN": "VVN: výzva k vyřazení",
@@ -81,7 +87,9 @@
 
   "fmt": {
     "BK": "Knihy",
-    "SE": "Seriály (periodika)"
+    "SE": "Seriály (periodika)",
+    "MP": "Mapy",
+    "MU": "Hudebniny"
   },
 
   "registracni_podminky": {
