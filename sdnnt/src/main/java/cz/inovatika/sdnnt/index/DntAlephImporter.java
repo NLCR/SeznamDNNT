@@ -280,7 +280,7 @@ public class DntAlephImporter {
     // JSONObject ret = new JSONObject();
     try {
 
-      // MarcRecord mr = MarcRecord.fromJSON(source);
+      // MarcRecord mr = MarcRecord.fromRAWJSON(source);
       mr.toSolrDoc();
       String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
               + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""

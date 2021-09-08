@@ -69,6 +69,10 @@ public class InitServlet extends HttpServlet {
       }
       
       SchedulerMgr.initJobs();
+
+      LOGGER.info("Starting scheduler ");
+      SchedulerMgr.getInstance().getScheduler().start();
+
       LOGGER.log(Level.INFO, "app dir is {0}", CONFIG_DIR);
     } catch (SchedulerException ex) {
       LOGGER.log(Level.SEVERE, null, ex);

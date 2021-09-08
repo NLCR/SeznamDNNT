@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import cz.inovatika.sdnnt.utils.License;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
@@ -32,6 +33,8 @@ import java.text.SimpleDateFormat;
  * @author alberto
  */
 public class MarcRecord {
+
+  private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyyMMdd");
 
   public static final Logger LOGGER = Logger.getLogger(MarcRecord.class.getName());
 
@@ -73,7 +76,7 @@ public class MarcRecord {
                   "700", "710", "711", "730",
                   "856", "990", "991", "992", "998", "956", "911", "910");
 
-  public static MarcRecord fromJSON(String json) throws JsonProcessingException {
+  public static MarcRecord fromRAWJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
     return mr;
@@ -81,11 +84,11 @@ public class MarcRecord {
   
   public static MarcRecord fromDoc(SolrDocument doc) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
-    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue("raw"), MarcRecord.class);
-    mr.stav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
-    mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
-    mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
-    mr.license = (String) doc.getFirstValue("license");
+    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue(RAW_FIELD), MarcRecord.class);
+    mr.stav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
+    mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
+    mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
+    mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
     return mr;
   }
 
@@ -93,7 +96,15 @@ public class MarcRecord {
     SolrQuery q = new SolrQuery("*").setRows(1)
             .addFilterQuery(IDENTIFIER_FIELD+":\"" + identifier + "\"")
             .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD+" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD);
-    SolrDocument doc = Indexer.getClient().query("catalog", q).getResults().get(0);
+    return fromIndex(Indexer.getClient(),q);
+  }
+
+  // testable method
+  static MarcRecord fromIndex( SolrClient client, SolrQuery q) throws SolrServerException, IOException {
+//    SolrQuery q = new SolrQuery("*").setRows(1)
+//            .addFilterQuery(IDENTIFIER_FIELD+":\"" + identifier + "\"")
+//            .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD+" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD);
+    SolrDocument doc = client.query("catalog", q).getResults().get(0);
     String json = (String) doc.getFirstValue(RAW_FIELD);
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
@@ -114,8 +125,6 @@ public class MarcRecord {
     if (doc.containsKey(LICENSE_FIELD)) {
       mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
     }
-    
-    
     mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
     return mr;
@@ -127,6 +136,10 @@ public class MarcRecord {
     json.put(DATESTAMP_FIELD, datestamp);
     json.put(SET_SPEC_FIELD, setSpec);
     json.put(LEADER_FIELD, leader);
+
+    json.put(DNTSTAV_FIELD, stav);
+    json.put(HISTORIE_STAVU_FIELD, historie_stavu);
+
     json.put("controlFields", controlFields);
 
     json.put("dataFields", dataFields);
@@ -197,7 +210,6 @@ public class MarcRecord {
     sdoc.setField(LEADER_FIELD, leader);
     sdoc.setField(RAW_FIELD, toJSON().toString());
 
-    sdoc.setField(DNTSTAV_FIELD, stav);
     sdoc.setField(HISTORIE_STAVU_FIELD, historie_stavu.toString());
     sdoc.setField(LICENSE_FIELD, license);
     sdoc.setField(LICENSE_HISTORY_FIELD, licenseHistory);
@@ -214,7 +226,13 @@ public class MarcRecord {
     sdoc.setField(ITEM_TYPE_FIELD, leader.substring(7, 8));
 
     setFMT(leader.substring(6, 7), leader.substring(7, 8));
-    addStavFromMarc();
+
+    if (stav != null && !stav.isEmpty()) {
+      sdoc.setField(DNTSTAV_FIELD, stav);
+    } else {
+      addStavFromMarc();
+    }
+
 
     // https://www.loc.gov/marc/bibliographic/bd008a.html
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
@@ -321,23 +339,31 @@ public class MarcRecord {
     List<String> statesArray = this.stav != null ? new ArrayList<>(this.stav) : new ArrayList<>();
     statesArray.addAll(newStates);
     changedState( user, statesArray, newStates.toArray(new String[newStates.size()]));
+    // sync solr doc
+    toSolrDoc();
   }
 
   public void enhanceState(String newState, String user) {
     List<String> statesArray = this.stav != null ? new ArrayList<>(this.stav) : new ArrayList<>();
     statesArray.add(newState);
     changedState( user, statesArray,newState);
+    // sync solr doc
+    toSolrDoc();
   }
 
   public void setStav(List<String> newStates, String user) {
     List<String> statesArray = new ArrayList<>(newStates);
     changedState( user, statesArray, statesArray.toArray(new String[statesArray.size()]));
+    // sync solr doc
+    toSolrDoc();
   }
 
   public void setStav(String newState, String user) {
     List<String> statesArray = new ArrayList<>();
     statesArray.add(newState);
     changedState( user, statesArray, newState);
+    // sync solr doc
+    toSolrDoc();
   }
 
   /**
@@ -349,9 +375,10 @@ public class MarcRecord {
     changeLicenseIfNeeded(statesArray, stav);
     stav = statesArray;
     datum_stavu = Calendar.getInstance().getTime();
+
     Arrays.stream(newState).forEach(newStateItem->{
-      JSONObject h = new JSONObject().put("stav", newStateItem).put("date", datum_stavu).put("user", user);
-      historie_stavu.put(h.toString());
+      JSONObject h = new JSONObject().put("stav", newStateItem).put("date", FORMAT.format(datum_stavu)).put("user", user);
+      historie_stavu.put(h);
     });
   }
 

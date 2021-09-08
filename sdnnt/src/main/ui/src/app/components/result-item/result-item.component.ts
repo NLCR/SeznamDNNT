@@ -182,6 +182,7 @@ export class ResultItemComponent implements OnInit {
 
   addToZadost() {
     const navrh = this.isZarazeno ? 'VVS' : 'NZN';
+    // poslat na server,  service
     if (!this.state.currentZadost[navrh]) {
       const z = new Zadost(new Date().getTime() + '', this.state.user.username);
       z.navrh = navrh;
@@ -225,6 +226,9 @@ export class ResultItemComponent implements OnInit {
   }
 
   saveZadost(navrh: string) {
+    if  (!this.state.currentZadost[navrh].identifiers) {
+      this.state.currentZadost[navrh].identifiers = [];
+    }    
     if (!this.state.currentZadost[navrh].identifiers.includes(this.doc.identifier)){
       this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
     }
@@ -266,7 +270,7 @@ export class ResultItemComponent implements OnInit {
       }
     });
 
-    // this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier});
+    // this.processZadostEvent.emit({type: 'change', identifier: this.doc.identifier});
   }
 
   approveLib() {

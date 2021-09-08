@@ -12,12 +12,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class IPAddressUtils {
-    
+
+    private IPAddressUtils() {}
+
     public static Logger LOGGER = Logger.getLogger(IPAddressUtils.class.getName());
 
     public static final String LOCALHOST_DNS = "localhost";
 
-    public static final String X_IP_FORWARD = "X_IP_FORWARD";
+    public static final String X_IP_FORWARD = "X-Forwarded-For";
     public static String[] LOCALHOSTS = {"127.0.0.1","0:0:0:0:0:0:0:1","::1", LOCALHOST_DNS};
 
     static {

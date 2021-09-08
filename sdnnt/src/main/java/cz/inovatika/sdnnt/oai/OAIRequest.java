@@ -224,7 +224,7 @@ public class OAIRequest {
           ret.append("<setSpec>").append(set).append("</setSpec>");
           ret.append("</header>");
           String raw = (String) doc.getFirstValue("raw");
-          MarcRecord mr = MarcRecord.fromJSON(raw);
+          MarcRecord mr = MarcRecord.fromRAWJSON(raw);
           ret.append(mr.toXml(false));
           ret.append("</record>");
         }
