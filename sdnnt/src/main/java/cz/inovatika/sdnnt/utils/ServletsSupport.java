@@ -14,13 +14,12 @@ public class ServletsSupport {
 
     /** Generic method for reading json object from request */
     public static JSONObject readInputJSON(HttpServletRequest req) throws IOException {
-      JSONObject inputJs;
       if (req.getMethod().equals("POST")) {
-        inputJs = new JSONObject(IOUtils.toString(req.getInputStream(), "UTF-8"));
+          String content = IOUtils.toString(req.getInputStream(), "UTF-8");
+          return  new JSONObject(content);
       } else {
-        inputJs = new JSONObject(req.getParameter("json"));
+        return new JSONObject(req.getParameter("json"));
       }
-      return inputJs;
     }
 
     /** Error json */

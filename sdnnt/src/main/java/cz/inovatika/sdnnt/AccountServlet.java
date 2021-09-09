@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.indexer.models.NotifikaceInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
@@ -385,7 +386,7 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
             User user = UserController.getUser(req);
-            return Indexer.followRecord(req.getParameter("identifier"),  user.username,  user.notifikace_interval,  "true".equals(req.getParameter("follow")));
+            return Indexer.followRecord(req.getParameter("identifier"),  user.username,  NotifikaceInterval.mesic.valueOf(user.notifikace_interval),  "true".equals(req.getParameter("follow")));
           } catch (Exception e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }

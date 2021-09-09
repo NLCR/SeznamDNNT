@@ -12,6 +12,7 @@ import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.indexer.models.NotifikaceInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.*;
@@ -281,13 +282,14 @@ public class Indexer {
    *
    * @return
    */
-  public static JSONObject checkNotifications(String interval) {
+  public static Map<User, List<Map<String,String>>>  checkNotifications( String interval) {
     JSONObject ret = new JSONObject();
     // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-1DAY TO NOW]
     // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-7DAYS TO NOW]
     // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/MONTH-1MONTH TO NOW]
+
     String fqCatalog;
-    String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} periodicity:" + interval;
+    String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:*";
     switch(interval) {
       case "den":
         fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
@@ -299,7 +301,11 @@ public class Indexer {
         fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO NOW]";
     }
     try {
-      Map<String, String> mails = new HashMap<>();
+      //Map<String, String> mails = new HashMap<>();
+
+      Map<User, List<Map<String,String>>> mails = new HashMap<>();
+
+
       String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery q = new SolrQuery("*").setRows(1000)
               .setSort("identifier", SolrQuery.ORDER.desc)
@@ -312,20 +318,27 @@ public class Indexer {
         QueryResponse qr = getClient().query("catalog", q);
         String nextCursorMark = qr.getNextCursorMark();
         SolrDocumentList docs = qr.getResults();
+
+
         for (SolrDocument doc : docs) {
-          String msg = "Zaznam " + (String) doc.getFirstValue("nazev")
-                  + " byl zmenen na " + (String) doc.getFirstValue("dntstav")
-                  + " dne " + (Date) doc.getFirstValue("datum_stavu");
+
+          Collection<Object> dntstav = doc.getFieldValues("dntstav");
+          Map<String,String> map = new HashMap<>();
+          map.put("nazev", (String) doc.getFirstValue("nazev"));
+          map.put("dntstav", dntstav.size() == 1 ? (String)new ArrayList<>(dntstav).get(0): dntstav.toString());
+          map.put("identifier", doc.getFieldValue("identifier").toString());
+
+
           // Dotazujeme user
           SolrQuery qUser = new SolrQuery("*").setRows(1)
               .addFilterQuery("{!join fromIndex=notifications from=user to=username} identifier:\"" + doc.getFirstValue("identifier") + "\"");
           List<User> users = getClient().query("users", qUser).getBeans(User.class);
           for (User user : users) {
             // Pridame udaje o zaznamu pro uzivatel
-            if (mails.containsKey(user.email)) {
-              mails.put(user.email, mails.get(user.email) + "\n\n" + msg);
+            if (mails.containsKey(user)) {
+              mails.get(user).add(map);
             } else {
-              mails.put(user.email, msg);
+              mails.put(user, new ArrayList<>(Arrays.asList(map)));
             }
           }
         }
@@ -337,13 +350,11 @@ public class Indexer {
         cursorMark = nextCursorMark;
       }
       LOGGER.log(Level.INFO, "checkNotifications finished");
-      ret.put("status", "OK");
-      ret.put("mails", mails);
+      return  mails;
     } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+      return new HashMap<>();
     }
-    return ret;
   }
 
   /**
@@ -905,7 +916,7 @@ public class Indexer {
     }
   }
 
-  public static JSONObject followRecord(String identifier, String user, String interval, boolean follow) {
+  public static JSONObject followRecord(String identifier, String user, NotifikaceInterval interval, boolean follow) {
     JSONObject ret = new JSONObject();
     try {
       if (follow) {
@@ -914,9 +925,9 @@ public class Indexer {
         idoc.addField("identifier", identifier);
         idoc.addField("user", user);
         if (interval != null) {
-          idoc.addField("periodicity", interval);
+          idoc.addField("periodicity", interval.name());
         } else {
-          idoc.addField("periodicity", "mesic");
+          idoc.addField("periodicity", NotifikaceInterval.mesic.name());
         }
         getClient().add("notifications", idoc, 10);
       } else {

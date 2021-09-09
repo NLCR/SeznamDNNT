@@ -59,8 +59,20 @@ public class MailServiceImpl implements MailService  {
 
     }
 
+    @Override
+    public void sendNotificationEmail(Pair<String, String> recepient, List<Map<String, String>> data) throws IOException, EmailException {
+        if (recepient != null) {
+            String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_notification";
 
-    private void sendPeparedMail(Pair<String, String> recipient, String path, JSONObject configuration, Map<String, String> scope) throws IOException, EmailException {
+            Map scope = new HashMap();
+            scope.put("user", recepient.getRight());
+            scope.put("notifications", data);
+
+            sendPeparedMail(recepient, path, Options.getInstance().getJSONObject("notificationemail"), scope);
+        } else throw new EmailException("No recepient");
+    }
+
+    private void sendPeparedMail(Pair<String, String> recipient, String path, JSONObject configuration, Object scope) throws IOException, EmailException {
         if (recipient != null) {
             String content = IOUtils.toString(new FileReader(new File(path)));
             String subject = configuration.has("subject") ? configuration.getString("subject")  : "Subject";

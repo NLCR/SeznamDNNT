@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import cz.inovatika.sdnnt.utils.License;
+import cz.inovatika.sdnnt.wflow.License;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.client.solrj.SolrClient;

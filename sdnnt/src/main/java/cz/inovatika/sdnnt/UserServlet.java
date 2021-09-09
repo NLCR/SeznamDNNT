@@ -163,11 +163,11 @@ public class UserServlet extends HttpServlet {
           JSONObject savingUser = readInputJSON(req);
           if (sender.username.equals(savingUser.optString("username"))) {
             // ok
-            return UserController.save(readInputJSON(req).toString());
+            return UserController.save(savingUser.toString());
           } else {
             // must be admin
             if (new RightsResolver(req, new UserMustBeInRole(admin)).permit()) {
-              return UserController.save(readInputJSON(req).toString());
+              return UserController.save(savingUser.toString());
             } else {
               return errorJson(response, SC_FORBIDDEN, "not allowed");
             }

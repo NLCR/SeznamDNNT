@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
+import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -391,15 +392,20 @@ public class UserController {
   }
 
   public static JSONObject save(User user) {
-
-    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-      solr.addBean("users", user);
-      solr.commit("users");
-      return user.toJSONObject();
-    } catch (Exception ex) {
+    try (SolrClient client = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      return save(user, client);
+    } catch (IOException | SolrServerException ex) {
       LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
       return errorJson(ex.getMessage());
+    }
+  }
 
+  public static JSONObject save(User user, SolrClient client) throws IOException, SolrServerException {
+    try {
+      client.addBean("users", user);
+      return user.toJSONObject();
+    } finally {
+      SolrUtils.quietCommit(client, "users");
     }
   }
 

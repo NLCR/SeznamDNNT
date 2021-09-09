@@ -1,19 +1,21 @@
-package cz.inovatika.sdnnt.utils;
+package cz.inovatika.sdnnt.wflow;
 
 import java.util.List;
 
 /** All posibilities of catalog item state*/
-public enum CatalogItemState {
+public enum ItemState {
 
     A(true),
     PA(false),
     V(false),
+    VS(false),
     VN(false),
-    NZ(true);
+    NZ(true),
+    N(true);
+
 
     protected boolean licenseFinalState;
-
-    CatalogItemState(boolean licenseFinalState) {
+    ItemState(boolean licenseFinalState) {
         this.licenseFinalState = licenseFinalState;
     }
 
@@ -24,7 +26,7 @@ public enum CatalogItemState {
 
     public static final boolean allFinalStates(List<String> states) {
         for (int i = 0; i < states.size(); i++) {
-            if (!CatalogItemState.valueOf(states.get(i)).isLicenseFinalState()) return false;
+            if (!ItemState.valueOf(states.get(i)).isLicenseFinalState()) return false;
 
         }
         return true;

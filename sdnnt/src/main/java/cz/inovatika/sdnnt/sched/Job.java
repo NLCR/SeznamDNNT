@@ -15,9 +15,17 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.mail.EmailException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.quartz.InterruptableJob;
@@ -136,16 +144,22 @@ public class Job implements InterruptableJob {
     NOTIFICATIONS {
       @Override
       JSONObject doPerform(JSONObject jobData) {
-        JSONObject ret = new JSONObject();
-        try {
-          ret = Indexer.checkNotifications(jobData.getString("interval"));
-          LOGGER.log(Level.INFO, "CHECK_STAV finished");
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex.toString());
+        Map<User, List<Map<String, String>>> map = Indexer.checkNotifications(jobData.getString("interval"));
+        if (!map.isEmpty()) {
+          LOGGER.log(Level.INFO, "Sending notification emails");
+          MailService mailService = new MailServiceImpl();
+          map.keySet().forEach(user-> {
+            try {
+              Pair<String, String> pair = Pair.of(user.email, user.jmeno + " " + user.prijmeni);
+              mailService.sendNotificationEmail(pair, map.get(user));
+              LOGGER.info(String.format("Notification for %s has been sent ", pair.toString()));
+            } catch (IOException | EmailException e) {
+              LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
+          });
         }
-
-        return ret;
+        LOGGER.log(Level.INFO, "CHECK_STAV finished");
+        return new JSONObject();
       }
     };
     abstract JSONObject doPerform(JSONObject jobData);

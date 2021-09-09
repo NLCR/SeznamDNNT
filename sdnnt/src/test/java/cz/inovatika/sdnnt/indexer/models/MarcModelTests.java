@@ -31,7 +31,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
 public class MarcModelTests {
 
     @Test
-    public void rawJSON() throws IOException, SolrServerException {
+    public void deserializeFromRAWJSON() throws IOException, SolrServerException {
         InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream("oai_aleph-nkp.cz_DNT01-000157317_RAW.json");
         String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
 
@@ -71,7 +71,7 @@ public class MarcModelTests {
     }
 
     @Test
-    public void solrDoc1() throws IOException, SolrServerException {
+    public void readFromSOLRDoc() throws IOException, SolrServerException {
         SolrClient mockClient = EasyMock.createMock(SolrClient.class);
         QueryResponse mockResponse = EasyMock.createMock(QueryResponse.class);
 
@@ -93,7 +93,7 @@ public class MarcModelTests {
     }
 
     @Test
-    public void solrDoc2() throws IOException, SolrServerException {
+    public void readFromSolrDoc2() throws IOException, SolrServerException {
         MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
         Assert.assertNotNull(marcRecord.datum_stavu);
         Assert.assertNotNull(marcRecord.stav);

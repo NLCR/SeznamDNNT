@@ -116,6 +116,8 @@ public class IndexerChangeStateTest {
 
     }
 
+
+
     private MarcRecord testChangeState(String ident, String navrh) throws IOException, SolrServerException {
         SolrClient mockClient = EasyMock.createMock(SolrClient.class);
         UpdateResponse mockUpdateResponse = EasyMock.createMock(UpdateResponse.class);
