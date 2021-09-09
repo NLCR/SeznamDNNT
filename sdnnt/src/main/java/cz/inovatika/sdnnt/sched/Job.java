@@ -34,8 +34,11 @@ import org.quartz.UnableToInterruptJobException;
 public class Job implements InterruptableJob {
 
   private static final Logger LOGGER = Logger.getLogger(Job.class.getName());
-  private Thread thread;
-  // JSONObject jobdata;
+
+
+  public Job() {
+   
+  }
 
   public JSONObject fire(String jobName) {
     LOGGER.log(Level.INFO, "Job {0} fired", jobName);
@@ -43,26 +46,17 @@ public class Job implements InterruptableJob {
   }
 
   public JSONObject fire(JSONObject jobData) {
-    thread = Thread.currentThread();
     // LOGGER.log(Level.INFO, "fire job {0}", jobData);
     jobData.put("interrupted", false);
     String action = jobData.getString("type");  
     Actions actionToDo = Actions.valueOf(action.toUpperCase());
     JSONObject ret = actionToDo.doPerform(jobData);
-    thread.interrupt();
     return ret;
   }
 
   @Override
   public void interrupt() throws UnableToInterruptJobException {
-    thread.interrupt();
-        try {
-            thread.join(1000);
-        } catch (InterruptedException e) {
-            throw new UnableToInterruptJobException(e);
-        } finally {
-            // ... do cleanup
-        }
+      //
   }
 
   @Override

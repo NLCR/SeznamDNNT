@@ -22,25 +22,6 @@ public class MailServiceImpl implements MailService  {
 
     public static final Logger LOGGER = Logger.getLogger(MailServiceImpl.class.getName());
 
-//    @Override
-//    public Session getSession(String name, String pass) {
-//        JSONObject mail = Options.getInstance().getJSONObject("mail");
-//        Properties properties = new Properties();
-//        Iterator<String> keys = mail.keys();
-//        keys.forEachRemaining(key-> {
-//            properties.setProperty("mail."+key, mail.get(key).toString());
-//        });
-//
-//        if (name == null) {
-//            name = properties.getProperty("mail.smtp.user");
-//        }
-//        if (pass == null) {
-//            pass = properties.getProperty("mail.smtp.pass");
-//        }
-//        Authenticator auth = new SMTPAuthenticator(name, pass);
-//        Session session = Session.getInstance(properties, auth);
-//        return session;
-//    }
 
 
 

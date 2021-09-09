@@ -171,6 +171,14 @@
       <version>3.0</version>
     </dependency>
 
+    <!-- solr testing -->
+    <dependency>
+      <groupId>org.apache.solr</groupId>
+      <artifactId>solr-core</artifactId>
+      <version>8.9.0</version>
+    </dependency>
+
+
   </dependencies>
 
   <build>

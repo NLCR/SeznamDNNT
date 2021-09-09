@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.History;
 import cz.inovatika.sdnnt.index.Indexer;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
@@ -93,7 +94,6 @@ public class Zadost {
   }
   
   public static JSONObject save(String js, String username) {
-
     try {
       Zadost zadost = Zadost.fromJSON(js);
       zadost.user = username;
@@ -149,7 +149,7 @@ public class Zadost {
       zprocess.date = new Date();
       zadost.process.put(identifier, zprocess);
       String newProcess = new JSONObject().put("process", zadost.process).toString();
-      History.log(zadost.id, oldProcess, newProcess, username, "zadost");
+      new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost");
       return save(zadost);
     } catch (JsonProcessingException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -173,7 +173,7 @@ public class Zadost {
       zprocess.date = new Date();
       zadost.process.put(identifier, zprocess);
       String newProcess = new JSONObject().put("process", zadost.process).toString();
-      History.log(zadost.id, oldProcess, newProcess, username, "zadost");
+      new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost");
       return save(zadost);
     } catch (JsonProcessingException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -182,6 +182,7 @@ public class Zadost {
   }
   
   public static JSONObject save(Zadost zadost) {
+
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       DocumentObjectBinder dob = new DocumentObjectBinder();
       SolrInputDocument idoc = dob.toSolrInputDocument(zadost);

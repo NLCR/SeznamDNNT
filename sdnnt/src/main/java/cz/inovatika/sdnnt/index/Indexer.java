@@ -14,16 +14,15 @@ import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.wflow.NavrhWorklflow;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -164,7 +163,7 @@ public class Indexer {
         historyDoc.setField("changes", changes.toString());
 
         // Create record in catalog
-        MarcRecord mr = MarcRecord.fromJSON(JsonPatch.apply(fwPatch, source).toString());
+        MarcRecord mr = MarcRecord.fromRAWJSON(JsonPatch.apply(fwPatch, source).toString());
         // mr.fillSolrDoc();
         return mr.toSolrDoc();
       } else {
@@ -199,7 +198,7 @@ public class Indexer {
     // JSONObject ret = new JSONObject();
     try {
 
-      MarcRecord mr = MarcRecord.fromJSON(source);
+      MarcRecord mr = MarcRecord.fromRAWJSON(source);
       mr.toSolrDoc();
       String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
               + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
@@ -235,7 +234,7 @@ public class Indexer {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("id:\"" + impNew.id + "\"");
       Import impOld = getClient().query("imports", q).getBeans(Import.class).get(0);
-      History.log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import");
+      new HistoryImpl(getClient()).log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import");
 
       // Update record in imports
       ret = Import.approve(impNew, identifier, user);
@@ -248,42 +247,35 @@ public class Indexer {
   }
 
   // zmeni viditelnost - musi but stav A nebo PA -> finalni stav A NZ
-  public static JSONObject reduceVisbilityState(String identifier, String navrh, String user) {
+  public static JSONObject reduceVisbilityState(String identifier, String navrh, String user) throws IOException, SolrServerException {
+    return reduceVisbilityState(identifier, navrh, user,  MarcRecord.fromIndex(identifier),getClient());
+  }
 
+  public static JSONObject reduceVisbilityState(String identifier, String navrh, String user,MarcRecord mr, SolrClient client) {
     JSONObject ret = new JSONObject();
     try {
-      MarcRecord mr = MarcRecord.fromIndex(identifier);
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
       List<String> oldStav = mr.stav;
-      if (navrh.equals("VVS") || navrh.equals("VVN")) {
-        if (navrh.equals("VVS")) {
-          if (oldStav == null) {
-            mr.enhanceState(Arrays.asList("A", "NZ"), user);
-          } else if (oldStav.contains("A")) {
-            mr.enhanceState("NZ", user);
-          } else if (oldStav.contains("PA")) {
-            mr.setStav(Arrays.asList("A","NZ"), user);
-          }
+      NavrhWorklflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
+
+        LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.stav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+
+        new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+        try {
+          client.add("catalog", mr.sdoc);
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          ret.put("error", ex);
         }
-
-        mr.toSolrDoc(true);
-        History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-
-        // Update record in catalog
-        getClient().add("catalog", mr.sdoc);
-        getClient().commit("catalog");
-
-      } else throw new IllegalStateException("Accepting only VVN or VVS requests");
-
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
+      });
+    } finally {
+      SolrUtils.quietCommit(client, "catalog");
     }
     return ret;
   }
-  
-  
+
+
   /**
    * Posila email o zmenu stavu zaznamu podle nastaveni uzivatelu
    *
@@ -321,7 +313,7 @@ public class Indexer {
         String nextCursorMark = qr.getNextCursorMark();
         SolrDocumentList docs = qr.getResults();
         for (SolrDocument doc : docs) {
-          String msg = "Zaznam " + (String) doc.getFirstValue("nazev") 
+          String msg = "Zaznam " + (String) doc.getFirstValue("nazev")
                   + " byl zmenen na " + (String) doc.getFirstValue("dntstav")
                   + " dne " + (Date) doc.getFirstValue("datum_stavu");
           // Dotazujeme user
@@ -338,7 +330,7 @@ public class Indexer {
           }
         }
 
-        
+
         if (cursorMark.equals(nextCursorMark)) {
           done = true;
         }
@@ -353,7 +345,7 @@ public class Indexer {
     }
     return ret;
   }
-  
+
   /**
    * Kontroluje stav podle nastavene lhuty (6 mesicu) a meni stav
    *
@@ -382,7 +374,7 @@ public class Indexer {
         for (SolrDocument doc : docs) {
           String oldRaw = (String) doc.getFirstValue("raw");
 
-          MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+          MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
 
           mr.stav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
           mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
@@ -390,7 +382,7 @@ public class Indexer {
           mr.license = (String) doc.getFirstValue("license");
           // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
           mr.setStav("A", "scheduler");
-          History.log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
+          new HistoryImpl(getClient()).log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
 
           SolrInputDocument idoc = mr.toSolrDoc();
           idocs.add(idoc);
@@ -418,35 +410,42 @@ public class Indexer {
     return ret;
   }
 
-  public static JSONObject changeStav(String identifier, String navrh, String user) {
-    JSONObject ret = new JSONObject();
+  //
+  public static JSONObject changeStav(String identifier, String navrh, String user ) {
+    return changeStav(identifier, navrh, user,getClient());
+  }
+
+  public static JSONObject changeStav(String identifier, String navrh, String user, SolrClient client ) {
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
+      return changeStav(identifier, navrh, user, mr, client);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.log(Level.SEVERE,e.getMessage(),e);
+      return new JSONObject();
+    }
+  }
+
+  static JSONObject changeStav(String identifier, String navrh, String user, MarcRecord mr, SolrClient client ) {
+    JSONObject ret = new JSONObject();
+    try {
+      // sync to solr doc
       mr.toSolrDoc();
+
       String oldRaw = mr.toJSON().toString();
-      List<String> oldStav = mr.stav;
-      if (navrh.equals("VVS")) {
-        if (oldStav == null || oldStav.contains("A")) {
-          mr.setStav("VS", user);
-        } else if (oldStav.contains("PA")) {
-          mr.setStav("VN", user);
+      NavrhWorklflow.valueOf(navrh).change(mr, user,(changedRecord, ident,oldstates,newstates)->{
+        try {
+          LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.stav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+
+          new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+          // Update record in catalog
+          client.add("catalog", mr.sdoc);
+        } catch (SolrServerException| IOException ex) {
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          ret.put("error", ex);
         }
-      } else if (navrh.equals("NZN")) {
-        mr.setStav("PA", user);
-      } else if (navrh.equals("VVN")) {
-        mr.setStav("N", user);
-      }
-
-      mr.toSolrDoc(true);
-      History.log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-
-      // Update record in catalog
-      getClient().add("catalog", mr.sdoc);
-      getClient().commit("catalog");
-
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
+      });
+    } finally {
+      SolrUtils.quietCommit(client,"catalog" );
     }
     return ret;
   }
@@ -470,10 +469,10 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
 
-      History.log(id, oldRaw, newRaw.toString(), user, "catalog");
+      new HistoryImpl(getClient()).log(id, oldRaw, newRaw.toString(), user, "catalog");
 
       // Update record in catalog
-      MarcRecord mr = MarcRecord.fromJSON(newRaw.toString());
+      MarcRecord mr = MarcRecord.fromRAWJSON(newRaw.toString());
       //mr.toSolrDoc();
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
@@ -506,7 +505,7 @@ public class Indexer {
         for (SolrDocument doc : docs) {
           String oldRaw = (String) doc.getFirstValue("raw");
 
-          MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+          MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
           SolrInputDocument idoc = mr.toSolrDoc();
           if (!cleanStav) {
             idoc.addField("dntstav", doc.getFieldValue("dntstav"));
@@ -515,7 +514,7 @@ public class Indexer {
             idoc.addField("license", doc.getFieldValue("license"));
             idoc.addField("license_history", doc.getFieldValue("license_history"));
           } else {
-            
+
             idoc.removeField("dntstav");
             idoc.removeField("datum_stavu");
             idoc.removeField("historie_stavu");
@@ -560,7 +559,7 @@ public class Indexer {
       String oldRaw = (String) docOld.getFirstValue("raw");
 
       // Update record in catalog
-      MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+      MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
       solr.add("catalog", mr.toSolrDoc());
       solr.commit("catalog");
       ret = mr.toJSON();
@@ -705,7 +704,7 @@ public class Indexer {
         solr.commit("history");
 
         // Update record in catalog
-        //      MarcRecord mr = MarcRecord.fromJSON(newRaw);      
+        //      MarcRecord mr = MarcRecord.fromRAWJSON(newRaw);
         //      mr.fillSolrDoc();
         //      solr.add("catalog", mr.toSolrDoc());
         //      solr.commit("catalog");
@@ -762,13 +761,13 @@ public class Indexer {
           idocs.add(idoc);
 
 //            String oldRaw = (String) doc.getFirstValue("raw");
-//            MarcRecord mr = MarcRecord.fromJSON(oldRaw);
+//            MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
 //            idocs.add(mr.toSolrDoc());
         }
 
         add("catalog", idocs, true, false, user);
         idocs.clear();
-//        for (SolrDocument doc : docs) 
+//        for (SolrDocument doc : docs)
 //          // if (doc.getFirstValue("marc_035a") != null) {
 //            SolrInputDocument hDoc = new SolrInputDocument();
 //            SolrInputDocument cDoc = mergeWithHistory((String) doc.getFirstValue("raw"), doc, hDoc, user, false, ret);
@@ -808,7 +807,6 @@ public class Indexer {
 
   /**
    *
-   * @param solr
    * @param jsDnt
    * @param identifier
    * @param sysno
@@ -867,7 +865,7 @@ public class Indexer {
       historyDoc.setField("changes", ret.toString());
 
       // Create record in catalog
-      MarcRecord mr = MarcRecord.fromJSON(JsonPatch.apply(fwPatch, source).toString());
+      MarcRecord mr = MarcRecord.fromRAWJSON(JsonPatch.apply(fwPatch, source).toString());
       return mr.toSolrDoc();
 
     } catch (SolrServerException | IOException ex) {
@@ -906,7 +904,7 @@ public class Indexer {
       }
     }
   }
-  
+
   public static JSONObject followRecord(String identifier, String user, String interval, boolean follow) {
     JSONObject ret = new JSONObject();
     try {
@@ -946,7 +944,7 @@ public class Indexer {
       }
       SolrDocument docDnt = docs.get(0);
       String json = (String) docDnt.getFirstValue("raw");
-      MarcRecord mr = MarcRecord.fromJSON(json);
+      MarcRecord mr = MarcRecord.fromRAWJSON(json);
       // mr.fillSolrDoc();
 
       ObjectMapper mapper = new ObjectMapper();

@@ -47,7 +47,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     private static final int LIMIT = 10000;
 
-    // Stavy jsou uz vytvorene
+    // Stavy jsou uz vytvorene pro validaci
     private static enum DocumentState {
         A {
             @Override

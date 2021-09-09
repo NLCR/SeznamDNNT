@@ -190,35 +190,30 @@ export class AppService {
   processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
     const params: HttpParams = new HttpParams();
-      //.set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
 
   approveNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh';
     const params: HttpParams = new HttpParams();
-      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
   approveNavrhLib(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
     const params: HttpParams = new HttpParams();
-      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason}, params);
   }
 
   rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject_navrh';
     const params: HttpParams = new HttpParams();
-      //.set('user', this.state.user.username);
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
   followRecord(identifier: string, follow: boolean): Observable<string> {
     let url = '/account/follow_record';
     const params: HttpParams = new HttpParams()
-    //.set('user', this.state.user.username)
     .set('identifier', identifier)
     .set('follow', follow+'');
     return this.get(url, params);

@@ -24,7 +24,7 @@ export class HistoryDialogComponent implements OnInit {
     this.service.getHistory(this.data.identifier).subscribe(res => {
       this.history = res.response.docs;
       this.stavy = this.history.filter(item => {
-        return item.changes.backward_patch.findIndex(p => p.path.indexOf('990') > 0) > -1;
+        return item.changes.backward_patch.findIndex(p => p.path.indexOf('historie_stavu') > 0) > -1;
       });
     });
   }

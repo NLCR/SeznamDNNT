@@ -38,7 +38,7 @@ public class ZadostIndexer {
       solr.commit("zadost");
 
       // Update record in catalog
-//      MarcRecord mr = MarcRecord.fromJSON(newRaw.toString());
+//      MarcRecord mr = MarcRecord.fromRAWJSON(newRaw.toString());
 //      mr.fillSolrDoc();
 //      solr.add("catalog", mr.toSolrDoc());
 //      solr.commit("catalog");

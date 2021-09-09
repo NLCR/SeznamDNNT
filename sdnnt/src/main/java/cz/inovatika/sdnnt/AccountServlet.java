@@ -250,6 +250,7 @@ public class AccountServlet extends HttpServlet {
           try {
             User user = UserController.getUser(req);
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
+            // TODO: Transakce
             Indexer.changeStav(inputJs.getString("identifier"),
                     "VVNtoN", user.username);
             return Zadost.approve(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(),
