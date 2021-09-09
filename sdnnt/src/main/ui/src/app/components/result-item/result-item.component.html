@@ -32,7 +32,7 @@
       </ng-container>
       <ng-container *ngIf="doc.marc_998a">
         <span class="app-text-icon">
-          <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+          <mat-icon class="app-mr-1">link</mat-icon><a [href]="alephLink" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
         </span>
         <span class="app-pipe"></span>
       </ng-container>
@@ -48,6 +48,8 @@
       <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.dntstav | translate">info</mat-icon>
         {{ 'state.' + doc.dntstav[doc.dntstav.length-1] | translate }}
+        <button mat-icon-button *ngIf="state.logged && state.user.role === 'kurator' && !inZadost"
+        (click)="showStates()" ><mat-icon class="material-icons-outlined" [matTooltip]="'desc.changestav'| translate">edit</mat-icon></button>
       </div>
       <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         <mat-icon class="material-icons-outlined">info</mat-icon>

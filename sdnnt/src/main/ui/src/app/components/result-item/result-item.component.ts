@@ -32,6 +32,7 @@ export class ResultItemComponent implements OnInit {
   imgSrc: string;
   processed: { date: Date, state: string, user: string, reason?: string };
   processedTooltip: string;
+  alephLink: string;
 
   dkLinks: string[] = [];
 
@@ -44,6 +45,11 @@ export class ResultItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
+    this.alephLink = this.doc.marc_998a[0];
+    if (!this.alephLink.startsWith('http')) {
+      this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
+    }
     this.newState.setValue(this.doc.dntstav);
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA');
     
@@ -144,6 +150,10 @@ export class ResultItemComponent implements OnInit {
     // dialogRef.afterClosed().subscribe(result => {
     //   console.log('The dialog was closed', result);
     // });
+  }
+
+  changeStav() {
+
   }
 
   public showStates() {

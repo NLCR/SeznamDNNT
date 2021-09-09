@@ -14,7 +14,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 export class StatesDialogComponent implements OnInit {
 
   newState: string;
-  public dntStates: string[] = ['undefined', 'PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
 
   constructor(
@@ -25,8 +25,9 @@ export class StatesDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    this.newState = this.data.dntstav ? this.data.dntstav : 'undefined';
-    this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
+    console.log(this.data);
+    this.newState = this.data.dntstav ? this.data.dntstav[0] : 'A';
+    // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
   }
 
 }
