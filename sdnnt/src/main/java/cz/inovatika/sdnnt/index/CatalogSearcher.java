@@ -6,27 +6,23 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -101,7 +97,8 @@ public class CatalogSearcher {
     parameterMap.entrySet().stream().forEach(stringEntry -> {
       resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
     });
-    User user = UserController.getUser(req);
+    //UserControler controler = new UserControlerImpl(req)
+    User user = new UserControlerImpl(req).getUser();
     return search(resmap, new ArrayList<>(), user);
   }
   
@@ -115,7 +112,7 @@ public class CatalogSearcher {
     parameterMap.entrySet().stream().forEach(stringEntry -> {
       resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
     });
-    User user = UserController.getUser(req);
+    User user = new UserControlerImpl(req).getUser();
     return getA(resmap, user);
   }
   
@@ -130,7 +127,7 @@ public class CatalogSearcher {
     parameterMap.entrySet().stream().forEach(stringEntry -> {
       resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
     });
-    User user = UserController.getUser(req);
+    User user = new UserControlerImpl(req).getUser();
     return getPA(resmap, user);
   }
   
@@ -366,7 +363,7 @@ public class CatalogSearcher {
       
       
     // Filtry podle role
-    // User user = UserController.getUser(req);
+    // User user = UserControllerQ.getUser(req);
     if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role

@@ -15,17 +15,19 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.mail.EmailException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.quartz.InterruptableJob;
@@ -124,7 +126,7 @@ public class Job implements InterruptableJob {
         return json;
       }
     },
-    // Zpracovava navhry VVS a NZN. Controluje lhuty, a meni stav zaznamu
+    // Zpracovava navhry VVS a NZN. Controluje lhuty, a meni dntstav zaznamu
     CHECK_STAV {
       @Override
       JSONObject doPerform(JSONObject jobData) {
@@ -144,21 +146,15 @@ public class Job implements InterruptableJob {
     NOTIFICATIONS {
       @Override
       JSONObject doPerform(JSONObject jobData) {
-        Map<User, List<Map<String, String>>> map = Indexer.checkNotifications(jobData.getString("interval"));
-        if (!map.isEmpty()) {
-          LOGGER.log(Level.INFO, "Sending notification emails");
+        try {
           MailService mailService = new MailServiceImpl();
-          map.keySet().forEach(user-> {
-            try {
-              Pair<String, String> pair = Pair.of(user.email, user.jmeno + " " + user.prijmeni);
-              mailService.sendNotificationEmail(pair, map.get(user));
-              LOGGER.info(String.format("Notification for %s has been sent ", pair.toString()));
-            } catch (IOException | EmailException e) {
-              LOGGER.log(Level.SEVERE,e.getMessage(),e);
-            }
-          });
+          UserControler controler = new UserControlerImpl(/* no reqest */ null);
+          NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
+          notificationsService.processNotifications( NotificationInterval.valueOf(jobData.getString("interval")));
+        } catch (UserControlerException | NotificationsException e) {
+          LOGGER.log(Level.SEVERE, e.getMessage(),e);
         }
-        LOGGER.log(Level.INFO, "CHECK_STAV finished");
+
         return new JSONObject();
       }
     };

@@ -1,11 +1,9 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import cz.inovatika.sdnnt.services.AccountService;
-import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -16,7 +14,6 @@ import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class AccountServiceImpl implements AccountService {
 

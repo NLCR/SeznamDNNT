@@ -9,7 +9,6 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,11 +24,11 @@ public class IndexerChangeStateTest {
 
     @Test
     public void testChangeState_NZN_1() throws IOException, SolrServerException {
-        // stav N -> stav PA
+        // dntstav N -> dntstav PA
         MarcRecord marcRecord = testChangeState("oai:aleph-nkp.cz:DNT01-000106789", "NZN");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.size()==1);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("PA"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.size()==1);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
 
         // underlaying solr document
         Collection<Object> fieldValues = marcRecord.sdoc.getFieldValues(DNTSTAV_FIELD);
@@ -46,10 +45,10 @@ public class IndexerChangeStateTest {
 
     @Test
     public void testChangeState_NZN_2() throws IOException, SolrServerException {
-        // stav  PA -> stav PA
+        // dntstav  PA -> dntstav PA
         MarcRecord marcRecord = testChangeState("oai:aleph-nkp.cz:DNT01-000157317", "NZN");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("PA"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
 
         Collection<Object> fieldValues = marcRecord.sdoc.getFieldValues(DNTSTAV_FIELD);
         Assert.assertTrue(fieldValues.toString().equals("[PA]"));
@@ -66,8 +65,8 @@ public class IndexerChangeStateTest {
     @Test
     public void testChangeState_VVS_1() throws IOException, SolrServerException {
         MarcRecord marcRecord = testChangeState("oai:aleph-nkp.cz:DNT01-000057930", "VVS");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("VS"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("VS"));
 
         Collection<Object> fieldValues = marcRecord.sdoc.getFieldValues(DNTSTAV_FIELD);
         Assert.assertTrue(fieldValues.toString().equals("[VS]"));
@@ -84,8 +83,8 @@ public class IndexerChangeStateTest {
     @Test
     public void testChangeState_VVS_2() throws IOException, SolrServerException {
         MarcRecord marcRecord = testChangeState("oai:aleph-nkp.cz:DNT01-000106789", "VVS");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("N"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("N"));
 
         Collection<Object> fieldValues = marcRecord.sdoc.getFieldValues(DNTSTAV_FIELD);
         Assert.assertTrue(fieldValues.toString().equals("[N]"));
@@ -101,8 +100,8 @@ public class IndexerChangeStateTest {
     @Test
     public void testChangeState_VVN_1() throws IOException, SolrServerException {
         MarcRecord marcRecord = testChangeState("oai:aleph-nkp.cz:DNT01-000057930", "VVN");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("A"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("A"));
 
         Collection<Object> fieldValues = marcRecord.sdoc.getFieldValues(DNTSTAV_FIELD);
         Assert.assertTrue(fieldValues.toString().equals("[A]"));

@@ -39,7 +39,7 @@ import org.json.JSONObject;
 
 /**
  * Importuje set DNT z Alephu pomoci OAI Hleda zaznam z SKC (catalog) a nastavi
- * stav Info o stavu z pole 990 a 992
+ * dntstav Info o stavu z pole 990 a 992
  *
  * @author alberto
  */
@@ -200,7 +200,7 @@ public class DntAlephImporter {
           idoc.addField(name, doc.getFieldValue(name));
         }
 
-        idoc.removeField("stav");
+        idoc.removeField("dntstav");
         idoc.removeField("dntstav");
         idoc.removeField("indextime");
         idoc.removeField("_version_");
@@ -213,7 +213,7 @@ public class DntAlephImporter {
             JSONObject h = new JSONObject();
             String stav = df.getSubFields().get("s").get(0).getValue();
             if (df.getSubFields().containsKey("s")) {
-              h.put("stav", stav);
+              h.put("dntstav", stav);
             }
             if (df.getSubFields().containsKey("a")) {
               String ds = df.getSubFields().get("a").get(0).getValue();
@@ -243,13 +243,13 @@ public class DntAlephImporter {
           idoc.setField("historie_stavu", hs.toString());
         }
 
-        // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
+        // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
         if (rec.dataFields.containsKey("990")) {
           for (DataField df : rec.dataFields.get("990")) {
             //JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("a")) {
               String stav = df.getSubFields().get("a").get(0).getValue();
-              //h.put("stav", stav);
+              //h.put("dntstav", dntstav);
               idoc.addField("dntstav", stav);
               if ("NZ".equals(stav)) {
                 idoc.setField("license", "dnntt");

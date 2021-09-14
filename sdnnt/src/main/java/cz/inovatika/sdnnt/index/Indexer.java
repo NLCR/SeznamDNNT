@@ -12,7 +12,7 @@ import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.indexer.models.NotifikaceInterval;
+import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
 import java.io.IOException;
 import java.util.*;
@@ -20,6 +20,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrUtils;
@@ -247,7 +249,7 @@ public class Indexer {
     return ret;
   }
 
-  // zmeni viditelnost - musi but stav A nebo PA -> finalni stav A NZ
+  // zmeni viditelnost - musi but dntstav A nebo PA -> finalni dntstav A NZ
   public static JSONObject reduceVisbilityState(String identifier, String navrh, String user) throws IOException, SolrServerException {
     return reduceVisbilityState(identifier, navrh, user,  MarcRecord.fromIndex(identifier),getClient());
   }
@@ -257,10 +259,10 @@ public class Indexer {
     try {
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
-      List<String> oldStav = mr.stav;
+      List<String> oldStav = mr.dntstav;
       NavrhWorklflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
 
-        LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.stav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+        LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.dntstav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
 
         new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
         try {
@@ -282,11 +284,21 @@ public class Indexer {
    *
    * @return
    */
-  public static Map<User, List<Map<String,String>>>  checkNotifications( String interval) {
+  public static Map<User, List<Map<String,String>>>  checkNotifications(UserControler controler,  String interval) {
+
+    try {
+      List<User> usersByNotificationInterval = controler.findUsersByNotificationInterval(interval);
+      for (User u :  usersByNotificationInterval) {
+        LOGGER.log(Level.INFO, String.format("Sending notifications: %s for user  %s",interval, u.jmeno+" "+u.prijmeni+"("+u.email));
+
+      }
+
+    } catch (UserControlerException e) {
+      e.printStackTrace();
+    }
+
+
     JSONObject ret = new JSONObject();
-    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-1DAY TO NOW]
-    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/DAY-7DAYS TO NOW]
-    // {!join fromIndex=catalog from=identifier to=identifier} datum_stavu:[NOW/MONTH-1MONTH TO NOW]
 
     String fqCatalog;
     String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:*";
@@ -358,7 +370,7 @@ public class Indexer {
   }
 
   /**
-   * Kontroluje stav podle nastavene lhuty (6 mesicu) a meni stav
+   * Kontroluje dntstav podle nastavene lhuty (6 mesicu) a meni dntstav
    *
    * @return
    */
@@ -387,7 +399,7 @@ public class Indexer {
 
           MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
 
-          mr.stav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
+          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
           mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
           mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
           mr.license = (String) doc.getFirstValue("license");
@@ -445,7 +457,7 @@ public class Indexer {
       String oldRaw = mr.toJSON().toString();
       NavrhWorklflow.valueOf(navrh).change(mr, user,(changedRecord, ident,oldstates,newstates)->{
         try {
-          LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.stav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+          LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.dntstav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
 
           new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
           // Update record in catalog
@@ -916,7 +928,7 @@ public class Indexer {
     }
   }
 
-  public static JSONObject followRecord(String identifier, String user, NotifikaceInterval interval, boolean follow) {
+  public static JSONObject followRecord(String identifier, String user, NotificationInterval interval, boolean follow) {
     JSONObject ret = new JSONObject();
     try {
       if (follow) {
@@ -927,7 +939,7 @@ public class Indexer {
         if (interval != null) {
           idoc.addField("periodicity", interval.name());
         } else {
-          idoc.addField("periodicity", NotifikaceInterval.mesic.name());
+          idoc.addField("periodicity", NotificationInterval.mesic.name());
         }
         getClient().add("notifications", idoc, 10);
       } else {

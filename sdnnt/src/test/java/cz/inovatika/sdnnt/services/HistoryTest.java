@@ -57,14 +57,14 @@ public class HistoryTest {
         expected.setField("identifier", "oai:aleph-nkp.cz:DNT01-000106789");
         expected.setField("user", "user");
         expected.setField("type", "catalog");
-        expected.setField("changes", "{\"forward_patch\":[{\"op\":\"replace\",\"path\":\"/dntstav/0\",\"value\":\"PA\"},{\"op\":\"add\",\"path\":\"/historie_stavu/3\",\"value\":{\"stav\":\"PA\",\"date\":\"20210909\",\"user\":\"user\"}}],\"backward_patch\":[{\"op\":\"replace\",\"path\":\"/dntstav/0\",\"value\":\"N\"},{\"op\":\"remove\",\"path\":\"/historie_stavu/3\"}]}");
+        expected.setField("changes", "{\"forward_patch\":[{\"op\":\"replace\",\"path\":\"/stav/0\",\"value\":\"PA\"},{\"op\":\"add\",\"path\":\"/historie_stavu/3\",\"value\":{\"stav\":\"PA\",\"date\":\"20210909\",\"user\":\"user\"}}],\"backward_patch\":[{\"op\":\"replace\",\"path\":\"/stav/0\",\"value\":\"N\"},{\"op\":\"remove\",\"path\":\"/historie_stavu/3\"}]}");
 
         EasyMock.expect(mockClient.add(EasyMock.eq("history"), EasyMock.eq(expected))).andReturn(mockUpdateResponse).times(1);
         EasyMock.expect(mockClient.commit(EasyMock.eq("history"))).andReturn(mockUpdateResponse).times(1);
 
         EasyMock.replay( mockClient, mockUpdateResponse);
         History history = new HistoryImpl(mockClient);
-        history.log("oai:aleph-nkp.cz:DNT01-000106789",stream("old"), stream("new"), "user","catalog");
+        history.log("oai:aleph-nkp.cz:DNT01-000106789",stream("history/old"), stream("history/new"), "user","catalog");
 
         EasyMock.verify(mockClient, mockUpdateResponse);
     }

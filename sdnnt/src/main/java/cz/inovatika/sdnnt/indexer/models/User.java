@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
@@ -84,7 +83,7 @@ public class User {
   public Date resetPwdExpiration;
 
   @Field
-  public String notifikace_interval = NotifikaceInterval.none.name();
+  public String notifikace_interval = NotificationInterval.none.name();
 
 
   public JSONObject toJSONObject() {
@@ -102,6 +101,8 @@ public class User {
     User o = objectMapper.readValue(json, User.class);
     return o;
   }
+
+
 
 
   @Override

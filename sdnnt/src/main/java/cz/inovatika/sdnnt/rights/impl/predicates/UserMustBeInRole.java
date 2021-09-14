@@ -1,9 +1,9 @@
 package cz.inovatika.sdnnt.rights.impl.predicates;
 
-import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.rights.Predicate;
 import cz.inovatika.sdnnt.rights.Role;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class UserMustBeInRole implements Predicate {
 
     @Override
     public boolean permit(HttpServletRequest req) {
-        User user = UserController.getUser(req);
+        User user = new UserControlerImpl(req).getUser();
         if (user != null) {
             Role role = Role.valueOf(user.role);
             return list.contains(role);

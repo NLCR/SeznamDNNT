@@ -1,7 +1,9 @@
 package cz.inovatika.sdnnt.indexer.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import cz.inovatika.sdnnt.index.ISBN;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.MD5;
@@ -22,6 +24,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONPropertyIgnore;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import java.text.DateFormat;
@@ -32,6 +35,8 @@ import java.text.SimpleDateFormat;
  *
  * @author alberto
  */
+
+//TODO: Change it
 public class MarcRecord {
 
   private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyyMMdd");
@@ -44,12 +49,15 @@ public class MarcRecord {
   public String setSpec;
   public String leader;
 
-  // Stav 
-  public List<String> stav = new ArrayList<>();
-  public JSONArray historie_stavu = new JSONArray();
+  public List<String> dntstav = new ArrayList<>();
+
   public Date datum_stavu;
   public String license;
   public List<String> licenseHistory;
+
+  @JsonIgnore
+  public JSONArray historie_stavu = new JSONArray();
+
 
   public boolean isDeleted = false;
 
@@ -83,9 +91,14 @@ public class MarcRecord {
   }
   
   public static MarcRecord fromDoc(SolrDocument doc) throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue(RAW_FIELD), MarcRecord.class);
-    mr.stav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
+    String rawJson = (String) doc.getFirstValue(RAW_FIELD);
+
+    MarcRecord mr = fromRAWJSON(rawJson);
+
+//    ObjectMapper objectMapper = new ObjectMapper();
+//    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue(RAW_FIELD), MarcRecord.class);
+
+    mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
     mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
     mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
     mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
@@ -110,9 +123,9 @@ public class MarcRecord {
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
 
     if (doc.containsKey(LEGACY_STAV_FIELD)) {
-      mr.stav =  doc.getFieldValues(LEGACY_STAV_FIELD).stream().map(Object::toString).collect(Collectors.toList());
+      mr.dntstav =  doc.getFieldValues(LEGACY_STAV_FIELD).stream().map(Object::toString).collect(Collectors.toList());
     } else {
-      mr.stav = new ArrayList<>();
+      mr.dntstav = new ArrayList<>();
     }
     if (doc.containsKey(DATUM_STAVU_FIELD)) {
       mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
@@ -137,7 +150,7 @@ public class MarcRecord {
     json.put(SET_SPEC_FIELD, setSpec);
     json.put(LEADER_FIELD, leader);
 
-    json.put(DNTSTAV_FIELD, stav);
+    json.put(DNTSTAV_FIELD, dntstav);
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
 
     json.put("controlFields", controlFields);
@@ -183,7 +196,7 @@ public class MarcRecord {
       // Pridame dnt pole
       xml.append("<marc:datafield tag=\"990\" ind1=\" \" ind2=\" \">");
       
-      for (String sk : stav) {
+      for (String sk : dntstav) {
           xml.append("<marc:subfield code=\"a\" >").append(sk).append("</marc:subfield>");
       }
       xml.append("</marc:datafield>");
@@ -227,8 +240,8 @@ public class MarcRecord {
 
     setFMT(leader.substring(6, 7), leader.substring(7, 8));
 
-    if (stav != null && !stav.isEmpty()) {
-      sdoc.setField(DNTSTAV_FIELD, stav);
+    if (dntstav != null && !dntstav.isEmpty()) {
+      sdoc.setField(DNTSTAV_FIELD, dntstav);
     } else {
       addStavFromMarc();
     }
@@ -336,7 +349,7 @@ public class MarcRecord {
 
   // pouze pro reducki viditelnosti
   public void enhanceState(List<String> newStates, String user) {
-    List<String> statesArray = this.stav != null ? new ArrayList<>(this.stav) : new ArrayList<>();
+    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
     statesArray.addAll(newStates);
     changedState( user, statesArray, newStates.toArray(new String[newStates.size()]));
     // sync solr doc
@@ -344,7 +357,7 @@ public class MarcRecord {
   }
 
   public void enhanceState(String newState, String user) {
-    List<String> statesArray = this.stav != null ? new ArrayList<>(this.stav) : new ArrayList<>();
+    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
     statesArray.add(newState);
     changedState( user, statesArray,newState);
     // sync solr doc
@@ -372,8 +385,8 @@ public class MarcRecord {
    * @param newState Pole pouze novych stavu - zapis do historie
    */
   private void changedState( String user, List<String> statesArray, String ... newState) {
-    changeLicenseIfNeeded(statesArray, stav);
-    stav = statesArray;
+    changeLicenseIfNeeded(statesArray, dntstav);
+    dntstav = statesArray;
     datum_stavu = Calendar.getInstance().getTime();
 
     Arrays.stream(newState).forEach(newStateItem->{
@@ -432,7 +445,7 @@ public class MarcRecord {
             JSONObject h = new JSONObject();
             String stav = df.getSubFields().get("s").get(0).getValue();
             if (df.getSubFields().containsKey("s")) {
-              h.put("stav", stav);
+              h.put("dntstav", stav);
             }
             if (df.getSubFields().containsKey("a")) {
               String ds = df.getSubFields().get("a").get(0).getValue();
@@ -462,13 +475,13 @@ public class MarcRecord {
           sdoc.setField("historie_stavu", hs.toString());
         }
 
-        // String stav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
+        // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
         if (dataFields.containsKey("990")) {
           for (DataField df : dataFields.get("990")) {
             //JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("a")) {
               String stav = df.getSubFields().get("a").get(0).getValue();
-              //h.put("stav", stav);
+              //h.put("dntstav", dntstav);
               sdoc.addField("dntstav", stav);
               if ("NZ".equals(stav)) {
                 sdoc.setField("license", "dnntt");

@@ -9,8 +9,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.servlet.ServletOutputStream;
-
 public class UserTests {
 
     @Test
@@ -23,7 +21,7 @@ public class UserTests {
         user.prijmeni="Testovic";
         user.adresa="Testovaci adresa, 123";
         user.apikey="API-KEY-123456";
-        user.notifikace_interval = NotifikaceInterval.mesic.name();
+        user.notifikace_interval = NotificationInterval.mesic.name();
 
         JSONObject userJSON = user.toJSONObject();
 
@@ -35,7 +33,7 @@ public class UserTests {
         Assert.assertTrue(userJSON.getString("prijmeni").equals("Testovic"));
         Assert.assertTrue(userJSON.getString("adresa").equals("Testovaci adresa, 123"));
         Assert.assertTrue(userJSON.getString("apikey").equals("API-KEY-123456"));
-        Assert.assertTrue(userJSON.getString("notifikace_interval").equals(NotifikaceInterval.mesic.name()));
+        Assert.assertTrue(userJSON.getString("notifikace_interval").equals(NotificationInterval.mesic.name()));
 
         User readFromJSON = User.fromJSON(userJSON.toString());
 
@@ -61,7 +59,6 @@ public class UserTests {
         user.apikey="API-KEY-123456";
 
 
-
         SolrDocument document = new SolrDocument();
         document.setField("role", "admin");
         document.setField("username", "testusername");
@@ -74,7 +71,6 @@ public class UserTests {
 
         DocumentObjectBinder binder = new DocumentObjectBinder();
         SolrInputDocument solrInputFields = binder.toSolrInputDocument(user);
-
 
         User bean = binder.getBean(User.class, document);
         System.out.println(bean);

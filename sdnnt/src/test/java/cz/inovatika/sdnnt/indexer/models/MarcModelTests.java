@@ -1,13 +1,12 @@
 package cz.inovatika.sdnnt.indexer.models;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
@@ -17,13 +16,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
-import java.util.List;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
@@ -86,49 +78,34 @@ public class MarcModelTests {
 
         MarcRecord marcRecord = MarcRecord.fromIndex(mockClient, q);
         Assert.assertNotNull(marcRecord.datum_stavu);
-        Assert.assertNotNull(marcRecord.stav);
-        Assert.assertTrue(marcRecord.stav.size() == 2);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("PA"));
-        Assert.assertTrue(marcRecord.stav.get(1).equals("N"));
+        Assert.assertNotNull(marcRecord.dntstav);
+        Assert.assertTrue(marcRecord.dntstav.size() == 1);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
     }
 
     @Test
     public void readFromSolrDoc2() throws IOException, SolrServerException {
         MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
         Assert.assertNotNull(marcRecord.datum_stavu);
-        Assert.assertNotNull(marcRecord.stav);
-        Assert.assertTrue(marcRecord.stav.size() == 2);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("PA"));
-        Assert.assertTrue(marcRecord.stav.get(1).equals("N"));
+        Assert.assertNotNull(marcRecord.dntstav);
+        Assert.assertTrue(marcRecord.dntstav.size() == 2);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
+        Assert.assertTrue(marcRecord.dntstav.get(1).equals("N"));
     }
 
+    @Test
+    public void testHistorieStavu() throws JsonProcessingException {
+        MarcRecord marcRecord = new MarcRecord();
+        marcRecord.identifier = "oai:aleph-nkp.cz:DNT01-000157317";
+        marcRecord.historie_stavu = new JSONArray();
+        JSONObject object =  marcRecord.toJSON();
+        Assert.assertNotNull(MarcRecord.fromRAWJSON(object.toString()));
+    }
 
     public static SolrDocumentList prepareResultList(String ident) throws IOException {
-        //"oai_aleph-nkp.cz_DNT01-000157317.json"
-        InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream(ident+".json");
-        String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
         SolrDocumentList documentList = new SolrDocumentList();
-        SolrDocument document = new SolrDocument();
-        JSONObject jsonObject = new JSONObject(jsonString);
-        jsonObject.keySet().forEach(key-> {
-            if (key.equals("datum_stavu")) {
-
-                TemporalAccessor datum = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(jsonObject.get(key).toString());
-                document.setField("datum_stavu", Date.from(Instant.from(datum)));
-
-            } else {
-                Object o = jsonObject.get(key);
-                if (o instanceof String) {
-                    document.setField(key, o);
-                } else if (o instanceof JSONArray) {
-                    JSONArray jArr = (JSONArray) o;
-                    document.setField(key, jArr.toList());
-                } else  {
-                    document.setField(key, o);
-                }
-            }
-        });
-        documentList.add(document);
+        documentList.add(MarcModelTestsUtils.prepareResultDocument(ident));
         return documentList;
     }
+
 }

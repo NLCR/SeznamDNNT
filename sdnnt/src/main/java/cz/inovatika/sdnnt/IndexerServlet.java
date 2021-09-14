@@ -22,9 +22,8 @@ import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -428,7 +427,7 @@ public class IndexerServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          User user = UserController.getUser(req);
+          User user = new UserControlerImpl(req).getUser();
           try {
             Indexer indexer = new Indexer();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);

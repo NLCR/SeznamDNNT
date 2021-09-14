@@ -12,23 +12,21 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
-
 public class IndexerReduceStateTest {
 
     @Test
     public void testChangeState_VVS_1() throws IOException, SolrServerException {
         MarcRecord marcRecord = testReduceState("oai:aleph-nkp.cz:DNT01-000057930", "VVS");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("A"));
-        Assert.assertTrue(marcRecord.stav.get(1).equals("NZ"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("A"));
+        Assert.assertTrue(marcRecord.dntstav.get(1).equals("NZ"));
     }
     @Test
     public void testChangeState_VVN_1() throws IOException, SolrServerException {
         MarcRecord marcRecord = testReduceState("oai:aleph-nkp.cz:DNT01-000157317", "VVN");
-        Assert.assertTrue(marcRecord.stav!=null);
-        Assert.assertTrue(marcRecord.stav.get(0).equals("A"));
-        Assert.assertTrue(marcRecord.stav.get(1).equals("NZ"));
+        Assert.assertTrue(marcRecord.dntstav !=null);
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("A"));
+        Assert.assertTrue(marcRecord.dntstav.get(1).equals("NZ"));
     }
 
 

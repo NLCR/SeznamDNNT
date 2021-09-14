@@ -1,8 +1,7 @@
 package cz.inovatika.sdnnt.rights.impl.predicates;
 
-import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.utils.IPAddressUtils;
+import cz.inovatika.sdnnt.services.UserControler;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,10 +28,10 @@ public class MustBeLoggedTest {
             User testingUser = new User();
             testingUser.username = "testinguser";
 
-            EasyMock.expect(session.getAttribute(UserController.AUTHENTICATED_USER)).andReturn(testingUser).anyTimes();
+            EasyMock.expect(session.getAttribute(UserControler.AUTHENTICATED_USER)).andReturn(testingUser).anyTimes();
             EasyMock.expect(request.getSession(true)).andReturn(session).anyTimes();
         } else {
-            EasyMock.expect(session.getAttribute(UserController.AUTHENTICATED_USER)).andReturn(null).anyTimes();
+            EasyMock.expect(session.getAttribute(UserControler.AUTHENTICATED_USER)).andReturn(null).anyTimes();
             EasyMock.expect(request.getSession(true)).andReturn(session).anyTimes();
         }
         EasyMock.expect(request.getSession()).andReturn(session).anyTimes();
