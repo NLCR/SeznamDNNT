@@ -304,6 +304,26 @@ public class AccountServlet extends HttpServlet {
       }
     },
     // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
+    CHANGE_STAV_DIRECT {
+      @Override
+      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+          try {
+            User user = new UserControlerImpl(req).getUser();
+            JSONObject inputJs = ServletsSupport.readInputJSON(req);
+            // todo: transactions (optimistic locking)
+            return Indexer.changeStavDirect(inputJs.getString("identifier"),
+                    inputJs.getString("newStav"), inputJs.getString("poznamka"), user.username);
+          } catch (Exception ex) {
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+      }
+    },
+    // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
     APPROVE_NAVRH {
       @Override
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {

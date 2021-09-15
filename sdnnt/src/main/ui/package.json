@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "start.ui.api": "ng serve --proxy-config proxy.api.conf.json",
+    "start.ui.api.ctx": "ng serve --proxy-config proxy.api.js",
     "build": "ng build",
     "build.prod": "ng build --prod",
     "test": "ng test",

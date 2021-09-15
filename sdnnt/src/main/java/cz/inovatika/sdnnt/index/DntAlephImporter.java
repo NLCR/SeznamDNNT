@@ -201,7 +201,6 @@ public class DntAlephImporter {
         }
 
         idoc.removeField("dntstav");
-        idoc.removeField("dntstav");
         idoc.removeField("indextime");
         idoc.removeField("_version_");
 
@@ -213,7 +212,7 @@ public class DntAlephImporter {
             JSONObject h = new JSONObject();
             String stav = df.getSubFields().get("s").get(0).getValue();
             if (df.getSubFields().containsKey("s")) {
-              h.put("dntstav", stav);
+              h.put("stav", stav);
             }
             if (df.getSubFields().containsKey("a")) {
               String ds = df.getSubFields().get("a").get(0).getValue();

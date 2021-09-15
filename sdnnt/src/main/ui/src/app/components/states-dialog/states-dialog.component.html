@@ -9,19 +9,11 @@
 </mat-form-field>
 <div fxLayout="row" fxLayoutGap="16px" class="app-mb-n16">
   <mat-form-field fxFlex appearance="fill">
-    <mat-label>Input</mat-label>
-    <input matInput>
-  </mat-form-field>
-  <mat-form-field fxFlex appearance="fill">
-    <mat-label>Input</mat-label>
-    <input matInput>
-  </mat-form-field>
-  <mat-form-field fxFlex appearance="fill">
-    <mat-label>Input</mat-label>
-    <input matInput>
+    <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
+    <input matInput [(ngModel)]="poznamka">
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
-  <button mat-button [mat-dialog-close]="newState" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
+  <button mat-button (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
   <button mat-button mat-dialog-close >{{ 'desc.zavrit' | translate }}</button>
 </div>

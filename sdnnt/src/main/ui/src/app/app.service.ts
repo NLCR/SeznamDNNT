@@ -172,6 +172,11 @@ export class AppService {
     return this.post(url, raw);
   }
 
+  changeStavDirect(identifier: string, newStav: string, poznamka: string): Observable<any> {
+    let url = '/account/change_stav_direct';
+    return this.post(url, {identifier, newStav, poznamka});
+  }
+
   saveZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_zadost';
     const params: HttpParams = new HttpParams();

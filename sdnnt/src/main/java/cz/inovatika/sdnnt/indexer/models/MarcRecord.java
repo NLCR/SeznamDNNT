@@ -351,7 +351,7 @@ public class MarcRecord {
   public void enhanceState(List<String> newStates, String user) {
     List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
     statesArray.addAll(newStates);
-    changedState( user, statesArray, newStates.toArray(new String[newStates.size()]));
+    changedState( user, statesArray, null, newStates.toArray(new String[newStates.size()]));
     // sync solr doc
     toSolrDoc();
   }
@@ -359,14 +359,14 @@ public class MarcRecord {
   public void enhanceState(String newState, String user) {
     List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
     statesArray.add(newState);
-    changedState( user, statesArray,newState);
+    changedState( user, statesArray,null,newState);
     // sync solr doc
     toSolrDoc();
   }
 
   public void setStav(List<String> newStates, String user) {
     List<String> statesArray = new ArrayList<>(newStates);
-    changedState( user, statesArray, statesArray.toArray(new String[statesArray.size()]));
+    changedState( user, statesArray, null, statesArray.toArray(new String[statesArray.size()]));
     // sync solr doc
     toSolrDoc();
   }
@@ -374,7 +374,15 @@ public class MarcRecord {
   public void setStav(String newState, String user) {
     List<String> statesArray = new ArrayList<>();
     statesArray.add(newState);
-    changedState( user, statesArray, newState);
+    changedState( user, statesArray, null, newState);
+    // sync solr doc
+    toSolrDoc();
+  }
+
+  public void setStav(String newState, String comment, String user) {
+    List<String> statesArray = new ArrayList<>();
+    statesArray.add(newState);
+    changedState( user, statesArray, comment, newState);
     // sync solr doc
     toSolrDoc();
   }
@@ -382,15 +390,16 @@ public class MarcRecord {
   /**
    * @param user Uzivatel
    * @param statesArray List stavu; muze obsovat kombinaci starsich stavu a novych stavu
+   * @param comment Poznamka pri zmene
    * @param newState Pole pouze novych stavu - zapis do historie
    */
-  private void changedState( String user, List<String> statesArray, String ... newState) {
+  private void changedState( String user, List<String> statesArray, String comment, String ... newState) {
     changeLicenseIfNeeded(statesArray, dntstav);
     dntstav = statesArray;
     datum_stavu = Calendar.getInstance().getTime();
 
     Arrays.stream(newState).forEach(newStateItem->{
-      JSONObject h = new JSONObject().put("stav", newStateItem).put("date", FORMAT.format(datum_stavu)).put("user", user);
+      JSONObject h = new JSONObject().put("stav", newStateItem).put("date", FORMAT.format(datum_stavu)).put("user", user).put("comment", comment);
       historie_stavu.put(h);
     });
   }

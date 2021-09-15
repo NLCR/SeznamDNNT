@@ -14,6 +14,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 export class StatesDialogComponent implements OnInit {
 
   newState: string;
+  poznamka: string;
   public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
 
@@ -28,6 +29,15 @@ export class StatesDialogComponent implements OnInit {
     console.log(this.data);
     this.newState = this.data.dntstav ? this.data.dntstav[0] : 'A';
     // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
+  }
+
+  change() {
+    if (!this.poznamka || this.poznamka === '') {
+      this.service.showSnackBar('poznamka_povinna', 'poznamka_povinna', true);
+      return;
+    } else {
+      this.dialogRef.close({newState: this.newState, poznamka: this.poznamka, change: true});
+    }
   }
 
 }

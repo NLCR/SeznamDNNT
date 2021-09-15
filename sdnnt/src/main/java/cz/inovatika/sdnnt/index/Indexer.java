@@ -434,6 +434,31 @@ public class Indexer {
   }
 
   //
+  public static JSONObject changeStavDirect(String identifier, String newStav, String poznamka, String user ) {
+    JSONObject ret = new JSONObject();
+    try {
+      MarcRecord mr = MarcRecord.fromIndex(identifier);
+      // sync to solr doc
+      mr.toSolrDoc();
+        try {
+          mr.setStav(newStav, poznamka, user);
+          // Update record in catalog
+          getClient().add("catalog", mr.sdoc);
+        } catch (SolrServerException| IOException ex) {
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          ret.put("error", ex);
+        }
+        
+    } catch (SolrServerException | IOException e) {
+      LOGGER.log(Level.SEVERE,e.getMessage(),e);
+      return new JSONObject();
+    } finally {
+      SolrUtils.quietCommit(getClient(),"catalog" );
+    }
+    return ret;
+  }
+
+  //
   public static JSONObject changeStav(String identifier, String navrh, String user ) {
     return changeStav(identifier, navrh, user,getClient());
   }

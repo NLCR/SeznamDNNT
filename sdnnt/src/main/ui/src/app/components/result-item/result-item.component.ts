@@ -158,32 +158,16 @@ export class ResultItemComponent implements OnInit {
 
   public showStates() {
     const dialogRef = this.dialog.open(StatesDialogComponent, {
-      width: '1150px',
+      width: '750px',
       data: this.doc,
       panelClass: 'app-states-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.doc.dntstav = result;
-        const dataField =
-        {
-          "ind2": " ",
-          "ind1": " ",
-          "tag": "990",
-          "subFields": {
-            "a": [
-              {
-                "code": "a",
-                "value": result
-              }
-            ]
-          }
-        }
-
-        this.doc.raw.dataFields['990'] = [dataField];
-        this.service.saveRecord(this.doc.identifier, this.doc.raw).subscribe(res => {
+      if (result && result.change) {
+        this.service.changeStavDirect(this.doc.identifier, result.newState, result.poznamka).subscribe(res => {
           console.log(res);
+        this.doc.dntstav = result;
         });
       }
 
