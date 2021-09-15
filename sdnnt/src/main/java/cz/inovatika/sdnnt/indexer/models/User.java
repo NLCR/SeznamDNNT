@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.beans.Field;
@@ -16,8 +17,8 @@ import org.json.JSONObject;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
-  
-  
+
+
   @Field
   public String username;
   
@@ -80,10 +81,9 @@ public class User {
   
   @Field
   public Date resetPwdExpiration;
-  
+
   @Field
-  public String notifikace_interval;
-  
+  public String notifikace_interval = NotificationInterval.none.name();
 
 
   public JSONObject toJSONObject() {
@@ -101,5 +101,21 @@ public class User {
     User o = objectMapper.readValue(json, User.class);
     return o;
   }
-  
+
+
+
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    User user = (User) o;
+    return Objects.equals(username, user.username) &&
+            Objects.equals(pwd, user.pwd);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(username, pwd);
+  }
 }

@@ -5,6 +5,7 @@ export class User {
   pwd: string;
   role: string;
   isActive: boolean;
+  notifikace_interval:string;
   //isApiEnabled:boolean;
 
   typ: string; //pravnicka/fyzicka osoba

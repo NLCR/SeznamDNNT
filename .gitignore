@@ -2,6 +2,7 @@
 /indexer/target/
 
 /solr/**/data
+**/solr/**/data
 /solr/filestore/
 /solr/userfiles/
 /sdnnt/target/

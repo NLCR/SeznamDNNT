@@ -10,6 +10,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,7 +44,7 @@ public class ConfigServlet extends HttpServlet {
       PrintWriter out = response.getWriter();
       JSONObject js = new JSONObject(Options.getInstance().getClientConf().toString());
       
-      User user = UserController.getUser(request);
+      User user = new UserControlerImpl(request).getUser();
       if (user != null) {
         js.put("user", user.toJSONObject());
       }

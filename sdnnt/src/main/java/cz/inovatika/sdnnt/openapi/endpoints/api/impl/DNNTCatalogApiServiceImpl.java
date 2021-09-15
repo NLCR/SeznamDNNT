@@ -1,11 +1,11 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
-import cz.inovatika.sdnnt.UserController;
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,12 +21,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *  Catalog search service
  */
 public class DNNTCatalogApiServiceImpl extends CatalogApiService {
+
+    public static final Logger LOGGER = Logger.getLogger(DNNTCatalogApiServiceImpl.class.getName());
 
     // Catalogue searcher
     CatalogSearcher catalogSearcher = new CatalogSearcher();
@@ -55,7 +58,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         User user = null;
         String headerString = crc.getHeaderString(DNNTRequestApiServiceImpl.API_KEY_HEADER);
         if (headerString != null) {
-            user = UserController.findUserByApiKey(headerString);
+            try {
+                user = new UserControlerImpl(null).findUserByApiKey(headerString);
+            } catch (UserControlerException e) {
+                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
         }
 
         if (user != null) {
@@ -177,7 +184,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
         if (doc.has("historie_stavu")) {
             new JSONArray(doc.getString("historie_stavu")).forEach(o-> {
-                historieStavu.add(((JSONObject)o).getString("stav"));
+                historieStavu.add(((JSONObject)o).getString("dntstav"));
             });
         }
 

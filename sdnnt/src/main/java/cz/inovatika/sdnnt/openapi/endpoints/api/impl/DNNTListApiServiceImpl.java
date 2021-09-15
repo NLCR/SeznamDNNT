@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput;
@@ -9,7 +8,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfListitem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemResponse;
-import cz.inovatika.sdnnt.utils.License;
+import cz.inovatika.sdnnt.wflow.License;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;

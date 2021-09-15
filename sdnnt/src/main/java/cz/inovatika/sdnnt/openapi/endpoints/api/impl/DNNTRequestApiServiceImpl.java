@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import cz.inovatika.sdnnt.UserController;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
@@ -13,7 +12,9 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
@@ -171,37 +172,41 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     @Override
     public Response requestGet(String status, String internalStatus,String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
-        if (headerString != null) {
-            User user = UserController.findUserByApiKey(headerString);
-            if (user != null) {
-                ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
-                try {
-                    // do it better
-                    JSONObject search = accountService.search(null, status, navrh, user, LIMIT, 0);
-                    JSONObject response = search.getJSONObject("response");
-                    JSONArray docs = response.getJSONArray("docs");
-                    for (int i = 0, ll = docs.length();i<ll;i++) {
+        try {
+            String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
+            if (headerString != null) {
+                User user = new UserControlerImpl(null).findUserByApiKey(headerString);
+                if (user != null) {
+                    ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
+                    try {
+                        // do it better
+                        JSONObject search = accountService.search(null, status, navrh, user, LIMIT, 0);
+                        JSONObject response = search.getJSONObject("response");
+                        JSONArray docs = response.getJSONArray("docs");
+                        for (int i = 0, ll = docs.length();i<ll;i++) {
 
-                        JSONObject jsonObject = docs.getJSONObject(i);
-                        ArrayOfDetails details = details(jsonObject, internalStatus);
-                        if (!details.isEmpty()) {
-                            ObjectMapper objectMapper = getObjectMapper();
-                            SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
-                            savedRequest.setDetails(details);
-                            arrayOfSavedRequest.add(savedRequest);
+                            JSONObject jsonObject = docs.getJSONObject(i);
+                            ArrayOfDetails details = details(jsonObject, internalStatus);
+                            if (!details.isEmpty()) {
+                                ObjectMapper objectMapper = getObjectMapper();
+                                SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                                savedRequest.setDetails(details);
+                                arrayOfSavedRequest.add(savedRequest);
+                            }
                         }
-                    }
-                    return Response.ok().entity(arrayOfSavedRequest).build();
+                        return Response.ok().entity(arrayOfSavedRequest).build();
 
-                } catch (SolrServerException | IOException e) {
-                    LOGGER.log(Level.SEVERE,e.getMessage());
-                    return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+                    } catch (SolrServerException | IOException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage());
+                        return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+                    }
+                } else {
+                    return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
                 }
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
             }
-        } else {
+        } catch (UserControlerException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
         }
     }
@@ -249,7 +254,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
-                User user = UserController.findUserByApiKey(headerString);
+                User user = new UserControlerImpl(null).findUserByApiKey(headerString);
                 if (user != null) {
                     List<Request> batch = body.getBatch();
                     for (Request req : batch) {
@@ -305,7 +310,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 }
             }
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
-        } catch (IOException e) {
+        } catch (IOException | UserControlerException e) {
             return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
         }
     }

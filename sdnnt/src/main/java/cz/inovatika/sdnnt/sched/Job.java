@@ -17,6 +17,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
+import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,7 +126,7 @@ public class Job implements InterruptableJob {
         return json;
       }
     },
-    // Zpracovava navhry VVS a NZN. Controluje lhuty, a meni stav zaznamu
+    // Zpracovava navhry VVS a NZN. Controluje lhuty, a meni dntstav zaznamu
     CHECK_STAV {
       @Override
       JSONObject doPerform(JSONObject jobData) {
@@ -136,16 +146,16 @@ public class Job implements InterruptableJob {
     NOTIFICATIONS {
       @Override
       JSONObject doPerform(JSONObject jobData) {
-        JSONObject ret = new JSONObject();
         try {
-          ret = Indexer.checkNotifications(jobData.getString("interval"));
-          LOGGER.log(Level.INFO, "CHECK_STAV finished");
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex.toString());
+          MailService mailService = new MailServiceImpl();
+          UserControler controler = new UserControlerImpl(/* no reqest */ null);
+          NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
+          notificationsService.processNotifications( NotificationInterval.valueOf(jobData.getString("interval")));
+        } catch (UserControlerException | NotificationsException e) {
+          LOGGER.log(Level.SEVERE, e.getMessage(),e);
         }
 
-        return ret;
+        return new JSONObject();
       }
     };
     abstract JSONObject doPerform(JSONObject jobData);

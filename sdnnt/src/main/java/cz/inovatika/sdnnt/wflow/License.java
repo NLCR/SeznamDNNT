@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.utils;
+package cz.inovatika.sdnnt.wflow;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ public enum License {
     dnntt {
         @Override
         public boolean acceptCurrentStatesSetting(List<String> states) {
-            return states.contains(CatalogItemState.NZ.name());
+            return states.contains(ItemState.NZ.name());
         }
     },
     dnnto {
         @Override
         public boolean acceptCurrentStatesSetting(List<String> states) {
-            return states.contains(CatalogItemState.A.name()) && !states.contains(CatalogItemState.NZ.name());
+            return states.contains(ItemState.A.name()) && !states.contains(ItemState.NZ.name());
         }
     };
 

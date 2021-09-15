@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
@@ -15,14 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.rights.RightsResolver;
-import cz.inovatika.sdnnt.rights.Role;
-import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
-import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -30,7 +29,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.util.NamedList;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
@@ -111,7 +109,7 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          User user = UserController.getUser(req);
+          User user = new UserControlerImpl(req).getUser();
           String q = req.getParameter("q");
           String state = req.getParameter("state");
           String navrh = req.getParameter("navrh");
@@ -197,7 +195,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
-            return service.saveRequest(readInputJSON(req).toString(), UserController.getUser(req));
+            return service.saveRequest(readInputJSON(req).toString(), new UserControlerImpl(req).getUser());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -215,7 +213,7 @@ public class AccountServlet extends HttpServlet {
 
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
-            return Zadost.saveWithFRBR(readInputJSON(req).toString(),UserController.getUser(req).username, req.getParameter("frbr"));
+            return Zadost.saveWithFRBR(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().username, req.getParameter("frbr"));
           } catch (Exception e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }
@@ -231,7 +229,7 @@ public class AccountServlet extends HttpServlet {
 
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            return Zadost.markAsProcessed(readInputJSON(req).toString(), UserController.getUser(req).username);
+            return Zadost.markAsProcessed(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().username);
           } catch (IOException e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }
@@ -248,7 +246,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            User user = UserController.getUser(req);
+            User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // TODO: Transakce
             Indexer.changeStav(inputJs.getString("identifier"),
@@ -263,14 +261,14 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
-    // kurator neschvali VVN. Nemenime stav, zustava PA
+    // kurator neschvali VVN. Nemenime dntstav, zustava PA
     // O nebo N - > (uživatel/korporace) -> NZN -> (kurátor) -> PA -> (běží lhůta, vstoupi do toho uživatel/korporace ) -> VVN -> (kurátor, opačné rozhodnutí) -> PA -> (6 měsíců)-> A
     REJECT_VVN {
       @Override
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            User user = UserController.getUser(req);
+            User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             Indexer.changeStav(inputJs.getString("identifier"),
                     "VVNtoPA", user.username);
@@ -290,7 +288,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            User user = UserController.getUser(request);
+            User user = new UserControlerImpl(request).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(request);
             // todo: transactions (optimistic locking)
             Indexer.reduceVisbilityState(inputJs.getString("identifier"),
@@ -312,7 +310,7 @@ public class AccountServlet extends HttpServlet {
 
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            User user = UserController.getUser(req);
+            User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // todo: transactions (optimistic locking)
             Indexer.changeStav(inputJs.getString("identifier"),
@@ -332,7 +330,7 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
-          User user = UserController.getUser(req);
+          User user = new UserControlerImpl(req).getUser();
           try {
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             return Zadost.reject(inputJs.getString("identifier"), inputJs.getJSONObject("zadost").toString(),
@@ -351,7 +349,7 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
-            User user = UserController.getUser(req);
+            User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.username);
           } catch (Exception ex) {
@@ -384,8 +382,8 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
-            User user = UserController.getUser(req);
-            return Indexer.followRecord(req.getParameter("identifier"),  user.username,  user.notifikace_interval,  "true".equals(req.getParameter("follow")));
+            User user = new UserControlerImpl(req).getUser();
+            return Indexer.followRecord(req.getParameter("identifier"),  user.username,  NotificationInterval.mesic.valueOf(user.notifikace_interval),  "true".equals(req.getParameter("follow")));
           } catch (Exception e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }
