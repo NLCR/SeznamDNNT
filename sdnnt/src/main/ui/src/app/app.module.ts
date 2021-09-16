@@ -47,6 +47,7 @@ import { ImportComponent } from './pages/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { PasswordResetedComponent } from './pages/password-reseted/password-reseted.component';
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
+import { GranularityComponent } from './components/granularity/granularity.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -96,6 +97,7 @@ const providers: any[] =[
     ImportComponent,
     ResetPasswordComponent,
     PasswordResetedComponent,
+    GranularityComponent,
   ],
   imports: [
     BrowserModule,

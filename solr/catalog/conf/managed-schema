@@ -87,6 +87,7 @@
    <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="license_history" type="string" indexed="true" stored="true" multiValued="true" />
+   <field name="granularity" type="string" indexed="true" stored="true" multiValued="true"  />
    
    <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
    

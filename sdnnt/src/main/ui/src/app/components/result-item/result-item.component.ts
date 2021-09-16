@@ -9,6 +9,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
 import { DataDialogComponent } from '../data-dialog/data-dialog.component';
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
+import { GranularityComponent } from '../granularity/granularity.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
 import { PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
@@ -29,6 +30,7 @@ export class ResultItemComponent implements OnInit {
   newState = new FormControl();
   isZarazeno: boolean;
   hasNavhr: boolean;
+  hasGranularity: boolean;
   imgSrc: string;
   processed: { date: Date, state: string, user: string, reason?: string };
   processedTooltip: string;
@@ -46,9 +48,11 @@ export class ResultItemComponent implements OnInit {
 
   ngOnInit(): void {
 
+    if (this.doc.marc_998a) {
     this.alephLink = this.doc.marc_998a[0];
     if (!this.alephLink.startsWith('http')) {
       this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
+    }
     }
     this.newState.setValue(this.doc.dntstav);
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA');
@@ -67,6 +71,7 @@ export class ResultItemComponent implements OnInit {
       }
     }
     this.hasNavhr = !!this.doc.zadost && !this.processed;
+    this.hasGranularity = this.doc.granularity && this.doc.granularity.length > 1;
     this.dkLinks = [];
     const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
     tags.forEach(t => {
@@ -154,6 +159,17 @@ export class ResultItemComponent implements OnInit {
 
   changeStav() {
 
+  }
+
+  public showGranularity() {
+    const data = {title: this.doc.nazev, items: this.doc.granularity};
+    const dialogRef = this.dialog.open(GranularityComponent, {
+      width: '750px',
+      data: data,
+      panelClass: 'app-states-dialog'
+    });
+
+    
   }
 
   public showStates() {

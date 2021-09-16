@@ -500,6 +500,31 @@ public class MarcRecord {
             }
           }
         }
+        
+        // Zpracovani pole 956 => granularity
+        // 956u: link do dk
+        // 9569: stav
+        // 956x: cislo
+        // 956y: rocnik
+        if (dataFields.containsKey("956")) {
+          for (DataField df : dataFields.get("956")) {
+            JSONObject h = new JSONObject();
+            if (df.getSubFields().containsKey("u")) {
+              h.put("link", df.getSubFields().get("u"));
+            }
+            if (df.getSubFields().containsKey("9")) {
+              h.put("stav", df.getSubFields().get("9"));
+            }
+            if (df.getSubFields().containsKey("x")) {
+              h.put("cislo", df.getSubFields().get("x").get(0).getValue());
+            }
+            if (df.getSubFields().containsKey("y")) {
+              h.put("rocnik", df.getSubFields().get("y").get(0).getValue());
+            }
+            sdoc.addField("granularity", h.toString());
+          }
+          
+        }
   }
 
   private void addRokVydani() {
