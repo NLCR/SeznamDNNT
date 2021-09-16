@@ -231,6 +231,9 @@ public class DntAlephImporter {
             if (df.getSubFields().containsKey("b")) {
               h.put("user", df.getSubFields().get("b").get(0).getValue());
             }
+            if (df.getSubFields().containsKey("p")) {
+              h.put("comment", df.getSubFields().get("p").get(0).getValue());
+            }
             if ("NZ".equals(stav)) {
               h.put("license", "dnntt");
             } else if ("A".equals(stav) && !idoc.containsKey("license")) {
