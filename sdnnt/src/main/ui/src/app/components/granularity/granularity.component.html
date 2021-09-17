@@ -1,9 +1,22 @@
 <h1 mat-dialog-title>{{ 'desc.granularity' | translate }}: <span>{{ data.title }}</span></h1>
 <div mat-dialog-content>
-  <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let item of data.items">{{ item.rocnik }} {{ item.cislo }}: 
-      <ng-container *ngFor="let s of  item.stav">{{ s.value }}&#160;</ng-container></mat-list-item>
-  </mat-list>
+  <table>
+    <thead>
+      <th>{{ 'rocnik' | translate }}</th>
+      <th>{{ 'cislo' | translate }}</th>
+      <th>{{ 'link' | translate }}</th>
+      <th>{{ 'stav' | translate }}</th>
+    </thead>
+    <ng-container *ngFor="let item of data.items">
+      <tr *ngIf="item.rocnik" >
+        <td>{{ item.rocnik }}</td>
+        <td>{{ item.cislo }}</td>
+        <td>{{ item.link }}</td>
+        <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>
+        
+      </tr>
+    </ng-container>
+  </table>
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>

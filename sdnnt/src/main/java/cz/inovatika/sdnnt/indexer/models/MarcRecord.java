@@ -503,17 +503,24 @@ public class MarcRecord {
         
         // Zpracovani pole 956 => granularity
         // 956u: link do dk
-        // 9569: stav
+        // 9569: stav 
         // 956x: cislo
         // 956y: rocnik
         if (dataFields.containsKey("956")) {
           for (DataField df : dataFields.get("956")) {
             JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("u")) {
-              h.put("link", df.getSubFields().get("u"));
+              h.put("link", df.getSubFields().get("u").get(0).getValue());
+//              for (SubField sf: df.getSubFields().get("u")) {
+//                h.append("link", sf.value);
+//              }
+              // h.put("link", df.getSubFields().get("u"));
             }
             if (df.getSubFields().containsKey("9")) {
-              h.put("stav", df.getSubFields().get("9"));
+              for (SubField sf: df.getSubFields().get("9")) {
+                h.append("stav", sf.value);
+              }
+              // h.put("stav", df.getSubFields().get("9"));
             }
             if (df.getSubFields().containsKey("x")) {
               h.put("cislo", df.getSubFields().get("x").get(0).getValue());

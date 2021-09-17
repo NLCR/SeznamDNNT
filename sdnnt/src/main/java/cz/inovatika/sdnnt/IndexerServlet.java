@@ -179,8 +179,13 @@ public class IndexerServlet extends HttpServlet {
             if (req.getParameter("core") != null) {
               core = req.getParameter("core");
             }
+            // Vychozi musime merge
+            boolean merge = true;
+            if (req.getParameter("merge") != null) {
+              merge = Boolean.parseBoolean(req.getParameter("merge"));
+            }
             json.put("indexed", oai.update(set, core,
-                    Boolean.parseBoolean(req.getParameter("merge")),
+                    merge,
                     true,
                     Boolean.parseBoolean(req.getParameter("allFields"))));
             return json;
