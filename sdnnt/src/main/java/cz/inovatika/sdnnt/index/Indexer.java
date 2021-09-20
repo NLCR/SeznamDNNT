@@ -113,6 +113,15 @@ public class Indexer {
                     (String) rec.getFieldValue("raw"),
                     doc, hDoc,
                     user, update, ret);
+            
+            // Nechame puvodni hodnoty "DNT" poli
+            cDoc.setField("dntstav", doc.getFieldValue("dntstav"));
+            cDoc.setField("datum_stavu", doc.getFieldValue("datum_stavu"));
+            cDoc.setField("historie_stavu", doc.getFieldValue("historie_stavu"));
+            cDoc.setField("license", doc.getFieldValue("license"));
+            cDoc.setField("license_history", doc.getFieldValue("license_history"));
+            cDoc.setField("granularity", doc.getFieldValue("granularity"));
+            
             if (cDoc != null) {
               hDocs.add(hDoc);
               cDocs.add(cDoc);
@@ -561,13 +570,14 @@ public class Indexer {
             idoc.addField("historie_stavu", doc.getFieldValue("historie_stavu"));
             idoc.addField("license", doc.getFieldValue("license"));
             idoc.addField("license_history", doc.getFieldValue("license_history"));
+            idoc.addField("granularity", doc.getFieldValue("granularity"));
           } else {
-
             idoc.removeField("dntstav");
             idoc.removeField("datum_stavu");
             idoc.removeField("historie_stavu");
             idoc.removeField("license");
             idoc.removeField("license_history");
+            idoc.removeField("granularity");
           }
 
           idocs.add(idoc);

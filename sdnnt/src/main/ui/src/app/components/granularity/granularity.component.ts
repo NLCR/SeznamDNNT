@@ -13,7 +13,6 @@ export class GranularityComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data) { }
 
   ngOnInit(): void {
-    console.log(this.data.items)
   }
 
 }
