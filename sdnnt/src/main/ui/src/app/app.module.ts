@@ -45,9 +45,12 @@ import { ExpressionDialogComponent } from './components/expression-dialog/expres
 import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
-import { PasswordResetedComponent } from './pages/password-reseted/password-reseted.component';
+
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 import { GranularityComponent } from './components/granularity/granularity.component';
+import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
+import { InputLoginNameDialogComponent } from './components/input-login-name-dialog/input-login-name-dialog.component';
+
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -83,6 +86,7 @@ const providers: any[] =[
     LoginDialogComponent,
     DataDialogComponent,
     UserPswDialogComponent,
+    InputLoginNameDialogComponent,
 
     SidenavListComponent,
     FacetsUsedComponent,
@@ -96,8 +100,9 @@ const providers: any[] =[
     ImportsComponent,
     ImportComponent,
     ResetPasswordComponent,
-    PasswordResetedComponent,
+
     GranularityComponent,
+    InputLoginNameComponent,
   ],
   imports: [
     BrowserModule,

@@ -145,6 +145,9 @@
     "check_password_confirmation_are_not_thesame": "Passwords are not the same",
     "check_password_isnotvalid": "The password doesn't meet the criteria",
 
+	"forgotten_password": "Zapomenuté heslo",
+	"send_reset_pwd_token": "Poslat resetovací token",
+
 
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",

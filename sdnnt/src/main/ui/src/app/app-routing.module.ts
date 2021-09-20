@@ -7,7 +7,7 @@ import { HelpComponent } from './pages/help/help.component';
 import { HomeComponent } from './pages/home/home.component';
 import { ImportComponent } from './pages/import/import.component';
 import { ImportsComponent } from './pages/imports/imports.component';
-import { PasswordResetedComponent } from './pages/password-reseted/password-reseted.component';
+import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { SearchComponent } from './pages/search/search.component';
 import { UserResetPasswordComponent } from './pages/user-reset-password/user-reset-password.component';
@@ -22,9 +22,9 @@ const routes: Routes = [
   { path: 'import/:id', component: ImportComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'search', component: SearchComponent},
-  //{ path: 'resetedpwd/:token', component: PasswordResetedComponent},
-  { path: 'pswd/:token', component: ResetPasswordComponent},
+   { path: 'pswd/:token', component: ResetPasswordComponent},
   { path: 'userpswd', component: UserResetPasswordComponent},
+  { path: 'fgtpswd', component: InputLoginNameComponent},
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 

@@ -29,6 +29,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenExcept
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.rights.Role.admin;
@@ -126,10 +127,14 @@ public class UserServlet extends HttpServlet {
     FORGOT_PWD {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        String resetPwdToken = new UserControlerImpl(req, new MailServiceImpl()).forgotPwd(readInputJSON(req));
-        JSONObject object = new JSONObject();
-        object.put("token", resetPwdToken);
-        return object;
+        try {
+          String resetPwdToken = new UserControlerImpl(req, new MailServiceImpl()).forgotPwd(readInputJSON(req));
+          JSONObject object = new JSONObject();
+          object.put("token", resetPwdToken);
+          return object;
+        } catch (UserControlerException e) {
+          return errorJson(e.getMessage());
+        }
       }
     },
 

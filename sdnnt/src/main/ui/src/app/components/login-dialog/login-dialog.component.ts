@@ -53,14 +53,15 @@ export class LoginDialogComponent implements OnInit {
 
   resetPwd() {
     this.dialogRef.close();
+    this.router.navigate(['/fgtpswd'], {});
 
-    this.service.forgotPwd(this.user).subscribe((res:any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.forgot_password_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.forgot_password_success', '', false);
-      }
-    });
+    // this.service.forgotPwd(this.user).subscribe((res:any) => {
+    //   if (res.error) {
+    //     this.service.showSnackBar('alert.forgot_password_error', res.error, true);
+    //   } else {
+    //     this.service.showSnackBar('alert.forgot_password_success', '', false);
+    //   }
+    // });
 
   }
 
