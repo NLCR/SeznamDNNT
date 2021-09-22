@@ -1,6 +1,7 @@
 export class Zadost {
   id: string;
   user: string;
+  institution: string;
   kurator: string;
   datum_zadani: Date;
   state: string;
@@ -17,5 +18,10 @@ export class Zadost {
     this.identifiers = [];
     this.state = 'open';
   }
+
+  // getUserAndInstitution(): string {
+  //   if (this.institution != null) return this.user +" ("+this.institution+")";
+  //   else return this.user;
+  // }
 }
 

@@ -68,7 +68,7 @@
           </div>
         </mat-expansion-panel>
 
-        <mat-expansion-panel [expanded]="true" [hidden]="state.user.role !== 'kurator'" *ngIf="allResultInstitutions.length > 0">
+        <mat-expansion-panel [expanded]="true"  *ngIf="allResultInstitutions.length > 0 && state.user.role === 'kurator'">
           <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
             <mat-panel-title>
               {{ 'desc.institution' | translate }}

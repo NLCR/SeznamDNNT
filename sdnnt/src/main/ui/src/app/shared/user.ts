@@ -21,8 +21,13 @@ export class User {
   kontaktni: string;
   apikey: string;
 
+  institution: string;
+
+
   nositel: string[]; // Nositel autorských práv k dílu: 
   poznamka: string;
   error?: string;
+
+
 }
 
