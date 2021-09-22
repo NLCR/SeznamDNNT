@@ -132,9 +132,14 @@ export class AccountComponent implements OnInit {
 
 
   removeAllFilters() {
+    this.stateFilter = null;
+    this.newStavFilter = null;
+    this.institutionFilter = null; 
+
     const q: any = {};
     q.navrh = null;
     q.state = null;
+    q.institution = null;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
