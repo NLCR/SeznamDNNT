@@ -57,6 +57,9 @@ public class MarcRecord {
 
   @JsonIgnore
   public JSONArray historie_stavu = new JSONArray();
+  
+  @JsonIgnore
+  public JSONArray granularity; 
 
 
   public boolean isDeleted = false;
@@ -102,13 +105,14 @@ public class MarcRecord {
     mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
     mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
     mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
+    mr.granularity = new JSONArray((String) doc.getFieldValue(GRANULARITY_FIELD));
     return mr;
   }
 
   public static MarcRecord fromIndex(String identifier) throws JsonProcessingException, SolrServerException, IOException {
     SolrQuery q = new SolrQuery("*").setRows(1)
             .addFilterQuery(IDENTIFIER_FIELD+":\"" + identifier + "\"")
-            .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD+" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD);
+            .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD+" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+ GRANULARITY_FIELD+":[json]");
     return fromIndex(Indexer.getClient(),q);
   }
 
@@ -140,6 +144,14 @@ public class MarcRecord {
     }
     mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
+    if (doc.containsKey(GRANULARITY_FIELD)) {
+      System.out.println(doc.getFieldValue(GRANULARITY_FIELD).toString());
+      JSONArray ja = new JSONArray( doc.getFieldValue(GRANULARITY_FIELD).toString());
+      System.out.println(ja.toString());
+      mr.granularity =  ja;
+    } else {
+      // mr.granularity = new JSONArray();
+    }
     return mr;
   }
 
@@ -228,7 +240,12 @@ public class MarcRecord {
     sdoc.setField(LICENSE_HISTORY_FIELD, licenseHistory);
 
     sdoc.setField(DATUM_STAVU_FIELD, datum_stavu);
-
+    
+    if (granularity != null) {
+      for (int i = 0; i<granularity.length(); i++)
+      sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
+    }
+    
     // Control fields
     for (String cf : controlFields.keySet()) {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
@@ -387,6 +404,16 @@ public class MarcRecord {
     toSolrDoc();
   }
 
+  public void setGranularity(JSONArray granularity, String comment, String user) {
+    this.granularity = granularity;
+    sdoc.removeField(GRANULARITY_FIELD);
+    if (granularity != null) {
+      for (int i = 0; i<granularity.length(); i++)
+      sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
+    }
+    
+  }
+
   /**
    * @param user Uzivatel
    * @param statesArray List stavu; muze obsovat kombinaci starsich stavu a novych stavu
@@ -507,6 +534,7 @@ public class MarcRecord {
         // 956x: cislo
         // 956y: rocnik
         if (dataFields.containsKey("956")) {
+          
           for (DataField df : dataFields.get("956")) {
             JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("u")) {

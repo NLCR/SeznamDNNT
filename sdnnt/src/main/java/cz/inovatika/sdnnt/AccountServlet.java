@@ -318,8 +318,12 @@ public class AccountServlet extends HttpServlet {
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // todo: transactions (optimistic locking)
             return Indexer.changeStavDirect(inputJs.getString("identifier"),
-                    inputJs.getString("newStav"), inputJs.getString("poznamka"), user.username);
+                    inputJs.getString("newStav"), 
+                    inputJs.getString("poznamka"), 
+                    inputJs.getJSONArray("granularity"), 
+                    user.username);
           } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
         } else {

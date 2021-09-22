@@ -443,7 +443,7 @@ public class Indexer {
   }
 
   //
-  public static JSONObject changeStavDirect(String identifier, String newStav, String poznamka, String user ) {
+  public static JSONObject changeStavDirect(String identifier, String newStav, String poznamka, JSONArray granularity, String user ) {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
@@ -451,6 +451,9 @@ public class Indexer {
       mr.toSolrDoc();
         try {
           mr.setStav(newStav, poznamka, user);
+          if (!granularity.isEmpty()) {
+            mr.setGranularity(granularity, poznamka, user);
+          }
           // Update record in catalog
           getClient().add("catalog", mr.sdoc);
         } catch (SolrServerException| IOException ex) {

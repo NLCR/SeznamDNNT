@@ -17,7 +17,6 @@ export class FooterComponent implements OnInit {
 
   ngOnInit(): void {
     this.service.getGitInfo().subscribe(res => {
-      console.log(res)
       this.gitHash = res["git.commit.id.abbrev"];
     });
 

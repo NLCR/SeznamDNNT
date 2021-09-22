@@ -7,6 +7,7 @@ public class MarcRecordFields {
     public static final String DNTSTAV_FIELD = "dntstav";
     public static final String LICENSE_FIELD = "license";
     public static final String LICENSE_HISTORY_FIELD = "license_history";
+    public static final String GRANULARITY_FIELD = "granularity";
 
     public static final String DATUM_STAVU_FIELD = "datum_stavu";
     public static final String IDENTIFIER_FIELD = "identifier";

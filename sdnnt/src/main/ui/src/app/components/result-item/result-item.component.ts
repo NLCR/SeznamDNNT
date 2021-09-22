@@ -174,16 +174,16 @@ export class ResultItemComponent implements OnInit {
 
   public showStates() {
     const dialogRef = this.dialog.open(StatesDialogComponent, {
-      width: '750px',
+      width: '1150px',
       data: this.doc,
       panelClass: 'app-states-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.change) {
-        this.service.changeStavDirect(this.doc.identifier, result.newState, result.poznamka).subscribe(res => {
+        this.service.changeStavDirect(this.doc.identifier, result.newState, result.poznamka, result.granularity).subscribe(res => {
           console.log(res);
-        this.doc.dntstav = result;
+        this.doc.dntstav = result.newState;
         });
       }
 

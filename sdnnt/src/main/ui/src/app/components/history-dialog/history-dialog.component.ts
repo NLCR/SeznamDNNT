@@ -23,7 +23,6 @@ export class HistoryDialogComponent implements OnInit {
   ngOnInit(): void {
     this.stavy = this.data.historie_stavu;
     this.stavy.map(h => {
-      console.log(h.date);
       const d: string = h.date;
       const y = parseInt(d.substr(0,4)),
         m = parseInt(d.substr(4,2)) - 1,

@@ -16,8 +16,13 @@ export class StatesDialogComponent implements OnInit {
   newState: string;
   poznamka: string;
   public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  granularity: any[] = [];
 
-
+  rocnik: string;
+  cislo: string;
+  link: string;
+  stav: string[];
+  
   constructor(
     public dialogRef: MatDialogRef<StatesDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
@@ -28,6 +33,7 @@ export class StatesDialogComponent implements OnInit {
   ngOnInit(): void {
     console.log(this.data);
     this.newState = this.data.dntstav ? this.data.dntstav[0] : 'A';
+    this.granularity = this.data.granularity ? this.data.granularity : [];
     // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
   }
 
@@ -36,8 +42,21 @@ export class StatesDialogComponent implements OnInit {
       this.service.showSnackBar('poznamka_povinna', 'poznamka_povinna', true);
       return;
     } else {
-      this.dialogRef.close({newState: this.newState, poznamka: this.poznamka, change: true});
+      this.dialogRef.close({newState: this.newState, poznamka: this.poznamka, granularity: this.granularity, change: true});
     }
+  }
+
+  addGranularitu() {
+    this.granularity.push({rocnik: this.rocnik, cislo: this.cislo, link: this.link, stav: this.stav});
+    this.rocnik = '';
+    this.cislo = '';
+    this.link = '';
+    this.stav = [];
+  
+  }
+
+  removeGranularitu(idx: number) {
+    this.granularity.splice(idx, 1);
   }
 
 }

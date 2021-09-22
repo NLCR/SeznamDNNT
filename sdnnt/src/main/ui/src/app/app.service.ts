@@ -172,9 +172,10 @@ export class AppService {
     return this.post(url, raw);
   }
 
-  changeStavDirect(identifier: string, newStav: string, poznamka: string): Observable<any> {
+  changeStavDirect(identifier: string, newStav: string, poznamka: string, granularity: any[]): Observable<any> {
+    console.log(granularity);
     let url = '/account/change_stav_direct';
-    return this.post(url, {identifier, newStav, poznamka});
+    return this.post(url, {identifier, newStav, poznamka, granularity});
   }
 
   saveZadost(zadost: Zadost): Observable<any> {
