@@ -11,7 +11,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class HistoryDialogComponent implements OnInit {
 
-  displayedColumns = ['indextime','user','from','to','poznamka']
+  displayedColumns = ['date','user', 'stav', 'license', 'comment']; //,'from','to','poznamka']
   history: HistoryItem[] = [];
   stavy: HistoryItem[] = [];
 
@@ -21,12 +21,22 @@ export class HistoryDialogComponent implements OnInit {
     private service: AppService) { }
 
   ngOnInit(): void {
-    this.service.getHistory(this.data.identifier).subscribe(res => {
-      this.history = res.response.docs;
-      this.stavy = this.history.filter(item => {
-        return item.changes.backward_patch.findIndex(p => p.path.indexOf('historie_stavu') > 0) > -1;
-      });
+    this.stavy = this.data.historie_stavu;
+    this.stavy.map(h => {
+      console.log(h.date);
+      const d: string = h.date;
+      const y = parseInt(d.substr(0,4)),
+        m = parseInt(d.substr(4,2)) - 1,
+        day = parseInt(d.substr(6,2));
+      h.date = new Date(y,m,day);
     });
+    console.log(this.stavy);
+    // this.service.getHistory(this.data.identifier).subscribe(res => {
+    //   this.history = res.response.docs;
+    //   this.stavy = this.history.filter(item => {
+    //     return item.changes.backward_patch.findIndex(p => p.path.indexOf('historie_stavu') > 0) > -1;
+    //   });
+    // });
   }
 
 }

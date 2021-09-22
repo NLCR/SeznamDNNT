@@ -289,7 +289,7 @@ public class CatalogSearcher {
             .setParam("stats", true)
             .setParam("stats.field","rokvydani")
             .setParam("q.op", "AND")
-            .setFields("*,raw:[json],granularity:[json]");
+            .setFields("*,raw:[json],granularity:[json],historie_stavu:[json]");
     
 
     if (req.containsKey("q")) {
