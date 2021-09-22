@@ -46,7 +46,6 @@ public class AccountServlet extends HttpServlet {
 
   public static final Logger LOGGER = Logger.getLogger(AccountServlet.class.getName());
 
-  private AccountService service;
 
 
   /**
@@ -69,7 +68,7 @@ public class AccountServlet extends HttpServlet {
       String actionNameParam = request.getPathInfo().substring(1);
       if (actionNameParam != null) {
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform(this.service, request, response);
+        JSONObject json = actionToDo.doPerform( request, response);
         out.println(json.toString(2));
       } else {
         out.print("actionNameParam -> " + actionNameParam);
@@ -94,30 +93,32 @@ public class AccountServlet extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.service = new AccountServiceImpl();
   }
 
   @Override
   public void init() throws ServletException {
     super.init();
-    this.service = new AccountServiceImpl();
   }
 
   enum Actions {
     // vyhledava zadosti
     SEARCH {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
+
+
           User user = new UserControlerImpl(req).getUser();
           String q = req.getParameter("q");
           String state = req.getParameter("state");
           String navrh = req.getParameter("navrh");
+          String institution = req.getParameter("institution");
           String page = req.getParameter("page");
           String rows = req.getParameter("rows");
 
           try {
-            return service.search(q, state, navrh, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
+            AccountService service = new AccountServiceImpl(new UserControlerImpl(req));
+            return service.search(q, state, navrh, institution, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -130,7 +131,7 @@ public class AccountServlet extends HttpServlet {
     // ziskani konkretni zadosti, vypisou se zaznamy
     GET_ZADOST {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         Options opts = Options.getInstance();
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
@@ -141,6 +142,7 @@ public class AccountServlet extends HttpServlet {
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
             NamedList<Object> qresp = solr.request(qreq, "zadost");
+
             return new JSONObject((String) qresp.get("response"));
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -154,7 +156,7 @@ public class AccountServlet extends HttpServlet {
     // dotazovani do druheho indexu
     GET_ZADOST_RECORDS {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           Options opts = Options.getInstance();
@@ -192,9 +194,11 @@ public class AccountServlet extends HttpServlet {
     // ulozeni zadosti
     SAVE_ZADOST {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
+            UserControlerImpl userControler = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(userControler);
             return service.saveRequest(readInputJSON(req).toString(), new UserControlerImpl(req).getUser());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -209,7 +213,7 @@ public class AccountServlet extends HttpServlet {
     // dilo -> vyjadreni -> provedeni
     ADD_FRBR_TO_ZADOST {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
@@ -225,7 +229,7 @@ public class AccountServlet extends HttpServlet {
     // odznaci zadost jako zprocesovanou
     PROCESS_ZADOST {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
@@ -243,7 +247,7 @@ public class AccountServlet extends HttpServlet {
     // O nebo N - > (uživatel/korporace) -> NZN -> (kurátor) -> PA -> (běží lhůta, vstoupi do toho uživatel/korporace ) -> VVN -> (kurátor) -> N
     APPROVE_VVN {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
@@ -265,7 +269,7 @@ public class AccountServlet extends HttpServlet {
     // O nebo N - > (uživatel/korporace) -> NZN -> (kurátor) -> PA -> (běží lhůta, vstoupi do toho uživatel/korporace ) -> VVN -> (kurátor, opačné rozhodnutí) -> PA -> (6 měsíců)-> A
     REJECT_VVN {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
@@ -285,7 +289,7 @@ public class AccountServlet extends HttpServlet {
 
     APPROVE_NAVRH_LIB{
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(request).getUser();
@@ -306,7 +310,7 @@ public class AccountServlet extends HttpServlet {
     // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
     CHANGE_STAV_DIRECT {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
@@ -326,7 +330,7 @@ public class AccountServlet extends HttpServlet {
     // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
     APPROVE_NAVRH {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
 
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
@@ -348,7 +352,7 @@ public class AccountServlet extends HttpServlet {
     // odmitnout navrh - pouze kurator - ne do api
     REJECT_NAVRH {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           User user = new UserControlerImpl(req).getUser();
           try {
@@ -366,7 +370,7 @@ public class AccountServlet extends HttpServlet {
     },
     APPROVE_NAVRH_IN_IMPORT {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
@@ -383,7 +387,7 @@ public class AccountServlet extends HttpServlet {
     },
     ADD_ID {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin, user)).permit()) {
           try {
             // TODO: What is it ??
@@ -399,7 +403,7 @@ public class AccountServlet extends HttpServlet {
     },
     FOLLOW_RECORD {
       @Override
-      JSONObject doPerform(AccountService service, HttpServletRequest req, HttpServletResponse response) throws Exception {
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
@@ -413,7 +417,7 @@ public class AccountServlet extends HttpServlet {
       }
     };
 
-    abstract JSONObject doPerform(AccountService service, HttpServletRequest request, HttpServletResponse response) throws Exception;
+    abstract JSONObject doPerform( HttpServletRequest request, HttpServletResponse response) throws Exception;
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

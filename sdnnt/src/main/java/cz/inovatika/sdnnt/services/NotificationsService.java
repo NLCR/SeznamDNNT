@@ -15,7 +15,6 @@ public interface NotificationsService {
     public List<Notification> findNotificationsByUser(String username) throws NotificationsException;
     public List<Notification> findNotificationsByInterval(NotificationInterval interval) throws NotificationsException;
 
-
     public void processNotifications(NotificationInterval interval) throws UserControlerException, NotificationsException;
 
 }

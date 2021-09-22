@@ -8,6 +8,7 @@ import java.io.IOException;
 
 public interface AccountService {
 
-    public JSONObject search(String q, String state, String navrh, User user,int rows, int page) throws SolrServerException, IOException;
+    public JSONObject search(String q, String state, String navrh, String institution, User user,int rows, int page) throws SolrServerException, IOException;
     public JSONObject saveRequest(String payload, User user) throws SolrServerException, IOException;
+
 }

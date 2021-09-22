@@ -73,7 +73,7 @@ public class UserTests {
         SolrInputDocument solrInputFields = binder.toSolrInputDocument(user);
 
         User bean = binder.getBean(User.class, document);
-        System.out.println(bean);
+
     }
 
 }

@@ -88,6 +88,7 @@ public class UserServlet extends HttpServlet {
   }
 
   enum Actions {
+
     LOGIN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -112,6 +113,7 @@ public class UserServlet extends HttpServlet {
         }
       }
     },
+
     LOGOUT {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -123,6 +125,9 @@ public class UserServlet extends HttpServlet {
         }
       }
     },
+
+
+
     // posle link uzivateli ze si ma vygenerovat heslo
     FORGOT_PWD {
       @Override
@@ -137,7 +142,6 @@ public class UserServlet extends HttpServlet {
         }
       }
     },
-
     CHANGE_PWD_USER {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -245,6 +249,16 @@ public class UserServlet extends HttpServlet {
         } else {
           return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
+      }
+    },
+
+    INSTITUTIONS {
+      @Override
+      JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        JSONArray institutions = Options.getInstance().getJSONArray("institutions");
+        JSONObject retVal = new JSONObject();
+        retVal.put("institutions", institutions != null ? institutions : new JSONArray());
+        return retVal;
       }
     };
 

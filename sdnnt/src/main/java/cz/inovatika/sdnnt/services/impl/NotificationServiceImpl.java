@@ -116,55 +116,57 @@ public class NotificationServiceImpl implements NotificationsService  {
     public void processNotifications(NotificationInterval interval) throws NotificationsException, UserControlerException {
         try (SolrClient client = buildClient()){
             List<User> users = userControler.findUsersByNotificationInterval(interval.name());
+            users.stream().forEach(user-> {
+                String fqCatalog;
+                String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:"+user.username;
+                switch(interval) {
+                    case den:
+                        fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
+                        break;
+                    case tyden:
+                        fqCatalog = "datum_stavu:[NOW/DAY-7DAYS TO NOW]";
+                        break;
+                    default:
+                        fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO NOW]";
+                }
+                try {
+                    final List<Map<String,String>> documents = new ArrayList<>();
+                    SolrQuery q = new SolrQuery("*").setRows(1000)
+                            .setSort("identifier", SolrQuery.ORDER.desc)
+                            .addFilterQuery(fqCatalog)
+                            .addFilterQuery(fqJoin)
+                            .setFields("identifier,datum_stavu,nazev,dntstav");
+                    iteration(client,"catalog",  CursorMarkParams.CURSOR_MARK_START, q, (doc) ->{
 
-            String fqCatalog;
-            String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} periodicity:"+interval.name();
-            switch(interval) {
-                case den:
-                    fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
-                    break;
-                case tyden:
-                    fqCatalog = "datum_stavu:[NOW/DAY-7DAYS TO NOW]";
-                    break;
-                default:
-                    fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO NOW]";
-            }
-            try {
-                final List<Map<String,String>> documents = new ArrayList<>();
-                //String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-                SolrQuery q = new SolrQuery("*").setRows(1000)
-                        .setSort("identifier", SolrQuery.ORDER.desc)
-                        .addFilterQuery(fqCatalog)
-                        .addFilterQuery(fqJoin)
-                        .setFields("identifier,datum_stavu,nazev,dntstav");
-                iteration(client,"catalog",  CursorMarkParams.CURSOR_MARK_START, q, (doc) ->{
+                        Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                        Map<String,String> map = new HashMap<>();
+                        map.put("nazev", (String) doc.getFirstValue("nazev"));
+                        map.put("dntstav", dntstav.size() == 1 ? (String)new ArrayList<>(dntstav).get(0): dntstav.toString());
+                        map.put("identifier", doc.getFieldValue("identifier").toString());
+                        documents.add(map);
 
-                    Collection<Object> dntstav = doc.getFieldValues("dntstav");
-                    Map<String,String> map = new HashMap<>();
-                    map.put("nazev", (String) doc.getFirstValue("nazev"));
-                    map.put("dntstav", dntstav.size() == 1 ? (String)new ArrayList<>(dntstav).get(0): dntstav.toString());
-                    map.put("identifier", doc.getFieldValue("identifier").toString());
-                    documents.add(map);
+                        return doc;
+                    });
+                    LOGGER.log(Level.INFO, "checkNotifications finished");
 
-                    return doc;
-                });
-                LOGGER.log(Level.INFO, "checkNotifications finished");
-
-                users.stream().filter(user -> {return user.email != null;}).forEach(user-> {
-                    LOGGER.info(String.format("Processing notification '%s', for user '%s' with email '%s'. Number of documents %d", interval.name(), user.jmeno+" "+user.prijmeni, user.email, documents.size()));
-                    Pair<String, String> pair = Pair.of(user.email, user.jmeno + " " + user.prijmeni);
-                    try {
-                        mailService.sendNotificationEmail(pair, documents);
-                    } catch (IOException | EmailException e) {
-                        LOGGER.log(Level.WARNING, String.format("Problem with sending email to %s due %s", e.getMessage(), user.email));
-                        LOGGER.throwing(this.getClass().getName(), "processNotifications",e);
+                    if (!documents.isEmpty()) {
+                        LOGGER.info(String.format("Processing notification '%s', for user '%s' with email '%s'. Number of documents %d", interval.name(), user.jmeno+" "+user.prijmeni, user.email, documents.size()));
+                        Pair<String, String> pair = Pair.of(user.email, user.jmeno + " " + user.prijmeni);
+                        try {
+                            mailService.sendNotificationEmail(pair, documents);
+                        } catch (IOException | EmailException e) {
+                            LOGGER.log(Level.WARNING, String.format("Problem with sending email to %s due %s", e.getMessage(), user.email));
+                            LOGGER.throwing(this.getClass().getName(), "processNotifications",e);
+                        }
+                    } else {
+                        LOGGER.info(String.format("No changed documents for user  %s and interval %s", user ,interval));
                     }
+                } catch (SolrServerException | IOException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                    //throw new NotificationsException(ex);
+                }
 
-                });
-            } catch (SolrServerException | IOException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new NotificationsException(ex);
-            }
+            });
         } catch (IOException e) {
             throw new NotificationsException(e);
         }

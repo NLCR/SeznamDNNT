@@ -281,6 +281,11 @@ export class AppService {
     return this.get(url);
   }
 
+  getInstitutions(): Observable<any> {
+    let url = 'user/institutions';
+    return this.get(url);
+  }
+
   registerUser(user: User): Observable<User> {
     let url = '/user/register';
     return this.post(url, user);

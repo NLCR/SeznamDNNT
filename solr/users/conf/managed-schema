@@ -77,6 +77,7 @@
     
     <field name="resetPwdToken" type="string" indexed="true" stored="true"  />
     <field name="resetPwdExpiration" type="date" indexed="true" stored="true" multiValued="false"  />
+    <field name="institution" type="string" indexed="true" stored="true" multiValued="false"  />
     
     
     <!-- uncomment the following to ignore any fields that don't already match an existing 

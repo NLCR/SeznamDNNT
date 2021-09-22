@@ -128,6 +128,14 @@
   },
 
   "desc": {
+    "institution": "Instituce",
+
+    "notifikace_interval": "Interval notifikace",
+    "none": "Nenastaveno",
+    "day": "Den",
+    "week": "Tyden",
+    "month": "Mesic",
+
 
     "change": "Změna",
     "change_password": "Změna hesla",
@@ -143,8 +151,8 @@
     "check_password_confirmation_are_not_thesame": "Hesla se neshodují",
     "check_password_isnotvalid": "Heslo musí splňovat kritéria",
 
-	"forgotten_password": "Zapomenuté heslo",
-	"send_reset_pwd_token": "Poslat resetovací token",
+    "forgotten_password": "Zapomenuté heslo",
+    "send_reset_pwd_token": "Poslat resetovací token",
 
 
     "zmena_stavu": "Změna stavu",

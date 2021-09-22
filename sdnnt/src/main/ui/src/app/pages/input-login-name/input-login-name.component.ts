@@ -27,6 +27,10 @@ export class InputLoginNameComponent implements OnInit {
       panelClass: 'app-data-dialog'
     });
 
+    dialogRef.afterClosed().subscribe(result => {
+      this.router.navigate(['/home'], {});
+    });
+
    }
 
 

@@ -39,6 +39,9 @@ export class AccountComponent implements OnInit {
 
   stateFilter: string;
   newStavFilter: string;
+  institutionFilter:string;
+
+  allResultInstitutions:string[] = [];
 
 
   constructor(
@@ -75,6 +78,11 @@ export class AccountComponent implements OnInit {
         this.zadosti = resp.response.docs;
         this.numFound = resp.response.numFound;
         this.loading = false;
+
+        this.allResultInstitutions = resp.facet_counts.facet_fields.institution.map( function(val, index){
+            return val.name;
+        });
+
       }
     });
 
@@ -106,6 +114,22 @@ export class AccountComponent implements OnInit {
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
+
+  setInstitution(institution: string) {
+    const q: any = {};
+    q.institution = institution;
+    if (this.institutionFilter === institution) {
+      q.institution = null;
+      this.institutionFilter = null;
+    } else {
+      this.institutionFilter  = institution;
+      q.institution = institution;
+    }
+    //this.allResultInstitutions = this.allResultInstitutions.filter(obj => obj !== institution);
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
 
   removeAllFilters() {
     const q: any = {};

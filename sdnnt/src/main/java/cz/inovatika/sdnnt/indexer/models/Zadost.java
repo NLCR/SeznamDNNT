@@ -41,10 +41,7 @@ public class Zadost {
   
   @Field
   public String typ;
-  
-  @Field
-  public String user;
-  
+
   @Field
   public String state;
   
@@ -71,7 +68,13 @@ public class Zadost {
   
   @Field
   public Map<String, ZadostProcess> process;
-  
+
+  @Field
+  public String user;
+
+  @Field
+  public String institution;
+
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     Zadost o = objectMapper.readValue(json, Zadost.class); 
@@ -95,6 +98,7 @@ public class Zadost {
   
   public static JSONObject save(String js, String username) {
     try {
+
       Zadost zadost = Zadost.fromJSON(js);
       zadost.user = username;
       return save(zadost);

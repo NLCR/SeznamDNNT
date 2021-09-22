@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class ZadostTest {
 
@@ -38,4 +39,5 @@ public class ZadostTest {
         Assert.assertTrue(object.has("user"));
         Assert.assertTrue(object.getString("user").equals("pokusny"));
     }
+
 }

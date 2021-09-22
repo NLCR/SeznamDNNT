@@ -22,6 +22,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -266,7 +267,13 @@ public class UserControlerImpl implements UserControler {
 
     @Override
     public User userSave(User user) throws UserControlerException, NotAuthorizedException {
-        User found = findUser(user.username);
+        User found = null;
+        try (SolrClient client = buildClient()) {
+            found = findOneUser(client, "username:\"" + user.username + "\"");
+        } catch (IOException | SolrServerException ex) {
+            throw new UserControlerException(ex.getMessage());
+        }
+
         if (found != null) {
             user.pwd=found.pwd;
             return toTOObject(save(user));
@@ -322,6 +329,7 @@ public class UserControlerImpl implements UserControler {
             toObject.adresa = user.adresa;
             toObject.notifikace_interval = user.notifikace_interval;
             toObject.role = user.role;
+            toObject.institution = user.institution;
             return toObject;
         } else {
             return null;

@@ -23,7 +23,6 @@ public interface UserControler {
     public User logout() throws UserControlerException;
 
     public User getUser();
-
     public List<User> getAll() throws UserControlerException;
 
     public User findUserByApiKey(String apikey) throws UserControlerException;
@@ -41,7 +40,6 @@ public interface UserControler {
     public User changePwdToken( String token, String pwd ) throws UserControlerInvalidPwdTokenException, UserControlerException, UserControlerExpiredTokenException;
 
     public User userSave(User user) throws UserControlerException, NotAuthorizedException;
-
 
     public List<Zadost> getZadost(String username) throws UserControlerException;
 }

@@ -32,7 +32,7 @@ public class User {
   public String state;
   
   @Field
-  public boolean isActive;
+  public boolean isActive = true;
 
   @Field
   public String typ;
@@ -81,6 +81,9 @@ public class User {
   
   @Field
   public Date resetPwdExpiration;
+
+  @Field
+  public String institution;
 
   @Field
   public String notifikace_interval = NotificationInterval.none.name();

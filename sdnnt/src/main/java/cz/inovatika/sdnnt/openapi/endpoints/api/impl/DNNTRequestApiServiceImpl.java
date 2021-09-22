@@ -146,10 +146,10 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
     // account service
-    AccountService accountService = new AccountServiceImpl();
+    //AccountService accountService = new AccountServiceImpl();
 
     // Catalogue searcher
-    CatalogSearcher catalogSearcher = new CatalogSearcher();
+    //CatalogSearcher catalogSearcher = new CatalogSearcher();
 
 
     @Override
@@ -179,8 +179,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 if (user != null) {
                     ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
                     try {
-                        // do it better
-                        JSONObject search = accountService.search(null, status, navrh, user, LIMIT, 0);
+                        AccountService accountService = new AccountServiceImpl();
+                        JSONObject search = accountService.search(null, status, navrh, null, user, LIMIT, 0);
                         JSONObject response = search.getJSONObject("response");
                         JSONArray docs = response.getJSONArray("docs");
                         for (int i = 0, ll = docs.length();i<ll;i++) {
@@ -254,6 +254,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
+                AccountService accountService = new AccountServiceImpl();
                 User user = new UserControlerImpl(null).findUserByApiKey(headerString);
                 if (user != null) {
                     List<Request> batch = body.getBatch();
@@ -318,7 +319,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     private void verifyIdentifiers(DocumentState navrh, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException {
         List<String> predecessor = navrh.allowingPredecessor().stream().map(DocumentState::name).collect(Collectors.toList());
 
-        List<Pair<String, List<String>>>  identFromCatalog = catalogSearcher.existingCatalogIdentifiersAndStates(identifiers);
+        List<Pair<String, List<String>>>  identFromCatalog = new CatalogSearcher().existingCatalogIdentifiersAndStates(identifiers);
         // neexistuji nebo nebo nemaji pole pro stavy ??
         List<String> nonExistentIdentifiers = new ArrayList<>(identifiers);
         // identifikatory se spatnymi stavy

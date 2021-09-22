@@ -2,7 +2,7 @@
   <div fxLayout="row" fxLayoutGap="32px">
     <div fxFlex="350px" class="app-left app-fx-facets">
       <div class="app-facets-used">
-        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length">
+        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length">
           <h3 matSubheader fxLayout="row">
             <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
             <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
@@ -21,6 +21,15 @@
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStav(filter.id)"><mat-icon>clear</mat-icon></a>
                 <div>
                   <span>{{ 'desc.typ_navrhu' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
+                </div>
+              </mat-list-item>
+            </ng-container>  
+
+            <ng-container *ngIf="institutionFilter">
+              <mat-list-item>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setInstitution(institutionFilter)"><mat-icon>clear</mat-icon></a>
+                <div>
+                  <span>{{ 'desc.institution' | translate }}:</span> {{institutionFilter }}
                 </div>
               </mat-list-item>
             </ng-container>  
@@ -58,6 +67,19 @@
             <a (click)="setStav('VVS')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
           </div>
         </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true" [hidden]="state.user.role !== 'kurator'" *ngIf="allResultInstitutions.length > 0">
+          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+            <mat-panel-title>
+              {{ 'desc.institution' | translate }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div *ngFor="let inst of allResultInstitutions">
+            <a (click)="setInstitution(inst)">{{ inst }}</a>
+          </div>
+        </mat-expansion-panel>
+
       </mat-accordion>
     </div>
 
@@ -78,8 +100,10 @@
           </ng-container>
           <ng-container matColumnDef="user">
             <th mat-header-cell *matHeaderCellDef [hidden]="state.user.role !== 'kurator'">{{ 'desc.uzivatel' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [hidden]="state.user.role !== 'kurator'">{{ element.user }}</td>
+            <td mat-cell *matCellDef="let element" [hidden]="state.user.role !== 'kurator'">{{ element.institution ?   element.user +' '+element.institution  : element.user  }} </td>
           </ng-container>
+
+
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
             <td mat-cell *matCellDef="let element" class="app-pr-2">

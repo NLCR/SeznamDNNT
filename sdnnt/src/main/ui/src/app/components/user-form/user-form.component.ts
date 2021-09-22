@@ -31,6 +31,9 @@ export class UserFormComponent implements OnInit, OnChanges {
   dedic: boolean;
   jiny: boolean;
   nakladatel: boolean;
+  institutions: string[];
+
+
   //notifikace_interval: string = 'mesic';
 
   constructor(
@@ -59,6 +62,13 @@ export class UserFormComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+
+      this.service.getInstitutions().subscribe(res => {
+        this.institutions = res.institutions.map(function(val,index) {
+          return val.acronym;
+        });
+      });
+  
   }
 
   setNositel() {

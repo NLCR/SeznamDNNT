@@ -253,10 +253,6 @@ public class UserControlerImplTest {
     }
 
 
-
-
-
-
     private void registerUsers() throws IOException, EmailException, UserControlerException {
         {
 
@@ -309,6 +305,7 @@ public class UserControlerImplTest {
         testUser.prijmeni="TestPrijmeni_"+postfix;
         testUser.role = Role.user.name();
         testUser.email = "test_"+postfix+"@testovic.cz";
+        testUser.institution = "institution";
         return testUser;
     }
 
