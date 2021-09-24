@@ -1,73 +1,67 @@
 <h1 mat-dialog-title>{{ 'desc.zmena_stavu_pro' | translate }}: <span>{{ data.title }}</span></h1>
-
-<mat-form-field appearance="outline" class="app-w-100">
-  <mat-label>{{ 'desc.stav' | translate }}</mat-label>
-  <mat-select name="newState" [(ngModel)]="newState">
-    <mat-option *ngFor="let stav of dntStates" [value]="stav">
-      {{ stav }} - {{ 'state.tooltip.' + stav | translate }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
-
-<table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4">
-  <thead>
-    <tr>
-      <th>{{ 'desc.rocnik' | translate }}</th>
-      <th>{{ 'desc.cislo' | translate }}</th>
-      <th>{{ 'desc.odkaz' | translate }}</th>
-      <th class="app-col-stav">{{ 'desc.stav' | translate }}</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <ng-container *ngFor="let item of granularity; let idx = index">
-      <tr *ngIf="item.rocnik" >
-        <td>{{ item.rocnik }}</td>
-        <td>{{ item.cislo }}</td>
-        <td>{{ item.link }}</td>
-        <td class="app-col-stav">
-          <mat-select name="newState" [(ngModel)]="item.stav" multiple>
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="app-w-100">
+    <mat-label>{{ 'desc.stav' | translate }}</mat-label>
+    <mat-select name="newState" [(ngModel)]="newState">
+      <mat-option *ngFor="let stav of dntStates" [value]="stav">
+        {{ stav }} - {{ 'state.tooltip.' + stav | translate }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  
+  <table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4">
+    <thead>
+      <tr>
+        <th>{{ 'desc.rocnik' | translate }}</th>
+        <th>{{ 'desc.cislo' | translate }}</th>
+        <th>{{ 'desc.odkaz' | translate }}</th>
+        <th class="app-col-stav">{{ 'desc.stav' | translate }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let item of granularity; let idx = index">
+        <tr *ngIf="item.rocnik" >
+          <td>{{ item.rocnik }}</td>
+          <td>{{ item.cislo }}</td>
+          <td>{{ item.link }}</td>
+          <td class="app-col-stav">
+            <mat-select name="newState" [(ngModel)]="item.stav" multiple>
+              <mat-option *ngFor="let stav of dntStates" [value]="stav">
+                {{ stav }}
+              </mat-option>
+            </mat-select>
+          </td>
+          <td class="app-col-action app-col-remove">
+            <mat-icon class="app-mr-1">clear</mat-icon>
+            <a (click)="removeGranularitu(idx)">{{ 'desc.odebrat_granularitu' | translate }}</a>
+          </td>
+        </tr>
+      </ng-container>
+      <tr>
+        <td><input name="rocnik" [(ngModel)]="rocnik" size="4" class="app-input" /></td>
+        <td><input name="cislo" [(ngModel)]="cislo" size="4" class="app-input" /></td>
+        <td><input name="link" [(ngModel)]="link" class="app-input" /></td>
+        <td>
+          <mat-select name="newState" [(ngModel)]="stav" multiple>
             <mat-option *ngFor="let stav of dntStates" [value]="stav">
               {{ stav }}
             </mat-option>
           </mat-select>
         </td>
-        <td class="app-col-action app-col-remove">
-          <mat-icon class="app-mr-1">clear</mat-icon>
-          <a (click)="removeGranularitu(idx)">{{ 'desc.odebrat_granularitu' | translate }}</a>
+        <td class="app-col-action">
+          <mat-icon class="app-mr-1">add</mat-icon>
+          <a (click)="addGranularitu()">{{ 'desc.pridat_granularitu' | translate }}</a>
         </td>
       </tr>
-    </ng-container>
-    <tr>
-      <td><input name="rocnik" [(ngModel)]="rocnik" size="4" /></td>
-      <td><input name="cislo" [(ngModel)]="cislo" size="4" /></td>
-      <td><input name="link" [(ngModel)]="link" /></td>
-      <td>
-        <mat-select name="newState" [(ngModel)]="stav" multiple>
-          <mat-option *ngFor="let stav of dntStates" [value]="stav">
-            {{ stav }}
-          </mat-option>
-        </mat-select>
-      </td>
-      <td class="app-col-action">
-        <mat-icon class="app-mr-1">add</mat-icon>
-        <a (click)="addGranularitu()">{{ 'desc.pridat_granularitu' | translate }}</a>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-<!-- <div fxLayout="row" fxLayoutGap="16px">
-  <mat-form-field fxFlex appearance="outline">
+    </tbody>
+  </table>
+  
+  <mat-form-field appearance="outline" class="app-w-100">
     <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
-    <input matInput [(ngModel)]="poznamka">
+    <textarea matInput [placeholder]="'desc.poznamka' | translate" [(ngModel)]="poznamka"></textarea>
   </mat-form-field>
-</div> -->
-
-<mat-form-field appearance="outline" class="app-w-100">
-  <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
-  <textarea matInput [placeholder]="'desc.poznamka' | translate" [(ngModel)]="poznamka"></textarea>
-</mat-form-field>
+</mat-dialog-content>
 
 <div mat-dialog-actions>
   <button mat-button (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>

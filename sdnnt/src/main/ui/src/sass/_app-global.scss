@@ -101,6 +101,11 @@ a {
   }
 }
 
+.app-input {
+  border: 1px solid $app-brand-border-color;
+  border-radius: $app-border-radius;
+}
+
 table {
   // import table
   &.app-table-import {
@@ -195,6 +200,10 @@ table {
         }
         &:nth-child(odd) {
           background-color: $app-gray-1;
+        }
+
+        .app-input {
+          width: calc(100% - 4px);
         }
       }
     }
