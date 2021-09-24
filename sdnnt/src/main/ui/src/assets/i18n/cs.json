@@ -129,32 +129,23 @@
 
   "desc": {
     "institution": "Instituce",
-
     "notifikace_interval": "Interval notifikace",
     "none": "Nenastaveno",
     "day": "Den",
     "week": "Tyden",
     "month": "Mesic",
-
-
     "change": "Změna",
     "change_password": "Změna hesla",
     "password": "Heslo",
     "password_confirmation": "Potvrzení hesla",
-
     "password_changed": "Heslo změněno",
     "password_changed_error":"Heslo se nepodařilo změnit",
-
-
     "check_password_required": "Heslo je požadováno",
     "check_password_confirmation_required": "Potvrzení hesla je požadováno",
     "check_password_confirmation_are_not_thesame": "Hesla se neshodují",
     "check_password_isnotvalid": "Heslo musí splňovat kritéria",
-
     "forgotten_password": "Zapomenuté heslo",
     "send_reset_pwd_token": "Poslat resetovací token",
-
-
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",
@@ -268,6 +259,10 @@
     "apienabled": "Povolit API",
     "apikey": "API klíč",
     "sledovat": "Sledovat záznam",
-    "ne_sledovat": "Přestat sledovat záznam"
+    "ne_sledovat": "Přestat sledovat záznam",
+    "granularita": "Granularita",
+    "rocnik": "Ročník",
+    "cislo": "Číslo",
+    "odkaz": "Odkaz"
   }
 }

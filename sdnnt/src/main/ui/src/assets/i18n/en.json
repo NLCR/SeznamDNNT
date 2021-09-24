@@ -127,33 +127,25 @@
     "datestamp": "Date modified"
   },
 
-
   "desc": {
     "institution": "Institution",
-
     "notifikace_interval": "Notification interval",
     "none": "Not set",
     "day": "Day",
     "week": "Week",
     "month": "Month",
-
     "change": "Change",
-
     "change_password": "Set or Reset password",
     "password": "Password",
     "password_confirmation": "Password confirmation",
-
     "password_changed": "Password has been changed",
     "password_changed_error":"Changing password failed",
-
     "check_password_required": "Password is required",
     "check_password_confirmation_required": "Password confirmation is required",
     "check_password_confirmation_are_not_thesame": "Passwords are not the same",
     "check_password_isnotvalid": "The password doesn't meet the criteria",
-
     "forgotten_password": "Forgotten password",
     "send_reset_pwd_token": "Send reset token",
-
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",
@@ -267,6 +259,10 @@
     "apienabled": "Enable API",
     "apikey": "API Key",
     "sledovat": "Follow record",
-    "ne_sledovat": "Unfollow record"
+    "ne_sledovat": "Unfollow record",
+    "granularita": "Granularity",
+    "rocnik": "Grade",
+    "cislo": "Number",
+    "odkaz": "Link"
   }
 }
