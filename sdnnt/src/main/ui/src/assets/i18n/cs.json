@@ -2,6 +2,10 @@
   "q" : {
     "placeholder": "Zadejte dotaz ..."
   },
+  "consent": {
+    "text": "Tento web používá k poskytování služeb, personalizaci reklam a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.",
+    "button": "Souhlasím"
+  },
   "home": {
     "news": "Aktuality",
     "about": "O DNNT", 

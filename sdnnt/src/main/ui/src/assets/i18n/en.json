@@ -2,6 +2,10 @@
   "q" : {
     "placeholder": "Set query ..."
   },
+  "consent": {
+    "text": "This website uses cookies to provide services, personalize ads and analyze traffic. By using this website, you agree to this.",
+    "button": "I agree"
+  },
   "home": {
     "news": "News",
     "about": "About", 

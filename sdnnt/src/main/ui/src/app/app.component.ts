@@ -10,6 +10,7 @@ import { AppState } from './app.state';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+  public isConsent: boolean = false;
 
   constructor(
     private config: AppConfiguration,

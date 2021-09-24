@@ -1,1 +1,8 @@
-<p>consent works!</p>
+<div fxLayout="row" fxLayoutGap="30px" class="app-wrapper" fxLayoutAlign="center center">
+  <div fxFlex>
+    <mat-icon class="material-icons-outlined">error_outline</mat-icon>{{ 'consent.text' | translate }}
+  </div>
+  <div>
+    <button mat-flat-button color="primary">{{ 'consent.button' | translate }}</button>
+  </div>
+</div>
