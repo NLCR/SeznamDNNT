@@ -236,6 +236,21 @@ table {
   .mat-icon {
     margin-right: $app-gap-icon;
   }
+
+  .app-badge-btn {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+
+    .mat-icon {
+      margin-right: 0 !important;
+      @include setIcon(16);
+    }
+  }
 }
 
 .app-text-icon {

@@ -48,10 +48,12 @@
       <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.'+doc.dntstav | translate">info</mat-icon>
         {{ 'state.' + doc.dntstav[doc.dntstav.length-1] | translate }}
-        <button mat-icon-button *ngIf="state.logged && state.user.role === 'kurator' && !inZadost"
-        (click)="showStates()" ><mat-icon class="material-icons-outlined" [matTooltip]="'desc.changestav'| translate">edit</mat-icon></button>
-        <button mat-icon-button *ngIf="hasGranularity"
-        (click)="showGranularity()" ><mat-icon class="material-icons-outlined" [matTooltip]="'desc.changestav'| translate">format_list_numbered</mat-icon></button>
+        <a *ngIf="state.logged && state.user.role === 'kurator' && !inZadost" (click)="showStates()" class="app-badge-btn">
+          <mat-icon class="material-icons-outlined" [matTooltip]="'desc.zmenit_stav'| translate">edit</mat-icon>
+        </a>
+        <a *ngIf="hasGranularity" (click)="showGranularity()" class="app-badge-btn">
+          <mat-icon class="material-icons-outlined" [matTooltip]="'desc.zobrazit_granularitu'| translate">format_list_numbered</mat-icon>
+        </a>      
       </div>
       <div class="app-badge app-ml-2" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         <mat-icon class="material-icons-outlined">info</mat-icon>
