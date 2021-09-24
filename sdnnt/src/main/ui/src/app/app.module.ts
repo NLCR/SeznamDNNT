@@ -50,6 +50,7 @@ import { MatPasswordStrengthModule } from '@angular-material-extensions/password
 import { GranularityComponent } from './components/granularity/granularity.component';
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { InputLoginNameDialogComponent } from './components/input-login-name-dialog/input-login-name-dialog.component';
+import { ConsentComponent } from './components/consent/consent.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -103,6 +104,7 @@ const providers: any[] =[
 
     GranularityComponent,
     InputLoginNameComponent,
+    ConsentComponent,
   ],
   imports: [
     BrowserModule,
