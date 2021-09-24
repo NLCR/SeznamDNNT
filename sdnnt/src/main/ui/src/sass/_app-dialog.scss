@@ -1,5 +1,21 @@
 // --- DIALOG ---
 
+// general dialog
+.mat-dialog-container {
+  .mat-dialog-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: unset;
+
+    span {
+      font-weight: normal;
+      color: $app-gray-6;
+      font-size: 16px;
+    }
+  }
+}
+
+// login dialog
 .app-login-dialog {
   .mat-dialog-container {
     position: relative;

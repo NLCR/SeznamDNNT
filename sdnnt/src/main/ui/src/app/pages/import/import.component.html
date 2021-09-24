@@ -53,7 +53,7 @@
             <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
               <tbody>
                 <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
-                  <tr >
+                  <tr>
                     <td [class.approved]="id.approved">
                       <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
