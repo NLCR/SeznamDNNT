@@ -263,6 +263,8 @@
     "granularita": "Granularita",
     "rocnik": "Ročník",
     "cislo": "Číslo",
-    "odkaz": "Odkaz"
+    "odkaz": "Odkaz",
+    "odebrat_granularitu": "Odebrat granularitu",
+    "pridat_granularitu": "Přidat granularitu"
   }
 }

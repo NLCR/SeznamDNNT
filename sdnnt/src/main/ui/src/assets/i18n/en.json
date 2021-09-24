@@ -263,6 +263,8 @@
     "granularita": "Granularity",
     "rocnik": "Grade",
     "cislo": "Number",
-    "odkaz": "Link"
+    "odkaz": "Link",
+    "odebrat_granularitu": "Remove granularity",
+    "pridat_granularitu": "Add granularity"
   }
 }

@@ -171,6 +171,23 @@ table {
 
     tbody {
       tr {
+        td {
+          &.app-col-action {
+            color: $app-primary-color;
+
+            .mat-icon {
+              @include setIcon(18, $position: sub)
+            }
+          }
+          &.app-col-remove {
+            color: $app-color-warning;
+
+            a {
+              @include setLinkColor($app-color-warning);
+            } 
+          }
+        }
+
         &:hover {
           td {
             background-color: $app-gray-2;

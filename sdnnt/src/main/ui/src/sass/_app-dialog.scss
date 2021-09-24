@@ -25,3 +25,14 @@
     }
   }
 }
+
+// state dialog
+.app-states-dialog {
+  .app-col-stav {
+    width: 100px !important;
+    
+    .mat-select {
+      @extend .app-w-100;
+    }
+  }
+}
