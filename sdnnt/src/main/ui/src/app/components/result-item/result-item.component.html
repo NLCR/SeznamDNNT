@@ -9,7 +9,7 @@
         <div>{{ doc.marc_250a }}</div>
         <div *ngIf="doc.marc_260a">{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>
         <div *ngIf="!doc.marc_260a">{{ doc.marc_264a }} {{ doc.marc_264b }} {{ doc.marc_264c }}</div>
-        <div>{{ doc.marc_020a }}</div>
+        <div class="app-break-w">{{ doc.marc_020a }}</div>
       </mat-card-subtitle>
     </div>
   </mat-card-header>

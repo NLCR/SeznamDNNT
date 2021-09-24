@@ -106,6 +106,10 @@ a {
   border-radius: $app-border-radius;
 }
 
+.app-break-w {
+  word-break: break-all;
+}
+
 table {
   // import table
   &.app-table-import {
