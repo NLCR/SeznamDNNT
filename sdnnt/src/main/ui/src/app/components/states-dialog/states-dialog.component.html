@@ -55,12 +55,17 @@
   </tbody>
 </table>
 
-<div fxLayout="row" fxLayoutGap="16px" class="app-mb-n16">
+<!-- <div fxLayout="row" fxLayoutGap="16px">
   <mat-form-field fxFlex appearance="outline">
     <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
     <input matInput [(ngModel)]="poznamka">
   </mat-form-field>
-</div>
+</div> -->
+
+<mat-form-field appearance="outline" class="app-w-100">
+  <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
+  <textarea matInput [placeholder]="'desc.poznamka' | translate" [(ngModel)]="poznamka"></textarea>
+</mat-form-field>
 
 <div mat-dialog-actions>
   <button mat-button (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
