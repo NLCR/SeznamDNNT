@@ -10,7 +10,8 @@ import { AppState } from './app.state';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  public isConsent: boolean = false;
+  
+  //public isConsent: boolean = true;
 
   constructor(
     private config: AppConfiguration,
@@ -18,9 +19,9 @@ export class AppComponent {
     private service: AppService,
     private route: ActivatedRoute,
     private router: Router
-  ) {
+  ) {}
 
-  }
+
 
   ngOnInit() {
 
@@ -36,4 +37,10 @@ export class AppComponent {
       }
     });
   }
+
+  isConsentEnabled() {
+    var consent:string = localStorage.getItem("consent");
+    return consent != null;
+  }
+
 }

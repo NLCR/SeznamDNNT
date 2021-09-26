@@ -54,6 +54,14 @@ paths:
             type: string
             enum: ["dnntt","dnnto"]
           required: false
+
+        - in: query
+          name: fmt
+          schema:
+            type: string
+            enum: ["BK","SE", "MP","MU"]
+          required: false
+
         - in: query
           name: fullCatalog
           schema:
@@ -74,6 +82,7 @@ paths:
             type: integer
             default: 0
           required: false
+
 
 
       responses:
@@ -115,6 +124,8 @@ paths:
             type: string
             enum: ["NZN","VVS", "VVN"]
           required: false
+
+
       responses:
         '200':
           description: Všechny uložené žádosti

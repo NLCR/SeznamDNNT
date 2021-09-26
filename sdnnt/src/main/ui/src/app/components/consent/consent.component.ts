@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'app-consent',
@@ -7,9 +8,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConsentComponent implements OnInit {
 
-  constructor() { }
+  //isConsent:boolean = true;
+
+  constructor(
+    public state: AppState
+  ) { }
 
   ngOnInit(): void {
+  }
+
+  close(): void {
+    localStorage.setItem("consent", "true");
   }
 
 }

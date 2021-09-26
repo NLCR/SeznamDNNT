@@ -31,19 +31,18 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
     public static final Logger LOGGER = Logger.getLogger(DNNTCatalogApiServiceImpl.class.getName());
 
-    // Catalogue searcher
     CatalogSearcher catalogSearcher = new CatalogSearcher();
 
 
+
     @Override
-    public Response catalogGet(String query, String state, String license,Boolean fullCatalog, Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
+    public Response catalogGet(String query, String state, String license, String fmt, Boolean fullCatalog, Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
         Map<String,String> map = new HashMap<>();
         map.put("q", query);
         map.put("rows", integer.toString());
         map.put("page", integer1.toString());
         if (fullCatalog) {
             map.put("fullCatalog", Boolean.TRUE.toString());
-
         }
 
         List<String> filters = new ArrayList<>();
@@ -53,7 +52,9 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         if (license !=null  && license.length() > 0) {
             filters.add("license:"+license.toLowerCase());
         }
-
+        if (fmt != null && fmt.length() > 0) {
+            filters.add("fmt:"+fmt.toUpperCase());
+        }
 
         User user = null;
         String headerString = crc.getHeaderString(DNNTRequestApiServiceImpl.API_KEY_HEADER);
@@ -161,6 +162,9 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
     private CatalogItem createcatalogItemFromJSON(JSONObject doc) {
         String ident = doc.getString("identifier");
         String catalog = doc.getJSONArray("marc_998a").optString(0);
+
+        String fmt = doc.optString("fmt", "");
+
         List<String> licenses = new ArrayList<>();
         List<String> stavy  = new ArrayList<>();
         List<String> nazev  = new ArrayList<>();
@@ -170,6 +174,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         List<String> institutions = new ArrayList<>();
         List<String> links = new ArrayList<>();
         List<String> pids = new ArrayList<>();
+        List<CatalogItemBaseGranularity> granularities = new ArrayList<>();
 
 
         doc.getJSONArray("nazev").forEach(o-> nazev.add(o.toString()));
@@ -183,13 +188,21 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
             doc.getJSONArray("nakladatel").forEach(o-> nakladatel.add(o.toString()));
         }
         if (doc.has("historie_stavu")) {
-            new JSONArray(doc.getString("historie_stavu")).forEach(o-> {
-                historieStavu.add(((JSONObject)o).getString("dntstav"));
+            doc.getJSONArray("historie_stavu").forEach(o-> {
+                JSONObject object = (JSONObject)o;
+                if (object.has("dntstav")) {
+                    historieStavu.add(object.getString("dntstav"));
+                } else if (object.has("stav")) {
+                    historieStavu.add(object.getString("stav"));
+                }
             });
         }
 
+        // marc 910a a marc 040a
         if (doc.has("marc_910a")) {
             doc.getJSONArray("marc_910a").forEach(o-> institutions.add(o.toString()));
+        } else if (doc.has("marc_040a")) {
+            doc.getJSONArray("marc_040a").forEach(o-> institutions.add(o.toString()));
         }
 
         if (doc.has("marc_911u")) {
@@ -197,14 +210,33 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
 
         if (links.isEmpty() && doc.has("marc_956u")) {
-            doc.getJSONArray("marc_956u").forEach(o-> links.add(o.toString()));
-
+            String itemFmt = doc.getString("fmt");
+            // serialy mohou mit granularitu, pokud ano, marc_956u ma vice linku - granularitu davat do pole granularity
+            if (itemFmt != null && itemFmt.equals("SE")) {
+                links.add(doc.getJSONArray("marc_956u").getString(0));
+            }
         }
 
         if (doc.has("license")) {
              doc.getJSONArray("license").forEach(o -> licenses.add(o.toString()));
         }
 
+        if (doc.has("granularity")){
+            JSONArray granularityJSON = doc.getJSONArray("granularity");
+            granularityJSON.forEach(item-> {
+                CatalogItemBaseGranularity granularity = new CatalogItemBaseGranularity();
+                JSONObject itemObject = (JSONObject) item;
+                List<String> states = new ArrayList<>();
+                itemObject.optJSONArray("stav").forEach(stav-> {  states.add(stav.toString()); });
+                granularity.states(states);
+                granularity.link(itemObject.optString("link",""));
+                if (itemObject.has("cislo")) {
+                    granularity.number(itemObject.getString("cislo"));
+                }
+                granularities.add(granularity);
+            });
+
+        }
 
         links.stream().filter(str-> str.contains("uuid:")).map(str-> {
             int indexOf = str.indexOf("uuid:");
@@ -218,13 +250,24 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 .catalog(catalog)
                 .title(nazev)
                 .states(stavy)
-                .author(autor)
                 .stateshistory(historieStavu)
                 .publisher(nakladatel)
-                .institutions(institutions)
                 .links(links)
                 .pids(pids)
+                .fmt(fmt)
                 .license(licenses);
+
+        if (!institutions.isEmpty()) {
+            item.institutions(institutions);
+        }
+
+        if (fmt.equals("BK")) {
+            item.author(autor);
+        }
+
+        if (!granularities.isEmpty()) {
+            item.granularity(granularities);
+        }
         return item;
     }
 

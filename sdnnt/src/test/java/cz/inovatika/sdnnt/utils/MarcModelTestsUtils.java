@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.utils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrDocument;
@@ -12,6 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
+import java.util.Arrays;
 import java.util.Date;
 
 public class MarcModelTestsUtils {
@@ -34,6 +36,11 @@ public class MarcModelTestsUtils {
                     document.setField(key, o);
                 } else if (o instanceof JSONArray) {
                     JSONArray jArr = (JSONArray) o;
+                    if (Arrays.asList("historie_stavu", "granularity").contains(key)) {
+                        document.setField(key, jArr.toString());
+                    } else {
+                        document.setField(key, jArr.toList());
+                    }
                     document.setField(key, jArr.toList());
                 } else  {
                     document.setField(key, o);

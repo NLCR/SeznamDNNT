@@ -42,3 +42,18 @@ properties:
       type: string
   frbr:
     type: string
+  fmt:
+    type: string
+  granularity:
+    type: array
+    items:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            type: string
+        link:
+          type: string
+        number:
+          type: string

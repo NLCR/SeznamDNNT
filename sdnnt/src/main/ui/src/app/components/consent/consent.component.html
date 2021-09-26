@@ -3,6 +3,6 @@
     <mat-icon class="material-icons-outlined">error_outline</mat-icon>{{ 'consent.text' | translate }}
   </div>
   <div>
-    <button mat-flat-button color="primary">{{ 'consent.button' | translate }}</button>
+    <button mat-flat-button  (click)="close()" color="primary">{{ 'consent.button' | translate }}</button>
   </div>
 </div>

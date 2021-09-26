@@ -23,6 +23,7 @@ example:
   pids: ["uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
   license: "dnntt"
   frbr: "/|diagnostickysoftwareadt4400.|testyprocesoru,testmoduluwcs,testdisplejeec7168,testdisplejeodi6310//|kucera,petr"
+  fmt: "BK"
   associatedItems:
     - identifier: "oai:aleph-nkp.cz:DNT01-000173599"
       catalog: "DNT01-000173599"

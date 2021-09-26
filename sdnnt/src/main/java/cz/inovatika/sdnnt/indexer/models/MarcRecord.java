@@ -97,15 +97,13 @@ public class MarcRecord {
     String rawJson = (String) doc.getFirstValue(RAW_FIELD);
 
     MarcRecord mr = fromRAWJSON(rawJson);
-
-//    ObjectMapper objectMapper = new ObjectMapper();
-//    MarcRecord mr = objectMapper.readValue((String) doc.getFirstValue(RAW_FIELD), MarcRecord.class);
-
     mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
     mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
     mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
     mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
-    mr.granularity = new JSONArray((String) doc.getFieldValue(GRANULARITY_FIELD));
+    if (doc.containsKey(GRANULARITY_FIELD)) {
+      mr.granularity = new JSONArray(doc.getFieldValue(GRANULARITY_FIELD).toString());
+    }
     return mr;
   }
 
@@ -135,7 +133,7 @@ public class MarcRecord {
       mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
     }
     if (doc.containsKey(HISTORIE_STAVU_FIELD)) {
-      mr.historie_stavu =  new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
+      mr.historie_stavu =  new JSONArray(doc.getFieldValue(HISTORIE_STAVU_FIELD).toString());
     } else {
       mr.historie_stavu = new JSONArray();
     }
@@ -145,9 +143,7 @@ public class MarcRecord {
     mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
     if (doc.containsKey(GRANULARITY_FIELD)) {
-      System.out.println(doc.getFieldValue(GRANULARITY_FIELD).toString());
       JSONArray ja = new JSONArray( doc.getFieldValue(GRANULARITY_FIELD).toString());
-      System.out.println(ja.toString());
       mr.granularity =  ja;
     } else {
       // mr.granularity = new JSONArray();
@@ -502,7 +498,7 @@ public class MarcRecord {
             }
             if ("NZ".equals(stav)) {
               h.put("license", "dnntt");
-            } else if ("A".equals(stav) && !sdoc.containsKey("license")) {
+            } else if ("A".equals(stav) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
               h.put("license", "dnnto");
             }
             // System.out.println(h);
@@ -521,7 +517,7 @@ public class MarcRecord {
               sdoc.addField("dntstav", stav);
               if ("NZ".equals(stav)) {
                 sdoc.setField("license", "dnntt");
-              } else if ("A".equals(stav) && !sdoc.containsKey("license")) {
+              } else if ("A".equals(stav) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
                 sdoc.setField("license", "dnnto");
               }
             }

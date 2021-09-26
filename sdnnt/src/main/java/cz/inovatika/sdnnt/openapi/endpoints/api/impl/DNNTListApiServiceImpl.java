@@ -35,17 +35,15 @@ import java.util.stream.Collectors;
 
 public class DNNTListApiServiceImpl extends ListsApiService {
 
-    // shoud be configured; now it is fixed value
+    // number of concurrent clients in case of exporting long csv file
     public static final int DEFAULT_CONCURRENT_CLIENTS = 3;
+    protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
-    protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
     public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a", "marc_911a");
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
-
-
 
     CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
 
@@ -313,8 +311,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             /**
              * Pokud je pritomno pole 911a a 911u, pak je mapovani pid - instituce - Pokud ne, pak se neda rict komu patri - zadna instituce
              */
-
-
             // Vraci vsechny linky do krameriu -> filtruje jine
             List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
             // Z linku posbirane pidy pokud obsahuji subsgring uuid

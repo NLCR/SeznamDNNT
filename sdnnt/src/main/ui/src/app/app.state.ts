@@ -35,6 +35,8 @@ export class AppState {
   public logged = false;
   // public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
 
+  public consent: boolean = true;
+
   public usedFilters: Filter[] = [];
 
   public fullCatalog: boolean;
