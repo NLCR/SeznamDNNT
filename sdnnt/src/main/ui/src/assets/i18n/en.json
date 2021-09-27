@@ -275,6 +275,10 @@
     "pridat_granularitu": "Add granularity",
     "zobrazit_granularitu": "Show granularity",
     "zustat_prihlasen": "Stay logged in",
-    "licence": "License"
+    "licence": "License",
+    "ean_se_shoduje": "Ean agrees",
+    "ean_se_neshoduje": "Ean doesn't match",
+    "otevrit_zdroj": "Open the source",
+    "hledat_na_google": "Search on google"
   }
 }

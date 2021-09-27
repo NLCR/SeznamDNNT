@@ -1,4 +1,4 @@
-<div class="app-container">  
+<div class="app-container">
   <ng-container>
     <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
       <div fxFlex>
@@ -27,29 +27,25 @@
         </div>
       </mat-card>
       <ng-container *ngFor="let doc of docs">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title fxLayoutAlign="unset" class="app-mb-0">
-              <ng-container *ngIf="doc.name">
-                <span class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below" style="max-width: 950px;">{{ doc.name }}</span>
-                <span class="app-pipe"></span>
-              </ng-container>
-              <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.hit_type">
-                <!-- {{ doc.hit_type }} -->
-                <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'" [matTooltip]="doc.hit_type === 'ean' ? 'Ean se shoduje!' : 'Ean se neshoduje!'">
-                  {{  doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
-                </mat-icon>
-                <span class="app-pipe"></span></ng-container>
-                
-              <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_v_zdroje' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank" [matTooltip]="'desc.hledat_google' | translate"><mat-icon>travel_explore</mat-icon></a><span class="app-pipe"></span></ng-container>
-              
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-actions *ngIf="doc.identifiers?.length > 0">
+        <mat-card class="app-view-import">
+          <mat-card-content>
+            <ng-container *ngIf="doc.name">
+              <strong class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below" style="max-width: 950px;">{{ doc.name }}</strong>
+              <span class="app-pipe"></span>
+            </ng-container>
+            <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
+            <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
+            <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
+            <ng-container *ngIf="doc.hit_type">
+              <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'" [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
+                {{  doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
+              </mat-icon>
+              <span class="app-pipe"></span>
+            </ng-container>
+            <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span></ng-container>
+            <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank" [matTooltip]="'desc.hledat_na_google' | translate"><mat-icon>travel_explore</mat-icon></a><span class="app-pipe"></span></ng-container>
+          </mat-card-content>
+          <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0"><!-- puvodne *ngIf="doc.identifiers?.length > 0" -->
             <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
               <tbody>
                 <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
