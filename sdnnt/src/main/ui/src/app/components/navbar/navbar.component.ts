@@ -44,7 +44,7 @@ export class NavbarComponent implements OnInit {
 
   showUser() {
     const d = this.dialog.open(UserDialogComponent, {
-      width: '450px',
+      width: '600px',
       panelClass: 'app-login-dialog',
       data: {isRegister: false}
     });

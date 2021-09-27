@@ -137,18 +137,6 @@
       </div>
     </div>
 
-    <!--    
-    <div fxFlex="100%" *ngIf="state.user?.role === 'admin'">
-      <div>
-        <mat-form-field appearance="fill" class="app-w-100">
-          <mat-label>{{ 'desc.apikey' | translate }}</mat-label>
-          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey"></textarea>
-        </mat-form-field>
-      </div>
-    </div>
-  -->
-
-
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="fill" class="app-w-100">
@@ -168,15 +156,16 @@
       <mat-checkbox name="nakladatel" [(ngModel)]="nakladatel" (change)="setNositel()">{{ 'desc.nakladatel_vydavatel' | translate }}</mat-checkbox>
     </section>
   </div>
-  <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
-  <label id="notifikace_interval_label">{{ 'desc.notifikace_interval' | translate }}</label>
-  
-  <mat-radio-group aria-labelledby="notifikace_interval_label" [(ngModel)]="user.notifikace_interval">
-    <mat-radio-button value="none">{{ 'desc.none' | translate }}</mat-radio-button>
-    <mat-radio-button value="den">{{ 'desc.day' | translate }}</mat-radio-button>
-    <mat-radio-button value="tyden">{{ 'desc.week' | translate }}</mat-radio-button>
-    <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
-  </mat-radio-group>
+  <mat-divider class="app-mb-4"></mat-divider>
+  <div class="app-mb-4">
+    <label id="notifikace_interval_label" class="app-label app-mr-2">{{ 'desc.notifikace_interval' | translate }}:</label>
+    <mat-radio-group aria-labelledby="notifikace_interval_label" [(ngModel)]="user.notifikace_interval">
+      <mat-radio-button value="none">{{ 'desc.none' | translate }}</mat-radio-button>
+      <mat-radio-button value="den">{{ 'desc.day' | translate }}</mat-radio-button>
+      <mat-radio-button value="tyden">{{ 'desc.week' | translate }}</mat-radio-button>
+      <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
+    </mat-radio-group>
+  </div>
   <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
   <div class="app-mb-4" *ngIf="isRegister">
     <div class="app-label">{{ 'desc.podminky' | translate }}</div>
