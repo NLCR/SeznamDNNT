@@ -3,13 +3,13 @@
   <mat-form-field appearance="outline" class="app-w-100">
     <mat-label>{{ 'desc.stav' | translate }}</mat-label>
     <mat-select name="newState" [(ngModel)]="newState">
-      <mat-option *ngFor="let stav of dntStates" [value]="stav">
+      <mat-option *ngFor="let stav of dntStates" [value]="stav" >
         {{ stav }} - {{ 'state.tooltip.' + stav | translate }}
       </mat-option>
     </mat-select>
   </mat-form-field>
   
-  <table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4">
+  <table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4" *ngIf="shouldShowGranularity()">
     <thead>
       <tr>
         <th>{{ 'desc.rocnik' | translate }}</th>

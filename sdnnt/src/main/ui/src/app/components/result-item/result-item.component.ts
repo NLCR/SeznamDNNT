@@ -162,7 +162,9 @@ export class ResultItemComponent implements OnInit {
   }
 
   public showGranularity() {
-    const data = {title: this.doc.nazev, items: this.doc.granularity};
+
+    const data = {title: this.doc.nazev, items: this.doc.granularity };
+
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',
       data: data,

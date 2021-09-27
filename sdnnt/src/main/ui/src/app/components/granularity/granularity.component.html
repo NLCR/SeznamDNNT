@@ -6,8 +6,8 @@
         <th>{{ 'desc.rocnik' | translate }}</th>
         <th>{{ 'desc.cislo' | translate }}</th>
         <th>{{ 'desc.odkaz' | translate }}</th>
-        <th>{{ 'desc.licence' | translate }}</th>
         <th>{{ 'desc.stav' | translate }}</th>
+        <th>{{ 'desc.licence' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -16,8 +16,10 @@
           <td>{{ item.rocnik }}</td>
           <td>{{ item.cislo }}</td>
           <td>{{ item.link }}</td>
-          <td>---</td>
           <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
+          <td *ngIf="item.stav.includes('NZ')">dnntt</td>
+          <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
+          <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
         </tr>
       </ng-container>
     </tbody>

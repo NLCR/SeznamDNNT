@@ -79,6 +79,9 @@ export class ImportsComponent implements OnInit {
         resp.facets.import_id.buckets.forEach(b => {
           this.stats[b.val] = {total: b.count, na_vyrazeni: b.hits_na_vyrazeni};
         });
+
+        this.numFound = this.imports.length;
+
         
         this.loading = false;
       }

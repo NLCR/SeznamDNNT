@@ -15,13 +15,14 @@ export class StatesDialogComponent implements OnInit {
 
   newState: string;
   poznamka: string;
-  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZ'];
   granularity: any[] = [];
 
   rocnik: string;
   cislo: string;
   link: string;
   stav: string[];
+  fmt: string;
   
   constructor(
     public dialogRef: MatDialogRef<StatesDialogComponent>,
@@ -31,9 +32,9 @@ export class StatesDialogComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    console.log(this.data);
-    this.newState = this.data.dntstav ? this.data.dntstav[0] : 'A';
+    this.newState = this.data.dntstav ? (this.data.dntstav.includes('NZ') ?  'NZ' :this.data.dntstav[0])  : 'A';
     this.granularity = this.data.granularity ? this.data.granularity : [];
+    this.fmt = this.data.fmt ? this.data.fmt : null;
     // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
   }
 
@@ -59,4 +60,7 @@ export class StatesDialogComponent implements OnInit {
     this.granularity.splice(idx, 1);
   }
 
+  shouldShowGranularity(): boolean {
+    return (this.fmt != null && this.fmt === "SE");
+  }
 }

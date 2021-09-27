@@ -13,7 +13,9 @@
           <div *ngIf="f.name !== '   '">
             <ng-container [ngSwitch]="facet">
               <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">{{ 'license.' + f.name | translate }}</a>
-              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">{{ 'field.' + f.name | translate }}</a>
+ 
+              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">{{ ('field.' + f.name | translate) }}</a>
+
               <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
               <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
             </ng-container>
