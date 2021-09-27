@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
 import { AppState } from './app.state';
+import { CookieService } from 'ngx-cookie';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,8 @@ export class AppComponent {
     public state: AppState,
     private service: AppService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cookieService: CookieService
   ) {}
 
 
@@ -39,7 +41,7 @@ export class AppComponent {
   }
 
   isConsentEnabled() {
-    var consent:string = localStorage.getItem("consent");
+    var consent:string = this.cookieService.get("consent");
     return consent != null;
   }
 

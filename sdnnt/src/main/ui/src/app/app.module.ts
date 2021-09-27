@@ -51,6 +51,7 @@ import { GranularityComponent } from './components/granularity/granularity.compo
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { InputLoginNameDialogComponent } from './components/input-login-name-dialog/input-login-name-dialog.component';
 import { ConsentComponent } from './components/consent/consent.component';
+import { CookieModule } from 'ngx-cookie';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -125,7 +126,8 @@ const providers: any[] =[
     AppRoutingModule,
     MatPasswordStrengthModule.forRoot(),
     BrowserAnimationsModule,
-    AngularEditorModule
+    AngularEditorModule,
+    CookieModule.forRoot()
   ],
   providers,
   bootstrap: [AppComponent]
