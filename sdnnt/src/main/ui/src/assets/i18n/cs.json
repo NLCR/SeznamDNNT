@@ -275,6 +275,10 @@
     "pridat_granularitu": "Přidat granularitu",
     "zobrazit_granularitu": "Zobrazit granularitu",
     "zustat_prihlasen": "Zůstat přihlášen",
-    "licence": "Licence"
+    "licence": "Licence",
+    "ean_se_shoduje": "Ean se shoduje",
+    "ean_se_neshoduje": "Ean se neshoduje",
+    "otevrit_zdroj": "Otevřít zdroj",
+    "hledat_na_google": "Hledat na google"
   }
 }

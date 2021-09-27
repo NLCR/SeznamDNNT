@@ -89,6 +89,12 @@
   .mat-icon {
     @include setIcon($size: 20);
   }
+
+  &.app-view-import {
+    .mat-icon {
+      @include setIcon($position: middle);
+    }
+  }
 }
 
 // table
