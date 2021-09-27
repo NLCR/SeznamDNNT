@@ -6,6 +6,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,12 +25,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
+
 /**
  *  Catalog search service
  */
 public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
     public static final Logger LOGGER = Logger.getLogger(DNNTCatalogApiServiceImpl.class.getName());
+
+    public static final String SE_FMT_VALUE = "SE";
+
 
     CatalogSearcher catalogSearcher = new CatalogSearcher();
 
@@ -47,10 +53,10 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
         List<String> filters = new ArrayList<>();
         if (state != null && state.length()> 0) {
-            filters.add("dntstav:"+state);
+            filters.add(DNTSTAV_FIELD+":"+state);
         }
         if (license !=null  && license.length() > 0) {
-            filters.add("license:"+license.toLowerCase());
+            filters.add(LICENSE_FIELD+":"+license.toLowerCase());
         }
         if (fmt != null && fmt.length() > 0) {
             filters.add("fmt:"+fmt.toUpperCase());
@@ -88,7 +94,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                         zadost.getJSONArray("identifiers").forEach(id-> { identifiers.add(id.toString());} );
                         associatedRequest.setIdentifiers(identifiers);
 
-                        associatedRequest.setUser(zadost.getString("user"));
+                        //associatedRequest.setUser(zadost.getString("user"));
 
                         if (zadost.has("datum_zadani")) {
                             TemporalAccessor datumZadaniTA = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(zadost.getString("datum_zadani"));
@@ -146,7 +152,9 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                     return associatedRequest.getIdentifiers().contains(item.getIdentifier());
                 }).forEach(associatedWithItem::add);
 
-                item.associatedRequests(associatedWithItem);
+                if (!associatedWithItem.isEmpty()) {
+                    item.associatedRequests(associatedWithItem);
+                }
                 itemsArray.add(item);
 
             }
@@ -171,27 +179,28 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         List<String> autor  = new ArrayList<>();
         List<String> nakladatel  = new ArrayList<>();
         List<String> historieStavu  = new ArrayList<>();
-        List<String> institutions = new ArrayList<>();
+        List<String> sigla = new ArrayList<>();
         List<String> links = new ArrayList<>();
         List<String> pids = new ArrayList<>();
         List<CatalogItemBaseGranularity> granularities = new ArrayList<>();
 
 
-        doc.getJSONArray("nazev").forEach(o-> nazev.add(o.toString()));
-        if (doc.has("author")) {
+        doc.getJSONArray(NAZEV_FIELD).forEach(o-> nazev.add(o.toString()));
+        if (doc.has(AUTHOR_FIELD)) {
             doc.getJSONArray("author").forEach(o-> autor.add(o.toString()));
         }
-        if (doc.has("dntstav")) {
-            doc.getJSONArray("dntstav").forEach(o-> stavy.add(o.toString()));
+        if (doc.has(MarcRecordFields.DNTSTAV_FIELD)) {
+            doc.getJSONArray(MarcRecordFields.DNTSTAV_FIELD).forEach(o-> stavy.add(o.toString()));
         }
-        if (doc.has("nakladatel")) {
-            doc.getJSONArray("nakladatel").forEach(o-> nakladatel.add(o.toString()));
+        if (doc.has(NAKLADATEL_FIELD)) {
+            doc.getJSONArray(NAKLADATEL_FIELD).forEach(o-> nakladatel.add(o.toString()));
         }
-        if (doc.has("historie_stavu")) {
-            doc.getJSONArray("historie_stavu").forEach(o-> {
+        if (doc.has(HISTORIE_STAVU_FIELD)) {
+            doc.getJSONArray(HISTORIE_STAVU_FIELD).forEach(o-> {
                 JSONObject object = (JSONObject)o;
-                if (object.has("dntstav")) {
-                    historieStavu.add(object.getString("dntstav"));
+                if (object.has(DNTSTAV_FIELD)) {
+                    historieStavu.add(object.getString(DNTSTAV_FIELD));
+                // legacy field - only for compatibility reason
                 } else if (object.has("stav")) {
                     historieStavu.add(object.getString("stav"));
                 }
@@ -199,30 +208,30 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
 
         // marc 910a a marc 040a
-        if (doc.has("marc_910a")) {
-            doc.getJSONArray("marc_910a").forEach(o-> institutions.add(o.toString()));
-        } else if (doc.has("marc_040a")) {
-            doc.getJSONArray("marc_040a").forEach(o-> institutions.add(o.toString()));
+        if (doc.has(MARC_910_A)) {
+            doc.getJSONArray(MARC_910_A).forEach(o-> sigla.add(o.toString()));
+        } else if (doc.has(MARC_040_A)) {
+            doc.getJSONArray(MARC_040_A).forEach(o-> sigla.add(o.toString()));
         }
 
-        if (doc.has("marc_911u")) {
-            doc.getJSONArray("marc_911u").forEach(o-> links.add(o.toString()));
+        if (doc.has(MARC_911_U)) {
+            doc.getJSONArray(MARC_911_U).forEach(o-> links.add(o.toString()));
         }
 
-        if (links.isEmpty() && doc.has("marc_956u")) {
-            String itemFmt = doc.getString("fmt");
+        if (links.isEmpty() && doc.has(MARC_956_U)) {
+            String itemFmt = doc.getString(FMT_FIELD);
             // serialy mohou mit granularitu, pokud ano, marc_956u ma vice linku - granularitu davat do pole granularity
-            if (itemFmt != null && itemFmt.equals("SE")) {
-                links.add(doc.getJSONArray("marc_956u").getString(0));
+            if (itemFmt != null && itemFmt.equals(SE_FMT_VALUE)) {
+                links.add(doc.getJSONArray(MARC_956_U).getString(0));
             }
         }
 
-        if (doc.has("license")) {
-             doc.getJSONArray("license").forEach(o -> licenses.add(o.toString()));
+        if (doc.has(LICENSE_FIELD)) {
+             doc.getJSONArray(LICENSE_FIELD).forEach(o -> licenses.add(o.toString()));
         }
 
-        if (doc.has("granularity")){
-            JSONArray granularityJSON = doc.getJSONArray("granularity");
+        if (doc.has(GRANULARITY_FIELD) && doc.has(FMT_FIELD) && doc.getString(FMT_FIELD).equals(SE_FMT_VALUE)){
+            JSONArray granularityJSON = doc.getJSONArray(GRANULARITY_FIELD);
             granularityJSON.forEach(item-> {
                 CatalogItemBaseGranularity granularity = new CatalogItemBaseGranularity();
                 JSONObject itemObject = (JSONObject) item;
@@ -235,7 +244,6 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 }
                 granularities.add(granularity);
             });
-
         }
 
         links.stream().filter(str-> str.contains("uuid:")).map(str-> {
@@ -251,22 +259,61 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 .title(nazev)
                 .states(stavy)
                 .stateshistory(historieStavu)
-                .publisher(nakladatel)
-                .links(links)
-                .pids(pids)
-                .fmt(fmt)
-                .license(licenses);
+                //.pids(pids)
+                .fmt(fmt);
 
-        if (!institutions.isEmpty()) {
-            item.institutions(institutions);
+
+        if (!nakladatel.isEmpty()) {
+            item.publisher(nakladatel);
         }
 
-        if (fmt.equals("BK")) {
+        if (!links.isEmpty()) {
+            item.links(links);
+        }
+
+        if (!pids.isEmpty()) {
+            item.pids(pids);
+        }
+
+        if (!sigla.isEmpty()) {
+            item.sigla(sigla);
+        }
+
+        if (!licenses.isEmpty()) {
+            item.license(licenses);
+        }
+
+        if (!autor.isEmpty()) {
             item.author(autor);
         }
 
+
         if (!granularities.isEmpty()) {
             item.granularity(granularities);
+        }
+
+        // identifiers
+        if (doc.has(MARC_015_A) || doc.has(MARC_020_A) || doc.has(MARC_022_A)) {
+            JSONArray ccnb = doc.optJSONArray(MARC_015_A);
+            JSONArray isbn = doc.optJSONArray(MARC_020_A);
+            JSONArray issn = doc.optJSONArray(MARC_022_A);
+            CatalogItemBaseOtherIdentifiers otherIdentifiers = new CatalogItemBaseOtherIdentifiers();
+            if (ccnb != null && ccnb.length() > 0) {
+                ccnb.forEach(oneCcnb -> {
+                    otherIdentifiers.addCcnbItem(oneCcnb.toString());
+                });
+            }
+            if (isbn != null && isbn.length() > 0)  {
+                isbn.forEach(oneIsbn -> {
+                    otherIdentifiers.addIsbnItem(oneIsbn.toString());
+                });
+            }
+            if (issn != null && issn.length() > 0)  {
+                issn.forEach(oneIssn -> {
+                    otherIdentifiers.addIssnItem(oneIssn.toString());
+                });
+            }
+            item.otherIdentifiers(otherIdentifiers);
         }
         return item;
     }

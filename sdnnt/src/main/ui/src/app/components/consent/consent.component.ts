@@ -11,7 +11,7 @@ export class ConsentComponent implements OnInit {
 
 
   constructor(
-    private cookieService: CookieService,
+    //private cookieService: CookieService,
     public state: AppState
   ) { }
 
@@ -19,7 +19,7 @@ export class ConsentComponent implements OnInit {
   }
 
   close(): void {
-    this.cookieService.put("consent", "true");
+    localStorage.setItem("consent", "true");
   }
 
 }

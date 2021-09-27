@@ -39,7 +39,7 @@ export class AppComponent {
   }
 
   isConsentEnabled() {
-    var consent:string = this.cookieService.get("consent");
+    var consent:string = localStorage.getItem("consent");
     return consent != null;
   }
 

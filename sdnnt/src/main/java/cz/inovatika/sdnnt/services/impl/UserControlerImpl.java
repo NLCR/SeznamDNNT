@@ -323,6 +323,7 @@ public class UserControlerImpl implements UserControler {
             toObject.username = user.username;
             toObject.jmeno = user.jmeno;
             toObject.prijmeni = user.prijmeni;
+            toObject.apikey = user.apikey;
             toObject.resetPwdToken = user.resetPwdToken;
             toObject.resetPwdExpiration = user.resetPwdExpiration;
             toObject.email = user.email;

@@ -2,6 +2,23 @@ type: object
 properties:
   identifier:
     type: string
+  other_identifiers:
+    type: object
+    properties:
+      issn:
+        type: array
+        items:
+          type: string
+      isbn:
+        type: array
+        items:
+          type: string
+      ccnb:
+        type: array
+        items:
+          type: string
+      frbr:
+        type: string
   catalog:
     type: string
   states:
@@ -24,7 +41,7 @@ properties:
     type: array
     items:
       type: string
-  institutions:
+  sigla:
     type: array
     items:
       type: string

@@ -12,13 +12,16 @@ allOf:
 
 example:
   identifier: "oai:aleph-nkp.cz:DNT01-000173538"
+  other_identifiers:
+    ccnb: "cnb000359230"
+    issn: "1210-731X"
   catalog: "DNT01-000173538"
   states": ["A","NZ"]
   stateshistory: ["PA","NZ","A"]
   title: [ "Diagnostický software ADT 4400. zpracovali P. Kučera ... [et al.]"]
   author: []
   publisher: ["SNTL"]
-  institutions: ["ABA001","ABA012","ABD013","ABD046"]
+  sigla: ["ABA001","ABA012","ABD013","ABD046"]
   links: ["http://krameriusndk.nkp.cz/search/handle/uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
   pids: ["uuid:4977a7b0-6525-11e2-9d9f-005056827e52"]
   license: "dnntt"
@@ -32,7 +35,7 @@ example:
       title: [ "Diagnostický software ADT 4400. zpracovali P. Kučera ... [et al.]"]
       author: []
       publisher: ["SNTL"]
-      institutions: ["ABA001","ABA012","ABD013","ABD046"]
+      sigla: ["ABA001","ABA012","ABD013","ABD046"]
       links: []
       pids: []
       license: "dnntt"

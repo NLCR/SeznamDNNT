@@ -22,5 +22,27 @@ public class MarcRecordFields {
 
     public static final String LEGACY_STAV_FIELD = "dntstav";
 
+    // institutions
+    public static final String MARC_910_A = "marc_910a";
+    public static final String MARC_040_A = "marc_040a";
+
+    // links
+    public static final String MARC_911_U = "marc_911u";
+    public static final String MARC_956_U = "marc_956u";
+
+    public static final String NAZEV_FIELD = "nazev";
+    public static final String AUTHOR_FIELD = "author";
+    public static final String NAKLADATEL_FIELD = "nakladatel";
+    public static final String FMT_FIELD = "fmt";
+
+    // identifiers
+    //isbn
+    public static final String MARC_020_A = "marc_020a";
+    //issn
+    public static final String MARC_022_A = "marc_022a";
+    //ccnb
+    public static final String MARC_015_A = "marc_015a";
+
+
     private MarcRecordFields() {}
 }

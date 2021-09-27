@@ -145,11 +145,6 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         public abstract boolean acceptNonExistingState();
     }
 
-    // account service
-    //AccountService accountService = new AccountServiceImpl();
-
-    // Catalogue searcher
-    //CatalogSearcher catalogSearcher = new CatalogSearcher();
 
 
     @Override
