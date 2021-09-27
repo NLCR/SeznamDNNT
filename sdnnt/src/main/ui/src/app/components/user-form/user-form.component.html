@@ -1,7 +1,5 @@
 
 <ng-container *ngIf="user">
-  
-
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
     <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
       <mat-radio-group [(ngModel)]="formTypeSelected">
@@ -179,6 +177,4 @@
       <mat-checkbox><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
     </p>
   </div>
-
-
 </ng-container>

@@ -11,7 +11,7 @@
           <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
           <input matInput #loginpwd type="password" [(ngModel)]="pwd" (keyup.enter)="login()">
         </mat-form-field> 
-        <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'Zustat prihlasen' | translate}}</mat-checkbox>
+        <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
       </div> 
       <div class="app-color-warning" *ngIf="loginError">
         {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.
@@ -19,14 +19,12 @@
     </ng-container>
     <ng-container *ngIf="state.logged">
       <span class="app-label">{{ 'desc.prihlaseny_uzivatel' | translate }}:</span>&#160;<strong>{{ state.user.jmeno}} {{state.user.prijmeni }}</strong><br />
-      <!-- <span class="app-label">{{ 'Role' | translate }}:</span>&#160;<strong>{{ 'pristupnost_' + state.user.pristupnost | translate }}</strong><br />
-      <span class="app-label">{{ 'field.f_organizace' | translate }}:</span>&#160;<strong>{{ state.user.organizaceNazev }}</strong> -->
     </ng-container>
 </div>
 <div mat-dialog-actions>
   <ng-container *ngIf="!state.logged">
-    <button mat-button (click)="login()">{{ 'desc.prihlasit_uzivatele' | translate }}</button>
-    <button mat-button (click)="resetPwd()">{{ 'desc.zapomeli_jste_heslo' | translate }}</button>
+    <button mat-flat-button color="primary" (click)="login()">{{ 'desc.prihlasit_uzivatele' | translate }}</button>
+    <button mat-flat-button color="primary" (click)="resetPwd()">{{ 'desc.zapomeli_jste_heslo' | translate }}</button>
   </ng-container>
   <ng-container *ngIf="state.logged">
     <button mat-button (click)="logout()">{{ 'desc.odhlasit' | translate }}</button>

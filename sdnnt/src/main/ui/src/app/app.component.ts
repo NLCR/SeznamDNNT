@@ -12,8 +12,6 @@ import { CookieService } from 'ngx-cookie';
 })
 export class AppComponent {
   
-  //public isConsent: boolean = true;
-
   constructor(
     private config: AppConfiguration,
     public state: AppState,
