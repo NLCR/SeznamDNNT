@@ -2,46 +2,25 @@
 <div mat-dialog-content>
   <mat-tab-group>
     <mat-tab label="Historie stavu">
-      <table mat-table [dataSource]="stavy" class="mat-elevation-z0">
-        <ng-container matColumnDef="date">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.date | date : 'dd.MM.yyyy' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="user">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.kdo' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.user }}</td>
-        </ng-container>
-        <ng-container matColumnDef="stav">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.stav }}</td>
-        </ng-container>
-        <ng-container matColumnDef="license">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.license' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.license }}</td>
-        </ng-container>
-        <!-- <ng-container matColumnDef="from">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.ze_stavu' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.changes.backward_patch[0].value }}</td>
-        </ng-container>
-        <ng-container matColumnDef="to">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_stav' | translate }}</th>
-          <td mat-cell *matCellDef="let element">
-            <ng-container *ngIf="element.changes.forward_patch[0].op === 'replace'">
-              {{ element.changes.forward_patch[0].value }}
-            </ng-container>
-            <ng-container *ngIf="element.changes.forward_patch[0].op === 'add'">
-              added {{ element.changes.forward_patch[0].value[0].tag }}
-            </ng-container>
-            
-          </td>
-        </ng-container> -->
-        <ng-container matColumnDef="comment">
-          <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>
-          <td mat-cell *matCellDef="let element">{{ element.comment }}</td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
+        <thead>
+          <tr>
+            <th>{{ 'desc.datum' | translate }}</th>
+            <th>{{ 'desc.kdo' | translate }}</th>
+            <th>{{ 'desc.stav' | translate }}</th>
+            <th>{{ 'desc.licence' | translate }}</th>
+            <th>{{ 'desc.typ' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of stavy">
+            <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
+            <td>{{ item.user }}</td>
+            <td>{{ item.stav }}</td>
+            <td>{{ item.licence }}</td>
+            <td>{{ item.comment }}</td>
+          </tr>
+        </tbody>
       </table>
     </mat-tab>
     <mat-tab label="Historie bibliografickeho zaznamu">

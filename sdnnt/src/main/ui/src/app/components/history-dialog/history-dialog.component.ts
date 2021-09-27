@@ -11,7 +11,6 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class HistoryDialogComponent implements OnInit {
 
-  displayedColumns = ['date','user', 'stav', 'license', 'comment']; //,'from','to','poznamka']
   history: HistoryItem[] = [];
   stavy: HistoryItem[] = [];
 
