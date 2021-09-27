@@ -56,7 +56,10 @@
       "VVS": "Request to be removed from the List (internal state of administration)"
       }
   },
-
+  "license": {
+    "dnnto": "Dnnto: License for online access",
+    "dnntt": "Dnntt: License for terminal access"
+  },
   "field": {
     "015a": "Number nr.bibl.",
     "020a": "ISBN",
@@ -71,6 +74,7 @@
     "language": "Document language",
     "nakladatel": "Publisher",
     "dntstav": "Document status",
+    "license": "Associated license",
     "marc_910a": "Sigla",
     "rokvydani": "Year of publication",
 
@@ -83,7 +87,7 @@
     "N": "N: unclassified",
     "X": "X: free",
     "PX": "PX: probably free work",
-    "NZ": "NZ: On-site terminal license",
+    "NZ": "NZ: On-site terminal",
     "NZN": "NZN: proposal for inclusion",
     "VVN": "VVN: call for decommissioning",
     "VVS": "VVS: call for decommissioning"

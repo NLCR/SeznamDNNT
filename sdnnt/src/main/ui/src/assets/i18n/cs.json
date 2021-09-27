@@ -56,6 +56,10 @@
       "VVS": "Výzva k vyřazení ze Seznamu (interní stav administrace)"
       }
   },
+  "license": {
+    "dnnto": "Dnnto: Licence pro online přístup",
+    "dnntt": "Dnnt: Licence pro terminálový přístup"
+  },
 
   "field": {
     "015a": "Číslo nár.bibl.",
@@ -71,6 +75,7 @@
     "language": "Jazyk dokumentu",
     "nakladatel": "Nakladatel",
     "dntstav": "Stav dokumentu",
+    "license": "Přiřazená licence",
     "marc_910a": "Sigla",
     "rokvydani": "Rok vydání",
 
@@ -83,7 +88,7 @@
     "N": "N: vyřazeno",
     "X": "X: volné",
     "PX": "PX: pravděpodobná volné",
-    "NZ": "NZ: Licence pro terminál na místě samém",
+    "NZ": "NZ: Zařazeno s omezením na místě samém",
     "NZN": "NZN: návrh k zařazení",
     "VVN": "VVN: výzva k vyřazení",
     "VVS": "VVS: výzva k vyřazení"
