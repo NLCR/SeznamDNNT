@@ -54,8 +54,6 @@ export class LoginDialogComponent implements OnInit {
   resetPwd() {
     this.dialogRef.close();
     this.router.navigate(['/fgtpswd'], {});
-
- 
   }
 
 

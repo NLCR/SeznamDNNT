@@ -1,25 +1,25 @@
 <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
 <h1 mat-dialog-title>{{ 'desc.prihlaseni_uzivatele' | translate }}</h1>
 <div mat-dialog-content>
-    <ng-container *ngIf="!state.logged">
-      <div fxLayout="row wrap">
-        <mat-form-field fxFlex="100%" appearance="fill">
-          <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
-          <input matInput cdkFocusInitial type="text" [(ngModel)]="user" (keyup.enter)="focusp($event, loginpwd)" autocomplete="on" id="loginuser">
-        </mat-form-field>
-        <mat-form-field fxFlex="100%" appearance="fill">
-          <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
-          <input matInput #loginpwd type="password" [(ngModel)]="pwd" (keyup.enter)="login()">
-        </mat-form-field> 
-        <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
-      </div> 
-      <div class="app-color-warning" *ngIf="loginError">
-        {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.
-      </div>    
-    </ng-container>
-    <ng-container *ngIf="state.logged">
-      <span class="app-label">{{ 'desc.prihlaseny_uzivatel' | translate }}:</span>&#160;<strong>{{ state.user.jmeno}} {{state.user.prijmeni }}</strong><br />
-    </ng-container>
+  <ng-container *ngIf="!state.logged">
+    <div fxLayout="row wrap">
+      <mat-form-field fxFlex="100%" appearance="outline">
+        <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
+        <input matInput [placeholder]="'desc.prihlasovaci_jmeno' | translate" cdkFocusInitial type="text" [(ngModel)]="user" (keyup.enter)="focusp($event, loginpwd)" autocomplete="on" id="loginuser">
+      </mat-form-field>
+      <mat-form-field fxFlex="100%" appearance="outline">
+        <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
+        <input matInput [placeholder]="'desc.heslo' | translate" #loginpwd type="password" [(ngModel)]="pwd" (keyup.enter)="login()">
+      </mat-form-field> 
+      <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
+    </div> 
+    <div class="app-color-warning" *ngIf="loginError">
+      {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.
+    </div>    
+  </ng-container>
+  <ng-container *ngIf="state.logged">
+    <span class="app-label">{{ 'desc.prihlaseny_uzivatel' | translate }}:</span>&#160;<strong>{{ state.user.jmeno}} {{state.user.prijmeni }}</strong><br />
+  </ng-container>
 </div>
 <div mat-dialog-actions>
   <ng-container *ngIf="!state.logged">

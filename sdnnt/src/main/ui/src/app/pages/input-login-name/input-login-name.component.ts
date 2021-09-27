@@ -22,9 +22,9 @@ export class InputLoginNameComponent implements OnInit {
 
     const data = {};
     const dialogRef = this.dialog.open(InputLoginNameDialogComponent, {
-      width: '800px',
+      width: '450px',
       data,
-      panelClass: 'app-data-dialog'
+      panelClass: 'app-login-name-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
