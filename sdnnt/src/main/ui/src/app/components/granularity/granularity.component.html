@@ -6,6 +6,7 @@
         <th>{{ 'desc.rocnik' | translate }}</th>
         <th>{{ 'desc.cislo' | translate }}</th>
         <th>{{ 'desc.odkaz' | translate }}</th>
+        <th>{{ 'desc.licence' | translate }}</th>
         <th>{{ 'desc.stav' | translate }}</th>
       </tr>
     </thead>
@@ -15,6 +16,7 @@
           <td>{{ item.rocnik }}</td>
           <td>{{ item.cislo }}</td>
           <td>{{ item.link }}</td>
+          <td>---</td>
           <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
         </tr>
       </ng-container>
