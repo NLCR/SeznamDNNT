@@ -3,7 +3,7 @@
 app-consent {
   @extend .app-w-100;
   display: block;
-  position: absolute;
+  position: fixed;
   background-color: $app-color-success;
   bottom: 0;
   left: 0;
