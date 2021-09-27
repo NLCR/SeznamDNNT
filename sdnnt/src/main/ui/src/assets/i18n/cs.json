@@ -35,12 +35,11 @@
     "waiting": "čeká na posouzení",
     "processed": "zpracováno",
     "open": "neodesláno",
-
     "rejected": "zamítnuto",
     "approved": "schváleno",
     "approvedlib": "omezeno na terminál",
 
-    "tooltip": {
+      "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
       "NNN": "Není na seznamu",
       "PA": "Dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
@@ -60,7 +59,6 @@
     "dnnto": "Dnnto: Licence pro online přístup",
     "dnntt": "Dnnt: Licence pro terminálový přístup"
   },
-
   "field": {
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
