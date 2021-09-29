@@ -39,9 +39,9 @@ export class UserResetPasswordComponent implements OnInit {
       console.log("State user "+this.state.user);
       const data = {};
       const dialogRef = this.dialog.open(UserPswDialogComponent, {
-        width: '800px',
+        width: '450px',
         data,
-        panelClass: 'app-data-dialog'
+        panelClass: 'app-password-reset-dialog'
       });
     }
 
