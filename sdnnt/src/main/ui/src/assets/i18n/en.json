@@ -50,6 +50,7 @@
       "X": "Free",
       "PX": "Probably free work",
       "NZ": "On-site terminal license",
+      "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
       "VVN": "Request for exclusion from the List Design (internal state of administration)",
       "VVS": "Request to be removed from the List (internal state of administration)"
@@ -279,6 +280,8 @@
     "ean_se_shoduje": "Ean agrees",
     "ean_se_neshoduje": "Ean doesn't match",
     "otevrit_zdroj": "Open the source",
-    "hledat_na_google": "Search on google"
+    "hledat_na_google": "Search on google",
+    "rok_od": "Year from",
+    "rok_do": "Year to"
   }
 }

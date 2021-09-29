@@ -31,14 +31,16 @@
     </mat-expansion-panel-header>
     <div fxLayout="row" fxLayoutGap="16px">
       <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
-        <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'Rok od' | translate" hidden=true [readonly]="true"  >
+        <mat-label>{{ 'desc.rok_od' | translate }}</mat-label>
+        <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true"  >
         <input matInput [(ngModel)]="rokod" [placeholder]="'Rok od' | translate" (click)="rok_od.open()" name="aa">
         <mat-datepicker-toggle matSuffix [for]="rok_od"></mat-datepicker-toggle>
         <mat-datepicker #rok_od startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_od, 'from')">
         </mat-datepicker>
       </mat-form-field>
       <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
-        <input matInput [matDatepicker]="rok_do" [value]="rokdodate.value" [placeholder]="'Rok do' | translate" hidden=true [readonly]="true">
+        <mat-label>{{ 'desc.rok_do' | translate }}</mat-label>
+        <input matInput [matDatepicker]="rok_do" [value]="rokdodate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true">
         <input matInput [(ngModel)]="rokdo" [placeholder]="'Rok do' | translate" (click)="rok_do.open()" name="bb">
         <mat-datepicker-toggle matSuffix [for]="rok_do"></mat-datepicker-toggle>
         <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">

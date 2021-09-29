@@ -280,6 +280,8 @@
     "ean_se_shoduje": "Ean se shoduje",
     "ean_se_neshoduje": "Ean se neshoduje",
     "otevrit_zdroj": "Otevřít zdroj",
-    "hledat_na_google": "Hledat na google"
+    "hledat_na_google": "Hledat na google",
+    "rok_od": "Rok od",
+    "rok_do": "Rok do"
   }
 }
