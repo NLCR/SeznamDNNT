@@ -43,9 +43,9 @@ export class ResetPasswordComponent implements OnInit {
             this.tokenValidation = Tokenvalidation.VALID;
             const data = {"token":token};
             const dialogRef = this.dialog.open(UserPswDialogComponent, {
-              width: '800px',
+              width: '450px',
               data,
-              panelClass: 'app-data-dialog'
+              panelClass: 'app-password-reset-dialog'
             });
           } else {
             this.tokenValidation = Tokenvalidation.INVALID;

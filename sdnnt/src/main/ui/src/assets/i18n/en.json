@@ -6,6 +6,13 @@
     "text": "This website uses cookies to provide services, personalize ads and analyze traffic. By using this website, you agree to this.",
     "button": "I agree"
   },
+  "reset_password": {
+    "contains_at_least_one_lower_character": "contains at least one lower character",
+    "contains_at_least_one_upper_character": "contains at least one upper character",
+    "contains_at_least_one_digit_character": "contains at least one digit character",
+    "contains_at_least_one_special_character": "contains at least one special character",
+    "contains_at_least_8_characters": "contains at least 8 characters"
+  },
   "home": {
     "news": "News",
     "about": "About", 

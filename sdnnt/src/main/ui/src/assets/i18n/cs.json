@@ -6,6 +6,13 @@
     "text": "Tento web používá k poskytování služeb, personalizaci reklam a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.",
     "button": "Souhlasím"
   },
+  "reset_password": {
+    "contains_at_least_one_lower_character": "obsahuje alespoň jedeno malé písmeno",
+    "contains_at_least_one_upper_character": "obsahuje alespoň jedeno velké  písmeno",
+    "contains_at_least_one_digit_character": "obsahuje alespoň jeden číselný znak",
+    "contains_at_least_one_special_character": "obsahuje alespoň jeden speciální znak",
+    "contains at_least_8_characters": "obsahuje alespoň 8 znaků"
+  },
   "home": {
     "news": "Aktuality",
     "about": "O DNNT", 

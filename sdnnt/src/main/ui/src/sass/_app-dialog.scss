@@ -36,3 +36,13 @@
     }
   }
 }
+
+// password reset dialog
+.app-password-reset-dialog {
+  .mat-dialog-content {
+    .mat-card {
+      @extend .app-mb-4, .app-clean-border;
+      background-color: $app-gray-1 !important;
+    }
+  }
+}
