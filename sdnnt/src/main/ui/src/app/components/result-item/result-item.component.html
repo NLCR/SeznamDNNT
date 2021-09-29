@@ -79,7 +79,7 @@
         (click)="setFollow(false)"
         [title]="'desc.ne_sledovat' | translate">
         <mat-icon class="app-color-warning">notifications_active</mat-icon>
-      </button>*ngIf="state.logged && !doc.hasNotifications &&  state.user.role === 'user'"
+      </button>
       <button mat-stroked-button
         *ngIf="state.logged && !doc.hasNotifications &&  state.user.role === 'user'"
         (click)="setFollow(true)"
