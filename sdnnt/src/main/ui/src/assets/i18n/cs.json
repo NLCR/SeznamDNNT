@@ -50,6 +50,7 @@
       "X": "Volné",
       "PX": "Pravděpodobná volná díla",
       "NZ": "Licence pro terminál na místě samém",
+      "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení do Návrhu seznamu (interní stav administrace)",
       "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
       "VVS": "Výzva k vyřazení ze Seznamu (interní stav administrace)"
