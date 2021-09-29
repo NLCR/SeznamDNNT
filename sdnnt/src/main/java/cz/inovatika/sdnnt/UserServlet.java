@@ -234,7 +234,13 @@ public class UserServlet extends HttpServlet {
       @Override 
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         // TODO: MailService ?? Create? Inject ?
-        return new UserControlerImpl(req, new MailServiceImpl()).register(readInputJSON(req).toString()).toJSONObject();
+        try {
+          return new UserControlerImpl(req, new MailServiceImpl()).register(readInputJSON(req).toString()).toJSONObject();
+        } catch (UserControlerException e) {
+          return errorJson(e.getMessage());
+        } catch (IOException e) {
+          return errorJson(e.getMessage());
+        }
       }
     },
     ALL {
