@@ -7,7 +7,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
-import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
+import { DialogIdentifierComponent } from '../dialog-identifier/dialog-identifier.component';
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { GranularityComponent } from '../granularity/granularity.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
@@ -137,10 +137,10 @@ export class ResultItemComponent implements OnInit {
     });
 
 
-    const dialogRef = this.dialog.open(DialogHistoryComponent, {
+    const dialogRef = this.dialog.open(DialogIdentifierComponent, {
       width: '750px',
       data,
-      panelClass: 'app-dialog-history'
+      panelClass: 'app-dialog-identifier'
     });
   }
 
@@ -148,7 +148,7 @@ export class ResultItemComponent implements OnInit {
     const dialogRef = this.dialog.open(HistoryDialogComponent, {
       width: '750px',
       data: this.doc,
-      panelClass: 'app-history-dialog'
+      panelClass: 'app-history-identifier'
     });
 
 
@@ -212,7 +212,7 @@ export class ResultItemComponent implements OnInit {
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
             width: '750px',
             data: res.response,
-            panelClass: 'app-dialog-history'
+            panelClass: 'app-dialog-identifier'
           });
 
           dialogRef.afterClosed().subscribe(result => {

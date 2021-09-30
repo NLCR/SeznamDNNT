@@ -10,14 +10,14 @@ export interface DataDialogData {
 }
 
 @Component({
-  selector: 'app-dialog-history',
-  templateUrl: './dialog-history.component.html',
-  styleUrls: ['./dialog-history.component.scss']
+  selector: 'app-dialog-identifier',
+  templateUrl: './dialog-identifier.component.html',
+  styleUrls: ['./dialog-identifier.component.scss']
 })
-export class DialogHistoryComponent implements OnInit {
+export class DialogIdentifierComponent implements OnInit {
 
   constructor(
-    public dialogRef: MatDialogRef<DialogHistoryComponent>,
+    public dialogRef: MatDialogRef<DialogIdentifierComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DataDialogData) { }
 
   ngOnInit(): void {
