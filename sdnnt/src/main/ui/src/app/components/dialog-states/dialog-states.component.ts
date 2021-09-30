@@ -7,11 +7,11 @@ import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
-  selector: 'app-states-dialog',
-  templateUrl: './states-dialog.component.html',
-  styleUrls: ['./states-dialog.component.scss']
+  selector: 'app-dialog-states',
+  templateUrl: './dialog-states.component.html',
+  styleUrls: ['./dialog-states.component.scss']
 })
-export class StatesDialogComponent implements OnInit {
+export class DialogStatesComponent implements OnInit {
 
   newState: string;
   poznamka: string;
@@ -25,7 +25,7 @@ export class StatesDialogComponent implements OnInit {
   fmt: string;
   
   constructor(
-    public dialogRef: MatDialogRef<StatesDialogComponent>,
+    public dialogRef: MatDialogRef<DialogStatesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
     public config: AppConfiguration,
     private service: AppService,

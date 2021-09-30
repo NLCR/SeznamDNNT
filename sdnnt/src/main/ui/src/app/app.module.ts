@@ -28,7 +28,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PaginatorComponent } from './components/paginator/paginator.component';
 import { DialogHistoryComponent } from './components/dialog-history/dialog-history.component';
-import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
+import { DialogStatesComponent } from './components/dialog-states/dialog-states.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { DialogIdentifierComponent } from './components/dialog-identifier/dialog-identifier.component';
 import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdialog.component';
@@ -84,7 +84,7 @@ const providers: any[] =[
     FacetsComponent,
     PaginatorComponent,
     DialogHistoryComponent,
-    StatesDialogComponent,
+    DialogStatesComponent,
     LoginDialogComponent,
     DialogIdentifierComponent,
     UserPswDialogComponent,

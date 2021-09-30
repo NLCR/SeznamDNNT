@@ -12,7 +12,7 @@ import { ExpressionDialogComponent } from '../expression-dialog/expression-dialo
 import { GranularityComponent } from '../granularity/granularity.component';
 import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
 import { PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
-import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
+import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 
 @Component({
   selector: 'app-result-item',
@@ -168,17 +168,17 @@ export class ResultItemComponent implements OnInit {
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',
       data: data,
-      panelClass: 'app-states-dialog'
+      panelClass: 'app-dialog-states'
     });
 
     
   }
 
   public showStates() {
-    const dialogRef = this.dialog.open(StatesDialogComponent, {
+    const dialogRef = this.dialog.open(DialogStatesComponent, {
       width: '1150px',
       data: this.doc,
-      panelClass: 'app-states-dialog'
+      panelClass: 'app-dialog-states'
     });
 
     dialogRef.afterClosed().subscribe(result => {
