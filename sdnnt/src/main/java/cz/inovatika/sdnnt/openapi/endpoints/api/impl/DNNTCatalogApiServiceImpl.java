@@ -7,6 +7,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.wflow.License;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -186,15 +187,27 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
 
         doc.getJSONArray(NAZEV_FIELD).forEach(o-> nazev.add(o.toString()));
+        // author fields
         if (doc.has(AUTHOR_FIELD)) {
-            doc.getJSONArray("author").forEach(o-> autor.add(o.toString()));
+            doc.getJSONArray("author").forEach(o -> autor.add(o.toString()));
         }
+        if (doc.has(MARC_700_a)) {
+            doc.getJSONArray(MARC_700_a).forEach(o-> autor.add(o.toString()));
+        }
+        // dntstav
         if (doc.has(MarcRecordFields.DNTSTAV_FIELD)) {
             doc.getJSONArray(MarcRecordFields.DNTSTAV_FIELD).forEach(o-> stavy.add(o.toString()));
         }
+        // publishers
         if (doc.has(NAKLADATEL_FIELD)) {
             doc.getJSONArray(NAKLADATEL_FIELD).forEach(o-> nakladatel.add(o.toString()));
         }
+
+        // neni potreba - soucasti nakladatele
+//        if (doc.has(MARC_264_B)) {
+//            doc.getJSONArray(MARC_264_B).forEach(o-> nakladatel.add(o.toString()));
+//        }
+
         if (doc.has(HISTORIE_STAVU_FIELD)) {
             doc.getJSONArray(HISTORIE_STAVU_FIELD).forEach(o-> {
                 JSONObject object = (JSONObject)o;
@@ -223,6 +236,10 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
             // serialy mohou mit granularitu, pokud ano, marc_956u ma vice linku - granularitu davat do pole granularity
             if (itemFmt != null && itemFmt.equals(SE_FMT_VALUE)) {
                 links.add(doc.getJSONArray(MARC_956_U).getString(0));
+            } else {
+                doc.getJSONArray(MARC_956_U).forEach(l-> {
+                    links.add(l.toString());
+                });
             }
         }
 
@@ -241,6 +258,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 granularity.link(itemObject.optString("link",""));
                 if (itemObject.has("cislo")) {
                     granularity.number(itemObject.getString("cislo"));
+                }
+                if (states.contains("A") && states.contains("NZ")) {
+                    granularity.license(License.dnntt.name());
+                } else if (states.contains("A")) {
+                    granularity.license(License.dnnto.name());
                 }
                 granularities.add(granularity);
             });
@@ -293,9 +315,10 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
 
         // identifiers
-        if (doc.has(MARC_015_A) || doc.has(MARC_020_A) || doc.has(MARC_022_A)) {
+        if (doc.has(MARC_015_A) || doc.has(MARC_020_A) || doc.has(MARC_022_A) || doc.has(MARC_902_A)) {
             JSONArray ccnb = doc.optJSONArray(MARC_015_A);
             JSONArray isbn = doc.optJSONArray(MARC_020_A);
+            JSONArray isbn2 = doc.optJSONArray(MARC_902_A);
             JSONArray issn = doc.optJSONArray(MARC_022_A);
             CatalogItemBaseOtherIdentifiers otherIdentifiers = new CatalogItemBaseOtherIdentifiers();
             if (ccnb != null && ccnb.length() > 0) {
@@ -303,10 +326,17 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                     otherIdentifiers.addCcnbItem(oneCcnb.toString());
                 });
             }
-            if (isbn != null && isbn.length() > 0)  {
+
+            if (isbn != null && isbn.length() > 0)   {
                 isbn.forEach(oneIsbn -> {
                     otherIdentifiers.addIsbnItem(oneIsbn.toString());
                 });
+            }
+            if (isbn2 != null && isbn2.length() > 0) {
+                isbn2.forEach(oneIsbn -> {
+                    otherIdentifiers.addIsbnItem(oneIsbn.toString());
+                });
+
             }
             if (issn != null && issn.length() > 0)  {
                 issn.forEach(oneIssn -> {

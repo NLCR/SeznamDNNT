@@ -3,13 +3,13 @@ package cz.inovatika.sdnnt.indexer.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import cz.inovatika.sdnnt.index.ISBN;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -24,7 +24,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONPropertyIgnore;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import java.text.DateFormat;
@@ -259,6 +258,13 @@ public class MarcRecord {
       addStavFromMarc();
     }
 
+    if (sdoc.containsKey(MARC_264_B)) {
+      String val = (String) sdoc.getFieldValue(MARC_264_B);
+      sdoc.setField(NAKLADATEL_FIELD, nakladatelFormat(val));
+    } else if (sdoc.containsKey(MARC_260_B)) {
+      String val = (String) sdoc.getFieldValue(MARC_260_B);
+      sdoc.setField(NAKLADATEL_FIELD, nakladatelFormat(val));
+    }
 
     // https://www.loc.gov/marc/bibliographic/bd008a.html
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
@@ -272,13 +278,12 @@ public class MarcRecord {
       try {
         sdoc.setField("date1_int", Integer.parseInt(date1));
       } catch (NumberFormatException ex) {
-
       }
       try {
         sdoc.setField("date2_int", Integer.parseInt(date2));
       } catch (NumberFormatException ex) {
-
       }
+
 
     }
 
@@ -302,6 +307,19 @@ public class MarcRecord {
     addRokVydani();  
 
     return sdoc;
+  }
+
+  private String nakladatelFormat(String val) {
+    if (val != null) {
+      String trimmed = val.trim();
+      AtomicReference<String> retVal = new AtomicReference(trimmed);
+      Arrays.asList(";", ",", ":").forEach(postfix-> {
+        if (trimmed.endsWith(postfix)) {
+          retVal.set(trimmed.substring(0, trimmed.length()-1));
+        }
+      });
+      return retVal.get().trim();
+    } else return null;
   }
 
   private void setFMT(String type_of_resource, String item_type) {
@@ -476,6 +494,7 @@ public class MarcRecord {
           for (DataField df : dataFields.get("992")) {
             JSONObject h = new JSONObject();
             String stav = df.getSubFields().get("s").get(0).getValue();
+            List<String> states = df.getSubFields().get("s").stream().map(SubField::getValue).collect(Collectors.toList());
             if (df.getSubFields().containsKey("s")) {
               h.put("stav", stav);
             }
@@ -496,9 +515,9 @@ public class MarcRecord {
             if (df.getSubFields().containsKey("b")) {
               h.put("user", df.getSubFields().get("b").get(0).getValue());
             }
-            if ("NZ".equals(stav)) {
+            if (isANZCombination(states)) {
               h.put("license", "dnntt");
-            } else if ("A".equals(stav) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
+            } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null) ){
               h.put("license", "dnnto");
             }
             // System.out.println(h);
@@ -512,12 +531,14 @@ public class MarcRecord {
           for (DataField df : dataFields.get("990")) {
             //JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("a")) {
-              String stav = df.getSubFields().get("a").get(0).getValue();
+              //String stav = df.getSubFields().get("a").get(0).getValue();
+              List<String> states = df.getSubFields().get("a").stream().map(SubField::getValue).collect(Collectors.toList());
               //h.put("dntstav", dntstav);
-              sdoc.addField("dntstav", stav);
-              if ("NZ".equals(stav)) {
+              states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
+              //sdoc.addField("dntstav", states);
+              if (isANZCombination(states)) {
                 sdoc.setField("license", "dnntt");
-              } else if ("A".equals(stav) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
+              } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
                 sdoc.setField("license", "dnnto");
               }
             }
@@ -556,6 +577,15 @@ public class MarcRecord {
           }
           
         }
+  }
+
+  private boolean isANZCombination(List<String> states) {
+    if (states.size() == 2 ) return states.contains("NZ") && states.contains("A");
+    else return states.contains("NZ");
+  }
+
+  private boolean isOnlyACombiation(List<String> states) {
+    return states.size() == 1 && states.get(0).equals("A");
   }
 
   private void addRokVydani() {

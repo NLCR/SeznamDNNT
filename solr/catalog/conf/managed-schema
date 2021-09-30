@@ -112,7 +112,9 @@
     
     <copyField source="marc_245a" dest="title"/>
     <copyField source="marc_100a" dest="author"/>
+	<!-- must be preprocessed fields marc_260 and marc_264
     <copyField source="marc_260b" dest="nakladatel"/>
+	--> 
     <copyField source="marc_*" dest="fullText"/>
     <copyField source="controlfield_*" dest="fullText"/>
     <copyField source="ean" dest="fullText"/>

@@ -32,17 +32,31 @@ public class MarcRecordFields {
 
     public static final String NAZEV_FIELD = "nazev";
     public static final String AUTHOR_FIELD = "author";
-    public static final String NAKLADATEL_FIELD = "nakladatel";
     public static final String FMT_FIELD = "fmt";
+
+    // Additional author field
+    public static final String MARC_700_a = "marc_700a";
+
+    // publisher fields
+    public static final String NAKLADATEL_FIELD = "nakladatel";
+    public static final String MARC_264_B = "marc_264b";
+    public static final String MARC_260_B = "marc_260b";
 
     // identifiers
     //isbn
     public static final String MARC_020_A = "marc_020a";
+    public static final String MARC_902_A = "marc_902a";
+    //marc_902a
     //issn
     public static final String MARC_022_A = "marc_022a";
     //ccnb
     public static final String MARC_015_A = "marc_015a";
 
+    // canceled ccnb
+    public static final String MARC_015_Z = "marc_015z";
+
+    //rocniky
+    public static final String MARC_2643 = "marc_2643";
 
     private MarcRecordFields() {}
 }
