@@ -5,17 +5,17 @@ import { HistoryItem } from 'src/app/shared/history-item';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
-  selector: 'app-history-dialog',
-  templateUrl: './history-dialog.component.html',
-  styleUrls: ['./history-dialog.component.scss']
+  selector: 'app-dialog-history',
+  templateUrl: './dialog-history.component.html',
+  styleUrls: ['./dialog-history.component.scss']
 })
-export class HistoryDialogComponent implements OnInit {
+export class DialogHistoryComponent implements OnInit {
 
   history: HistoryItem[] = [];
   stavy: HistoryItem[] = [];
 
   constructor(
-    public dialogRef: MatDialogRef<HistoryDialogComponent>,
+    public dialogRef: MatDialogRef<DialogHistoryComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
     private service: AppService) { }
 

@@ -10,7 +10,7 @@ import { Zadost } from 'src/app/shared/zadost';
 import { DialogIdentifierComponent } from '../dialog-identifier/dialog-identifier.component';
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { GranularityComponent } from '../granularity/granularity.component';
-import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
+import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
 import { PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
 import { StatesDialogComponent } from '../states-dialog/states-dialog.component';
 
@@ -145,7 +145,7 @@ export class ResultItemComponent implements OnInit {
   }
 
   showHistory() {
-    const dialogRef = this.dialog.open(HistoryDialogComponent, {
+    const dialogRef = this.dialog.open(DialogHistoryComponent, {
       width: '750px',
       data: this.doc,
       panelClass: 'app-history-identifier'

@@ -27,7 +27,7 @@ import { AppMaterialModule } from './app-material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PaginatorComponent } from './components/paginator/paginator.component';
-import { HistoryDialogComponent } from './components/history-dialog/history-dialog.component';
+import { DialogHistoryComponent } from './components/dialog-history/dialog-history.component';
 import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
 import { DialogIdentifierComponent } from './components/dialog-identifier/dialog-identifier.component';
@@ -83,7 +83,7 @@ const providers: any[] =[
     ResultItemComponent,
     FacetsComponent,
     PaginatorComponent,
-    HistoryDialogComponent,
+    DialogHistoryComponent,
     StatesDialogComponent,
     LoginDialogComponent,
     DialogIdentifierComponent,
