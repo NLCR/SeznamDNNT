@@ -1,8 +1,13 @@
 <h1 mat-dialog-title>{{ 'desc.identifikatory_zaznamu' | translate }}: <span>{{ data.title }}</span></h1>
 <div mat-dialog-content>
-  <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let item of data.items">{{ item.label | translate }}: {{ item.value }}</mat-list-item>
-  </mat-list>
+  <table class="app-table" [cellPadding]="0" [cellSpacing]="0">
+    <tbody>
+      <tr *ngFor="let item of data.items">
+        <th>{{ item.label | translate }}</th>
+        <td>{{ item.value }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
