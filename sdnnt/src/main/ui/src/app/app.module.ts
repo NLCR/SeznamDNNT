@@ -30,7 +30,7 @@ import { PaginatorComponent } from './components/paginator/paginator.component';
 import { HistoryDialogComponent } from './components/history-dialog/history-dialog.component';
 import { StatesDialogComponent } from './components/states-dialog/states-dialog.component';
 import { LoginDialogComponent } from './components/login-dialog/login-dialog.component';
-import { DataDialogComponent } from './components/data-dialog/data-dialog.component';
+import { DialogHistoryComponent } from './components/dialog-history/dialog-history.component';
 import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdialog.component';
 
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
@@ -86,7 +86,7 @@ const providers: any[] =[
     HistoryDialogComponent,
     StatesDialogComponent,
     LoginDialogComponent,
-    DataDialogComponent,
+    DialogHistoryComponent,
     UserPswDialogComponent,
     InputLoginNameDialogComponent,
 

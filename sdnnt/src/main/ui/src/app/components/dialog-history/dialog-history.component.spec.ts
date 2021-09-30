@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DataDialogComponent } from './data-dialog.component';
+import { DialogHistoryComponent } from './dialog-history.component';
 
 describe('DataDialogComponent', () => {
-  let component: DataDialogComponent;
-  let fixture: ComponentFixture<DataDialogComponent>;
+  let component: DialogHistoryComponent;
+  let fixture: ComponentFixture<DialogHistoryComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DataDialogComponent ]
+      declarations: [ DialogHistoryComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DataDialogComponent);
+    fixture = TestBed.createComponent(DialogHistoryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

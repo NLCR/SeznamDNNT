@@ -7,7 +7,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
-import { DataDialogComponent } from '../data-dialog/data-dialog.component';
+import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { GranularityComponent } from '../granularity/granularity.component';
 import { HistoryDialogComponent } from '../history-dialog/history-dialog.component';
@@ -137,10 +137,10 @@ export class ResultItemComponent implements OnInit {
     });
 
 
-    const dialogRef = this.dialog.open(DataDialogComponent, {
+    const dialogRef = this.dialog.open(DialogHistoryComponent, {
       width: '750px',
       data,
-      panelClass: 'app-data-dialog'
+      panelClass: 'app-dialog-history'
     });
   }
 
@@ -212,7 +212,7 @@ export class ResultItemComponent implements OnInit {
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
             width: '750px',
             data: res.response,
-            panelClass: 'app-data-dialog'
+            panelClass: 'app-dialog-history'
           });
 
           dialogRef.afterClosed().subscribe(result => {
