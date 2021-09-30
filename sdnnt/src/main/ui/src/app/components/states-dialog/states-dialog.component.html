@@ -57,13 +57,13 @@
     </tbody>
   </table>
   
-  <mat-form-field appearance="outline" class="app-w-100">
+  <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap">
     <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
     <textarea matInput [placeholder]="'desc.poznamka' | translate" [(ngModel)]="poznamka"></textarea>
   </mat-form-field>
 </mat-dialog-content>
 
 <div mat-dialog-actions>
-  <button mat-button (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
   <button mat-button mat-dialog-close >{{ 'desc.zavrit' | translate }}</button>
 </div>
