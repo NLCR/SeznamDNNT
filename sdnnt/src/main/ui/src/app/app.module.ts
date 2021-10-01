@@ -40,7 +40,7 @@ import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
 import { DialogSendRequestComponent } from './components/dialog-send-request/dialog-send-request.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
-import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component';
+import { DialogPromptComponent } from './components/dialog-prompt/dialog-prompt.component';
 import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
 import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/import/import.component';
@@ -97,7 +97,7 @@ const providers: any[] =[
     UserDialogComponent,
     DialogSendRequestComponent,
     ZadostComponent,
-    PromptDialogComponent,
+    DialogPromptComponent,
     ExpressionDialogComponent,
     ImportsComponent,
     ImportComponent,

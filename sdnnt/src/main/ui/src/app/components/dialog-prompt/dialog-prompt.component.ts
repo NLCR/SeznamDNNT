@@ -2,11 +2,11 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-prompt-dialog',
-  templateUrl: './prompt-dialog.component.html',
-  styleUrls: ['./prompt-dialog.component.scss']
+  selector: 'app-dialog-prompt',
+  templateUrl: './dialog-prompt.component.html',
+  styleUrls: ['./dialog-prompt.component.scss']
 })
-export class PromptDialogComponent implements OnInit {
+export class DialogPromptComponent implements OnInit {
 
   result: string;
 

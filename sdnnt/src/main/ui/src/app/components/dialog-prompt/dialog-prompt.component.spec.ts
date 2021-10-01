@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PromptDialogComponent } from './prompt-dialog.component';
+import { DialogPromptComponent } from './dialog-prompt.component';
 
 describe('RejectDialogComponent', () => {
-  let component: PromptDialogComponent;
-  let fixture: ComponentFixture<PromptDialogComponent>;
+  let component: DialogPromptComponent;
+  let fixture: ComponentFixture<DialogPromptComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PromptDialogComponent ]
+      declarations: [ DialogPromptComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PromptDialogComponent);
+    fixture = TestBed.createComponent(DialogPromptComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

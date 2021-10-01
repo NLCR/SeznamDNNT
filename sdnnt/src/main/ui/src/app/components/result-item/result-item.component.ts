@@ -11,7 +11,7 @@ import { DialogIdentifierComponent } from '../dialog-identifier/dialog-identifie
 import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
 import { GranularityComponent } from '../granularity/granularity.component';
 import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
-import { PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
+import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 
 @Component({
@@ -270,7 +270,7 @@ export class ResultItemComponent implements OnInit {
 
   approve() {
     
-    const dialogRef = this.dialog.open(PromptDialogComponent, {
+    const dialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
@@ -288,7 +288,7 @@ export class ResultItemComponent implements OnInit {
   approveLib() {
     
     
-    const dialogRef = this.dialog.open(PromptDialogComponent, {
+    const dialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
@@ -304,7 +304,7 @@ export class ResultItemComponent implements OnInit {
   }
 
   reject() {
-    const dialogRef = this.dialog.open(PromptDialogComponent, {
+    const dialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'duvod_pro_odmitnuti', label: 'duvod'},
       panelClass: 'app-register-dialog'
