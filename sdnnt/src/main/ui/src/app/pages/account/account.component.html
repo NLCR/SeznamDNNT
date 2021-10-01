@@ -100,10 +100,12 @@
           </ng-container>
           <ng-container matColumnDef="user">
             <th mat-header-cell *matHeaderCellDef [hidden]="state.user.role !== 'kurator'">{{ 'desc.uzivatel' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [hidden]="state.user.role !== 'kurator'">{{ element.institution ?   element.user +' '+element.institution  : element.user  }} </td>
+            <td mat-cell *matCellDef="let element" [hidden]="state.user.role !== 'kurator'">{{ element.user }}</td>
           </ng-container>
-
-
+          <ng-container matColumnDef="institution">
+            <th mat-header-cell *matHeaderCellDef [hidden]="state.user.role !== 'kurator'">{{ 'desc.institution' | translate }}</th>
+            <td mat-cell *matCellDef="let element" [hidden]="state.user.role !== 'kurator'">{{ element.institution }}</td>
+          </ng-container>
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
             <td mat-cell *matCellDef="let element" class="app-pr-2">
@@ -162,7 +164,6 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
-
       </div>
       <div class="app-mt-4">
         <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
