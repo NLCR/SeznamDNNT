@@ -80,6 +80,8 @@
    <field name="nazev" type="text_lowercase" indexed="true" stored="true" multiValued="true"  />
    <field name="mistovydani" type="lowercase" indexed="true" stored="true"  />
    <field name="nakladatel" type="lowercase" indexed="true" stored="true" multiValued="true"  />
+   <field name="sigla" type="string" indexed="true" stored="true" multiValued="true"  />
+
    <field name="rokvydani" type="pints" indexed="true" stored="true" />
    
    <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
@@ -116,7 +118,9 @@
     
     <copyField source="marc_245a" dest="title"/>
     <copyField source="marc_100a" dest="author"/>
+    <!--
     <copyField source="marc_260b" dest="nakladatel"/>
+    -->
     <copyField source="marc_*" dest="fullText"/>
     <copyField source="controlfield_*" dest="fullText"/>
     <copyField source="ean" dest="fullText"/>

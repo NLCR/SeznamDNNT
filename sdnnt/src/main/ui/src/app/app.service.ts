@@ -303,7 +303,7 @@ export class AppService {
   }
   
   adminResetPwd(user: string): Observable<User> {
-    let url = '/user/reset_pwd';
+    let url = '/user/admin_reset_pwd';
     return this.post(url, { username: user });
   }
 

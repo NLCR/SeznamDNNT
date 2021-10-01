@@ -266,6 +266,14 @@ public class MarcRecord {
       sdoc.setField(NAKLADATEL_FIELD, nakladatelFormat(val));
     }
 
+    if (sdoc.containsKey(MARC_910_A)) {
+      List<String> collected = sdoc.getFieldValues(MARC_910_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+    } else if (sdoc.containsKey(MARC_040_A)) {
+      List<String> collected = sdoc.getFieldValues(MARC_040_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+    }
+
     // https://www.loc.gov/marc/bibliographic/bd008a.html
     if (controlFields.containsKey("008") && controlFields.get("008").length() > 37) {
       sdoc.setField("language", controlFields.get("008").substring(35, 38));

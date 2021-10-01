@@ -283,7 +283,7 @@ public class CatalogSearcher {
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
             .setStart(start) 
-            .setFacet(true).addFacetField("fmt", "language", "dntstav","license", "marc_910a", "nakladatel" )
+            .setFacet(true).addFacetField("fmt", "language", "dntstav","license", "sigla", "nakladatel" )
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
             .setParam("stats", true)

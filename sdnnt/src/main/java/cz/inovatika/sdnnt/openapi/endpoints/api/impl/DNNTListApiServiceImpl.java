@@ -33,6 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+// zmenit
 public class DNNTListApiServiceImpl extends ListsApiService {
 
     // number of concurrent clients in case of exporting long csv file
@@ -41,7 +42,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
-    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a", "marc_911a");
+    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "sigla", "marc_911a");
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 

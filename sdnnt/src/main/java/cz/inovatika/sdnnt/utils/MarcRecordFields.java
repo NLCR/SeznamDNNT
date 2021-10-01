@@ -22,7 +22,8 @@ public class MarcRecordFields {
 
     public static final String LEGACY_STAV_FIELD = "dntstav";
 
-    // institutions
+    // institutions, sigla
+    public static final String SIGLA_FIELD = "sigla";
     public static final String MARC_910_A = "marc_910a";
     public static final String MARC_040_A = "marc_040a";
 
