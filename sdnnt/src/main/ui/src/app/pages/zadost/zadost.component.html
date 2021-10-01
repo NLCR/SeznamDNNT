@@ -31,7 +31,21 @@
             </ng-container>
           </div>
           <div>
-            <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button>
+            <mat-button-toggle-group name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
+              <mat-button-toggle value="" [matMenuTriggerFor]="delegateMenu" matTooltip="Delogovat na jineho uzivatele"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon></mat-button-toggle>
+              <mat-button-toggle value="" [matMenuTriggerFor]="priorityMenu" matTooltip="Nastavit prioritu"><mat-icon class="material-icons-outlined">priority_high</mat-icon></mat-button-toggle>
+              <mat-button-toggle *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
+            </mat-button-toggle-group>
+            <mat-menu #delegateMenu="matMenu">
+              <button mat-menu-item>Franta Ruzicka</button>
+              <button mat-menu-item>Marek Vochcalpadlo</button>
+            </mat-menu>
+            <mat-menu #priorityMenu="matMenu">
+              <button mat-menu-item>Priorita 1</button>
+              <button mat-menu-item>Priorita 2</button>
+              <button mat-menu-item>Priorita 3</button>
+            </mat-menu>
+            <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->
             <mat-slide-toggle *ngIf="state.user.role === 'kurator'" [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
           </div>
         </div>
