@@ -3,7 +3,7 @@ import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { LoginDialogComponent } from '../login-dialog/login-dialog.component';
+import { DialogLoginComponent } from '../dialog-login/dialog-login.component';
 import { UserDialogComponent } from '../user-dialog/user-dialog.component';
 import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
@@ -35,9 +35,9 @@ export class NavbarComponent implements OnInit {
   }
 
   showLogin() {
-    this.dialog.open(LoginDialogComponent, {
+    this.dialog.open(DialogLoginComponent, {
       width: '450px',
-      panelClass: 'app-login-dialog',
+      panelClass: 'app-dialog-login',
       data: null
     });
   }
@@ -45,7 +45,7 @@ export class NavbarComponent implements OnInit {
   showUser() {
     const d = this.dialog.open(UserDialogComponent, {
       width: '600px',
-      panelClass: 'app-login-dialog',
+      panelClass: 'app-dialog-login',
       data: {isRegister: false}
     });
 

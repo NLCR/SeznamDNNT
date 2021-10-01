@@ -7,11 +7,11 @@ import { Router } from '@angular/router';
 
 
 @Component({
-  selector: 'app-login-dialog',
-  templateUrl: './login-dialog.component.html',
-  styleUrls: ['./login-dialog.component.scss']
+  selector: 'app-dialog-login',
+  templateUrl: './dialog-login.component.html',
+  styleUrls: ['./dialog-login.component.scss']
 })
-export class LoginDialogComponent implements OnInit {
+export class DialogLoginComponent implements OnInit {
 
   user: string;
   pwd: string;
@@ -20,7 +20,7 @@ export class LoginDialogComponent implements OnInit {
   keepLogged: boolean;
 
   constructor(
-    public dialogRef: MatDialogRef<LoginDialogComponent>,
+    public dialogRef: MatDialogRef<DialogLoginComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private config: AppConfiguration,
     public state: AppState,
