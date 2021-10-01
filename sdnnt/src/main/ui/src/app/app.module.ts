@@ -38,7 +38,7 @@ import { FacetsUsedComponent } from './components/facets/facets-used/facets-used
 import { AccountItemComponent } from './components/account-item/account-item.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
 import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
-import { ZadostSendDialogComponent } from './components/zadost-send-dialog/zadost-send-dialog.component';
+import { DialogSendRequestComponent } from './components/dialog-send-request/dialog-send-request.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component';
 import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
@@ -95,7 +95,7 @@ const providers: any[] =[
     AccountItemComponent,
     UserFormComponent,
     UserDialogComponent,
-    ZadostSendDialogComponent,
+    DialogSendRequestComponent,
     ZadostComponent,
     PromptDialogComponent,
     ExpressionDialogComponent,

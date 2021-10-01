@@ -4,11 +4,11 @@ import { AppService } from 'src/app/app.service';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
-  selector: 'app-zadost-send-dialog',
-  templateUrl: './zadost-send-dialog.component.html',
-  styleUrls: ['./zadost-send-dialog.component.scss']
+  selector: 'app-dialog-send-request',
+  templateUrl: './dialog-send-request.component.html',
+  styleUrls: ['./dialog-send-request.component.scss']
 })
-export class ZadostSendDialogComponent implements OnInit {
+export class DialogSendRequestComponent implements OnInit {
 
   newState: string;
   poznamka: string;
@@ -17,7 +17,7 @@ export class ZadostSendDialogComponent implements OnInit {
   public dntStates: string[] = ['NZN', 'VVN'];
 
   constructor(
-    public dialogRef: MatDialogRef<ZadostSendDialogComponent>,
+    public dialogRef: MatDialogRef<DialogSendRequestComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Zadost,
     private service: AppService) { }
 

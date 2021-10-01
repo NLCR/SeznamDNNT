@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ZadostSendDialogComponent } from './zadost-send-dialog.component';
+import { DialogSendRequestComponent } from './dialog-send-request.component';
 
 describe('ZadostSendDialogComponent', () => {
-  let component: ZadostSendDialogComponent;
-  let fixture: ComponentFixture<ZadostSendDialogComponent>;
+  let component: DialogSendRequestComponent;
+  let fixture: ComponentFixture<DialogSendRequestComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ZadostSendDialogComponent ]
+      declarations: [ DialogSendRequestComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ZadostSendDialogComponent);
+    fixture = TestBed.createComponent(DialogSendRequestComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

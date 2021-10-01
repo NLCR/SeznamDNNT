@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { ZadostSendDialogComponent } from 'src/app/components/zadost-send-dialog/zadost-send-dialog.component';
+import { DialogSendRequestComponent } from 'src/app/components/dialog-send-request/dialog-send-request.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
@@ -154,7 +154,7 @@ export class AccountComponent implements OnInit {
   }
 
   send(zadost: Zadost) {
-    const dialogRef = this.dialog.open(ZadostSendDialogComponent, {
+    const dialogRef = this.dialog.open(DialogSendRequestComponent, {
       width: '750px',
       data: zadost,
       panelClass: 'app-send-request'
