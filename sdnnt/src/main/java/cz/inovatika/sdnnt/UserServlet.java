@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
@@ -33,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.rights.Role.admin;
+import static cz.inovatika.sdnnt.rights.Role.mainKurator;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
@@ -257,6 +259,23 @@ public class UserServlet extends HttpServlet {
         }
       }
     },
+
+    USERS_BY_ROLE {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin, mainKurator)).permit()) {
+          JSONObject retval = new JSONObject();
+          JSONArray docs = new JSONArray();
+          String role = req.getParameter("role");
+          new UserControlerImpl(req).findUsersByRole(role != null ? Role.valueOf(role) : Role.user).stream().map(User::toJSONObject).forEach(docs::put);
+          retval.put("docs", docs);
+          return retval;
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+      }
+    },
+
 
     INSTITUTIONS {
       @Override

@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.services.impl;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserControler;
@@ -315,7 +316,16 @@ public class UserControlerImpl implements UserControler {
     }
 
 
-
+    @Override
+    public List<User> findUsersByRole(Role role) throws UserControlerException {
+        try (SolrClient solr = buildClient()) {
+            SolrQuery query = new SolrQuery("role:\""+role.name()+"\"")
+                    .setRows(1000);
+            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+        } catch (SolrServerException | IOException ex) {
+            throw new UserControlerException(ex);
+        }
+    }
 
     User toTOObject(User user) {
         if (user != null) {

@@ -6,6 +6,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { User } from 'src/app/shared/user';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
@@ -22,6 +23,9 @@ export class ZadostComponent implements OnInit {
   // action: string;
   hideProcessed: boolean;
 
+  kurators: User[];
+
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -33,6 +37,11 @@ export class ZadostComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
+
+    this.service.getUsersByRole('kurator').subscribe(res => {
+      this.kurators = res.docs;
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
 
     this.subs.push(this.route.queryParams.subscribe(val => {
@@ -58,6 +67,30 @@ export class ZadostComponent implements OnInit {
       this.docs.map(doc => {
         doc.isProcessed = process && process[doc.identifier];
       });
+    });
+  }
+
+  setPriority(priority: string) {
+      this.zadost.priority = priority;
+      this.service.saveZadost(this.zadost).subscribe((res: any) => {
+        if (res.error) {
+          this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        } else {
+          this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+          this.getDocs(this.route.snapshot.queryParams);
+        }
+      });
+  }
+
+  setDelegated(delegated: string) {
+    this.zadost.delegated = delegated;
+    this.service.saveZadost(this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.getDocs(this.route.snapshot.queryParams);
+      }
     });
   }
 

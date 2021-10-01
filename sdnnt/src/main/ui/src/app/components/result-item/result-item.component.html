@@ -48,7 +48,7 @@
       <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.' + doc.dntstav | translate">info</mat-icon>
         {{ 'state.' + doc.dntstav[doc.dntstav.length-1] | translate }}
-        <a *ngIf="state.logged && state.user.role === 'kurator' && !inZadost" (click)="showStates()" class="app-badge-btn">
+        <a *ngIf="state.logged && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && !inZadost" (click)="showStates()" class="app-badge-btn">
           <mat-icon class="material-icons-outlined" [matTooltip]="'desc.zmenit_stav'| translate">edit</mat-icon>
         </a>
         <a *ngIf="hasGranularity" (click)="showGranularity()" class="app-badge-btn">
@@ -63,13 +63,13 @@
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">info</mat-icon>
         {{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.navrh}}
       </div>
-      <button mat-stroked-button *ngIf="state.logged && !hasNavhr && state.user.role !== 'kurator' && !inZadost"
+      <button mat-stroked-button *ngIf="state.logged && !hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost"
         (click)="addToZadost()">
         <mat-icon>check</mat-icon>
         {{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
       </button>
       <button mat-stroked-button
-        *ngIf="state.logged && state.user.role !== 'kurator' && inZadost && (zadost.state === 'open')"
+        *ngIf="state.logged && (state.user.role !== 'kurator' &&state.user.role !== 'mainKurator') && inZadost && (zadost.state === 'open')"
         (click)="removeFromZadost()">
         <mat-icon>close</mat-icon>
         {{ 'desc.odstranit_z_zadosti' | translate }}
@@ -88,7 +88,7 @@
       </button>
 
       <ng-container *ngIf="state.user && inZadost && !processed?.state">
-        <mat-button-toggle-group class="app-ml-3" *ngIf="state.user.role === 'kurator' && zadost.state === 'waiting'"
+        <mat-button-toggle-group class="app-ml-3" *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'"
           [value]="processed?.state">
           <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()"
             [matTooltip]="'Schvalit zmenu stavu na PA'" matTooltipPosition="above">

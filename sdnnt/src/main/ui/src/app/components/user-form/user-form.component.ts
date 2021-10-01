@@ -82,12 +82,6 @@ export class UserFormComponent implements OnInit, OnChanges {
   }
 
   switchEnableApi() {
-    /*
-    if (this.isApiEnabled()) {
-       this.user.apikey = null; 
-    } else {
-      this.user.apikey = Guid.newGuid().toString();
-    }*/
     if (this.isApiEnabled) {
       this.user.apikey = Guid.newGuid().toString();
       console.log("Generated api key "+this.user.apikey);

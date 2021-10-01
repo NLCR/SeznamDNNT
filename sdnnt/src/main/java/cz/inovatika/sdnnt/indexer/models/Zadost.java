@@ -75,6 +75,13 @@ public class Zadost {
   @Field
   public String institution;
 
+  @Field
+  public String delegated;
+
+  @Field
+  public String priority;
+
+
   public static Zadost fromJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     Zadost o = objectMapper.readValue(json, Zadost.class); 

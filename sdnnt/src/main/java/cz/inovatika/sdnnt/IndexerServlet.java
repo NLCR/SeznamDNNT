@@ -20,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.rights.RightsResolver;
-import static cz.inovatika.sdnnt.rights.Role.admin;
-import static cz.inovatika.sdnnt.rights.Role.kurator;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
@@ -34,6 +32,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONObject;
 
+import static cz.inovatika.sdnnt.rights.Role.*;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
 
 import static javax.servlet.http.HttpServletResponse.*;
@@ -434,7 +433,7 @@ public class IndexerServlet extends HttpServlet {
     SAVE {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           User user = new UserControlerImpl(req).getUser();
           try {
             Indexer indexer = new Indexer();

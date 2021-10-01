@@ -282,6 +282,11 @@ export class AppService {
     return this.get(url);
   }
 
+  getUsersByRole(role: string): Observable<any> {
+    let url = 'user/users_by_role?role='+role;
+    return this.get(url);
+  }
+
   getInstitutions(): Observable<any> {
     let url = 'user/institutions';
     return this.get(url);

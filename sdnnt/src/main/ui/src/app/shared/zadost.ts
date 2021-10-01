@@ -12,6 +12,10 @@ export class Zadost {
   identifiers: string[];
   process: string;
 
+  delegated: string;
+  priority: string;
+  
+
   constructor(timestamp: string, user: string) {
     this.id = user + timestamp;
     this.user = user;

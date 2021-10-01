@@ -27,7 +27,7 @@ public class User {
   
   @Field
   public String role;
-  
+
   @Field
   public String state;
   

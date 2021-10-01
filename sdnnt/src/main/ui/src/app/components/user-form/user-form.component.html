@@ -105,20 +105,13 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
-      <div class="app-mr-4">
+    <div fxFlex="100%" *ngIf="state.user?.role === 'admin'">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.role' | translate }}</mat-label>
           <mat-select name="role"  [(ngModel)]="user.role">
             <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
           </mat-select>
         </mat-form-field>
-      </div>
-    </div>
-    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
-      <div>
-        <mat-checkbox name="isactive" [(ngModel)]="user.isActive" class="app-ml-8">{{ 'desc.je_aktivni' | translate }}</mat-checkbox>
-      </div>
     </div>
 
 

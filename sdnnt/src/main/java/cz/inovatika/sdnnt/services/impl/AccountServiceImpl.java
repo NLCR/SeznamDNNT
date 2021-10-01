@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.UserControler;
 import org.apache.solr.client.solrj.SolrClient;
@@ -37,7 +38,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public JSONObject search(String q, String state, String navrh, String institution, User user, int rows, int page) throws SolrServerException, IOException {
+    public JSONObject search(String q, String state, String navrh, String institution,String priority, String delegated, User user, int rows, int page) throws SolrServerException, IOException {
         NamedList<Object> qresp = null;
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
@@ -49,7 +50,7 @@ public class AccountServiceImpl implements AccountService {
 
             SolrQuery query = new SolrQuery(q)
                     .setParam("df", "fullText")
-                    .setFacet(true).addFacetField("typ", "state", "navrh","institution")
+                    .setFacet(true).addFacetField("typ", "state", "navrh","institution", "delegated", "priority")
                     .setParam("json.nl", "arrntv")
                     .setFields("*,process:[json]");
 
@@ -68,7 +69,14 @@ public class AccountServiceImpl implements AccountService {
                 query.addFilterQuery("institution:"+institution);
             }
 
-            if ("kurator".equals(user.role)) {
+            if (delegated != null) {
+                query.addFilterQuery("delegated:"+institution);
+            }
+            if (priority != null) {
+                query.addFilterQuery("priority:"+institution);
+            }
+
+            if (Role.kurator.name().equals(user.role) || Role.mainKurator.name().equals(user.role)) {
                 query.addFilterQuery("-state:open");
                 query.addSort(SolrQuery.SortClause.desc("state"));
                 query.addSort(SolrQuery.SortClause.asc("indextime"));

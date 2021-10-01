@@ -113,12 +113,17 @@ public class AccountServlet extends HttpServlet {
           String state = req.getParameter("state");
           String navrh = req.getParameter("navrh");
           String institution = req.getParameter("institution");
+          String delegated = req.getParameter("delegated");
+          String priority = req.getParameter("priority");
+
           String page = req.getParameter("page");
           String rows = req.getParameter("rows");
 
           try {
             AccountService service = new AccountServiceImpl(new UserControlerImpl(req));
-            return service.search(q, state, navrh, institution, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
+
+            //String priority, String delegated
+            return service.search(q, state, navrh, institution, priority, delegated, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -231,7 +236,7 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             return Zadost.markAsProcessed(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().username);
           } catch (IOException e) {
@@ -248,7 +253,7 @@ public class AccountServlet extends HttpServlet {
     APPROVE_VVN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -270,7 +275,7 @@ public class AccountServlet extends HttpServlet {
     REJECT_VVN {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -290,7 +295,7 @@ public class AccountServlet extends HttpServlet {
     APPROVE_NAVRH_LIB{
       @Override
       JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(request).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(request);
@@ -312,7 +317,7 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -336,7 +341,7 @@ public class AccountServlet extends HttpServlet {
       @Override
       JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
 
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -357,7 +362,7 @@ public class AccountServlet extends HttpServlet {
     REJECT_NAVRH {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           User user = new UserControlerImpl(req).getUser();
           try {
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -375,7 +380,7 @@ public class AccountServlet extends HttpServlet {
     APPROVE_NAVRH_IN_IMPORT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
@@ -392,7 +397,7 @@ public class AccountServlet extends HttpServlet {
     ADD_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin, user)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin, user)).permit()) {
           try {
             // TODO: What is it ??
             return new JSONObject();

@@ -27,8 +27,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONObject;
 
-import static cz.inovatika.sdnnt.rights.Role.admin;
-import static cz.inovatika.sdnnt.rights.Role.kurator;
+import static cz.inovatika.sdnnt.rights.Role.*;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
@@ -170,7 +169,7 @@ public class SearchServlet extends HttpServlet {
     IMPORT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           JSONObject ret = new JSONObject();
           Options opts = Options.getInstance();
 
@@ -230,7 +229,7 @@ public class SearchServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, admin)).permit()) {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           Options opts = Options.getInstance();
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
 

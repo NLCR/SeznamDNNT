@@ -40,8 +40,13 @@ export class AccountComponent implements OnInit {
   stateFilter: string;
   newStavFilter: string;
   institutionFilter:string;
+  delegatedFilter: string;
+  priorityFilter: string;
+
 
   allResultInstitutions:string[] = [];
+  allPriorities:string[] = [];
+  allDelegated:string[] = [];
 
 
   constructor(
@@ -81,6 +86,14 @@ export class AccountComponent implements OnInit {
 
         this.allResultInstitutions = resp.facet_counts.facet_fields.institution.map( function(val, index){
             return val.name;
+        });
+
+        this.allPriorities = resp.facet_counts.facet_fields.priority.map( function(val, index){
+          return val.name;
+        });
+
+        this.allDelegated = resp.facet_counts.facet_fields.delegated.map( function(val, index){
+          return val.name;
         });
 
       }
@@ -130,6 +143,34 @@ export class AccountComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+
+  setDelegated(delegated: string) {
+    const q: any = {};
+    q.delegated = delegated;
+    if (this.delegatedFilter === delegated) {
+      q.delegated = null;
+      this.delegatedFilter = null;
+    } else {
+      q.delegated = delegated;
+      this.delegatedFilter  = delegated;
+    }
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
+  setPriority(priority: string) {
+    const q: any = {};
+    q.priority = priority;
+    if (this.priorityFilter === priority) {
+      q.priority = null;
+      this.priorityFilter = null;
+    } else {
+      q.priority = priority;
+      this.priorityFilter  = priority;
+    }
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
 
   removeAllFilters() {
     this.stateFilter = null;
@@ -181,4 +222,6 @@ export class AccountComponent implements OnInit {
       }
     });
   }
+
+
 }

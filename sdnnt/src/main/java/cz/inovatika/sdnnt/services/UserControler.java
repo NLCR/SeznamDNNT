@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.services;
 
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
@@ -24,6 +25,8 @@ public interface UserControler {
 
     public User getUser();
     public List<User> getAll() throws UserControlerException;
+    public List<User> findUsersByRole(Role role) throws UserControlerException;
+
 
     public User findUserByApiKey(String apikey) throws UserControlerException;
     public User findUser(String username) throws UserControlerException;
