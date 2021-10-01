@@ -148,16 +148,16 @@ export class AccountComponent implements OnInit {
     // const dialogRef = this.dialog.open(ZadostInfoDialogComponent, {
     //   width: '1150px',
     //   data: zadost,
-    //   panelClass: 'app-dialog-states'
+    //   panelClass: 'app-states-dialog'
     // });
     this.router.navigate(['zadost', zadost.id], {});
   }
 
   send(zadost: Zadost) {
     const dialogRef = this.dialog.open(ZadostSendDialogComponent, {
-      width: '1150px',
+      width: '750px',
       data: zadost,
-      panelClass: 'app-dialog-states'
+      panelClass: 'app-send-request'
     });
     
   }

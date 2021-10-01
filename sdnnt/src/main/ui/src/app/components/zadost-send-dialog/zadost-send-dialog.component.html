@@ -1,15 +1,13 @@
 <h1 mat-dialog-title>{{ 'desc.poslat_zadost' | translate }}</h1>
-<div fxLayout="row" fxLayoutGap="16px" class="app-mb-n16">
-  <mat-form-field fxFlex appearance="fill">
-    <mat-label>{{ 'desc.pozadavek' | translate }}</mat-label>
-    <input matInput name="pozadavek" [(ngModel)]="pozadavek" />
-  </mat-form-field>
-  <mat-form-field fxFlex appearance="fill">
-    <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
-    <input matInput name="poznamka" [(ngModel)]="poznamka" />
-  </mat-form-field>
-</div>
+<mat-form-field appearance="outline" class="app-w-100">
+  <mat-label>{{ 'desc.pozadavek' | translate }}</mat-label>
+  <input matInput name="pozadavek" [(ngModel)]="pozadavek" [placeholder]="'desc.pozadavek' | translate" />
+</mat-form-field>
+<mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap">
+  <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
+  <input matInput name="poznamka" [(ngModel)]="poznamka" [placeholder]="'desc.poznamka' | translate" />
+</mat-form-field>
 <div mat-dialog-actions>
-  <button mat-button (click)="send()" cdkFocusInitial>{{ 'desc.send' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="send()" cdkFocusInitial>{{ 'desc.send' | translate }}</button>
   <button mat-button mat-dialog-close >{{ 'desc.zavrit' | translate }}</button>
 </div>

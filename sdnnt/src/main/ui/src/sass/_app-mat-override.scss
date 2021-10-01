@@ -211,6 +211,10 @@
   }
 
   &.mat-form-field-appearance-outline {
+    .mat-form-field-wrapper {
+      margin-bottom: -0.34375em;
+    }
+    
     &.app-clean-bottom-gap {
       .mat-form-field-wrapper {
         margin-bottom: -1.34375em;
