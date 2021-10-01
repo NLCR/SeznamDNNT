@@ -175,7 +175,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
                     try {
                         AccountService accountService = new AccountServiceImpl();
-                        JSONObject search = accountService.search(null, status, navrh, null, user, LIMIT, 0);
+                        JSONObject search = accountService.search(null, status, navrh, null, null, null , user, LIMIT, 0);
                         JSONObject response = search.getJSONObject("response");
                         JSONArray docs = response.getJSONArray("docs");
                         for (int i = 0, ll = docs.length();i<ll;i++) {
