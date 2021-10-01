@@ -626,6 +626,10 @@
     "hledat_na_google": "Search on google",
     "rok_od": "Year from",
     "rok_do": "Year to",
-    "komentar": "Comment"
+    "komentar": "Comment",
+
+    "delegated_kurator": "Delegovaný kurátor",
+    "priority": "Priorita"
+
   }
 }

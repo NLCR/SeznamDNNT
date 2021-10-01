@@ -523,15 +523,20 @@ public class MarcRecord {
             if (df.getSubFields().containsKey("b")) {
               h.put("user", df.getSubFields().get("b").get(0).getValue());
             }
+
             if (isANZCombination(states)) {
               h.put("license", "dnntt");
             } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null) ){
               h.put("license", "dnnto");
             }
+
             // System.out.println(h);
             hs.put(h);
           }
           sdoc.setField("historie_stavu", hs.toString());
+
+
+
         }
 
         // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
@@ -548,6 +553,20 @@ public class MarcRecord {
                 sdoc.setField("license", "dnntt");
               } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
                 sdoc.setField("license", "dnnto");
+              }
+
+              // history license
+              if (states.size() == 1 && states.contains("N")) {
+                List<String> removedLicences = new ArrayList<>();
+                hs.forEach(jsonObj-> {
+                  JSONObject json = (JSONObject) jsonObj;
+                  if (json.has("license")) {
+                    removedLicences.add(json.getString("license"));
+                  }
+                });
+                if (!removedLicences.isEmpty()) {
+                  removedLicences.stream().forEach(l-> {sdoc.addField("license_history", l);});
+                }
               }
             }
           }

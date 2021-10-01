@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.User;
@@ -70,10 +71,10 @@ public class AccountServiceImpl implements AccountService {
             }
 
             if (delegated != null) {
-                query.addFilterQuery("delegated:"+institution);
+                query.addFilterQuery("delegated:\""+delegated+"\"");
             }
             if (priority != null) {
-                query.addFilterQuery("priority:"+institution);
+                query.addFilterQuery("priority:\""+priority+"\"");
             }
 
             if (Role.kurator.name().equals(user.role) || Role.mainKurator.name().equals(user.role)) {
@@ -103,6 +104,11 @@ public class AccountServiceImpl implements AccountService {
         zadost.user = user.username;
         zadost.institution = user.institution;
         return saveRequest(zadost);
+    }
+
+    public JSONObject saveCuratorRequest(String payload) throws JsonProcessingException {
+       Zadost zadost = Zadost.fromJSON(payload);
+       return saveRequest(zadost);
     }
 
     // moved from Zadost

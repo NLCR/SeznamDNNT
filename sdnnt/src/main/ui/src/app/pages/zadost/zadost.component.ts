@@ -72,7 +72,7 @@ export class ZadostComponent implements OnInit {
 
   setPriority(priority: string) {
       this.zadost.priority = priority;
-      this.service.saveZadost(this.zadost).subscribe((res: any) => {
+      this.service.saveKuratorZadost(this.zadost).subscribe((res: any) => {
         if (res.error) {
           this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
         } else {
@@ -84,7 +84,7 @@ export class ZadostComponent implements OnInit {
 
   setDelegated(delegated: string) {
     this.zadost.delegated = delegated;
-    this.service.saveZadost(this.zadost).subscribe((res: any) => {
+    this.service.saveKuratorZadost(this.zadost).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {

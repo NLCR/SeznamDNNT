@@ -10,12 +10,46 @@ properties:
     type: string
   title:
     type: string
+  type:
+    type: string
   catalogIdentifier:
     type: string
 
+  other_identifiers:
+    type: object
+    properties:
+      issn:
+        type: array
+        items:
+          type: string
+      isbn:
+        type: array
+        items:
+          type: string
+      ccnb:
+        type: array
+        items:
+          type: string
+
+  granularity:
+    type: array
+    items:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            type: string
+        license:
+          type: string
+        link:
+          type: string
+        number:
+          type: string
 example:
   pid: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
   license: "dnntt"
   sigla: "BOA001"
   title: "ERA 21 ekologie, realizace, architektura"
   catalogIdentifier: "oai:aleph-nkp.cz:SKC01-000085907"
+  type: "BK"

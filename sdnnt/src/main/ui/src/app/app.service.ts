@@ -181,9 +181,17 @@ export class AppService {
   saveZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_zadost';
     const params: HttpParams = new HttpParams();
+    return this.post(url, zadost, params);
+  }
+
+  saveKuratorZadost(zadost: Zadost): Observable<any> {
+    let url = '/account/save_kurator_zadost';
+    const params: HttpParams = new HttpParams();
       //.set('user', this.state.user.username);
     return this.post(url, zadost, params);
   }
+
+
 
   addFRBRToZadost(zadost: Zadost, frbr: string): Observable<any> {
     let url = '/account/add_frbr_to_zadost';

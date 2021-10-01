@@ -84,15 +84,15 @@ export class AccountComponent implements OnInit {
         this.numFound = resp.response.numFound;
         this.loading = false;
 
-        this.allResultInstitutions = resp.facet_counts.facet_fields.institution.map( function(val, index){
+        this.allResultInstitutions = resp.facet_counts.facet_fields.institution.filter((itm) => itm.value > 0 ).map( function(val, index){
             return val.name;
         });
 
-        this.allPriorities = resp.facet_counts.facet_fields.priority.map( function(val, index){
+        this.allPriorities = resp.facet_counts.facet_fields.priority.filter((itm) => itm.value > 0 ).map( function(val, index){
           return val.name;
         });
 
-        this.allDelegated = resp.facet_counts.facet_fields.delegated.map( function(val, index){
+        this.allDelegated = resp.facet_counts.facet_fields.delegated.filter((itm) => itm.value > 0 ).map( function(val, index){
           return val.name;
         });
 
@@ -176,12 +176,17 @@ export class AccountComponent implements OnInit {
     this.stateFilter = null;
     this.newStavFilter = null;
     this.institutionFilter = null; 
+    this.priorityFilter = null;
+    this.delegatedFilter = null;
 
     const q: any = {};
     q.navrh = null;
     q.state = null;
     q.institution = null;
+    q.priority = null;
+    q.delegated = null;
     q.page = null;
+
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 

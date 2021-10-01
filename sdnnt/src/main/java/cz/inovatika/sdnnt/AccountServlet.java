@@ -214,6 +214,26 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
+    // ulozeni zadosti
+    SAVE_KURATOR_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+          try {
+            UserControlerImpl userControler = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(userControler);
+            return service.saveCuratorRequest(readInputJSON(req).toString());
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+      }
+    },
+
+
     // pridava vsechny zaznamy jednoho vyjadreni do zadosti
     // dilo -> vyjadreni -> provedeni
     ADD_FRBR_TO_ZADOST {

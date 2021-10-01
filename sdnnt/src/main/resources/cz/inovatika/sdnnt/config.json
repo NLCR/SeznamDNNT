@@ -16,36 +16,12 @@
     "yearsSE": 10
   },
 
-  "mail": {
-    "from.user": "xxxx.xxx@gmail.com",
-    "from.name": "YYYY SSSS",
-    "smtp.user": "aaaaa@gmail.com",
-    "smtp.pass": "pswd",
-    "smtp.host" : "smtp.gmail.com",
-    "smtp.auth": true,
-    "smtp.starttls.enable": true,
-    "smtp.port":587
-  },
 
-  "registration": {
-    "subject": "Registrace uzivatele " ,
-    "content.html": true
-  },
 
-  "passwordreset": {
-    "subject": "Reset hesla" ,
-    "content.html": true
-  },
-
-  "resetlink": {
-    "subject": "Zadost o resetovani hesla" ,
-    "content.html": true
-  },  
-  
   "jobs": {
     "zadost": {
       "type": "zadost",
-      "cron": "0 40 1 * * ?"
+      "cron": "0 0 0 * * ?"
     },
     "notifikace_den": {
       "type": "notifications",
@@ -55,16 +31,16 @@
     "notifikace_tyden": {
       "type": "notifications",
       "interval": "tyden",
-      "cron": "0 2 0 ? * MON"
+      "cron": "0 0 2 ? * MON"
     },
     "notifikace_mesic": {
       "type": "notifications",
       "interval": "mesic",
-      "cron": "0 5 0 1 * ?"
+      "cron": "0 15 22 ? * 6L"
     },
     "test": {
       "type": "test",
-      "cron": "0 0 * * * ?"
+      "cron": "0 2 0 ? * MON"
     }
   }
 

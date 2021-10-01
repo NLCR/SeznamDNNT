@@ -408,9 +408,9 @@ public class Indexer {
 
           MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
 
-          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues("dntstav").toArray());
+          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD).toArray());
           mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
-          mr.historie_stavu = new JSONArray((String) doc.getFirstValue("histotie_stavu"));
+          mr.historie_stavu = new JSONArray((String) doc.getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
           mr.license = (String) doc.getFirstValue("license");
           // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
           mr.setStav("A", "scheduler");

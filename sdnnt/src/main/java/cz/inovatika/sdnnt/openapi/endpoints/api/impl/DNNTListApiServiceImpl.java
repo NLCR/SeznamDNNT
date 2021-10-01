@@ -1,19 +1,22 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
-import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfListitem;
-import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemResponse;
+import cz.inovatika.sdnnt.openapi.endpoints.model.*;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.wflow.License;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrDocument;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -33,6 +36,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_022_A;
+
 // zmenit
 public class DNNTListApiServiceImpl extends ListsApiService {
 
@@ -41,8 +47,14 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
+//if (doc.getFieldValue(MARC_015_A) != null || doc.getFieldValue(MARC_020_A) != null ||doc.getFieldValue(MARC_902_A) != null ) {
 
-    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "sigla", "marc_911a");
+    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", MarcRecordFields.SIGLA_FIELD, "marc_911a",
+            GRANULARITY_FIELD,
+            MARC_015_A,
+            MARC_020_A,
+            MARC_902_A
+            );
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
@@ -51,7 +63,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response addedDnnto(String instituion, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+instituion, "license:"+ License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
+        List<String> plusList = (instituion != null) ?  new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+instituion, "license:"+ License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -104,7 +116,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response removedDnntt(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
+        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -129,7 +141,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response removedDnnto(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license_history:"+License.dnnto.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name()));
+        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnnto.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -158,7 +170,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?  new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license:"+License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
+                List<String> plusList = (institution != null) ?  new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnnto.name())) :  new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()));
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
@@ -180,12 +192,12 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
+                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
-                return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", "marc_910a","marc_911a"));
+                return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", MarcRecordFields.MARC_911_U, MarcRecordFields.SIGLA_FIELD,"marc_911a"));
             } else {
                 return Response.status(429).entity("Too many requests; Please wait and repeat request again").build();
             }
@@ -202,7 +214,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license_history:"+License.dnnto.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name()));
+                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnnto.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name()));
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
@@ -224,7 +236,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
+                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
@@ -296,8 +308,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Collection<Object> mlinks856u =  doc.getFieldValues("marc_856u");
         Collection<Object> mlinks956u =  doc.getFieldValues("marc_956u");
 
-        Collection<Object> minstitutions911a = doc.getFieldValues("marc_911a");
-        Collection<Object> minstitutions910a = doc.getFieldValues("marc_910a");
+        Collection<Object> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD);
+        //Collection<Object> minstitutions910a = doc.getFieldValues("marc_910a");
 
         final List<String> links = new ArrayList<>();
         if (mlinks911u != null && !mlinks911u.isEmpty()) {
@@ -321,9 +333,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }).collect(Collectors.toList());
 
 
-            if (mlinks911u != null && !mlinks911u.isEmpty() && minstitutions911a !=null && !minstitutions911a.isEmpty()) {
 
-                List<String> institutions = new ArrayList(minstitutions911a);
+
+            if (mlinks911u != null && !mlinks911u.isEmpty() && minstitutions !=null && !minstitutions.isEmpty()) {
+
+                List<String> institutions = new ArrayList(minstitutions);
                 // indexy do puvodni pole linku
                 List<Integer> indicies = krameriusLinks.stream().map(it-> links.indexOf(it)).collect(Collectors.toList());
                 // Sigly knihoven podle linku

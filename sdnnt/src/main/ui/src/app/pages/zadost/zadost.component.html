@@ -33,12 +33,12 @@
           <div>
             <mat-button-toggle-group *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
               <mat-button-toggle *ngIf="state.user.role === 'mainKurator'" value="" [matMenuTriggerFor]="delegateMenu" matTooltip="Delogovat na jineho uzivatele">
-                <mat-icon *ngIf="zadost.delegated === null" class="material-icons-outlined">manage_accounts</mat-icon>
-                <ng-container *ngIf="zadost.delegated !== null">{{ zadost.delegated }}</ng-container>
+                <mat-icon *ngIf="!zadost.delegated?.length" class="material-icons-outlined">manage_accounts</mat-icon>
+                <ng-container *ngIf="zadost.delegated?.length">{{ zadost.delegated }}</ng-container>
               </mat-button-toggle>
               <mat-button-toggle *ngIf="state.user.role === 'mainKurator'" value="" [matMenuTriggerFor]="priorityMenu" matTooltip="Nastavit prioritu">
-                <mat-icon *ngIf="zadost.priority === null" class="material-icons-outlined">priority_high</mat-icon>
-                <ng-container *ngIf="zadost.priority !== null">{{ zadost.priority }}</ng-container>
+                <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
+                <ng-container *ngIf="zadost.priority?.length">{{ zadost.priority }}</ng-container>
               </mat-button-toggle>
               <mat-button-toggle *ngIf="zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
             </mat-button-toggle-group>
