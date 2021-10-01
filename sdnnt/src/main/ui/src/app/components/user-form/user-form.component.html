@@ -9,7 +9,7 @@
     </div>
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
           <input matInput #jmeno="matInput" cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
@@ -17,7 +17,7 @@
     </div>
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prijmeni' | translate }}</mat-label>
           <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
@@ -25,7 +25,7 @@
     </div>
     <div fxFlex="100%" *ngIf="formTypeSelected === 2">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
           <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
@@ -33,7 +33,7 @@
     </div>
     <div fxFlex="50%">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}*</mat-label>
           <input #username="matInput" matInput [(ngModel)]="user.username" 
           name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate"
@@ -43,7 +43,7 @@
     </div>
     <div fxFlex="50%">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>Email*</mat-label>
           <input matInput #email="matInput" name="email" placeholder="Email" [(ngModel)]="user.email" type="email" email />
         </mat-form-field>
@@ -51,7 +51,7 @@
     </div>
     <div fxFlex="50%">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
           <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" />
         </mat-form-field>
@@ -59,7 +59,7 @@
     </div>
     <div fxFlex="50%">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>IČO</mat-label>
           <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico" />
         </mat-form-field>
@@ -68,7 +68,7 @@
 
     <div fxFlex="100%">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.adresa' | translate }}</mat-label>
           <input matInput name="adresa" [placeholder]="'desc.adresa' | translate" [(ngModel)]="user.adresa" />
         </mat-form-field>
@@ -77,7 +77,7 @@
 
     <div fxFlex="100%">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.institution' | translate }}</mat-label>
 
           <mat-select name="instituce"  [(ngModel)]="user.institution">
@@ -91,7 +91,7 @@
 
     <div fxFlex="50%" *ngIf="formTypeSelected === 2">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}</mat-label>
           <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
@@ -99,7 +99,7 @@
     </div>
     <div fxFlex="50%" *ngIf="formTypeSelected === 2">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}</mat-label>
           <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
@@ -107,7 +107,7 @@
     </div>
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.role' | translate }}</mat-label>
           <mat-select name="role"  [(ngModel)]="user.role">
             <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
@@ -124,7 +124,7 @@
 
     <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
       <div class="app-mr-4">
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey" disabled></textarea>
         </mat-form-field>
       </div>
@@ -137,7 +137,7 @@
 
     <div fxFlex="100%">
       <div>
-        <mat-form-field appearance="fill" class="app-w-100">
+        <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.poznamka' | translate }}</mat-label>
           <textarea matInput [placeholder]="'desc.poznamka' | translate" name="poznamka" [(ngModel)]="user.poznamka"></textarea>
         </mat-form-field>
