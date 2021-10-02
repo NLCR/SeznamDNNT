@@ -1,0 +1,15 @@
+Dobry den pane/pani {{user}}, 
+
+Seznam zmenenych dokumentu:
+
+{{#notifications}}
+
+Nazev: {{nazev}}
+Identifikator: {{identifier}}
+Stav: {{dntstav}}
+Odkaz: https://server/sdnnt/search?page=0&q={{identifier}}
+
+{{/notifications}}
+
+
+S pozdravem SDNNT
