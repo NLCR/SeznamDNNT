@@ -2,20 +2,6 @@
 	"client": {
 	},
 	"server": {
-		"institutions":[
-			{
-				"acronym":"Instituce 1",
-				"name":"Příklad první instituce"
-			},
-			{
-				"acronym":"Instituce 2",
-				"name":"Přiklad druhé instituce"
-			},
-			{
-				"acronym":"Instituce 3",
-				"name":"Příklad třetí instituce"
-			}
-		],
 		
 		"mail": {
 			"from.user": "some.user@someemail",
@@ -52,7 +38,7 @@
 		    "check_stav": {
 				"type": "check_stav",
 				"cron": "0 0 1 1 FEB,AUG ? *"
-			}
+			},
 			"zadost": {
 				"type": "zadost",
 				"cron": "0 0 0 * * ?"
@@ -72,6 +58,23 @@
 				"interval": "mesic",
 				"cron": "0 0 23 23 * ?"
 			}
-		}
+		},
+		
+		
+		"institutions":[
+			{
+				"acronym":"Instituce 1",
+				"name":"Příklad první instituce"
+			},
+			{
+				"acronym":"Instituce 2",
+				"name":"Přiklad druhé instituce"
+			},
+			{
+				"acronym":"Instituce 3",
+				"name":"Příklad třetí instituce"
+			}
+		]
+
 	}
 }
