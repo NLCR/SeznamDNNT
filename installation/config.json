@@ -1,0 +1,77 @@
+{
+	"client": {
+	},
+	"server": {
+		"institutions":[
+			{
+				"acronym":"Instituce 1",
+				"name":"Příklad první instituce"
+			},
+			{
+				"acronym":"Instituce 2",
+				"name":"Přiklad druhé instituce"
+			},
+			{
+				"acronym":"Instituce 3",
+				"name":"Příklad třetí instituce"
+			}
+		],
+		
+		"mail": {
+			"from.user": "some.user@someemail",
+			"from.name": "SDNNT USER",
+			"smtp.user": "smtpuser",
+			"smtp.pass": "smtppass",
+			"smtp.host" : "smtphost",
+			"smtp.auth": true,
+			"smtp.starttls.enable": true,
+			"smtp.port":587
+		  },
+
+		  "registration": {
+			"subject": "Registrace uživatele" ,
+			"content.html": true
+		  },
+
+		  "passwordreset": {
+			"subject": "Reset hesla" ,
+			"content.html": true
+		  },
+
+		  "resetlink": {
+			"subject": "Žádost o resetování hesla" ,
+			"content.html": true
+		  },
+
+		  "notificationemail": {
+			"subject": "Notifikace o změně stavu" ,
+			"content.html": true
+		  },
+
+		"jobs": {
+		    "check_stav": {
+				"type": "check_stav",
+				"cron": "0 0 1 1 FEB,AUG ? *"
+			}
+			"zadost": {
+				"type": "zadost",
+				"cron": "0 0 0 * * ?"
+			},
+			"notifikace_den": {
+				"type": "notifications",
+				"interval": "den",
+				"cron": "0 0 0 * * ?"
+			},
+			"notifikace_tyden": {
+				"type": "notifications",
+				"interval": "tyden",
+				"cron": "0 2 0 ? * MON"
+			},
+			"notifikace_mesic": {
+				"type": "notifications",
+				"interval": "mesic",
+				"cron": "0 0 23 23 * ?"
+			}
+		}
+	}
+}
