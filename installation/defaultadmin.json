@@ -1,0 +1,16 @@
+{ 
+  "add":{
+	"doc":{
+        "username":"admin3",
+        "pwd":"8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+        "role":"admin",
+        "isActive":true,
+        "jmeno":"Sdnnt",
+        "prijmeni":"admin",
+        "email":"admin.email@somemail.com",
+        "notifikace_interval":"none",
+        "indextime":"2021-10-02T00:00:00.000Z",
+		}
+   },
+   "commit": {}
+}
