@@ -1,7 +1,7 @@
 <app-facets-used></app-facets-used>
 
 <mat-accordion multi>
-  <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.withNotification' | translate}}</mat-checkbox>
+  
   <ng-container *ngFor="let facet of facets">
     <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="true">
       <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">

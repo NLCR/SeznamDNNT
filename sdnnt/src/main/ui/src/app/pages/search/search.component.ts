@@ -115,4 +115,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+  setNotis() {
+    const q: any = {};
+    q.withNotification = this.state.withNotification;
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
 }
