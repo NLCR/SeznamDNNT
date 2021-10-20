@@ -4,7 +4,7 @@
       <img [src]="imgSrc" />
     </div>
     <div>
-      <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245c }}</span></mat-card-title>
+      <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245c }} {{ doc.marc_245i }} {{ doc.marc_245n }} {{ doc.marc_245p }}</span></mat-card-title>
       <mat-card-subtitle>
         <div>{{ doc.marc_250a }}</div>
         <div *ngIf="doc.marc_260a">{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>

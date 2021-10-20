@@ -308,6 +308,12 @@ public class MarcRecord {
     if (sdoc.containsKey("marc_245c")) {
       nazev += sdoc.getFieldValue("marc_245c") + " ";
     }
+    if (sdoc.containsKey("marc_245i")) {
+      nazev += sdoc.getFieldValue("marc_245i") + " ";
+    }
+    if (sdoc.containsKey("marc_245n")) {
+      nazev += sdoc.getFieldValue("marc_245n") + " ";
+    }
     if (sdoc.containsKey("marc_245p")) {
       nazev += sdoc.getFieldValue("marc_245p") + " ";
     }
