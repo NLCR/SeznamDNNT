@@ -75,13 +75,13 @@
         {{ 'desc.odstranit_z_zadosti' | translate }}
       </button>
       <button mat-stroked-button
-        *ngIf="state.logged && doc.hasNotifications && state.user.role === 'user'"
+        *ngIf="state.logged && doc.hasNotifications"
         (click)="setFollow(false)"
         [matTooltip]="'desc.ne_sledovat' | translate">
         <mat-icon class="app-color-warning">notifications_active</mat-icon>
       </button>
       <button mat-stroked-button
-        *ngIf="state.logged && !doc.hasNotifications &&  state.user.role === 'user'"
+        *ngIf="state.logged && !doc.hasNotifications"
         (click)="setFollow(true)"
         [matTooltip]="'desc.sledovat' | translate">
         <mat-icon class="material-icons-outlined">notifications</mat-icon>

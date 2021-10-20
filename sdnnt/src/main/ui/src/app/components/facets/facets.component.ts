@@ -48,6 +48,13 @@ export class FacetsComponent implements OnInit {
 
   }
 
+  setNotis() {
+    const q: any = {};
+    q.withNotification = this.state.withNotification;
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
   addFilter(field: string, f:{name: string, type: string, value: number}) {
     const q: any = {};
     q[field] = f.name;

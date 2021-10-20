@@ -180,7 +180,7 @@ public class AccountServlet extends HttpServlet {
                     .setStart(start)
                     .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + req.getParameter("id"))
                     .setSort(SolrQuery.SortClause.asc("title_sort"))
-                    .setFields("*,raw:[json]");
+                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json]");
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");

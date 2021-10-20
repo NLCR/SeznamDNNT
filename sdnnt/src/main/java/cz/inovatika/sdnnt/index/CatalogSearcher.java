@@ -370,6 +370,11 @@ public class CatalogSearcher {
       query.addFilterQuery("dntstav:*");
     } else { 
     }
+    
+    if ("true".equals(req.get("withNotification"))) {
+      query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.username);
+    }
+    
      
     return query;
   }
