@@ -627,8 +627,8 @@
     "rok_od": "Rok od",
     "rok_do": "Rok do",
     "komentar": "Komentář",
-
     "delegated_kurator": "Delegovaný kurátor",
-    "priority": "Priorita"
+    "priority": "Priorita",
+    "zobrazit_zaznamy_s_notifikaci": "Zobrazit záznamy s notifikací"
   }
 }
