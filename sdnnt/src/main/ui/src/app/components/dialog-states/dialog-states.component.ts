@@ -15,7 +15,7 @@ export class DialogStatesComponent implements OnInit {
 
   newState: string;
   poznamka: string;
-  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZ'];
+  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZ', 'X'];
   granularity: any[] = [];
 
   rocnik: string;

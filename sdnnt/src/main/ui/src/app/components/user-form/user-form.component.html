@@ -4,7 +4,7 @@
     <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
       <mat-radio-group [(ngModel)]="formTypeSelected">
         <mat-radio-button [value]="1">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
-        <mat-radio-button [value]="2">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
+        <mat-radio-button [value]="2" disabled>{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
       </mat-radio-group>
     </div>
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
@@ -53,7 +53,7 @@
       <div class="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
-          <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" />
+          <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" #phonenumber="matInput" />
         </mat-form-field>
       </div>
     </div>
@@ -61,7 +61,7 @@
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>IČO</mat-label>
-          <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico" />
+          <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico"  #ico="matInput" />
         </mat-form-field>
       </div>
     </div>
@@ -80,10 +80,9 @@
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.institution' | translate }}</mat-label>
 
-          <mat-select name="instituce"  [(ngModel)]="user.institution">
-            <mat-option *ngFor="let inst of institutions" [value]="inst">{{ inst | translate }}</mat-option>
+          <mat-select name="instituce"  [(ngModel)]="user.institution"  [disabled]="!intitutionChangeEnabled()">
+            <mat-option *ngFor="let inst of institutions" [value]="inst"  >{{ inst | translate }}</mat-option>
           </mat-select>
-
 
         </mat-form-field>
       </div>
@@ -158,16 +157,16 @@
     </mat-radio-group>
   </div>
   <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
-  <div class="app-mb-4" *ngIf="isRegister">
+  <div  #condition class="app-mb-4" *ngIf="isRegister">
     <div class="app-label">{{ 'desc.podminky' | translate }}</div>
     <p>
-      <mat-checkbox><span [innerHTML]="'registracni_podminky.podminka_1' | translate"></span></mat-checkbox>
+      <mat-checkbox #conditionOne   [(ngModel)]="user.registerOption.condition1" name="condition1" ><span [innerHTML]="'registracni_podminky.podminka_1' | translate"></span></mat-checkbox>
     </p>
     <p>
-      <mat-checkbox><span [innerHTML]="'registracni_podminky.podminka_2' | translate"></span></mat-checkbox>
+      <mat-checkbox #conditionTwo  [(ngModel)]="user.registerOption.condition2" name="condition2"><span [innerHTML]="'registracni_podminky.podminka_2' | translate"></span></mat-checkbox>
     </p>
     <p>
-      <mat-checkbox><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
+      <mat-checkbox #conditionThree  [(ngModel)]="user.registerOption.condition3" name="condition3"><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
     </p>
   </div>
 </ng-container>

@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit,OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, Inject, Input, OnInit,OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
@@ -6,6 +6,7 @@ import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-user-form',
@@ -17,13 +18,28 @@ export class UserFormComponent implements OnInit, OnChanges {
   @Input() user: User;
   @Input() isRegister: boolean;
   @Input() focus: string;
+  @Input() scroll: string;
+
+
+
 
   @ViewChild('username') username: MatInput;
   @ViewChild('email') email: MatInput;
   @ViewChild('jmeno') jmeno: MatInput;
+  @ViewChild('phonenumber') phonenumber: MatInput;
+  @ViewChild('ico') ico: MatInput;
 
-  focusables: {[key: string] : MatInput};
-  
+
+  @ViewChild('conditionOne') conditionOneCheck: MatCheckbox;
+  @ViewChild('conditionTwo') conditionTwoCheck: MatCheckbox;
+  @ViewChild('conditionThree') conditionThreeCheck: MatCheckbox;
+
+  @ViewChild('condition') conditionsElement: ElementRef; 
+
+
+  inputFocusables: {[key: string] : MatInput};
+  checkboxFocusables: {[key: string] : MatCheckbox};
+
   formTypeSelected: number = 1;
   isApiEnabled: boolean;
 
@@ -50,15 +66,38 @@ export class UserFormComponent implements OnInit, OnChanges {
       this.jiny = this.user.nositel?.includes('jiny');
       this.nakladatel = this.user.nositel?.includes('nakladatel');
     }
-    this.focusables = {
+
+    // @ViewChild('phonenumber') phonenumber: MatInput;
+    // @ViewChild('ico') ico: MatInput;
+  
+    this.inputFocusables = {
       username: this.username,
       email: this.email,
-      jmeno: this.jmeno
+      jmeno: this.jmeno,
+      phonenumber: this.phonenumber,
+      ico: this.ico
     }
+
+    this.checkboxFocusables = {
+      condition1: this.conditionOneCheck,
+      condition2: this.conditionTwoCheck,
+      condition3: this.conditionThreeCheck
+    }
+
+
+    
+
     if (changes.focus && changes.focus.currentValue) {
-      this.focusables[changes.focus.currentValue].focus();
+
+      if (this.inputFocusables[changes.focus.currentValue]) {
+        this.inputFocusables[changes.focus.currentValue].focus();
+      } 
+
+      if (this.checkboxFocusables[changes.focus.currentValue]) {
+        this.checkboxFocusables[changes.focus.currentValue].focus();
+        this.conditionsElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
-    // console.log("Changed user "+this.user.username);
   }
 
   ngOnInit(): void {
@@ -71,6 +110,14 @@ export class UserFormComponent implements OnInit, OnChanges {
   
   }
 
+
+  intitutionChangeEnabled(): boolean {
+    const retval:boolean = this.user.role == 'admin' || this.isRegister;
+    console.log("Returning value "+retval);
+    return retval;
+  }
+
+  
   setNositel() {
     this.user.nositel = [];
     if (this.autor) {

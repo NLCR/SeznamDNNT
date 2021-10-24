@@ -1,12 +1,14 @@
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { UserRegisterOption } from './user-register-option';
 
 export class User {
+
+  
   username: string;
   pwd: string;
   role: string;
   isActive: boolean;
   notifikace_interval:string;
-  //isApiEnabled:boolean;
 
   typ: string; //pravnicka/fyzicka osoba
   titul: string;
@@ -29,5 +31,6 @@ export class User {
   error?: string;
 
 
+  registerOption: UserRegisterOption;
 }
 

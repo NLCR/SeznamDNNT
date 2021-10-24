@@ -38,9 +38,11 @@ export class ZadostComponent implements OnInit {
       return;
     }
 
-    this.service.getUsersByRole('kurator').subscribe(res => {
-      this.kurators = res.docs;
-    });
+    if (this.state.user.role == 'kurator') {
+      this.service.getUsersByRole('kurator').subscribe(res => {
+        this.kurators = res.docs;
+      });
+    }
 
     const id = this.route.snapshot.paramMap.get('id');
 
