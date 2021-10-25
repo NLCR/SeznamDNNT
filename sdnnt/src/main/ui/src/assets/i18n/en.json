@@ -631,6 +631,7 @@
     "komentar": "Comment",
     "delegated_kurator": "Delegovaný kurátor",
     "priority": "Priorita",
-    "zobrazit_zaznamy_s_notifikaci": "Show notifications with notifications"
+    "zobrazit_zaznamy_s_notifikaci": "Show notifications with notifications",
+    "registracni_formular": "Registration form"
   }
 }
