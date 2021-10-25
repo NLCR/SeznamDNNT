@@ -116,6 +116,8 @@
   "alert": {
     "ulozeni_zadosti_success": "Uložení žádosti proběhlo úspěšně.",
     "ulozeni_zadosti_error": "Chyba při uložení žádosti.",
+    "odstraneni_zadosti_success": "Odstranění dokumentu z žádosti proběhlo úspěšně.",
+    "odstraneni_zadosti_error": "Chyba při odstranění dokumentu z žádosti.",
     "schvaleni_navrhu_success": "Schválení návrhu proběhlo úspěšně.",
     "schvaleni_navrhu_error": "Chyba při schválení návrhu.",
     "zamitnuti_navrhu_success": "Zamítnutí návrhu proběhlo úspěšně.",
@@ -629,6 +631,7 @@
     "komentar": "Komentář",
     "delegated_kurator": "Delegovaný kurátor",
     "priority": "Priorita",
-    "zobrazit_zaznamy_s_notifikaci": "Zobrazit záznamy s notifikací"
+    "zobrazit_zaznamy_s_notifikaci": "Zobrazit záznamy s notifikací",
+    "registracni_formular": "Registrační formulář"
   }
 }

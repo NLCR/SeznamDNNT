@@ -116,9 +116,9 @@ export class ZadostComponent implements OnInit {
     this.zadost.identifiers = this.zadost.identifiers.filter(id => id !== identifier);
     this.service.saveZadost(this.zadost).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        this.service.showSnackBar('alert.odstraneni_zadosti_error', res.error, true);
       } else {
-        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.service.showSnackBar('alert.odstraneni_zadosti_success', '', false);
         this.getDocs(this.route.snapshot.queryParams);
       }
     });
