@@ -116,6 +116,8 @@
   "alert": {
     "ulozeni_zadosti_success": "The request was saved successfully.",
     "ulozeni_zadosti_error": "Error saving request.",
+    "odstraneni_zadosti_success": "The document was successfully removed from the application.",
+    "odstraneni_zadosti_error": "Error deleting document from request.",
     "schvaleni_navrhu_success": "The approval of the proposal was successful.",
     "schvaleni_navrhu_error": "Error approving design.",
     "zamitnuti_navrhu_success": "The proposal was rejected successfully.",
