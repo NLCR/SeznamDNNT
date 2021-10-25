@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { MatPasswordStrengthComponent } from '@angular-material-extensions/password-strength';
 import { Title } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
-import { UserPswDialogComponent } from 'src/app/components/user-pswdialog/user-pswdialog.component';
+import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-password/dialog-change-password.component';
 
 
 
@@ -38,7 +38,7 @@ export class UserResetPasswordComponent implements OnInit {
     if (this.state.user != null) {
       console.log("State user "+this.state.user);
       const data = {};
-      const dialogRef = this.dialog.open(UserPswDialogComponent, {
+      const dialogRef = this.dialog.open(DialogChangePasswordComponent, {
         width: '450px',
         data,
         panelClass: 'app-reset-password-dialog'

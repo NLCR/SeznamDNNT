@@ -31,7 +31,7 @@ import { DialogHistoryComponent } from './components/dialog-history/dialog-histo
 import { DialogStatesComponent } from './components/dialog-states/dialog-states.component';
 import { DialogLoginComponent } from './components/dialog-login/dialog-login.component';
 import { DialogIdentifierComponent } from './components/dialog-identifier/dialog-identifier.component';
-import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdialog.component';
+import { DialogChangePasswordComponent } from './components/dialog-change-password/dialog-change-password.component';
 
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 import { FacetsUsedComponent } from './components/facets/facets-used/facets-used.component';
@@ -87,7 +87,7 @@ const providers: any[] =[
     DialogStatesComponent,
     DialogLoginComponent,
     DialogIdentifierComponent,
-    UserPswDialogComponent,
+    DialogChangePasswordComponent,
     InputLoginNameDialogComponent,
 
     SidenavListComponent,

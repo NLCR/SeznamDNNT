@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdialog.component';
+import { DialogChangePasswordComponent } from './components/dialog-change-password/dialog-change-password.component';
 import { AccountComponent } from './pages/account/account.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { HelpComponent } from './pages/help/help.component';

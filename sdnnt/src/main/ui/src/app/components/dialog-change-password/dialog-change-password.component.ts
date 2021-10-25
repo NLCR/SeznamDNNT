@@ -10,18 +10,18 @@ import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 
 @Component({
-  selector: 'user-pswdialog',
-  templateUrl: './user-pswdialog.component.html',
-  styleUrls: ['./user-pswdialog.component.scss']
+  selector: 'dialog-change-password',
+  templateUrl: './dialog-change-password.component.html',
+  styleUrls: ['./dialog-change-password.component.scss']
 })
-export class UserPswDialogComponent implements OnInit {
+export class DialogChangePasswordComponent implements OnInit {
 
   
   @ViewChild('passwordComponentWithConfirmation', {static: true})
   passwordComponentWithConfirmation: MatPasswordStrengthComponent;
 
   constructor(
-    public dialogRef: MatDialogRef<UserPswDialogComponent>,
+    public dialogRef: MatDialogRef<DialogChangePasswordComponent>,
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
