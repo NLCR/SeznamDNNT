@@ -4,6 +4,15 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
+import {FormControl} from '@angular/forms'; // autocomplete
+import {Observable} from 'rxjs'; // autocomplete
+import {map, startWith} from 'rxjs/operators'; // autocomplete
+
+// -- autocomplete --
+export interface Usr {
+  name: string;
+}
+// -- autocomplete --
 
 @Component({
   selector: 'app-admin',
@@ -11,6 +20,16 @@ import { User } from 'src/app/shared/user';
   styleUrls: ['./admin.component.scss']
 })
 export class AdminComponent implements OnInit {
+
+  // -- autocomplete --
+  myControl = new FormControl();
+  options: Usr[] = [
+    {name: 'Petr Kudela'},
+    {name: 'Pavel Stastny'},
+    {name: 'Igor Macek'}
+  ];
+  filteredOptions: Observable<Usr[]>;
+  // -- autocomplete --
 
   public htmlContent: string;
   public selected: string = 'news';
@@ -77,7 +96,28 @@ export class AdminComponent implements OnInit {
       this.selUser = this.users[0];
     });
     this.service.getText(this.selected).subscribe(text => this.htmlContent = text);
+
+    // -- autocomplete --
+    this.filteredOptions = this.myControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => typeof value === 'string' ? value : value.name),
+        map(name => name ? this._filter(name) : this.options.slice())
+      );
+      // -- autocomplete --
   }
+
+  // -- autocomplete --
+  displayFn(usr: Usr): string {
+    return usr && usr.name ? usr.name : '';
+  }
+
+  private _filter(name: string): Usr[] {
+    const filterValue = name.toLowerCase();
+
+    return this.options.filter(option => option.name.toLowerCase().includes(filterValue));
+  }
+  // -- autocomplete --
 
   selectText(id: string) {
     this.selected = id;
