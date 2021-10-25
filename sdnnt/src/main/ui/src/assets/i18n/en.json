@@ -1,6 +1,6 @@
 {
   "q" : {
-    "placeholder": "Set query ..."
+    "placeholder": "Browse documents ..."
   },
   "consent": {
     "text": "This website uses cookies to provide services, personalize ads and analyze traffic. By using this website, you agree to this.",
@@ -61,7 +61,7 @@
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
       "VVN": "Request for exclusion from the List Design (internal state of administration)",
       "VVS": "Request to be removed from the List (internal state of administration)"
-      }
+    }
   },
   "license": {
     "dnnto": "Dnnto: License for online access",
@@ -529,7 +529,7 @@
     "odstranit_vsechny_filtry": "Odstranit všechny filtry",
     "domu": "Home",
     "napoveda": "Help",
-    "moje_konto": "My account",
+    "moje_pozadavky": "My requirements",
     "imports": "Imports",
     "administrace": "Administration",
     "nkp": "Národní knihovna České republiky",

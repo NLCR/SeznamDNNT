@@ -7,7 +7,7 @@
   </a>
   <mat-divider></mat-divider>
   <a mat-list-item *ngIf="!state.user" (click)="register(); onSidenavClose()" [title]="'desc.registrovat_se' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'desc.registrovat_se' | translate }}</a>
-  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_konto' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
+  <a mat-list-item *ngIf="state.user" (click)="onSidenavClose()" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_pozadavky' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_pozadavky' | translate }}</a>
   <a mat-list-item *ngIf="state.user && state.user.role === 'admin'" (click)="onSidenavClose()" routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
   <a mat-list-item *ngIf="state.user" (click)="showUser(); onSidenavClose()" routerLinkActive="app-active" [title]="state.user.jmeno + ' ' + state.user.prijmeni"><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }}</a>
   <a mat-list-item *ngIf="!state.user" (click)="showLogin(); onSidenavClose()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>

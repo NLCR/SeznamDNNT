@@ -21,7 +21,7 @@
         <mat-icon class="material-icons-outlined">help_outline</mat-icon> {{ 'desc.napoveda' | translate }}
       </a>
       <a mat-stroked-button *ngIf="!state.user" (click)="register()" [title]="'desc.registrovat_se' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'desc.registrovat_se' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_konto' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_konto' | translate }}</a>
+      <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_pozadavky' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_pozadavky' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')" routerLink="imports" routerLinkActive="app-active" [title]="'desc.imports' | translate"><mat-icon class="material-icons-outlined">download</mat-icon> {{ 'desc.imports' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user" (click)="showUser()" routerLinkActive="app-active" [title]="state.user.jmeno + ' ' + state.user.prijmeni"><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }}</a>

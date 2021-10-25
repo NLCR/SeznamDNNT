@@ -1,6 +1,6 @@
 {
   "q" : {
-    "placeholder": "Zadejte dotaz ..."
+    "placeholder": "Procházet dokumenty ..."
   },
   "consent": {
     "text": "Tento web používá k poskytování služeb, personalizaci reklam a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.",
@@ -46,7 +46,7 @@
     "approved": "schváleno",
     "approvedlib": "omezeno na terminál",
 
-      "tooltip": {
+    "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
       "NNN": "Není na seznamu",
       "PA": "Dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
@@ -61,7 +61,7 @@
       "NZN": "Návrh k zařazení do Návrhu seznamu (interní stav administrace)",
       "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
       "VVS": "Výzva k vyřazení ze Seznamu (interní stav administrace)"
-      }
+    }
   },
   "license": {
     "dnnto": "Dnnto: Licence pro online přístup",
@@ -529,7 +529,7 @@
     "odstranit_vsechny_filtry": "Odstranit všechny filtry",
     "domu": "Domů",
     "napoveda": "Nápověda",
-    "moje_konto": "Moje konto",
+    "moje_pozadavky": "Moje požadavky",
     "imports": "Importy",
     "administrace": "Administrace",
     "nkp": "Národní knihovna České republiky",
