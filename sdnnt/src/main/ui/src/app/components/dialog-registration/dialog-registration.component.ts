@@ -4,7 +4,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
-import { UserFormComponent } from '../user-form/user-form.component';
+import { DialogRegistrationFormComponent } from '../dialog-registration-form/dialog-registration-form.component';
 import { UserRegisterOption } from 'src/app/shared/user-register-option';
 
 @Component({

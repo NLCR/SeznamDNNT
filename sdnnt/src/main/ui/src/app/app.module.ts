@@ -36,7 +36,7 @@ import { UserPswDialogComponent } from './components/user-pswdialog/user-pswdial
 import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 import { FacetsUsedComponent } from './components/facets/facets-used/facets-used.component';
 import { AccountItemComponent } from './components/account-item/account-item.component';
-import { UserFormComponent } from './components/user-form/user-form.component';
+import { DialogRegistrationFormComponent } from './components/dialog-registration-form/dialog-registration-form.component';
 import { DialogRegistrationComponent } from './components/dialog-registration/dialog-registration.component';
 import { DialogSendRequestComponent } from './components/dialog-send-request/dialog-send-request.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
@@ -93,7 +93,7 @@ const providers: any[] =[
     SidenavListComponent,
     FacetsUsedComponent,
     AccountItemComponent,
-    UserFormComponent,
+    DialogRegistrationFormComponent,
     DialogRegistrationComponent,
     DialogSendRequestComponent,
     ZadostComponent,

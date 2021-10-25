@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ 'desc.registracni_formular' | translate }}</h1>
 <div mat-dialog-content>
-  <app-user-form [user]="user" [isRegister]="data.isRegister" [focus]="focus"></app-user-form>
+  <app-dialog-registration-form [user]="user" [isRegister]="data.isRegister" [focus]="focus"></app-dialog-registration-form>
 </div>
 <div mat-dialog-actions>
   <button mat-flat-button color="primary" (click)="save()">{{ 'desc.registrovat_se' | translate }}</button>
