@@ -8,11 +8,11 @@ import { UserFormComponent } from '../user-form/user-form.component';
 import { UserRegisterOption } from 'src/app/shared/user-register-option';
 
 @Component({
-  selector: 'app-user-dialog',
-  templateUrl: './user-dialog.component.html',
-  styleUrls: ['./user-dialog.component.scss']
+  selector: 'app-dialog-registration',
+  templateUrl: './dialog-registration.component.html',
+  styleUrls: ['./dialog-registration.component.scss']
 })
-export class UserDialogComponent implements OnInit {
+export class DialogRegistrationComponent implements OnInit {
 
   user: User;
   focus: string;
@@ -20,7 +20,7 @@ export class UserDialogComponent implements OnInit {
 
 
   constructor(
-    public dialogRef: MatDialogRef<UserDialogComponent>,
+    public dialogRef: MatDialogRef<DialogRegistrationComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public state: AppState,
     private service: AppService,

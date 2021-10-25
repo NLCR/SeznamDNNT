@@ -37,7 +37,7 @@ import { SidenavListComponent } from './components/sidenav-list/sidenav-list.com
 import { FacetsUsedComponent } from './components/facets/facets-used/facets-used.component';
 import { AccountItemComponent } from './components/account-item/account-item.component';
 import { UserFormComponent } from './components/user-form/user-form.component';
-import { UserDialogComponent } from './components/user-dialog/user-dialog.component';
+import { DialogRegistrationComponent } from './components/dialog-registration/dialog-registration.component';
 import { DialogSendRequestComponent } from './components/dialog-send-request/dialog-send-request.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 import { DialogPromptComponent } from './components/dialog-prompt/dialog-prompt.component';
@@ -94,7 +94,7 @@ const providers: any[] =[
     FacetsUsedComponent,
     AccountItemComponent,
     UserFormComponent,
-    UserDialogComponent,
+    DialogRegistrationComponent,
     DialogSendRequestComponent,
     ZadostComponent,
     DialogPromptComponent,
