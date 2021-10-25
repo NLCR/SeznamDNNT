@@ -341,6 +341,8 @@ public class UserControlerImpl implements UserControler {
             toObject.notifikace_interval = user.notifikace_interval;
             toObject.role = user.role;
             toObject.institution = user.institution;
+            toObject.ico = user.ico;
+            toObject.poznamka = user.poznamka;
             return toObject;
         } else {
             return null;
