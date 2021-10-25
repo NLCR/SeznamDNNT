@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DialogLoginComponent } from '../dialog-login/dialog-login.component';
-import { UserDialogComponent } from '../user-dialog/user-dialog.component';
+import { DialogRegistrationComponent } from '../dialog-registration/dialog-registration.component';
 import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
 
@@ -43,7 +43,7 @@ export class NavbarComponent implements OnInit {
   }
 
   showUser() {
-    const d = this.dialog.open(UserDialogComponent, {
+    const d = this.dialog.open(DialogRegistrationComponent, {
       width: '600px',
       panelClass: 'app-dialog-login',
       data: {isRegister: false}
@@ -78,7 +78,7 @@ export class NavbarComponent implements OnInit {
 
   register() {
     
-    const d = this.dialog.open(UserDialogComponent, {
+    const d = this.dialog.open(DialogRegistrationComponent, {
       width: '600px',
       panelClass: 'app-register-dialog',
       data: {isRegister: true}
