@@ -43,7 +43,7 @@
               </mat-autocomplete>
             </mat-form-field>
           </form>
-          <mat-list role="list">
+          <mat-list role="list" class="app-user-list">
             <mat-list-item role="listitem" *ngFor="let u of users" (click)="selectUser(u)"
               [class.active]="u === selUser">
               {{ u.jmeno }} {{ u.prijmeni }}

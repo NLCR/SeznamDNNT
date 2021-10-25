@@ -5,6 +5,11 @@ app-admin {
     @extend .app-clean-pd;
     border: 1px solid $app-brand-border-color;
 
+    &.app-user-list {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
     .mat-list-item {
       @extend .app-cursor-pointer;
       height: 36px;
