@@ -633,6 +633,10 @@
     "priority": "Priorita",
     "zobrazit_zaznamy_s_notifikaci": "Show notifications with notifications",
     "registracni_formular": "Registration form",
-    "hledat_uzivatele": "Search user"
+    "hledat_uzivatele": "Search user",
+    "mesto": "City",
+    "ulice": "Street",
+    "cislo_popisne": "Number of descriptive",
+    "psc": "Zip code"
   }
 }

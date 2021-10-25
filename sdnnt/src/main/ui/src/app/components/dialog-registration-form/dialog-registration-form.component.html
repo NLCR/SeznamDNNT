@@ -65,11 +65,47 @@
       </div>
     </div>
 
-    <div fxFlex="100%">
+    <!-- <div fxFlex="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.adresa' | translate }}</mat-label>
           <input matInput name="adresa" [placeholder]="'desc.adresa' | translate" [(ngModel)]="user.adresa" />
+        </mat-form-field>
+      </div>
+    </div> -->
+
+    <div fxFlex="50%">
+      <div class="app-mr-4">
+        <mat-form-field appearance="outline" class="app-w-100">
+          <mat-label>{{ 'desc.mesto' | translate }}</mat-label>
+          <input matInput name="mesto" [placeholder]="'desc.mesto' | translate" [(ngModel)]="user.mesto" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div fxFlex="50%">
+      <div>
+        <mat-form-field appearance="outline" class="app-w-100">
+          <mat-label>{{ 'desc.ulice' | translate }}</mat-label>
+          <input matInput name="ulice" [placeholder]="'desc.ulice' | translate" [(ngModel)]="user.ulice" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div fxFlex="50%">
+      <div class="app-mr-4">
+        <mat-form-field appearance="outline" class="app-w-100">
+          <mat-label>{{ 'desc.cislo_popisne' | translate }}</mat-label>
+          <input matInput name="cislo_popisne" [placeholder]="'desc.cislo_popisne' | translate" [(ngModel)]="user.cislo_popisne" />
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div fxFlex="50%">
+      <div>
+        <mat-form-field appearance="outline" class="app-w-100">
+          <mat-label>{{ 'desc.psc' | translate }}</mat-label>
+          <input matInput name="psc" [placeholder]="'desc.psc' | translate" [(ngModel)]="user.psc" />
         </mat-form-field>
       </div>
     </div>
@@ -78,11 +114,9 @@
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.institution' | translate }}</mat-label>
-
           <mat-select name="instituce"  [(ngModel)]="user.institution"  [disabled]="!intitutionChangeEnabled()">
             <mat-option *ngFor="let inst of institutions" [value]="inst"  >{{ inst | translate }}</mat-option>
           </mat-select>
-
         </mat-form-field>
       </div>
     </div>

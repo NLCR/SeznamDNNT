@@ -16,6 +16,8 @@ export class User {
   prijmeni: string;
   ico: string;
   adresa: string;
+  cislo_popisne: string;
+  ulice: string;
   psc: string;
   mesto: string;
   telefon: string;

@@ -633,6 +633,10 @@
     "priority": "Priorita",
     "zobrazit_zaznamy_s_notifikaci": "Zobrazit záznamy s notifikací",
     "registracni_formular": "Registrační formulář",
-    "hledat_uzivatele": "Hledat uživatele"
+    "hledat_uzivatele": "Hledat uživatele",
+    "mesto": "Město",
+    "ulice": "Ulice",
+    "cislo_popisne": "Číslo popisné",
+    "psc": "Psč"
   }
 }
