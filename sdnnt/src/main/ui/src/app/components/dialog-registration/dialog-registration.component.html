@@ -3,7 +3,7 @@
   <app-dialog-registration-form [user]="user" [isRegister]="data.isRegister" [focus]="focus"></app-dialog-registration-form>
 </div>
 <div mat-dialog-actions>
-  <button mat-flat-button color="primary" (click)="save()">{{ data.isRegister ? 'desc.registrovat_se' : 'desc.ulozit' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="save()">{{ data.isRegister ? ('desc.registrovat_se' | translate) : ('desc.ulozit' | translate) }}</button>
   <button mat-flat-button  mat-dialog-close color="primary" *ngIf="!data.isRegister" (click)="resetPwd()">{{ 'desc.reset_hesla' | translate }}</button>
   <button mat-flat-button mat-dialog-close color="primary" *ngIf="state.user" (click)="logout()" [title]="'desc.odhlasit' | translate"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</button>
   <button mat-button mat-dialog-close>{{ 'desc.zavrit' | translate }}</button>
