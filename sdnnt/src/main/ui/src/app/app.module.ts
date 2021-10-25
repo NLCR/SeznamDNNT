@@ -49,7 +49,7 @@ import { ResetPasswordComponent } from './pages/reset-password/reset-password.co
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 import { GranularityComponent } from './components/granularity/granularity.component';
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
-import { InputLoginNameDialogComponent } from './components/input-login-name-dialog/input-login-name-dialog.component';
+import { DialogForgottenPasswordComponent } from './components/dialog-forgotten-password/dialog-forgotten-password.component';
 import { ConsentComponent } from './components/consent/consent.component';
 import { CookieModule } from 'ngx-cookie';
 
@@ -88,7 +88,7 @@ const providers: any[] =[
     DialogLoginComponent,
     DialogIdentifierComponent,
     DialogChangePasswordComponent,
-    InputLoginNameDialogComponent,
+    DialogForgottenPasswordComponent,
 
     SidenavListComponent,
     FacetsUsedComponent,

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InputLoginNameDialogComponent } from './input-login-name-dialog.component';
+import { DialogForgottenPasswordComponent } from './dialog-forgotten-password.component';
 
 describe('InputLoginNameDialogComponent', () => {
-  let component: InputLoginNameDialogComponent;
-  let fixture: ComponentFixture<InputLoginNameDialogComponent>;
+  let component: DialogForgottenPasswordComponent;
+  let fixture: ComponentFixture<DialogForgottenPasswordComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ InputLoginNameDialogComponent ]
+      declarations: [ DialogForgottenPasswordComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(InputLoginNameDialogComponent);
+    fixture = TestBed.createComponent(DialogForgottenPasswordComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

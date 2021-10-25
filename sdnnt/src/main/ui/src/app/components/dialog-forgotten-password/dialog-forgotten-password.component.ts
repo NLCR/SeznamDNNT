@@ -6,16 +6,16 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
-  selector: 'app-input-login-name-dialog',
-  templateUrl: './input-login-name-dialog.component.html',
-  styleUrls: ['./input-login-name-dialog.component.scss']
+  selector: 'app-dialog-forgotten-password',
+  templateUrl: './dialog-forgotten-password.component.html',
+  styleUrls: ['./dialog-forgotten-password.component.scss']
 })
-export class InputLoginNameDialogComponent implements OnInit {
+export class DialogForgottenPasswordComponent implements OnInit {
 
   user: string;
 
   constructor(
-    public dialogRef: MatDialogRef<InputLoginNameDialogComponent>,
+    public dialogRef: MatDialogRef<DialogForgottenPasswordComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private config: AppConfiguration,
     public state: AppState,

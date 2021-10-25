@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { InputLoginNameDialogComponent } from 'src/app/components/input-login-name-dialog/input-login-name-dialog.component';
+import { DialogForgottenPasswordComponent } from 'src/app/components/dialog-forgotten-password/dialog-forgotten-password.component';
 
 @Component({
   selector: 'app-input-login-name',
@@ -21,7 +21,7 @@ export class InputLoginNameComponent implements OnInit {
   ) {
 
     const data = {};
-    const dialogRef = this.dialog.open(InputLoginNameDialogComponent, {
+    const dialogRef = this.dialog.open(DialogForgottenPasswordComponent, {
       width: '450px',
       data,
       panelClass: 'app-login-name-dialog'
