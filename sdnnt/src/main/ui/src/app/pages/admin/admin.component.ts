@@ -5,14 +5,9 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
 import {FormControl} from '@angular/forms'; // autocomplete
-import {Observable} from 'rxjs'; // autocomplete
-import {map, startWith} from 'rxjs/operators'; // autocomplete
+import {Observable, Subject} from 'rxjs'; // autocomplete
+import {map, startWith,debounce, debounceTime} from 'rxjs/operators'; // autocomplete
 
-// -- autocomplete --
-export interface Usr {
-  name: string;
-}
-// -- autocomplete --
 
 @Component({
   selector: 'app-admin',
@@ -21,15 +16,8 @@ export interface Usr {
 })
 export class AdminComponent implements OnInit {
 
-  // -- autocomplete --
-  myControl = new FormControl();
-  options: Usr[] = [
-    {name: 'Petr Kudela'},
-    {name: 'Pavel Stastny'},
-    {name: 'Igor Macek'}
-  ];
-  filteredOptions: Observable<Usr[]>;
-  // -- autocomplete --
+
+  private subject: Subject<string> = new Subject();
 
   public htmlContent: string;
   public selected: string = 'news';
@@ -82,6 +70,7 @@ export class AdminComponent implements OnInit {
 
   public users: User[];
   selUser : User;
+  //userFilterValue: string ="";
 
   constructor(
     public config: AppConfiguration,
@@ -91,33 +80,20 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.activePage = 'Admin';
-    this.service.getUsers().subscribe(res => {
+    this.service.getUsersByPrefix("").subscribe(res => {
       this.users = res.docs;
       this.selUser = this.users[0];
     });
     this.service.getText(this.selected).subscribe(text => this.htmlContent = text);
 
-    // -- autocomplete --
-    this.filteredOptions = this.myControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => typeof value === 'string' ? value : value.name),
-        map(name => name ? this._filter(name) : this.options.slice())
-      );
-      // -- autocomplete --
+    this.subject.pipe(
+      debounceTime(400)
+    ).subscribe(searchTextValue=>{
+      this.filterUsers(searchTextValue);
+    });
+
   }
 
-  // -- autocomplete --
-  displayFn(usr: Usr): string {
-    return usr && usr.name ? usr.name : '';
-  }
-
-  private _filter(name: string): Usr[] {
-    const filterValue = name.toLowerCase();
-
-    return this.options.filter(option => option.name.toLowerCase().includes(filterValue));
-  }
-  // -- autocomplete --
 
   selectText(id: string) {
     this.selected = id;
@@ -126,6 +102,19 @@ export class AdminComponent implements OnInit {
 
   selectUser(user: User) {
     this.selUser = user;
+  }
+
+  onFilterUsersKeyUp(target) {
+    this.subject.next(target.value);
+  }
+
+  filterUsers(fval) {
+    this.service.getUsersByPrefix(fval).subscribe(res => {
+      if (res.docs.length > 0 ) {
+        this.users = res.docs;
+        this.selUser = this.users[0];
+      }
+    });
   }
 
   saveText() {

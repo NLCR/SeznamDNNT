@@ -200,12 +200,15 @@ export class AccountComponent implements OnInit {
   }
 
   send(zadost: Zadost) {
-    const dialogRef = this.dialog.open(DialogSendRequestComponent, {
-      width: '750px',
-      data: zadost,
-      panelClass: 'app-send-request'
-    });
-    
+    // no identifiers
+    if (zadost.identifiers) {
+      const dialogRef = this.dialog.open(DialogSendRequestComponent, {
+        width: '750px',
+        data: zadost,
+        panelClass: 'app-send-request'
+      });
+    }
+
   }
 
   countProcessed(zadost: Zadost) {

@@ -157,9 +157,7 @@ export class ResultItemComponent implements OnInit {
     // });
   }
 
-  changeStav() {
-
-  }
+  changeStav() {}
 
   public showGranularity() {
 
@@ -194,16 +192,23 @@ export class ResultItemComponent implements OnInit {
 
   addToZadost() {
     const navrh = this.isZarazeno ? 'VVS' : 'NZN';
-    // poslat na server,  service
-    if (!this.state.currentZadost[navrh]) {
-      const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-      z.navrh = navrh;
-      this.state.currentZadost[navrh] = z;
-    }
+
+    this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
+      this.state.currentZadost[navrh]= res;
+      this.addToZadostInternal(navrh);
+    });
+
+    // // ziskava data v kazdem pripadu 
+    // if (!this.state.currentZadost[navrh]) {
+    // } else {
+    //   this.addToZadostInternal(navrh);
+    // }
+  }
+
+
+  addToZadostInternal(navrh: string) {
     let onlyRecord = true;
-
     this.service.getExpression(this.doc.frbr).subscribe((res: any) => {
-
       if (res.error) {
         this.service.showSnackBar('', res.error, true);
       } else {
@@ -225,17 +230,14 @@ export class ResultItemComponent implements OnInit {
                 this.addFRBRToZadost(navrh);
               }
             }
-
           });
-
         } else {
           this.saveZadost(navrh);
         }
       }
-
     });
-
   }
+
 
   saveZadost(navrh: string) {
     if  (!this.state.currentZadost[navrh].identifiers) {

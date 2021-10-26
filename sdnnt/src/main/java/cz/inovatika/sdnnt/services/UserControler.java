@@ -26,6 +26,7 @@ public interface UserControler {
     public User getUser();
     public List<User> getAll() throws UserControlerException;
     public List<User> findUsersByRole(Role role) throws UserControlerException;
+    public List<User> findUsersByPrefix(String prefix) throws UserControlerException;
 
 
     public User findUserByApiKey(String apikey) throws UserControlerException;

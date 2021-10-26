@@ -113,7 +113,6 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
 
   intitutionChangeEnabled(): boolean {
     const retval:boolean = this.user.role == 'admin' || this.isRegister;
-    console.log("Returning value "+retval);
     return retval;
   }
 

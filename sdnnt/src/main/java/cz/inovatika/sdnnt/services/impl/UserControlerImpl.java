@@ -113,6 +113,17 @@ public class UserControlerImpl implements UserControler {
 
 
     @Override
+    public List<User> findUsersByPrefix(String prefix) throws UserControlerException {
+        try (SolrClient solr = buildClient()) {
+            SolrQuery query = new SolrQuery(String.format("username:%s* OR jmeno:%s* OR prijmeni:%s*",  prefix, prefix, prefix))
+                    .setRows(1000);
+            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+        } catch (SolrServerException | IOException ex) {
+            throw new UserControlerException(ex);
+        }
+    }
+
+    @Override
     public User findUser(String username) throws UserControlerException{
         try (SolrClient solr = buildClient()) {
             return toTOObject(findOneUser(solr, "username:\"" + username + "\""));

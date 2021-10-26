@@ -143,9 +143,16 @@ public class MailServiceImpl implements MailService  {
             LOGGER.info("Adding recepient "+recip.getLeft());
             email.addTo(recip.getLeft(), recip.getRight());
         }
+
+        long start = System.currentTimeMillis();
+
         email.setFrom(from.getLeft(), from.getRight());
         email.setSubject(subject);
         email.setMsg(text);
         email.send();
+
+        long end = System.currentTimeMillis();
+
+        LOGGER.info(String.format("Send email took %d", (end - start)));
     }
 }

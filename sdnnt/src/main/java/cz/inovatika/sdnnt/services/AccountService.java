@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+// TODO: Change return type from json to model objects
 public interface AccountService {
 
     public JSONObject search(String q, String state, String navrh, String institution, String priority, String delegated, User user,int rows, int page) throws SolrServerException, IOException;

@@ -239,6 +239,12 @@ export class AppService {
     return this.get(url, params);
   }
 
+  prepareZadost(navrh: string): Observable<any> {
+    let url = 'account/prepare_zadost';
+    const params: HttpParams = new HttpParams().set('navrh', navrh);
+    return this.get(url, params);
+  }
+
   getZadostRecords(params: HttpParams): Observable<any> {
     let url = 'account/get_zadost_records';
     return this.get(url, params);
@@ -287,6 +293,11 @@ export class AppService {
 
   getUsers(): Observable<any> {
     let url = 'user/all';
+    return this.get(url);
+  }
+
+  getUsersByPrefix(prefix: string): Observable<any> {
+    let url = 'user/users_by_prefix?prefix='+prefix;
     return this.get(url);
   }
 

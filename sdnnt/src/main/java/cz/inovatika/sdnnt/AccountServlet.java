@@ -6,6 +6,9 @@ import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.indexer.models.Zadost;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -29,6 +32,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.util.NamedList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
@@ -444,8 +448,47 @@ public class AccountServlet extends HttpServlet {
           return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
       }
-    };
+    },
 
+
+    PREPARE_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+        if (new RightsResolver(req, new MustBeLogged()).permit()) {
+
+          UserControlerImpl userControler = new UserControlerImpl(req);
+
+          String navrh = req.getParameter("navrh");
+          AccountService service = new AccountServiceImpl(userControler);
+          JSONObject result = service.search(null, "open", navrh, null, null, null , userControler.getUser(), 100, 0);
+
+          if (result.has("response") && result.getJSONObject("response").has("numFound")) {
+            int numFound = result.getJSONObject("response").getInt("numFound");
+            if (numFound > 0) {
+              JSONArray docs = result.getJSONObject("response").getJSONArray("docs");
+              Zadost zadost = Zadost.fromJSON(docs.getJSONObject(0).toString());
+              return zadost.toJSON();
+            }
+          }
+
+          // nenaslo;
+          Zadost nZadost = new Zadost();
+          String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
+          nZadost.id = String.format("%s_%s", timeStamp, userControler.getUser().username);
+          nZadost.navrh = navrh;
+          nZadost.state="open";
+          nZadost.user = userControler.getUser().username;
+          nZadost.identifiers = new ArrayList<>();
+
+          JSONObject jsonZadost = service.saveRequest(nZadost.toJSON().toString(), userControler.getUser());
+          return jsonZadost;
+
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+      }
+    };
     abstract JSONObject doPerform( HttpServletRequest request, HttpServletResponse response) throws Exception;
   }
 

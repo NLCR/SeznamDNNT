@@ -276,6 +276,22 @@ public class UserServlet extends HttpServlet {
       }
     },
 
+    USERS_BY_PREFIX {
+        @Override
+        JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin, mainKurator)).permit()) {
+                JSONObject retval = new JSONObject();
+                JSONArray docs = new JSONArray();
+                String prefix = req.getParameter("prefix");
+                new UserControlerImpl(req).findUsersByPrefix(prefix).stream().map(User::toJSONObject).forEach(docs::put);
+                retval.put("docs", docs);
+                return retval;
+            } else {
+                return errorJson(response, SC_FORBIDDEN, "not allowed");
+            }
+        }
+    },
+
 
     INSTITUTIONS {
       @Override

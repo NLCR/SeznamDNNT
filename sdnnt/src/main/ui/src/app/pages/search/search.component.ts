@@ -85,6 +85,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   }
 
+  /*
   addToZadost() {
     if (!this.hasStateFilter) {
       return;
@@ -92,12 +93,15 @@ export class SearchComponent implements OnInit, OnDestroy {
     let isZarazeno = false;
     isZarazeno = this.state.usedFilters.find(f => f.field === 'dntstav').value.includes('A');
     const new_stav = isZarazeno ? 'VVS' : 'NZN'
+
     if (!this.state.currentZadost[new_stav]) {
+        
       const z = new Zadost(new Date().getTime() + '', this.state.user.username);
       z.navrh = new_stav;
       z.identifiers = [];
       this.state.currentZadost[new_stav] = z;
     }
+
     this.state.currentZadost[new_stav].identifiers = this.state.currentZadost[new_stav].identifiers.concat(this.docs.map(doc => doc.identifier));
     this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe((res: any) => {
       if (res.error) {
@@ -106,7 +110,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
     });
-  }
+  }*/
 
   viewFullCatalog() {
     const q: any = {};

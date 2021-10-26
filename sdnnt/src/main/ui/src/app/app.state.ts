@@ -42,7 +42,7 @@ export class AppState {
   public fullCatalog: boolean;
   public withNotification: boolean;
 
-  // Aktualni zadost kam se pridavaji navrhy
+  // Aktualni zadost kam se pridavaji navrhy; zmenit
   currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
 
   setConfig(cfg: Configuration) {

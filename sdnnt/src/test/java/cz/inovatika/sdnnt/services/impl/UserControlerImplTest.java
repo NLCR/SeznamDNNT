@@ -140,6 +140,46 @@ public class UserControlerImplTest {
 
     }
 
+    /** Test get users  by role*/
+    @Test
+    public void testGetByFindByPrefix() throws EmailException, IOException, UserControlerException, SolrServerException {
+
+        SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
+        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        long numFound = response.getResults().getNumFound();
+        Assert.assertTrue(numFound == 0);
+
+        registerUsers();
+
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        HttpSession session = EasyMock.createMock(HttpSession.class);
+
+        UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
+                .withConstructor(request)
+                .addMockedMethod("buildClient").createMock();
+
+        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+
+        EasyMock.replay(request, session, userControler);
+
+        List<User> usersByRole = userControler.findUsersByPrefix("test");
+        Assert.assertTrue(usersByRole.size() == 3);
+
+        usersByRole.get(0).role = Role.knihovna.name();
+        userControler.save(usersByRole.get(0));
+
+        usersByRole.get(1).role = Role.kurator.name();
+        userControler.save(usersByRole.get(1));
+
+        usersByRole.get(2).role = Role.user.name();
+        userControler.save(usersByRole.get(2));
+
+        Assert.assertTrue(userControler.findUsersByRole(Role.user).size() == 1);
+        Assert.assertTrue(userControler.findUsersByRole(Role.knihovna).size() == 1);
+        Assert.assertTrue(userControler.findUsersByRole(Role.kurator).size() == 1);
+
+    }
+
 
     /** Test get all users  */
     @Test
