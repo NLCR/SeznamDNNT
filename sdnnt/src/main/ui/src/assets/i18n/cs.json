@@ -133,7 +133,11 @@
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
     "invalid_jmeno": "Špatné jméno",
-    "invalid_email": "email adresa není validní"
+    "invalid_email": "email adresa není validní",
+    "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
+    "sledovat_zaznam_error": "Chyba při sledování záznamu.",
+    "odebrani_sledovaneho_zaznamu_success": "Odebrání sledovaného záznamu proběhlo úspěšně.",
+    "odebrani_sledovaneho_zaznamu_error": "Chyba při odebrání sledovaného záznamu."
   },
 
   "sort": {
@@ -597,7 +601,7 @@
     "en": "Anglický jazyk",
     "registrovat_se": "Registrovat se",
     "pouze_zaznamy_na_seznamu": "Pouze záznamy na seznamu",
-    "zobrazit_cely_katalog": "Zobrazit i záznamy mimo seznamu",
+    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Zobrazit dokumenty, které nejsou zařazeny na seznamu",
     "datum_importu": "Datum importu",
     "celkem": "Celkem",
     "na_vyrazeni": "Na vyřazení",

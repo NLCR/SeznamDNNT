@@ -133,7 +133,11 @@
     "forgot_password_success": "The reset password link has been sent.",
     "invalid_username": "Invalid user name",
     "invalid_jmeno": "Invalid name",
-    "invalid_email": "Invalid e-mail"
+    "invalid_email": "Invalid e-mail",
+    "sledovat_zaznam_success": "Record tracking was successful.",
+    "sledovat_zaznam_error": "Error tracking log.",
+    "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",
+    "odebrani_sledovaneho_zaznamu_error": "Error removing watch record."
   },
 
   "sort": {
@@ -597,7 +601,7 @@
     "cs": "Český jazyk",
     "registrovat_se": "To register",
     "pouze_zaznamy_na_seznamu": "Only entries in the list",
-    "zobrazit_cely_katalog": "View records from whole catalog",
+    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Show documents that are not listed",
     "datum_importu": "Date of import",
     "celkem": "Total",
     "na_vyrazeni": "For elimination",
