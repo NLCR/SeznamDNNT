@@ -199,7 +199,7 @@
                 <mat-button-toggle (click)="showRecords(element)" [matTooltip]="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && element.state === 'waiting' ? ('desc.zpracovani_zadosti' | translate) : ('desc.prehled_zadosti' | translate)" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">{{ (state.user.role === 'kurator' || state.user.role === 'mainKurator' ) && element.state === 'waiting' ? 'rule' : 'visibility' }}</mat-icon>
                 </mat-button-toggle>
-                <mat-button-toggle *ngIf="element.state === 'open'" (click)="send(element)" [matTooltip]="'Poslat' | translate" matTooltipPosition="above">
+                <mat-button-toggle *ngIf="element.state === 'open'" (click)="send(element)" [matTooltip]="'desc.poslat_zadost' | translate" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">send</mat-icon>
                 </mat-button-toggle>
                 <mat-button-toggle *ngIf="element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
