@@ -66,9 +66,20 @@ export class ZadostComponent implements OnInit {
       this.docs = resp.response.docs;
       const process = this.zadost.process;
       this.numFound = resp.response.numFound;
+
+      const notifications = resp.notifications;
       this.docs.map(doc => {
         doc.isProcessed = process && process[doc.identifier];
       });
+
+      this.docs.forEach(doc=> {
+        const docId = doc.identifier;
+        const flag:boolean = notifications.some(n=> docId === n.identifier);
+        if (flag) {
+          doc.hasNotifications = true;
+        }
+      });
+
     });
   }
 

@@ -66,8 +66,13 @@
     <field name="titul" type="string" indexed="true" stored="true"  />
     <field name="ico" type="string" indexed="true" stored="true"  />
     <field name="adresa" type="string" indexed="true" stored="true"  />
+
     <field name="psc" type="string" indexed="true" stored="true"  />
     <field name="mesto" type="string" indexed="true" stored="true"  />
+	
+	<field name="ulice" type="string" indexed="true" stored="true"  />
+    <field name="cislo" type="string" indexed="true" stored="true"  />
+
     <field name="telefon" type="string" indexed="true" stored="true"  />
     <field name="email" type="string" indexed="true" stored="true"  />
     <field name="kontaktni" type="string" indexed="true" stored="true"  />

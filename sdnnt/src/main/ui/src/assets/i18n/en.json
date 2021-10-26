@@ -137,7 +137,13 @@
     "sledovat_zaznam_success": "Record tracking was successful.",
     "sledovat_zaznam_error": "Error tracking log.",
     "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",
-    "odebrani_sledovaneho_zaznamu_error": "Error removing watch record."
+    "odebrani_sledovaneho_zaznamu_error": "Error removing watch record.",
+    "invalid_phonenumber": "Invalid phone number",
+    "invalid_ico": "Ivalid ICO number",
+    "invalid_psc": "Invalid zip code",
+    "condition1": "You must agree to the terms at the bottom of the dialog",
+    "condition2": "You must agree to the terms at the bottom of the dialog",
+    "condition3": "You must agree to the terms at the bottom of the dialog"
   },
 
   "sort": {
@@ -640,10 +646,11 @@
     "hledat_uzivatele": "Search user",
     "mesto": "City",
     "ulice": "Street",
-    "cislo_popisne": "Number of descriptive",
+    "cislo_domu": "House number",
     "psc": "Zip code",
     "zmenit_osobni_udaje": "Change personal information",
     "zmenit_heslo": "Change Password",
-    "oduvodneni": "Justification"
+    "oduvodneni": "Justification",
+    "filter_uzivatele": "Users filter"
   }
 }

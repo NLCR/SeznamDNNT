@@ -76,6 +76,13 @@ export class DialogRegistrationComponent implements OnInit {
         return;
       }
 
+      const pscValid = (this.user.psc &&  this.user.psc != null) ? this.user.psc.match(/^\+?(\d{3})?(\s*)(\d{2})$/) : true;
+      if (this.user.psc && !pscValid) {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_psc', true);
+        this.focus = 'psc';
+        return;
+      }
+
       if (!this.user.registerOption?.condition1) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.condition1', true);
         this.focus = 'condition1';
@@ -110,6 +117,42 @@ export class DialogRegistrationComponent implements OnInit {
         }
       });
     } else {
+
+      const validUsername = this.user.username.trim() === this.user.username.trim().replace(/[^\S]/gi, '');
+      if (!this.user.username || this.user.username.trim() === '' ||!validUsername ) {
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_username', true);
+        this.focus = 'username';
+        return;
+      }
+
+      const validEmail = (this.user.email && this.user.email != null) ? this.user.email.trim().match(/^\S+@\S+\.\S+$/) : true;
+      if (this.user.email && (!this.user.email.trim().includes('@') || !validEmail)) {
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_email', true);
+        this.focus = 'email';
+        return;
+      }
+
+      const validICO = (this.user.ico && this.user.ico != null) ? this.user.ico.trim().match(/^\d{2}\s*\d{2}\s*\d{2}\s*\d{2}$/) : true;
+      if (this.user.ico  && !validICO) {
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_ico', true);
+        this.focus = 'ico';
+        return;
+      } 
+
+      const phoneNumberValid = (this.user.telefon &&  this.user.telefon != null) ? this.user.telefon.match(/^\+?(\d{3,4})?(\s*)(\d{3}\s*\d{3}\s*\d{3})$/) : true;
+      if (this.user.telefon && !phoneNumberValid) {
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_phonenumber', true);
+        this.focus = 'phonenumber';
+        return;
+      }
+
+      const pscValid = (this.user.psc &&  this.user.psc != null) ? this.user.psc.match(/^\+?(\d{3})?(\s*)(\d{2})$/) : true;
+      if (this.user.psc && !pscValid) {
+        this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_psc', true);
+        this.focus = 'psc';
+        return;
+      }
+
       this.service.saveUser(this.user).subscribe((res: User) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_uzivatele_error', res.error, true);

@@ -348,12 +348,19 @@ public class UserControlerImpl implements UserControler {
             toObject.resetPwdToken = user.resetPwdToken;
             toObject.resetPwdExpiration = user.resetPwdExpiration;
             toObject.email = user.email;
-            toObject.adresa = user.adresa;
             toObject.notifikace_interval = user.notifikace_interval;
             toObject.role = user.role;
             toObject.institution = user.institution;
             toObject.ico = user.ico;
             toObject.poznamka = user.poznamka;
+
+            toObject.mesto = user.mesto;
+            toObject.adresa = user.adresa;
+            toObject.ulice = user.ulice;
+            toObject.cislo = user.cislo;
+            toObject.telefon = user.telefon;
+            toObject.psc = user.psc;
+
             return toObject;
         } else {
             return null;

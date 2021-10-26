@@ -59,6 +59,12 @@ public class User {
   public String mesto;
 
   @Field
+  public String ulice;
+
+  @Field
+  public String cislo;
+
+  @Field
   public String telefon;
 
   @Field

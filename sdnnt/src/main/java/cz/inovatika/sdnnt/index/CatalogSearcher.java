@@ -14,8 +14,9 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
-import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.NotificationUtils;
+import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -70,16 +71,11 @@ public class CatalogSearcher {
       NamedList<Object> qresp = solr.request(qreq, "catalog");
       ret = new JSONObject((String) qresp.get("response"));
       if (ret.getJSONObject("response").getInt("numFound") > 0) {
-        // Pridame info z zadosti
-        List<String> ids = new ArrayList<>();
-        for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
-          JSONObject doc = (JSONObject) o;
-          ids.add("\""+doc.getString("identifier")+"\"");
-        }
+        List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
         JSONArray zadosti = findZadosti(ids);
         ret.put("zadosti", zadosti);
         if (user != null) {
-          JSONArray notifications = findNotifications(ids, user.username);
+          JSONArray notifications = NotificationUtils.findNotifications(ids, user.username, Indexer.getClient());
           ret.put("notifications", notifications);
         }
       }
@@ -90,7 +86,7 @@ public class CatalogSearcher {
     }
     return ret;
   }
-  
+
   public JSONObject search(HttpServletRequest req) {
     Map<String, String[]> parameterMap = req.getParameterMap();
     Map<String, String>  resmap = new HashMap<>();
@@ -183,28 +179,6 @@ public class CatalogSearcher {
         rParser.setWriterType("json");
         qreq.setResponseParser(rParser);
         NamedList<Object> qresp = solr.request(qreq, "zadost");
-        return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
-      } else return new JSONArray();
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-  }
-  
-  private JSONArray findNotifications(List<String> identifiers, String user) {
-    try {
-      if (!identifiers.isEmpty()) {
-        SolrClient solr = Indexer.getClient();
-        String q = identifiers.toString().replace("[", "(").replace("]", ")").replaceAll(",", "");
-        SolrQuery query = new SolrQuery("identifier:" + q)
-                .addFilterQuery("user:" + user)
-                .setFields("identifier");
-
-        QueryRequest qreq = new QueryRequest(query);
-        NoOpResponseParser rParser = new NoOpResponseParser();
-        rParser.setWriterType("json");
-        qreq.setResponseParser(rParser);
-        NamedList<Object> qresp = solr.request(qreq, "notifications");
         return (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
       } else return new JSONArray();
     } catch (SolrServerException | IOException ex) {

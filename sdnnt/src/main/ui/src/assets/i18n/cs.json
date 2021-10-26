@@ -137,7 +137,13 @@
     "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
     "sledovat_zaznam_error": "Chyba při sledování záznamu.",
     "odebrani_sledovaneho_zaznamu_success": "Odebrání sledovaného záznamu proběhlo úspěšně.",
-    "odebrani_sledovaneho_zaznamu_error": "Chyba při odebrání sledovaného záznamu."
+    "odebrani_sledovaneho_zaznamu_error": "Chyba při odebrání sledovaného záznamu.",
+    "invalid_phonenumber": "Chybné telefonní číslo",
+    "invalid_ico": "Chybné IČO",
+    "invalid_psc": "Chybné PSČ",
+    "condition1": "Je nutné souhlasit s podmínkami registrace",
+    "condition2": "Je nutné souhlasit s podmínkami registrace",
+    "condition3": "Je nutné souhlasit s podmínkami registrace"
   },
 
   "sort": {
@@ -640,10 +646,12 @@
     "hledat_uzivatele": "Hledat uživatele",
     "mesto": "Město",
     "ulice": "Ulice",
-    "cislo_popisne": "Číslo popisné",
+    "cislo_domu": "Číslo",
+
     "psc": "Psč",
     "zmenit_osobni_udaje": "Změnit osobní údaje",
     "zmenit_heslo": "Změnit heslo",
-    "oduvodneni": "Odůvodnění"
+    "oduvodneni": "Odůvodnění",
+    "filter_uzivatele": "Filtrování uživatelů"
   }
 }

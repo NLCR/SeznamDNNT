@@ -28,6 +28,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @ViewChild('jmeno') jmeno: MatInput;
   @ViewChild('phonenumber') phonenumber: MatInput;
   @ViewChild('ico') ico: MatInput;
+  @ViewChild('psc') psc: MatInput;
 
 
   @ViewChild('conditionOne') conditionOneCheck: MatCheckbox;
@@ -75,7 +76,8 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       email: this.email,
       jmeno: this.jmeno,
       phonenumber: this.phonenumber,
-      ico: this.ico
+      ico: this.ico,
+      psc: this.psc
     }
 
     this.checkboxFocusables = {

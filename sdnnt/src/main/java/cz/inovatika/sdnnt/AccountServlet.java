@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -24,6 +25,8 @@ import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.NotificationUtils;
+import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -190,7 +193,14 @@ public class AccountServlet extends HttpServlet {
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
             NamedList<Object> qresp = solr.request(qreq, "catalog");
-            return new JSONObject((String) qresp.get("response"));
+            JSONObject ret =  new JSONObject((String) qresp.get("response"));
+
+            List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
+            JSONArray notifications = NotificationUtils.findNotifications(ids, new UserControlerImpl(req).getUser().username, solr);
+            ret.put("notifications", notifications);
+
+            return ret;
+
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
