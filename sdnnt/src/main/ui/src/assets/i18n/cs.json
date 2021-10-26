@@ -133,7 +133,11 @@
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
     "invalid_jmeno": "Špatné jméno",
-    "invalid_email": "email adresa není validní"
+    "invalid_email": "email adresa není validní",
+    "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
+    "sledovat_zaznam_error": "Chyba při sledování záznamu.",
+    "odebrani_sledovaneho_zaznamu_success": "Odebrání sledovaného záznamu proběhlo úspěšně.",
+    "odebrani_sledovaneho_zaznamu_error": "Chyba při odebrání sledovaného záznamu."
   },
 
   "sort": {

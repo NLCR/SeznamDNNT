@@ -321,9 +321,17 @@ export class ResultItemComponent implements OnInit {
   setFollow(follow: boolean) {
     this.service.followRecord(this.doc.identifier, follow).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.follow_zaznam_error', res.error, true);
+        if (follow === true) {
+          this.service.showSnackBar('alert.sledovat_zaznam_error', res.error, true);
+        } else {
+          this.service.showSnackBar('alert.odebrani_sledovaneho_zaznamu_error', res.error, true);
+        }
       } else {
-        this.service.showSnackBar('alert.follow_zaznam_success', '', false);
+        if (follow === true) {
+          this.service.showSnackBar('alert.sledovat_zaznam_success', '', false);
+        } else {
+          this.service.showSnackBar('alert.odebrani_sledovaneho_zaznamu_success', '', false);
+        }
         this.doc.hasNotifications = follow;
       }
     });

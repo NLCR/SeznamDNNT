@@ -133,7 +133,11 @@
     "forgot_password_success": "The reset password link has been sent.",
     "invalid_username": "Invalid user name",
     "invalid_jmeno": "Invalid name",
-    "invalid_email": "Invalid e-mail"
+    "invalid_email": "Invalid e-mail",
+    "sledovat_zaznam_success": "Record tracking was successful.",
+    "sledovat_zaznam_error": "Error tracking log.",
+    "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",
+    "odebrani_sledovaneho_zaznamu_error": "Error removing watch record."
   },
 
   "sort": {
