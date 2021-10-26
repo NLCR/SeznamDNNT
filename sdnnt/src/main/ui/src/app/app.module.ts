@@ -128,8 +128,11 @@ const providers: any[] =[
     BrowserAnimationsModule,
     AngularEditorModule,
     CookieModule.forRoot()
+
+    //UserIdleModule.forRoot({idle: 600, timeout: 300, ping: 120})
   ],
   providers,
+  
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -104,4 +104,16 @@ export class AppState {
     }
     this.loggedSubject.next(changed === this.logged);
   }
+
+  startTrackSession() {
+    // bnIdle.startWatching(300).subscribe((res) => {
+    //   if(res) {
+    //       console.log("session expired");
+    //   }
+    // })
+  }
+
+  stopTrackSession() {
+    //bnIdle.stopTimer();
+  }
 }
