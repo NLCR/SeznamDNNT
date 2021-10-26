@@ -71,7 +71,9 @@ export class NavbarComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
+      this.state.currentZadost = {VVS: null, NZN: null,VVN:null};
       localStorage.removeItem('user');
+      sessionStorage.clear();
       this.router.navigate(['/']);
     });
   }
@@ -105,5 +107,8 @@ export class NavbarComponent implements OnInit {
     this.sidenavToggle.emit();
   }
   
+  resetPasswd() {
+    this.router.navigate(['/userpswd'], {});
+  }
 
 }

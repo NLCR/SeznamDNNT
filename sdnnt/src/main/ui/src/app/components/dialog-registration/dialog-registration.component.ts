@@ -36,10 +36,6 @@ export class DialogRegistrationComponent implements OnInit {
     
   }
 
-  resetPwd() {
-    this.router.navigate(['/userpswd'], {});
-  }
-
 
   save() {
     
@@ -126,17 +122,4 @@ export class DialogRegistrationComponent implements OnInit {
     }
     
   }
-
-  logout() {
-    this.service.logout().subscribe(res => {
-      this.state.setLogged(res);
-      this.state.logged = false;
-      this.state.user = null;
-      this.state.currentZadost = {VVS: null, NZN: null,VVN:null};
-      localStorage.removeItem('user');
-      sessionStorage.clear();
-      this.router.navigate(['/']);
-    });
-  }
-
 }

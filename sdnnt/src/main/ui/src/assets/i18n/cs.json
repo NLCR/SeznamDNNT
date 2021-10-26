@@ -637,6 +637,8 @@
     "mesto": "Město",
     "ulice": "Ulice",
     "cislo_popisne": "Číslo popisné",
-    "psc": "Psč"
+    "psc": "Psč",
+    "zmenit_osobni_udaje": "Změnit osobní údaje",
+    "zmenit_heslo": "Změnit heslo"
   }
 }

@@ -24,7 +24,14 @@
       <a mat-stroked-button *ngIf="state.user" routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_pozadavky' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_pozadavky' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')" routerLink="imports" routerLinkActive="app-active" [title]="'desc.imports' | translate"><mat-icon class="material-icons-outlined">download</mat-icon> {{ 'desc.imports' | translate }}</a>
       <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user" (click)="showUser()" routerLinkActive="app-active" [title]="state.user.jmeno + ' ' + state.user.prijmeni"><mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }}</a>
+      <a mat-stroked-button *ngIf="state.user" [matMenuTriggerFor]="userMenu" routerLinkActive="app-active" [title]="state.user.jmeno + ' ' + state.user.prijmeni">
+        <mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }}
+      </a>
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item (click)="showUser()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</button>
+        <button mat-menu-item (click)="resetPasswd()"><mat-icon class="material-icons-outlined">vpn_key</mat-icon>{{ 'desc.zmenit_heslo' | translate }}</button>
+        <button mat-menu-item (click)="logout()"><mat-icon class="material-icons-outlined">logout</mat-icon>{{ 'desc.odhlasit' | translate }}</button>
+      </mat-menu>
       <a mat-stroked-button *ngIf="!state.user" (click)="showLogin()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
       <!-- <a mat-stroked-button *ngIf="state.user" (click)="logout()" [title]="'desc.odhlasit' | translate"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a> -->
       <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')" [title]="'desc.en' | translate">{{ 'EN' | translate }}</a>
