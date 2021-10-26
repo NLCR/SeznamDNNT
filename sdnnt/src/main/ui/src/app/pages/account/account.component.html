@@ -177,7 +177,7 @@
             <td mat-cell *matCellDef="let element">{{ element.identifiers?.length }} ({{ countProcessed(element) }})</td>
           </ng-container>
           <ng-container matColumnDef="pozadavek">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.pozadavek' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.pozadavek" matTooltipPosition="above">
               <div class="app-text-cutter">
                 {{ element.pozadavek }}

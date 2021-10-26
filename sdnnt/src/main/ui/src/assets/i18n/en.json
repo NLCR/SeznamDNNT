@@ -643,6 +643,7 @@
     "cislo_popisne": "Number of descriptive",
     "psc": "Zip code",
     "zmenit_osobni_udaje": "Change personal information",
-    "zmenit_heslo": "Change Password"
+    "zmenit_heslo": "Change Password",
+    "oduvodneni": "Justification"
   }
 }
