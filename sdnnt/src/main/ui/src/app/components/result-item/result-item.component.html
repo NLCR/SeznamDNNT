@@ -26,7 +26,9 @@
       </ng-container>
       <ng-container *ngIf="dkLinks.length === 1">
         <span class="app-text-icon">
-          <mat-icon class="app-mr-1">link</mat-icon><a [href]="dkLinks[0]" target="_blank">{{ 'desc.odkaz_do_dk' | translate }}</a>
+          <mat-icon class="app-mr-1">link</mat-icon><a [href]="dkLinks[0]" target="_blank">
+            <!-- {{ 'desc.odkaz_do_dk' | translate }} -->{{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
+          </a>
         </span>
         <span class="app-pipe"></span>
       </ng-container>
