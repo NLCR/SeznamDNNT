@@ -19,6 +19,8 @@ export class DialogLoginComponent implements OnInit {
   loading: boolean;
   keepLogged: boolean;
 
+  hidePassword:boolean = true;
+
   constructor(
     public dialogRef: MatDialogRef<DialogLoginComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
