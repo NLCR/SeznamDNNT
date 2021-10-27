@@ -15,6 +15,116 @@
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
+      <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
+        {{ doc.dntstav[doc.dntstav.length-1] }}   
+      </div>
+      <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
+        {{ processed.state }}
+      </div>
+      <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
+        {{ doc.zadost.navrh }}
+      </div>
+      <div *ngIf="doc.license" [class]="'app-badge ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
+        {{ doc.license }}
+      </div>
+      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA'" [class]="'app-badge'" class="app-ml-1" [matTooltip]="'license.dnnto-noactive' | translate">
+        dnnto
+      </div>
+      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA' && doc.dntstav[doc.dntstav.length-1] === 'NZ'" [class]="'app-badge'" class="app-ml-1" [matTooltip]="'license.dnntt-noactive' | translate">
+        dnntt
+      </div>
+    </div>
+    <div fxLayout="row">   
+      <mat-button-toggle-group *ngIf="state.logged">
+        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost" (click)="addToZadost()">
+          <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
+        </mat-button-toggle>
+        <mat-button-toggle *ngIf="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
+          <mat-icon>close</mat-icon>{{ 'desc.odstranit_z_zadosti' | translate }}
+        </mat-button-toggle>
+        <mat-button-toggle *ngIf="doc.hasNotifications" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
+          <mat-icon class="app-color-warning">notifications_active</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle *ngIf="!doc.hasNotifications" (click)="setFollow(true)" [matTooltip]="'desc.sledovat' | translate">
+          <mat-icon class="material-icons-outlined">notifications</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle [matMenuTriggerFor]="menuMore">
+          <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-menu #menuMore="matMenu">
+        <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
+          <mat-icon>link</mat-icon><a>{{ 'desc.odkazy_do_dk' | translate }}</a>
+          <mat-menu #menuDKLinks="matMenu">
+            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
+          </mat-menu>
+        </button>
+        <button mat-menu-item *ngIf="dkLinks.length === 1">
+          <mat-icon>link</mat-icon>
+          <a [href]="dkLinks[0]" target="_blank">
+            {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
+          </a>
+        </button>
+        <button mat-menu-item *ngIf="doc.marc_998a">
+          <mat-icon>link</mat-icon>
+          <a [href]="alephLink" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+        </button>
+        <button mat-menu-item (click)="showIdentifiers()">
+          <mat-icon>fingerprint</mat-icon>
+          <a>{{ 'desc.identifikatory' | translate }}</a>
+        </button>
+        <button mat-menu-item (click)="showHistory()">
+          <mat-icon>update</mat-icon>
+          <a>{{ 'desc.historie_zmen' | translate }}</a>
+        </button>
+        <button mat-menu-item *ngIf="state.logged && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && !inZadost" (click)="showStates()">
+          <mat-icon>edit</mat-icon>
+          <a>{{ 'desc.zmenit_stav'| translate }}</a>
+        </button>
+        <button mat-menu-item *ngIf="hasGranularity" (click)="showGranularity()">
+          <mat-icon>format_list_numbered</mat-icon>
+          <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
+        </button>
+      </mat-menu>
+    
+      <ng-container *ngIf="state.user && inZadost && !processed?.state">
+        <mat-button-toggle-group class="app-ml-3" *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" [value]="processed?.state">
+          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na PA'" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">check</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VVS' || zadost.navrh === 'VVN')" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na VS'" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">check</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VVS' || zadost.navrh === 'VVN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()" [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">local_library</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="rejected" (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
+            <mat-icon class="material-icons-outlined">not_interested</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </ng-container>
+    </div>
+  </mat-card-actions>
+</mat-card>
+
+<!-- <mat-card>
+  <mat-card-header fxLayout="row" fxLayoutGap="16px">
+    <div *ngIf="imgSrc">
+      <img [src]="imgSrc" />
+    </div>
+    <div>
+      <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245c }} {{ doc.marc_245i }} {{ doc.marc_245n }} {{ doc.marc_245p }}</span></mat-card-title>
+      <mat-card-subtitle>
+        <div>{{ doc.marc_250a }}</div>
+        <div *ngIf="doc.marc_260a">{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>
+        <div *ngIf="!doc.marc_260a">{{ doc.marc_264a }} {{ doc.marc_264b }} {{ doc.marc_264c }}</div>
+        <div class="app-break-w">{{ doc.marc_020a }}</div>
+      </mat-card-subtitle>
+    </div>
+  </mat-card-header>
+  <mat-card-actions fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex fxFlexAlign="flex-end">
       <ng-container *ngIf="dkLinks.length > 1">
         <span class="app-text-icon">
           <mat-icon class="app-mr-1">link</mat-icon><a [matMenuTriggerFor]="menu">{{ 'desc.odkazy_do_dk' | translate }}</a>
@@ -29,7 +139,6 @@
           <mat-icon class="app-mr-1">link</mat-icon>
           <a [href]="dkLinks[0]" target="_blank">
             {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
-            <!-- {{ 'desc.odkaz_do_dk' | translate }} -->
           </a>
         </span>
         <span class="app-pipe"></span>
@@ -67,6 +176,7 @@
         <mat-icon class="material-icons-outlined" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">info</mat-icon>
         {{ 'desc.zaznam_ma_navrh' | translate }}: {{doc.zadost.navrh}}
       </div>
+
       <button mat-stroked-button *ngIf="state.logged && !hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost"
         (click)="addToZadost()">
         <mat-icon>check</mat-icon>
@@ -114,4 +224,4 @@
       </ng-container>
     </div>
   </mat-card-actions>
-</mat-card>
+</mat-card> -->

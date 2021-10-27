@@ -65,7 +65,9 @@
   },
   "license": {
     "dnnto": "Dnnto: License for online access",
-    "dnntt": "Dnntt: License for terminal access"
+    "dnnto-noactive": "Assigned license dnnto",
+    "dnntt": "Dnntt: License for terminal access",
+    "dnntt-noactive": "Assigned license dnntt"
   },
   "field": {
     "015a": "Number nr.bibl.",
@@ -651,6 +653,7 @@
     "zmenit_osobni_udaje": "Change personal information",
     "zmenit_heslo": "Change Password",
     "oduvodneni": "Justification",
-    "filter_uzivatele": "Users filter"
+    "filter_uzivatele": "Users filter",
+    "vice": "More"
   }
 }

@@ -58,6 +58,21 @@
           color: $app-color-lightnes;
         }
       }
+    } @else if ($type == "badge-dev") {
+      color: $app-gray-6;
+      background-color: $app-gray-2;
+
+      &.#{$state} {
+        color: $app-color-lightnes;
+        background-color: $color;
+      }
+
+      &.light {
+        &.#{$state} {
+          color: $color;
+          background-color: rgba($color, .1);
+        }
+      }
     } @else if ($type == "color") {
       &.#{$state} {
         color: $color;

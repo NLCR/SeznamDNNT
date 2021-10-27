@@ -64,8 +64,10 @@
     }
   },
   "license": {
-    "dnnto": "Dnnto: Licence pro online přístup",
-    "dnntt": "Dnnt: Licence pro terminálový přístup"
+    "dnnto": "Licence pro online přístup",
+    "dnnto-noactive": "Přidělená licence dnnto",
+    "dnntt": "Licence pro terminálový přístup",
+    "dnntt-noactive": "Přidělená licence dnntt"
   },
   "field": {
     "015a": "Číslo nár.bibl.",
@@ -86,18 +88,18 @@
     "rokvydani": "Rok vydání",
 
     "undefined": "nezařazeno",
-    "NNN": "Není na Seznamu",
-    "PA": "PA: dílo publikováno jako návrh",
-    "A": "A: zařazeno",
-    "VS": "VS: vyřazeno - dílo bylo na seznamu (A)",
-    "VN": "VN: vyřazeno – dílo bylo na návrhu seznamu (PA)",
-    "N": "N: vyřazeno",
-    "X": "X: volné",
-    "PX": "PX: pravděpodobná volné",
-    "NZ": "NZ: Zařazeno s omezením na místě samém",
-    "NZN": "NZN: návrh k zařazení",
-    "VVN": "VVN: výzva k vyřazení",
-    "VVS": "VVS: výzva k vyřazení"
+    "NNN": "není na seznamu",
+    "PA": "dílo publikováno jako návrh",
+    "A": "zařazeno",
+    "VS": "vyřazeno - dílo bylo na seznamu (A)",
+    "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
+    "N": "vyřazeno",
+    "X": "volné",
+    "PX": "pravděpodobná volné",
+    "NZ": "zařazeno s omezením",
+    "NZN": "návrh k zařazení",
+    "VVN": "výzva k vyřazení",
+    "VVS": "výzva k vyřazení"
   },
 
   "fmt": {
@@ -647,11 +649,11 @@
     "mesto": "Město",
     "ulice": "Ulice",
     "cislo_domu": "Číslo",
-
     "psc": "Psč",
     "zmenit_osobni_udaje": "Změnit osobní údaje",
     "zmenit_heslo": "Změnit heslo",
     "oduvodneni": "Odůvodnění",
-    "filter_uzivatele": "Filtrování uživatelů"
+    "filter_uzivatele": "Filtrování uživatelů",
+    "vice": "Více"
   }
 }
