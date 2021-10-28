@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.TestServletStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpSession;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -86,6 +88,12 @@ public class UserControlerImplTest {
         loginSession.setAttribute("user", users.get(0));
         EasyMock.expectLastCall().times(1);
 
+        loginSession.setMaxInactiveInterval(TrackingFilter.MAX_INACTIVE_INTERVAL);
+        EasyMock.expectLastCall().times(1);
+
+        loginSession.setAttribute(EasyMock.eq("SESSION_UPDATED_DATE"), anyObject(Date.class));
+        EasyMock.expectLastCall().times(1);
+
         UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(loginRequest)
                 .addMockedMethod("buildClient").createMock();
@@ -93,6 +101,7 @@ public class UserControlerImplTest {
 
         EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
         EasyMock.replay(loginRequest, loginSession, userControler);
+
         User login = userControler.login();
 
         Assert.assertTrue(login.username.equals(users.get(0).username));

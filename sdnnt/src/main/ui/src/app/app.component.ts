@@ -4,6 +4,7 @@ import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
 import { AppState } from './app.state';
 import { CookieService } from 'ngx-cookie';
+import { interval, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -36,11 +37,24 @@ export class AppComponent {
         this.state.processParams(params);
       }
     });
+
+    interval(10000).subscribe(x => {
+      if (this.state.user != null) {
+        this.service.ping().subscribe((res)=>{
+          if(res.pinginguser && res.remainingtime) {
+            console.log("Remaining time in secods "+res.remainingtime)
+          } else {
+            console.log("Expired; user is log out")
+          }
+        });
+      }    
+    });
   }
 
   isConsentEnabled() {
     var consent:string = localStorage.getItem("consent");
     return consent != null;
   }
+
 
 }

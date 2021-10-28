@@ -29,6 +29,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -128,6 +129,20 @@ public class UserServlet extends HttpServlet {
       }
     },
 
+
+    PING {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject retVal = new JSONObject();
+        if (new UserControlerImpl(req).getUser() != null) {
+          retVal.put("pinginguser", new UserControlerImpl(req).getUser().username);
+        }
+        if (req.getSession() != null && req.getSession().getAttribute(TrackingFilter.REMAINING_TIME) != null) {
+          retVal.put("remainingtime",req.getSession().getAttribute(TrackingFilter.REMAINING_TIME));
+        }
+        return retVal;
+      }
+    },
 
 
     // posle link uzivateli ze si ma vygenerovat heslo

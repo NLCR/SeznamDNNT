@@ -296,6 +296,11 @@ export class AppService {
     return this.get(url);
   }
 
+  ping(): Observable<any> {
+    let url = 'user/ping';
+    return this.get(url, new HttpParams(), false);
+  }
+
   getUsersByPrefix(prefix: string): Observable<any> {
     let url = 'user/users_by_prefix?prefix='+prefix;
     return this.get(url);

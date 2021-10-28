@@ -10,6 +10,7 @@ import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
+import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
 import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -56,6 +57,7 @@ public class UserControlerImpl implements UserControler {
 
     private void setSessionObject(HttpServletRequest req, User user) {
         req.getSession(true).setAttribute(AUTHENTICATED_USER, user);
+        TrackSessionUtils.touchSession(req.getSession());
     }
 
     @Override
@@ -70,6 +72,7 @@ public class UserControlerImpl implements UserControler {
                 User user = findOneUser(client, "username:\"" + username + "\"");
                 if (user != null && user.pwd != null && user.pwd.equals(pwdHashed)) {
                     setSessionObject(this.request, user);
+
                     return toTOObject(user);
                 } else throw new UserControlerException("Cannot find user or invalid password");
             } catch (Exception ex) {
