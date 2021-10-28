@@ -38,12 +38,30 @@ export class AppComponent {
       }
     });
 
-    interval(10000).subscribe(x => {
+
+    interval(this.config.pinginterval*1000).subscribe(x => {
       if (this.state.user != null) {
         this.service.ping().subscribe((res)=>{
           if(res.pinginguser && res.remainingtime) {
-            console.log("Remaining time in secods "+res.remainingtime)
+
+            console.log("pinginguser "+res.pinginguser);
+            console.log("remainingtime "+res.remainingtime);
+
+            if (res.remainingtime < 20) {
+                // show dialog
+            }
           } else {
+
+            this.service.logout().subscribe(res => {
+              
+              this.state.setLogged(res);
+              this.state.logged = false;
+              this.state.user = null;
+              localStorage.removeItem('user');
+
+              this.router.navigate(['/home'], {});
+
+            });
             console.log("Expired; user is log out")
           }
         });

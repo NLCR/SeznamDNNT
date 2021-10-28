@@ -64,12 +64,5 @@ export class ResetPasswordComponent implements OnInit {
 
 
 
-  // getContent() {
-  //   this.service.getText('invalid_token').subscribe(text => this.content = text);
-  // }
-
-  // onStrengthChanged(strength: number) {
-  //   console.log('password strength = ', strength);
-  // }
-
+  
 }

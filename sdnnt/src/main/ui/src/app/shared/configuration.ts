@@ -28,6 +28,7 @@ export interface Configuration {
   // User from session
   user: User;
 
-  // loginTimeOut in minutes
-  loginTimeOut: number;
+  // ping interval
+  pinginterval: number;
+
 }

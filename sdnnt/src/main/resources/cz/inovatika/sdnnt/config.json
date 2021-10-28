@@ -16,7 +16,9 @@
     "yearsSE": 10
   },
 
-
+  "session": {
+    "timeout": 30
+  },
 
   "jobs": {
     "zadost": {

@@ -88,7 +88,7 @@ public class UserControlerImplTest {
         loginSession.setAttribute("user", users.get(0));
         EasyMock.expectLastCall().times(1);
 
-        loginSession.setMaxInactiveInterval(TrackingFilter.MAX_INACTIVE_INTERVAL);
+        loginSession.setMaxInactiveInterval(TrackingFilter.DEFAULT_MAX_INACTIVE_INTERVAL);
         EasyMock.expectLastCall().times(1);
 
         loginSession.setAttribute(EasyMock.eq("SESSION_UPDATED_DATE"), anyObject(Date.class));
