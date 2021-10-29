@@ -169,7 +169,9 @@ public class OAIHarvester {
             try (InputStream is = entity.getContent()) {
               reqTime += new Date().getTime() - start;
               start = new Date().getTime();
+
               resumptionToken = readFromXML(is);
+
               procTime += new Date().getTime() - start;
               start = new Date().getTime();
               if (!recs.isEmpty()) {
@@ -200,7 +202,9 @@ public class OAIHarvester {
               try (InputStream is = entity.getContent()) {
                 reqTime += new Date().getTime() - start;
                 start = new Date().getTime();
+
                 resumptionToken = readFromXML(is);
+
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
@@ -290,7 +294,6 @@ public class OAIHarvester {
       }
     }
     return resumptionToken;
-    //throw new XMLStreamException("Premature end of file");
   }
 
   private void readMarcRecords(XMLStreamReader reader) throws XMLStreamException, IOException {

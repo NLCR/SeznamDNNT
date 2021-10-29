@@ -46,6 +46,8 @@ properties:
           type: string
         number:
           type: string
+        year:
+          type: string
 example:
   pid: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
   license: "dnntt"

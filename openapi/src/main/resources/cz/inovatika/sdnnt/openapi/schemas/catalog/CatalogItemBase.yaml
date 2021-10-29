@@ -76,3 +76,5 @@ properties:
           type: string
         number:
           type: string
+        year:
+          type: string

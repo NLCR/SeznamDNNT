@@ -47,12 +47,12 @@ public class TrackingFilter implements javax.servlet.Filter {
 
             String pathInfo = httpReq.getPathInfo();
             if (pathInfo == null || !pathInfo.endsWith("/ping")) {
-                LOGGER.info(String.format("Updating session %s with max inactive interval %d", session.getId(), maxInactiveInterval));
+                LOGGER.fine(String.format("Updating session %s with max inactive interval %d", session.getId(), maxInactiveInterval));
                 TrackSessionUtils.touchSession(session);
                 List<String> attnames = new ArrayList<>();
                 session.getAttributeNames().asIterator().forEachRemaining(attnames::add);
 
-                LOGGER.info("Session attribute names "+attnames);
+                LOGGER.fine("Session attribute names "+attnames);
             } else {
 
                 Date lastTouch = (Date) session.getAttribute(KEY);
