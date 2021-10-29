@@ -651,6 +651,15 @@
     "zmenit_osobni_udaje": "Change personal information",
     "zmenit_heslo": "Change Password",
     "oduvodneni": "Justification",
-    "filter_uzivatele": "Users filter"
+    "filter_uzivatele": "Users filter",
+
+    "expirace_sesssion": "Your session is going to be expired",
+
+    "expirace_session_keep":"Continue in work",
+    "expirace_session_logout":"Logout",
+    "expirace_session_text":"Your session is going to be expired soon",
+
+    "expirace_seconds":"seconds"
+
   }
 }

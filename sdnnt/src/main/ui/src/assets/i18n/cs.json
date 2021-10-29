@@ -652,6 +652,15 @@
     "zmenit_osobni_udaje": "Změnit osobní údaje",
     "zmenit_heslo": "Změnit heslo",
     "oduvodneni": "Odůvodnění",
-    "filter_uzivatele": "Filtrování uživatelů"
+    "filter_uzivatele": "Filtrování uživatelů",
+
+    "expirace_sesssion": "Vaše relace za chvíli vyprší",
+
+    "expirace_session_keep":"Pokračovat v práci",
+    "expirace_session_logout":"Odhlásit",
+    "expirace_session_text":"Vaše relace vyprší za ",
+
+    "expirace_seconds":"vteřin"
+
   }
 }

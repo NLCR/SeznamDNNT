@@ -33,7 +33,8 @@ export class AppState {
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
   public logged = false;
-  // public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZN', 'VVN', 'VVS'];
+  public expirationDialog = false;
+
 
   public consent: boolean = true;
 

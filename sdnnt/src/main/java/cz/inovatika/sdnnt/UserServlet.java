@@ -144,6 +144,16 @@ public class UserServlet extends HttpServlet {
       }
     },
 
+    PONG {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject retVal = new JSONObject();
+        if (new UserControlerImpl(req).getUser() != null) {
+          retVal.put("poinginguser", new UserControlerImpl(req).getUser().username);
+        }
+        return retVal;
+      }
+    },
 
     // posle link uzivateli ze si ma vygenerovat heslo
     FORGOT_PWD {

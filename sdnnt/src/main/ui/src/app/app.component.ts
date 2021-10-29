@@ -5,6 +5,10 @@ import { AppService } from './app.service';
 import { AppState } from './app.state';
 import { CookieService } from 'ngx-cookie';
 import { interval, Subscription } from 'rxjs';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { DialogSessionExpirationComponent } from './components/dialog-session-expiration/dialog-session-expiration.component';
+
+
 
 @Component({
   selector: 'app-root',
@@ -13,7 +17,10 @@ import { interval, Subscription } from 'rxjs';
 })
 export class AppComponent {
   
+
+
   constructor(
+    private sesionDialog: MatDialog,
     private config: AppConfiguration,
     public state: AppState,
     private service: AppService,
@@ -22,6 +29,8 @@ export class AppComponent {
     private cookieService: CookieService
   ) {}
 
+
+  sessionDialogRef;
 
 
   ngOnInit() {
@@ -42,18 +51,35 @@ export class AppComponent {
     interval(this.config.pinginterval*1000).subscribe(x => {
       if (this.state.user != null) {
         this.service.ping().subscribe((res)=>{
-          if(res.pinginguser && res.remainingtime) {
 
-            console.log("pinginguser "+res.pinginguser);
-            console.log("remainingtime "+res.remainingtime);
+          if(res.pinginguser && res.remainingtime) {
+            console.log("Remaining time "+res.remainingtime);
 
             if (res.remainingtime < 20) {
-                // show dialog
+              if (!this.state.expirationDialog) {
+                // dialog session expiration
+                this.sessionDialogRef = this.sesionDialog.open(DialogSessionExpirationComponent, {
+                  width: '300px',
+                  panelClass: 'app-dialog-login',
+                  data: {remainingtime: res.remainingtime}
+                });
+
+                this.sessionDialogRef.afterClosed().subscribe(() => {
+                  this.state.expirationDialog = false;
+                });
+                
+                this.state.expirationDialog = true;
+              }                
             }
           } else {
 
+            this.state.expirationDialog = false;
+
+            if (this.sessionDialogRef != null) {
+              this.sessionDialogRef.close();
+            }
+
             this.service.logout().subscribe(res => {
-              
               this.state.setLogged(res);
               this.state.logged = false;
               this.state.user = null;
@@ -64,6 +90,7 @@ export class AppComponent {
             });
             console.log("Expired; user is log out")
           }
+
         });
       }    
     });

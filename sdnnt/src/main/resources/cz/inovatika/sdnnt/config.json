@@ -17,7 +17,7 @@
   },
 
   "session": {
-    "timeout": 30
+    "maxinactiveinterval": 1200
   },
 
   "jobs": {
