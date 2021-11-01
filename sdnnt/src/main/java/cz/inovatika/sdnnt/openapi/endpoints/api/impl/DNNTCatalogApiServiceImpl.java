@@ -249,23 +249,31 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
         if (doc.has(GRANULARITY_FIELD) && doc.has(FMT_FIELD) && doc.getString(FMT_FIELD).equals(SE_FMT_VALUE)){
             JSONArray granularityJSON = doc.getJSONArray(GRANULARITY_FIELD);
-            granularityJSON.forEach(item-> {
-                CatalogItemBaseGranularity granularity = new CatalogItemBaseGranularity();
-                JSONObject itemObject = (JSONObject) item;
-                List<String> states = new ArrayList<>();
-                itemObject.optJSONArray("stav").forEach(stav-> {  states.add(stav.toString()); });
-                granularity.states(states);
-                granularity.link(itemObject.optString("link",""));
-                if (itemObject.has("cislo")) {
-                    granularity.number(itemObject.getString("cislo"));
+            for (int i=0,ll=granularityJSON.length();i<ll;i++) {
+                // skip first
+                if (i> 0) {
+                    CatalogItemBaseGranularity granularity = new CatalogItemBaseGranularity();
+                    JSONObject itemObject = (JSONObject) granularityJSON.getJSONObject(i);
+                    List<String> states = new ArrayList<>();
+                    itemObject.optJSONArray("stav").forEach(stav-> {  states.add(stav.toString()); });
+                    granularity.states(states);
+                    granularity.link(itemObject.optString("link",""));
+                    if (itemObject.has("cislo")) {
+                        granularity.number(itemObject.getString("cislo"));
+                    }
+                    if (itemObject.has("rocnik")) {
+                        granularity.year(itemObject.getString("rocnik"));
+                    }
+                    if (states.contains("A") && states.contains("NZ")) {
+                        granularity.license(License.dnntt.name());
+                    } else if (states.contains("A")) {
+                        granularity.license(License.dnnto.name());
+                    }
+                    granularities.add(granularity);
+
                 }
-                if (states.contains("A") && states.contains("NZ")) {
-                    granularity.license(License.dnntt.name());
-                } else if (states.contains("A")) {
-                    granularity.license(License.dnnto.name());
-                }
-                granularities.add(granularity);
-            });
+
+            }
         }
 
         links.stream().filter(str-> str.contains("uuid:")).map(str-> {
