@@ -654,6 +654,7 @@
     "zmenit_heslo": "Change Password",
     "oduvodneni": "Justification",
     "filter_uzivatele": "Users filter",
-    "vice": "More"
+    "vice": "More",
+    "omezit_na_terminal": "Restrict to terminal"
   }
 }

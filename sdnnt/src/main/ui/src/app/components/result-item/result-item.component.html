@@ -36,6 +36,9 @@
     </div>
     <div fxLayout="row">   
       <mat-button-toggle-group *ngIf="state.logged">
+        <mat-button-toggle>
+          <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
+        </mat-button-toggle>
         <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost" (click)="addToZadost()">
           <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
         </mat-button-toggle>
