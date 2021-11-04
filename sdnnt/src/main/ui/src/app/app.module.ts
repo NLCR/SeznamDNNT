@@ -52,6 +52,7 @@ import { InputLoginNameComponent } from './pages/input-login-name/input-login-na
 import { DialogForgottenPasswordComponent } from './components/dialog-forgotten-password/dialog-forgotten-password.component';
 import { ConsentComponent } from './components/consent/consent.component';
 import { CookieModule } from 'ngx-cookie';
+import { DialogDeleteRequestComponent } from './components/dialog-delete-request/dialog-delete-request.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -106,6 +107,7 @@ const providers: any[] =[
     GranularityComponent,
     InputLoginNameComponent,
     ConsentComponent,
+    DialogDeleteRequestComponent,
   ],
   imports: [
     BrowserModule,

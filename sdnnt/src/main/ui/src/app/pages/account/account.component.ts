@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DialogDeleteRequestComponent } from 'src/app/components/dialog-delete-request/dialog-delete-request.component';
 import { DialogSendRequestComponent } from 'src/app/components/dialog-send-request/dialog-send-request.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
@@ -228,6 +229,13 @@ export class AccountComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
         zadost.state = 'processed';
       }
+    });
+  }
+
+  public confirmDeleteRequest() {
+    const dialogRef = this.dialog.open(DialogDeleteRequestComponent, {
+      width: '750px',
+      panelClass: 'app-dialog-states'
     });
   }
 

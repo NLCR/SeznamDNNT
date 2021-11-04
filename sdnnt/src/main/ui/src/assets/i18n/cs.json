@@ -145,7 +145,8 @@
     "invalid_psc": "Chybné PSČ",
     "condition1": "Je nutné souhlasit s podmínkami registrace",
     "condition2": "Je nutné souhlasit s podmínkami registrace",
-    "condition3": "Je nutné souhlasit s podmínkami registrace"
+    "condition3": "Je nutné souhlasit s podmínkami registrace",
+    "delete_request": "Opravdu chcete smazat tuto žádost"
   },
 
   "sort": {
@@ -655,6 +656,7 @@
     "oduvodneni": "Odůvodnění",
     "filter_uzivatele": "Filtrování uživatelů",
     "vice": "Více",
-    "omezit_na_terminal": "Omezit na terminál"
+    "omezit_na_terminal": "Omezit na terminál",
+    "smazat_zadost": "Smazat žádost"
   }
 }

@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>{{ 'desc.smazat_zadost' | translate }}</h1>
+<div mat-dialog-content>
+  <mat-card class="app-alert app-warning">
+    <mat-card-content>
+      <mat-icon class="material-icons-outlined">warning</mat-icon>{{ 'alert.delete_request' | translate }}?
+    </mat-card-content>
+  </mat-card>
+</div>
+<div mat-dialog-actions>
+  <button mat-flat-button color="primary" (click)="deleteRequest()">{{ 'desc.smazat_zadost' | translate }}</button>
+  <button mat-button matDialogClose>{{ 'desc.zrusit' | translate }}</button>
+</div>

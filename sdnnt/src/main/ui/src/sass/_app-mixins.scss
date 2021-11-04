@@ -60,6 +60,21 @@
   }
 }
 
+// set alert card
+@mixin setAlertCard() {
+  @each $alert, $color in $alerts {
+    &.app-#{$alert} {
+      color: $color;
+      border-color: rgba($color, .2);
+      background-color: rgba($color, .1) !important;
+
+      .mat-icon {
+        color: $color;
+      }
+    }
+  }
+}
+
 // set gap
 @mixin setGap() {
   @each $gap, $val in $gaps {

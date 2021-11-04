@@ -145,7 +145,8 @@
     "invalid_psc": "Invalid zip code",
     "condition1": "You must agree to the terms at the bottom of the dialog",
     "condition2": "You must agree to the terms at the bottom of the dialog",
-    "condition3": "You must agree to the terms at the bottom of the dialog"
+    "condition3": "You must agree to the terms at the bottom of the dialog",
+    "delete_request": "Are you sure you want to delete this request"
   },
 
   "sort": {
@@ -655,6 +656,7 @@
     "oduvodneni": "Justification",
     "filter_uzivatele": "Users filter",
     "vice": "More",
-    "omezit_na_terminal": "Restrict to terminal"
+    "omezit_na_terminal": "Restrict to terminal",
+    "smazat_zadost": "Delete request"
   }
 }
