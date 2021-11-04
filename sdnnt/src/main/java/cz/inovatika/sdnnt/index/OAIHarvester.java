@@ -1,12 +1,16 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.utils.HarvestDebug;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,6 +19,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -65,7 +71,7 @@ public class OAIHarvester {
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
             opts.getJSONObject("OAIHavest").getString("url"),
             set);
-    getRecords(url);
+    getRecords("full", url);
     ret.put("indexed", indexed);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
     ret.put("ellapsed", ellapsed);
@@ -116,7 +122,7 @@ public class OAIHarvester {
             from,
             until,
             set);
-    getRecords(url);
+    getRecords("update", url);
     ret.put("indexed", indexed);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
     ret.put("ellapsed", ellapsed);
@@ -140,7 +146,7 @@ public class OAIHarvester {
             from,
             until,
             set);
-    getRecords(url);
+    getRecords("updateFrom", url);
     ret.put("indexed", indexed);
     ret.put("deleted", deleted);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
@@ -154,7 +160,7 @@ public class OAIHarvester {
     return ret;
   }
 
-  private void getRecords(String url) { 
+  private void getRecords(String type, String url) {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
     Options opts = Options.getInstance();
     String resumptionToken = null;
@@ -166,26 +172,43 @@ public class OAIHarvester {
         try (CloseableHttpResponse response1 = client.execute(httpGet)) {
           final HttpEntity entity = response1.getEntity();
           if (entity != null) {
-            try (InputStream is = entity.getContent()) {
-              reqTime += new Date().getTime() - start;
-              start = new Date().getTime();
 
-              resumptionToken = readFromXML(is);
+            InputStream dStream = null;
+            File dFile = null;
 
-              procTime += new Date().getTime() - start;
-              start = new Date().getTime();
-              if (!recs.isEmpty()) {
-                Indexer.add(collection, recs, merge, update, "harvester");
-                indexed += recs.size();
-                recs.clear();
+            try(InputStream netStream = entity.getContent()) {
+
+                dFile = HarvestDebug.debugFile(type, netStream, url);
+                dStream = new FileInputStream(dFile);
+
+                reqTime += new Date().getTime() - start;
+                start = new Date().getTime();
+
+                resumptionToken = readFromXML(dStream);
+
+                procTime += new Date().getTime() - start;
+                start = new Date().getTime();
+                if (!recs.isEmpty()) {
+                    Indexer.add(collection, recs, merge, update, "harvester");
+                    indexed += recs.size();
+                    recs.clear();
+                }
+                if (!toDelete.isEmpty()) {
+                    solr.deleteById(collection, toDelete);
+                    deleted += toDelete.size();
+                    toDelete.clear();
+                }
+                solrTime += new Date().getTime() - start;
+
+              if (dStream != null ) {
+                IOUtils.closeQuietly(dStream);
               }
-              if (!toDelete.isEmpty()) {
-                solr.deleteById(collection, toDelete);
-                deleted += toDelete.size();
-                toDelete.clear();
-              }
-              solrTime += new Date().getTime() - start;
-              is.close();
+
+              Files.delete(dFile.toPath());
+              Files.delete(dFile.getParentFile().toPath());
+
+            } finally {
+                if (dStream != null) IOUtils.closeQuietly(dStream);
             }
           }
         }
@@ -199,27 +222,48 @@ public class OAIHarvester {
           try (CloseableHttpResponse response1 = client.execute(httpGet)) {
             final HttpEntity entity = response1.getEntity();
             if (entity != null) {
-              try (InputStream is = entity.getContent()) {
-                reqTime += new Date().getTime() - start;
-                start = new Date().getTime();
 
-                resumptionToken = readFromXML(is);
+                InputStream dStream = null;
+                File dFile = null;
 
-                procTime += new Date().getTime() - start;
-                start = new Date().getTime();
-                if (recs.size() > batchSize) {
-                  Indexer.add(collection, recs, merge, update, "harvester");
-                  indexed += recs.size();
-                  solrTime += new Date().getTime() - start;
-                  LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
-                    indexed,
-                    DurationFormatUtils.formatDurationHMS(reqTime),
-                    DurationFormatUtils.formatDurationHMS(procTime),
-                    DurationFormatUtils.formatDurationHMS(solrTime)});
-                  recs.clear();
+                try (InputStream netStream = entity.getContent()) {
+
+                    dFile = HarvestDebug.debugFile(type, netStream, url);
+                    dStream = new FileInputStream(dFile);
+
+
+                    reqTime += new Date().getTime() - start;
+                    start = new Date().getTime();
+
+                    resumptionToken = readFromXML(dStream);
+
+                    procTime += new Date().getTime() - start;
+                    start = new Date().getTime();
+                    if (recs.size() > batchSize) {
+                        Indexer.add(collection, recs, merge, update, "harvester");
+                        indexed += recs.size();
+                        solrTime += new Date().getTime() - start;
+                        LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                        indexed,
+                        DurationFormatUtils.formatDurationHMS(reqTime),
+                        DurationFormatUtils.formatDurationHMS(procTime),
+                        DurationFormatUtils.formatDurationHMS(solrTime)});
+                        recs.clear();
+                    }
+
+
+                  if (dStream != null ) {
+                    IOUtils.closeQuietly(dStream);
+                  }
+
+                  Files.delete(dFile.toPath());
+                  Files.delete(dFile.getParentFile().toPath());
+                } finally {
+
+                  if (dStream != null) {
+                    IOUtils.closeQuietly(dStream);
+                  }
                 }
-                is.close();
-              }
             }
           }
 
