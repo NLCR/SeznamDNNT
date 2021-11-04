@@ -15,7 +15,7 @@
   </mat-card-header>
   <mat-card-actions fxLayout="row" fxLayoutGap="32px">
     <div fxFlex fxFlexAlign="flex-end">
-      <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav">
+      <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
         {{ doc.dntstav[doc.dntstav.length-1] }}   
       </div>
       <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">

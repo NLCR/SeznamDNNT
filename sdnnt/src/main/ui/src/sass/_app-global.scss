@@ -240,7 +240,7 @@ table {
   min-width: 15px;
   justify-content: center;
 
-  @include setStateColor(badge-dev);
+  @include setStateColor(badge);
 
   .mat-icon {
     margin-right: $app-gap-icon;

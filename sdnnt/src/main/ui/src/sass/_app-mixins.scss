@@ -42,24 +42,6 @@
   @each $state, $color in $states {
     @if ($type == "badge") {
       color: $app-gray-6;
-      border-color: $app-gray-6;
-
-      .app-badge-btn {
-        background-color: $color;
-        color: $app-color-lightnes;
-      }
-
-      &.#{$state} {
-        color: $color;
-        border-color: $color;
-
-        .app-badge-btn {
-          background-color: $color;
-          color: $app-color-lightnes;
-        }
-      }
-    } @else if ($type == "badge-dev") {
-      color: $app-gray-6;
       background-color: $app-gray-2;
 
       &.#{$state} {
