@@ -511,7 +511,7 @@
     "check_password_confirmation_are_not_thesame": "Passwords are not the same",
     "check_password_isnotvalid": "The password doesn't meet the criteria",
     "zapomenute_heslo": "Forgotten password",
-    "poslat_resetovaci_token": "Send reset token",
+    "poslat_nove_heslo": "Send new password",
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",

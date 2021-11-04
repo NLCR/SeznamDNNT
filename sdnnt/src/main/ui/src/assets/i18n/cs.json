@@ -511,7 +511,7 @@
     "check_password_confirmation_are_not_thesame": "Hesla se neshodují",
     "check_password_isnotvalid": "Heslo musí splňovat kritéria",
     "zapomenute_heslo": "Zapomenuté heslo",
-    "poslat_resetovaci_token": "Poslat resetovací token",
+    "poslat_nove_heslo": "Poslat nové heslo",
     "zmena_stavu": "Změna stavu",
     "zaznam_z_katalogu": "Záznam z katalogu",
     "identifikatory": "Identifikátory",
