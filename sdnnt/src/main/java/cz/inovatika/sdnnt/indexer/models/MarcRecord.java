@@ -298,12 +298,17 @@ public class MarcRecord {
     setIsProposable();
 
     sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+
+    //245a (název): 245b (podnázev). 245n (číslo dílu/části), 245p (název části/dílu) / 245c (autoři, překlad, ilustrátoři apod.)
     String nazev = "";
     if (sdoc.containsKey("marc_245a")) {
       nazev += sdoc.getFieldValue("marc_245a") + " ";
     }
     if (sdoc.containsKey("marc_245b")) {
       nazev += sdoc.getFieldValue("marc_245b") + " ";
+    }
+    if (sdoc.containsKey("marc_245p")) {
+      nazev += sdoc.getFieldValue("marc_245p") + " ";
     }
     if (sdoc.containsKey("marc_245c")) {
       nazev += sdoc.getFieldValue("marc_245c") + " ";
@@ -313,9 +318,6 @@ public class MarcRecord {
     }
     if (sdoc.containsKey("marc_245n")) {
       nazev += sdoc.getFieldValue("marc_245n") + " ";
-    }
-    if (sdoc.containsKey("marc_245p")) {
-      nazev += sdoc.getFieldValue("marc_245p") + " ";
     }
     sdoc.setField("nazev", nazev.trim());
     addRokVydani();  

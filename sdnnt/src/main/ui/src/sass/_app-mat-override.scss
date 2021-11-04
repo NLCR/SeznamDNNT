@@ -19,9 +19,14 @@
 // button toggle
 .mat-button-toggle-appearance-standard {
   @extend .app-clean-bg;
-  
-  .mat-button-toggle-label-content {
-    line-height: 34px;
+
+  .mat-button-toggle-button {
+
+    .mat-button-toggle-label-content {
+      height: 32px;
+      display: flex;
+      align-items: center;
+    }
   }
 }
 

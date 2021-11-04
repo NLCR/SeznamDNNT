@@ -7,5 +7,9 @@ app-result-item {
         width: 80px;
       }
     }
+
+    &:hover {
+      background-color: $app-gray-1 !important;
+    }
   }
 }

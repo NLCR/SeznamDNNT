@@ -1,9 +1,12 @@
 // --- FACETS ---
 
 app-facets {
-  //@import "app-facets-used";
   .app-facet-wrapper {
     max-height: 250px;
     overflow-y: auto;
+
+    a {
+      line-height: 22px;
+    }
   }
 }

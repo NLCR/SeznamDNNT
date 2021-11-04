@@ -65,7 +65,9 @@
   },
   "license": {
     "dnnto": "Dnnto: License for online access",
-    "dnntt": "Dnntt: License for terminal access"
+    "dnnto-noactive": "Assigned license dnnto",
+    "dnntt": "Dnntt: License for terminal access",
+    "dnntt-noactive": "Assigned license dnntt"
   },
   "field": {
     "015a": "Number nr.bibl.",
@@ -659,7 +661,8 @@
     "expirace_session_logout":"Logout",
     "expirace_session_text":"Your session is going to be expired soon",
 
-    "expirace_seconds":"seconds"
+    "expirace_seconds":"seconds",
 
+    "vice": "More"
   }
 }

@@ -13,12 +13,19 @@
         <ng-container *ngFor="let f of facet_fields[facet]">
           <div *ngIf="f.name !== '   '">
             <ng-container [ngSwitch]="facet">
-              <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">{{ 'license.' + f.name | translate }}</a>
-              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">{{ ('field.' + f.name | translate) }}</a>
+              <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">
+                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                <!-- <div [class]="'app-badge light ' + f.name" class="app-mr-1">{{ f.name }}</div> -->
+                {{ 'license.' + f.name | translate }}
+              </a>
+              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">
+                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                <!-- <div [class]="'app-badge light ' + f.name" class="app-mr-1">{{ f.name }}</div> -->
+                {{ ('field.' + f.name | translate) }}
+              </a>
               <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
               <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
               <a *ngSwitchCase="'sigla'" (click)="addFilter(facet, f)">{{ 'sigla.' + f.name | translate }}</a>
-
               <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
             </ng-container>
           </div>
