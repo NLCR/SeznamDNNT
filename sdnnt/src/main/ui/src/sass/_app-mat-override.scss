@@ -63,6 +63,17 @@
 .mat-card {
   @extend .app-clean-bg, .app-clean-shadow, .app-clean-radius;
   border-bottom: 1px solid $app-brand-border-color;
+
+  &.app-alert {
+    text-align: center;
+    border: 1px solid;
+    @include setAlertCard();
+
+    .mat-icon {
+      @extend .app-mr-2;
+      @include setIcon($position: sub)
+    }
+  }
   
   .mat-card-header-text {
     @extend .app-clean-mg;

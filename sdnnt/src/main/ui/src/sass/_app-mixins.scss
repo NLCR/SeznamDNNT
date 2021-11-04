@@ -48,13 +48,6 @@
         color: $app-color-lightnes;
         background-color: $color;
       }
-
-      &.light {
-        &.#{$state} {
-          color: $color;
-          background-color: rgba($color, .1);
-        }
-      }
     } @else if ($type == "color") {
       &.#{$state} {
         color: $color;
@@ -62,6 +55,21 @@
     } @else if ($type == "bglight") {
       &.#{$state} {
         background-color: rgba($color, .07);
+      }
+    }
+  }
+}
+
+// set alert card
+@mixin setAlertCard() {
+  @each $alert, $color in $alerts {
+    &.app-#{$alert} {
+      color: $color;
+      border-color: rgba($color, .2);
+      background-color: rgba($color, .1) !important;
+
+      .mat-icon {
+        color: $color;
       }
     }
   }

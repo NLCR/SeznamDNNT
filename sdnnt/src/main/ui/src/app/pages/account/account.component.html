@@ -205,6 +205,9 @@
                 <mat-button-toggle *ngIf="element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">done</mat-icon>
                 </mat-button-toggle>
+                <mat-button-toggle [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest()">
+                  <mat-icon class="material-icons-outlined app-color-warning">clear</mat-icon>
+                </mat-button-toggle>
               </mat-button-toggle-group>
             </td>
           </ng-container>

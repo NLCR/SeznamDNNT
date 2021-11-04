@@ -23,7 +23,7 @@ app-navbar {
         margin: 0 4px;
 
         &.app-active {
-          color: $app-primary-color;
+          color: $app-color-primary;
           border-color: transparent;
         }
 
@@ -35,7 +35,7 @@ app-navbar {
       }
 
       &.app-active {
-        border: 1px solid $app-primary-color;
+        border: 1px solid $app-color-primary;
       }
     }
   }

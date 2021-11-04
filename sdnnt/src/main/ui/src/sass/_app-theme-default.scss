@@ -32,6 +32,18 @@ $app-theme:  mat-light-theme($app-primary, $app-accent, $app-warn);
 @include angular-material-theme($app-theme);
 
 // theme colors
-$app-primary-color: mat-color($app-primary);
-$app-primary-color-darker: mat-color($app-primary, 600);
-$app-accent-color: mat-color($app-accent);
+$app-color-primary: mat-color($app-primary);
+$app-color-primary-darker: mat-color($app-primary, 600);
+$app-color-accent: mat-color($app-accent);
+$app-color-lightnes: #ffffff!default;
+$app-color-darknes: #000000 !default;
+$app-color-warning: mat-color($app-warn) !default;
+$app-color-info: mat-color($mat-amber, 900) !default;
+$app-color-fav: mat-color($mat-yellow, 800) !default;
+$app-color-success: mat-color($mat-green, 800) !default;
+
+$alerts: (
+  warning: $app-color-warning,
+  info: $app-color-info,
+  success:  $app-color-success
+);

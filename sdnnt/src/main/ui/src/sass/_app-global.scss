@@ -3,10 +3,10 @@
 a {
   cursor: pointer;
   text-decoration: none;
-  color: $app-primary-color;
+  color: $app-color-primary;
 
   &:hover {
-    //color: darken($app-primary-color, 10);
+    //color: darken($app-color-primary, 10);
     text-decoration: none;
   }
 
@@ -182,7 +182,7 @@ table {
       tr {
         td {
           &.app-col-action {
-            color: $app-primary-color;
+            color: $app-color-primary;
 
             .mat-icon {
               @include setIcon(18, $position: sub)
@@ -261,37 +261,6 @@ table {
     }
   }
 }
-
-/* .app-badge {
-  display: inline-flex;
-  padding: 0 8px;
-  border-radius: $app-border-radius;
-  border: 1px solid;
-  height: $app-badge-height;
-  align-items: center;
-  border-radius: $app-badge-height;
-
-  @include setStateColor(badge);
-
-  .mat-icon {
-    margin-right: $app-gap-icon;
-  }
-
-  .app-badge-btn {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-
-    .mat-icon {
-      margin-right: 0 !important;
-      @include setIcon(16);
-    }
-  }
-} */
 
 .app-text-icon {
   .mat-icon {

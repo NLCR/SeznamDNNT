@@ -145,7 +145,8 @@
     "invalid_psc": "Invalid zip code",
     "condition1": "You must agree to the terms at the bottom of the dialog",
     "condition2": "You must agree to the terms at the bottom of the dialog",
-    "condition3": "You must agree to the terms at the bottom of the dialog"
+    "condition3": "You must agree to the terms at the bottom of the dialog",
+    "delete_request": "Are you sure you want to delete this request"
   },
 
   "sort": {
@@ -510,7 +511,7 @@
     "check_password_confirmation_are_not_thesame": "Passwords are not the same",
     "check_password_isnotvalid": "The password doesn't meet the criteria",
     "zapomenute_heslo": "Forgotten password",
-    "poslat_resetovaci_token": "Send reset token",
+    "poslat_nove_heslo": "Send new password",
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
     "identifikatory": "Identifiers",
@@ -663,6 +664,8 @@
 
     "expirace_seconds":"seconds",
 
-    "vice": "More"
+    "vice": "More",
+    "omezit_na_terminal": "Restrict to terminal",
+    "smazat_zadost": "Delete request"
   }
 }
