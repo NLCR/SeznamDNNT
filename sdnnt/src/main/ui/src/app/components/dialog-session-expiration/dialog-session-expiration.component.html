@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>{{ 'desc.expirace_sesssion' | translate }}</h1>
+<div mat-dialog-content>
+  <ng-container *ngIf="state.logged">
+    <div fxLayout="row wrap">
+        <mat-label>{{ 'desc.expirace_session_text' | translate }} {{counter}} </mat-label> <mat-label> &nbsp; {{ 'desc.expirace_seconds' | translate }}</mat-label>
+    </div> 
+  </ng-container>
+</div>
+<div mat-dialog-actions>
+  <ng-container *ngIf="state.logged">
+    <button mat-flat-button mat-button color="primary" (click)="keepAlive()">{{ 'desc.expirace_session_keep' | translate }}</button>
+    <button mat-flat-button mat-button color="primary" (click)="close()">{{ 'desc.expirace_session_logout' | translate }}</button>
+  </ng-container>
+</div>
