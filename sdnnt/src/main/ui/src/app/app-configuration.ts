@@ -32,6 +32,10 @@ import { User } from './shared/user';
         return this.config.homeTabs;
     }
 
+    public get homeCards() {
+        return this.config.homeCards;
+    }
+
     public get dntStates() {
         return this.config.dntStates;
     }

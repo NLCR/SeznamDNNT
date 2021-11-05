@@ -21,5 +21,12 @@
     {"field": "datestamp", "dir": "asc"},
     {"field": "datestamp", "dir": "desc"}
   ],
-  "loginTimeOut" : 240
+  "loginTimeOut" : 240,
+  "homeCards": [
+    {"field": "A", "type": "stav"},
+    {"field": "N", "type": "stav"},
+    {"field": "PA", "type": "stav"},
+    {"field": "dnnto", "type": "licence"},
+    {"field": "dnntt", "type": "licence"}
+  ]
 }

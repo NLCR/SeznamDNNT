@@ -48,6 +48,14 @@
         color: $app-color-lightnes;
         background-color: $color;
       }
+    } @else if ($type == "card") {
+      color: $app-gray-6;
+      background-color: $app-gray-2;
+
+      &.#{$state} {
+        color: $app-color-lightnes;
+        background-color: $color;
+      }
     } @else if ($type == "color") {
       &.#{$state} {
         color: $color;

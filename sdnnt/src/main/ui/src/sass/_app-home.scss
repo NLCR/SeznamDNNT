@@ -1,6 +1,36 @@
 // --- HOME ---
 
 app-home {
+  .app-card-home {
+    @extend .app-clean-shadow;
+    @include setStateColor(card);
+    border-radius: $app-badge-height;
+    cursor: pointer;
+
+    .mat-card-header {
+      min-height: 80px;
+
+      .mat-card-avatar {
+        background-color: rgba($app-color-lightnes, .2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 18px;
+      }
+
+      .mat-card-subtitle {
+        color: rgba($app-color-lightnes, .7);
+      }
+    }
+
+    .mat-card-actions {
+      strong {
+        font-size: 16px;
+      }
+    }
+  }
+
   .mat-tab-group {
     .mat-tab-body-wrapper {
 

@@ -61,54 +61,56 @@
 
 // card
 .mat-card {
-  @extend .app-clean-bg, .app-clean-shadow, .app-clean-radius;
-  border-bottom: 1px solid $app-brand-border-color;
+  &:not(.app-card-home) {
+    @extend .app-clean-bg, .app-clean-shadow, .app-clean-radius;
+    border-bottom: 1px solid $app-brand-border-color;
 
-  &.app-alert {
-    text-align: center;
-    border: 1px solid;
-    @include setAlertCard();
+    &.app-alert {
+      text-align: center;
+      border: 1px solid;
+      @include setAlertCard();
 
-    .mat-icon {
-      @extend .app-mr-2;
-      @include setIcon($position: sub)
-    }
-  }
-  
-  .mat-card-header-text {
-    @extend .app-clean-mg;
-
-    .mat-card-title {
-      font-size: 16px;
-      display: flex;
-      align-items: flex-start;
-
-      .mat-checkbox {
-        display: flex;
+      .mat-icon {
+        @extend .app-mr-2;
+        @include setIcon($position: sub)
       }
     }
-  }
+    
+    .mat-card-header-text {
+      @extend .app-clean-mg;
 
-  .mat-card-content {
-    @extend .app-clean-mg;
-  }
+      .mat-card-title {
+        font-size: 16px;
+        display: flex;
+        align-items: flex-start;
 
-  .mat-card-actions {
-    padding: 8px;
-    margin-bottom: 0 !important;
-
-    .mat-button-base {
-      margin: 0 0 0 $app-gap-half;
+        .mat-checkbox {
+          display: flex;
+        }
+      }
     }
-  }
 
-  .mat-icon {
-    @include setIcon($size: 20);
-  }
+    .mat-card-content {
+      @extend .app-clean-mg;
+    }
 
-  &.app-view-import {
+    .mat-card-actions {
+      padding: 8px;
+      margin-bottom: 0 !important;
+
+      .mat-button-base {
+        margin: 0 0 0 $app-gap-half;
+      }
+    }
+
     .mat-icon {
-      @include setIcon($position: middle);
+      @include setIcon($size: 20);
+    }
+
+    &.app-view-import {
+      .mat-icon {
+        @include setIcon($position: middle);
+      }
     }
   }
 }

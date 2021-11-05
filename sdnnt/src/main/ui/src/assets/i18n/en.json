@@ -668,6 +668,7 @@
 
     "vice": "More",
     "omezit_na_terminal": "Restrict to terminal",
-    "smazat_zadost": "Delete request"
+    "smazat_zadost": "Delete request",
+    "zaznamu": "records"
   }
 }

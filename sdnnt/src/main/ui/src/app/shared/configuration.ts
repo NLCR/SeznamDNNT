@@ -7,6 +7,7 @@ export interface Configuration {
   lang: string;
   snackDuration: number;
   homeTabs: string[];
+  homeCards: string[];
 
   // Seznam roli
   role: string[];
