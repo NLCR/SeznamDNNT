@@ -1,3 +1,4 @@
+import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
@@ -14,6 +15,8 @@ export class HomeComponent implements OnInit {
   activeTab: string;
   tabContent: string;
 
+  cardsFacets: object = {};
+
   constructor(
     public config: AppConfiguration,
     public state: AppState,
@@ -25,16 +28,20 @@ export class HomeComponent implements OnInit {
     this.getText(this.config.homeTabs[0]);
     this.service.langChanged.subscribe(() => {
       this.service.getText(this.activeTab).subscribe(text => this.tabContent = text);
-    })
+    });
+
+    const p = Object.assign({}, {});
+    this.service.search(p as HttpParams).subscribe((res)=>{
+
+      for (let dntstav of res.facet_counts.facet_fields.dntstav) {
+        this.cardsFacets[dntstav.name] = dntstav.value;          
+      }
+      for (let license of res.facet_counts.facet_fields.license) {
+        this.cardsFacets[license.name] = license.value;          
+      }
+    });
   }
 
-  login() {
-
-  }
-
-  register() {
-
-  }
 
   getText(tab: string) {
     this.activeTab = tab;
