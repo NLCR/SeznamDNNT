@@ -24,14 +24,17 @@
       <div *ngIf="hasNavhr && !inZadost" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
         {{ doc.zadost.navrh }}
       </div>
-      <div *ngIf="doc.license" [class]="'app-badge ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
-        {{ doc.license }}
+      <div *ngIf="doc.license" [class]="'app-badge app-icon-in ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
+        <mat-icon class="material-icons-outlined">{{ doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+        {{ 'license.' + doc.license + '-badge' | translate }}
       </div>
-      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA'" [class]="'app-badge'" class="app-ml-1" [matTooltip]="'license.dnnto-noactive' | translate">
-        dnnto
+      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA'" class="app-badge app-icon-in app-ml-1" [matTooltip]="'license.dnnto-noactive' | translate">
+        <mat-icon class="material-icons-outlined">camera_alt</mat-icon>
+        {{ 'license.dnnto-badge' | translate }}
       </div>
-      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA' && doc.dntstav[doc.dntstav.length-1] === 'NZ'" [class]="'app-badge'" class="app-ml-1" [matTooltip]="'license.dnntt-noactive' | translate">
-        dnntt
+      <div *ngIf="doc.dntstav[doc.dntstav.length-1] === 'PA' && doc.dntstav[doc.dntstav.length-1] === 'NZ'" class="app-badge app-icon-in app-ml-1" [matTooltip]="'license.dnntt-noactive' | translate">
+        <mat-icon class="material-icons-outlined">no_photography</mat-icon>
+        {{ 'license.dnntt-badge' | translate }}
       </div>
     </div>
     <div fxLayout="row">   

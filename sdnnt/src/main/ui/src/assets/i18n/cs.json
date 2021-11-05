@@ -65,8 +65,10 @@
   },
   "license": {
     "dnnto": "Licence pro online přístup",
+    "dnnto-badge": "Online",
     "dnnto-noactive": "Přidělená licence dnnto",
     "dnntt": "Licence pro terminálový přístup",
+    "dnntt-badge": "Terminál",
     "dnntt-noactive": "Přidělená licence dnntt"
   },
   "field": {

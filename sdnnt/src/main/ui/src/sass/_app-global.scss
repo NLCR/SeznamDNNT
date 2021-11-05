@@ -228,6 +228,7 @@ table {
 
 
 .app-badge {
+  @include setStateColor(badge);
   font-size: 12px;
   font-weight: 500;
   line-height: 18px;
@@ -240,27 +241,24 @@ table {
   min-width: 15px;
   justify-content: center;
 
-  @include setStateColor(badge);
+  &.app-icon-in {
+    vertical-align: bottom;
+
+    .mat-icon {
+      margin-right: 2px;
+      @include setIcon(16);
+
+      .mat-card & {
+        @include setIcon(16);
+      }
+    }
+  }
 
   .mat-icon {
     margin-right: $app-gap-icon;
   }
-
-  .app-badge-btn {
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 8px;
-
-    .mat-icon {
-      margin-right: 0 !important;
-      @include setIcon(16);
-    }
-  }
 }
+
 
 .app-text-icon {
   .mat-icon {

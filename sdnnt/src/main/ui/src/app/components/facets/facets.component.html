@@ -14,7 +14,10 @@
           <div *ngIf="f.name !== '   '">
             <ng-container [ngSwitch]="facet">
               <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">
-                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                <div [class]="'app-badge app-icon-in ' + f.name" class="app-mr-1">
+                  <mat-icon class="material-icons-outlined app-m-0">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                </div>
+                <!-- <mat-icon [class]="'material-icons-outlined app-m-0 ' + f.name">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon> -->
                 {{ 'license.' + f.name | translate }}
               </a>
               <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">
