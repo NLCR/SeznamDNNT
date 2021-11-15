@@ -44,7 +44,14 @@ export class AppState {
   public withNotification: boolean;
 
   // Aktualni zadost kam se pridavaji navrhy; zmenit
-  currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
+  // NZN, VN, VN_, VNL (VNL a VNZ je typ na omezeni na terminal tedy jeden typ )
+  // uzivatel ma jednu zadost na omezeni na terminal a rozhodne se podle ceho ji posle  
+  //currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
+  currentZadost: {NZN: Zadost,VN: Zadost, VNX: Zadost} = {
+    VN: null,
+    NZN: null, 
+    VNX:null
+  };
 
   setConfig(cfg: Configuration) {
     this.config = cfg;
@@ -94,10 +101,10 @@ export class AppState {
         res.zadost.forEach(z => {
           if (z.navrh === 'NZN') {
             this.currentZadost.NZN = z;
-          }else if (z.navrh === 'VVS') {
-            this.currentZadost.VVS = z;
-          }else if (z.navrh === 'VVN') {
-            this.currentZadost.VVN = z;
+          }else if (z.navrh === 'VN') {
+            this.currentZadost.VN = z;
+          }else if (z.navrh === 'VNZ' || z.navrh === 'VNL') {
+            this.currentZadost.VNX = z;
           }
         }); 
         

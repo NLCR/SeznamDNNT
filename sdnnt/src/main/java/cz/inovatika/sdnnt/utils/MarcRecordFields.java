@@ -5,11 +5,16 @@ public class MarcRecordFields {
 
     public static final String HISTORIE_STAVU_FIELD = "historie_stavu";
     public static final String DNTSTAV_FIELD = "dntstav";
+    public static final String DATUM_STAVU_FIELD = "datum_stavu";
+
+    public static final String KURATORSTAV_FIELD = "kuratorstav";
+    public static final String DATUM_KURATOR_STAV_FIELD = "datum_kurator_stav";
+    public static final String HISTORIE_KURATORSTAVU_FIELD = "historie_kurator_stavu";
+
     public static final String LICENSE_FIELD = "license";
     public static final String LICENSE_HISTORY_FIELD = "license_history";
     public static final String GRANULARITY_FIELD = "granularity";
 
-    public static final String DATUM_STAVU_FIELD = "datum_stavu";
     public static final String IDENTIFIER_FIELD = "identifier";
     public static final String DATESTAMP_FIELD = "datestamp";
     public static final String SET_SPEC_FIELD = "setSpec";

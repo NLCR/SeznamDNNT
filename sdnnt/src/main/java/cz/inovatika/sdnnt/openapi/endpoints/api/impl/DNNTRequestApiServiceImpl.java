@@ -12,6 +12,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
@@ -175,7 +176,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
                     try {
                         AccountService accountService = new AccountServiceImpl();
-                        JSONObject search = accountService.search(null, status, navrh, null, null, null , user, LIMIT, 0);
+                        JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null , user, LIMIT, 0);
                         JSONObject response = search.getJSONObject("response");
                         JSONArray docs = response.getJSONArray("docs");
                         for (int i = 0, ll = docs.length();i<ll;i++) {
@@ -270,10 +271,10 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             rawObject.put("datum_zadani" , utc);
 
                             try {
-                                JSONObject object = accountService.saveRequest(rawObject.toString(), user);
+                                JSONObject object = accountService.saveRequest(rawObject.toString(), user, null);
                                 response.getSaved().add(objectMapper.readValue(object.toString(), SuccessRequestSaved.class));
 
-                            } catch (SolrServerException e) {
+                            } catch (SolrServerException | ConflictException e) {
                                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
 
                                 FailedRequestNotSaved ns = new FailedRequestNotSaved();

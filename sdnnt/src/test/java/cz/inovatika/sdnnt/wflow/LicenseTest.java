@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.wflow;
 
+import cz.inovatika.sdnnt.model.License;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -33,13 +33,9 @@ public class HistoryImpl implements History {
     public void log(String identifier, String oldRaw, String newRaw, String user, String type) {
         try {
 
-
-
             ObjectMapper mapper = new ObjectMapper();
             String oldChanged = changeObject(new JSONObject(oldRaw)).toString();
             String newChanged = changeObject( new JSONObject(newRaw)).toString();
-
-
 
             JsonNode source = mapper.readTree(changeObject( new JSONObject(oldRaw)).toString());
             JsonNode target = mapper.readTree(changeObject( new JSONObject(newRaw)).toString());
@@ -57,6 +53,8 @@ public class HistoryImpl implements History {
             idoc.setField("changes", changes.toString());
             // all dnnt state rename to stav
             solr.add("history", idoc);
+
+
         } catch (IOException | SolrServerException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

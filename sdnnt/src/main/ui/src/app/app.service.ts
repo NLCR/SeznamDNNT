@@ -62,14 +62,11 @@ export class AppService {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error);
     } else {
-      // The backend returned an unsuccessful response code.
-      // The response body may contain clues as to what went wrong.
       console.error(
         `Backend returned code ${error.status}, body was: `, error.error);
     }
     // Return an observable with a user-facing error message.
-    return throwError(
-      'Something bad happened; please try again later.');
+    return throwError({'status':error.status, 'message': error.message});
   }
 
 
@@ -184,6 +181,14 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
+  sendZadost(zadost: Zadost): Observable<any> {
+    let url = '/account/send_zadost';
+    const params: HttpParams = new HttpParams();
+    return this.post(url, zadost, params);
+  }
+
+
+
   saveKuratorZadost(zadost: Zadost): Observable<any> {
     let url = '/account/save_kurator_zadost';
     const params: HttpParams = new HttpParams();
@@ -239,9 +244,14 @@ export class AppService {
     return this.get(url, params);
   }
 
-  prepareZadost(navrh: string): Observable<any> {
+  prepareZadost(navrhy: string[]): Observable<any> {
     let url = 'account/prepare_zadost';
-    const params: HttpParams = new HttpParams().set('navrh', navrh);
+    let params: HttpParams = new HttpParams();
+
+    for (let navrh of navrhy) {
+      params = params.set('navrh', navrh);
+    }
+
     return this.get(url, params);
   }
 

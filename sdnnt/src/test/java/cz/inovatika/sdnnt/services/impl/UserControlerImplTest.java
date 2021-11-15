@@ -2,7 +2,7 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.it.EmbeddedServerPrepare;
+import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.MailService;
@@ -12,6 +12,7 @@ import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.TestServletStream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -27,17 +28,20 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
 import static org.easymock.EasyMock.*;
 
 public class UserControlerImplTest {
 
-    public static EmbeddedServerPrepare prepare;
+    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplTest.class.getName());
+
+    public static SolrTestServer prepare;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        prepare = new EmbeddedServerPrepare();
-        prepare.setupBeforeClass();
+        prepare = new SolrTestServer();
+        prepare.setupBeforeClass("users");
     }
 
     @AfterClass
@@ -53,6 +57,12 @@ public class UserControlerImplTest {
     /** Test register and loging */
     @Test
     public void testRegistrationAndLogin() throws NotAuthorizedException, UserControlerException, IOException, SolrServerException, EmailException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+
+
         // delete solr
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -112,6 +122,10 @@ public class UserControlerImplTest {
     /** Test get users  by role*/
     @Test
     public void testGetByRole() throws EmailException, IOException, UserControlerException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -127,7 +141,10 @@ public class UserControlerImplTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
 
         EasyMock.replay(request, session, userControler);
 
@@ -152,6 +169,10 @@ public class UserControlerImplTest {
     /** Test get users  by role*/
     @Test
     public void testGetByFindByPrefix() throws EmailException, IOException, UserControlerException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -167,7 +188,10 @@ public class UserControlerImplTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
 
         EasyMock.replay(request, session, userControler);
 
@@ -193,6 +217,10 @@ public class UserControlerImplTest {
     /** Test get all users  */
     @Test
     public void testGetAll() throws EmailException, IOException, UserControlerException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -234,6 +262,10 @@ public class UserControlerImplTest {
     /** Test save API key and find by API key */
     @Test
     public void testSaveAndGetByApiKey() throws IOException, SolrServerException, EmailException, UserControlerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -247,7 +279,10 @@ public class UserControlerImplTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
 
         EasyMock.replay(request,  userControler);
 
@@ -265,6 +300,10 @@ public class UserControlerImplTest {
     /** Test save by interval and find by interval */
     @Test
     public void testSaveAndGetByInterval() throws IOException, SolrServerException, EmailException, UserControlerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
@@ -278,7 +317,10 @@ public class UserControlerImplTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
 
         EasyMock.replay(request,  userControler);
 
@@ -313,6 +355,11 @@ public class UserControlerImplTest {
     @Test
     public void testAdminResetPswd() throws IOException, SolrServerException, EmailException, UserControlerException {
 
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
         QueryResponse response = prepare.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
@@ -332,7 +379,12 @@ public class UserControlerImplTest {
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
 
         EasyMock.replay(request,  userControler,mailService);
 
@@ -377,11 +429,21 @@ public class UserControlerImplTest {
 
     // register user
     private void registerOneUser(User regUser, MailService mailService, HttpServletRequest request) throws IOException, EmailException, UserControlerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+
         UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+
         EasyMock.replay(/*request,session.*/ userControler,mailService);
 
         userControler.register(regUser.toJSONObject().toString());
@@ -412,5 +474,20 @@ public class UserControlerImplTest {
         TestServletStream stream = new TestServletStream(new ByteArrayInputStream(object.toString().getBytes()));
         EasyMock.expect(request.getInputStream()).andReturn(stream).times(1);
     }
+
+
+
+    protected class BuildSolrClientSupport extends UserControlerImpl{
+
+        public BuildSolrClientSupport() {
+            super(null);
+        }
+
+        @Override
+        SolrClient buildClient() {
+            return SolrTestServer.getClient();
+        }
+    }
+
 
 }

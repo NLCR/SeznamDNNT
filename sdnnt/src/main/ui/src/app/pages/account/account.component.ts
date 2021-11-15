@@ -35,7 +35,23 @@ export class AccountComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['datum_zadani','user', 'institution', 'state', 'navrh','datum_vyrizeni','count', 'pozadavek','poznamka','actions'];
+  displayedColumns = [
+    'id',
+    'version',
+
+    'datum_zadani',
+    'user', 
+    'institution', 
+    'state', 
+    'navrh',
+    'datum_vyrizeni',
+    'count', 
+    'pozadavek',
+    'poznamka',
+    'deadline',
+    'period',
+    'actions'
+  ];
   zadosti: Zadost[] = [];
 
   stateFilter: string;
@@ -76,6 +92,7 @@ export class AccountComponent implements OnInit {
     this.loading = true;
     const p = Object.assign({}, params);
 
+    
     this.items = [];
     this.searchResponse = null;
     this.facets = null;
@@ -96,7 +113,6 @@ export class AccountComponent implements OnInit {
         this.allDelegated = resp.facet_counts.facet_fields.delegated.filter((itm) => itm.value > 0 ).map( function(val, index){
           return val.name;
         });
-
       }
     });
 
@@ -208,12 +224,22 @@ export class AccountComponent implements OnInit {
         data: zadost,
         panelClass: 'app-send-request'
       });
-    }
 
+      dialogRef.afterClosed().subscribe(result => {
+
+        this.route.queryParams.subscribe(val => {
+          this.search(val);
+          this.newStavFilter = val.navrh;
+          this.stateFilter = val.state;
+        });
+    
+      });
+      
+    }
   }
 
   countProcessed(zadost: Zadost) {
-    return Object.keys(zadost.process).length;
+    return zadost.process ?  Object.keys(zadost.process).length : 0;
   }
 
   process(zadost: Zadost) {

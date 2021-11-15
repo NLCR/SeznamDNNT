@@ -3,13 +3,13 @@ package cz.inovatika.sdnnt;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.model.Zadost;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -23,11 +23,13 @@ import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
+import cz.inovatika.sdnnt.utils.VersionStringCast;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -128,9 +130,7 @@ public class AccountServlet extends HttpServlet {
 
           try {
             AccountService service = new AccountServiceImpl(new UserControlerImpl(req));
-
-            //String priority, String delegated
-            return service.search(q, state, navrh, institution, priority, delegated, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1);
+            return VersionStringCast.cast(service.search(q, state, Arrays.asList(navrh), institution, priority, delegated, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1));
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -147,8 +147,11 @@ public class AccountServlet extends HttpServlet {
         Options opts = Options.getInstance();
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+
+            /*
             SolrQuery query = new SolrQuery("id:" + req.getParameter("id"))
                     .setRows(1).setFields("*,process:[json]");
+
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
@@ -156,6 +159,10 @@ public class AccountServlet extends HttpServlet {
             NamedList<Object> qresp = solr.request(qreq, "zadost");
 
             return new JSONObject((String) qresp.get("response"));
+            */
+            AccountService service = new AccountServiceImpl(new UserControlerImpl(req));
+            return service.getRequest(req.getParameter("id"));
+
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -181,7 +188,7 @@ public class AccountServlet extends HttpServlet {
             start = Integer.parseInt(req.getParameter("page")) * rows;
           }
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-
+            // TODO: Move to service and back by tests
             SolrQuery query = new SolrQuery("*:*")
                     .setRows(rows)
                     .setStart(start)
@@ -210,6 +217,26 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
+
+    // ulozeni zadosti
+    SEND_ZADOST {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged()).permit()) {
+          try {
+            UserControlerImpl userControler = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(userControler);
+            return service.sendRequest(readInputJSON(req).toString());
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+      }
+    },
+
     // ulozeni zadosti
     SAVE_ZADOST {
       @Override
@@ -218,7 +245,10 @@ public class AccountServlet extends HttpServlet {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
             AccountService service = new AccountServiceImpl(userControler);
-            return service.saveRequest(readInputJSON(req).toString(), new UserControlerImpl(req).getUser());
+            return service.saveRequest(readInputJSON(req).toString(), new UserControlerImpl(req).getUser(), null);
+          } catch(ConflictException cex) {
+            LOGGER.log(Level.SEVERE, null, cex);
+            return errorJson(response, SC_CONFLICT, cex.getMessage());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -236,7 +266,7 @@ public class AccountServlet extends HttpServlet {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
             AccountService service = new AccountServiceImpl(userControler);
-            return service.saveCuratorRequest(readInputJSON(req).toString());
+            return service.saveCuratorRequest(readInputJSON(req).toString(), null);
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -468,32 +498,32 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
 
           UserControlerImpl userControler = new UserControlerImpl(req);
-
-          String navrh = req.getParameter("navrh");
           AccountService service = new AccountServiceImpl(userControler);
-          JSONObject result = service.search(null, "open", navrh, null, null, null , userControler.getUser(), 100, 0);
 
-          if (result.has("response") && result.getJSONObject("response").has("numFound")) {
-            int numFound = result.getJSONObject("response").getInt("numFound");
-            if (numFound > 0) {
-              JSONArray docs = result.getJSONObject("response").getJSONArray("docs");
-              Zadost zadost = Zadost.fromJSON(docs.getJSONObject(0).toString());
-              return zadost.toJSON();
-            }
+          String[] navrhy = req.getParameterValues("navrh");
+          if (navrhy != null && navrhy.length >0 ) {
+              //String navrh = req.getParameter("navrh");
+              JSONObject result = service.search(null, "open", Arrays.asList(navrhy), null, null, null , userControler.getUser(), 100, 0);
+              if (result.has("response") && result.getJSONObject("response").has("numFound")) {
+                  int numFound = result.getJSONObject("response").getInt("numFound");
+                  if (numFound > 0) {
+                      JSONArray docs = result.getJSONObject("response").getJSONArray("docs");
+                      Zadost zadost = Zadost.fromJSON(docs.getJSONObject(0).toString());
+                      return zadost.toJSON();
+                  }
+              }
+              Zadost nZadost = new Zadost(UUID.randomUUID().toString());
+              nZadost.setNavrh(navrhy[0]);
+              nZadost.setState("open");
+              nZadost.setUser(userControler.getUser().username);
+              nZadost.setIdentifiers(new ArrayList<>());
+
+              JSONObject jsonZadost = service.saveRequest(nZadost.toJSON().toString(), userControler.getUser(), null);
+              return jsonZadost;
+
+          } else {
+              return errorJson(response, SC_BAD_REQUEST, "missing navrh parameter");
           }
-
-          // nenaslo;
-          Zadost nZadost = new Zadost();
-          String timeStamp = new SimpleDateFormat("yyMMddHHmmss").format(new Date());
-          nZadost.id = String.format("%s_%s", timeStamp, userControler.getUser().username);
-          nZadost.navrh = navrh;
-          nZadost.state="open";
-          nZadost.user = userControler.getUser().username;
-          nZadost.identifiers = new ArrayList<>();
-
-          JSONObject jsonZadost = service.saveRequest(nZadost.toJSON().toString(), userControler.getUser());
-          return jsonZadost;
-
         } else {
           return errorJson(response, SC_FORBIDDEN, "not allowed");
         }

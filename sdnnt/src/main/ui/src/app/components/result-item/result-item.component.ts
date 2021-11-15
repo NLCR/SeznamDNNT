@@ -13,6 +13,7 @@ import { GranularityComponent } from '../granularity/granularity.component';
 import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
 import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-result-item',
@@ -190,19 +191,21 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
-  addToZadost() {
-    const navrh = this.isZarazeno ? 'VVS' : 'NZN';
-
-    this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-      this.state.currentZadost[navrh]= res;
-      this.addToZadostInternal(navrh);
+  addToZadostForReduction() {
+    // prepare VNX
+    const navrh = this.isZarazeno ? 'VN' : 'NZN';
+    this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
+      this.state.currentZadost['VNX']= res;
+      this.addToZadostInternal(res.navrh);
     });
+  }
 
-    // // ziskava data v kazdem pripadu 
-    // if (!this.state.currentZadost[navrh]) {
-    // } else {
-    //   this.addToZadostInternal(navrh);
-    // }
+  addToZadost() {
+    const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
+    this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
+      this.state.currentZadost[res.navrh]= res;
+      this.addToZadostInternal(res.navrh);
+    });
   }
 
 
@@ -240,20 +243,23 @@ export class ResultItemComponent implements OnInit {
 
 
   saveZadost(navrh: string) {
-    if  (!this.state.currentZadost[navrh].identifiers) {
-      this.state.currentZadost[navrh].identifiers = [];
+    const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
+    if  (!this.state.currentZadost[key].identifiers) {
+      this.state.currentZadost[key].identifiers = [];
     }    
-    if (!this.state.currentZadost[navrh].identifiers.includes(this.doc.identifier)){
-      this.state.currentZadost[navrh].identifiers.push(this.doc.identifier);
+    if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)){
+      this.state.currentZadost[key].identifiers.push(this.doc.identifier);
     }
     
-    this.service.saveZadost(this.state.currentZadost[navrh]).subscribe((res: any) => {
+    this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
       }
-    });
+    }
+    
+    );
   }
 
   addFRBRToZadost(navrh: string) {

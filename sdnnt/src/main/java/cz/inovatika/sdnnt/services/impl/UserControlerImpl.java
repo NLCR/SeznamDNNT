@@ -2,7 +2,7 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.MailService;
@@ -16,7 +16,6 @@ import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -24,7 +23,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.common.SolrException;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -312,8 +311,14 @@ public class UserControlerImpl implements UserControler {
                     .addFilterQuery("state:open")
                     .setFields("id", "identifiers", "typ", "user", "state", "navrh", "poznamka", "pozadavek", "datum_zadani", "datum_vyrizeni", "formular")
                     .setRows(10);
-            List<Zadost> zadost = solr.query("zadost", query).getBeans(Zadost.class);
-            return zadost;
+            //List<Zadost> zadost = solr.query("zadost", query).getBeans(Zadost.class);
+
+            List<Zadost> zadosti = new ArrayList<>();
+            SolrUtils.jsonDocsFromResult(solr, query, "zadost").forEach(z-> {
+                zadosti.add(Zadost.fromJSON(z.toString()));
+            });
+
+            return zadosti;
         } catch (SolrServerException | IOException ex) {
             throw new  UserControlerException(ex);
         }

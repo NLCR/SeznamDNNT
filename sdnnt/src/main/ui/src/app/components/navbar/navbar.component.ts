@@ -71,7 +71,13 @@ export class NavbarComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
-      this.state.currentZadost = {VVS: null, NZN: null,VVN:null};
+
+      this.state.currentZadost={
+        VN: null,
+        NZN: null, 
+        VNX:null
+      };
+
       localStorage.removeItem('user');
       sessionStorage.clear();
       this.router.navigate(['/']);

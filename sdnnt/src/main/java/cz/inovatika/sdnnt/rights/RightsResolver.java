@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Rights resolver;
+ * Aggregates all predicates; iterates and if any of them return false; then final result is false otherwise final result is true
+ */
 public class RightsResolver {
 
     private HttpServletRequest req;

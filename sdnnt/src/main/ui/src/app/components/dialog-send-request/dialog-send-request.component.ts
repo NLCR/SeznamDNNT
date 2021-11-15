@@ -13,7 +13,6 @@ export class DialogSendRequestComponent implements OnInit {
   newState: string;
   poznamka: string;
   pozadavek: string;
-  public dntStates: string[] = ['NZN', 'VVN'];
 
   constructor(
     public dialogRef: MatDialogRef<DialogSendRequestComponent>,
@@ -24,9 +23,23 @@ export class DialogSendRequestComponent implements OnInit {
   }
 
   send() {
+
+    this.service.sendZadost(this.data).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.data = <Zadost>res;
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.dialogRef.close();
+      }
+    });
+
+    
+    /*
     this.data.datum_zadani = new Date();
     this.data.pozadavek = this.pozadavek;
     this.data.poznamka = this.poznamka;
+    // sluzba 
     this.data.state = 'waiting';
     this.service.saveZadost(this.data).subscribe((res: any) => {
       if (res.error) {
@@ -36,6 +49,8 @@ export class DialogSendRequestComponent implements OnInit {
         this.dialogRef.close();
       }
     });
+    */
+
   }
 
 }

@@ -20,7 +20,6 @@ export class ZadostComponent implements OnInit {
   zadost: Zadost;
   numFound: number;
   docs: SolrDocument[];
-  // action: string;
   hideProcessed: boolean;
 
   kurators: User[];
@@ -48,7 +47,7 @@ export class ZadostComponent implements OnInit {
 
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.service.getZadost(id).subscribe((resp: any) => {
-        this.zadost = resp.response.docs[0];
+        this.zadost = resp.response ?   resp.response.docs[0] : resp;
         this.getDocs(val);
       });
     }));
@@ -95,6 +94,22 @@ export class ZadostComponent implements OnInit {
       });
   }
 
+  setTypNavrhu(navrh: string) {
+    this.zadost.navrh = navrh;
+    this.service.saveZadost(this.zadost).subscribe((res: any) => {
+      if (res.error) {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        this.service.getZadost(this.zadost.id).subscribe((res: Zadost) => {
+            this.zadost = res;
+            this.getDocs(this.route.snapshot.queryParams);
+        });
+      }
+    });
+}
+
+
   setDelegated(delegated: string) {
     this.zadost.delegated = delegated;
     this.service.saveKuratorZadost(this.zadost).subscribe((res: any) => {
@@ -131,14 +146,28 @@ export class ZadostComponent implements OnInit {
       } else {
         this.service.showSnackBar('alert.odstraneni_zadosti_success', '', false);
         this.getDocs(this.route.snapshot.queryParams);
+
+        this.service.getZadost(this.zadost.id).subscribe((res:any) => {
+          this.zadost = res;
+        });
+
       }
-    });
+    },
+    (error) => {
+          if (error.status == 409)  {
+            this.service.showSnackBar('alert.ulozeni_zadosti_error', this.service.getTranslation('alert.users_conflict'), true);
+          } else {
+            this.service.showSnackBar('alert.ulozeni_zadosti_error', error.message, true);
+          }
+      }
+    );
   }
 
 
   processNavrh(data: { type: string, identifier: string, komentar: string }) {
     switch (data.type) {
       case 'approve': 
+       // approve navrh 
         this.service.approveNavrh(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);

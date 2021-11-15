@@ -15,9 +15,13 @@
             <strong>{{ 'desc.prehled_zadosti' | translate }}</strong>
             <ng-container >
               <span class="app-pipe"></span>
-              <span class="app-metadata">
-                {{ zadost.id }}<span class="app-pipe"></span>
+              <span class="app-metadata">{{ zadost.id }}<span class="app-pipe"></span>
+
+
+                <ng-container *ngIf="zadost.version">{{ zadost.version }}<span class="app-pipe"></span></ng-container>
+
                 <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
+
                 <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container>
                 <ng-container *ngIf="zadost.state">
                   <mat-icon class="material-icons-outlined" [class]="zadost.state" [matTooltip]="'state.' + zadost.state | translate" matTooltip="above">
@@ -31,7 +35,7 @@
             </ng-container>
           </div>
           <div>
-            <mat-button-toggle-group *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
+            <mat-button-toggle-group  name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
               <mat-button-toggle *ngIf="state.user.role === 'mainKurator'" value="" [matMenuTriggerFor]="delegateMenu" matTooltip="Delogovat na jineho uzivatele">
                 <mat-icon *ngIf="!zadost.delegated?.length" class="material-icons-outlined">manage_accounts</mat-icon>
                 <ng-container *ngIf="zadost.delegated?.length">{{ zadost.delegated }}</ng-container>
@@ -40,9 +44,17 @@
                 <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
                 <ng-container *ngIf="zadost.priority?.length">{{ zadost.priority }}</ng-container>
               </mat-button-toggle>
-              <mat-button-toggle *ngIf="zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
+              <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
+
+              <mat-button-toggle *ngIf="zadost.navrh === 'VNZ' || zadost.navrh === 'VNL'"  value="" [matMenuTriggerFor]="typeVNXMenu" matTooltip="Typ zadosti">
+                <mat-icon class="material-icons-outlined">{{ 'no_photography' }}</mat-icon>
+                <ng-container *ngIf="zadost.navrh?.length">{{ zadost.navrh }}</ng-container>
+              </mat-button-toggle>
+
             </mat-button-toggle-group>
+
       
+
             <mat-menu #delegateMenu="matMenu">
               <ng-container *ngFor="let d of kurators">
                 <button (click)="setDelegated(d.jmeno +' '+d.prijmeni)" mat-menu-item>{{d.jmeno +' '+d.prijmeni}}</button>
@@ -53,17 +65,33 @@
               <button mat-menu-item (click)="setPriority('Priorita 2')">Priorita 2</button>
               <button mat-menu-item (click)="setPriority('Priorita 3')">Priorita 3</button>
             </mat-menu>
+            
+            <mat-menu #typeVNXMenu="matMenu">
+              <button mat-menu-item (click)="setTypNavrhu('VNZ')">VNZ Memorandum  8ABC</button>
+              <button mat-menu-item (click)="setTypNavrhu('VNL')">VNL Memorandum 8BCD</button>
+            </mat-menu>
+
             <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->
             <mat-slide-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
+
+            
+
           </div>
         </div>
       </mat-card>
-      <ng-container *ngFor="let doc of docs">
-        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
-        [inZadost]="true" [zadost]="zadost" 
-        (removeFromZadostEvent)="removeDoc($event)"
-        (processZadostEvent)="processNavrh($event)"></app-result-item>
+      <ng-container>
+        
       </ng-container>
+      
+
+
+        <ng-container *ngFor="let doc of docs">
+          <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
+          [inZadost]="true" [zadost]="zadost" 
+          (removeFromZadostEvent)="removeDoc($event)"
+          (processZadostEvent)="processNavrh($event)">
+          </app-result-item>
+        </ng-container>
     </div>
     <div class="app-mt-4">
       <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>

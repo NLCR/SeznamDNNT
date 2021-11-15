@@ -14,7 +14,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import cz.inovatika.sdnnt.wflow.License;
+import cz.inovatika.sdnnt.model.License;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.client.solrj.SolrClient;
@@ -35,7 +36,7 @@ import java.text.SimpleDateFormat;
  * @author alberto
  */
 
-//TODO: Change it
+//TODO: Rewrite it
 public class MarcRecord {
 
   private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyyMMdd");
@@ -48,15 +49,24 @@ public class MarcRecord {
   public String setSpec;
   public String leader;
 
+  // hlavni, verejny stav
   public List<String> dntstav = new ArrayList<>();
-
   public Date datum_stavu;
-  public String license;
-  public List<String> licenseHistory;
 
   @JsonIgnore
   public JSONArray historie_stavu = new JSONArray();
-  
+
+  // kuratorsky stav
+  public List<String> kuratorstav = new ArrayList<>();
+  public Date datum_krator_stavu;
+
+  @JsonIgnore
+  public JSONArray historie_kurator_stavu = new JSONArray();
+
+  public String license;
+  public List<String> licenseHistory;
+
+
   @JsonIgnore
   public JSONArray granularity; 
 
@@ -98,6 +108,8 @@ public class MarcRecord {
     MarcRecord mr = fromRAWJSON(rawJson);
     mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
     mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
+
+
     mr.historie_stavu = new JSONArray((String) doc.getFirstValue(HISTORIE_STAVU_FIELD));
     mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
     if (doc.containsKey(GRANULARITY_FIELD)) {
@@ -128,18 +140,35 @@ public class MarcRecord {
     } else {
       mr.dntstav = new ArrayList<>();
     }
+    if (doc.containsKey(KURATORSTAV_FIELD)) {
+      mr.kuratorstav = doc.getFieldValues(LEGACY_STAV_FIELD).stream().map(Object::toString).collect(Collectors.toList());
+    }
+
     if (doc.containsKey(DATUM_STAVU_FIELD)) {
       mr.datum_stavu = (Date) doc.getFirstValue(DATUM_STAVU_FIELD);
     }
+
+    if (doc.containsKey(DATUM_KURATOR_STAV_FIELD)) {
+      mr.datum_krator_stavu = (Date) doc.getFirstValue(DATUM_KURATOR_STAV_FIELD);
+    }
+
     if (doc.containsKey(HISTORIE_STAVU_FIELD)) {
       mr.historie_stavu =  new JSONArray(doc.getFieldValue(HISTORIE_STAVU_FIELD).toString());
     } else {
       mr.historie_stavu = new JSONArray();
     }
+
+    if (doc.containsKey(HISTORIE_KURATORSTAVU_FIELD)) {
+      mr.historie_kurator_stavu =  new JSONArray(doc.getFieldValue(HISTORIE_KURATORSTAVU_FIELD).toString());
+    } else {
+      mr.historie_kurator_stavu = new JSONArray();
+    }
+
     if (doc.containsKey(LICENSE_FIELD)) {
       mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
     }
     mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
+
 
     if (doc.containsKey(GRANULARITY_FIELD)) {
       JSONArray ja = new JSONArray( doc.getFieldValue(GRANULARITY_FIELD).toString());
@@ -158,7 +187,9 @@ public class MarcRecord {
     json.put(LEADER_FIELD, leader);
 
     json.put(DNTSTAV_FIELD, dntstav);
+    json.put(KURATORSTAV_FIELD, kuratorstav);
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
+
 
     json.put("controlFields", controlFields);
 
@@ -542,8 +573,7 @@ public class MarcRecord {
             hs.put(h);
           }
           sdoc.setField("historie_stavu", hs.toString());
-
-
+          sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, hs.toString());
 
         }
 
@@ -554,13 +584,20 @@ public class MarcRecord {
             if (df.getSubFields().containsKey("a")) {
               //String stav = df.getSubFields().get("a").get(0).getValue();
               List<String> states = df.getSubFields().get("a").stream().map(SubField::getValue).collect(Collectors.toList());
-              //h.put("dntstav", dntstav);
-              states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
-              //sdoc.addField("dntstav", states);
+
+              //states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
               if (isANZCombination(states)) {
                 sdoc.setField("license", "dnntt");
+                sdoc.setField("dntstav", "A");
+                sdoc.setField(KURATORSTAV_FIELD, "A");
               } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
                 sdoc.setField("license", "dnnto");
+                sdoc.setField("dntstav", "A");
+                sdoc.setField(KURATORSTAV_FIELD, "A");
+
+              } else {
+                states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
+                states.forEach(oneState -> {sdoc.addField(KURATORSTAV_FIELD, oneState);});
               }
 
               // history license
@@ -591,16 +628,22 @@ public class MarcRecord {
             JSONObject h = new JSONObject();
             if (df.getSubFields().containsKey("u")) {
               h.put("link", df.getSubFields().get("u").get(0).getValue());
-//              for (SubField sf: df.getSubFields().get("u")) {
-//                h.append("link", sf.value);
-//              }
-              // h.put("link", df.getSubFields().get("u"));
             }
             if (df.getSubFields().containsKey("9")) {
               for (SubField sf: df.getSubFields().get("9")) {
                 h.append("stav", sf.value);
+                h.append(KURATORSTAV_FIELD, sf.value);
               }
-              // h.put("stav", df.getSubFields().get("9"));
+              List<Object> ostavy = new ArrayList<>();
+              h.getJSONArray("stav").forEach(ostavy::add);
+              List<String> stavy = ostavy.stream().map(Object::toString).collect(Collectors.toList());
+
+              if (isOnlyACombiation(stavy)) {
+                h.put(LICENSE_FIELD, License.dnnto.name());
+              } else if (isANZCombination(stavy)) {
+                h.put(LICENSE_FIELD, License.dnnto.name());
+              }
+              //if (h.getJSONArray("stav"))
             }
             if (df.getSubFields().containsKey("x")) {
               h.put("cislo", df.getSubFields().get("x").get(0).getValue());
@@ -608,6 +651,7 @@ public class MarcRecord {
             if (df.getSubFields().containsKey("y")) {
               h.put("rocnik", df.getSubFields().get("y").get(0).getValue());
             }
+
             sdoc.addField("granularity", h.toString());
           }
           
@@ -615,12 +659,12 @@ public class MarcRecord {
   }
 
   private boolean isANZCombination(List<String> states) {
-    if (states.size() == 2 ) return states.contains("NZ") && states.contains("A");
+    if (states.size() == 2 ) return states.contains("NZ") && (states.contains("A") || (states.contains("PA")));
     else return states.contains("NZ");
   }
 
   private boolean isOnlyACombiation(List<String> states) {
-    return states.size() == 1 && states.get(0).equals("A");
+    return states.size() == 1 && (states.get(0).equals("A") || (states.get(0).equals("PA")));
   }
 
   private void addRokVydani() {

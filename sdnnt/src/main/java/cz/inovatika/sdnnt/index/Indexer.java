@@ -25,7 +25,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrUtils;
-import cz.inovatika.sdnnt.wflow.NavrhWorklflow;
+import cz.inovatika.sdnnt.model.workflow.DocumentWorkflow;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -269,7 +269,7 @@ public class Indexer {
       mr.toSolrDoc();
       String oldRaw = mr.toJSON().toString();
       List<String> oldStav = mr.dntstav;
-      NavrhWorklflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
+      DocumentWorkflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
 
         LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.dntstav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
 
@@ -492,12 +492,11 @@ public class Indexer {
       mr.toSolrDoc();
 
       String oldRaw = mr.toJSON().toString();
-      NavrhWorklflow.valueOf(navrh).change(mr, user,(changedRecord, ident,oldstates,newstates)->{
+      // workflow
+      DocumentWorkflow.valueOf(navrh).change(mr, user,(changedRecord, ident, oldstates, newstates)->{
         try {
           LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.dntstav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
-
           new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-          // Update record in catalog
           client.add("catalog", mr.sdoc);
         } catch (SolrServerException| IOException ex) {
           LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

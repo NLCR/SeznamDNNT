@@ -1,0 +1,80 @@
+{
+  "response": {
+    "docs": [
+      {
+        "navrh": "NZN",
+        "indextime": "2021-11-13T19:05:25Z",
+        "_version_": 1716340994868248576,
+        "identifiers": ["oai:aleph-nkp.cz:DNT01-000157751"],
+        "id": "3d750d00-4be0-4267-9966-4f1b79cfba08",
+        "state": "open",
+        "user": "pokusny"
+      },
+      {
+        "navrh": "VN",
+        "indextime": "2021-11-13T19:13:11.095Z",
+        "_version_": 1716341483604279296,
+        "identifiers": ["oai:aleph-nkp.cz:DNT01-000008874"],
+        "id": "fe077742-3871-4210-a751-a9cb86e9f1a3",
+        "state": "open",
+        "user": "pokusny"
+      }
+    ],
+    "numFound": 2,
+    "start": 0,
+    "numFoundExact": true
+  },
+  "responseHeader": {
+    "QTime": 0,
+    "params": {
+      "q": "*",
+      "df": "fullText",
+      "facet.field": [
+        "typ",
+        "state",
+        "navrh",
+        "institution",
+        "delegated",
+        "priority"
+      ],
+      "json.nl": "arrntv",
+      "fl": "*,process:[json]",
+      "fq": "user:pokusny",
+      "sort": "state asc,datum_zadani desc",
+      "rows": "20",
+      "facet": "true",
+      "wt": "json",
+      "version": "2.2"
+    },
+    "status": 0
+  },
+  "facet_counts": {
+    "facet_intervals": {},
+    "facet_queries": {},
+    "facet_fields": {
+      "institution": [],
+      "navrh": [
+        {
+          "name": "NZN",
+          "type": "int",
+          "value": 1
+        },
+        {
+          "name": "VN",
+          "type": "int",
+          "value": 1
+        }
+      ],
+      "typ": [],
+      "delegated": [],
+      "state": [{
+        "name": "open",
+        "type": "int",
+        "value": 2
+      }],
+      "priority": []
+    },
+    "facet_heatmaps": {},
+    "facet_ranges": {}
+  }
+}

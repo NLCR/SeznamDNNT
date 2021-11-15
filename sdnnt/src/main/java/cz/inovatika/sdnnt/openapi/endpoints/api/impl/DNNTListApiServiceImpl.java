@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput;
@@ -9,14 +8,12 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.wflow.License;
+import cz.inovatika.sdnnt.model.License;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrDocument;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -37,7 +34,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_022_A;
 
 // zmenit
 public class DNNTListApiServiceImpl extends ListsApiService {

@@ -1,7 +1,8 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.*;
-import cz.inovatika.sdnnt.it.EmbeddedServerPrepare;
+import cz.inovatika.sdnnt.it.SolrTestServer;
+import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -9,6 +10,7 @@ import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
 import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -19,15 +21,18 @@ import org.junit.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class NotificationServiceImplTest {
 
-    public static EmbeddedServerPrepare prepare;
+    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplTest.class.getName());
+
+    public static SolrTestServer prepare;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        prepare = new EmbeddedServerPrepare();
-        prepare.setupBeforeClass();
+        prepare = new SolrTestServer();
+        prepare.setupBeforeClass("notifikace");
     }
 
     @AfterClass
@@ -43,6 +48,12 @@ public class NotificationServiceImplTest {
 
     @Test
     public void testNotificationDen() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+
 
         MarcRecord marcRecord1 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
         Calendar calendar1 = Calendar.getInstance();
@@ -87,6 +98,8 @@ public class NotificationServiceImplTest {
                 .withConstructor(controler, mailService)
                 .addMockedMethod("buildClient").createMock();
 
+
+
         mailService.sendNotificationEmail(
                 EasyMock.isA(Pair.class),
                 EasyMock.isA(List.class)
@@ -106,7 +119,12 @@ public class NotificationServiceImplTest {
             }
         }).times(1);
 
-        EasyMock.expect(service.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(service.buildClient()).andReturn(prepare.getClient()).anyTimes();
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
 
         EasyMock.replay(mailService, controler, service);
         service.saveNotification(notification("test1", "oai:aleph-nkp.cz:DNT01-000057930"));
@@ -142,4 +160,18 @@ public class NotificationServiceImplTest {
         user.email = "test@testovic.cz";
         return new ArrayList<>(Arrays.asList(user));
     }
+
+
+    protected class BuildSolrClientSupport extends NotificationServiceImpl {
+
+        public BuildSolrClientSupport() {
+            super(null, null);
+        }
+
+        @Override
+        SolrClient buildClient() {
+            return SolrTestServer.getClient();
+        }
+    }
+
 }

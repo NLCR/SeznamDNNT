@@ -7,7 +7,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.wflow.License;
+import cz.inovatika.sdnnt.model.License;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -213,11 +213,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 JSONObject object = (JSONObject)o;
                 if (object.has(DNTSTAV_FIELD)) {
                     historieStavu.add(object.getString(DNTSTAV_FIELD));
-                // legacy field - only for compatibility reason
                 } else if (object.has("stav")) {
                     historieStavu.add(object.getString("stav"));
                 }
             });
+
         }
 
         // marc 910a a marc 040a
@@ -262,7 +262,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                         granularity.number(itemObject.getString("cislo"));
                     }
                     if (itemObject.has("rocnik")) {
-                        granularity.year(itemObject.getString("rocnik"));
+                        //granularity.year(itemObject.getString("rocnik"));
                     }
                     if (states.contains("A") && states.contains("NZ")) {
                         granularity.license(License.dnntt.name());

@@ -10,6 +10,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.Date;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
 
+@Ignore
 public class IndexerChangeStateTest {
 
 

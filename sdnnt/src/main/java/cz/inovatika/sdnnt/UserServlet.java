@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
@@ -31,7 +31,6 @@ import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.rights.Role.admin;

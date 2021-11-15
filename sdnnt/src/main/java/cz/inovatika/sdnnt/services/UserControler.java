@@ -1,17 +1,14 @@
 package cz.inovatika.sdnnt.services;
 
 import cz.inovatika.sdnnt.indexer.models.User;
-import cz.inovatika.sdnnt.indexer.models.Zadost;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
-import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.logging.Logger;
 
