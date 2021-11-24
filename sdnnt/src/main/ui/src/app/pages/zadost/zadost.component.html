@@ -24,6 +24,7 @@
                     <ng-container *ngIf="zadost.state === 'open'">lock_open</ng-container>
                     <ng-container *ngIf="zadost.state === 'waiting'">lock_clock</ng-container>
                     <ng-container *ngIf="zadost.state === 'processed'">lock</ng-container>
+                    <ng-container *ngIf="zadost.state === 'waiting_for_automatic_process'">person</ng-container>
                   </mat-icon><span class="app-pipe"></span>
                 </ng-container>
                 <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>

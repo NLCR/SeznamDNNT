@@ -200,7 +200,7 @@
               <mat-icon class="material-icons-outlined" [class]="element.state" [matTooltip]="'state.' + element.state | translate" matTooltip="above">
                 <ng-container *ngIf="element.state === 'open'">lock_open</ng-container>
                 <ng-container *ngIf="element.state === 'waiting'">schedule_send</ng-container>
-                <ng-container *ngIf="element.state === 'waiting_for_automatic_process'">lock_clock</ng-container>
+                <ng-container *ngIf="element.state === 'waiting_for_automatic_process'">person</ng-container>
                 <ng-container *ngIf="element.state === 'processed'">lock</ng-container>
               </mat-icon>
             </td>
