@@ -687,14 +687,9 @@
     "debug_vnl_1_10wd":"10 kalendářních dnů",
     "debug_vnl_2_18m":"18 měsíců",
     "debug_vnl_3_5wd":"5 pracovních dnů",
-<<<<<<< HEAD
-=======
-
-
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",
-    "deadline" : "Čas vyřízení/přepnutí"
->>>>>>> d6eb6e6d42a07215f4b3be26e7e07414b41c3cb5
+    "deadline" : "Čas vyřízení/přepnutí",
 
     "verze_zadosti": "Veze žádosti"
   }

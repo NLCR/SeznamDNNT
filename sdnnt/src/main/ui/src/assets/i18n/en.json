@@ -687,15 +687,9 @@
     "debug_vnl_1_10wd":"10 days",
     "debug_vnl_2_18m":"18 months",
     "debug_vnl_3_5wd":"5 working days",
-<<<<<<< HEAD
-=======
-
     "desiredstate" : "Feature state/license",
     "period" : "Period",
-    "deadline" : "Processing deadline"
-
-
->>>>>>> d6eb6e6d42a07215f4b3be26e7e07414b41c3cb5
+    "deadline" : "Processing deadline",
 
     "verze_zadosti": "He carries requests"
   }
