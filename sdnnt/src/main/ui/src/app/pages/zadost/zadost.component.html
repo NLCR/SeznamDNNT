@@ -24,15 +24,14 @@
                     <ng-container *ngIf="zadost.state === 'open'">lock_open</ng-container>
                     <ng-container *ngIf="zadost.state === 'waiting'">lock_clock</ng-container>
                     <ng-container *ngIf="zadost.state === 'processed'">lock</ng-container>
-                    <ng-container *ngIf="zadost.state === 'waiting_for_automatic_process'">person</ng-container>
+                    <ng-container *ngIf="zadost.state === 'waiting_for_automatic_process'">hourglass_bottom</ng-container>
                   </mat-icon><span class="app-pipe"></span>
                 </ng-container>
-                <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>
-                <a [matTooltip]="('desc.verze_zadosti' | translate) + ': ' + zadost.version + '
-                                  ' + ('desc.uzivatel' | translate) + ': ' + zadost.user + '
-                                  ' + ('Datum zadani' | translate) + ': ' + (zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm')"
-                  ><mat-icon class="material-icons-outlined">info</mat-icon>
-                </a>
+                <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh" [matTooltip]="'state.tooltip.' + zadost.navrh | translate">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>
+                <mat-icon class="material-icons-outlined" 
+                  [matTooltip]="('desc.verze_zadosti' | translate) + ': ' + zadost.version + '
+                  ' + ('desc.uzivatel' | translate) + ': ' + zadost.user + '
+                  ' + ('Datum zadani' | translate) + ': ' + (zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm')">info</mat-icon>
               </span>
             </ng-container>
           </div>

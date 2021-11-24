@@ -47,6 +47,7 @@
     "rejected": "zamítnuto",
     "approved": "schváleno",
     "approvedlib": "omezeno na terminál",
+    "waiting_for_automatic_process": "Čekání na automatický proces",
 
     "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
@@ -691,6 +692,7 @@
     "period" : "Lhůta",
     "deadline" : "Čas vyřízení/přepnutí",
 
-    "verze_zadosti": "Veze žádosti"    
+    "verze_zadosti": "Veze žádosti",
+    "id": "Id"
   }
 }
