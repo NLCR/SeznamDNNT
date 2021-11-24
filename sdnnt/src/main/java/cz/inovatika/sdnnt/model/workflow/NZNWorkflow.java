@@ -50,7 +50,7 @@ public class NZNWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
-        if (!this.getOwner().getWorkflowState().equals(A)) {
+        if (this.getOwner().getWorkflowState() == null || !this.getOwner().getWorkflowState().equals(A)) {
             return getOwner().isSwitchToNextStatePossible(getPeriod(getOwner().getWorkflowState()));
         } else {
             return false;

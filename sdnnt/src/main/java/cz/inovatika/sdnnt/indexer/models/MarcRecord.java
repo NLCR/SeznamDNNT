@@ -297,14 +297,17 @@ public class MarcRecord {
     } else {
       if (!sdoc.containsKey(DNTSTAV_FIELD)) {
           MarcRecordUtilsToRefactor.addStavFromMarc(sdoc, dataFields);
+          this.dntstav = new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD));
       }
     }
 
     if (kuratorstav != null && !kuratorstav.isEmpty()) {
       sdoc.setField(KURATORSTAV_FIELD, kuratorstav);
     } else {
-      sdoc.setField(KURATORSTAV_FIELD, dntstav);
-      sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, historie_stavu.toString());
+      if (!sdoc.containsKey(KURATORSTAV_FIELD)) {
+        sdoc.setField(KURATORSTAV_FIELD, dntstav);
+        sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, historie_stavu.toString());
+      }
     }
 
     if (sdoc.containsKey(MARC_264_B)) {
@@ -402,9 +405,9 @@ public class MarcRecord {
 //    toSolrDoc();
 //  }
 
-  public void setKuratorStav(String kstav, String user, String poznamka) {
+  public void setKuratorStav(String kstav, String pstav, String user, String poznamka) {
     CuratorItemState curatorItemState = CuratorItemState.valueOf(kstav);
-    changedState( user, curatorItemState.getPublicItemState().name(), curatorItemState.name(), poznamka);
+    changedState( user, pstav, curatorItemState.name(), poznamka);
     changeLicenseIfNeeded(kstav);
     toSolrDoc();
   }

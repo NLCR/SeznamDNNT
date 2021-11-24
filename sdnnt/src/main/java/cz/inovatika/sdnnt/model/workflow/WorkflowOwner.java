@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow;
 
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.PublicItemState;
 
 import java.util.Date;
 
@@ -15,6 +16,8 @@ public interface WorkflowOwner {
      * @return
      */
     public CuratorItemState getWorkflowState();
+
+    public PublicItemState getCurrentPublicState();
 
     public Date getWorkflowDate();
 

@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.document;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
@@ -25,19 +26,24 @@ public class DocumentProxy implements WorkflowOwner {
         return !this.marcRecord.kuratorstav.isEmpty() ? CuratorItemState.valueOf(this.marcRecord.kuratorstav.get(0)) : null;
     }
 
+    @Override
+    public PublicItemState getCurrentPublicState() {
+        return !this.marcRecord.dntstav.isEmpty() ? PublicItemState.valueOf(this.marcRecord.dntstav.get(0)) : null;
+    }
 
     @Override
     public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         Date date = new Date();
 
         List<String> dntstav = this.marcRecord.dntstav;
-        if (!dntstav.contains(itm.getPublicItemState().name()) || changingLicenseState) {
-            this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(itm.getPublicItemState().name()));
+
+        if (!dntstav.contains(itm.getPublicItemState(this).name()) || changingLicenseState) {
+            this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(itm.getPublicItemState(this).name()));
             this.marcRecord.datum_stavu = new Date(date.getTime());
 
 
             JSONObject historyObject = new JSONObject();
-            historyObject.put("stav", itm.getPublicItemState().name());
+            historyObject.put("stav", itm.getPublicItemState(this).name());
             historyObject.put("date", MarcRecord.FORMAT.format(this.marcRecord.datum_stavu));
             if (user != null) {
                 historyObject.put("user", user);

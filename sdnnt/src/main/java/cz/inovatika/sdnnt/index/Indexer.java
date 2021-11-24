@@ -20,6 +20,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
@@ -447,7 +450,9 @@ public class Indexer {
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
       try {
-          mr.setKuratorStav(newStav, user, poznamka);
+        CuratorItemState kstav = CuratorItemState.valueOf(newStav);
+        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
+        mr.setKuratorStav(kstav.name(),pstav.name() , user, poznamka);
           if (!granularity.isEmpty()) {
             mr.setGranularity(granularity, poznamka, user);
           }
