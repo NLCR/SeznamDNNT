@@ -34,7 +34,8 @@ $states: (
   "processed": mat-color($mat-light-green, $state_shade),
   "rejected": mat-color($mat-red, $state_shade),
   "approvedlib": mat-color($mat-amber, $state_shade),
-  "approved": mat-color($mat-lime, 800)
+  "approved": mat-color($mat-lime, 800),
+  "waiting_for_automatic_process": mat-color($mat-blue, 800)
 );
 
 // gaps

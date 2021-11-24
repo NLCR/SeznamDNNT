@@ -52,7 +52,7 @@
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
 
-        <ng-container *ngIf="state.user && inZadost && (!processed?.state || (doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX'))">
+        <ng-container *ngIf="state.user && inZadost && (!processed?.state || (doc.kurator && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX'))">
           <ng-container *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'">
             <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na NPA'" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">check</mat-icon>
