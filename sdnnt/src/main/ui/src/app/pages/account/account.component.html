@@ -165,35 +165,30 @@
 
       <div class="app-results-wrapper">
         <table mat-table [dataSource]="zadosti" class="mat-elevation-z0">
-
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.id' | translate }}</th>
             <td mat-cell *matCellDef="let element">
               <span [matTooltip]="element.id">{{ element.id.substring(element.id.length -8) }}</span>
             </td>
           </ng-container>
-
           <ng-container matColumnDef="version">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.version' | translate }}</th>
             <td mat-cell *matCellDef="let element">
               <span [matTooltip]="element.id">{{  element.version.substring(element.version.length -8)  }}</span>
             </td>
           </ng-container>
-
-
           <ng-container matColumnDef="datum_zadani">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_zadani' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}</td>
           </ng-container>
-
           <ng-container matColumnDef="user">
             <th mat-header-cell *matHeaderCellDef [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ 'desc.uzivatel' | translate }}</th>
             <td mat-cell *matCellDef="let element" [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ element.user }}</td>
           </ng-container>
-          <ng-container matColumnDef="institution">
+          <!-- <ng-container matColumnDef="institution">
             <th mat-header-cell *matHeaderCellDef [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ 'desc.institution' | translate }}</th>
             <td mat-cell *matCellDef="let element" [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ element.institution }}</td>
-          </ng-container>
+          </ng-container> -->
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
             <td mat-cell *matCellDef="let element" class="app-pr-2">
@@ -206,38 +201,31 @@
             </td>
           </ng-container>
           <ng-container matColumnDef="navrh">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.navhr_na_stav' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef><!-- {{ 'desc.navhr_na_stav' | translate }} --></th>
             <td mat-cell *matCellDef="let element">
-              <span [matTooltip]="'state.tooltip.' + element.navrh | translate">{{ element.navrh }}</span>
+              <span [class]="'app-badge app-mr-1 ' +  element.navrh" [matTooltip]="'state.tooltip.' + element.navrh | translate">{{ element.navrh }}</span>
             </td>
           </ng-container>
           <ng-container matColumnDef="datum_vyrizeni">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_vyrizeni' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.datum_vyrizeni | date : 'dd.MM.yyyy HH:mm'  }}</td>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.datum_vyrizeni | date : 'dd.MM.yyyy HH:mm'">{{ element.datum_vyrizeni | date : 'dd.MM.yyyy'  }}</td>
           </ng-container>
           <ng-container matColumnDef="count">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.pocet_zadosti' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.identifiers?.length }} -  ({{ countProcessed(element) }})</td>
           </ng-container>
-
-
           <ng-container matColumnDef="deadline">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.deadline' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.deadline | date : 'dd.MM.yyyy HH:mm' }}</td>
+            <td mat-cell *matCellDef="let element" [matTooltip]="element.deadline | date : 'dd.MM.yyyy HH:mm'">{{ element.deadline | date : 'dd.MM.yyyy' }}</td>
           </ng-container>
-
-
           <ng-container matColumnDef="period">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.period' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.type_of_period ?  ('desc.'+element.type_of_period | translate) : '' }}</td>
           </ng-container>
-
-
           <ng-container matColumnDef="desiredstate">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.desiredstate' | translate }}</th>
             <td mat-cell *matCellDef="let element">{{ element.desired_item_state && element.desired_license ? ""+element.desired_item_state+" - ("+element.desired_license+")" : (element.desired_item_state ? ""+element.desired_item_state : "") }}</td>
           </ng-container>
-
           <ng-container matColumnDef="pozadavek">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.pozadavek" matTooltipPosition="above">
@@ -246,7 +234,6 @@
               </div>
             </td>
           </ng-container>
-
           <ng-container matColumnDef="poznamka">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.poznamka" matTooltipPosition="above">
@@ -255,8 +242,6 @@
               </div>
             </td>
           </ng-container>
-
-
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let element" class="app-text-right">
