@@ -18,44 +18,28 @@
       <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
         {{ doc.dntstav[doc.dntstav.length-1] }}   
       </div>
-
-
       <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         {{ processed.state }}
       </div>
-
-      
       <div *ngIf="doc.license" [class]="'app-badge app-icon-in ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
         <mat-icon class="material-icons-outlined">{{ doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
         {{ 'license.' + doc.license + '-badge' | translate }}
       </div>
-
       <div *ngIf="hasNavhr && !inZadost && state.logged && (state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
         {{  doc.zadost.navrh }}
       </div>
-
-
-      <ng-container *ngIf="state.user && 
-                          (state.user.role === 'kurator' || state.user.role === 'mainKurator') && 
-                          doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] !=  
-                          doc.dntstav[doc.dntstav.length-1] ">
-
-        <span class="app-pipe"></span>
-        <div [class]="'app-badge ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
-           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
-         </div>
+      <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] != doc.dntstav[doc.dntstav.length-1]">
+        <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
+          {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
+        </div>
       </ng-container>    
-      
     </div>
     <div fxLayout="row">   
       <mat-button-toggle-group *ngIf="state.logged">
-        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && 
-        !inZadost && doc.license !== null && doc.license == 'dnnto'"
-        (click)="addToZadostForReduction()" >
+        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
           <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost" 
-            (click)="addToZadost()">
+        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost" (click)="addToZadost()">
           <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
         </mat-button-toggle>
         <mat-button-toggle *ngIf="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
@@ -108,7 +92,6 @@
       </mat-menu>
     
       <ng-container *ngIf="state.user && inZadost && (!processed?.state || (doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX'))">
-
         <mat-button-toggle-group class="app-ml-3" *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" [value]="processed?.state">
           <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na NPA'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
@@ -116,21 +99,16 @@
           <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX' ) || zadost.navrh === 'VNZ')" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">check</mat-icon>
           </mat-button-toggle>
-
           <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()" [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">local_library</mat-icon>
           </mat-button-toggle>
-
           <mat-button-toggle value="rejected" *ngIf="!(zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')" (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">not_interested</mat-icon>
           </mat-button-toggle>
-
           <!-- VNL / dilo bylo  vydano = vyradit -->
           <mat-button-toggle value="releasedProved" *ngIf="(zadost.navrh === 'VNL'&& doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX') && doc.license !== null && doc.license == 'dnntt'" (click)="releasedProved()" [matTooltip]="'Dilo bylo vydano'" matTooltipPosition="above">
             <mat-icon class="material-icons-outlined">library_books</mat-icon>
           </mat-button-toggle>
-
-
         </mat-button-toggle-group>
       </ng-container>
     </div>
