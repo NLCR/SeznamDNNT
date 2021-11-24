@@ -151,7 +151,9 @@
     "condition1": "You must agree to the terms at the bottom of the dialog",
     "condition2": "You must agree to the terms at the bottom of the dialog",
     "condition3": "You must agree to the terms at the bottom of the dialog",
-    "delete_request": "Are you sure you want to delete this request"
+    "delete_request": "Are you sure you want to delete this request",
+    "smazani_zadosti_success": "The request was deleted successfully.",
+    "smazani_zadosti_error": "Error deleting request."
   },
 
   "sort": {
