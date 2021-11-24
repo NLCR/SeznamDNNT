@@ -45,16 +45,14 @@
                 <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
                 <ng-container *ngIf="zadost.priority?.length">{{ zadost.priority }}</ng-container>
               </mat-button-toggle>
-              <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
-
+              <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">
+                {{'desc.oznacit_jako_zpracovane' | translate}}
+              </mat-button-toggle>
               <mat-button-toggle *ngIf="(zadost.navrh === 'VNZ' || zadost.navrh === 'VNL') && zadost.state === 'open'"  value="" [matMenuTriggerFor]="typeVNXMenu" matTooltip="Typ zadosti">
                 <mat-icon class="material-icons-outlined">{{ 'no_photography' }}</mat-icon>
                 <ng-container *ngIf="zadost.navrh?.length">{{ zadost.navrh }}</ng-container>
               </mat-button-toggle>
-
             </mat-button-toggle-group>
-
-      
 
             <mat-menu #delegateMenu="matMenu">
               <ng-container *ngFor="let d of kurators">
@@ -74,25 +72,17 @@
 
             <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->
             <mat-slide-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
-
-            
-
           </div>
         </div>
       </mat-card>
-      <ng-container>
-        
+
+      <ng-container *ngFor="let doc of docs">
+        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
+        [inZadost]="true" [zadost]="zadost" 
+        (removeFromZadostEvent)="removeDoc($event)"
+        (processZadostEvent)="processNavrh($event)">
+        </app-result-item>
       </ng-container>
-      
-
-
-        <ng-container *ngFor="let doc of docs">
-          <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
-          [inZadost]="true" [zadost]="zadost" 
-          (removeFromZadostEvent)="removeDoc($event)"
-          (processZadostEvent)="processNavrh($event)">
-          </app-result-item>
-        </ng-container>
     </div>
     <div class="app-mt-4">
       <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
