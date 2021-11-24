@@ -159,7 +159,11 @@
     "title_sort": "Názvu",
     "rokvydani": "Roku vydání",
     "date1_int": "Roku vydání",
-    "datestamp": "Data změny"
+    "datestamp": "Data změny",
+    "deadline": "Uzávěrky",
+    "priority": "Priority",
+    "datum_zadani": "Data zadání",
+    "datum_vyrizeni": "Data vyřízení"
   },
 
   "language" : {

@@ -159,7 +159,11 @@
     "title_sort": "Title",
     "rokvydani": "Year of issue",
     "date1_int": "Year of issue",
-    "datestamp": "Date modified"
+    "datestamp": "Date modified",
+    "deadline": "Deadline",
+    "priority": "Priority",
+    "datum_zadani": "Date of assignment",
+    "datum_vyrizeni": "Settlement date"
   },
 
   "language" : {
