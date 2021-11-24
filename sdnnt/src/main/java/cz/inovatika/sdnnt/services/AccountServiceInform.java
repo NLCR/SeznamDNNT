@@ -11,6 +11,5 @@ import java.util.List;
 @FunctionalInterface
 public interface AccountServiceInform {
 
-
     void saved(Zadost zadost);
 }

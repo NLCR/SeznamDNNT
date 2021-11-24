@@ -32,6 +32,7 @@
     "A": "zařazeno",
     "VS": "vyřazeno - dílo bylo na seznamu (A)",
     "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
+ 
     "N": "vyřazeno",
     "X": "volné",
     "PX": "pravděpodobná volná díla",
@@ -39,6 +40,7 @@
     "NZN": "návrh k zařazení",
     "VVN": "výzva k vyřazení",
     "VVS": "výzva k vyřazení",
+
     "waiting": "čeká na posouzení",
     "processed": "zpracováno",
     "open": "neodesláno",
@@ -669,6 +671,16 @@
     "vice": "Více",
     "omezit_na_terminal": "Omezit na terminál",
     "smazat_zadost": "Smazat žádost",
-    "zaznamu": "záznamů"
+    "zaznamu": "záznamů",
+
+    "debug_nzn_0_5wd":"5 pracovních dnů",
+    "debug_nzn_1_12_18":"1.2 nebo 1.8",
+    "debug_nzn_2_6m":"6 měsíců",
+    "debug_vn_0_28d":"28 dnů",
+    "debug_vnl_0_5wd":"5 pracovních dnů",
+    "debug_vnl_1_10wd":"10 kalendářních dnů",
+    "debug_vnl_2_18m":"18 měsíců",
+    "debug_vnl_3_5wd":"5 pracovních dnů"
+
   }
 }

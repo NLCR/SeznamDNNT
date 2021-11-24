@@ -73,21 +73,7 @@ public class SchedulerMgr {
 
   }
 
-  public JSONObject setJobs() throws SchedulerException {
-    try {
-      getScheduler().clear();
-      JSONObject jobs = Options.getInstance().getJSONObject("jobs");
-      for (Object key : jobs.keySet()) {
-        SchedulerMgr.addJob((String) key, jobs.getJSONObject((String) key));
-      }
-      return jobs;
-    } catch (Exception ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return new JSONObject().put("error", ex);
-    }
 
-  }
-  
 
   public static JobDataMap setData(String jobName, JSONObject jobdata) throws Exception {
     Map<String, Object> map = new HashMap<String, Object>();

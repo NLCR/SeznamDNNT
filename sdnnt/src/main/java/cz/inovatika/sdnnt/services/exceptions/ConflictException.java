@@ -1,23 +1,11 @@
 package cz.inovatika.sdnnt.services.exceptions;
 
-public class ConflictException extends Exception {
+/**
+ * Konflikt verzi, prave ukladana zadasto byla zmenena nekym jinym
+ */
+public class ConflictException extends BaseException {
 
-    public ConflictException() {
-    }
-
-    public ConflictException(String message) {
-        super(message);
-    }
-
-    public ConflictException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ConflictException(Throwable cause) {
-        super(cause);
-    }
-
-    public ConflictException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public ConflictException(String key, String message) {
+        super(key, message);
     }
 }

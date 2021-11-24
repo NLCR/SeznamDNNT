@@ -23,6 +23,7 @@ export class Zadost {
   type_of_period: string;
   deadline: Date;
   desired_item_state: string;
+  desired_license: string;
   
 
   constructor(timestamp: string, user: string) {

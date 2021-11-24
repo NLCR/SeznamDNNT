@@ -14,6 +14,9 @@ export class PaginatorComponent implements OnInit {
 
   @Input() numFound;
   @Input() showSort: boolean ;
+  @Input() sortType: string = 'sort'; // sort vs sort_account
+
+  
   
   pageIndex: number;
 
@@ -45,8 +48,30 @@ export class PaginatorComponent implements OnInit {
   }
 
   sortBy(sort: Sort) {
-    this.state.sort = sort;
-    this.router.navigate([], { queryParams: { sort: sort.field + ' ' + sort.dir }, queryParamsHandling: 'merge' });
+
+    this.state.sort[this.sortType]= sort;
+    const queryParams:any = {};
+    queryParams[this.sortType] = sort.field + ' ' + sort.dir;
+    this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });
   }
+
+
+  // get currentSort(): Sort {
+  //   return this.state.sortmap.get(this.sortType);
+  // }
+  
+  // set currentSort(s: Sort) {
+  //   // this.state.sortmap.set(this.sortType, s);
+  //   // // console.log("current sort map is "+this.state.sortmap)
+  //   // // console.log("Setting current  sort to "+this.state.sortmap.get(this.sortType))
+  // }
+
+  // getSorts():Sort[] {
+  //   if (this.sortType === 'sort') {
+  //     return this.config.sorts
+  //   } else {
+  //     return this.config.sortsAccount;
+  //   }
+  // }
 
 }

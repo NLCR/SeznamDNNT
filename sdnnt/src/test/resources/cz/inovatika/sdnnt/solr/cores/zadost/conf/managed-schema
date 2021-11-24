@@ -80,8 +80,9 @@
 	
    <!-- typ deadlinu; kurator nebo scheduler -->
    <field name="desired_item_state" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
+   <field name="desired_license" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
 
-   <field name="type_of_deadline" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
+   <field name="type_of_transition" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
    <!-- deadline -->
    <field name="deadline" type="date" indexed="true" stored="true" multiValued="false" docValues="true"  />
    <!--  typ lhuty; lhuta0, lhuta1.. atd-->

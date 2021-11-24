@@ -81,5 +81,4 @@ public class TrackingFilter implements javax.servlet.Filter {
     public void destroy() {
 
     }
-    // implements Filter's methods: init(), doFilter() and destroy()
 }

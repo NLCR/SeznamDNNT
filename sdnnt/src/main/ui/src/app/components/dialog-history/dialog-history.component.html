@@ -9,7 +9,9 @@
             <th>{{ 'desc.kdo' | translate }}</th>
             <th>{{ 'desc.stav' | translate }}</th>
             <th>{{ 'desc.licence' | translate }}</th>
-            <th>{{ 'desc.typ' | translate }}</th>
+            <th>{{ 'desc.komentar' | translate }}</th>
+            
+            <th *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">{{ 'desc.zadost' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -17,12 +19,46 @@
             <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
             <td>{{ item.user }}</td>
             <td>{{ item.stav }}</td>
-            <td>{{ item.licence }}</td>
+            <td>{{ item.license }}</td>
             <td>{{ item.comment }}</td>
+            <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+                [matTooltip]=" item.zadost">
+             {{ item.zadost?.substring(item.zadost.length -8) }}</td>
           </tr>
         </tbody>
       </table>
     </mat-tab>
+
+    
+    <mat-tab label="Historie  kuratorskeho stavu" *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">
+      <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
+        <thead>
+          <tr>
+            <th>{{ 'desc.datum' | translate }}</th>
+            <th>{{ 'desc.kdo' | translate }}</th>
+            <th>{{ 'desc.stav' | translate }}</th>
+            <th>{{ 'desc.licence' | translate }}</th>
+            <th>{{ 'desc.komentar' | translate }}</th>
+            
+            <th>{{ 'desc.zadost' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of kuratorskestavy">
+            <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
+            <td>{{ item.user }}</td>
+            <td>{{ item.stav }}</td>
+            <td>{{ item.license }}</td>
+            <td>{{ item.comment }}</td>
+            <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+                [matTooltip]=" item.zadost">
+             {{ item.zadost?.substring(item.zadost.length -8) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </mat-tab>
+
+
     <mat-tab label="Historie bibliografickeho zaznamu">
       <ul>
         <li *ngFor="let item of history">

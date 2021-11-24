@@ -1,25 +1,23 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.User;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.ZadostProcess;
+import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.model.workflow.DocumentWorkflow;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.easymock.EasyMock;
-import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.logging.Logger;
 
 public class AccountServiceImplTest {
@@ -49,9 +47,9 @@ public class AccountServiceImplTest {
 
 
 
-
+    // Plain save
     @Test
-    public void testSaveZadost() throws IOException, SolrServerException, ConflictException {
+    public void testSaveZadost() throws IOException, SolrServerException, ConflictException, AccountException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning("TestSaveZadost is skipping");
@@ -60,9 +58,10 @@ public class AccountServiceImplTest {
 
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler)
+                .withConstructor(controler, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
@@ -70,15 +69,18 @@ public class AccountServiceImplTest {
             new BuildSolrClientSupport()
         ).anyTimes();
 
-        EasyMock.replay(controler, service);
+        EasyMock.replay(controler, service ,bservice);
 
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
+        zadost.setState("open");
         zadost.setInstitution("NKP");
         zadost.setUser("pokusny");
-        zadost.setNavrh(DocumentWorkflow.NZN.name());
-        zadost.setTypeOfPeriod(Period.period_0.name());
+        zadost.setNavrh("NZN");
+        zadost.setTypeOfPeriod(Period.period_nzn_1.name());
+        zadost.setPozadavek("Pozadavek ABC");
+        zadost.setPoznamka("Poznamka ABC");
 
         service.saveRequest(zadost.toJSON().toString(), user, null);
 
@@ -87,17 +89,23 @@ public class AccountServiceImplTest {
         Assert.assertTrue(fromService.getUser().equals("pokusny"));
         Assert.assertTrue(fromService.getInstitution().equals("NKP"));
         Assert.assertTrue(fromService.getNavrh().equals("NZN"));
+
+        Assert.assertNotNull(fromService.getPozadavek());
+        Assert.assertNotNull(fromService.getPoznamka());
+
     }
 
 
+    // Plain saave version and periods
     @Test
-    public void testSaveAndLoadVersionAndPeriods() throws IOException, SolrServerException, ConflictException {
+    public void testSaveAndLoadVersionAndPeriods() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning("TestSaveZadost is skipping");
             return;
         }
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
                 .withConstructor(controler)
@@ -119,12 +127,13 @@ public class AccountServiceImplTest {
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
         zadost.setInstitution("NKP");
         zadost.setUser("pokusny");
-        zadost.setNavrh(DocumentWorkflow.NZN.name());
+        zadost.setState("open");
+        zadost.setNavrh("NZN");
 
-        Period period = Period.period_0;
+        Period period = Period.period_nzn_1;
 
         zadost.setTypeOfPeriod(period.name());
-        zadost.setTypeOfDeadline(period.getDeadlineType().name());
+        zadost.setTransitionType(period.getTransitionType().name());
         zadost.setDeadline(period.defineDeadline(new Date()));
 
         service.saveRequest(zadost.toJSON().toString(), user, null);
@@ -148,17 +157,19 @@ public class AccountServiceImplTest {
     }
 
 
+    // Test zadost save process
     @Test
-    public void testZadostProcess() throws IOException, SolrServerException, ConflictException {
+    public void testZadostKuratorProcess() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning("testZadostProcess is skipping");
             return;
         }
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler)
+                .withConstructor(controler, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
@@ -177,7 +188,8 @@ public class AccountServiceImplTest {
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
         zadost.setInstitution("NKP");
         zadost.setUser("pokusny");
-        zadost.setNavrh(DocumentWorkflow.NZN.name());
+        zadost.setState("open");
+        zadost.setNavrh("NZN");
 
 
         ZadostProcess zprocess = new ZadostProcess();
@@ -200,12 +212,9 @@ public class AccountServiceImplTest {
         Assert.assertTrue(process.get("identifier-abc") != null);
         Assert.assertTrue(process.get("identifier-abc").getReason().equals("Komentar"));
         Assert.assertTrue(process.get("identifier-abc").getUser().equals("pokusny"));
-
-
-
     }
 
-
+    // Test send zadost
     @Test
     public void testSendZadostNZN() throws IOException, SolrServerException, ConflictException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
@@ -214,9 +223,10 @@ public class AccountServiceImplTest {
         }
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler)
+                .withConstructor(controler, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
@@ -235,9 +245,9 @@ public class AccountServiceImplTest {
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
         zadost.setInstitution("NKP");
         zadost.setUser("pokusny");
-        zadost.setNavrh(DocumentWorkflow.NZN.name());
+        zadost.setNavrh("NZN");
 
-        service.sendRequest(zadost.toJSON().toString());
+        service.userCloseRequest(zadost.toJSON().toString());
 
 
         Zadost savedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
@@ -245,15 +255,17 @@ public class AccountServiceImplTest {
 
 
         Assert.assertTrue(savedZadost.getDesiredItemState().equals("NPA"));
-        Assert.assertTrue(savedZadost.getTypeOfDeadline().equals("kurator"));
+        Assert.assertTrue(savedZadost.getTransitionType().equals("kurator"));
 
 
         Assert.assertNotNull(savedZadost.getDeadline());
 
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(savedZadost.getDeadline());
 
-        Assert.assertTrue(cal.get(Calendar.MONTH) == 1 || cal.get(Calendar.MONTH) == 7);
+        LocalDate date1 = LocalDate.now();
+        LocalDate date2 = LocalDate.ofInstant(savedZadost.getDeadline().toInstant(), ZoneId.systemDefault());
+
+        int days = java.time.Period.between(date1, date2).getDays();
+        Assert.assertTrue(days >= 5);
     }
 
 
@@ -265,9 +277,11 @@ public class AccountServiceImplTest {
         }
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler)
+                .withConstructor(controler, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
@@ -288,25 +302,15 @@ public class AccountServiceImplTest {
         zadost.setUser("pokusny");
         zadost.setNavrh("VN");
 
-        service.sendRequest(zadost.toJSON().toString());
+        service.userCloseRequest(zadost.toJSON().toString());
 
         Zadost savedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
         Assert.assertTrue(Long.parseLong(savedZadost.getVersion()) > 0);
 
-        System.out.println(savedZadost.getDesiredItemState());
-        System.out.println(savedZadost.getTypeOfDeadline());
-        System.out.println(savedZadost.getDeadline());
 
-//        Assert.assertTrue(savedZadost.getDesiredItemState().equals("NPA"));
-//        Assert.assertTrue(savedZadost.getTypeOfDeadline().equals("kurator"));
-//
-//
-//        Assert.assertNotNull(savedZadost.getDeadline());
-//
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(savedZadost.getDeadline());
-//
-//        Assert.assertTrue(cal.get(Calendar.MONTH) == 1 || cal.get(Calendar.MONTH) == 7);
+        Assert.assertTrue(savedZadost.getDesiredItemState().equals("N"));
+        Assert.assertNotNull(savedZadost.getTransitionType() != null);
+        Assert.assertNotNull(savedZadost.getDeadline() != null);
     }
 
 
@@ -318,9 +322,11 @@ public class AccountServiceImplTest {
         }
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler)
+                .withConstructor(controler, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
@@ -341,26 +347,12 @@ public class AccountServiceImplTest {
         zadost.setUser("pokusny");
         zadost.setNavrh("VNZ");
 
-        service.sendRequest(zadost.toJSON().toString());
+        service.userCloseRequest(zadost.toJSON().toString());
 
         Zadost savedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
         Assert.assertTrue(Long.parseLong(savedZadost.getVersion()) > 0);
-
-        System.out.println(savedZadost.getDesiredItemState());
-        System.out.println(savedZadost.getTypeOfDeadline());
-        System.out.println(savedZadost.getDeadline());
-
-//        Assert.assertTrue(savedZadost.getDesiredItemState().equals("NPA"));
-//        Assert.assertTrue(savedZadost.getTypeOfDeadline().equals("kurator"));
-//
-//
-//        Assert.assertNotNull(savedZadost.getDeadline());
-//
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(savedZadost.getDeadline());
-//
-//        Assert.assertTrue(cal.get(Calendar.MONTH) == 1 || cal.get(Calendar.MONTH) == 7);
     }
+
 
 
 

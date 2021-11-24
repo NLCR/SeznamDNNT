@@ -25,10 +25,11 @@ public class MarcModelTestsUtils {
         SolrDocument document = new SolrDocument();
         JSONObject jsonObject = new JSONObject(jsonString);
         jsonObject.keySet().forEach(key-> {
-            if (key.equals("datum_stavu")) {
+            if (key.equals("datum_stavu") || key.equals("datum_kurator_stav")) {
 
                 TemporalAccessor datum = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).parse(jsonObject.get(key).toString());
-                document.setField("datum_stavu", Date.from(Instant.from(datum)));
+                document.setField(key, Date.from(Instant.from(datum)));
+
 
             } else {
                 Object o = jsonObject.get(key);

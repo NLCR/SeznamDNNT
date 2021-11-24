@@ -51,9 +51,7 @@ public class JobsServlet extends HttpServlet {
         JSONObject jobData = Options.getInstance().getJSONObject("jobs").getJSONObject(jobName);
         String action = jobData.getString("type");  
         Job.Actions actionToDo = Job.Actions.valueOf(action.toUpperCase());
-        JSONObject json = actionToDo.doPerform(jobData);
-        // JSONObject json = job.fire(jobName);
-        out.println(json.toString(2));
+        actionToDo.doPerform(jobData);
       } else {
         out.print("jobName -> " + jobName);
       }

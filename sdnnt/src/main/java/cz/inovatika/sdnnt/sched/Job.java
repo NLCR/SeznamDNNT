@@ -22,12 +22,16 @@ import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
+import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.io.FileUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.quartz.InterruptableJob;
@@ -50,18 +54,16 @@ public class Job implements InterruptableJob {
    
   }
 
-  public JSONObject fire(String jobName) {
+  public void fire(String jobName) {
     LOGGER.log(Level.INFO, "Job {0} fired", jobName);
-    return fire(Options.getInstance().getJSONObject("jobs").getJSONObject(jobName));
+    fire(Options.getInstance().getJSONObject("jobs").getJSONObject(jobName));
   }
 
-  public JSONObject fire(JSONObject jobData) {
-    // LOGGER.log(Level.INFO, "fire job {0}", jobData);
+  public void fire(JSONObject jobData) {
     jobData.put("interrupted", false);
     String action = jobData.getString("type");  
     Actions actionToDo = Actions.valueOf(action.toUpperCase());
-    JSONObject ret = actionToDo.doPerform(jobData);
-    return ret;
+    actionToDo.doPerform(jobData);
   }
 
   @Override
@@ -107,58 +109,34 @@ public class Job implements InterruptableJob {
   
   enum Actions {
 
-    TEST {
+
+    WORKFLOW {
       @Override
-      JSONObject doPerform(JSONObject jobData) {
-        JSONObject json = new JSONObject();
+      void doPerform(JSONObject jobData) {
         try {
-
-          Date start = new Date();
-          String from = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().format(DateTimeFormatter.ISO_DATE_TIME);
-          json.put("from", from);
-          json.put("calendar", start.toInstant().atOffset(ZoneOffset.UTC).toLocalDateTime().format(DateTimeFormatter.ISO_DATE_TIME));
-          json.put("zone", ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT));
-        } catch (JSONException ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          json.put("error", ex.toString());
+            AccountServiceImpl accountService = new AccountServiceImpl(null, null);
+            accountService.schedulerSwitchStates();
+        } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+          LOGGER.log(Level.SEVERE, e.getMessage(),e);
         }
-
-        return json;
       }
     },
-    // Zpracovava navhry VVS a NZN. Controluje lhuty, a meni dntstav zaznamu
-    CHECK_STAV {
-      @Override
-      JSONObject doPerform(JSONObject jobData) {
-        JSONObject ret = new JSONObject();
-        try {
-          ret = Indexer.checkStav();
-          LOGGER.log(Level.INFO, "CHECK_STAV finished");
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, null, ex);
-          ret.put("error", ex.toString());
-        }
 
-        return ret;
-      }
-    },
     // Posila email o zmenu stavu zaznamu podle nastaveni uzivatelu
     NOTIFICATIONS {
       @Override
-      JSONObject doPerform(JSONObject jobData) {
+      void doPerform(JSONObject jobData) {
         try {
-          MailService mailService = new MailServiceImpl();
-          UserControler controler = new UserControlerImpl(/* no reqest */ null);
-          NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
-          notificationsService.processNotifications( NotificationInterval.valueOf(jobData.getString("interval")));
+            MailService mailService = new MailServiceImpl();
+            UserControler controler = new UserControlerImpl(/* no reqest */ null);
+            NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
+            notificationsService.processNotifications( NotificationInterval.valueOf(jobData.getString("interval")));
         } catch (UserControlerException | NotificationsException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);
         }
-
-        return new JSONObject();
       }
     };
-    abstract JSONObject doPerform(JSONObject jobData);
+    abstract void doPerform(JSONObject jobData);
   }
   
 }

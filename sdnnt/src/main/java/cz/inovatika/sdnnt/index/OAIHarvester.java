@@ -472,7 +472,8 @@ public class OAIHarvester {
             String val = reader.getElementText();
             sfs.add(new SubField(code, val));
             if (allFields || MarcRecord.tagsToIndex.contains(tag)) {
-              mr.sdoc.addField("marc_" + tag + code, val);
+              // Pristup do solr dokumentu
+              //mr.sdoc.addField("marc_" + tag + code, val);
             }
           }
         case XMLStreamReader.END_ELEMENT:

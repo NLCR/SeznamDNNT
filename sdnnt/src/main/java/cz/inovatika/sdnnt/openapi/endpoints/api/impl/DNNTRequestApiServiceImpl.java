@@ -12,9 +12,11 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -49,7 +51,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     private static final int LIMIT = 10000;
 
-    // Stavy jsou uz vytvorene pro validaci
+    // zamenit
     private static enum DocumentState {
         A {
             @Override
@@ -175,8 +177,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 if (user != null) {
                     ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
                     try {
-                        AccountService accountService = new AccountServiceImpl();
-                        JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null , user, LIMIT, 0);
+                        AccountService accountService = new AccountServiceImpl(new ResourceBundleServiceImpl(containerRequestContext));
+                        JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null ,null , user, LIMIT, 0);
                         JSONObject response = search.getJSONObject("response");
                         JSONArray docs = response.getJSONArray("docs");
                         for (int i = 0, ll = docs.length();i<ll;i++) {
@@ -192,7 +194,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                         }
                         return Response.ok().entity(arrayOfSavedRequest).build();
 
-                    } catch (SolrServerException | IOException e) {
+                    } catch (SolrServerException | IOException | AccountException e) {
                         LOGGER.log(Level.SEVERE,e.getMessage());
                         return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
                     }
@@ -250,7 +252,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
-                AccountService accountService = new AccountServiceImpl();
+                AccountService accountService = new AccountServiceImpl(new ResourceBundleServiceImpl(crc));
                 User user = new UserControlerImpl(null).findUserByApiKey(headerString);
                 if (user != null) {
                     List<Request> batch = body.getBatch();
@@ -307,7 +309,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 }
             }
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
-        } catch (IOException | UserControlerException e) {
+        } catch (IOException | UserControlerException |AccountException e) {
             return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
         }
     }

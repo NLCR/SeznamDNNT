@@ -206,17 +206,44 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
+  deleteZadost(zadost: Zadost): Observable<any> {
+    let url = '/account/delete';
+    const params: HttpParams = new HttpParams();
+    return this.post(url, zadost, params);
+  }
+
   processZadost(zadost: Zadost): Observable<any> {
     let url = '/account/process_zadost';
     const params: HttpParams = new HttpParams();
     return this.post(url, zadost, params);
   }
 
-  approveNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
-    let url = '/account/approve_navrh';
+  approveItem(identifier: string, zadost: Zadost, reason: string, alternative: string): Observable<string> {
+    let url = '/account/approve';
+    let params: HttpParams = new HttpParams();
+    if (alternative != null) {
+      params = params.append('alternative', alternative);
+    }
+    return this.post(url, { identifier, zadost, reason }, params);
+  }
+
+  rejectItem(identifier: string, zadost: Zadost, reason: string): Observable<string> {
+    let url = '/account/reject';
     const params: HttpParams = new HttpParams();
     return this.post(url, { identifier, zadost, reason }, params);
   }
+
+  // rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
+  //   let url = '/account/reject_navrh';
+  //   const params: HttpParams = new HttpParams();
+  //   return this.post(url, { identifier, zadost, reason }, params);
+  // }
+
+  // approveNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
+  //   let url = '/account/approve_navrh';
+  //   const params: HttpParams = new HttpParams();
+  //   return this.post(url, { identifier, zadost, reason }, params);
+  // }
 
   approveNavrhLib(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
@@ -224,11 +251,6 @@ export class AppService {
     return this.post(url, { identifier, zadost, reason}, params);
   }
 
-  rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
-    let url = '/account/reject_navrh';
-    const params: HttpParams = new HttpParams();
-    return this.post(url, { identifier, zadost, reason }, params);
-  }
 
   followRecord(identifier: string, follow: boolean): Observable<string> {
     let url = '/account/follow_record';

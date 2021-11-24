@@ -28,7 +28,12 @@ export class AppState {
   public q: string;
   public page: number = 0;
   public rows: number = 20;
-  public sort: Sort;
+  
+  // sort for results
+  //public sort: Sort;
+  
+  public sort: {[key: string]: Sort};
+
 
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
@@ -62,7 +67,14 @@ export class AppState {
     this.rows = this.config.rows;
     this.page = 0;
     this.usedFilters = [];
-    this.sort = this.config.sorts[0];
+    //this.sort = this.config.sorts[0];
+    this.sort = {};
+
+    this.sort['sort'] = this.config.sorts.sort[0];
+    this.sort['sort_account'] = this.config.sorts.sort_account.find(s => s.field === "deadline" && s.dir==='asc');
+    this.sort['user_sort_account'] = this.config.sorts.user_sort_account.find(s => s.field === "datum_zadani" && s.dir==='asc');
+ 
+
     this.fullCatalog = false;
     this.withNotification = false;
     searchParams.keys.forEach(p => {
@@ -78,7 +90,14 @@ export class AppState {
       } else if (p === 'withNotification') {
         this.withNotification = param === 'true';
       } else if (p === 'sort') {
-        this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
+        //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
+        this.sort.sort= this.config.sorts.sort.find(s => param === (s.field + " " + s.dir));
+      } else if (p === 'sort_account') {
+        //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
+        this.sort.sort_account = this.config.sorts.sort_account.find(s => param === (s.field + " " + s.dir));
+      } else if (p === 'user_sort_account') {
+        //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
+        this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + " " + s.dir));
       } else {
         if (this.config.filterFields.includes(p)) {
           this.usedFilters.push({field: p, value: param});

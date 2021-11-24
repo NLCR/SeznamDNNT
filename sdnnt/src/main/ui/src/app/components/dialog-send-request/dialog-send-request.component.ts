@@ -23,6 +23,9 @@ export class DialogSendRequestComponent implements OnInit {
   }
 
   send() {
+    
+    this.data.pozadavek = this.pozadavek;
+    this.data.poznamka = this.poznamka;
 
     this.service.sendZadost(this.data).subscribe((res: any) => {
       if (res.error) {

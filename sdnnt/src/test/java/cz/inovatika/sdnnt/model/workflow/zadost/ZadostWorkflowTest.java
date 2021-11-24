@@ -2,8 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.zadost;
 
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
-import cz.inovatika.sdnnt.model.workflow.WorkflowState;
+import cz.inovatika.sdnnt.model.workflow.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,7 +11,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class WorkflowTest {
+public class ZadostWorkflowTest {
 
     @Test
     public void testNZNWorkflow() {
@@ -23,25 +22,24 @@ public class WorkflowTest {
         WorkflowState state = null;
 
         List<String> expectedStates = new ArrayList<>(Arrays.asList("NPA","PA","A"));
-        List<Period> expectedPeriods = new ArrayList<>(Arrays.asList(Period.period_0,Period.period_1,null));
-        //List<Boolean> expectedChangingLicensesFlag = new ArrayList<>(Arrays.asList(Period.period_0,Period.period_1,null));
 
-
-        AbstractZadostWorkflow workflow = AbstractZadostWorkflow.create(zadost);
+        Workflow workflow = ZadostWorkflowFactory.create(zadost);
 
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
 
-            state.applyState();
+            state.switchState("mojeid", zadost.getUser(), zadost.getId());
+
 
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
-            Assert.assertTrue(state.getLicense().name().equals("dnnto"));
-            Assert.assertTrue(state.getPeriod().equals(expectedPeriods.remove(0)));
+            Assert.assertTrue(state.getLicense() == null || state.getLicense().name().equals("dnnto"));
         }
 
         Assert.assertTrue(state.isFinalSate());
 
         if (state.isFinalSate()) {
-            state.applyState();
+
+
+            state.switchState("mojeid", zadost.getUser(), zadost.getId());
 
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
             Assert.assertTrue(state.getLicense().name().equals("dnnto"));
@@ -56,7 +54,6 @@ public class WorkflowTest {
         WorkflowState state = null;
         VNWorkflow workflow = new VNWorkflow(owner);
 
-
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
 
             System.out.println("Chteny stav "+state.getCuratorState());
@@ -64,11 +61,10 @@ public class WorkflowTest {
             System.out.println("Deadline pro licenci: "+state.getPeriod());
 
             System.out.println("Period: "+ state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
-            //System.out.println(state.getPeriod().getDeadlineType());
 
-            owner.setWorkflowState(state.getCuratorState());
+            owner.switchWorkflowState(state.getCuratorState(),null ,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -78,7 +74,7 @@ public class WorkflowTest {
             System.out.println("Chteny stav "+zadost.getDesiredItemState());
             System.out.println("Chtena licence "+state.getLicense());
             System.out.println("Lhuta "+state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
             System.out.println("Deadline "+zadost.getDeadline());
         }
 
@@ -101,11 +97,11 @@ public class WorkflowTest {
             System.out.println("Deadline pro licenci: "+state.getPeriod());
 
             System.out.println("Period: "+ state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
-            //System.out.println(state.getPeriod().getDeadlineType());
+            //System.out.println(state.getPeriod().getTransitionType());
 
-            owner.setWorkflowState(state.getCuratorState());
+            owner.switchWorkflowState(state.getCuratorState(), state.getLicense().name(), true, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -114,16 +110,17 @@ public class WorkflowTest {
             System.out.println("Setting workflow owner state to "+state.getCuratorState());
             System.out.println("Setting licence to "+state.getLicense());
             System.out.println("Lhuta "+state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
             System.out.println("Setting deadline "+state.getDate());
+            owner.switchWorkflowState(state.getCuratorState(),null ,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
     }
 
     @Test
     public void testVNZWorkflow() {
-        System.out.println(" VNN >> ");
+        System.out.println(" VNZ >> ");
         Zadost zadost = new Zadost("mojeid");
         WorkflowOwner owner = new ZadostProxy(zadost);
         WorkflowState state = null;
@@ -138,11 +135,11 @@ public class WorkflowTest {
             System.out.println("Deadline pro licenci: "+state.getPeriod());
 
             System.out.println("Period: "+ state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
-            //System.out.println(state.getPeriod().getDeadlineType());
+            //System.out.println(state.getPeriod().getTransitionType());
 
-            owner.setWorkflowState(state.getCuratorState());
+            owner.switchWorkflowState(state.getCuratorState(), null, false , state.getPeriod(),"mojeid" , zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -151,9 +148,10 @@ public class WorkflowTest {
             System.out.println("Setting workflow owner state to "+state.getCuratorState());
             System.out.println("Setting licence to "+state.getLicense());
             System.out.println("Lhuta "+state.getPeriod());
-            System.out.println("Kdo prepina: "+state.getPeriod().getDeadlineType());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
             System.out.println("Setting deadline "+state.getDate());
+            owner.switchWorkflowState(state.getCuratorState(), null, false, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
     }

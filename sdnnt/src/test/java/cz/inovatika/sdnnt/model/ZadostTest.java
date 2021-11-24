@@ -1,9 +1,6 @@
 package cz.inovatika.sdnnt.model;
 
 import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
-import cz.inovatika.sdnnt.model.Period;
-import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.ZadostProcess;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -118,9 +115,10 @@ public class ZadostTest {
         zadost.setIdentifiers(Arrays.asList("oai-test-1","oai-test-2"));
         zadost.setNavrh("NZN");
         zadost.setInstitution("NKP");
-        zadost.setTypeOfPeriod(Period.period_0.name());
-        zadost.setTypeOfDeadline(Period.period_0.getDeadlineType().name());
+        zadost.setTypeOfPeriod(Period.period_nzn_1.name());
+        zadost.setTransitionType(Period.period_nzn_1.getTransitionType().name());
         zadost.setDesiredItemState("NPA");
+        zadost.setDesiredLicense("dnntt");
 
         ZadostProcess zp = new ZadostProcess();
         zp.setDate(new Date());
@@ -137,8 +135,8 @@ public class ZadostTest {
         Assert.assertEquals(deseriazed.getUser(), "pokusny");
         Assert.assertEquals(deseriazed.getNavrh(), "NZN");
         Assert.assertEquals(deseriazed.getInstitution(), "NKP");
-        Assert.assertEquals(deseriazed.getTypeOfPeriod(), "period_0");
-        Assert.assertEquals(deseriazed.getTypeOfDeadline(), Period.period_0.getDeadlineType().name());
+        Assert.assertEquals(deseriazed.getTypeOfPeriod(), "period_nzn_1");
+        Assert.assertEquals(deseriazed.getTransitionType(), Period.period_nzn_1.getTransitionType().name());
 
         Assert.assertTrue(deseriazed.getProcess().size() == 1);
         Assert.assertTrue(deseriazed.getProcess().containsKey("iddone"));
@@ -147,6 +145,7 @@ public class ZadostTest {
         Assert.assertTrue(deseriazed.getProcess().get("iddone").getDate() != null );
 
         Assert.assertEquals(deseriazed.getDesiredItemState(), "NPA");
+        Assert.assertEquals(deseriazed.getDesiredLicense(), "dnntt");
 
         SolrInputDocument solrInputFields = zadost.toSolrInputDocument();
         Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.DEADLINE_KEY));
@@ -154,8 +153,10 @@ public class ZadostTest {
         Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.NAVRH_KEY));
         Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.INSTITUTION_KEY));
         Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.TYPE_OF_PERIOD_KEY));
-        Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.TYPE_OF_DEADLINE_KEY));
+        Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.TRANSITION_TYPE_KEY));
 
+        Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.DESIRED_ITEM_STATE_KEY));
+        Assert.assertNotNull(solrInputFields.getFieldValue(Zadost.DESIRED_LICENSE_KEY));
         Object fieldValue = solrInputFields.getFieldValue(Zadost.PROCESS_KEY);
         Assert.assertNotNull(fieldValue);
     }

@@ -307,8 +307,23 @@ export class ResultItemComponent implements OnInit {
         this.processZadostEvent.emit({type: 'approveLib', identifier: this.doc.identifier, komentar: result});
       }
     });
+  }
 
-    
+
+  releasedProved() {
+        
+    const dialogRef = this.dialog.open(DialogPromptComponent, {
+      width: '700px',
+      data: {caption: 'komentar', label: 'komentar'},
+      panelClass: 'app-register-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.processZadostEvent.emit({type: 'releasedProved', identifier: this.doc.identifier, komentar: result});
+      }
+    });
+
   }
 
   reject() {

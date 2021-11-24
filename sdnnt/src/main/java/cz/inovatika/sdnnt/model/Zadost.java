@@ -89,16 +89,14 @@ public class Zadost implements NotNullAwareObject{
   // deadline vypocitany z lhuty
   public static final String DEADLINE_KEY = "deadline";
 
-  // typ deadlinu - ocekava se kuratorsky zasah nebo se jedna o automaticke prepnuti
-  public static final String TYPE_OF_DEADLINE_KEY = "type_of_deadline";
+  // typ prepnuti do stavu - Kurator nebo automat
+  public static final String TRANSITION_TYPE_KEY = "type_of_transition";
 
-   // Scheduler bude brat zadosti nejdrive NZN, pak VN, pak VNZ a pak VNL
   public static final String DESIRED_ITEM_STATE_KEY = "desired_item_state";
-  //public static final String DESIRED_ITEM_STATE_KEY = "d_item_state";
-  //public static final String DESIRED_ITEM_STATE_KEY = "ditemstate";
+  public static final String DESIRED_LICENSE_KEY = "desired_license";
+
 
   // historie zadosti
-
   private String id;
   private String typ;
   private String state;
@@ -118,10 +116,13 @@ public class Zadost implements NotNullAwareObject{
 
   private String typeOfPeriod;
   private Date deadline;
-  private String typeOfDeadline;
+
+  private String transitionType;
 
   private String desiredItemState;
+  private String desiredLicense;
 
+  private boolean isEscalated = false;
 
   // version for
   private String version;
@@ -265,12 +266,12 @@ public class Zadost implements NotNullAwareObject{
     this.typeOfPeriod = typeOfPeriod;
   }
 
-  public String getTypeOfDeadline() {
-    return typeOfDeadline;
+  public String getTransitionType() {
+    return transitionType;
   }
 
-  public void setTypeOfDeadline(String typeOfDeadline) {
-    this.typeOfDeadline = typeOfDeadline;
+  public void setTransitionType(String tt) {
+    this.transitionType = tt;
   }
 
   public Date getDeadline() {
@@ -281,13 +282,28 @@ public class Zadost implements NotNullAwareObject{
     this.deadline = deadline;
   }
 
-
   public String getDesiredItemState() {
     return desiredItemState;
   }
 
   public void setDesiredItemState(String desiredItemState) {
     this.desiredItemState = desiredItemState;
+  }
+
+  public void setEscalated(boolean escalated) {
+    isEscalated = escalated;
+  }
+
+  public boolean isEscalated() {
+    return isEscalated;
+  }
+
+  public String getDesiredLicense() {
+    return desiredLicense;
+  }
+
+  public void setDesiredLicense(String desiredLicense) {
+    this.desiredLicense = desiredLicense;
   }
 
   public void addProcess(String id, ZadostProcess zp) {
@@ -402,8 +418,8 @@ public class Zadost implements NotNullAwareObject{
       sinput.addField(TYPE_OF_PERIOD_KEY, getTypeOfPeriod());
     }
 
-    if (getTypeOfDeadline() != null) {
-      sinput.addField(TYPE_OF_DEADLINE_KEY, getTypeOfDeadline());
+    if (getTransitionType() != null) {
+      sinput.addField(TRANSITION_TYPE_KEY, getTransitionType());
     }
 
     if (getDeadline() != null) {
@@ -415,6 +431,10 @@ public class Zadost implements NotNullAwareObject{
       sinput.addField(DESIRED_ITEM_STATE_KEY, desitemstate);
     }
 
+    if (getDesiredLicense() != null) {
+      String desLicense = getDesiredLicense();
+      sinput.addField(DESIRED_LICENSE_KEY, desLicense);
+    }
     return sinput;
 
   }
@@ -501,8 +521,8 @@ public class Zadost implements NotNullAwareObject{
         }
       }
 
-      if(jsonobj.has(TYPE_OF_DEADLINE_KEY)) {
-        zadost.setTypeOfDeadline(jsonobj.getString(TYPE_OF_DEADLINE_KEY));
+      if(jsonobj.has(TRANSITION_TYPE_KEY)) {
+        zadost.setTransitionType(jsonobj.getString(TRANSITION_TYPE_KEY));
       }
 
       if (jsonobj.has(TYPE_OF_PERIOD_KEY)) {
@@ -515,6 +535,10 @@ public class Zadost implements NotNullAwareObject{
 
       if (jsonobj.has(DESIRED_ITEM_STATE_KEY)) {
         zadost.setDesiredItemState(jsonobj.getString(DESIRED_ITEM_STATE_KEY));
+      }
+
+      if (jsonobj.has(DESIRED_LICENSE_KEY)) {
+        zadost.setDesiredLicense(jsonobj.getString(DESIRED_LICENSE_KEY));
       }
       return zadost;
 
@@ -589,8 +613,8 @@ public class Zadost implements NotNullAwareObject{
       jsonObject.put(DEADLINE_KEY, SolrUtils.solrDateString(getDeadline()));
     }
 
-    if (getTypeOfDeadline() != null) {
-      jsonObject.put(TYPE_OF_DEADLINE_KEY, getTypeOfDeadline());
+    if (getTransitionType() != null) {
+      jsonObject.put(TRANSITION_TYPE_KEY, getTransitionType());
     }
 
     if (getTypeOfPeriod() != null) {
@@ -601,6 +625,9 @@ public class Zadost implements NotNullAwareObject{
       jsonObject.put(DESIRED_ITEM_STATE_KEY, getDesiredItemState());
     }
 
+    if (getDesiredLicense() != null) {
+      jsonObject.put(DESIRED_LICENSE_KEY, getDesiredLicense());
+    }
     return jsonObject;
 
   }
@@ -648,22 +675,34 @@ public class Zadost implements NotNullAwareObject{
     }
   }
 
-  // kurator process
-  public static JSONObject markAsProcessed(String js, String username) {
-    try {
-      Zadost zadost = Zadost.fromJSON(js);
-      zadost.kurator = username;
-      zadost.datum_vyrizeni = new Date(); // ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
-      zadost.state = "processed";
-      return save(zadost);
+
+  /// move to service
+
+  public static JSONObject markAsProcessed(SolrClient client, String js, String username, String requestProcessedState) {
+    Zadost zadost = Zadost.fromJSON(js);
+    zadost.kurator = username;
+    zadost.datum_vyrizeni = new Date(); // ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
+    //zadost.state = "processed";
+    return save(client, zadost);
+  }
+  public static JSONObject markAsProcessed(String js, String username, String requestProcessedState) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      return markAsProcessed(solr, js, username, requestProcessedState);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
     }
   }
 
-  // move to service
   public static JSONObject approve(String identifier, String js, String komentar, String username, String approvestate) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      return approve(solr, identifier, js, komentar, username, approvestate);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  public static JSONObject approve(SolrClient client, String identifier, String js, String komentar, String username, String approvestate) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       String oldProcess = new JSONObject().put("process", zadost.process).toString();
@@ -675,8 +714,8 @@ public class Zadost implements NotNullAwareObject{
       zadost.addProcess(identifier, zprocess);
       String newProcess = new JSONObject().put("process", zadost.process).toString();
       // history must be updated after success
-      new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost");
-      return save(zadost);
+      new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost");
+      return save(client, zadost);
     } catch (JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
@@ -708,9 +747,18 @@ public class Zadost implements NotNullAwareObject{
     }
   }
   
-  public static JSONObject save(Zadost zadost) {
 
+  public static JSONObject save(Zadost zadost) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      return save(solr, zadost);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+
+  public static JSONObject save(SolrClient client, Zadost zadost) {
+    try{
       SolrInputDocument idoc =zadost.toSolrInputDocument();
 
       UpdateRequest updateRequest = new UpdateRequest();
@@ -719,18 +767,15 @@ public class Zadost implements NotNullAwareObject{
       if (zadost.getVersion() != null ) {
         updateRequest.setParam(VERSION_KEY, ""+zadost.getVersion());
       }
-
-      //solr.addBean("zadost", zadost);
-      solr.add("zadost", idoc);
-      solr.commit("zadost");
-      solr.close();
+      client.add("zadost", idoc);
+      client.commit("zadost");
+      client.close();
       return zadost.toJSON();
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
     }
   }
-
 
   @Override
   public String toString() {
@@ -753,7 +798,7 @@ public class Zadost implements NotNullAwareObject{
             ", priority='" + priority + '\'' +
             ", typeOfPeriod='" + typeOfPeriod + '\'' +
             ", deadline=" + deadline +
-            ", typeOfDeadline='" + typeOfDeadline + '\'' +
+            ", transitionType='" + transitionType + '\'' +
             ", desiredItemState='" + desiredItemState + '\'' +
             ", version=" + version +
             '}';

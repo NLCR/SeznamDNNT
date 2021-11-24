@@ -21,17 +21,69 @@ package cz.inovatika.sdnnt.model;
  */
 public enum CuratorItemState {
 
+    // vyrazeno  N
+    N{
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.N;
+        }
+    },
+    // vyrazeno/nezarazeno ale ceka na zarazeni  N
+    NPA {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.N;
+        }
+    },
+    // ceka na zarazeni  PA
+    PA {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.PA;
+        }
+    },
+    //zarazeno  A
+    A {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.A;
+        }
+    },
 
-    N, // vyrazeno  N
-    NPA, // vyrazeno/nezarazeno ale ceka na zarazeni  N
+    // zarazeno  A
+    NL {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.A;
+        }
+    },
 
-    PA, // ceka na zarazeni  PA
+    NLX {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.A;
+        }
+    },
 
-    A, //zarazeno  A
+    NZ {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return PublicItemState.N;
+        }
+    },
 
-    NL, // zarazeno  A
-    NZ, // zarazeno A
+    PX {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return null;
+        }
+    },
+    X {
+        @Override
+        public PublicItemState getPublicItemState() {
+            return null;
+        }
+    }; // neni zadny stav
 
-    PX, // neni zadny stav
-    X; // neni zadny stav
+    public abstract PublicItemState getPublicItemState();
 }

@@ -24,12 +24,23 @@ public class ServletsSupport {
 
     /** Error json */
     public static JSONObject errorJson(HttpServletResponse response, int statusCode, String errorMessage) {
-        if (statusCode != -1) response.setStatus(statusCode);
+        // must handle on client side
+        //if (statusCode != -1) response.setStatus(statusCode);
+        if (response != null) response.setStatus(HttpServletResponse.SC_OK);
         JSONObject errorObject = new JSONObject();
         errorObject.put("error", errorMessage);
         return errorObject;
     }
 
+    public static JSONObject errorJson(HttpServletResponse response, int statusCode, String key, String errorMessage) {
+        // must handle on client side
+        //if (statusCode != -1) response.setStatus(statusCode);
+        if (response != null) response.setStatus(HttpServletResponse.SC_OK);
+        JSONObject errorObject = new JSONObject();
+        errorObject.put("error", errorMessage);
+        errorObject.put("key", key);
+        return errorObject;
+    }
 
 
     /** Error json */

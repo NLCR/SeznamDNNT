@@ -20,11 +20,26 @@
     "maxinactiveinterval": 1200
   },
 
+  "workflow" :{
+    "periods": {
+      "debug": true,
+
+      "debug_nzn_0" : {
+        "value": 6
+      },
+      "period_nzn_0" : {
+        "value": 6
+      }
+    }
+  },
+
   "jobs": {
-    "zadost": {
-      "type": "zadost",
-      "cron": "0 0 0 * * ?"
+    "zadost_po_minute": {
+      "type": "workflow",
+      "cron": "0 * * * * ?"
     },
+
+
     "notifikace_den": {
       "type": "notifications",
       "interval": "den",
@@ -40,6 +55,8 @@
       "interval": "mesic",
       "cron": "0 15 22 ? * 6L"
     },
+
+
     "test": {
       "type": "test",
       "cron": "0 2 0 ? * MON"

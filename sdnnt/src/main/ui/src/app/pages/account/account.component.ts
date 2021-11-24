@@ -35,23 +35,24 @@ export class AccountComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = [
-    'id',
-    'version',
+  // displayedColumns = [
+  //   'id',
+  //   'datum_zadani',
+  //   'user', 
+  //   'institution', 
+  //   'state', 
+  //   'navrh',
+  //   'datum_vyrizeni',
+  //   'count', 
+  //   'pozadavek',
+  //   'poznamka',
+  //   'deadline',
+  //   'period',
+  //   'actions'
+  // ];
 
-    'datum_zadani',
-    'user', 
-    'institution', 
-    'state', 
-    'navrh',
-    'datum_vyrizeni',
-    'count', 
-    'pozadavek',
-    'poznamka',
-    'deadline',
-    'period',
-    'actions'
-  ];
+  displayedColumns =[];
+
   zadosti: Zadost[] = [];
 
   stateFilter: string;
@@ -80,6 +81,40 @@ export class AccountComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
+
+    if (this.state.user.role == 'kurator' || this.state.user.role==='mainKurator' || this.state.user.role === 'admin') {
+      this.displayedColumns = [
+        'id',
+        'datum_zadani',
+        'user', 
+        'institution', 
+        'state', 
+        'navrh',
+        'datum_vyrizeni',
+        'count', 
+        'deadline',
+        'desiredstate',
+        'period',
+        'actions'
+      ];
+    
+    } else {
+      this.displayedColumns = [
+        'id',
+        'datum_zadani',
+        'user', 
+        'institution', 
+        'state', 
+        'navrh',
+        'datum_vyrizeni',
+        'count', 
+        'pozadavek',
+        'poznamka',
+        'actions'
+      ];
+
+    }
+
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
@@ -226,13 +261,11 @@ export class AccountComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-
         this.route.queryParams.subscribe(val => {
           this.search(val);
           this.newStavFilter = val.navrh;
           this.stateFilter = val.state;
         });
-    
       });
       
     }
@@ -253,16 +286,40 @@ export class AccountComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-        zadost.state = 'processed';
+        //zadost.state = 'processed';
+        // type_of_deadline: string;
+        // type_of_period: string;
+        // deadline: Date;
+        // desired_item_state: string;
+        // desired_license: string;
+      
+        zadost.desired_license = res.desired_license;
+        zadost.desired_item_state = res.desired_item_state;
+        zadost.deadline = res.deadline;
+        zadost.type_of_deadline = res.type_of_deadline;
+        zadost.type_of_period = res.type_of_period;
+        zadost.datum_vyrizeni = res.datum_vyrizeni;
+
+        zadost.state = res.state;
       }
     });
   }
 
-  public confirmDeleteRequest() {
+  public confirmDeleteRequest(zadost: Zadost) {
     const dialogRef = this.dialog.open(DialogDeleteRequestComponent, {
       width: '750px',
+      data: zadost,
       panelClass: 'app-dialog-states'
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.route.queryParams.subscribe(val => {
+        this.search(val);
+        this.newStavFilter = val.navrh;
+        this.stateFilter = val.state;
+      });
+    });
+
   }
 
 

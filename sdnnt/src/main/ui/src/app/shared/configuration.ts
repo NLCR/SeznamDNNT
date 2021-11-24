@@ -23,8 +23,10 @@ export interface Configuration {
   // Seznam poli, ktere se zpracuju v url jako filter
   filterFields: string[];
   
-  // Seznam 
-  sorts: Sort[];
+  // Sort pro standardni data 
+  sorts: {[key: string]: Sort[]};
+  // // Sort v account
+  // sorts_account:  Sort[];
 
   // User from session
   user: User;

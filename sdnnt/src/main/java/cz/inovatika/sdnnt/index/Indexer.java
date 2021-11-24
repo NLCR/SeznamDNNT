@@ -25,7 +25,6 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrUtils;
-import cz.inovatika.sdnnt.model.workflow.DocumentWorkflow;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -211,13 +210,13 @@ public class Indexer {
     try {
 
       MarcRecord mr = MarcRecord.fromRAWJSON(source);
-      mr.toSolrDoc();
-      String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
-              + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
-              + " AND controlfield_008:\"" + mr.sdoc.getFieldValue("controlfield_008") + "\")"
-              + " OR marc_020a:\"" + mr.sdoc.getFieldValue("marc_020a") + "\""
-              + " OR marc_015a:\"" + mr.sdoc.getFieldValue("marc_015a") + "\""
-              + " OR dedup_fields:\"" + mr.sdoc.getFieldValue("dedup_fields") + "\"";
+      SolrInputDocument sdoc = mr.toSolrDoc();
+      String q = "(controlfield_001:\"" + sdoc.getFieldValue("controlfield_001") + "\""
+              + " AND marc_040a:\"" + sdoc.getFieldValue("marc_040a") + "\""
+              + " AND controlfield_008:\"" + sdoc.getFieldValue("controlfield_008") + "\")"
+              + " OR marc_020a:\"" + sdoc.getFieldValue("marc_020a") + "\""
+              + " OR marc_015a:\"" + sdoc.getFieldValue("marc_015a") + "\""
+              + " OR dedup_fields:\"" + sdoc.getFieldValue("dedup_fields") + "\"";
 
       SolrQuery query = new SolrQuery(q)
               .setRows(20)
@@ -241,7 +240,7 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     try {
 
-      Indexer.changeStav(identifier, "VVS", user);
+      Indexer.changeStav(identifier,  user);
       Import impNew = Import.fromJSON(newRaw);
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("id:\"" + impNew.id + "\"");
@@ -264,27 +263,28 @@ public class Indexer {
   }
 
   public static JSONObject reduceVisbilityState(String identifier, String navrh, String user,MarcRecord mr, SolrClient client) {
-    JSONObject ret = new JSONObject();
-    try {
-      mr.toSolrDoc();
-      String oldRaw = mr.toJSON().toString();
-      List<String> oldStav = mr.dntstav;
-      DocumentWorkflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
-
-        LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.dntstav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
-
-        new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-        try {
-          client.add("catalog", mr.sdoc);
-        } catch (SolrServerException | IOException ex) {
-          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-          ret.put("error", ex);
-        }
-      });
-    } finally {
-      SolrUtils.quietCommit(client, "catalog");
-    }
-    return ret;
+    throw new UnsupportedOperationException("unsupported");
+//    JSONObject ret = new JSONObject();
+//    try {
+//      mr.toSolrDoc();
+//      String oldRaw = mr.toJSON().toString();
+//      List<String> oldStav = mr.dntstav;
+//      DocumentWorkflow.valueOf(navrh).reduce(mr, user, (chanedRecord, ident, oldstates, newstates)->{
+//
+//        LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(), new StringBuilder().append(chanedRecord.dntstav).append(":").append(chanedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+//
+//        new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+//        try {
+//          client.add("catalog", mr.sdoc);
+//        } catch (SolrServerException | IOException ex) {
+//          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+//          ret.put("error", ex);
+//        }
+//      });
+//    } finally {
+//      SolrUtils.quietCommit(client, "catalog");
+//    }
+//    return ret;
   }
 
 
@@ -378,69 +378,66 @@ public class Indexer {
     }
   }
 
-  /**
-   * Kontroluje dntstav podle nastavene lhuty (6 mesicu) a meni dntstav
-   *
-   * @return
-   */
-  public static JSONObject checkStav() {
-    JSONObject ret = new JSONObject();
-    String collection = "catalog";
 
-    int indexed = 0;
-    try {
-      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-      // Menime z PA -> A
-      SolrQuery q = new SolrQuery("*").setRows(1000)
-              .setSort("identifier", SolrQuery.ORDER.desc)
-              .addFilterQuery("dntstav:PA")
-              .addFilterQuery("datum_stavu:[* TO NOW/MONTH-6MONTHS]")
-              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
-      List<SolrInputDocument> idocs = new ArrayList<>();
-      boolean done = false;
-      while (!done) {
-        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-        QueryResponse qr = getClient().query(collection, q);
-        String nextCursorMark = qr.getNextCursorMark();
-        SolrDocumentList docs = qr.getResults();
-        for (SolrDocument doc : docs) {
-          String oldRaw = (String) doc.getFirstValue("raw");
-
-          MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
-
-          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD).toArray());
-          mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
-          mr.historie_stavu = new JSONArray((String) doc.getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
-          mr.license = (String) doc.getFirstValue("license");
-          // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
-          mr.setStav("A", "scheduler");
-          new HistoryImpl(getClient()).log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
-
-          SolrInputDocument idoc = mr.toSolrDoc();
-          idocs.add(idoc);
-        }
-
-        if (!idocs.isEmpty()) {
-          getClient().add(collection, idocs);
-          getClient().commit(collection);
-          indexed += idocs.size();
-          idocs.clear();
-          LOGGER.log(Level.INFO, "Curently changed: {0}", indexed);
-        }
-        if (cursorMark.equals(nextCursorMark)) {
-          done = true;
-        }
-        cursorMark = nextCursorMark;
-      }
-      getClient().commit(collection);
-      LOGGER.log(Level.INFO, "checkStav finished: {0}", indexed);
-      ret.put("checkStav", indexed);
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
-    }
-    return ret;
-  }
+  // IGNORE
+//  public static JSONObject checkStav() {
+//    JSONObject ret = new JSONObject();
+//    String collection = "catalog";
+//
+//    int indexed = 0;
+//    try {
+//      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+//      // Menime z PA -> A
+//      SolrQuery q = new SolrQuery("*").setRows(1000)
+//              .setSort("identifier", SolrQuery.ORDER.desc)
+//              .addFilterQuery("dntstav:PA")
+//              .addFilterQuery("datum_stavu:[* TO NOW/MONTH-6MONTHS]")
+//              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
+//      List<SolrInputDocument> idocs = new ArrayList<>();
+//      boolean done = false;
+//      while (!done) {
+//        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+//        QueryResponse qr = getClient().query(collection, q);
+//        String nextCursorMark = qr.getNextCursorMark();
+//        SolrDocumentList docs = qr.getResults();
+//        for (SolrDocument doc : docs) {
+//          String oldRaw = (String) doc.getFirstValue("raw");
+//
+//          MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
+//
+//          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD).toArray());
+//          mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
+//          mr.historie_stavu = new JSONArray((String) doc.getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
+//          mr.license = (String) doc.getFirstValue("license");
+//          // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
+//          mr.setStav("A", "scheduler");
+//          new HistoryImpl(getClient()).log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
+//
+//          SolrInputDocument idoc = mr.toSolrDoc();
+//          idocs.add(idoc);
+//        }
+//
+//        if (!idocs.isEmpty()) {
+//          getClient().add(collection, idocs);
+//          getClient().commit(collection);
+//          indexed += idocs.size();
+//          idocs.clear();
+//          LOGGER.log(Level.INFO, "Curently changed: {0}", indexed);
+//        }
+//        if (cursorMark.equals(nextCursorMark)) {
+//          done = true;
+//        }
+//        cursorMark = nextCursorMark;
+//      }
+//      getClient().commit(collection);
+//      LOGGER.log(Level.INFO, "checkStav finished: {0}", indexed);
+//      ret.put("checkStav", indexed);
+//    } catch (SolrServerException | IOException ex) {
+//      LOGGER.log(Level.SEVERE, null, ex);
+//      ret.put("error", ex);
+//    }
+//    return ret;
+//  }
 
   //
   public static JSONObject changeStavDirect(String identifier, String newStav, String poznamka, JSONArray granularity, String user ) {
@@ -448,14 +445,13 @@ public class Indexer {
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
       // sync to solr doc
-      mr.toSolrDoc();
-        try {
-          mr.setStav(newStav, poznamka, user);
+      SolrInputDocument sdoc = mr.toSolrDoc();
+      try {
+          mr.setKuratorStav(newStav, user, poznamka);
           if (!granularity.isEmpty()) {
             mr.setGranularity(granularity, poznamka, user);
           }
-          // Update record in catalog
-          getClient().add("catalog", mr.sdoc);
+          getClient().add("catalog", mr.toSolrDoc());
         } catch (SolrServerException| IOException ex) {
           LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
           ret.put("error", ex);
@@ -471,38 +467,39 @@ public class Indexer {
   }
 
   //
-  public static JSONObject changeStav(String identifier, String navrh, String user ) {
-    return changeStav(identifier, navrh, user,getClient());
+  public static JSONObject changeStav(String identifier, String user ) {
+    return changeStav(identifier, user,getClient());
   }
 
-  public static JSONObject changeStav(String identifier, String navrh, String user, SolrClient client ) {
+  public static JSONObject changeStav(String identifier,  String user, SolrClient client) {
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
-      return changeStav(identifier, navrh, user, mr, client);
+      return changeStav(identifier,  user, mr, client);
     } catch (SolrServerException | IOException e) {
       LOGGER.log(Level.SEVERE,e.getMessage(),e);
       return new JSONObject();
     }
   }
 
-  static JSONObject changeStav(String identifier, String navrh, String user, MarcRecord mr, SolrClient client ) {
+  public static JSONObject changeStav(String identifier,  String user, MarcRecord mr, SolrClient client ) {
     JSONObject ret = new JSONObject();
     try {
       // sync to solr doc
       mr.toSolrDoc();
-
       String oldRaw = mr.toJSON().toString();
-      // workflow
-      DocumentWorkflow.valueOf(navrh).change(mr, user,(changedRecord, ident, oldstates, newstates)->{
-        try {
-          LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.dntstav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
-          new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
-          client.add("catalog", mr.sdoc);
-        } catch (SolrServerException| IOException ex) {
-          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-          ret.put("error", ex);
-        }
-      });
+
+
+//      // workflow
+//      DocumentWorkflow.valueOf(navrh).change(mr, user,(changedRecord, ident, oldstates, newstates)->{
+//        try {
+//          LOGGER.info(String.format("Changing state for '%s', old state %s, new state %s, document sync %s", ident, oldstates.toString(), newstates.toString(),new StringBuilder().append(changedRecord.dntstav).append(":").append(changedRecord.sdoc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD))));
+//          new HistoryImpl(client).log(identifier, oldRaw, mr.toJSON().toString(), user, "catalog");
+//          client.add("catalog", mr.sdoc);
+//        } catch (SolrServerException| IOException ex) {
+//          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+//          ret.put("error", ex);
+//        }
+//      });
     } finally {
       SolrUtils.quietCommit(client,"catalog" );
     }

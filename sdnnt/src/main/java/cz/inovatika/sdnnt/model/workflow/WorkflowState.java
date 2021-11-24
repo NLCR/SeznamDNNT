@@ -9,23 +9,30 @@ import java.util.logging.Logger;
 
 /**
  * Reprezentuje workflow stav
- *
  */
 public class WorkflowState {
 
     public static final Logger LOGGER = Logger.getLogger(WorkflowState.class.getName());
 
-    // Kuratorsky stav
+    // Kuratorsky stav objektu
     private CuratorItemState curatorState;
 
-    // workflow owner -
+    // workflow owner - zadost nebo dokument
     private WorkflowOwner workflowOwner;
 
+    // perioda ktera je mezi stavy
     private Period period;
+
+    // datum vypocitane z periody
     private Date date;
+
+    // licence odpovidajici stavu
     private License license;
 
+    // zda se meni licence
     private boolean changingLicence;
+
+    // priznak zda je stav finalni
     private boolean finalSate;
 
     public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date,  Period period, boolean changingLicense, boolean finalSate) {
@@ -63,11 +70,19 @@ public class WorkflowState {
     }
 
 
+    public void switchState(String originator, String user, String poznamka) {
 
+        boolean shouldChangeLicense = false;
+        License expectingLicense = getLicense();
+        if (expectingLicense == null && this.workflowOwner.getLicense() != null) {
+            shouldChangeLicense = true;
+        } else if (expectingLicense != null && this.workflowOwner.getLicense() == null) {
+            shouldChangeLicense = true;
+        } else if (expectingLicense != null && this.workflowOwner.getLicense() != null &&  !expectingLicense.name().equals(this.workflowOwner.getLicense())) {
+            shouldChangeLicense = true;
+        }
 
-    public void applyState() {
-        LOGGER.info(String.format("Switching to state %s with period %s, deadline %s", getCuratorState().name(), getPeriod(), getDate()));
-        this.workflowOwner.setWorkflowState(getCuratorState());
-        this.workflowOwner.applyPeriod(getPeriod());
+        this.workflowOwner.switchWorkflowState(getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense, getPeriod(),originator , user, poznamka);
+        this.workflowOwner.setPeriodBetweenStates(getPeriod());
     }
 }

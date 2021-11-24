@@ -46,7 +46,7 @@
               </mat-button-toggle>
               <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</mat-button-toggle>
 
-              <mat-button-toggle *ngIf="zadost.navrh === 'VNZ' || zadost.navrh === 'VNL'"  value="" [matMenuTriggerFor]="typeVNXMenu" matTooltip="Typ zadosti">
+              <mat-button-toggle *ngIf="(zadost.navrh === 'VNZ' || zadost.navrh === 'VNL') && zadost.state === 'open'"  value="" [matMenuTriggerFor]="typeVNXMenu" matTooltip="Typ zadosti">
                 <mat-icon class="material-icons-outlined">{{ 'no_photography' }}</mat-icon>
                 <ng-container *ngIf="zadost.navrh?.length">{{ zadost.navrh }}</ng-container>
               </mat-button-toggle>

@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
@@ -27,6 +28,8 @@ import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
 /**
  *
@@ -72,7 +75,7 @@ public class CatalogSearcher {
       ret = new JSONObject((String) qresp.get("response"));
       if (ret.getJSONObject("response").getInt("numFound") > 0) {
         List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
-        JSONArray zadosti = findZadosti(ids);
+        JSONArray zadosti = findZadosti(user, ids);
         ret.put("zadosti", zadosti);
         if (user != null) {
           JSONArray notifications = NotificationUtils.findNotifications(ids, user.username, Indexer.getClient());
@@ -165,14 +168,18 @@ public class CatalogSearcher {
   }
 
 
-  private JSONArray findZadosti(List<String> identifiers) {
+  private JSONArray findZadosti(User user, List<String> identifiers) {
     try {
       if (!identifiers.isEmpty()) {
         SolrClient solr = Indexer.getClient();
         String q = identifiers.toString().replace("[", "(").replace("]", ")").replaceAll(",", "");
         SolrQuery query = new SolrQuery("identifiers:" + q)
-                //SolrQuery query = new SolrQuery("identifiers:\"" + identifier + "\"")
-                .setFields("*,process:[json]");
+          .setFields("*,process:[json]").setRows(100);
+
+        // u uzivatele filtrujeme jenom pro konkrentniho uzivatele
+        if (user != null && user.role.equals(Role.user.name())) {
+            query = query.addFilterQuery("user:\"" + user.username+ "\"");
+        }
 
         QueryRequest qreq = new QueryRequest(query);
         NoOpResponseParser rParser = new NoOpResponseParser();
@@ -263,7 +270,7 @@ public class CatalogSearcher {
             .setParam("stats", true)
             .setParam("stats.field","rokvydani")
             .setParam("q.op", "AND")
-            .setFields("*,raw:[json],granularity:[json],historie_stavu:[json]");
+            .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
     
 
     if (req.containsKey("q")) {

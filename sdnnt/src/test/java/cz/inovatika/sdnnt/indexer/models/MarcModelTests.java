@@ -2,12 +2,14 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
+import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,6 +18,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
@@ -60,7 +63,13 @@ public class MarcModelTests {
         Assert.assertTrue(marcRecord.dataFields.containsKey("655"));
         Assert.assertTrue(marcRecord.dataFields.containsKey("998"));
         Assert.assertTrue(marcRecord.dataFields.containsKey("504"));
+
+
+        SolrInputDocument solrInputFields = marcRecord.toSolrDoc();
+        System.out.println(solrInputFields);
+
     }
+
 
     @Test
     public void readFromSOLRDoc() throws IOException, SolrServerException {
@@ -73,6 +82,8 @@ public class MarcModelTests {
 
 
         EasyMock.expect(mockResponse.getResults()).andReturn(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_"))).anyTimes();
+        //EasyMock.expect(mockResponse.).andReturn(mockResponse).anyTimes();
+
         EasyMock.expect(mockClient.query("catalog",q)).andReturn(mockResponse).anyTimes();
         EasyMock.replay(mockClient, mockResponse);
 
@@ -81,6 +92,8 @@ public class MarcModelTests {
         Assert.assertNotNull(marcRecord.dntstav);
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
+
+
     }
 
     @Test
@@ -88,9 +101,34 @@ public class MarcModelTests {
         MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
         Assert.assertNotNull(marcRecord.datum_stavu);
         Assert.assertNotNull(marcRecord.dntstav);
-        Assert.assertTrue(marcRecord.dntstav.size() == 2);
+        Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
-        Assert.assertTrue(marcRecord.dntstav.get(1).equals("N"));
+
+        // nenastaveny kuratorsky stav; vyplni dle verejneho stavu
+        Assert.assertNotNull(marcRecord.kuratorstav);
+        Assert.assertTrue(marcRecord.kuratorstav.equals(Arrays.asList("PA")));
+        Assert.assertNotNull(marcRecord.historie_kurator_stavu);
+        Assert.assertNotNull(marcRecord.datum_krator_stavu);
+        Assert.assertTrue(marcRecord.datum_krator_stavu.equals(marcRecord.datum_stavu));
+
+    }
+
+    @Test
+    public void readFromSolrDoc4() throws IOException, SolrServerException {
+        MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000106789".replaceAll("\\:","_")).get(0));
+        Assert.assertNotNull(marcRecord.datum_stavu);
+        Assert.assertNotNull(marcRecord.dntstav);
+        Assert.assertTrue(marcRecord.dntstav.size() == 1);
+
+        Assert.assertTrue(marcRecord.dntstav.get(0).equals("N"));
+        Assert.assertNotNull(marcRecord.historie_stavu);
+        Assert.assertNotNull(marcRecord.datum_stavu);
+
+        // ma kuratorsky stav, datum i historii
+        Assert.assertNotNull(marcRecord.kuratorstav);
+        Assert.assertTrue(marcRecord.kuratorstav.equals(Arrays.asList("NPA")));
+        Assert.assertNotNull(marcRecord.historie_kurator_stavu);
+        Assert.assertNotNull(marcRecord.datum_krator_stavu);
     }
 
     @Test
@@ -105,6 +143,7 @@ public class MarcModelTests {
     public static SolrDocumentList prepareResultList(String ident) throws IOException {
         SolrDocumentList documentList = new SolrDocumentList();
         documentList.add(MarcModelTestsUtils.prepareResultDocument(ident));
+        documentList.setNumFound(1);
         return documentList;
     }
 

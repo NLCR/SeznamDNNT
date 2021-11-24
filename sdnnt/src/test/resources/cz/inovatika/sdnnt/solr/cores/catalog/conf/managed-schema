@@ -83,15 +83,16 @@
    <field name="sigla" type="string" indexed="true" stored="true" multiValued="true"  />
 
    <field name="rokvydani" type="pints" indexed="true" stored="true" />
-   
+
+	<!-- verejny stav -->
    <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
-   <field name="kuratorstav" type="string" indexed="true" stored="true" multiValued="true"  />
-   <field name="historie_kurator_stavu" type="string" indexed="true" stored="true"  />
-
-
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
    <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
-
+	<!-- kuratorsky stav -->
+   <field name="kuratorstav" type="string" indexed="true" stored="true" multiValued="true"  />
+   <field name="historie_kurator_stavu" type="string" indexed="true" stored="true"  />
+   <field name="datum_kurator_stav" type="date" indexed="true" stored="true" multiValued="false" />
+	<!-- licence -->
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="license_history" type="string" indexed="true" stored="true" multiValued="true" />
 

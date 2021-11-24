@@ -18,14 +18,14 @@
   
   <mat-form-field *ngIf="showSort" fxFlex="120px" class="app-sorting fxHide_md fxHide_sm fxHide_xs">
     <mat-label>{{ 'desc.radit_podle' | translate }}</mat-label>
-    <mat-select [(ngModel)]="state.sort">
-      <mat-select-trigger fxLayout="row" [class.app-sort-trigger]="state.sort">
-        <ng-container *ngIf="state.sort">
-          <span fxFlex>{{ 'sort.' + state.sort.field | translate}}</span>
-          <span><mat-icon class="app-m-0">{{ state.sort.dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon></span>
+    <mat-select [(ngModel)]="state.sort[sortType]">
+      <mat-select-trigger fxLayout="row" [class.app-sort-trigger]="state.sort[sortType]">
+        <ng-container *ngIf="state.sort[sortType]">
+          <span fxFlex>{{ 'sort.' + state.sort[sortType].field | translate}}</span>
+          <span><mat-icon class="app-m-0">{{ state.sort[sortType].dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon></span>
         </ng-container>
       </mat-select-trigger>
-      <mat-option *ngFor="let sort of config.sorts" (click)="sortBy(sort)" [value]="sort" fxLayout="row">
+      <mat-option *ngFor="let sort of config.sorts[sortType]" (click)="sortBy(sort)" [value]="sort" fxLayout="row">
         <span fxFlex>{{ 'sort.' + sort.field | translate }}</span>
         <span><mat-icon class="app-m-0">{{ sort.dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon></span>
       </mat-option>

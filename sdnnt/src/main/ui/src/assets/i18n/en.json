@@ -35,10 +35,12 @@
     "N": "discarded",
     "X": "free",
     "PX": "probably free work",
+
     "NZ": "on-site terminal license",
     "NZN": "proposal for inclusion",
     "VVN": "call for decommissioning",
     "VVS": "call for decommissioning",
+
     "waiting": "waiting",
     "processed": "processed",
     "open": "open",
@@ -669,6 +671,17 @@
     "vice": "More",
     "omezit_na_terminal": "Restrict to terminal",
     "smazat_zadost": "Delete request",
-    "zaznamu": "records"
+    "zaznamu": "records",
+
+    "debug_nzn_0_5wd":"5 working days",
+    "debug_nzn_1_12_18":"1.2 or 1.8",
+    "debug_nzn_2_6m":"6 months",
+    "debug_vn_0_28d":"28 days",
+    "debug_vnl_0_5wd":"5 wokring days",
+    "debug_vnl_1_10wd":"10 days",
+    "debug_vnl_2_18m":"18 months",
+    "debug_vnl_3_5wd":"5 working days"
+
+
   }
 }

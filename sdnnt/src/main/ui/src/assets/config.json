@@ -11,7 +11,8 @@
   },
   "identifiers": ["015a", "020a", "022a"],
   "filterFields": ["dntstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani"],
-  "sorts": [
+  "sorts":{
+    "sort": [
     {"field": "score", "dir": "asc"},
     {"field": "score", "dir": "desc"},
     {"field": "title_sort", "dir": "asc"},
@@ -21,6 +22,34 @@
     {"field": "datestamp", "dir": "asc"},
     {"field": "datestamp", "dir": "desc"}
   ],
+
+  "sort_account": [
+    {"field": "deadline", "dir": "asc"},
+    {"field": "deadline", "dir": "desc"},
+    {"field": "priority", "dir": "asc"},
+    {"field": "priority", "dir": "desc"},
+
+    {"field": "datum_zadani", "dir": "asc"},
+    {"field": "datum_zadani", "dir": "desc"},
+
+    {"field": "datum_vyrizeni", "dir": "asc"},
+    {"field": "datum_vyrizeni", "dir": "desc"}
+
+  ],
+
+  "user_sort_account": [
+
+    {"field": "datum_zadani", "dir": "asc"},
+    {"field": "datum_zadani", "dir": "desc"},
+
+    {"field": "datum_vyrizeni", "dir": "asc"},
+    {"field": "datum_vyrizeni", "dir": "desc"}
+
+  ]
+
+},
+
+
   "loginTimeOut" : 240,
   "homeCards": [
     {"field": "A", "type": "stav"},

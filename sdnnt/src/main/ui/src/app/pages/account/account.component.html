@@ -146,7 +146,7 @@
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div>
-          <app-paginator [numFound]="numFound"  [showSort]="true"></app-paginator>
+          <app-paginator [numFound]="numFound"  [showSort]="true" [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
         </div>
       </div>
       <div class="app-results-wrapper">
@@ -212,12 +212,18 @@
             <td mat-cell *matCellDef="let element">{{ element.deadline | date : 'dd.MM.yyyy HH:mm' }}</td>
           </ng-container>
 
+
           <ng-container matColumnDef="period">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.period' | translate }}</th>
-            <td mat-cell *matCellDef="let element">{{ element.type_of_period | translate }}</td>
+            <td mat-cell *matCellDef="let element">{{ element.type_of_period ?  ('desc.'+element.type_of_period | translate) : '' }}</td>
           </ng-container>
 
-          
+
+          <ng-container matColumnDef="desiredstate">
+            <th mat-header-cell *matHeaderCellDef>{{ 'desc.desiredstate' | translate }}</th>
+            <td mat-cell *matCellDef="let element">{{ element.desired_item_state && element.desired_license ? ""+element.desired_item_state+" - ("+element.desired_license+")" : (element.desired_item_state ? ""+element.desired_item_state : "") }}</td>
+          </ng-container>
+
           <ng-container matColumnDef="pozadavek">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.pozadavek" matTooltipPosition="above">
@@ -250,7 +256,8 @@
                 <mat-button-toggle *ngIf="element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">done</mat-icon>
                 </mat-button-toggle>
-                <mat-button-toggle [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest()">
+                <mat-button-toggle  *ngIf="((state.user.role === 'user' || state.user.role === 'knihovna') && element.state === 'open') ||
+                (state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')" [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest(element)">
                   <mat-icon class="material-icons-outlined app-color-warning">clear</mat-icon>
                 </mat-button-toggle>
               </mat-button-toggle-group>
@@ -262,7 +269,7 @@
         </table>
       </div>
       <div class="app-mt-4">
-        <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
+        <app-paginator [numFound]="numFound" [showSort]="false" ></app-paginator>
       </div>
     </div>
   </div>

@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { AppService } from 'src/app/app.service';
+import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
   selector: 'app-dialog-delete-request',
@@ -7,13 +11,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DialogDeleteRequestComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private router: Router,
+    private service: AppService,
+    @Inject(MAT_DIALOG_DATA) public data: Zadost
+  ) { }
 
   ngOnInit(): void {
   }
 
   deleteRequest() {
-    // metoda pro smazani zadosti
+    this.service.deleteZadost(this.data).subscribe(res => {
+      if (res.error) {
+        this.service.showSnackBar('alert.smazani_zadosti_error', res.error, true);
+      } else {
+        this.service.showSnackBar('alert.smazani_zadosti_success', '', false);
+      }
+    });
   }
 
 }

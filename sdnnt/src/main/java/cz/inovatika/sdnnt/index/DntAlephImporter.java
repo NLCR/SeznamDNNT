@@ -1,11 +1,16 @@
 package cz.inovatika.sdnnt.index;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import cz.inovatika.sdnnt.index.utils.HarvestDebug;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -90,10 +95,18 @@ public class DntAlephImporter {
         try (CloseableHttpResponse response1 = client.execute(httpGet)) {
           final HttpEntity entity = response1.getEntity();
           if (entity != null) {
+
+            InputStream dStream = null;
+            File dFile = null;
+
             try (InputStream is = entity.getContent()) {
+
+              dFile = HarvestDebug.debugFile("dnt", is, url);
+              dStream = new FileInputStream(dFile);
+
               reqTime += new Date().getTime() - start;
               start = new Date().getTime();
-              resumptionToken = readFromXML(is);
+              resumptionToken = readFromXML(dStream);
               procTime += new Date().getTime() - start;
               start = new Date().getTime();
               if (!recs.isEmpty()) {
@@ -103,12 +116,18 @@ public class DntAlephImporter {
               }
 
               solrTime += new Date().getTime() - start;
-              is.close();
+
+              dStream.close();
+
+              Files.delete(dFile.toPath());
+              Files.delete(dFile.getParentFile().toPath());
+
             }
           }
         }
 
         while (resumptionToken != null) {
+
           start = new Date().getTime();
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
           LOGGER.log(Level.INFO, "Getting {0}...", resumptionToken);
@@ -117,10 +136,19 @@ public class DntAlephImporter {
           try (CloseableHttpResponse response1 = client.execute(httpGet)) {
             final HttpEntity entity = response1.getEntity();
             if (entity != null) {
+
+              InputStream dStream = null;
+              File dFile = null;
+
               try (InputStream is = entity.getContent()) {
+
+                dFile = HarvestDebug.debugFile("dnt", is, url);
+                dStream = new FileInputStream(dFile);
+
                 reqTime += new Date().getTime() - start;
                 start = new Date().getTime();
-                resumptionToken = readFromXML(is);
+                resumptionToken = readFromXML(dStream);
+
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
@@ -134,7 +162,12 @@ public class DntAlephImporter {
                     DurationFormatUtils.formatDurationHMS(solrTime)});
                   recs.clear();
                 }
-                is.close();
+
+                dStream.close();
+
+                Files.delete(dFile.toPath());
+                Files.delete(dFile.getParentFile().toPath());
+
               }
             }
           }
@@ -177,150 +210,151 @@ public class DntAlephImporter {
     }
   }
 
-  private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
-    List<SolrInputDocument> idocs = new ArrayList<>();
 
-    DateFormat dformat = new SimpleDateFormat("yyyyMMdd");
-    for (MarcRecord rec : recs) {
-      SolrDocumentList docs = find(rec);
-      if (docs == null) {
-
-      } else if (docs.getNumFound() == 0) {
-        LOGGER.log(Level.WARNING, "Record " + rec.identifier + " not found in catalog");
-        ret.append("errors", "Record " + rec.identifier + " not found in catalog.");
-        idocs.add(rec.toSolrDoc());
-      } else if (docs.getNumFound() > 1) {
-        LOGGER.log(Level.WARNING, "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
-        // ret.append("errors", "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
-      }
-
-      for (SolrDocument doc : docs) {
-        SolrInputDocument idoc = new SolrInputDocument();
-        for (String name : doc.getFieldNames()) {
-          idoc.addField(name, doc.getFieldValue(name));
-        }
-
-        idoc.removeField("dntstav");
-        idoc.removeField("indextime");
-        idoc.removeField("_version_");
-
-        JSONArray hs = new JSONArray();
-        if (rec.dataFields.containsKey("992")) {
-          Date datum_stavu = new Date();
-          datum_stavu.setTime(0);
-          for (DataField df : rec.dataFields.get("992")) {
-            JSONObject h = new JSONObject();
-            String stav = df.getSubFields().get("s").get(0).getValue();
-            if (df.getSubFields().containsKey("s")) {
-              h.put("stav", stav);
-            }
-            if (df.getSubFields().containsKey("a")) {
-              String ds = df.getSubFields().get("a").get(0).getValue();
-              try {
-                Date d = dformat.parse(ds);
-                h.put("date", ds);
-                if (d.after(datum_stavu)) {
-                  idoc.setField("datum_stavu", d);
-                  datum_stavu = d;
-                }
-              } catch (ParseException pex) {
-                LOGGER.warning(pex.getMessage());
-              }
-
-            }
-            if (df.getSubFields().containsKey("b")) {
-              h.put("user", df.getSubFields().get("b").get(0).getValue());
-            }
-            if (df.getSubFields().containsKey("p")) {
-              h.put("comment", df.getSubFields().get("p").get(0).getValue());
-            }
-
-            if ("NZ".equals(stav)) {
-              h.put("license", "dnntt");
-            } else if ("A".equals(stav) && !idoc.containsKey("license")) {
-              h.put("license", "dnnto");
-            }
-            // System.out.println(h);
-            hs.put(h);
-          }
-          idoc.setField("historie_stavu", hs.toString());
-        }
-
-        // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
-        if (rec.dataFields.containsKey("990")) {
-          for (DataField df : rec.dataFields.get("990")) {
-            //JSONObject h = new JSONObject();
-            if (df.getSubFields().containsKey("a")) {
-              String stav = df.getSubFields().get("a").get(0).getValue();
-              //h.put("dntstav", dntstav);
-              idoc.addField("dntstav", stav);
-              if ("NZ".equals(stav)) {
-                idoc.setField("license", "dnntt");
-              } else if ("A".equals(stav) && !idoc.containsKey("license")) {
-                idoc.setField("license", "dnnto");
-              }
-            }
-          }
-        }
-
-        idocs.add(idoc);
-
-      }
-
-      if (!idocs.isEmpty()) {
-        Indexer.getClient().add("catalog", idocs);
-        idocs.clear();
-      }
-
-    }
-    if (!idocs.isEmpty()) {
-      Indexer.getClient().add("catalog", idocs);
-      idocs.clear();
-    }
-  }
-
-  private SolrDocumentList find(MarcRecord mr) {
-    // JSONObject ret = new JSONObject();
-    try {
-
-      // MarcRecord mr = MarcRecord.fromRAWJSON(source);
-      mr.toSolrDoc();
-      String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
-              + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
-              + " AND controlfield_008:\"" + mr.sdoc.getFieldValue("controlfield_008") + "\")"
-              // + " OR marc_020a:\"" + mr.sdoc.getFieldValue("marc_020a") + "\""
-              + " OR marc_015a:\"" + mr.sdoc.getFieldValue("marc_015a") + "\""
-              + " OR dedup_fields:\"" + mr.sdoc.getFieldValue("dedup_fields") + "\"";
-      if (mr.dataFields.containsKey("020")) {
-        for (DataField df : mr.dataFields.get("020")) {
-          if (df.getSubFields().containsKey("a")) {
-            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
-          }
-        }
-      }
-      if (mr.dataFields.containsKey("902")) {
-        for (DataField df : mr.dataFields.get("902")) {
-          if (df.getSubFields().containsKey("a")) {
-            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
-          }
-        }
-      }
-
-      SolrQuery query = new SolrQuery(q)
-              .setRows(20)
-              .setFields("*");
-      SolrDocumentList docs = Indexer.getClient().query("catalog", query).getResults();
-      if (docs.getNumFound() == 0) {
-        LOGGER.log(Level.WARNING, "Query " + q + " not found in catalog");
-      }
-      return docs;
-
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-    // return ret;
-  }
+// Commented by ps
+//  private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
+//    List<SolrInputDocument> idocs = new ArrayList<>();
+//
+//    DateFormat dformat = new SimpleDateFormat("yyyyMMdd");
+//    for (MarcRecord rec : recs) {
+//      SolrDocumentList docs = find(rec);
+//      if (docs == null) {
+//
+//      } else if (docs.getNumFound() == 0) {
+//        LOGGER.log(Level.WARNING, "Record " + rec.identifier + " not found in catalog");
+//        ret.append("errors", "Record " + rec.identifier + " not found in catalog.");
+//        idocs.add(rec.toSolrDoc());
+//      } else if (docs.getNumFound() > 1) {
+//        LOGGER.log(Level.WARNING, "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
+//        // ret.append("errors", "For" + rec.identifier + " found more than one record in catalog: " + docs.stream().map(d -> (String) d.getFirstValue("identifier")).collect(Collectors.joining()));
+//      }
+//
+//      for (SolrDocument doc : docs) {
+//        SolrInputDocument idoc = new SolrInputDocument();
+//        for (String name : doc.getFieldNames()) {
+//          idoc.addField(name, doc.getFieldValue(name));
+//        }
+//
+//        idoc.removeField("dntstav");
+//        idoc.removeField("indextime");
+//        idoc.removeField("_version_");
+//
+//        JSONArray hs = new JSONArray();
+//        if (rec.dataFields.containsKey("992")) {
+//          Date datum_stavu = new Date();
+//          datum_stavu.setTime(0);
+//          for (DataField df : rec.dataFields.get("992")) {
+//            JSONObject h = new JSONObject();
+//            String stav = df.getSubFields().get("s").get(0).getValue();
+//            if (df.getSubFields().containsKey("s")) {
+//              h.put("stav", stav);
+//            }
+//            if (df.getSubFields().containsKey("a")) {
+//              String ds = df.getSubFields().get("a").get(0).getValue();
+//              try {
+//                Date d = dformat.parse(ds);
+//                h.put("date", ds);
+//                if (d.after(datum_stavu)) {
+//                  idoc.setField("datum_stavu", d);
+//                  datum_stavu = d;
+//                }
+//              } catch (ParseException pex) {
+//                LOGGER.warning(pex.getMessage());
+//              }
+//
+//            }
+//            if (df.getSubFields().containsKey("b")) {
+//              h.put("user", df.getSubFields().get("b").get(0).getValue());
+//            }
+//            if (df.getSubFields().containsKey("p")) {
+//              h.put("comment", df.getSubFields().get("p").get(0).getValue());
+//            }
+//
+//            if ("NZ".equals(stav)) {
+//              h.put("license", "dnntt");
+//            } else if ("A".equals(stav) && !idoc.containsKey("license")) {
+//              h.put("license", "dnnto");
+//            }
+//            // System.out.println(h);
+//            hs.put(h);
+//          }
+//          idoc.setField("historie_stavu", hs.toString());
+//        }
+//
+//        // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
+//        if (rec.dataFields.containsKey("990")) {
+//          for (DataField df : rec.dataFields.get("990")) {
+//            //JSONObject h = new JSONObject();
+//            if (df.getSubFields().containsKey("a")) {
+//              String stav = df.getSubFields().get("a").get(0).getValue();
+//              //h.put("dntstav", dntstav);
+//              idoc.addField("dntstav", stav);
+//              if ("NZ".equals(stav)) {
+//                idoc.setField("license", "dnntt");
+//              } else if ("A".equals(stav) && !idoc.containsKey("license")) {
+//                idoc.setField("license", "dnnto");
+//              }
+//            }
+//          }
+//        }
+//
+//        idocs.add(idoc);
+//
+//      }
+//
+//      if (!idocs.isEmpty()) {
+//        Indexer.getClient().add("catalog", idocs);
+//        idocs.clear();
+//      }
+//
+//    }
+//    if (!idocs.isEmpty()) {
+//      Indexer.getClient().add("catalog", idocs);
+//      idocs.clear();
+//    }
+//  }
+// Commented by ps
+//  private SolrDocumentList find(MarcRecord mr) {
+//    try {
+//
+//      // MarcRecord mr = MarcRecord.fromRAWJSON(source);
+//      mr.toSolrDoc();
+//      String q = "(controlfield_001:\"" + mr.sdoc.getFieldValue("controlfield_001") + "\""
+//              + " AND marc_040a:\"" + mr.sdoc.getFieldValue("marc_040a") + "\""
+//              + " AND controlfield_008:\"" + mr.sdoc.getFieldValue("controlfield_008") + "\")"
+//              // + " OR marc_020a:\"" + mr.sdoc.getFieldValue("marc_020a") + "\""
+//              + " OR marc_015a:\"" + mr.sdoc.getFieldValue("marc_015a") + "\""
+//              + " OR dedup_fields:\"" + mr.sdoc.getFieldValue("dedup_fields") + "\"";
+//      if (mr.dataFields.containsKey("020")) {
+//        for (DataField df : mr.dataFields.get("020")) {
+//          if (df.getSubFields().containsKey("a")) {
+//            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+//          }
+//        }
+//      }
+//      if (mr.dataFields.containsKey("902")) {
+//        for (DataField df : mr.dataFields.get("902")) {
+//          if (df.getSubFields().containsKey("a")) {
+//            q += " OR marc_020a:\"" + df.getSubFields().get("a").get(0).getValue() + "\"";
+//          }
+//        }
+//      }
+//
+//      SolrQuery query = new SolrQuery(q)
+//              .setRows(20)
+//              .setFields("*");
+//      SolrDocumentList docs = Indexer.getClient().query("catalog", query).getResults();
+//      if (docs.getNumFound() == 0) {
+//        LOGGER.log(Level.WARNING, "Query " + q + " not found in catalog");
+//      }
+//      return docs;
+//
+//    } catch (SolrServerException | IOException ex) {
+//      LOGGER.log(Level.SEVERE, null, ex);
+//      return null;
+//    }
+//    // return ret;
+//  }
 
   private String readFromXML(InputStream is) throws XMLStreamException {
 
@@ -501,7 +535,7 @@ public class DntAlephImporter {
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();
             sfs.add(new SubField(code, val));
-            mr.sdoc.addField("marc_" + tag + code, val);
+            //mr.sdoc.addField("" + tag + code, val);
           }
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();

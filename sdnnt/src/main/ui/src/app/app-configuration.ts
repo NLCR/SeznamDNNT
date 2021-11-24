@@ -56,9 +56,11 @@ import { User } from './shared/user';
         return this.config.sorts;
     }
 
+
     public get pinginterval() {
         return this.config.pinginterval || 10;
     }
+
 
     //pinginterval: number;
 
