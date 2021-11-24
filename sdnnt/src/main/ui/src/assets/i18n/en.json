@@ -691,7 +691,14 @@
     "desiredstate" : "Feature state/license",
     "period" : "Period",
     "deadline" : "Processing deadline",
+    "verze_zadosti": "He carries requests",
+    "id": "Id",
+    "priorita": "Priority",
+    "vnz_memorandum": "VNZ Memorandum",
+    "vnl_memorandum": "VNL Memorandum",
 
-    "verze_zadosti": "He carries requests"
+    "delogovat_na_jineho_uzivatele": "Delegate to another user",
+    "nastavit_prioritu": "Set priority",
+    "typ_zadosti": "Type of request"
   }
 }

@@ -691,8 +691,14 @@
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",
     "deadline" : "Čas vyřízení/přepnutí",
-
     "verze_zadosti": "Veze žádosti",
-    "id": "Id"
+    "id": "Id",
+    "priorita": "Priorita",
+    "vnz_memorandum": "VNZ Memorandum",
+    "vnl_memorandum": "VNL Memorandum",
+
+    "delogovat_na_jineho_uzivatele": "Delegovat na jiného uživatele",
+    "nastavit_prioritu": "Nastavit prioritu",
+    "typ_zadosti": "Typ žádosti"
   }
 }
