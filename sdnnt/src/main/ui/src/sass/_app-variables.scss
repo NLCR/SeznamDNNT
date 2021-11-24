@@ -20,6 +20,8 @@ $states: (
   "A": mat-color($mat-indigo, $state_shade),
   "VS": mat-color($mat-cyan, $state_shade),
   "VN": mat-color($mat-teal, $state_shade),
+  "VNL": mat-color($mat-cyan, $state_shade),
+  "VNZ": mat-color($mat-teal, $state_shade),
   "N": mat-color($mat-green, $state_shade),
   "X": mat-color($mat-gray, $state_shade),
   "NZN": mat-color($mat-blue-gray, $state_shade),

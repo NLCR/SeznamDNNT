@@ -55,13 +55,15 @@
       "PA": "Dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
       "A": "Zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
       "VS": "Vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
-      "VN": "Vyřazeno – dílo bylo na Návrhu seznamu (PA), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
-      "N": "Vyřazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
+      "VN": "Výzva k vyřazení",
+      "VNL": "Výzva k omezení na terminál",
+      "VNZ": "Výzva k omezení na terminál",
+      "N": "Vyřazeno",
       "X": "Volné",
       "PX": "Pravděpodobná volná díla",
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
-      "NZN": "Návrh k zařazení do Návrhu seznamu (interní stav administrace)",
+      "NZN": "Návrh k zařazení",
       "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
       "VVS": "Výzva k vyřazení ze Seznamu (interní stav administrace)"
     }
@@ -593,8 +595,8 @@
 
     "navrzeno_na_zarazeni": "Zařazení",
     "navrzeno_na_vyrazeni": "Vyřazení",
-    "navrzeno_na_omezeni_vnl": "Omezení, článek 8",
-    "navrzeno_na_omezeni_vnz": "Omezení, článek X",
+    "navrzeno_na_omezeni_vnl": "Terminál/VNL",
+    "navrzeno_na_omezeni_vnz": "Terminál/VNZ ",
 
     "nedoreseno": "Nedořešeno",
     "fyzicka_osoba": "Fyzická osoba",
@@ -696,7 +698,7 @@
     "debug_vnl_3_5wd":"5 pracovních dnů",
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",
-    "deadline" : "Čas vyřízení/přepnutí",
+    "deadline" : "Čas uzávěrky/přepnutí",
     "verze_zadosti": "Veze žádosti",
     "id": "Id",
     "priorita": "Priorita",
@@ -706,5 +708,15 @@
     "delogovat_na_jineho_uzivatele": "Delegovat na jiného uživatele",
     "nastavit_prioritu": "Nastavit prioritu",
     "typ_zadosti": "Typ žádosti"
+  },
+
+  "acts": {
+    "schvalit_npa":"Schvalit změnu stavu na NPA",
+    "schvalit_zmenu_stavu":"Schvalit změnu stavu",
+    "schvalit_pouze_na_terminalu":"Schválit pouze na terminálu",
+    "odmitnout_zmenu":"Odmítnout změnu",
+    "dilo_publikovano":"Dílo bylo nakladatelem publikováno"
+
   }
+
 }

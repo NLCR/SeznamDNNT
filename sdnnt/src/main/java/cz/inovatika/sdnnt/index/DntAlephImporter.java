@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.index;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.index.utils.HarvestDebug;
+import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
@@ -41,6 +42,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
 /**
  * Importuje set DNT z Alephu pomoci OAI Hleda zaznam z SKC (catalog) a nastavi
@@ -202,12 +205,105 @@ public class DntAlephImporter {
     List<SolrInputDocument> idocs = new ArrayList<>();
 
     for (MarcRecord rec : recs) {
-      idocs.add(rec.toSolrDoc());
+      idocs.add(toSolrDoc(rec));
     }
     if (!idocs.isEmpty()) {
       Indexer.getClient().add("catalog", idocs);
       idocs.clear();
     }
+  }
+
+
+
+  public SolrInputDocument toSolrDoc(MarcRecord rec) {
+    SolrInputDocument sdoc = new SolrInputDocument();
+    if (sdoc.isEmpty()) {
+      MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);
+    }
+    sdoc.setField(IDENTIFIER_FIELD, rec.identifier);
+    sdoc.setField(DATESTAMP_FIELD, rec.datestamp);
+    sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
+    sdoc.setField(LEADER_FIELD, rec.leader);
+    sdoc.setField(RAW_FIELD, rec.toJSON().toString());
+
+//    sdoc.setField(HISTORIE_STAVU_FIELD, rec.historie_stavu.toString());
+//    sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, rec.historie_kurator_stavu.toString());
+
+    // Control fields
+    for (String cf : rec.controlFields.keySet()) {
+      sdoc.addField("controlfield_" + cf, rec.controlFields.get(cf));
+    }
+
+    sdoc.setField(RECORD_STATUS_FIELD, rec.leader.substring(5, 6));
+    sdoc.setField(TYPE_OF_RESOURCE_FIELD, rec.leader.substring(6, 7));
+    sdoc.setField(ITEM_TYPE_FIELD, rec.leader.substring(7, 8));
+
+    MarcRecordUtilsToRefactor.setFMT(sdoc, rec.leader.substring(6, 7), rec.leader.substring(7, 8));
+
+
+    if (sdoc.containsKey(MARC_264_B)) {
+      String val = (String) sdoc.getFieldValue(MARC_264_B);
+      sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
+    } else if (sdoc.containsKey(MARC_260_B)) {
+      String val = (String) sdoc.getFieldValue(MARC_260_B);
+      sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
+    }
+
+    if (sdoc.containsKey(MARC_910_A)) {
+      List<String> collected = sdoc.getFieldValues(MARC_910_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+    } else if (sdoc.containsKey(MARC_040_A)) {
+      List<String> collected = sdoc.getFieldValues(MARC_040_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+    }
+
+    // https://www.loc.gov/marc/bibliographic/bd008a.html
+    if (rec.controlFields.containsKey("008") && rec.controlFields.get("008").length() > 37) {
+      sdoc.setField("language", rec.controlFields.get("008").substring(35, 38));
+      sdoc.setField("place_of_pub", rec.controlFields.get("008").substring(15, 18));
+      sdoc.setField("type_of_date", rec.controlFields.get("008").substring(6, 7));
+      String date1 = rec.controlFields.get("008").substring(7, 11);
+      String date2 = rec.controlFields.get("008").substring(11, 15);
+      sdoc.setField("date1", date1);
+      sdoc.setField("date2", date2);
+      try {
+        sdoc.setField("date1_int", Integer.parseInt(date1));
+      } catch (NumberFormatException ex) {
+      }
+      try {
+        sdoc.setField("date2_int", Integer.parseInt(date2));
+      } catch (NumberFormatException ex) {
+      }
+    }
+
+    MarcRecordUtilsToRefactor.setIsProposable(sdoc);
+
+    sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+
+    //245a (název): 245b (podnázev). 245n (číslo dílu/části), 245p (název části/dílu) / 245c (autoři, překlad, ilustrátoři apod.)
+    String nazev = "";
+    if (sdoc.containsKey("marc_245a")) {
+      nazev += sdoc.getFieldValue("marc_245a") + " ";
+    }
+    if (sdoc.containsKey("marc_245b")) {
+      nazev += sdoc.getFieldValue("marc_245b") + " ";
+    }
+    if (sdoc.containsKey("marc_245p")) {
+      nazev += sdoc.getFieldValue("marc_245p") + " ";
+    }
+    if (sdoc.containsKey("marc_245c")) {
+      nazev += sdoc.getFieldValue("marc_245c") + " ";
+    }
+    if (sdoc.containsKey("marc_245i")) {
+      nazev += sdoc.getFieldValue("marc_245i") + " ";
+    }
+    if (sdoc.containsKey("marc_245n")) {
+      nazev += sdoc.getFieldValue("marc_245n") + " ";
+    }
+    sdoc.setField("nazev", nazev.trim());
+    MarcRecordUtilsToRefactor.addRokVydani(sdoc);
+
+    return sdoc;
   }
 
 

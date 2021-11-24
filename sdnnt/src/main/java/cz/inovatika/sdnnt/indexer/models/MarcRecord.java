@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -375,7 +376,7 @@ public class MarcRecord {
     return sdoc;
   }
 
-  private String nakladatelFormat(String val) {
+  public static String nakladatelFormat(String val) {
     if (val != null) {
       String trimmed = val.trim();
       AtomicReference<String> retVal = new AtomicReference(trimmed);
@@ -405,10 +406,9 @@ public class MarcRecord {
 //    toSolrDoc();
 //  }
 
-  public void setKuratorStav(String kstav, String pstav, String user, String poznamka) {
+  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka) {
     CuratorItemState curatorItemState = CuratorItemState.valueOf(kstav);
-    changedState( user, pstav, curatorItemState.name(), poznamka);
-    changeLicenseIfNeeded(kstav);
+    changedState( user, pstav, curatorItemState.name(), license, poznamka);
     toSolrDoc();
   }
 
@@ -423,57 +423,64 @@ public class MarcRecord {
 
   public void setGranularity(JSONArray granularity, String comment, String user) {
     this.granularity = granularity;
-//    if (granularity != null) {
-//      for (int i = 0; i<granularity.length(); i++)
-//    }
   }
 
 
-  private void changedState( String user, String publicState, String kuratorState, String comment) {
-    // sync state
+  private void changedState( String user, String publicState, String kuratorState, String license, String comment) {
     toSolrDoc();
-
     Date now = Calendar.getInstance().getTime();
-
-    if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty() && !this.dntstav.get(0).equals(publicState))) {
+    if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty())) {
       this.dntstav = Arrays.asList(publicState);
       this.datum_stavu = now;
-      JSONObject h = new JSONObject().put("stav", publicState).put("date", FORMAT.format(datum_stavu)).put("user", user).put("comment", comment);
+      JSONObject h = new JSONObject().put("stav", publicState).
+              put("date", FORMAT.format(datum_stavu)).
+              put("user", user).
+              put("comment", comment);
+
+      if (license != null) {  h.put("license", license); }
       this.historie_stavu.put(h);
 
-      this.changeLicenseIfNeeded(this.dntstav.get(0));
     }
 
     this.kuratorstav = Arrays.asList(kuratorState);
     this.datum_krator_stavu = now;
 
     JSONObject kh = new JSONObject().put("stav", kuratorState).put("date", FORMAT.format(datum_krator_stavu)).put("user", user).put("comment", comment);
+    if (license != null) {  kh.put("license", license); }
+
     this.historie_kurator_stavu.put(kh);
+
+    changeLicenseIfNeeded(kuratorState, license);
   }
 
-  private void changeLicenseIfNeeded(String nState) {
+  private void changeLicenseIfNeeded(String nState, String license) {
     CuratorItemState cstate = CuratorItemState.valueOf(nState);
     String oldLicense = this.license;
       switch (cstate) {
-        case NPA:
         case PA:
         case A:
-          if (this.license == null) {
-            this.license = License.dnnto.name();
-            if (licenseHistory == null) {
-              licenseHistory = new ArrayList<>();
-            }
+          if (licenseHistory == null) { licenseHistory = new ArrayList<>(); }
+          if (this.license != null) {
+              this.license = license;
+          } else {
+              this.license = License.dnnto.name();
           }
         break;
 
-        case N:
+        case NLX:
+          if (licenseHistory == null) { licenseHistory = new ArrayList<>(); }
+          if (this.license == null) {
+            this.license = license;
+          }
+        break;
+
+        default:
+          if (licenseHistory == null) {  licenseHistory = new ArrayList<>(); }
           if (this.license != null) {
-            if (licenseHistory == null) {
-              licenseHistory = new ArrayList<>();
-            }
             licenseHistory.add(oldLicense);
             this.license = null;
           }
+        break;
       }
   }
 

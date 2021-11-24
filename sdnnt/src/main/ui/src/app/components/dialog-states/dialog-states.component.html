@@ -8,7 +8,16 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  
+
+  <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap app-mb-4" *ngIf="newState == 'PA' || newState == 'A'">
+    <mat-label>{{ 'desc.licence' | translate }}</mat-label>
+    <mat-select name="newState" [(ngModel)]="newLicense">
+      <mat-option *ngFor="let l of ['dnntt', 'dnnto']" [value]="l" >
+        {{ l }} - {{ 'license.' + l | translate }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4" *ngIf="shouldShowGranularity()">
     <thead>
       <tr>

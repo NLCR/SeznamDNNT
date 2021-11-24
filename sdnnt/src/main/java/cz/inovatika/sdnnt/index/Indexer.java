@@ -382,89 +382,23 @@ public class Indexer {
   }
 
 
-  // IGNORE
-//  public static JSONObject checkStav() {
-//    JSONObject ret = new JSONObject();
-//    String collection = "catalog";
-//
-//    int indexed = 0;
-//    try {
-//      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
-//      // Menime z PA -> A
-//      SolrQuery q = new SolrQuery("*").setRows(1000)
-//              .setSort("identifier", SolrQuery.ORDER.desc)
-//              .addFilterQuery("dntstav:PA")
-//              .addFilterQuery("datum_stavu:[* TO NOW/MONTH-6MONTHS]")
-//              .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
-//      List<SolrInputDocument> idocs = new ArrayList<>();
-//      boolean done = false;
-//      while (!done) {
-//        q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
-//        QueryResponse qr = getClient().query(collection, q);
-//        String nextCursorMark = qr.getNextCursorMark();
-//        SolrDocumentList docs = qr.getResults();
-//        for (SolrDocument doc : docs) {
-//          String oldRaw = (String) doc.getFirstValue("raw");
-//
-//          MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
-//
-//          mr.dntstav = Arrays.asList((String[]) doc.getFieldValues(MarcRecordFields.DNTSTAV_FIELD).toArray());
-//          mr.datum_stavu = (Date) doc.getFirstValue("datum_stavu");
-//          mr.historie_stavu = new JSONArray((String) doc.getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
-//          mr.license = (String) doc.getFirstValue("license");
-//          // mr.license_history = new JSONArray((String) doc.getFirstValue("license_history"));
-//          mr.setStav("A", "scheduler");
-//          new HistoryImpl(getClient()).log(mr.identifier, oldRaw, mr.toJSON().toString(), "scheduler", "catalog");
-//
-//          SolrInputDocument idoc = mr.toSolrDoc();
-//          idocs.add(idoc);
-//        }
-//
-//        if (!idocs.isEmpty()) {
-//          getClient().add(collection, idocs);
-//          getClient().commit(collection);
-//          indexed += idocs.size();
-//          idocs.clear();
-//          LOGGER.log(Level.INFO, "Curently changed: {0}", indexed);
-//        }
-//        if (cursorMark.equals(nextCursorMark)) {
-//          done = true;
-//        }
-//        cursorMark = nextCursorMark;
-//      }
-//      getClient().commit(collection);
-//      LOGGER.log(Level.INFO, "checkStav finished: {0}", indexed);
-//      ret.put("checkStav", indexed);
-//    } catch (SolrServerException | IOException ex) {
-//      LOGGER.log(Level.SEVERE, null, ex);
-//      ret.put("error", ex);
-//    }
-//    return ret;
-//  }
 
   //
-  public static JSONObject changeStavDirect(String identifier, String newStav, String poznamka, JSONArray granularity, String user ) {
+  public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user ) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
-      try {
-        CuratorItemState kstav = CuratorItemState.valueOf(newStav);
-        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
-        mr.setKuratorStav(kstav.name(),pstav.name() , user, poznamka);
-          if (!granularity.isEmpty()) {
-            mr.setGranularity(granularity, poznamka, user);
-          }
-          getClient().add("catalog", mr.toSolrDoc());
-        } catch (SolrServerException| IOException ex) {
-          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-          ret.put("error", ex);
-        }
-        
-    } catch (SolrServerException | IOException e) {
-      LOGGER.log(Level.SEVERE,e.getMessage(),e);
-      return new JSONObject();
+      CuratorItemState kstav = CuratorItemState.valueOf(newStav);
+      PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
+      if (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+        mr.license  = licence;
+      }
+      mr.setKuratorStav(kstav.name(),pstav.name(), licence , user, poznamka);
+
+      if (!granularity.isEmpty()) {  mr.setGranularity(granularity, poznamka, user); }
+      getClient().add("catalog", mr.toSolrDoc());
     } finally {
       SolrUtils.quietCommit(getClient(),"catalog" );
     }

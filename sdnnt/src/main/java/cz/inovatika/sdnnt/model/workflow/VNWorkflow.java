@@ -35,7 +35,7 @@ public class VNWorkflow extends Workflow {
     @Override
     public boolean isSwitchPossible() {
         CuratorItemState cstate = this.getOwner().getWorkflowState();
-        return (cstate == null || Arrays.asList(A, PA, X, PX).contains(cstate));
+        return (cstate == null || Arrays.asList(A, PA, X, PX, NL).contains(cstate));
     }
 
 

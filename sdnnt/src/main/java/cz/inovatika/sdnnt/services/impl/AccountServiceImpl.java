@@ -188,7 +188,8 @@ public class AccountServiceImpl implements AccountService {
                 inform.saved(zadost);
             }
             SolrUtils.quietCommit(solr, "zadost");
-            return VersionStringCast.cast(zadost.toJSON());
+            return VersionStringCast.cast(getRequest(zadost.getId()));
+            //return VersionStringCast.cast(zadost.toJSON());
         } catch(BaseHttpSolrClient.RemoteSolrException ex) {
             if (ex.code() == 409) {
                 if (this.resourceServiceService != null) {

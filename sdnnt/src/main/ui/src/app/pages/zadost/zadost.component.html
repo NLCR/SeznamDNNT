@@ -37,11 +37,11 @@
           </div>
           <div>
             <mat-button-toggle-group  name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
-              <mat-button-toggle *ngIf="state.user.role === 'mainKurator'" value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
+              <mat-button-toggle *ngIf="state.user.role === 'mainKurator' && kurators && kurators.length > 0 && zadost.state==='waiting'" value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
                 <mat-icon *ngIf="!zadost.delegated?.length" class="material-icons-outlined">manage_accounts</mat-icon>
                 <ng-container *ngIf="zadost.delegated?.length">{{ zadost.delegated }}</ng-container>
               </mat-button-toggle>
-              <mat-button-toggle *ngIf="state.user.role === 'mainKurator'" value="" [matMenuTriggerFor]="priorityMenu" [matTooltip]="'desc.nastavit_prioritu' | translate">
+              <mat-button-toggle *ngIf="state.user.role === 'mainKurator' && zadost.state==='waiting'" value="" [matMenuTriggerFor]="priorityMenu" [matTooltip]="'desc.nastavit_prioritu' | translate">
                 <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
                 <ng-container *ngIf="zadost.priority?.length">{{ zadost.priority }}</ng-container>
               </mat-button-toggle>
@@ -66,8 +66,8 @@
             </mat-menu>
             
             <mat-menu #typeVNXMenu="matMenu">
-              <button mat-menu-item (click)="setTypNavrhu('VNZ')">{{ 'vnz_memorandum' | translate }} 8ABC</button>
-              <button mat-menu-item (click)="setTypNavrhu('VNL')">{{ 'vnl_memorandum' | translate }} 8BCD</button>
+              <button mat-menu-item (click)="setTypNavrhu('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</button>
+              <button mat-menu-item (click)="setTypNavrhu('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</button>
             </mat-menu>
 
             <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->

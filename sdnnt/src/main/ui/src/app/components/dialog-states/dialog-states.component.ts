@@ -14,8 +14,9 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 export class DialogStatesComponent implements OnInit {
 
   newState: string;
+  newLicense: string;
   poznamka: string;
-  public dntStates: string[] = ['PA', 'A', 'VS', 'VN', 'N', 'NZ', 'X'];
+  public dntStates: string[] = [ 'A', 'PA', 'NPA', 'N',  'NL', 'X', 'PX'];
   granularity: any[] = [];
 
   rocnik: string;
@@ -32,7 +33,8 @@ export class DialogStatesComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-    this.newState = this.data.dntstav ? (this.data.dntstav.includes('NZ') ?  'NZ' :this.data.dntstav[0])  : 'A';
+    this.newState = this.data.kuratorstav ?  this.data.kuratorstav[0]  : 'A';
+    this.newLicense = this.data.license ? this.data.license[0] : null  ;
     this.granularity = this.data.granularity ? this.data.granularity : [];
     this.fmt = this.data.fmt ? this.data.fmt : null;
     // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
@@ -43,7 +45,7 @@ export class DialogStatesComponent implements OnInit {
       this.service.showSnackBar('poznamka_povinna', 'poznamka_povinna', true);
       return;
     } else {
-      this.dialogRef.close({newState: this.newState, poznamka: this.poznamka, granularity: this.granularity, change: true});
+      this.dialogRef.close({newState: this.newState, newLicense: this.newLicense, poznamka: this.poznamka, granularity: this.granularity, change: true});
     }
   }
 

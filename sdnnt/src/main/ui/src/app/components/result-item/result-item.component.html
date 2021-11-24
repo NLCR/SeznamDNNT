@@ -52,22 +52,27 @@
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
 
-        <ng-container *ngIf="state.user && inZadost && (!processed?.state || (doc.kurator && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX'))">
+        <ng-container *ngIf="(state.user && inZadost && !processed?.state) || (doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')">
           <ng-container *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'">
-            <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na NPA'" matTooltipPosition="above">
+            <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" 
+            [matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">check</mat-icon>
             </mat-button-toggle>
-            <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX' ) || zadost.navrh === 'VNZ')" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu'" matTooltipPosition="above">
+            <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX' ) || zadost.navrh === 'VNZ')" 
+              (click)="approve()" [matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">check</mat-icon>
             </mat-button-toggle>
-            <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()" [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
-              <mat-icon class="material-icons-outlined">local_library</mat-icon>
+            <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()" 
+            [matTooltip]="'acts.schvalit_pouze_na_terminalu' | translate" matTooltipPosition="above">
+              <mat-icon class="material-icons-outlined">no_photography</mat-icon>
             </mat-button-toggle>
-            <mat-button-toggle value="rejected" *ngIf="!(zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')" (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
+            <mat-button-toggle value="rejected" *ngIf="!(zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')" (click)="reject()" 
+            [matTooltip]="'acts.odmitnout_zmenu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">not_interested</mat-icon>
             </mat-button-toggle>
             <!-- VNL / dilo bylo  vydano = vyradit -->
-            <mat-button-toggle value="releasedProved" *ngIf="(zadost.navrh === 'VNL'&& doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX') && doc.license !== null && doc.license == 'dnntt'" (click)="releasedProved()" [matTooltip]="'Dilo bylo vydano'" matTooltipPosition="above">
+            <mat-button-toggle value="releasedProved" *ngIf="(zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX' && doc.license !== null && doc.license == 'dnntt')" (click)="releasedProved()" 
+            [matTooltip]="'acts.dilo_publikovano' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">library_books</mat-icon>
             </mat-button-toggle>
           </ng-container>

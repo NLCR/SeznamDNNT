@@ -90,6 +90,38 @@ public class CatalogSearcher {
     return ret;
   }
 
+  public JSONObject getById(String id, User user) {
+    JSONObject ret = new JSONObject();
+    try {
+      SolrClient solr = Indexer.getClient();
+      SolrQuery query = new SolrQuery("identifier:\""+id+"\"")
+              .setRows(1)
+              .setStart(0)
+              .setSort("identifier", SolrQuery.ORDER.asc)
+              .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+
+      QueryRequest qreq = new QueryRequest(query);
+      NoOpResponseParser rParser = new NoOpResponseParser();
+      rParser.setWriterType("json");
+      qreq.setResponseParser(rParser);
+      NamedList<Object> qresp = solr.request(qreq, "catalog");
+      ret = new JSONObject((String) qresp.get("response"));
+      if (ret.getJSONObject("response").getInt("numFound") > 0) {
+        List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
+        JSONArray zadosti = findZadosti(user, ids);
+        ret.put("zadosti", zadosti);
+        if (user != null) {
+          JSONArray notifications = NotificationUtils.findNotifications(ids, user.username, Indexer.getClient());
+          ret.put("notifications", notifications);
+        }
+      }
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
   public JSONObject search(HttpServletRequest req) {
     Map<String, String[]> parameterMap = req.getParameterMap();
     Map<String, String>  resmap = new HashMap<>();
@@ -177,7 +209,7 @@ public class CatalogSearcher {
           .setFields("*,process:[json]").setRows(100);
 
         // u uzivatele filtrujeme jenom pro konkrentniho uzivatele
-        if (user != null && user.role.equals(Role.user.name())) {
+        if (user != null && (user.role.equals(Role.user.name())  || user.role.equals(Role.knihovna.name()))) {
             query = query.addFilterQuery("user:\"" + user.username+ "\"");
         }
 

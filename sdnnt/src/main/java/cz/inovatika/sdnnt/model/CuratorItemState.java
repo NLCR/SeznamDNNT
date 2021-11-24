@@ -79,15 +79,15 @@ public enum CuratorItemState {
     PX {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
-            return null;
+            return owner.getCurrentPublicState();
         }
     },
     X {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
-            return null;
+            return PublicItemState.X;
         }
-    }; // neni zadny stav
+    };
 
 
     public abstract PublicItemState getPublicItemState(WorkflowOwner owner);

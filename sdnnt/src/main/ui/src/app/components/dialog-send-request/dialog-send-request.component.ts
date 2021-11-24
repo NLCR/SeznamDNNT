@@ -29,7 +29,12 @@ export class DialogSendRequestComponent implements OnInit {
 
     this.service.sendZadost(this.data).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        if (res.key) {
+          this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        } else {
+          this.service.showSnackBar(res.key, '', true);
+
+        }
       } else {
         this.data = <Zadost>res;
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);

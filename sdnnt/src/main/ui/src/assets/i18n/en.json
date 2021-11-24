@@ -56,6 +56,8 @@
       "A": "Included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
       "VS": "Discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
       "VN": "Discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
+      "VNL": "Limited to terminal",
+      "VNZ": "Limited to terminal",
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
@@ -696,7 +698,7 @@
     "debug_vnl_3_5wd":"5 working days",
     "desiredstate" : "Feature state/license",
     "period" : "Period",
-    "deadline" : "Processing deadline",
+    "deadline" : "Deadline/State switch",
     "verze_zadosti": "He carries requests",
     "id": "Id",
     "priorita": "Priority",
@@ -706,5 +708,15 @@
     "delogovat_na_jineho_uzivatele": "Delegate to another user",
     "nastavit_prioritu": "Set priority",
     "typ_zadosti": "Type of request"
+  },
+
+  "acts": {
+    "schvalit_npa":"Approve to NPA",
+    "schvalit_zmenu_stavu":"Approve state change",
+    "schvalit_pouze_na_terminalu":"Approve terminal license",
+    "odmitnout_zmenu":"Reject",
+    "dilo_publikovano":"Title has been published, state N"
+
   }
+
 }

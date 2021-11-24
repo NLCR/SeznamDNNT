@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.User;
@@ -393,11 +394,17 @@ public class AccountServlet extends HttpServlet {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // todo: transactions (optimistic locking)
-            return Indexer.changeStavDirect(inputJs.getString("identifier"),
-                    inputJs.getString("newStav"), 
-                    inputJs.getString("poznamka"), 
+            Indexer.changeStavDirect(inputJs.getString("identifier"),
+                    inputJs.getString("newStav"),
+                    inputJs.optString("newLicense"),
+                    inputJs.getString("poznamka"),
                     inputJs.getJSONArray("granularity"), 
                     user.username);
+
+
+            CatalogSearcher searcher = new CatalogSearcher();
+            return searcher.getById(inputJs.getString("identifier"), user);
+
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());

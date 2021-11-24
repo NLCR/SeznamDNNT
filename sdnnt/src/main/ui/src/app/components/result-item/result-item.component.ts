@@ -182,9 +182,11 @@ export class ResultItemComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.change) {
-        this.service.changeStavDirect(this.doc.identifier, result.newState, result.poznamka, result.granularity).subscribe(res => {
-          console.log(res);
-        this.doc.dntstav = result.newState;
+        this.service.changeStavDirect(this.doc.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
+
+          if (res.response.docs.length > 0 ) {
+            this.doc= res.response.docs[0];
+          }
         });
       }
 
@@ -216,7 +218,9 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('', res.error, true);
       } else {
         if (res.response.numFound > 1) {
+          // docasne vypnuto 
           // Je vice zaznamu pro toto vyjadreni. Zeptame se
+          /*
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
             width: '750px',
             data: res.response,
@@ -233,7 +237,9 @@ export class ResultItemComponent implements OnInit {
                 this.addFRBRToZadost(navrh);
               }
             }
-          });
+          });*/
+          this.saveZadost(navrh);
+
         } else {
           this.saveZadost(navrh);
         }
@@ -256,10 +262,15 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        if (!this.doc.zadost) {
+            this.doc.zadost = this.state.currentZadost[key];
+            this.hasNavhr = !!this.doc.zadost && !this.processed;
+          } else if (this.doc.zadost.identifiers) {
+            this.doc.zadost.identifiers.push(this.doc.identifier);;
+            this.hasNavhr = !!this.doc.zadost && !this.processed;
+        }
       }
-    }
-    
-    );
+    });
   }
 
   addFRBRToZadost(navrh: string) {
