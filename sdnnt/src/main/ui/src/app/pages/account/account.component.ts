@@ -21,12 +21,15 @@ export class AccountComponent implements OnInit {
   filterState = [
     {id: "open", val: "neodeslano"},
     {id: "waiting", val: "ceka_na_posouzeni"},
+    {id: "waiting_for_automatic_process", val: "ceka_na_automaticke_zpracovani"},
     {id: "processed", val: "zpracovano"}
   ];
 
   filterType = [
     {id: "NZN", val: "navrzeno_na_zarazeni"},
-    {id: "VVS", val: "navrzeno_na_vyrazeni"}
+    {id: "VN", val: "navrzeno_na_vyrazeni"},
+    {id: "VNZ", val: "navrzeno_na_omezeni_vnz"},
+    {id: "VNL", val: "navrzeno_na_omezeni_vnl"}
   ];
   
   loading: boolean;
@@ -322,5 +325,14 @@ export class AccountComponent implements OnInit {
 
   }
 
+  public refresh() {
+    
+    this.route.queryParams.subscribe(val => {
+      this.search(val);
+      this.newStavFilter = val.navrh;
+      this.stateFilter = val.state;
+    });
+
+  }
 
 }

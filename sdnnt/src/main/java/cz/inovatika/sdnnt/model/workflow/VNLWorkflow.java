@@ -30,6 +30,7 @@ public class VNLWorkflow extends Workflow {
         } else if (owner.getWorkflowState()== NL) {
             return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false);
         } else if (owner.getWorkflowState()== NLX) {
+            //this.getOwner().getWorkflowState()
             return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), period, true, true);
         }
         return null;
@@ -37,14 +38,16 @@ public class VNLWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
-        if (this.getOwner().getWorkflowState().equals(NL)) {
-            return this.getOwner().isSwitchToNextStatePossible(getPeriod(NL));
-        } else if (this.getOwner().getWorkflowState().equals(NLX)) {
-            return this.getOwner().isSwitchToNextStatePossible(getPeriod(NLX));
-        } else {
-            CuratorItemState cstate = this.getOwner().getWorkflowState();
-            return Arrays.asList(A, PA, PX, X).contains(cstate);
-        }
+        if (this.owner.getWorkflowState() != null) {
+            if (this.getOwner().getWorkflowState().equals(NL)) {
+                return this.getOwner().isSwitchToNextStatePossible(getPeriod(NL));
+            } else if (this.getOwner().getWorkflowState().equals(NLX)) {
+                return this.getOwner().isSwitchToNextStatePossible(getPeriod(NLX));
+            } else {
+                CuratorItemState cstate = this.getOwner().getWorkflowState();
+                return Arrays.asList(A, PA, PX, X).contains(cstate);
+            }
+        } else return false;
     }
 
     @Override

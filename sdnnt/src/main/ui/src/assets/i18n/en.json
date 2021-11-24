@@ -579,10 +579,16 @@
     "stav_zadosti": "Application status",
     "neodeslano": "Not sent",
     "ceka_na_posouzeni": "Awaiting review",
+    "ceka_na_automaticke_zpracovani": "Awaiting automatic process",
+
     "zpracovano": "Processed",
     "typ_navrhu": "Design type",
     "navrzeno_na_zarazeni": "Designed for inclusion",
     "navrzeno_na_vyrazeni": "Designed to be discarded",
+
+    "navrzeno_na_omezeni_vnl": "License reduction, article 8",
+    "navrzeno_na_omezeni_vnz": "License reduction, article X",
+
     "nedoreseno": "Unresolved",
     "fyzicka_osoba": "Individual",
     "pravnicka_osoba": "Legal entity",
@@ -681,6 +687,15 @@
     "debug_vnl_1_10wd":"10 days",
     "debug_vnl_2_18m":"18 months",
     "debug_vnl_3_5wd":"5 working days",
+<<<<<<< HEAD
+=======
+
+    "desiredstate" : "Feature state/license",
+    "period" : "Period",
+    "deadline" : "Processing deadline"
+
+
+>>>>>>> d6eb6e6d42a07215f4b3be26e7e07414b41c3cb5
 
     "verze_zadosti": "He carries requests"
   }

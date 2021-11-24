@@ -579,10 +579,16 @@
     "stav_zadosti": "Stav žádosti",
     "neodeslano": "Neodesláno",
     "ceka_na_posouzeni": "Čeká na posouzení",
+    "ceka_na_automaticke_zpracovani": "Čeká na automatické zpracování",
+
     "zpracovano": "Zpracováno",
     "typ_navrhu": "Typ návrhu",
-    "navrzeno_na_zarazeni": "Navrženo na zařazení",
-    "navrzeno_na_vyrazeni": "Navrženo na vyřazení",
+
+    "navrzeno_na_zarazeni": "Zařazení",
+    "navrzeno_na_vyrazeni": "Vyřazení",
+    "navrzeno_na_omezeni_vnl": "Omezení, článek 8",
+    "navrzeno_na_omezeni_vnz": "Omezení, článek X",
+
     "nedoreseno": "Nedořešeno",
     "fyzicka_osoba": "Fyzická osoba",
     "pravnicka_osoba": "Právnická osoba",
@@ -681,6 +687,14 @@
     "debug_vnl_1_10wd":"10 kalendářních dnů",
     "debug_vnl_2_18m":"18 měsíců",
     "debug_vnl_3_5wd":"5 pracovních dnů",
+<<<<<<< HEAD
+=======
+
+
+    "desiredstate" : "Budoucí stav/licence",
+    "period" : "Lhůta",
+    "deadline" : "Čas vyřízení/přepnutí"
+>>>>>>> d6eb6e6d42a07215f4b3be26e7e07414b41c3cb5
 
     "verze_zadosti": "Veze žádosti"
   }

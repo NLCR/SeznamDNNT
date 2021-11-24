@@ -15,7 +15,13 @@ export class HomeComponent implements OnInit {
   activeTab: string;
   tabContent: string;
 
-  cardsFacets: object = {};
+  cardsFacets: object = {
+    'A':0,
+    'PA':0,
+    'N':0,
+    'dntt':0,
+    'dnto':0,
+  };
 
   constructor(
     public config: AppConfiguration,

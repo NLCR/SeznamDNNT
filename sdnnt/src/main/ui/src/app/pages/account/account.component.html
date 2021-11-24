@@ -91,10 +91,10 @@
             <a (click)="setStav('VN')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
           </div>
           <div *ngIf="newStavFilter !== 'VNL'">
-            <a (click)="setStav('VNL')">{{ 'desc.navrzeno_na_omezeni_dostupnosti_1' | translate }}</a>
+            <a (click)="setStav('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</a>
           </div>
           <div *ngIf="newStavFilter !== 'VNZ'">
-            <a (click)="setStav('VNZ')">{{ 'desc.navrzeno_na_omezeni_dostupnosti_2' | translate }}</a>
+            <a (click)="setStav('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</a>
           </div>
         </mat-expansion-panel>
 
@@ -139,7 +139,20 @@
       </mat-accordion>
     </div>
 
+
     <div fxFlex class="app-right">
+
+      <!--      
+      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+        <div>
+          <mat-button-toggle-group>
+            <mat-button-toggle (click)="refresh()"  matTooltipPosition="above">
+              <mat-icon class="material-icons-outlined" >refresh</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>   
+        </div>
+      </div>
+      -->
 
       <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
         <div fxFlex>
@@ -149,6 +162,7 @@
           <app-paginator [numFound]="numFound"  [showSort]="true" [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
         </div>
       </div>
+
       <div class="app-results-wrapper">
         <table mat-table [dataSource]="zadosti" class="mat-elevation-z0">
 

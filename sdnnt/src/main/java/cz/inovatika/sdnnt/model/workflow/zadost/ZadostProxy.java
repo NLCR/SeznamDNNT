@@ -1,9 +1,6 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
-import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.TransitionType;
-import cz.inovatika.sdnnt.model.Period;
-import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.*;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 
 import java.util.Date;
@@ -20,6 +17,11 @@ public class ZadostProxy implements WorkflowOwner  {
     @Override
     public CuratorItemState getWorkflowState() {
         return  zadost.getDesiredItemState() != null ? CuratorItemState.valueOf(zadost.getDesiredItemState()) : null;
+    }
+
+    @Override
+    public PublicItemState getCurrentPublicState() {
+        return null;
     }
 
     @Override
