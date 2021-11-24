@@ -680,7 +680,8 @@
     "debug_vnl_0_5wd":"5 pracovních dnů",
     "debug_vnl_1_10wd":"10 kalendářních dnů",
     "debug_vnl_2_18m":"18 měsíců",
-    "debug_vnl_3_5wd":"5 pracovních dnů"
+    "debug_vnl_3_5wd":"5 pracovních dnů",
 
+    "verze_zadosti": "Veze žádosti"
   }
 }

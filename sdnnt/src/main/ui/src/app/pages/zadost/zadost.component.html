@@ -16,13 +16,9 @@
             <ng-container >
               <span class="app-pipe"></span>
               <span class="app-metadata">{{ zadost.id }}<span class="app-pipe"></span>
-
-
-                <ng-container *ngIf="zadost.version">{{ zadost.version }}<span class="app-pipe"></span></ng-container>
-
+                <!-- <ng-container *ngIf="zadost.version">{{ zadost.version }}<span class="app-pipe"></span></ng-container>
                 <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
-
-                <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container>
+                <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container> -->
                 <ng-container *ngIf="zadost.state">
                   <mat-icon class="material-icons-outlined" [class]="zadost.state" [matTooltip]="'state.' + zadost.state | translate" matTooltip="above">
                     <ng-container *ngIf="zadost.state === 'open'">lock_open</ng-container>
@@ -30,7 +26,12 @@
                     <ng-container *ngIf="zadost.state === 'processed'">lock</ng-container>
                   </mat-icon><span class="app-pipe"></span>
                 </ng-container>
-                <ng-container *ngIf="zadost.navrh">{{ zadost.navrh }}<span class="app-pipe"></span></ng-container>
+                <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>
+                <a [matTooltip]="('desc.verze_zadosti' | translate) + ': ' + zadost.version + '
+                                  ' + ('desc.uzivatel' | translate) + ': ' + zadost.user + '
+                                  ' + ('Datum zadani' | translate) + ': ' + (zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm')"
+                  ><mat-icon class="material-icons-outlined">info</mat-icon>
+                </a>
               </span>
             </ng-container>
           </div>
