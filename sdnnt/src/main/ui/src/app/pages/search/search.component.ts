@@ -61,9 +61,11 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.docs.forEach(doc => {
           const identifier = doc.identifier;
           resp.zadosti.forEach(z => {
-            if (z.identifiers.includes(identifier)) {
-              doc.zadost = z;
-            }
+            if (z.state !== 'processed') {
+              if (z.identifiers.includes(identifier)) {
+                doc.zadost = z;
+              }
+            }  
           });
         });
       }
