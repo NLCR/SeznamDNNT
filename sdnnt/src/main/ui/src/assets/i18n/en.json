@@ -69,10 +69,10 @@
     }
   },
   "license": {
-    "dnnto": "Dnnto: License for online access",
+    "dnnto": "License for online access",
     "dnnto-badge": "Available online",
     "dnnto-noactive": "Assigned license dnnto",
-    "dnntt": "Dnntt: License for terminal access",
+    "dnntt": "License for terminal access",
     "dnntt-badge": "Available at terminals",
     "dnntt-noactive": "Assigned license dnntt"
   },
