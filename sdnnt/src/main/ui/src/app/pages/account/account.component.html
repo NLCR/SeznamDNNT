@@ -262,9 +262,9 @@
               </mat-button-toggle-group>
             </td>
           </ng-container>
-  
+      
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.escalated]="escalated" [class.expired]="expired" [ngClass]="{'escalated': escalated, 'expired': expired}"></tr>
         </table>
       </div>
       <div class="app-mt-4">

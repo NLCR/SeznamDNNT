@@ -22,7 +22,7 @@ export class ZadostComponent implements OnInit {
   docs: SolrDocument[];
   hideProcessed: boolean;
   escalated: boolean = false;
-  expired: boolean = false;
+  expired: boolean = true;
   
 
   kurators: User[];

@@ -120,6 +120,8 @@
   @extend .app-w-100;
 
   tr {
+    @include setStateColor(bglight);
+    
     &.mat-row {
       height: auto;
     }

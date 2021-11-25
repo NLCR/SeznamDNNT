@@ -37,6 +37,8 @@ export class AccountComponent implements OnInit {
   searchResponse: SolrResponse;
   facets;
   numFound: number;
+  escalated: boolean = false;
+  expired: boolean = false;
 
   // displayedColumns = [
   //   'id',

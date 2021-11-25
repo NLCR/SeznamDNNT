@@ -37,7 +37,9 @@ $states: (
   "rejected": mat-color($mat-red, $state_shade),
   "approvedlib": mat-color($mat-amber, $state_shade),
   "approved": mat-color($mat-lime, 800),
-  "waiting_for_automatic_process": mat-color($mat-blue, 800)
+  "waiting_for_automatic_process": mat-color($mat-blue, 800),
+  "escalated": mat-color($mat-yellow, 800),
+  "expired": mat-color($mat-red, 900)
 );
 
 // gaps
