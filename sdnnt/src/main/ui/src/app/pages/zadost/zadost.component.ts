@@ -21,6 +21,9 @@ export class ZadostComponent implements OnInit {
   numFound: number;
   docs: SolrDocument[];
   hideProcessed: boolean;
+  escalated: boolean = false;
+  expired: boolean = false;
+  
 
   kurators: User[];
 
