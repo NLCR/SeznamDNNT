@@ -28,18 +28,19 @@
   "state": {
     "undefined": "nezařazeno",
     "PA": "dílo publikováno jako návrh",
+    "NPA": "dílo bude bude publikováno jako návrh",
     "NNN": "není na seznamu",
     "A": "zařazeno",
-    "VS": "vyřazeno - dílo bylo na seznamu (A)",
-    "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
- 
     "N": "vyřazeno",
     "X": "volné",
     "PX": "pravděpodobná volná díla",
-    "NZ": "licence pro terminál na místě samém",
+    "NL":"omezení na terminál/plánované vydání po získání licence",
+    "NLX":"omezeno na terminál",
+
+    "VN": "výzva pro vyřazení",
     "NZN": "návrh k zařazení",
-    "VVN": "výzva k vyřazení",
-    "VVS": "výzva k vyřazení",
+    "VNL": "Výzva k omezení na terminál",
+    "VNZ": "Výzva k omezení na terminál",
 
     "waiting": "čeká na posouzení",
     "processed": "zpracováno",
@@ -52,9 +53,9 @@
     "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
       "NNN": "Není na seznamu",
+      "NPA": "Dílo bude publikováno jako Návrh k zařazení do seznamu, datum přepnutí 1.2 nebo 1.8",
       "PA": "Dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
       "A": "Zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
-      "VS": "Vyřazeno - dílo bylo na Seznamu (A), ale je vyřazeno; dílo může být předmětem NZN, případně administrativních oprav",
       "VN": "Výzva k vyřazení",
       "VNL": "Výzva k omezení na terminál",
       "VNZ": "Výzva k omezení na terminál",
@@ -64,8 +65,8 @@
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
-      "VVN": "Výzva k vyřazení z Návrhu seznamu (interní stav administrace)",
-      "VVS": "Výzva k vyřazení ze Seznamu (interní stav administrace)"
+      "NLX":"Omezeno na terminál, interní stav"
+
     }
   },
   "license": {
@@ -90,23 +91,26 @@
     "language": "Jazyk dokumentu",
     "nakladatel": "Nakladatel",
     "dntstav": "Stav dokumentu",
+    "kuratorstav": "Kurátorský stav",
     "license": "Přiřazená licence",
     "sigla": "Sigla",
     "rokvydani": "Rok vydání",
 
     "undefined": "nezařazeno",
     "NNN": "není na seznamu",
+    "NPA": "návrh na zařazení",
     "PA": "dílo publikováno jako návrh",
     "A": "zařazeno",
-    "VS": "vyřazeno - dílo bylo na seznamu (A)",
-    "VN": "vyřazeno – dílo bylo na návrhu seznamu (PA)",
+    "VN": "Vyřazení",
     "N": "vyřazeno",
     "X": "volné",
     "PX": "pravděpodobná volné",
     "NZ": "zařazeno s omezením",
     "NZN": "návrh k zařazení",
-    "VVN": "výzva k vyřazení",
-    "VVS": "výzva k vyřazení"
+    "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",
+    "VNZ": "Výzva k licenci pro terminál na místě samém",
+    "NL":"omezení na terminál/plánované vydání po získání licence",
+    "NLX":"omezeno na terminál"
   },
 
   "fmt": {
@@ -629,7 +633,7 @@
     "en": "Anglický jazyk",
     "registrovat_se": "Registrovat se",
     "pouze_zaznamy_na_seznamu": "Pouze záznamy na seznamu",
-    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Zobrazit dokumenty, které nejsou zařazeny na seznamu",
+    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Zobrazit i dokumenty, které nejsou zařazeny na seznamu",
     "datum_importu": "Datum importu",
     "celkem": "Celkem",
     "na_vyrazeni": "Na vyřazení",
@@ -696,6 +700,17 @@
     "debug_vnl_1_10wd":"10 kalendářních dnů",
     "debug_vnl_2_18m":"18 měsíců",
     "debug_vnl_3_5wd":"5 pracovních dnů",
+
+    "period_nzn_0_5wd":"5 pracovních dnů",
+    "period_nzn_1_12_18": "1.2 nebo 1.8",
+    "period_nzn_2_6m": "6 měsíců",  
+    "period_vn_0_28d": "28 dnů",  
+    "period_vln_0_5wd": "5 pracovních dnů",  
+    "period_vnl_1_10d":"10 kalendářních dnů",
+    "period_vln_2_18m": "18 měsíců",
+    "period_vln_3_5wd":"5 pracovních dnů",    
+
+
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",
     "deadline" : "Čas uzávěrky/přepnutí",
@@ -717,6 +732,11 @@
     "odmitnout_zmenu":"Odmítnout změnu",
     "dilo_publikovano":"Dílo bylo nakladatelem publikováno"
 
+  },
+
+  "account":{
+    "noworkflow":"Není možné schválit stav",
+    "noworkflowstates": "Není možné schválit stav"
   }
 
 }

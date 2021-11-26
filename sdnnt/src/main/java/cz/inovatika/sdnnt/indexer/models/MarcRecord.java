@@ -298,7 +298,7 @@ public class MarcRecord {
     } else {
       if (!sdoc.containsKey(DNTSTAV_FIELD)) {
           MarcRecordUtilsToRefactor.addStavFromMarc(sdoc, dataFields);
-          this.dntstav = new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD));
+          this.dntstav = sdoc.getFieldValues(DNTSTAV_FIELD) != null  ?  new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD)) : null;
       }
     }
 

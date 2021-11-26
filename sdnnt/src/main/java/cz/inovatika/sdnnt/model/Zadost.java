@@ -122,7 +122,6 @@ public class Zadost implements NotNullAwareObject{
   private String desiredItemState;
   private String desiredLicense;
 
-  private boolean isEscalated = false;
 
   // version for
   private String version;
@@ -290,14 +289,37 @@ public class Zadost implements NotNullAwareObject{
     this.desiredItemState = desiredItemState;
   }
 
-  public void setEscalated(boolean escalated) {
-    isEscalated = escalated;
-  }
 
   public boolean isEscalated() {
-    return isEscalated;
+    if (getDeadline() != null) {
+      JSONObject jsonObject = Options.getInstance().getJSONObject("workflow").getJSONObject("escalation");
+      String typ = this.getNavrh();
+      if (typ != null && jsonObject.has(typ)) {
+        JSONObject type = jsonObject.getJSONObject(typ);
+        int value = type.getInt("value");
+        String unit = "day";
+        if (type.has("unit")) {
+          unit = type.getString("unit");
+        }
+
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(getDeadline());
+        if (unit.equals("day")) {
+          instance.add(Calendar.DAY_OF_MONTH, (-1)*value);
+        } else if (unit.equals("minute")) {
+          instance.add(Calendar.MINUTE, (-1)*value);
+
+        }
+
+        return new Date().after(instance.getTime());
+      } else return false;
+
+    } else return false;
   }
 
+  public boolean isExpired() {
+    return getDeadline() != null ? new Date().after(getDeadline()) : false;
+  }
   public String getDesiredLicense() {
     return desiredLicense;
   }
@@ -439,6 +461,8 @@ public class Zadost implements NotNullAwareObject{
 
   }
 
+
+
   public static Zadost fromJSON(String json) {
 
     JSONObject jsonobj = new JSONObject(json);
@@ -544,6 +568,8 @@ public class Zadost implements NotNullAwareObject{
 
     } else throw new IllegalArgumentException("given object doesnt contain id ");
   }
+
+
 
   public JSONObject toJSON() {
     JSONObject jsonObject = new JSONObject();

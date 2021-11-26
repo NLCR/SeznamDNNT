@@ -215,7 +215,7 @@ public class DntAlephImporter {
 
 
 
-  public SolrInputDocument toSolrDoc(MarcRecord rec) {
+  static SolrInputDocument toSolrDoc(MarcRecord rec) {
     SolrInputDocument sdoc = new SolrInputDocument();
     if (sdoc.isEmpty()) {
       MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);

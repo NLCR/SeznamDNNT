@@ -392,9 +392,17 @@ public class MarcRecordUtilsToRefactor {
 
   // TODO: Rewrite it !! big hack
   public static void syncFromDoc(SolrDocumentBase doc, MarcRecord mr) {
-    mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
+    if (doc.getFieldValues(DNTSTAV_FIELD) != null) {
+      mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
+    } else {
+      mr.dntstav = new ArrayList<>();
+    }
     mr.datum_stavu = (Date) doc.getFieldValue(DATUM_STAVU_FIELD);
-    mr.historie_stavu = new JSONArray((String) doc.getFieldValue(HISTORIE_STAVU_FIELD));
+    if ( doc.getFieldValue(HISTORIE_STAVU_FIELD) != null) {
+      mr.historie_stavu = new JSONArray((String) doc.getFieldValue(HISTORIE_STAVU_FIELD));
+    } else {
+      mr.historie_stavu = new JSONArray();
+    }
 
 
     if (doc.containsKey(KURATORSTAV_FIELD)) {

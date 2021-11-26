@@ -78,7 +78,7 @@ public class AccountServiceImplTest {
         zadost.setInstitution("NKP");
         zadost.setUser("pokusny");
         zadost.setNavrh("NZN");
-        zadost.setTypeOfPeriod(Period.period_nzn_1.name());
+        zadost.setTypeOfPeriod(Period.period_nzn_1_12_18.name());
         zadost.setPozadavek("Pozadavek ABC");
         zadost.setPoznamka("Poznamka ABC");
 
@@ -130,7 +130,7 @@ public class AccountServiceImplTest {
         zadost.setState("open");
         zadost.setNavrh("NZN");
 
-        Period period = Period.period_nzn_1;
+        Period period = Period.period_nzn_1_12_18;
 
         zadost.setTypeOfPeriod(period.name());
         zadost.setTransitionType(period.getTransitionType().name());

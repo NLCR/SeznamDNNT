@@ -28,18 +28,19 @@
   "state": {
     "undefined": "unclassified",
     "PA": "work published as draft",
+    "NPA": "work is going to be published as draft",
     "NNN": "not in List",
     "A": "included",
-    "VS": "discarded - work was on the list (A)",
-    "VN": "discarded - the work was on the draft list (PA)",
     "N": "discarded",
     "X": "free",
     "PX": "probably free work",
+    "NL":"On-site terminal license, internal state",
+    "NLX":"On-site terminal license, internal state",
 
-    "NZ": "on-site terminal license",
+    "VN": "call for decommissioning",
     "NZN": "proposal for inclusion",
-    "VVN": "call for decommissioning",
-    "VVS": "call for decommissioning",
+    "VNL": "Call for on on-site terminal license",
+    "VNZ": "Call for on on-site terminal license",
 
     "waiting": "waiting",
     "processed": "processed",
@@ -52,20 +53,20 @@
     "tooltip": {
       "undefined": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
       "NNN": "Not in List",
+      "NPA": "Work will published as Proposal for inclusion in the list, it switches on 1.2 or 1.8",
       "PA": "Work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
       "A": "Included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
-      "VS": "Discarded - the work was on List (A), but is discarded; the work may be subject to NZN or administrative corrections",
       "VN": "Discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
-      "VNL": "Limited to terminal",
-      "VNZ": "Limited to terminal",
+      "VNL": "Call for on on-site terminal license",
+      "VNZ": "Call for on on-site terminal license",
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
-      "VVN": "Request for exclusion from the List Design (internal state of administration)",
-      "VVS": "Request to be removed from the List (internal state of administration)"
+      "NLX":"On-site terminal license, internal state"
+
     }
   },
   "license": {
@@ -96,17 +97,20 @@
 
     "undefined": "unclassified",
     "NNN": "Not in List",
-    "PA": "PA: work published as a draft",
-    "A": "A: classified",
-    "VS": "VS: discarded - the work was on the list (A)",
-    "VN": "VN: discarded - the work was on the draft list (PA)",
-    "N": "N: unclassified",
-    "X": "X: free",
-    "PX": "PX: probably free work",
-    "NZ": "NZ: On-site terminal",
+    "NPA": "Call for title classification",
+    "PA": "Work published as a draft",
+    "A": "Classified",
+    "VS": "Discarded",
+    "VN": "Request for discard",
+    "N": "Discared",
+    "X": "Free",
+    "PX": "Probably free work",
+    "NZ": "On-site terminal",
     "NZN": "NZN: proposal for inclusion",
-    "VVN": "VVN: call for decommissioning",
-    "VVS": "VVS: call for decommissioning"
+    "VNL": "Call for on on-site terminal license",
+    "VNZ": "Call for on on-site terminal license",
+    "NL":"On-site terminal license, internal state",
+    "NLX":"On-site terminal license, internal state"
   },
 
   "fmt": {
@@ -717,6 +721,11 @@
     "odmitnout_zmenu":"Reject",
     "dilo_publikovano":"Title has been published, state N"
 
+  },
+
+  "account":{
+    "noworkflow":"Not possible to approve state",
+    "noworkflowstates": "Not possible to switch to next state "
   }
 
 }

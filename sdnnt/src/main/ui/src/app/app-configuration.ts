@@ -52,6 +52,10 @@ import { User } from './shared/user';
         return this.config.filterFields;
     }
 
+    public get userFilterFields() {
+        return this.config.userFilterFields;
+    }
+
     public get sorts() {
         return this.config.sorts;
     }

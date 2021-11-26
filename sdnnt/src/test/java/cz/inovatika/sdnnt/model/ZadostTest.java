@@ -115,8 +115,8 @@ public class ZadostTest {
         zadost.setIdentifiers(Arrays.asList("oai-test-1","oai-test-2"));
         zadost.setNavrh("NZN");
         zadost.setInstitution("NKP");
-        zadost.setTypeOfPeriod(Period.period_nzn_1.name());
-        zadost.setTransitionType(Period.period_nzn_1.getTransitionType().name());
+        zadost.setTypeOfPeriod(Period.period_nzn_1_12_18.name());
+        zadost.setTransitionType(Period.period_nzn_1_12_18.getTransitionType().name());
         zadost.setDesiredItemState("NPA");
         zadost.setDesiredLicense("dnntt");
 
@@ -135,8 +135,8 @@ public class ZadostTest {
         Assert.assertEquals(deseriazed.getUser(), "pokusny");
         Assert.assertEquals(deseriazed.getNavrh(), "NZN");
         Assert.assertEquals(deseriazed.getInstitution(), "NKP");
-        Assert.assertEquals(deseriazed.getTypeOfPeriod(), "period_nzn_1");
-        Assert.assertEquals(deseriazed.getTransitionType(), Period.period_nzn_1.getTransitionType().name());
+        Assert.assertEquals(deseriazed.getTypeOfPeriod(), "period_nzn_1_12_18");
+        Assert.assertEquals(deseriazed.getTransitionType(), Period.period_nzn_1_12_18.getTransitionType().name());
 
         Assert.assertTrue(deseriazed.getProcess().size() == 1);
         Assert.assertTrue(deseriazed.getProcess().containsKey("iddone"));

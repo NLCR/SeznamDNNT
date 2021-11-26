@@ -21,8 +21,9 @@ export class ZadostComponent implements OnInit {
   numFound: number;
   docs: SolrDocument[];
   hideProcessed: boolean;
-  escalated: boolean = false;
-  expired: boolean = true;
+  
+  //escalated: boolean = false;
+  //expired: boolean = true;
   
 
   kurators: User[];
@@ -51,6 +52,7 @@ export class ZadostComponent implements OnInit {
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.service.getZadost(id).subscribe((resp: any) => {
         this.zadost = resp.response ?   resp.response.docs[0] : resp;
+        
         this.getDocs(val);
       });
     }));

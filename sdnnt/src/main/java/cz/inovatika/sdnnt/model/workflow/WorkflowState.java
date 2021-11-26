@@ -32,10 +32,11 @@ public class WorkflowState {
     // zda se meni licence
     private boolean changingLicence;
 
+
     // priznak zda je stav finalni
     private boolean finalSate;
 
-    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date,  Period period, boolean changingLicense, boolean finalSate) {
+    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date, Period period, boolean changingLicense, boolean finalSate) {
         this.workflowOwner = workflowOwner;
         this.curatorState = cstate;
         this.date = date;
@@ -82,7 +83,7 @@ public class WorkflowState {
             shouldChangeLicense = true;
         }
 
-        this.workflowOwner.switchWorkflowState(getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense, getPeriod(),originator , user, poznamka);
+        this.workflowOwner.switchWorkflowState(getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense, this. getPeriod(),originator , user, poznamka);
         this.workflowOwner.setPeriodBetweenStates(getPeriod());
     }
 }

@@ -29,7 +29,7 @@
         {{  doc.zadost.navrh }}
       </div>
       <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] != doc.dntstav[doc.dntstav.length-1]">
-        <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
+        <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.kuratorstav[doc.kuratorstav.length-1] | translate">
           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
         </div>
       </ng-container>    
@@ -39,7 +39,7 @@
         <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
           <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost" (click)="addToZadost()">
+        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost && notPublic(doc)" (click)="addToZadost()">
           <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
         </mat-button-toggle>
         <mat-button-toggle *ngIf="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
@@ -52,13 +52,13 @@
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
 
-        <ng-container *ngIf="(state.user && inZadost && !processed?.state) || (doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')">
+        <ng-container *ngIf="(state.user && inZadost && !processed?.state) || (curratorInteractionNeedAfterProcessed(zadost, doc))">
           <ng-container *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'">
             <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" 
             [matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">check</mat-icon>
             </mat-button-toggle>
-            <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX' ) || zadost.navrh === 'VNZ')" 
+            <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost && zadost.navrh && zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX') || zadost.navrh === 'VNZ')" 
               (click)="approve()" [matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">check</mat-icon>
             </mat-button-toggle>
@@ -71,7 +71,7 @@
               <mat-icon class="material-icons-outlined">not_interested</mat-icon>
             </mat-button-toggle>
             <!-- VNL / dilo bylo  vydano = vyradit -->
-            <mat-button-toggle value="releasedProved" *ngIf="(zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX' && doc.license !== null && doc.license == 'dnntt')" (click)="releasedProved()" 
+            <mat-button-toggle value="releasedProved" *ngIf="(curratorInteractionNeedAfterProcessed(zadost, doc) && doc.license !== null && doc.license == 'dnntt')" (click)="releasedProved()" 
             [matTooltip]="'acts.dilo_publikovano' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">library_books</mat-icon>
             </mat-button-toggle>

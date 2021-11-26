@@ -27,20 +27,25 @@ public class DocumentProxy implements WorkflowOwner {
     }
 
     @Override
-    public PublicItemState getCurrentPublicState() {
+    public PublicItemState getPublicState() {
         return !this.marcRecord.dntstav.isEmpty() ? PublicItemState.valueOf(this.marcRecord.dntstav.get(0)) : null;
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public Date getPublicStateDate() {
+        return this.marcRecord.datum_krator_stavu;
+    }
+
+    @Override
+    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState,  Period period, String originator, String user, String poznamka) {
         Date date = new Date();
 
         List<String> dntstav = this.marcRecord.dntstav;
 
         if (!dntstav.contains(itm.getPublicItemState(this).name()) || changingLicenseState) {
             this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(itm.getPublicItemState(this).name()));
-            this.marcRecord.datum_stavu = new Date(date.getTime());
 
+            this.marcRecord.datum_stavu = new Date(date.getTime());
 
             JSONObject historyObject = new JSONObject();
             historyObject.put("stav", itm.getPublicItemState(this).name());
@@ -92,12 +97,12 @@ public class DocumentProxy implements WorkflowOwner {
     }
 
     @Override
-    public boolean isSwitchToNextStatePossible(Period period) {
+    public boolean isSwitchToNextStatePossible(Date date, Period period) {
         if (period.getTransitionType().equals(TransitionType.kurator)) {
             return true;
         } else {
-            Date deadlineDate = period.defineDeadline(getWorkflowDate());
-            //Date ownerDate = getWorkflowDate();
+            //Date deadlineDate = period.defineDeadline(getWorkflowDate());
+            Date deadlineDate = period.defineDeadline(date);
             return new Date().after(deadlineDate);
         }
     }

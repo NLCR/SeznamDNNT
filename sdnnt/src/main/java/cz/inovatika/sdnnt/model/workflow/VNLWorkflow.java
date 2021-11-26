@@ -26,12 +26,12 @@ public class VNLWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         if (owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) {
-            return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true, false);
+            return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true,  false);
         } else if (owner.getWorkflowState()== NL) {
             return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false);
         } else if (owner.getWorkflowState()== NLX) {
             //this.getOwner().getWorkflowState()
-            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), period, true, true);
+            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), period, true,  true);
         }
         return null;
     }
@@ -40,9 +40,9 @@ public class VNLWorkflow extends Workflow {
     public boolean isSwitchPossible() {
         if (this.owner.getWorkflowState() != null) {
             if (this.getOwner().getWorkflowState().equals(NL)) {
-                return this.getOwner().isSwitchToNextStatePossible(getPeriod(NL));
+                return this.getOwner().isSwitchToNextStatePossible(getOwner().getWorkflowDate(), getPeriod(NL) );
             } else if (this.getOwner().getWorkflowState().equals(NLX)) {
-                return this.getOwner().isSwitchToNextStatePossible(getPeriod(NLX));
+                return this.getOwner().isSwitchToNextStatePossible(getOwner().getWorkflowDate(), getPeriod(NLX) );
             } else {
                 CuratorItemState cstate = this.getOwner().getWorkflowState();
                 return Arrays.asList(A, PA, PX, X).contains(cstate);
@@ -53,7 +53,7 @@ public class VNLWorkflow extends Workflow {
     @Override
     public WorkflowState nextAlternativeState(String stateHint) {
         if (this.getOwner().getWorkflowState().equals(NLX) && stateHint != null && TITLE_RELEASED.equals(stateHint)) {
-            return new WorkflowState(this.owner, N, null, owner.getWorkflowDate(), null, true, true);
+            return new WorkflowState(this.owner, N, null, owner.getWorkflowDate(), null, true,  true);
         }
         return null;
 
@@ -72,13 +72,13 @@ public class VNLWorkflow extends Workflow {
         if (Options.getInstance().getJSONObject("workflow").has("periods") && Options.getInstance().getJSONObject("workflow").getJSONObject("periods").has("debug")) {
             debug = Options.getInstance().getJSONObject("workflow").getJSONObject("periods").getBoolean("debug");
         }
-        if (state == null) return debug ? debug_vnl_0_5wd : period_vln_0;
+        if (state == null) return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
         else {
             switch(state) {
-                case NPA: return debug ? debug_vnl_0_5wd : period_vln_0;
-                case PA: return debug ? debug_vnl_0_5wd : period_vln_0;
-                case NLX: return debug ? debug_vnl_3_5wd : period_vln_3;
-                case NL: return debug ? debug_vnl_2_18m : period_vln_2;
+                case NPA: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
+                case PA: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
+                case NLX: return debug ? debug_vnl_3_5wd : period_vln_3_5wd;
+                case NL: return debug ? debug_vnl_2_18m : period_vln_2_18m;
                 default: return null;
             }
         }

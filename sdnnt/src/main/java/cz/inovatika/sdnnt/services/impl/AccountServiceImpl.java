@@ -136,6 +136,17 @@ public class AccountServiceImpl implements AccountService {
             qresp = solr.request(qreq, "zadost");
             solr.close();
             ret = new JSONObject((String) qresp.get("response"));
+
+            JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+            for (int i = 0; i < docs.length(); i++) {
+                JSONObject zadostJSON = docs.getJSONObject(i);
+                Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+                if (zadost.isExpired()) {
+                    zadostJSON.put("expired", true);
+                } else if (zadost.isEscalated()) {
+                    zadostJSON.put("escalated", true);
+                }
+            }
         }
 
         return VersionStringCast.cast(ret);
@@ -485,7 +496,6 @@ public class AccountServiceImpl implements AccountService {
                                 // stav musi existovat a musi byt typu scheduler
                                 if (workflowState != null && workflowState.getPeriod() !=null && workflowState.getPeriod().getTransitionType().equals(TransitionType.scheduler)) {
 
-                                    LOGGER.info(String.format("Switching states for request %s ", id));
 
                                     //marcRecord.toSolrDoc();
                                     String oldRaw = marcRecord.toJSON().toString();
@@ -500,7 +510,11 @@ public class AccountServiceImpl implements AccountService {
                                     } catch (IOException | SolrServerException e) {
                                         LOGGER.log(Level.SEVERE, e.getMessage(),e);
                                     }
+
+                                    LOGGER.info(String.format("\tautomatic switch,  request(%s, %s)  = doc(%s, %s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ,""+(marcRecord.dntstav+" "+marcRecord.kuratorstav +( marcRecord.license != null  ? " / "+marcRecord.license : ""))));
                                 }
+                            } else {
+                                LOGGER.info(String.format("\tnot accepte, request(%s, %s) =   doc(%s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ));
                             }
                         }
                     } catch (JsonProcessingException e) {

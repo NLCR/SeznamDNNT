@@ -21,15 +21,28 @@
   },
 
   "workflow" :{
-    "periods": {
-      "debug": true,
-
-      "debug_nzn_0" : {
-        "value": 6
+    "escalation" :{
+      "VNZ" : {
+        "value": 3,
+        "unit": "day"
       },
-      "period_nzn_0" : {
-        "value": 6
+      "VNL" : {
+        "value": 3,
+        "unit": "day"
+      },
+      "NZN" : {
+        "value": 3,
+        "unit": "day"
       }
+    },
+    "periods": {
+        "debug": true,
+        "debug_nzn_0" : {
+          "value": 6
+        },
+        "period_nzn_0" : {
+          "value": 6
+        }
     }
   },
 

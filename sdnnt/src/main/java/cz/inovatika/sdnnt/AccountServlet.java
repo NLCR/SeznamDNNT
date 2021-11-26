@@ -393,7 +393,7 @@ public class AccountServlet extends HttpServlet {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            // todo: transactions (optimistic locking)
+            // TODO: transactions (optimistic locking)
             Indexer.changeStavDirect(inputJs.getString("identifier"),
                     inputJs.getString("newStav"),
                     inputJs.optString("newLicense"),

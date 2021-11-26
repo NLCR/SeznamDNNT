@@ -4,8 +4,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
-
-import java.util.Arrays;
+import cz.inovatika.sdnnt.model.PublicItemState;
 
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
@@ -26,8 +25,8 @@ public class VNWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
 
-        if (owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) {
-            return new WorkflowState(this.owner, N,null,owner.getWorkflowDate(), period, true, true);
+        if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA) {
+            return new WorkflowState(this.owner, N,null,owner.getWorkflowDate(), period, true,  true);
         }
         return null;
     }
@@ -35,7 +34,7 @@ public class VNWorkflow extends Workflow {
     @Override
     public boolean isSwitchPossible() {
         CuratorItemState cstate = this.getOwner().getWorkflowState();
-        return (cstate == null || Arrays.asList(A, PA, X, PX, NL).contains(cstate));
+        return (cstate == null || !cstate.equals(N));
     }
 
 
@@ -45,7 +44,7 @@ public class VNWorkflow extends Workflow {
         Period period = getPeriod(currentState);
 
         if (alternative != null && License.dnntt.name().equals(alternative)) {
-            return new WorkflowState(this.owner, owner.getWorkflowState(),License.dnntt,owner.getWorkflowDate(), period, true, true);
+            return new WorkflowState(this.owner, owner.getWorkflowState(),License.dnntt,owner.getWorkflowDate(), period, true,  true);
 
         }
         return null;
@@ -70,13 +69,15 @@ public class VNWorkflow extends Workflow {
         if (Options.getInstance().getJSONObject("workflow").has("periods") && Options.getInstance().getJSONObject("workflow").getJSONObject("periods").has("debug")) {
             debug = Options.getInstance().getJSONObject("workflow").getJSONObject("periods").getBoolean("debug");
         }
-        if (state == null) return debug ? debug_vn_0_28d : period_vn_0;
+        if (state == null) return debug ? debug_vn_0_28d : period_vn_0_28d;
         else {
             switch(state) {
-                case PX: return debug ? debug_vn_0_28d : period_vn_0;
-                case X: return debug ? debug_vn_0_28d : period_vn_0;
-                case A: return debug ? debug_vn_0_28d : period_vn_0;
-                case PA: return debug ? debug_vn_0_28d : period_vn_0;
+                case PX: return debug ? debug_vn_0_28d : period_vn_0_28d;
+                case X: return debug ? debug_vn_0_28d : period_vn_0_28d;
+                case A: return debug ? debug_vn_0_28d : period_vn_0_28d;
+                case PA: return debug ? debug_vn_0_28d : period_vn_0_28d;
+                case NL: return debug ? debug_vn_0_28d : period_vn_0_28d;
+                case NLX: return debug ? debug_vn_0_28d : period_vn_0_28d;
                 default: return null;
             }
         }

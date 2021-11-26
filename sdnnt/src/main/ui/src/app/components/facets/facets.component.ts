@@ -30,12 +30,18 @@ export class FacetsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //this.facets = Object.keys(this.facet_fields);
     this.facets = [];
+    // filter kurator stav for users 
     this.config.filterFields.forEach(f => {
-      if (this.facet_fields[f]) {
-        this.facets.push(f);
+      let flag:boolean = true;
+      if (f && f ==="kuratorstav") {
+        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');        
       }
+      if (flag) {
+        if (this.facet_fields[f]) {
+          this.facets.push(f);
+        }
+      }      
     });
 
     if (this.stats) {

@@ -24,6 +24,12 @@
                 <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
                 {{ ('field.' + f.name | translate) }}
               </a>
+
+              <a *ngSwitchCase="'kuratorstav'" (click)="addFilter(facet, f)" >
+                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                {{ ('field.' + f.name | translate) }}
+              </a>
+
               <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
               <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
               <a *ngSwitchCase="'sigla'" (click)="addFilter(facet, f)">{{ 'sigla.' + f.name | translate }}</a>

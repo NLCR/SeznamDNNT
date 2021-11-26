@@ -25,6 +25,8 @@ export class Zadost {
   desired_item_state: string;
   desired_license: string;
   
+  escalated: boolean = false;
+  expired: boolean = false;
 
   constructor(timestamp: string, user: string) {
     this.id = user + timestamp;

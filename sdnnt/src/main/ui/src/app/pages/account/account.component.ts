@@ -158,6 +158,15 @@ export class AccountComponent implements OnInit {
 
   }
 
+
+  isEscalated(z:Zadost): boolean {
+    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.escalated
+  }
+
+  isExpired(z:Zadost): boolean {
+    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.expired
+  }
+
   setStav(navrh: string) {
     const q: any = {};
     // added by peter

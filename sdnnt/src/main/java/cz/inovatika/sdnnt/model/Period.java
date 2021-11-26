@@ -30,7 +30,7 @@ public enum Period {
         }
     },
 
-    period_nzn_0 {
+    period_nzn_0_5wd {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
@@ -74,7 +74,7 @@ public enum Period {
         }
     },
 
-    period_nzn_1 {
+    period_nzn_1_12_18 {
         @Override
         public Date defineDeadline(Date inputDate) {
             // nema smysl to delat konfiguratovatlne
@@ -127,7 +127,7 @@ public enum Period {
             return TransitionType.scheduler;
         }
     },
-    period_nzn_2 {
+    period_nzn_2_6m {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
@@ -158,7 +158,7 @@ public enum Period {
             return TransitionType.kurator;
         }
     },
-    period_vn_0 {
+    period_vn_0_28d {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
@@ -191,7 +191,7 @@ public enum Period {
             return TransitionType.kurator;
         }
     },
-    period_vln_0 {
+    period_vln_0_5wd {
         @Override
         public Date defineDeadline(Date inputDate) {
             //vyřazení ze vzdáleného přístupu (do 5 pracovních dnů – lze požádat nakladatele o prodloužení do 10 pracovních dnů) - Memorandum odst. 11
@@ -219,7 +219,7 @@ public enum Period {
             return TransitionType.kurator;
         }
     },
-    period_vnl_1 {
+    period_vnl_1_10d {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
@@ -246,7 +246,7 @@ public enum Period {
             return TransitionType.scheduler;
         }
     },
-    period_vln_2 {
+    period_vln_2_18m {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
@@ -275,7 +275,7 @@ public enum Period {
             return TransitionType.kurator;
         }
     },
-    period_vln_3{
+    period_vln_3_5wd {
         @Override
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();

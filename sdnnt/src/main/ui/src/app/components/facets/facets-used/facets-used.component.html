@@ -11,6 +11,7 @@
         <ng-container [ngSwitch]="f.field">
           <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
+          <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>

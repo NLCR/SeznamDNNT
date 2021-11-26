@@ -67,7 +67,8 @@ public class DocumentWorkflowFactory {
     private static boolean vnDocument(List<String> kuratorstav) {
         return  kuratorstav.contains(CuratorItemState.A.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name()) ||
-                kuratorstav.contains(CuratorItemState.NL.name());
+                kuratorstav.contains(CuratorItemState.NL.name()) ||
+                kuratorstav.contains(CuratorItemState.NLX.name());
     }
 
 

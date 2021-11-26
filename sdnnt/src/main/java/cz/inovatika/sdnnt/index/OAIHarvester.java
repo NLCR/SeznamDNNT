@@ -357,7 +357,7 @@ public class OAIHarvester {
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);
             if (!mr.isDeleted) {
-              recs.add(mr.toSolrDoc());
+              recs.add(DntAlephImporter.toSolrDoc(mr));
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
               toDelete.add(mr.identifier);

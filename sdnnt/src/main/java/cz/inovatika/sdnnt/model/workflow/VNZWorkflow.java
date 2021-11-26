@@ -19,11 +19,12 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public WorkflowState nextState() {
+        Period period = getPeriod(owner.getWorkflowState(), owner.getLicense() != null ? License.valueOf(owner.getLicense()) : null);
         if (owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) {
             if (owner.getWorkflowState() == null) {
-                return new WorkflowState(this.owner, A, License.dnntt,owner.getWorkflowDate(), period_vln_0, true,  true);
+                return new WorkflowState(this.owner, A, License.dnntt,owner.getWorkflowDate(), period, true,  true);
             } else {
-                return new WorkflowState(this.owner, getOwner().getWorkflowState(), License.dnntt,owner.getWorkflowDate(), period_vln_0, true,  true);
+                return new WorkflowState(this.owner, getOwner().getWorkflowState(), License.dnntt,owner.getWorkflowDate(), period, true,  true);
 
             }
         }
@@ -55,11 +56,11 @@ public class VNZWorkflow extends Workflow {
         if (Options.getInstance().getJSONObject("workflow").has("periods") && Options.getInstance().getJSONObject("workflow").getJSONObject("periods").has("debug")) {
             debug = Options.getInstance().getJSONObject("workflow").getJSONObject("periods").getBoolean("debug");
         }
-        if (license == null) return debug ? debug_vnl_0_5wd : period_vln_0;
+        if (license == null) return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
         else {
             switch(state) {
-                case A: return debug ? debug_vnl_0_5wd : period_vln_0;
-                case PA: return debug ? debug_vnl_0_5wd : period_vln_0;
+                case A: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
+                case PA: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
                 default: return null;
             }
         }

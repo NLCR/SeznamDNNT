@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
@@ -61,7 +62,6 @@ public class CatalogSearcher {
   }
 
 
-
   public JSONObject search(Map<String, String> req,List<String> filters, User user) {
     JSONObject ret = new JSONObject();
     try {
@@ -87,6 +87,8 @@ public class CatalogSearcher {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     }
+    // remove public states facet values from curator states
+    SearchResultsUtils.removePublicStatesFromCuratorStatesFacets(ret);
     return ret;
   }
 
@@ -296,7 +298,7 @@ public class CatalogSearcher {
     SolrQuery query = new SolrQuery(q)
             .setRows(rows)
             .setStart(start) 
-            .setFacet(true).addFacetField("fmt", "language", "dntstav","license", "sigla", "nakladatel" )
+            .setFacet(true).addFacetField("fmt", "language", "dntstav","kuratorstav","license", "sigla", "nakladatel" )
             .setFacetMinCount(1)
             .setParam("json.nl", "arrntv")
             .setParam("stats", true)
@@ -376,14 +378,13 @@ public class CatalogSearcher {
       
       
     // Filtry podle role
-    // User user = UserControllerQ.getUser(req);
     if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.role)) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
       query.addFilterQuery("dntstav:*");
-    } else { 
     }
-    
+
+
     if ("true".equals(req.get("withNotification"))) {
       query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.username);
     }

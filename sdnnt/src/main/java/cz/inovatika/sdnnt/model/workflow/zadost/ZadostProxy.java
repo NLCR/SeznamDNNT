@@ -20,12 +20,18 @@ public class ZadostProxy implements WorkflowOwner  {
     }
 
     @Override
-    public PublicItemState getCurrentPublicState() {
+    public Date getPublicStateDate() {
+        // u zadodsti je to to same
+        return getWorkflowDate();
+    }
+
+    @Override
+    public PublicItemState getPublicState() {
         return null;
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState,  Period period, String originator, String user, String poznamka) {
         this.zadost.setDesiredItemState(itm.name());
         if (changingLicenseState)  this.zadost.setDesiredLicense(license);
         // zadost, nova deadline
@@ -33,7 +39,7 @@ public class ZadostProxy implements WorkflowOwner  {
     }
 
     @Override
-    public boolean isSwitchToNextStatePossible(Period period) {
+    public boolean isSwitchToNextStatePossible(Date date, Period period) {
         if (period == null) return true;
         if (period.getTransitionType().equals(TransitionType.kurator)) {
             return true;

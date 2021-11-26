@@ -11,20 +11,20 @@ import java.util.Date;
  */
 public interface WorkflowOwner {
 
-    /**
-     * Aktualni stav pro prepnuti; u zadosti je to desired stav u dokumentu je standardni stav
-     * @return
-     */
+    // Workflow stav
     public CuratorItemState getWorkflowState();
-
-    public PublicItemState getCurrentPublicState();
-
+    // datum prepnuti workflow stavu
     public Date getWorkflowDate();
 
-    // prepnuti stavu
+    // Verejny stav
+    public PublicItemState getPublicState();
+    // datum prepnuti verejneho stavu
+    public Date getPublicStateDate();
+
+
     public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
 
-    public boolean isSwitchToNextStatePossible(Period period);
+    public boolean isSwitchToNextStatePossible(Date date, Period period);
 
     public void setWorkflowDate(Date date);
 

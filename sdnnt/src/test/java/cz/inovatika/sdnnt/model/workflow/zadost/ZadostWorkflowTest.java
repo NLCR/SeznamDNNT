@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
-import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.*;
 import org.junit.Assert;
@@ -64,7 +63,7 @@ public class ZadostWorkflowTest {
             System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
 
-            owner.switchWorkflowState(state.getCuratorState(),null ,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(state.getCuratorState(),null ,false ,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -101,7 +100,7 @@ public class ZadostWorkflowTest {
 
             //System.out.println(state.getPeriod().getTransitionType());
 
-            owner.switchWorkflowState(state.getCuratorState(), state.getLicense().name(), true, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(state.getCuratorState(), state.getLicense().name(), true,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -113,7 +112,7 @@ public class ZadostWorkflowTest {
             System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
             System.out.println("Setting deadline "+state.getDate());
-            owner.switchWorkflowState(state.getCuratorState(),null ,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(state.getCuratorState(),null ,false ,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
     }
@@ -139,7 +138,7 @@ public class ZadostWorkflowTest {
 
             //System.out.println(state.getPeriod().getTransitionType());
 
-            owner.switchWorkflowState(state.getCuratorState(), null, false , state.getPeriod(),"mojeid" , zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(state.getCuratorState(), null, false ,  state.getPeriod(),"mojeid" , zadost.getUser(), zadost.getId());
             System.out.println("======== -------- ==========");
         }
         System.out.println("======== Konecny stav ==========");
@@ -151,7 +150,7 @@ public class ZadostWorkflowTest {
             System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
 
             System.out.println("Setting deadline "+state.getDate());
-            owner.switchWorkflowState(state.getCuratorState(), null, false, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(state.getCuratorState(), null, false,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
     }

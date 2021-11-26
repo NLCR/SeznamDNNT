@@ -371,5 +371,15 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
+
+  //(zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')
+
+  curratorInteractionNeedAfterProcessed(zadost:Zadost, doc: SolrDocument): boolean {
+    return (zadost && zadost.navrh && zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX');
+  }
+
+  notPublic(doc: SolrDocument) {
+    return doc.dntstav == null || doc.dntstav[doc.dntstav.length-1] !== 'X';
+  }
 }
 

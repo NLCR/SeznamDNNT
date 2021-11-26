@@ -255,8 +255,7 @@
                 <mat-button-toggle *ngIf="element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
                   <mat-icon class="material-icons-outlined">done</mat-icon>
                 </mat-button-toggle>
-                <mat-button-toggle  *ngIf="((state.user.role === 'user' || state.user.role === 'knihovna') && element.state === 'open') ||
-                (state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')" [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest(element)">
+                <mat-button-toggle  *ngIf="((state.user.role === 'user' || state.user.role === 'knihovna') && element.state === 'open')" [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest(element)">
                   <mat-icon class="material-icons-outlined app-color-warning">clear</mat-icon>
                 </mat-button-toggle>
               </mat-button-toggle-group>
@@ -264,7 +263,8 @@
           </ng-container>
       
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.escalated]="escalated" [class.expired]="expired" [ngClass]="{'escalated': escalated, 'expired': expired}"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.escalated]="escalated" [class.expired]="expired" 
+            [ngClass]="{'escalated': isEscalated(row), 'expired': isExpired(row) }"></tr>
         </table>
       </div>
       <div class="app-mt-4">
