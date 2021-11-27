@@ -125,6 +125,9 @@ export class AccountComponent implements OnInit {
       this.search(val);
       this.newStavFilter = val.navrh;
       this.stateFilter = val.state;
+      this.priorityFilter = val.priority;
+      this.institutionFilter = val.institution;
+      this.delegatedFilter = val.delegated;
     });
   }
 
