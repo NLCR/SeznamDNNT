@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Role;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
@@ -14,14 +15,17 @@ public class UserTests {
     @Test
     public void testSerializeAndDeserialize() throws JsonProcessingException {
         User user = new User();
-        user.role = Role.admin.name();
-        user.username ="testusername";
-        user.email = "test@test.eu";
-        user.jmeno="TEST";
-        user.prijmeni="Testovic";
-        user.adresa="Testovaci adresa, 123";
-        user.apikey="API-KEY-123456";
-        user.notifikace_interval = NotificationInterval.mesic.name();
+        user.setRole(Role.admin.name());
+        user.setUsername("testusername");
+        user.setEmail( "test@test.eu");
+        user.setJmeno("TEST");
+        user.setPrijmeni("Testovic");
+        user.setAdresa("Testovaci adresa, 123");
+        user.setUlice("Ulice");
+        user.setCislo("C1234");
+        user.setApikey("API-KEY-123456");
+        user.setNotifikaceInterval( NotificationInterval.mesic.name());
+
 
         JSONObject userJSON = user.toJSONObject();
 
@@ -37,12 +41,12 @@ public class UserTests {
 
         User readFromJSON = User.fromJSON(userJSON.toString());
 
-        Assert.assertTrue(readFromJSON.username.equals(user.username));
-        Assert.assertTrue(readFromJSON.role.equals(user.role));
-        Assert.assertTrue(readFromJSON.email.equals(user.email));
-        Assert.assertTrue(readFromJSON.jmeno.equals(user.jmeno));
-        Assert.assertTrue(readFromJSON.prijmeni.equals(user.prijmeni));
-        Assert.assertTrue(readFromJSON.notifikace_interval.equals(user.notifikace_interval));
+        Assert.assertTrue(readFromJSON.getUsername().equals(user.getUsername()));
+        Assert.assertTrue(readFromJSON.getRole().equals(user.getRole()));
+        Assert.assertTrue(readFromJSON.getEmail().equals(user.getEmail()));
+        Assert.assertTrue(readFromJSON.getJmeno().equals(user.getJmeno()));
+        Assert.assertTrue(readFromJSON.getPrijmeni().equals(user.getPrijmeni()));
+        Assert.assertTrue(readFromJSON.getNotifikaceInterval().equals(user.getNotifikaceInterval()));
 
     }
 
@@ -50,13 +54,13 @@ public class UserTests {
     public void testSolrBinder() {
 
         User user = new User();
-        user.role = Role.admin.name();
-        user.username = "testusername";
-        user.email = "test@test.eu";
-        user.jmeno="TEST";
-        user.prijmeni="Testovic";
-        user.adresa="Testovaci adresa, 123";
-        user.apikey="API-KEY-123456";
+        user.setRole( Role.admin.name());
+        user.setUsername( "testusername");
+        user.setEmail( "test@test.eu");
+        user.setJmeno("TEST");
+        user.setPrijmeni("Testovic");
+        user.setAdresa("Testovaci adresa, 123");
+        user.setApikey("API-KEY-123456");
 
 
         SolrDocument document = new SolrDocument();
@@ -69,10 +73,17 @@ public class UserTests {
         document.setField("apikey", "apikey");
         document.setField("notifikace_interval", "den");
 
-        DocumentObjectBinder binder = new DocumentObjectBinder();
-        SolrInputDocument solrInputFields = binder.toSolrInputDocument(user);
+        SolrInputDocument solrInputFields = user.toSolrInputDocument();
 
-        User bean = binder.getBean(User.class, document);
+        Assert.assertNotNull(solrInputFields.getFieldValue("role"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("username"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("email"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("jmeno"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("prijmeni"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("adresa"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("apikey"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("notifikace_interval"));
+        //User bean = binder.getBean(User.class, document);
 
     }
 

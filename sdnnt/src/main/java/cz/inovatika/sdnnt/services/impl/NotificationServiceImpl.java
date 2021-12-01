@@ -3,7 +3,7 @@ package cz.inovatika.sdnnt.services.impl;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.Notification;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserControler;
@@ -118,7 +118,7 @@ public class NotificationServiceImpl implements NotificationsService  {
             List<User> users = userControler.findUsersByNotificationInterval(interval.name());
             users.stream().forEach(user-> {
                 String fqCatalog;
-                String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:"+user.username;
+                String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:"+user.getUsername();
                 switch(interval) {
                     case den:
                         fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
@@ -150,12 +150,12 @@ public class NotificationServiceImpl implements NotificationsService  {
                     LOGGER.log(Level.INFO, "checkNotifications finished");
 
                     if (!documents.isEmpty()) {
-                        LOGGER.info(String.format("Processing notification '%s', for user '%s' with email '%s'. Number of documents %d", interval.name(), user.jmeno+" "+user.prijmeni, user.email, documents.size()));
-                        Pair<String, String> pair = Pair.of(user.email, user.jmeno + " " + user.prijmeni);
+                        LOGGER.info(String.format("Processing notification '%s', for user '%s' with email '%s'. Number of documents %d", interval.name(), user.getJmeno()+" "+user.getPrijmeni(), user.getEmail(), documents.size()));
+                        Pair<String, String> pair = Pair.of(user.getEmail(), user.getJmeno() + " " + user.getPrijmeni());
                         try {
                             mailService.sendNotificationEmail(pair, documents);
                         } catch (IOException | EmailException e) {
-                            LOGGER.log(Level.WARNING, String.format("Problem with sending email to %s due %s", e.getMessage(), user.email));
+                            LOGGER.log(Level.WARNING, String.format("Problem with sending email to %s due %s", e.getMessage(), user.getEmail()));
                             LOGGER.throwing(this.getClass().getName(), "processNotifications",e);
                         }
                     } else {

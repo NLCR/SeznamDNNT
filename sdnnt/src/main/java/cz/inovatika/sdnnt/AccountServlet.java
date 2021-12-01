@@ -3,14 +3,12 @@ package cz.inovatika.sdnnt;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -133,8 +131,9 @@ public class AccountServlet extends HttpServlet {
           String rows = req.getParameter("rows");
 
           try {
-            AccountService service = new AccountServiceImpl(new UserControlerImpl(req), new ResourceBundleServiceImpl(req));
-            return VersionStringCast.cast(service.search(q, state, Arrays.asList(navrh), institution, priority, delegated, sort, user, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1));
+            UserControlerImpl uc = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
+            return VersionStringCast.cast(service.search(q, state, Arrays.asList(navrh), institution, priority, delegated, sort, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1));
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -164,7 +163,8 @@ public class AccountServlet extends HttpServlet {
 
             return new JSONObject((String) qresp.get("response"));
             */
-            AccountService service = new AccountServiceImpl(new UserControlerImpl(req), new ResourceBundleServiceImpl(req));
+            UserControlerImpl uc = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
             return service.getRequest(req.getParameter("id"));
 
           } catch (SolrServerException | IOException ex) {
@@ -192,7 +192,8 @@ public class AccountServlet extends HttpServlet {
             start = Integer.parseInt(req.getParameter("page")) * rows;
           }
           try {
-            AccountService service = new AccountServiceImpl(new UserControlerImpl(req), new ResourceBundleServiceImpl(req));
+            UserControlerImpl uc = new UserControlerImpl(req);
+            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
             return service.getRecords(req.getParameter("id"),rows, start );
           } catch (SolrServerException | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -211,7 +212,7 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
             return service.userCloseRequest(readInputJSON(req).toString());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -231,8 +232,8 @@ public class AccountServlet extends HttpServlet {
           try {
 
             UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
-            return service.saveRequest(readInputJSON(req).toString(), new UserControlerImpl(req).getUser(), null);
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
+            return service.saveRequest(readInputJSON(req).toString(), null);
 
           } catch(ConflictException cex) {
             LOGGER.log(Level.SEVERE, null, cex);
@@ -256,7 +257,7 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
             return service.saveCuratorRequest(readInputJSON(req).toString(), null);
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -277,7 +278,7 @@ public class AccountServlet extends HttpServlet {
 
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
-            return Zadost.saveWithFRBR(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().username, req.getParameter("frbr"));
+            return Zadost.saveWithFRBR(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().getUsername(), req.getParameter("frbr"));
           } catch (Exception e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }
@@ -293,7 +294,7 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
             return service.curatorCloseRequest(readInputJSON(req).toString());
           } catch (IOException e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -315,7 +316,7 @@ public class AccountServlet extends HttpServlet {
             Zadost zadost = Zadost.fromJSON(zadostJSON);
 
             UserControlerImpl userControler = new UserControlerImpl(request);
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
             String alternativeState = request.getParameter("alternative");
             if (alternativeState != null) {
               return service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
@@ -345,7 +346,7 @@ public class AccountServlet extends HttpServlet {
           Zadost zadost = Zadost.fromJSON(zadostJSON);
 
           UserControlerImpl userControler = new UserControlerImpl(request);
-          AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+          AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
           return service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
 
         } else {
@@ -368,11 +369,11 @@ public class AccountServlet extends HttpServlet {
           List<String> ordinaryUsers = Arrays.asList(Role.user.name(), Role.knihovna.name());
           List<String> kuratorsAndAdmins = Arrays.asList(Role.admin.name(), Role.kurator.name(), Role.mainKurator.name());
 
-          boolean deleteIsPossible = (ordinaryUsers.contains(user.role) && zadost.getState().equals("open")) ||
-                  (kuratorsAndAdmins.contains(user.role));
+          boolean deleteIsPossible = (ordinaryUsers.contains(user.getRole()) && zadost.getState().equals("open")) ||
+                  (kuratorsAndAdmins.contains(user.getRole()));
 
           if (deleteIsPossible) {
-            AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
             return service.deleteRequest(zadost.toJSON().toString());
           } else {
             return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
@@ -399,7 +400,7 @@ public class AccountServlet extends HttpServlet {
                     inputJs.optString("newLicense"),
                     inputJs.getString("poznamka"),
                     inputJs.getJSONArray("granularity"), 
-                    user.username);
+                    user.getUsername());
 
 
             CatalogSearcher searcher = new CatalogSearcher();
@@ -422,7 +423,7 @@ public class AccountServlet extends HttpServlet {
           try {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.username);
+            return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.getUsername());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -454,7 +455,7 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try {
             User user = new UserControlerImpl(req).getUser();
-            return Indexer.followRecord(req.getParameter("identifier"),  user.username,  NotificationInterval.mesic.valueOf(user.notifikace_interval),  "true".equals(req.getParameter("follow")));
+            return Indexer.followRecord(req.getParameter("identifier"),  user.getUsername(),  NotificationInterval.mesic.valueOf(user.getNotifikaceInterval()),  "true".equals(req.getParameter("follow")));
           } catch (Exception e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
           }
@@ -472,12 +473,12 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
 
           UserControlerImpl userControler = new UserControlerImpl(req);
-          AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+          AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
 
           String[] navrhy = req.getParameterValues("navrh");
           if (navrhy != null && navrhy.length >0 ) {
               //String navrh = req.getParameter("navrh");
-              JSONObject result = service.search(null, "open", Arrays.asList(navrhy), null, null, null ,null, userControler.getUser(), 100, 0);
+              JSONObject result = service.search(null, "open", Arrays.asList(navrhy), null, null, null ,null, 100, 0);
               if (result.has("response") && result.getJSONObject("response").has("numFound")) {
                   int numFound = result.getJSONObject("response").getInt("numFound");
                   if (numFound > 0) {
@@ -486,15 +487,8 @@ public class AccountServlet extends HttpServlet {
                       return zadost.toJSON();
                   }
               }
-              Zadost nZadost = new Zadost(UUID.randomUUID().toString());
-              nZadost.setNavrh(navrhy[0]);
-              nZadost.setState("open");
-              nZadost.setUser(userControler.getUser().username);
-              nZadost.setIdentifiers(new ArrayList<>());
-
-              JSONObject jsonZadost = service.saveRequest(nZadost.toJSON().toString(), userControler.getUser(), null);
-              return jsonZadost;
-
+              String navrh = navrhy[0];
+              return service.prepare(navrh);
           } else {
               return errorJson(response, SC_BAD_REQUEST, "missing navrh parameter");
           }

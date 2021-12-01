@@ -2,7 +2,7 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.*;
 import cz.inovatika.sdnnt.it.SolrTestServer;
-import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -154,10 +154,10 @@ public class NotificationServiceImplTest {
 
     private List<User> createNotificationUsers() {
         User user = new User();
-        user.username = "test1";
-        user.jmeno = "Test_1_jmeno";
-        user.prijmeni = "Test_1_prijmeni";
-        user.email = "test@testovic.cz";
+        user.setUsername( "test1");
+        user.setJmeno( "Test_1_jmeno");
+        user.setPrijmeni( "Test_1_prijmeni");
+        user.setEmail( "test@testovic.cz");
         return new ArrayList<>(Arrays.asList(user));
     }
 

@@ -6,7 +6,7 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
@@ -30,8 +29,6 @@ import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-
 /**
  *
  * @author alberto
@@ -44,7 +41,9 @@ public class CatalogSearcher {
     JSONObject ret = new JSONObject();
     try {
       SolrClient solr = Indexer.getClient();
-      SolrQuery query = new SolrQuery("frbr:\"" + id + "\"");
+      SolrQuery query = new SolrQuery("frbr:\"" + id + "\"")
+      .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+
       // 50 is a maximum
       query.setRows(50);
       QueryRequest qreq = new QueryRequest(query);
@@ -78,7 +77,7 @@ public class CatalogSearcher {
         JSONArray zadosti = findZadosti(user, ids);
         ret.put("zadosti", zadosti);
         if (user != null) {
-          JSONArray notifications = NotificationUtils.findNotifications(ids, user.username, Indexer.getClient());
+          JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
           ret.put("notifications", notifications);
         }
       }
@@ -113,7 +112,7 @@ public class CatalogSearcher {
         JSONArray zadosti = findZadosti(user, ids);
         ret.put("zadosti", zadosti);
         if (user != null) {
-          JSONArray notifications = NotificationUtils.findNotifications(ids, user.username, Indexer.getClient());
+          JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
           ret.put("notifications", notifications);
         }
       }
@@ -211,8 +210,8 @@ public class CatalogSearcher {
           .setFields("*,process:[json]").setRows(100);
 
         // u uzivatele filtrujeme jenom pro konkrentniho uzivatele
-        if (user != null && (user.role.equals(Role.user.name())  || user.role.equals(Role.knihovna.name()))) {
-            query = query.addFilterQuery("user:\"" + user.username+ "\"");
+        if (user != null && (user.getRole().equals(Role.user.name())  || user.getRole().equals(Role.knihovna.name()))) {
+            query = query.addFilterQuery("user:\"" + user.getUsername()+ "\"");
         }
 
         QueryRequest qreq = new QueryRequest(query);
@@ -378,7 +377,7 @@ public class CatalogSearcher {
       
       
     // Filtry podle role
-    if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.role)) {
+    if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.getRole())) {
       // Filtrujeme defaultne kdyz neni parametr a kdyz je true
       // Z UI a podle user role
       query.addFilterQuery("dntstav:*");
@@ -386,7 +385,7 @@ public class CatalogSearcher {
 
 
     if ("true".equals(req.get("withNotification"))) {
-      query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.username);
+      query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.getUsername());
     }
     
      

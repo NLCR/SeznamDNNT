@@ -1,6 +1,6 @@
 package cz.inovatika.sdnnt.rights.impl.predicates;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.UserControler;
 import org.easymock.EasyMock;
@@ -33,8 +33,8 @@ public class UserMustBeInRoleTest {
         HttpSession session = EasyMock.createMock(HttpSession.class);
         if (userInSession) {
             User testingUser = new User();
-            testingUser.username = "testinguser";
-            testingUser.role = role.name();
+            testingUser.setUsername("testinguser");
+            testingUser.setRole( role.name() );
             EasyMock.expect(session.getAttribute(UserControler.AUTHENTICATED_USER)).andReturn(testingUser).anyTimes();
             EasyMock.expect(request.getSession(true)).andReturn(session).anyTimes();
         } else {

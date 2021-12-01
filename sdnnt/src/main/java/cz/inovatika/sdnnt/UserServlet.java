@@ -16,14 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
-import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
@@ -95,11 +94,11 @@ public class UserServlet extends HttpServlet {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         try {
-          UserControler controler = new UserControlerImpl(req);
+          UserControlerImpl controler = new UserControlerImpl(req);
           User login = controler.login();
           if (login != null) {
             JSONObject retVal = login.toJSONObject();
-            List<Zadost> zadost = controler.getZadost(login.username);
+            List<Zadost> zadost = controler.getZadost(login.getUsername());
             if (zadost != null && !zadost.isEmpty()) {
               JSONArray jsonArray = new JSONArray();
               zadost.stream().forEach(z-> {
@@ -134,7 +133,7 @@ public class UserServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject retVal = new JSONObject();
         if (new UserControlerImpl(req).getUser() != null) {
-          retVal.put("pinginguser", new UserControlerImpl(req).getUser().username);
+          retVal.put("pinginguser", new UserControlerImpl(req).getUser().getUsername());
         }
         if (req.getSession() != null && req.getSession().getAttribute(TrackingFilter.REMAINING_TIME) != null) {
           retVal.put("remainingtime",req.getSession().getAttribute(TrackingFilter.REMAINING_TIME));
@@ -148,7 +147,7 @@ public class UserServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         JSONObject retVal = new JSONObject();
         if (new UserControlerImpl(req).getUser() != null) {
-          retVal.put("poinginguser", new UserControlerImpl(req).getUser().username);
+          retVal.put("poinginguser", new UserControlerImpl(req).getUser().getUsername());
         }
         return retVal;
       }
@@ -237,7 +236,7 @@ public class UserServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           User sender = new UserControlerImpl(req).getUser();
           JSONObject savingUser = readInputJSON(req);
-          if (sender.username.equals(savingUser.optString("username"))) {
+          if (sender.getUsername().equals(savingUser.optString("username"))) {
             // ok
             return new UserControlerImpl(req).userSave(User.fromJSON(savingUser.toString())).toJSONObject();
           } else {

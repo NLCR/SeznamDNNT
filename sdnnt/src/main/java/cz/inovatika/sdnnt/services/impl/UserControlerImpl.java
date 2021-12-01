@@ -1,10 +1,11 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -21,10 +22,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.NoOpResponseParser;
-import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.common.util.NamedList;
-import org.json.JSONArray;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,10 @@ import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 
-public class UserControlerImpl implements UserControler {
+public class UserControlerImpl implements UserControler, ApplicationUserLoginSupport {
+
+
+    private static int USERS_LIMIT = 10000;
 
     private HttpServletRequest request;
     private MailService mailService;
@@ -69,7 +71,7 @@ public class UserControlerImpl implements UserControler {
                 String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"));
                 ret.put("username", username);
                 User user = findOneUser(client, "username:\"" + username + "\"");
-                if (user != null && user.pwd != null && user.pwd.equals(pwdHashed)) {
+                if (user != null && user.getPwd() != null && user.getPwd().equals(pwdHashed)) {
                     setSessionObject(this.request, user);
 
                     return toTOObject(user);
@@ -97,8 +99,12 @@ public class UserControlerImpl implements UserControler {
     public List<User> getAll() throws UserControlerException{
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("*:*")
-                    .setRows(1000);
-            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+                    .setRows(USERS_LIMIT);
+
+            QueryResponse users = solr.query("users", query);
+            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+            return collect;
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -119,7 +125,10 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery(String.format("username:%s* OR jmeno:%s* OR prijmeni:%s*",  prefix, prefix, prefix))
                     .setRows(1000);
-            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+            QueryResponse users = solr.query("users", query);
+            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            return collect;
+            //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -145,16 +154,16 @@ public class UserControlerImpl implements UserControler {
             User user = User.fromJSON(js);
 
             String newPwd = GeneratePSWDUtility.generatePwd();
-            user.pwd = DigestUtils.sha256Hex(newPwd);
+            user.setPwd( DigestUtils.sha256Hex(newPwd));
 
             // generate token and store expiration
-            user.resetPwdToken = UUID.randomUUID().toString();
-            user.resetPwdExpiration = Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
+            user.setResetPwdToken( UUID.randomUUID().toString());
+            user.setResetPwdExpiration(Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC)));
 
             save(user);
 
-            Pair<String,String> userRecepient = Pair.of(user.email, user.jmeno +" "+user.prijmeni);
-            mailService.sendRegistrationMail(user, userRecepient,newPwd, user.resetPwdToken);
+            Pair<String,String> userRecepient = Pair.of(user.getEmail(), user.getJmeno() +" "+user.getPrijmeni());
+            mailService.sendRegistrationMail(user, userRecepient,newPwd, user.getResetPwdToken());
 
             return toTOObject(user);
         } catch (Exception ex) {
@@ -170,9 +179,9 @@ public class UserControlerImpl implements UserControler {
         try {
             User subject = findUser(username);
 
-            if (subject != null && subject.email != null) {
-                subject.pwd = DigestUtils.sha256Hex(newPwd);
-                mailService.sendResetPasswordMail(subject, Pair.of(subject.email, subject.jmeno +" "+subject.prijmeni), newPwd);
+            if (subject != null && subject.getEmail() != null) {
+                subject.setPwd(DigestUtils.sha256Hex(newPwd));
+                mailService.sendResetPasswordMail(subject, Pair.of(subject.getEmail(), subject.getJmeno() +" "+subject.getPrijmeni()), newPwd);
                 return  toTOObject(save(subject));
             } else {
                 throw new UserControlerException("User's email must be specified");
@@ -190,24 +199,27 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("email:\"" + input + "\" OR username:\""+input+"\"")
                     .setRows(1);
-            List<User> users = solr.query("users", query).getBeans(User.class);
+
+            QueryResponse usersResponse = solr.query("users", query);
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            //List<User> users = solr.query("users", query).getBeans(User.class);
             if (users.isEmpty()) {
                 throw new UserControlerException("Cannot find user");
             } else {
                 User user = users.get(0);
-                if (user.email != null) {
+                if (user.getEmail() != null) {
 
                     // generate token and store expiration
-                    user.resetPwdToken = UUID.randomUUID().toString();
-                    user.resetPwdExpiration = Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC));
+                    user.setResetPwdToken( UUID.randomUUID().toString());
+                    user.setResetPwdExpiration( Date.from(LocalDateTime.now().plusDays(Options.getInstance().getInt("resetPwdExpirationDays", 3)).toInstant(ZoneOffset.UTC)));
                     save(user);
 
                     //save everything to user
-                    mailService.sendResetPasswordRequest(user, Pair.of(user.email, user.jmeno +" "+user.prijmeni), user.resetPwdToken);
-                    return user.resetPwdToken;
+                    mailService.sendResetPasswordRequest(user, Pair.of(user.getEmail(), user.getJmeno() +" "+user.getPrijmeni()), user.getResetPwdToken());
+                    return user.getResetPwdToken();
 
                 } else {
-                    throw new UserControlerException(String.format("User %s doesnt have  email",user.username));
+                    throw new UserControlerException(String.format("User %s doesnt have  email",user.getUsername()));
                 }
             }
         } catch (SolrServerException | IOException |EmailException ex) {
@@ -221,7 +233,9 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
                     .setRows(1);
-            List<User> users = solr.query("users", query).getBeans(User.class);
+
+            List<User> users = solr.query("users", query).getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
+
             return !users.isEmpty();
         } catch (SolrServerException | IOException   ex) {
             throw  new UserControlerException(ex);
@@ -232,9 +246,9 @@ public class UserControlerImpl implements UserControler {
     public User changePwdUser( String pwd) throws UserControlerException, NotAuthorizedException {
         User sender = getUser();
         if (sender != null) {
-            sender.pwd  = DigestUtils.sha256Hex(pwd);
-            sender.resetPwdToken = null;
-            sender.resetPwdExpiration = null;
+            sender.setPwd(DigestUtils.sha256Hex(pwd));
+            sender.setResetPwdToken(null);
+            sender.setResetPwdExpiration(null);
             return toTOObject(save(sender));
         } else {
             throw new NotAuthorizedException("not authorized");
@@ -246,16 +260,20 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("resetPwdToken:\"" + token + "\"")
                     .setRows(1);
-            List<User> users = solr.query("users", query).getBeans(User.class);
+
+            QueryResponse usersResponse = solr.query("users", query);
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+
+            //List<User> users = solr.query("users", query).getBeans(User.class);
             solr.close();
             if (users.isEmpty()) {
                 throw new UserControlerInvalidPwdTokenException("invalid token");
             } else {
                 User user = users.get(0);
-                if (user.resetPwdExpiration.after(new Date())) {
-                    user.pwd  = DigestUtils.sha256Hex(pwd);
-                    user.resetPwdToken = null;
-                    user.resetPwdExpiration = null;
+                if (user.getResetPwdExpiration().after(new Date())) {
+                    user.setPwd(DigestUtils.sha256Hex(pwd));
+                    user.setResetPwdToken( null );
+                    user.setResetPwdExpiration( null);
                     return toTOObject(save(user));
                 } else {
                     throw new UserControlerExpiredTokenException("expired");
@@ -272,7 +290,11 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("notifikace_interval:\""+interval+"\"")
                     .setRows(1000);
-            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+
+            QueryResponse usersResponse = solr.query("users", query);
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            return users;
+            //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -283,16 +305,16 @@ public class UserControlerImpl implements UserControler {
     public User userSave(User user) throws UserControlerException, NotAuthorizedException {
         User found = null;
         try (SolrClient client = buildClient()) {
-            found = findOneUser(client, "username:\"" + user.username + "\"");
+            found = findOneUser(client, "username:\"" + user.getUsername() + "\"");
         } catch (IOException | SolrServerException ex) {
             throw new UserControlerException(ex.getMessage());
         }
 
         if (found != null) {
-            user.pwd=found.pwd;
+            user.setPwd(found.getPwd());
             return toTOObject(save(user));
         } else {
-            throw new UserControlerException(String.format("Cannot save user %s", user.username));
+            throw new UserControlerException(String.format("Cannot save user %s", user.getUsername()));
         }
     }
 
@@ -327,7 +349,7 @@ public class UserControlerImpl implements UserControler {
 
     private  User save(User user, SolrClient client) throws IOException, SolrServerException {
         try {
-            client.addBean("users", user);
+            client.add("users", user.toSolrInputDocument());
             return toTOObject(user);
         } finally {
             SolrUtils.quietCommit(client, "users");
@@ -340,7 +362,11 @@ public class UserControlerImpl implements UserControler {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("role:\""+role.name()+"\"")
                     .setRows(1000);
-            return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
+
+            QueryResponse usersResponse = solr.query("users", query);
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            return users;
+
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -349,25 +375,26 @@ public class UserControlerImpl implements UserControler {
     User toTOObject(User user) {
         if (user != null) {
             User toObject = new User();
-            toObject.username = user.username;
-            toObject.jmeno = user.jmeno;
-            toObject.prijmeni = user.prijmeni;
-            toObject.apikey = user.apikey;
-            toObject.resetPwdToken = user.resetPwdToken;
-            toObject.resetPwdExpiration = user.resetPwdExpiration;
-            toObject.email = user.email;
-            toObject.notifikace_interval = user.notifikace_interval;
-            toObject.role = user.role;
-            toObject.institution = user.institution;
-            toObject.ico = user.ico;
-            toObject.poznamka = user.poznamka;
+            toObject.setUsername(user.getUsername());
+            toObject.setJmeno(user.getJmeno());
+            toObject.setPrijmeni(user.getPrijmeni());
+            toObject.setApikey(user.getApikey());
+            toObject.setResetPwdToken(user.getResetPwdToken());
+            toObject.setResetPwdExpiration(  user.getResetPwdExpiration());
+            toObject.setEmail( user.getEmail()) ;
+            toObject.setNotifikaceInterval(user.getNotifikaceInterval());
+            toObject.setNositel(user.getNositel());
+            toObject.setRole(user.getRole());
+            toObject.setInstitution( user.getInstitution());
+            toObject.setIco(user.getIco());
+            toObject.setPoznamka(user.getPoznamka());
 
-            toObject.mesto = user.mesto;
-            toObject.adresa = user.adresa;
-            toObject.ulice = user.ulice;
-            toObject.cislo = user.cislo;
-            toObject.telefon = user.telefon;
-            toObject.psc = user.psc;
+            toObject.setMesto(user.getMesto());
+            toObject.setAdresa(user.getAdresa());
+            toObject.setUlice(user.getUlice());
+            toObject.setCislo(user.getCislo());
+            toObject.setTelefon(user.getTelefon());
+            toObject.setPsc(user.getPsc());
 
             return toObject;
         } else {
@@ -378,12 +405,15 @@ public class UserControlerImpl implements UserControler {
     User findOneUser(SolrClient solr, String q) throws SolrServerException, IOException {
         SolrQuery query = new SolrQuery(q)
                 .setRows(1);
-        List<User> users = solr.query("users", query).getBeans(User.class);
-        solr.close();
-        if (users.isEmpty()) {
-            return null;
+
+        QueryResponse usersResult = solr.query("users", query);
+
+        long numFound = usersResult.getResults().getNumFound();
+        if (numFound >0 ) {
+            SolrDocument document = usersResult.getResults().get(0);
+            return User.fromSolrDocument(document);
         } else {
-            return users.get(0);
+            return null;
         }
     }
 

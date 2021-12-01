@@ -1,9 +1,10 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
@@ -71,26 +72,27 @@ public class AccountServiceWorkflowImplTest {
 
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
+        ApplicationUserLoginSupport appLogin =  EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler, bservice)
+                .withConstructor(controler,appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(controler.getUser()).andReturn(user).anyTimes();
+        EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
 
         EasyMock.expect(service.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
 
-        EasyMock.replay(controler, service);
+        EasyMock.replay(controler, service, appLogin);
 
         // vytvoreni zadosti
         Zadost zadost = new Zadost("01234");
         zadost.setIdentifiers(N_IDENTIFIERS);
         zadost.setState("open");
         zadost.setNavrh("NZN");
-        service.saveRequest(zadost.toJSON().toString(),user,  null);
+        service.saveRequest(zadost.toJSON().toString(), null);
 
         Zadost fromIndex = Zadost.fromJSON(service.getRequest("01234").toString());
         Assert.assertTrue(fromIndex.getNavrh().equals("NZN"));
@@ -116,7 +118,7 @@ public class AccountServiceWorkflowImplTest {
 
             MarcRecord oneRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157742");
             Assert.assertTrue(oneRecord.kuratorstav.size() == 1 && oneRecord.kuratorstav.get(0).equals("NPA"));
-            moveMonths(client, oneRecord, 6, false);
+            moveMonths(client, oneRecord, -6, false);
             client.commit("catalog");
 
             MarcRecord secondRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157765");
@@ -149,7 +151,7 @@ public class AccountServiceWorkflowImplTest {
         try (SolrClient client = SolrTestServer.getClient()) {
             MarcRecord oneRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157742");
             // posunuju dokument za lhutu
-            moveMonths(client, oneRecord, 12, true);
+            moveMonths(client, oneRecord, -12, true);
 
         }
 
@@ -201,10 +203,10 @@ public class AccountServiceWorkflowImplTest {
 
     private User testUser() {
         User user = new User();
-        user.institution="NKP";
-        user.username = "pokusny";
-        user.jmeno = "Jmeno";
-        user.prijmeni = "Prijmeni";
+        user.setInstitution("NKP");
+        user.setUsername( "pokusny");
+        user.setJmeno( "Jmeno");
+        user.setPrijmeni("Prijmeni");
         return user;
     }
 

@@ -5,8 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.Workflow;
+import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
@@ -19,8 +23,10 @@ import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jvnet.hk2.annotations.Service;
@@ -29,20 +35,13 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 @Service
 public class DNNTRequestApiServiceImpl extends RequestApiService {
-
-
 
 
     public static final Logger LOGGER = Logger.getLogger(DNNTRequestApiServiceImpl.class.getName());
@@ -51,180 +50,87 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
     private static final int LIMIT = 10000;
 
-    // zamenit
-    private static enum DocumentState {
-        A {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        N {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        PA {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        VN {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-
-        VS {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        VVS {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return Arrays.asList(A);
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        VVN {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return Arrays.asList(PA);
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return false;
-            }
-        },
-        NZN {
-            @Override
-            public List<DocumentState> allowingPredecessor() {
-                return Arrays.asList(VN, VS, N);
-            }
-
-            @Override
-            public boolean acceptNonExistingState() {
-                return true;
-            }
-        };
-
-        public abstract List<DocumentState> allowingPredecessor();
-
-        public abstract boolean acceptNonExistingState();
-    }
-
-
 
     @Override
-    public Response requestBatchVvn(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        return request(containerRequestContext,  batchRequest, DocumentState.VVN);
+    public Response requestBatchVnl(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, "VNL");
+    }
+
+    @Override
+    public Response requestBatchVnz(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, "VNZ");
     }
 
     @Override
     public Response requestBatchNzn(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        return request(containerRequestContext,  batchRequest, DocumentState.NZN);
+        return request(containerRequestContext,  batchRequest, "NZN");
     }
+
 
     @Override
-    public Response requestBatchVvs(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        return request(containerRequestContext,  batchRequest, DocumentState.VVS);
+    public Response requestBatchVN(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        return request(containerRequestContext,  batchRequest, "VN");
     }
-
-
-
 
     @Override
     public Response requestGet(String status, String internalStatus,String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-        try {
-            String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
-            if (headerString != null) {
-                User user = new UserControlerImpl(null).findUserByApiKey(headerString);
-                if (user != null) {
-                    ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
-                    try {
-                        AccountService accountService = new AccountServiceImpl(new ResourceBundleServiceImpl(containerRequestContext));
-                        JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null ,null , user, LIMIT, 0);
-                        JSONObject response = search.getJSONObject("response");
-                        JSONArray docs = response.getJSONArray("docs");
-                        for (int i = 0, ll = docs.length();i<ll;i++) {
+        String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
+        if (headerString != null) {
+            UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
+            OpenApiLoginSupportImpl loginSupport = new OpenApiLoginSupportImpl(headerString);
+            if (loginSupport.getUser() != null) {
+                ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
+                try {
 
-                            JSONObject jsonObject = docs.getJSONObject(i);
-                            ArrayOfDetails details = details(jsonObject, internalStatus);
-                            if (!details.isEmpty()) {
-                                ObjectMapper objectMapper = getObjectMapper();
-                                SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
-                                savedRequest.setDetails(details);
-                                arrayOfSavedRequest.add(savedRequest);
-                            }
+                    AccountService accountService = new AccountServiceImpl(userControler, loginSupport , new ResourceBundleServiceImpl(containerRequestContext));
+                    JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null ,null , LIMIT, 0);
+                    JSONObject response = search.getJSONObject("response");
+                    JSONArray docs = response.getJSONArray("docs");
+                    for (int i = 0, ll = docs.length();i<ll;i++) {
+
+                        JSONObject jsonObject = docs.getJSONObject(i);
+                        ArrayOfDetails details = details(jsonObject, internalStatus);
+                        if (!details.isEmpty()) {
+                            ObjectMapper objectMapper = getObjectMapper();
+                            SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                            savedRequest.setDetails(details);
+                            arrayOfSavedRequest.add(savedRequest);
                         }
-                        return Response.ok().entity(arrayOfSavedRequest).build();
-
-                    } catch (SolrServerException | IOException | AccountException e) {
-                        LOGGER.log(Level.SEVERE,e.getMessage());
-                        return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
                     }
-                } else {
-                    return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
+                    return Response.ok().entity(arrayOfSavedRequest).build();
+
+                } catch (SolrServerException | IOException | AccountException e) {
+                    LOGGER.log(Level.SEVERE,e.getMessage());
+                    return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
                 }
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
             }
-        } catch (UserControlerException e) {
+        } else {
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
         }
     }
 
     private ArrayOfDetails details(JSONObject jsonObject, String intStatus) {
-        JSONObject process = jsonObject.getJSONObject("process");
-        ArrayOfDetails details = new ArrayOfDetails();
-        process.keySet().stream().forEach(key -> {
-            JSONObject detailJSON = process.getJSONObject(key);
-            Detail.StateEnum state = Detail.StateEnum.fromValue(detailJSON.optString("state"));
-            if (intStatus == null || (state != null && state.toString().equals(intStatus))) {
-                Detail detail =  new Detail()
-                        .identifier(key)
-                        .reason(detailJSON.optString("reason"))
-                        .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
-                        .user(detailJSON.optString("user"));
-                details.add(detail);
-            }
-        });
-        return details;
+        if (jsonObject.has("process")) {
+            JSONObject process = jsonObject.getJSONObject("process");
+            ArrayOfDetails details = new ArrayOfDetails();
+            process.keySet().stream().forEach(key -> {
+                JSONObject detailJSON = process.getJSONObject(key);
+                Detail.StateEnum state = Detail.StateEnum.fromValue(detailJSON.optString("state"));
+                if (intStatus == null || (state != null && state.toString().equals(intStatus))) {
+                    Detail detail =  new Detail()
+                            .identifier(key)
+                            .reason(detailJSON.optString("reason"))
+                            .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
+                            .user(detailJSON.optString("user"));
+                    details.add(detail);
+                }
+            });
+            return details;
+        } else {
+            return new ArrayOfDetails();
+        }
     }
 
     private ObjectMapper getObjectMapper() {
@@ -242,7 +148,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
 
-    private Response request(ContainerRequestContext crc, BatchRequest body, DocumentState state) {
+    private Response request(ContainerRequestContext crc, BatchRequest body, String navrh) {
         try {
             BatchResponse response = new BatchResponse();
             response.setNotsaved(new ArrayOfFailedRequest());
@@ -252,31 +158,38 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
-                AccountService accountService = new AccountServiceImpl(new ResourceBundleServiceImpl(crc));
-                User user = new UserControlerImpl(null).findUserByApiKey(headerString);
-                if (user != null) {
+
+                UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
+                OpenApiLoginSupportImpl openApiLoginSupport = new OpenApiLoginSupportImpl(headerString);
+
+                AccountService accountService = new AccountServiceImpl(userControler, openApiLoginSupport, new ResourceBundleServiceImpl(crc));
+
+                if (openApiLoginSupport.getUser() != null) {
                     List<Request> batch = body.getBatch();
                     for (Request req : batch) {
 
                         try {
-                            verifyIdentifiers(state, req.getIdentifiers());
-                            String s = objectMapper.writeValueAsString(req);
+                            // verify/ maximum item and current state
 
-                            JSONObject rawObject = new JSONObject(s);
-                            rawObject.put("id", user.username+ UUID.randomUUID().toString());
+                            JSONObject prepare = accountService.prepare(navrh);
+                            Zadost zadost = Zadost.fromJSON(prepare.toString());
+                            verifyIdentifiers(zadost, req.getIdentifiers());
 
-                            rawObject.put("navrh",state.name());
-                            rawObject.put("process",new JSONObject());
-                            rawObject.put("state","waiting");
+                            if (req.getIdentifiers() != null) {
+                                zadost.setIdentifiers(req.getIdentifiers());
+                            } else {
+                                zadost.setIdentifiers(new ArrayList<>());
+                            }
 
-                            String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(Instant.now().truncatedTo(ChronoUnit.MILLIS));
-                            rawObject.put("datum_zadani" , utc);
+                            zadost.setPozadavek(req.getPozadavek());
+                            zadost.setPoznamka(req.getPoznamka());
 
                             try {
-                                JSONObject object = accountService.saveRequest(rawObject.toString(), user, null);
-                                response.getSaved().add(objectMapper.readValue(object.toString(), SuccessRequestSaved.class));
 
-                            } catch (SolrServerException | ConflictException e) {
+                                JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
+                                response.getSaved().add(objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class));
+
+                            } catch ( ConflictException e) {
                                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
 
                                 FailedRequestNotSaved ns = new FailedRequestNotSaved();
@@ -302,6 +215,22 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     .poznamka(req.getPoznamka());
 
                             response.getNotsaved().add(ns.reason("Invalid state of these documents: "+e.getPids()));
+                        } catch (SolrServerException e) {
+                            // solr exception
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+
+                            response.getNotsaved().add(ns.reason("Solr exception: "+e.getMessage()));
+                        } catch (ConflictException e) {
+                            // conflict
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+
+                            response.getNotsaved().add(ns.reason("Conflict: "+e.getMessage()));
                         }
 
                     }
@@ -309,43 +238,32 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 }
             }
             return Response.status(Response.Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not authorized")).build();
-        } catch (IOException | UserControlerException |AccountException e) {
+        } catch (IOException | AccountException e) {
             return Response.accepted().status(Response.Status.INTERNAL_SERVER_ERROR).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
         }
     }
 
-    private void verifyIdentifiers(DocumentState navrh, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException {
-        List<String> predecessor = navrh.allowingPredecessor().stream().map(DocumentState::name).collect(Collectors.toList());
-
-        List<Pair<String, List<String>>>  identFromCatalog = new CatalogSearcher().existingCatalogIdentifiersAndStates(identifiers);
-        // neexistuji nebo nebo nemaji pole pro stavy ??
-        List<String> nonExistentIdentifiers = new ArrayList<>(identifiers);
-        // identifikatory se spatnymi stavy
+    private void verifyIdentifiers(Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException {
+        List<String> nonExistentIdentifiers = new ArrayList<>();
         List<String> invalidIdentifiers = new ArrayList<>();
 
-        identFromCatalog.stream().map(Pair::getLeft).forEach(nonExistentIdentifiers::remove);
-
-        identFromCatalog.forEach(pair-> {
-            boolean found = false;
-            List<String> documentStates = pair.getRight();
-            for (String docState : documentStates) {
-                if (predecessor.contains(docState)) {
-                    found = true;
-                    break;
+        for (String documentId :  identifiers) {
+            try (SolrClient solr = buildClient()) {
+                MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
+                if (marcRecord != null) {
+                    Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
+                    if (workflow == null) {
+                        invalidIdentifiers.add(documentId);
+                    }
+                } else {
+                    nonExistentIdentifiers.add(documentId);
                 }
             }
-            if (navrh.acceptNonExistingState() && documentStates.isEmpty()) {
-                found = true;
-            }
-            if (!found) {
-                invalidIdentifiers.add(pair.getLeft());
-            }
-        });
-
+        }
         if (!nonExistentIdentifiers.isEmpty()) throw new NonExistentIdentifeirsException(nonExistentIdentifiers);
         if (!invalidIdentifiers.isEmpty()) throw new InvalidIdentifiersException(invalidIdentifiers);
 
-    }
+   }
 
     public static class NonExistentIdentifeirsException extends Exception {
         private List<String> idents;
@@ -370,4 +288,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             return pids;
         }
     }
+
+    SolrClient buildClient() {
+        return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+    }
+
 }

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
@@ -438,7 +438,7 @@ public class IndexerServlet extends HttpServlet {
           try {
             Indexer indexer = new Indexer();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            return indexer.save(req.getParameter("id"), inputJs, user.username);
+            return indexer.save(req.getParameter("id"), inputJs, user.getUsername());
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }

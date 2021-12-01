@@ -1,7 +1,7 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.index.CatalogSearcher;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -43,14 +43,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
 
     @Override
-    public Response catalogGet(String query, String state, String license, String fmt, Boolean fullCatalog, Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
+    public Response catalogGet(String query, String state, String license, String fmt,  Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
         Map<String,String> map = new HashMap<>();
         map.put("q", query);
         map.put("rows", integer.toString());
         map.put("page", integer1.toString());
-        if (fullCatalog) {
-            map.put("fullCatalog", Boolean.TRUE.toString());
-        }
 
         List<String> filters = new ArrayList<>();
         if (state != null && state.length()> 0) {

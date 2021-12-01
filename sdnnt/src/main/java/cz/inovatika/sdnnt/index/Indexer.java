@@ -13,7 +13,7 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -26,7 +26,6 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -301,7 +300,7 @@ public class Indexer {
     try {
       List<User> usersByNotificationInterval = controler.findUsersByNotificationInterval(interval);
       for (User u :  usersByNotificationInterval) {
-        LOGGER.log(Level.INFO, String.format("Sending notifications: %s for user  %s",interval, u.jmeno+" "+u.prijmeni+"("+u.email));
+        LOGGER.log(Level.INFO, String.format("Sending notifications: %s for user  %s",interval, u.getJmeno()+" "+u.getPrijmeni()+"("+u.getEmail()));
 
       }
 
@@ -356,7 +355,8 @@ public class Indexer {
           // Dotazujeme user
           SolrQuery qUser = new SolrQuery("*").setRows(1)
               .addFilterQuery("{!join fromIndex=notifications from=user to=username} identifier:\"" + doc.getFirstValue("identifier") + "\"");
-          List<User> users = getClient().query("users", qUser).getBeans(User.class);
+          QueryResponse uResponse = getClient().query("users", qUser);
+          List<User> users = uResponse.getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
           for (User user : users) {
             // Pridame udaje o zaznamu pro uzivatel
             if (mails.containsKey(user)) {

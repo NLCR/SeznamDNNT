@@ -3,7 +3,7 @@ package cz.inovatika.sdnnt.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
@@ -11,10 +11,7 @@ import cz.inovatika.sdnnt.model.workflow.WorkflowState;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.model.workflow.zadost.ZadostWorkflowFactory;
 import cz.inovatika.sdnnt.rights.Role;
-import cz.inovatika.sdnnt.services.AccountService;
-import cz.inovatika.sdnnt.services.AccountServiceInform;
-import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.*;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.*;
@@ -50,16 +47,19 @@ public class AccountServiceImpl implements AccountService {
     private static final int DEFAULT_SEARCH_RESULT_SIZE = 20;
 
     private UserControler userControler;
+    private ApplicationUserLoginSupport loginSupport;
+
     private ResourceServiceService resourceServiceService;
 
-    public AccountServiceImpl(UserControler userControler, ResourceServiceService res) {
+    public AccountServiceImpl(UserControler userControler, ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
         this.userControler = userControler;
+        this.loginSupport = loginSupport;
         this.resourceServiceService = res;
     }
 
-    public AccountServiceImpl(ResourceServiceService res) {
-        this.resourceServiceService = res;
-    }
+//    public AccountServiceImpl(ResourceServiceService res) {
+//        this.resourceServiceService = res;
+//    }
 
     public AccountServiceImpl(UserControler userControler) {
         this.userControler = userControler;
@@ -68,7 +68,10 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl() {}
 
     @Override
-    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, User user, int rows, int page) throws SolrServerException, IOException {
+    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, int rows, int page) throws SolrServerException, IOException {
+
+        User user = this.loginSupport.getUser();
+
         NamedList<Object> qresp = null;
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
@@ -115,7 +118,7 @@ public class AccountServiceImpl implements AccountService {
                 }
             }
 
-            if (Role.kurator.name().equals(user.role) || Role.mainKurator.name().equals(user.role)) {
+            if (Role.kurator.name().equals(user.getRole()) || Role.mainKurator.name().equals(user.getRole())) {
                 query.addFilterQuery("-state:open");
                 query.addSort(SolrQuery.SortClause.desc("state"));
                 if (sort == null) {
@@ -123,7 +126,7 @@ public class AccountServiceImpl implements AccountService {
                 }
 
             } else {
-                query.addFilterQuery("user:" + user.username);
+                query.addFilterQuery("user:" + user.getUsername());
                 query.addSort(SolrQuery.SortClause.asc("state"));
                 if (sort == null) {
                     query.addSort(SolrQuery.SortClause.desc("datum_zadani"));
@@ -153,20 +156,33 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public JSONObject saveRequest(String payload, User user, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException, AccountException {
+    public JSONObject saveRequest(String payload, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException, AccountException {
+        // zadost, testuje se na stav open
         Zadost zadost = Zadost.fromJSON(payload);
         if (zadost.getState().equals("open")) {
-            zadost.setUser(user.username);
-            zadost.setInstitution(user.institution);
+            zadost.setUser(this.loginSupport.getUser().getUsername());
+            zadost.setInstitution(this.loginSupport.getUser().getInstitution());
             JSONObject jsonObject = saveRequest(zadost, inform);
             return VersionStringCast.cast(jsonObject);
         } else {
-            if (this.resourceServiceService != null) {
+            if (this.resourceServiceService != null && this.resourceServiceService.getBundle() != null) {
                 throw new AccountException("account.notopened", this.resourceServiceService.getBundle().getString("account.notopened"));
             } else {
                 throw new AccountException("account.notopened", "account.notopened");
             }
         }
+    }
+
+
+    @Override
+    public JSONObject prepare(String navrh) throws SolrServerException, IOException, AccountException, ConflictException {
+        Zadost nZadost = new Zadost(UUID.randomUUID().toString());
+        nZadost.setNavrh(navrh);
+        nZadost.setState("open");
+        nZadost.setUser(this.loginSupport.getUser().getUsername());
+        nZadost.setIdentifiers(new ArrayList<>());
+        JSONObject jsonZadost = this.saveRequest(nZadost.toJSON().toString(), null);
+        return jsonZadost;
     }
 
     public JSONObject saveCuratorRequest(String payload, AccountServiceInform inform) throws JsonProcessingException, ConflictException {
@@ -203,7 +219,7 @@ public class AccountServiceImpl implements AccountService {
             //return VersionStringCast.cast(zadost.toJSON());
         } catch(BaseHttpSolrClient.RemoteSolrException ex) {
             if (ex.code() == 409) {
-                if (this.resourceServiceService != null) {
+                if (this.resourceServiceService != null && this.resourceServiceService.getBundle() != null) {
                     throw new ConflictException("account.conflict", this.resourceServiceService.getBundle().getString("account.conflict"));
                 } else {
                     throw new ConflictException("account.conflict", "account.conflict");
@@ -224,7 +240,7 @@ public class AccountServiceImpl implements AccountService {
     public JSONObject saveRequestWithFRBR(String payload, User user , String frbr, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException {
         try {
             Zadost zadost = Zadost.fromJSON(payload);
-            zadost.setUser(user.username);
+            zadost.setUser(user.getUsername());
             try (SolrClient solr = buildClient()) {
                 SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
                         .setFields("identifier")
@@ -263,7 +279,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public JSONObject curatorCloseRequest(String payload) throws ConflictException, AccountException {
         Zadost zadost = Zadost.fromJSON(payload);
-        zadost.setKurator(this.userControler.getUser().username);
+        zadost.setKurator(this.loginSupport.getUser().getUsername());
         zadost.setDatumVyrizeni(new Date());
         return closeRequest(zadost, "processed");
     }
@@ -271,7 +287,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public JSONObject userCloseRequest(String payload) throws ConflictException{
         Zadost zadost = Zadost.fromJSON(payload);
-        zadost.setUser(this.userControler.getUser().username);
+        zadost.setUser(this.loginSupport.getUser().getUsername());
         zadost.setDatumZadani(new Date());
 
         return closeRequest(zadost, "waiting");
@@ -338,8 +354,8 @@ public class AccountServiceImpl implements AccountService {
             JSONObject ret = new JSONObject((String) qresp.get("response"));
 
             List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
-            if (this.userControler.getUser() != null) {
-                JSONArray notifications = NotificationUtils.findNotifications(ids, this.userControler.getUser().username, solr);
+            if (this.loginSupport.getUser() != null) {
+                JSONArray notifications = NotificationUtils.findNotifications(ids, this.loginSupport.getUser().getUsername(), solr);
                 ret.put("notifications", notifications);
             }
 
@@ -352,7 +368,7 @@ public class AccountServiceImpl implements AccountService {
         JSONObject zadostJSON = getRequest(zadostId);
         if (zadostJSON != null) {
             try {
-                String username = userControler.getUser().username;
+                String username = this.loginSupport.getUser().getUsername();
                 Zadost.reject(documentId,zadostJSON.toString(),  reason, username);
                 return VersionStringCast.cast(getRequest(zadostId));
             } catch (JSONException e) {
@@ -376,13 +392,13 @@ public class AccountServiceImpl implements AccountService {
 
                     // prene se a
                     WorkflowState workflowState = workflow.nextAlternativeState(alternative);
-                    workflowState.switchState(zadostId, userControler.getUser().username, reason);
+                    workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
                     solr.add("catalog", marcRecord.toSolrDoc());
                     solr.commit("catalog");
 
                     Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
-                            reason,userControler.getUser().username,null);
+                            reason,this.loginSupport.getUser().getUsername(),null);
 
                 }
             }
@@ -406,13 +422,13 @@ public class AccountServiceImpl implements AccountService {
                         // prene se a
                         WorkflowState workflowState = workflow.nextState();
                         if (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
-                            workflowState.switchState(zadostId, userControler.getUser().username, reason);
+                            workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
                             solr.add("catalog", marcRecord.toSolrDoc());
                             solr.commit("catalog");
 
                             Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
-                                    reason,userControler.getUser().username,null);
+                                    reason,this.loginSupport.getUser().getUsername(),null);
 
                         } else  throw new AccountException("account.nocuratorworkflow", "account.nocuratorworkflow");
                     } else throw new AccountException("account.noworkflowstates", "account.noworkflowstates");
@@ -514,7 +530,7 @@ public class AccountServiceImpl implements AccountService {
                                     LOGGER.info(String.format("\tautomatic switch,  request(%s, %s)  = doc(%s, %s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ,""+(marcRecord.dntstav+" "+marcRecord.kuratorstav +( marcRecord.license != null  ? " / "+marcRecord.license : ""))));
                                 }
                             } else {
-                                LOGGER.info(String.format("\tnot accepte, request(%s, %s) =   doc(%s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ));
+                                LOGGER.info(String.format("\tnot accept, request(%s, %s) =   doc(%s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ));
                             }
                         }
                     } catch (JsonProcessingException e) {

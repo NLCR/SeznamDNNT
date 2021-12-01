@@ -5,14 +5,13 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.MailService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.*;
 import org.json.JSONObject;
 
-import javax.mail.*;
 import java.io.*;
 import java.rmi.ServerException;
 import java.util.*;
@@ -32,7 +31,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recepient.getRight());
             scopes.put("token", token);
             if (user != null) {
-                scopes.put("username", user.username);
+                scopes.put("username", user.getUsername());
             }
 
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_link";
@@ -49,7 +48,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("user", recepient.getRight());
             scopes.put("password", generatedPswd);
             if (user != null) {
-                scopes.put("username", user.username);
+                scopes.put("username", user.getUsername());
             }
 
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_reset_password";
@@ -108,7 +107,7 @@ public class MailServiceImpl implements MailService  {
             scopes.put("password", generatedPswd);
             scopes.put("token", requestToken);
             if (user != null) {
-                scopes.put("username", user.username);
+                scopes.put("username", user.getUsername());
             }
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_registration";
             LOGGER.info("Sending email: Generated password for new created user");

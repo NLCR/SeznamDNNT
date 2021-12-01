@@ -1,6 +1,6 @@
 package cz.inovatika.sdnnt.services;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -34,7 +34,6 @@ public interface AccountService {
      * @param priority Filtr pro prioritu
      * @param delegated Filtr pro delegovanou osobu
      * @param sort Sortovani dle (u uzivatele datum vytvoreni a zpracovani, u kuratoru - deadline, priority atd.. )
-     * @param user
      * @param rows
      * @param page
      * @return
@@ -42,12 +41,16 @@ public interface AccountService {
      * @throws IOException IO chyba
      * @throws AccountException Genericka vyjimka pri ukladani zadosti
      */
-    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, User user, int rows, int page) throws SolrServerException, IOException,AccountException;
+    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, int rows, int page) throws SolrServerException, IOException,AccountException;
+
+
+    //
+    public JSONObject prepare(String navrh) throws SolrServerException, IOException, AccountException, ConflictException;
+
 
     /**
      * Ulozeni zadosti pro uzivatele, musi byt ve stavu open
      * @param payload Zadost ve formatu json
-     * @param user Uzivatel
      * @param inform Informace o ulozeni zdosti
      * @return Vraci json ulozene zadosti
      * @throws SolrServerException Chyba spojeni se solrem
@@ -56,7 +59,8 @@ public interface AccountService {
      * @throws AccountException Genericka vyjimka pri ukladani zadosti
      * @see AccountServiceInform
      */
-    public JSONObject saveRequest(String payload, User user, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException, AccountException;
+    public JSONObject saveRequest(String payload, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException, AccountException;
+
 
 
     /**

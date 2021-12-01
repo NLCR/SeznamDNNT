@@ -1,14 +1,12 @@
 package cz.inovatika.sdnnt.services;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
 
 import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import java.io.IOException;
 import java.rmi.ServerException;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 

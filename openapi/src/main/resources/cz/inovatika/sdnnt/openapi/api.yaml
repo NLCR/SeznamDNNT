@@ -34,7 +34,7 @@ paths:
       description: |
         Umožňuje vyhledávat a prohlížet data v katalogu. Předdefinované filtry
           - Licence - licence díla (**DNNTT**, **DNNTO**)
-          - Stavy - Stav díla (**A**, **PA**, **VS**, **VN**, **N**, **NZN**, **VVN**, **VVS**, **NZ**)
+          - Stavy - Stav díla (**A**, **PA**, **V**, **VN**, **N**, **NZN**, **VNL**, **VNZ**)
 
       parameters:
         - in: query
@@ -46,7 +46,7 @@ paths:
           name: state
           schema:
             type: string
-            enum: ["A","PA","V","VS","VN","N","NZ"]
+            enum: ["A","PA","V","N"]
           required: false
         - in: query
           name: license
@@ -62,12 +62,7 @@ paths:
             enum: ["BK","SE", "MP","MU"]
           required: false
 
-        - in: query
-          name: fullCatalog
-          schema:
-            type: boolean
-            default: false
-          required: false
+
         - in: query
           name: rows
           schema:
@@ -109,7 +104,7 @@ paths:
           name: status
           schema:
             type: string
-            enum: ["open","waiting","processed"]
+            enum: ["open", "waiting", "waiting_for_automatic_process", "processed"]
           required: false
         - in: query
           name: itemstatus
@@ -122,7 +117,7 @@ paths:
           name: navrh
           schema:
             type: string
-            enum: ["NZN","VVS", "VVN"]
+            enum: ["NZN","VN", "VNL","VNZ"]
           required: false
 
 
@@ -146,7 +141,7 @@ paths:
         Řeší návrh k zařazení na seznam.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
           - Dílo je identifikováno identifikátorem ze souborného katalogu.
-          - Dílo musí být ve stavu **N** případně **VN**
+          - Dílo musí být ve stavu **N**
       operationId: requestBatchNzn
       requestBody:
         description: Hromadný návrh (jeden nebo více, identifikátor musí existovat v souborném katalogu, dokument u sebe musí mít přítomné pole stavů marc_911a)
@@ -171,7 +166,7 @@ paths:
       security:
         - api_key: []
 
-  /request/batch/vvs:
+  /request/batch/vn:
     put:
       tags:
         - Požadavky
@@ -180,8 +175,8 @@ paths:
         Řeší hromadnou výzvu k vyřazení ze seznamu.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
           - Dílo je identifikováno identifikátorem ze souborného katalogu.
-          - Dílo musí být ve stavu **A**
-      operationId: requestBatchVvs
+          - Dílo musí být ve stavu **A** případně **PA**
+      operationId: requestBatchVN
       requestBody:
         description: Hromadná výzva (jedna nebo více, identifikátor musí existovat v souborném katalogu, dokument u sebe musí mít přítomné pole stavů marc_911a)
         content:
@@ -204,18 +199,18 @@ paths:
         - api_key: []
 
 
-  /request/batch/vvn:
+  /request/batch/vnl:
     put:
       tags:
         - Požadavky
-      summary: Výzva k vyřazení z Návrhu seznamu
+      summary: Výzva k omezení na terminál / VNL
       description: |
-        Řeší hromadnou hromadný požadavek o vyřazení z návrhu ze seznamu.
+        Řeší hromadnou hromadný požadavek .
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
           - Dílo je identifikováno identifikátorem ze souborného katalogu.
-          - Dílo musí být ve stavu **PA**
+          - Dílo musí být ve stavu **A** případně **PA**
 
-      operationId: requestBatchVvn
+      operationId: requestBatchVnl
       requestBody:
         description: Hromadná výzva(jedna nebo více, identifikátor musí existovat v souborném katalogu, dokument u sebe musí mít přítomné pole stavů marc_911a)
         content:
@@ -237,6 +232,38 @@ paths:
       security:
         - api_key: []
 
+  /request/batch/vnz:
+    put:
+      tags:
+        - Požadavky
+      summary: Výzva k omezení na terminál / VNZ
+      description: |
+        Řeší hromadnou hromadný požadavek o vyřazení z návrhu ze seznamu.
+          - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
+          - Dílo je identifikováno identifikátorem ze souborného katalogu.
+          - Dílo musí být ve stavu **A** případně **PA**
+
+      operationId: requestBatchVnz
+      requestBody:
+        description: Hromadná výzva(jedna nebo více, identifikátor musí existovat v souborném katalogu, dokument u sebe musí mít přítomné pole stavů marc_911a)
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/requests/BatchRequest.yaml'
+        required: true
+
+      responses:
+        '200':
+          description: Žádost vytvořena a ve stavu waiting
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/requests/BatchResponse.yaml'
+        '400':
+          description: Špatný dotaz (syntaxe atd..)
+
+      security:
+        - api_key: []
 
 components:
   securitySchemes:

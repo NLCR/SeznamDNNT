@@ -1,7 +1,7 @@
 
 package cz.inovatika.sdnnt;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;

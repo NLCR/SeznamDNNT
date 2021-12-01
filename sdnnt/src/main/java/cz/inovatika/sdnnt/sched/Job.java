@@ -114,7 +114,7 @@ public class Job implements InterruptableJob {
       @Override
       void doPerform(JSONObject jobData) {
         try {
-            AccountServiceImpl accountService = new AccountServiceImpl(null, null);
+            AccountServiceImpl accountService = new AccountServiceImpl(null, null, null);
             accountService.schedulerSwitchStates();
         } catch (ConflictException | AccountException | IOException | SolrServerException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);

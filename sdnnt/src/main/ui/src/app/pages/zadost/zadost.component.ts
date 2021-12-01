@@ -94,6 +94,7 @@ export class ZadostComponent implements OnInit {
           this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
         } else {
           this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+          this.zadost = res;
           this.getDocs(this.route.snapshot.queryParams);
         }
       });

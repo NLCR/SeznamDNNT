@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.inovatika.sdnnt.model.User;
 import org.apache.solr.client.solrj.beans.Field;
 import org.json.JSONObject;
 

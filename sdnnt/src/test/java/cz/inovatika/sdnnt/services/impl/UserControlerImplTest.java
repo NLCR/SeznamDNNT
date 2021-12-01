@@ -1,7 +1,7 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
@@ -25,10 +25,12 @@ import javax.servlet.http.HttpSession;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static org.easymock.EasyMock.*;
 
@@ -87,7 +89,8 @@ public class UserControlerImplTest {
         registerOneUser(regUser,sendRegistrationMail,  EasyMock.createMock(HttpServletRequest.class));
 
         // find user
-        List<User> users = prepare.getClient().query("users", solrQuery).getBeans(User.class);
+        List<User> users = prepare.getClient().query("users", solrQuery).getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
+        //List<User> users = prepare.getClient().query("users", solrQuery).getBeans(User.class);
         Assert.assertTrue(users.size() == 1);
 
         // login
@@ -114,8 +117,11 @@ public class UserControlerImplTest {
 
         User login = userControler.login();
 
-        Assert.assertTrue(login.username.equals(users.get(0).username));
-        Assert.assertTrue(login.pwd == null);
+        Assert.assertTrue(login.getUsername().equals(users.get(0).getUsername()));
+        Assert.assertTrue(login.getPwd() == null);
+
+        Assert.assertTrue(login.getNositel().size() == 2);
+
 
     }
 
@@ -151,13 +157,13 @@ public class UserControlerImplTest {
         List<User> usersByRole = userControler.findUsersByRole(Role.user);
         Assert.assertTrue(usersByRole.size() == 3);
 
-        usersByRole.get(0).role = Role.knihovna.name();
+        usersByRole.get(0).setRole( Role.knihovna.name());
         userControler.save(usersByRole.get(0));
 
-        usersByRole.get(1).role = Role.kurator.name();
+        usersByRole.get(1).setRole(Role.kurator.name());
         userControler.save(usersByRole.get(1));
 
-        usersByRole.get(2).role = Role.user.name();
+        usersByRole.get(2).setRole(Role.user.name());
         userControler.save(usersByRole.get(2));
 
         Assert.assertTrue(userControler.findUsersByRole(Role.user).size() == 1);
@@ -198,13 +204,13 @@ public class UserControlerImplTest {
         List<User> usersByRole = userControler.findUsersByPrefix("test");
         Assert.assertTrue(usersByRole.size() == 3);
 
-        usersByRole.get(0).role = Role.knihovna.name();
+        usersByRole.get(0).setRole(Role.knihovna.name());
         userControler.save(usersByRole.get(0));
 
-        usersByRole.get(1).role = Role.kurator.name();
+        usersByRole.get(1).setRole( Role.kurator.name());
         userControler.save(usersByRole.get(1));
 
-        usersByRole.get(2).role = Role.user.name();
+        usersByRole.get(2).setRole(Role.user.name());
         userControler.save(usersByRole.get(2));
 
         Assert.assertTrue(userControler.findUsersByRole(Role.user).size() == 1);
@@ -242,21 +248,21 @@ public class UserControlerImplTest {
         List<User> all = userControler.getAll();
         Assert.assertTrue(all.size() == 3);
 
-        Assert.assertTrue(all.get(0).username.equals("test1"));
-        Assert.assertTrue(all.get(1).username.equals("test2"));
-        Assert.assertTrue(all.get(2).username.equals("test3"));
+        Assert.assertTrue(all.get(0).getUsername().equals("test1"));
+        Assert.assertTrue(all.get(1).getUsername().equals("test2"));
+        Assert.assertTrue(all.get(2).getUsername().equals("test3"));
 
-        Assert.assertTrue(all.get(0).jmeno.equals("TestJmeno_1"));
-        Assert.assertTrue(all.get(1).jmeno.equals("TestJmeno_2"));
-        Assert.assertTrue(all.get(2).jmeno.equals("TestJmeno_3"));
+        Assert.assertTrue(all.get(0).getJmeno().equals("TestJmeno_1"));
+        Assert.assertTrue(all.get(1).getJmeno().equals("TestJmeno_2"));
+        Assert.assertTrue(all.get(2).getJmeno().equals("TestJmeno_3"));
 
-        Assert.assertTrue(all.get(0).prijmeni.equals("TestPrijmeni_1"));
-        Assert.assertTrue(all.get(1).prijmeni.equals("TestPrijmeni_2"));
-        Assert.assertTrue(all.get(2).prijmeni.equals("TestPrijmeni_3"));
+        Assert.assertTrue(all.get(0).getPrijmeni().equals("TestPrijmeni_1"));
+        Assert.assertTrue(all.get(1).getPrijmeni().equals("TestPrijmeni_2"));
+        Assert.assertTrue(all.get(2).getPrijmeni().equals("TestPrijmeni_3"));
 
-        Assert.assertTrue(all.get(0).pwd == null);
-        Assert.assertTrue(all.get(1).pwd == null);
-        Assert.assertTrue(all.get(2).pwd == null);
+        Assert.assertTrue(all.get(0).getPwd() == null);
+        Assert.assertTrue(all.get(1).getPwd() == null);
+        Assert.assertTrue(all.get(2).getPwd() == null);
     }
 
     /** Test save API key and find by API key */
@@ -290,7 +296,7 @@ public class UserControlerImplTest {
         User u1 = userControler.findUser("test1");
         Assert.assertTrue(u1 != null);
 
-        u1.apikey = "API-KEY-1";
+        u1.setApikey( "API-KEY-1");
         userControler.save(u1);
 
         User ur1 = userControler.findUserByApiKey("API-KEY-1");
@@ -331,10 +337,10 @@ public class UserControlerImplTest {
         User u2 = userControler.findUser("test2");
         Assert.assertTrue(u2 != null);
 
-        u1.notifikace_interval = NotificationInterval.den.name();
+        u1.setNotifikaceInterval(NotificationInterval.den.name());
         userControler.save(u1);
 
-        u2.notifikace_interval = NotificationInterval.mesic.name();
+        u2.setNotifikaceInterval(NotificationInterval.mesic.name());
         userControler.save(u2);
 
         List<User> den = userControler.findUsersByNotificationInterval(NotificationInterval.den.name());
@@ -453,19 +459,20 @@ public class UserControlerImplTest {
 
     private User testUser(String postfix) {
         User testUser = new User();
-        testUser.username="test"+postfix;
-        testUser.jmeno="TestJmeno_"+postfix;
-        testUser.prijmeni="TestPrijmeni_"+postfix;
-        testUser.role = Role.user.name();
-        testUser.email = "test_"+postfix+"@testovic.cz";
-        testUser.institution = "institution";
+        testUser.setUsername("test"+postfix);
+        testUser.setJmeno("TestJmeno_"+postfix);
+        testUser.setPrijmeni("TestPrijmeni_"+postfix);
+        testUser.setRole( Role.user.name() );
+        testUser.setEmail( "test_"+postfix+"@testovic.cz");
+        testUser.setInstitution( "institution" );
+        testUser.setNositel(Arrays.asList("autor", "nevim"));
         return testUser;
     }
 
 
     private void loginRequest(User user, String pwd ,HttpServletRequest request, HttpSession session) throws IOException {
         JSONObject object = new JSONObject();
-        object.put("user", user.username);
+        object.put("user", user.getUsername());
         object.put("pwd", pwd);
 
         EasyMock.expect(session.getAttribute(UserControler.AUTHENTICATED_USER)).andReturn(null).anyTimes();

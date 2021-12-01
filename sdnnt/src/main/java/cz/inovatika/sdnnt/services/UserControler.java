@@ -1,6 +1,6 @@
 package cz.inovatika.sdnnt.services;
 
-import cz.inovatika.sdnnt.indexer.models.User;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
@@ -17,10 +17,7 @@ public interface UserControler {
     public static final Logger LOGGER = Logger.getLogger(UserControler.class.getName());
     public static final String AUTHENTICATED_USER = "user";
 
-    public User login() throws UserControlerException;
-    public User logout() throws UserControlerException;
 
-    public User getUser();
     public List<User> getAll() throws UserControlerException;
     public List<User> findUsersByRole(Role role) throws UserControlerException;
     public List<User> findUsersByPrefix(String prefix) throws UserControlerException;
