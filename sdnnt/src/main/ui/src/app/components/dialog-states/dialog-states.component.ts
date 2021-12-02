@@ -65,4 +65,10 @@ export class DialogStatesComponent implements OnInit {
   shouldShowGranularity(): boolean {
     return (this.fmt != null && this.fmt === "SE");
   }
+
+  changeState(evt: any) {
+    if ((this.newState === 'PA' || this.newState === 'A') && (!this.newLicense)) {
+      this.newLicense = 'dnnto';
+    }
+  }
 }
