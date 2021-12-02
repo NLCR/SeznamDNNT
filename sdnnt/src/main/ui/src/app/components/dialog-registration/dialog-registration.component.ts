@@ -41,16 +41,15 @@ export class DialogRegistrationComponent implements OnInit {
     
     if (this.data.isRegister) {
 
-
-      const validUsername = this.user.username.trim() === this.user.username.trim().replace(/[^\S]/gi, '');
+      const validUsername = this.user.username && this.user.username.trim() === this.user.username.trim().replace(/[^\S]/gi, '');
       if (!this.user.username || this.user.username.trim() === '' ||!validUsername ) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_username', true);
         this.focus = 'username';
         return;
       }
 
-      const validEmail = (this.user.email && this.user.email != null) ? this.user.email.trim().match(/^\S+@\S+\.\S+$/) : true;
-      if (this.user.email && (!this.user.email.trim().includes('@') || !validEmail)) {
+      const validEmail = (this.user.email && this.user.email != null && this.user.email.length > 3 ) ? this.user.email.trim().match(/^\S+@\S+\.\S+$/) : false;
+      if ((!this.user.email  ||  (this.user.email && (!this.user.email.trim().includes('@')) || !validEmail))) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_email', true);
         this.focus = 'email';
         return;
@@ -59,6 +58,12 @@ export class DialogRegistrationComponent implements OnInit {
       if (!this.user.jmeno || this.user.jmeno.trim() === '')  {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_jmeno', true);
         this.focus = 'jmeno';
+        return;
+      }
+
+      if (!this.user.prijmeni || this.user.prijmeni.trim() === '')  {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_prijmeni', true);
+        this.focus = 'prijmeni';
         return;
       }
 

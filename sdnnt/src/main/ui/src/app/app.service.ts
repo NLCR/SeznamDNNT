@@ -271,7 +271,7 @@ export class AppService {
     let params: HttpParams = new HttpParams();
 
     for (let navrh of navrhy) {
-      params = params.set('navrh', navrh);
+      params = params.append('navrh', navrh);
     }
 
     return this.get(url, params);

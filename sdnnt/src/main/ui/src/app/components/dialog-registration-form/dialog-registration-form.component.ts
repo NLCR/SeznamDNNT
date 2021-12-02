@@ -26,6 +26,9 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @ViewChild('username') username: MatInput;
   @ViewChild('email') email: MatInput;
   @ViewChild('jmeno') jmeno: MatInput;
+ 
+  @ViewChild('prijmeni') prijmeni: MatInput;
+
   @ViewChild('phonenumber') phonenumber: MatInput;
   @ViewChild('ico') ico: MatInput;
   @ViewChild('psc') psc: MatInput;
@@ -75,6 +78,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       username: this.username,
       email: this.email,
       jmeno: this.jmeno,
+      prijmeni: this.prijmeni,
       phonenumber: this.phonenumber,
       ico: this.ico,
       psc: this.psc

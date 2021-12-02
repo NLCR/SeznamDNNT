@@ -45,8 +45,11 @@ export class FacetsComponent implements OnInit {
     });
 
     if (this.stats) {
-      this.rokod = this.stats['rokvydani'].min;
-      this.rokdo = this.stats['rokvydani'].max;
+      //
+      this.rokod = (this.stats['rokvydani'].min ? this.stats['rokvydani'].min : 1915);
+      this.rokdo = (this.stats['rokvydani'].max ? this.stats['rokvydani'].max : 2008);
+
+
       this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
       this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
       this.showRoky = true;

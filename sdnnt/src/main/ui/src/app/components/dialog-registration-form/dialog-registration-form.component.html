@@ -17,8 +17,8 @@
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.prijmeni' | translate }}</mat-label>
-          <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
+          <mat-label>{{ 'desc.prijmeni' | translate }}*</mat-label>
+          <input matInput #prijmeni="matInput" name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
       </div>
     </div>
