@@ -17,7 +17,7 @@
     "news": "Aktuality",
     "about": "O SDNNT", 
     "readers": "Čtenářům", 
-    "authors": "Autorům",
+    "authors": "Nositelům práv",
     "publishers": "Nakladatelům",
     "libraries": "Knihovnám",
     "api": "Popis API"
@@ -146,6 +146,7 @@
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
     "invalid_jmeno": "Špatné jméno",
+    "invalid_prijmeni": "Špatné příjmení",
     "invalid_email": "email adresa není validní",
     "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
     "sledovat_zaznam_error": "Chyba při sledování záznamu.",

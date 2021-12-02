@@ -146,6 +146,7 @@
     "forgot_password_success": "The reset password link has been sent.",
     "invalid_username": "Invalid user name",
     "invalid_jmeno": "Invalid name",
+    "invalid_prijmeni": "Invalid surname",
     "invalid_email": "Invalid e-mail",
     "sledovat_zaznam_success": "Record tracking was successful.",
     "sledovat_zaznam_error": "Error tracking log.",

@@ -29,6 +29,7 @@ export class AppState {
   public page: number = 0;
   public rows: number = 20;
   
+  public rokvydani:string;
   // sort for results
   //public sort: Sort;
   
@@ -99,7 +100,6 @@ export class AppState {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
         this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + " " + s.dir));
       } else {
-
         //let fFields =  this.user != null && (this.user.role === "kurator" || this.user.role === "mainKurator" || this.user.role === "admin") ?  this.config.filterFields : this.config.userFilterFields;     
         if (this.config.filterFields.includes(p)) {
           this.usedFilters.push({field: p, value: param});
