@@ -373,16 +373,15 @@ public class CatalogSearcher {
       
       query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
       
-      // query.addFilterQuery("is_proposable:true OR dntstav:*");
-      
-      
+
     // Filtry podle role
     if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.getRole())) {
-      // Filtrujeme defaultne kdyz neni parametr a kdyz je true
-      // Z UI a podle user role
       query.addFilterQuery("dntstav:*");
     }
 
+    if (user == null || "user".equals(user.getRole())) {
+      query.addFilterQuery("-dntstav:X");
+    }
 
     if ("true".equals(req.get("withNotification"))) {
       query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.getUsername());
