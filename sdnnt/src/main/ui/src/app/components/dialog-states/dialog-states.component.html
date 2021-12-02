@@ -25,6 +25,7 @@
         <th>{{ 'desc.cislo' | translate }}</th>
         <th>{{ 'desc.odkaz' | translate }}</th>
         <th class="app-col-stav">{{ 'desc.stav' | translate }}</th>
+        <th class="app-col-licence">{{ 'desc.licence' | translate }}</th>
         <th></th>
       </tr>
     </thead>
@@ -41,6 +42,7 @@
               </mat-option>
             </mat-select>
           </td>
+          <td class="app-col-licence">dnnto</td>
           <td class="app-col-action app-col-remove">
             <mat-icon class="app-mr-1">clear</mat-icon>
             <a (click)="removeGranularitu(idx)">{{ 'desc.odebrat_granularitu' | translate }}</a>
@@ -52,9 +54,16 @@
         <td><input name="cislo" [(ngModel)]="cislo" size="4" class="app-input" /></td>
         <td><input name="link" [(ngModel)]="link" class="app-input" /></td>
         <td>
-          <mat-select name="newState" [(ngModel)]="stav" multiple>
+          <mat-select name="newState" [(ngModel)]="stav">
             <mat-option *ngFor="let stav of dntStates" [value]="stav">
               {{ stav }}
+            </mat-option>
+          </mat-select>
+        </td>
+        <td class="app-col-licence">
+          <mat-select name="newState" [(ngModel)]="stav">
+            <mat-option *ngFor="let stav of dntStates" [value]="stav">
+              dnnto
             </mat-option>
           </mat-select>
         </td>

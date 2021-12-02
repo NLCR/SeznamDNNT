@@ -29,11 +29,15 @@
 // state dialog
 .app-dialog-states {
   .app-col-stav {
-    width: 100px !important;
+    width: 55px !important;
     
     .mat-select {
       @extend .app-w-100;
     }
+  }
+
+  .app-col-licence {
+    width: 60px !important;
   }
 }
 
