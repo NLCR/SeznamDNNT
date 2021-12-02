@@ -30,19 +30,27 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let item of granularity; let idx = index">
-        <tr *ngIf="item.rocnik" >
-          <td>{{ item.rocnik }}</td>
-          <td>{{ item.cislo }}</td>
-          <td>{{ item.link }}</td>
+      <ng-container *ngFor="let itm of granularity; let idx = index">
+        <tr *ngIf="itm.rocnik" >
+          <td>{{ itm.rocnik }}</td>
+          <td>{{ itm.cislo }}</td>
+          <td>{{ itm.link }}</td>
           <td class="app-col-stav">
-            <mat-select name="newState" [(ngModel)]="item.stav" multiple>
+            <mat-select name="newState" [(ngModel)]="itm.kuratorstav"  >
               <mat-option *ngFor="let stav of dntStates" [value]="stav">
                 {{ stav }}
               </mat-option>
             </mat-select>
           </td>
-          <td class="app-col-licence">dnnto</td>
+
+          <td class="app-col-licence">
+            <mat-select name="newState" [(ngModel)]="itm.license"  *ngIf="itm.kuratorstav == 'A' || itm.kuratorstav == 'PA'">
+              <mat-option *ngFor="let license of ['dnnto','dnntt']" [value]="license">
+                {{ license }}
+              </mat-option>
+            </mat-select>
+
+          </td>
           <td class="app-col-action app-col-remove">
             <mat-icon class="app-mr-1">clear</mat-icon>
             <a (click)="removeGranularitu(idx)">{{ 'desc.odebrat_granularitu' | translate }}</a>
@@ -54,18 +62,22 @@
         <td><input name="cislo" [(ngModel)]="cislo" size="4" class="app-input" /></td>
         <td><input name="link" [(ngModel)]="link" class="app-input" /></td>
         <td>
+            <!--
           <mat-select name="newState" [(ngModel)]="stav">
             <mat-option *ngFor="let stav of dntStates" [value]="stav">
               {{ stav }}
             </mat-option>
           </mat-select>
+          -->
         </td>
         <td class="app-col-licence">
+          <!--
           <mat-select name="newState" [(ngModel)]="stav">
             <mat-option *ngFor="let stav of dntStates" [value]="stav">
               dnnto
             </mat-option>
           </mat-select>
+          -->
         </td>
         <td class="app-col-action">
           <mat-icon class="app-mr-1">add</mat-icon>

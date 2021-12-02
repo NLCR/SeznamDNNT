@@ -18,6 +18,9 @@ export class DialogStatesComponent implements OnInit {
   poznamka: string;
   public dntStates: string[] = [ 'A', 'PA', 'NPA', 'N',  'NL', 'X', 'PX'];
   granularity: any[] = [];
+  
+  //ngranularity: any[] = [];
+  
 
   rocnik: string;
   cislo: string;
@@ -37,15 +40,67 @@ export class DialogStatesComponent implements OnInit {
     this.newLicense = this.data.license ? this.data.license[0] : null  ;
     this.granularity = this.data.granularity ? this.data.granularity : [];
     this.fmt = this.data.fmt ? this.data.fmt : null;
-    // this.dntStates = this.config.dntStates[this.state.user ? this.state.user.role : 'user'];
+    this.granularity = this.granularity.map(function(itm) {
+      return DialogStatesComponent.flat(itm);
+    });
   }
 
+  /** TODO: Do it on the server side */
+  static flat(obj:any) {
+    let retval:any = new Object();
+    for (let p in obj) {
+        retval[p] =  Array.isArray(obj[p]) ? obj[p][0] : obj[p];
+    }
+    return retval;
+  }
+
+  static array(obj:any) {
+
+    if (obj.kuratorstav && obj.kuratorstav !== 'PA' && obj.kuratorstav !== 'A') {
+      delete obj.license;
+    }
+
+    switch(obj.kuratorstav) {
+      case "A":
+        obj.stav = 'A';
+      break;
+      case "PA":
+        obj.stav = 'PA';
+      break;
+      case "NPA":
+        obj.stav = 'N';
+      break;
+      case "N":
+        obj.stav = 'N';
+      break;
+      case "NL":
+        obj.stav = 'NL';
+      break;
+      case "X":
+        obj.stav = 'X';
+      break;
+      case "PX":
+        obj.stav = 'N';
+      break;
+    }
+
+
+    if (obj.stav && !Array.isArray(obj.stav)) {
+      obj.stav = [obj.stav];
+    }
+    if (obj.kuratorstav &&  !Array.isArray(obj.kuratorstav)) {
+      obj.kuratorstav   = [obj.kuratorstav];    
+    }
+    return obj;
+  }
+  /**  */
+  
   change() {
     if (!this.poznamka || this.poznamka === '') {
       this.service.showSnackBar('poznamka_povinna', 'poznamka_povinna', true);
       return;
     } else {
-      this.dialogRef.close({newState: this.newState, newLicense: this.newLicense, poznamka: this.poznamka, granularity: this.granularity, change: true});
+       this.dialogRef.close({newState: this.newState, newLicense: this.newLicense, poznamka: this.poznamka, granularity: this.granularity.map(DialogStatesComponent.array), change: true});
     }
   }
 
@@ -70,5 +125,13 @@ export class DialogStatesComponent implements OnInit {
     if ((this.newState === 'PA' || this.newState === 'A') && (!this.newLicense)) {
       this.newLicense = 'dnnto';
     }
+  }
+
+  setProperty(evt: any) {
+    console.log("Test "+evt);
+  }
+
+  kuratStavChange() {
+    console.log(this.granularity);
   }
 }

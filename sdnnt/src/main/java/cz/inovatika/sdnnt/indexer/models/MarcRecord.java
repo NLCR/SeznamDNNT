@@ -277,9 +277,11 @@ public class MarcRecord {
     sdoc.setField(DATUM_STAVU_FIELD, datum_stavu);
     sdoc.setField(DATUM_KURATOR_STAV_FIELD, datum_krator_stavu);
 
-    if (granularity != null) {
-      for (int i = 0; i<granularity.length(); i++)
-      sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
+    if (granularity != null ) {
+      if (sdoc.containsKey(GRANULARITY_FIELD)) {
+        sdoc.removeField(GRANULARITY_FIELD);
+      }
+      for (int i = 0; i<granularity.length(); i++)  sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
     }
     
     // Control fields

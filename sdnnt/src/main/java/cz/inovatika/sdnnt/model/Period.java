@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.model;
 
 import cz.inovatika.sdnnt.Options;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.swing.text.html.Option;
@@ -49,23 +50,7 @@ public enum Period {
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
             instance.setTime(inputDate);
-            int mnt = instance.get(Calendar.MINUTE);
-            if (mnt < 15) {
-                instance.set(Calendar.MINUTE, 15);
-
-                return instance.getTime();
-            } else  if (mnt >= 15 && mnt< 30) {
-                instance.set(Calendar.MINUTE, 30);
-                return instance.getTime();
-            } else  if (mnt >= 30 && mnt< 45) {
-                instance.set(Calendar.MINUTE, 45);
-                return instance.getTime();
-            } else {
-                instance.set(Calendar.MINUTE, 00);
-                instance.add(Calendar.HOUR, 1);
-
-                return instance.getTime();
-            }
+            return addMinutes(instance,periodValue(this.name(), 5)).getTime();
         }
 
         @Override
@@ -224,7 +209,7 @@ public enum Period {
         public Date defineDeadline(Date inputDate) {
             Calendar instance = Calendar.getInstance();
             instance.setTime(inputDate);
-            return endOfdayAlign(addWorkingDays(instance,10)).getTime();
+            return endOfdayAlign(addWorkingDays(instance,periodValue(this.name(),10))).getTime();
         }
 
         @Override
@@ -334,6 +319,19 @@ public enum Period {
 
 
     static boolean publicDay(int day, int month) {
+        Options opts = Options.getInstance();
+        if (opts.getJSONObject("workflow").has("holidays")) {
+            JSONArray holidays = opts.getJSONObject("workflow").getJSONArray("holidays");
+            for (int i = 0; i < holidays.length(); i++) {
+                JSONObject holiday = holidays.getJSONObject(i);
+                if (holiday.has("day") && holiday.has("month")) {
+                    int d = holiday.getInt("day");
+                    int m = holiday.getInt("month");
+                    return d == day && month == m;
+                }
+
+            }
+        }
         return false;
     }
 

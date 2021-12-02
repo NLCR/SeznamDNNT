@@ -36,23 +36,15 @@
       }
     },
     "periods": {
-        "debug": true,
-        "debug_nzn_0" : {
-          "value": 6
-        },
-        "period_nzn_0" : {
-          "value": 6
-        }
+        "debug": false
     }
   },
 
   "jobs": {
     "zadost_po_minute": {
       "type": "workflow",
-      "cron": "0 * * * * ?"
+      "cron": "0 0/120 * * * ?"
     },
-
-
     "notifikace_den": {
       "type": "notifications",
       "interval": "den",
@@ -67,13 +59,8 @@
       "type": "notifications",
       "interval": "mesic",
       "cron": "0 15 22 ? * 6L"
-    },
-
-
-    "test": {
-      "type": "test",
-      "cron": "0 2 0 ? * MON"
     }
+
   }
 
 }
