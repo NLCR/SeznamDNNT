@@ -606,7 +606,7 @@
     "fyzicka_osoba": "Individual",
     "pravnicka_osoba": "Legal entity",
     "nazev_spolecnosti": "Company name",
-    "role_v_systemu": "Roles in the system",
+    "role_v_systemu": "Additional information",
     "autor": "Author",
     "dedic_autorskych_prav": "Heir to copyright",
     "jiny_nositel": "Another copyright holder / executor",
