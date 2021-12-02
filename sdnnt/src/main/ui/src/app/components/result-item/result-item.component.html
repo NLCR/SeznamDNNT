@@ -19,7 +19,7 @@
         {{ doc.dntstav[doc.dntstav.length-1] }}   
       </div>
       <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
-        {{ processed.state }}
+        {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="doc.license" [class]="'app-badge app-icon-in ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
         <mat-icon class="material-icons-outlined">{{ doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>

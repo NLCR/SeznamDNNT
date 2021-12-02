@@ -24,7 +24,6 @@
                 </div>
               </mat-list-item>
             </ng-container>  
-
             <ng-container *ngIf="institutionFilter">
               <mat-list-item>
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setInstitution(institutionFilter)"><mat-icon>clear</mat-icon></a>
@@ -33,7 +32,6 @@
                 </div>
               </mat-list-item>
             </ng-container>  
-
             <ng-container *ngIf="delegatedFilter">
               <mat-list-item>
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setDelegated(delegatedFilter)"><mat-icon>clear</mat-icon></a>
@@ -42,7 +40,6 @@
                 </div>
               </mat-list-item>
             </ng-container>  
-
             <ng-container *ngIf="priorityFilter">
               <mat-list-item>
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setPriority(priorityFilter)"><mat-icon>clear</mat-icon></a>
@@ -52,7 +49,6 @@
                 </div>
               </mat-list-item>
             </ng-container>  
-
           </div>
         </mat-list>
       </div>
@@ -104,12 +100,10 @@
               {{ 'desc.institution' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-
           <div *ngFor="let inst of allResultInstitutions">
             <a (click)="setInstitution(inst)">{{ inst }}</a>
           </div>
         </mat-expansion-panel>
-
 
         <mat-expansion-panel [expanded]="true"  *ngIf="allPriorities.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
           <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
@@ -117,7 +111,6 @@
               {{ 'desc.priority' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-
           <div *ngFor="let p of allPriorities">
             <a (click)="setPriority(p)">{{ p }}</a>
           </div>
@@ -129,13 +122,10 @@
               {{ 'desc.delegated_kurator' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-
           <div *ngFor="let d of allDelegated">
             <a (click)="setDelegated(d)">{{ d }}</a>
           </div>
         </mat-expansion-panel>
-
-
       </mat-accordion>
     </div>
 
