@@ -55,8 +55,7 @@ public enum CuratorItemState {
     NL {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
-            PublicItemState currentPublicState = owner.getPublicState();
-            return currentPublicState != null ? currentPublicState :  PublicItemState.A;
+            return PublicItemState.NL;
         }
     },
 
