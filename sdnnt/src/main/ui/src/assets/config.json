@@ -52,10 +52,11 @@
 
   "loginTimeOut" : 240,
   "homeCards": [
-    {"field": "A", "type": "stav"},
-    {"field": "N", "type": "stav"},
-    {"field": "PA", "type": "stav"},
-    {"field": "dnnto", "type": "licence"},
-    {"field": "dnntt", "type": "licence"}
+    {"field": "A", "type": "stav", "visible": true},
+    {"field": "N", "type": "stav", "visible": true},
+    {"field": "PA", "type": "stav", "visible": true},
+    {"field": "NL", "type": "stav", "visible": false},
+    {"field": "dnnto", "type": "licence", "visible": true},
+    {"field": "dnntt", "type": "licence", "visible": true}
   ]
 }

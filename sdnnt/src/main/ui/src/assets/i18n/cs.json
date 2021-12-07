@@ -34,7 +34,7 @@
     "N": "vyřazeno",
     "X": "volné",
     "PX": "pravděpodobná volná díla",
-    "NL":"omezení na terminál/plánované vydání po získání licence",
+    "NL":"omezení na terminál / plánované vydání po získání licence",
     "NLX":"omezeno na terminál",
 
     "VN": "výzva pro vyřazení",
@@ -62,7 +62,7 @@
       "N": "Vyřazeno",
       "X": "Volné",
       "PX": "Pravděpodobná volná díla",
-      "NL":"omezení na terminál/plánované vydání po získání licence",
+      "NL":"omezení na terminál / plánované vydání po získání licence",
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
@@ -109,7 +109,7 @@
     "NZN": "návrh k zařazení",
     "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",
     "VNZ": "Výzva k licenci pro terminál na místě samém",
-    "NL":"omezení na terminál/plánované vydání po získání licence",
+    "NL":"omezení na terminál / plánované vydání po získání licence",
     "NLX":"omezeno na terminál"
   },
 
