@@ -62,11 +62,11 @@
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
+      "NL":"On-site terminal license, internal state",
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
       "NLX":"On-site terminal license, internal state"
-
     }
   },
   "license": {
@@ -701,6 +701,16 @@
     "debug_vnl_1_10wd":"10 days",
     "debug_vnl_2_18m":"18 months",
     "debug_vnl_3_5wd":"5 working days",
+
+    "period_nzn_0_5wd":"5 working days",
+    "period_nzn_1_12_18": "1.2 or 1.8",
+    "period_nzn_2_6m": "6 months",  
+    "period_vn_0_28d": "28 days",  
+    "period_vln_0_5wd": "5 working days",  
+    "period_vnl_1_10d":"10 calendar days",
+    "period_vln_2_18m": "18 months",
+    "period_vln_3_5wd":"5 working days", 
+    
     "desiredstate" : "Feature state/license",
     "period" : "Period",
     "deadline" : "Deadline/State switch",
@@ -721,12 +731,10 @@
     "schvalit_pouze_na_terminalu":"Approve terminal license",
     "odmitnout_zmenu":"Reject",
     "dilo_publikovano":"Title has been published, state N"
-
   },
 
   "account":{
     "noworkflow":"Not possible to approve state",
     "noworkflowstates": "Not possible to switch to next state "
   }
-
 }

@@ -62,11 +62,11 @@
       "N": "Vyřazeno",
       "X": "Volné",
       "PX": "Pravděpodobná volná díla",
+      "NL":"omezení na terminál/plánované vydání po získání licence",
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
       "NLX":"Omezeno na terminál, interní stav"
-
     }
   },
   "license": {
@@ -711,7 +711,6 @@
     "period_vln_2_18m": "18 měsíců",
     "period_vln_3_5wd":"5 pracovních dnů",    
 
-
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",
     "deadline" : "Čas uzávěrky/přepnutí",
@@ -732,12 +731,10 @@
     "schvalit_pouze_na_terminalu":"Schválit pouze na terminálu",
     "odmitnout_zmenu":"Odmítnout změnu",
     "dilo_publikovano":"Dílo bylo nakladatelem publikováno"
-
   },
 
   "account":{
     "noworkflow":"Není možné schválit stav",
     "noworkflowstates": "Není možné schválit stav"
   }
-
 }
