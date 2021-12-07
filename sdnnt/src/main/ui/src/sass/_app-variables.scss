@@ -29,6 +29,7 @@ $states: (
   "NNN": mat-color($mat-yellow, 800),
   "VVN": mat-color($mat-orange, $state_shade),
   "VVS": mat-color($mat-brown, $state_shade),
+  "NL": mat-color($mat-light-blue, $state_shade),
   "dnnto": mat-color($mat-deep-purple, $state_shade),
   "dnntt": mat-color($mat-deep-orange, $state_shade),
   "open": mat-color($mat-blue, $state_shade),
