@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>{{ 'desc.ukazat_korespondenci' | translate }}</h1>
+<div mat-dialog-content>
+  <mat-form-field class="app-w-100 app-clean-bottom-gap" appearance="outline">
+    <mat-label>{{ 'desc.korespondence' | translate }}</mat-label>
+    <textarea matInput [placeholder]="'desc.vlozit_korespondenci' | translate" rows="6"></textarea>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-flat-button color="primary">{{ 'desc.ulozit' | translate }}</button>
+  <button mat-button mat-dialog-close>{{ 'desc.zavrit' | translate }}</button>
+</div>

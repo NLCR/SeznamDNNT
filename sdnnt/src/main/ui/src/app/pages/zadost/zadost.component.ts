@@ -8,6 +8,8 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { User } from 'src/app/shared/user';
 import { Zadost } from 'src/app/shared/zadost';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
 
 @Component({
   selector: 'app-zadost',
@@ -33,7 +35,8 @@ export class ZadostComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
-    public state: AppState) { }
+    public state: AppState,
+    public dialog: MatDialog) { }
 
   ngOnInit(): void {
     if (!this.state.user) {
@@ -224,9 +227,13 @@ export class ZadostComponent implements OnInit {
         });
         break;
     }
+  }
 
-
-
+  showCorrespondence() {
+    const dialogRef = this.dialog.open(DialogCorrespondenceComponent, {
+      width: '750px',
+      panelClass: 'app-history-identifier'
+    });
   }
 
 }

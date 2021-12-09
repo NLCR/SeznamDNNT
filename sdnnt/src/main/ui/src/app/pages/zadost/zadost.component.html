@@ -34,7 +34,9 @@
                   ' + ('desc.datum_zadani' | translate) + ': ' + (zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm')+ '
                   ' + ('desc.poznamka' | translate) + ': ' + zadost.poznamka+ '
                   ' + ('desc.pozadavek' | translate) + ': ' + zadost.pozadavek+' 
-                  ' + (zadost.institution ?  ('desc.institution' | translate) + ': '+zadost.institution : '' ) ">info</mat-icon>
+                  ' + (zadost.institution ?  ('desc.institution' | translate) + ': '+zadost.institution : '' )
+                  ">info</mat-icon><span class="app-pipe"></span>
+                  <a (click)="showCorrespondence()" [matTooltip]="'desc.ukazat_korespondenci' | translate"><mat-icon class="material-icons-outlined">mail</mat-icon></a>
               </span>
             </ng-container>
           </div>

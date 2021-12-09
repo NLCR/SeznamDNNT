@@ -722,7 +722,10 @@
 
     "delogovat_na_jineho_uzivatele": "Delegate to another user",
     "nastavit_prioritu": "Set priority",
-    "typ_zadosti": "Type of request"
+    "typ_zadosti": "Type of request",
+    "ukazat_korespondenci": "Show correspondence",
+    "korespondence": "Correspondence",
+    "vlozit_korespondenci": "Add correspondence ..."
   },
 
   "acts": {
