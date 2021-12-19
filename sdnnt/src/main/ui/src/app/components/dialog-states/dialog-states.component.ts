@@ -124,7 +124,13 @@ export class DialogStatesComponent implements OnInit {
   changeState(evt: any) {
     if ((this.newState === 'PA' || this.newState === 'A') && (!this.newLicense)) {
       this.newLicense = 'dnnto';
+    } else if (this.newState === 'NL')  {
+      this.newLicense = 'dnntt'
     }
+  }
+
+  changeLicensePossible() {
+    return this.newState !== 'PA' && this.newState !=='A';
   }
 
   setProperty(evt: any) {

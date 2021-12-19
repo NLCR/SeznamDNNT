@@ -13,6 +13,7 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
+import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
 import java.util.*;
@@ -394,7 +395,10 @@ public class Indexer {
       PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
       if ( pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
         mr.license  = licence;
+      } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
+        mr.license = License.dnntt.name();
       }
+
       mr.setKuratorStav(kstav.name(),pstav.name(), licence , user, poznamka);
 
       if (!granularity.isEmpty()) {  mr.setGranularity(granularity, poznamka, user); }

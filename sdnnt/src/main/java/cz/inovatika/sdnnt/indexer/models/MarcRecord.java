@@ -468,6 +468,9 @@ public class MarcRecord {
               this.license = License.dnnto.name();
           }
         break;
+        case NL:
+          this.license = License.dnntt.name();
+        break;
 
         case NLX:
           if (licenseHistory == null) { licenseHistory = new ArrayList<>(); }

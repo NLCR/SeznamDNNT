@@ -236,7 +236,6 @@ export class ZadostComponent implements OnInit {
       data: this.zadost
     });
 
-
     dialogRef.afterClosed().subscribe(res => {
         if (res?.result) {
             this.zadost.email = res.result;
