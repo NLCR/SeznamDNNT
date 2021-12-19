@@ -479,6 +479,10 @@ public class MarcRecord {
           }
         break;
 
+        case PX:
+        // keep license
+        break;
+
         default:
           if (licenseHistory == null) {  licenseHistory = new ArrayList<>(); }
           if (this.license != null) {
