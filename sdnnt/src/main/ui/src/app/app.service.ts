@@ -323,6 +323,12 @@ export class AppService {
     // return of({name: "", role: ""})
   }
 
+
+  thirdPartyUser(): Observable<User> {
+    const url = '/user/shib_user_info';
+    return this.get(url);
+  }
+
   getUsers(): Observable<any> {
     let url = 'user/all';
     return this.get(url);

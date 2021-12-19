@@ -56,7 +56,7 @@ export class ResultItemComponent implements OnInit {
     }
     }
     this.newState.setValue(this.doc.dntstav);
-    this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA');
+    this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
     
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
@@ -122,6 +122,17 @@ export class ResultItemComponent implements OnInit {
       }
 
     }
+  }
+
+  curatorAndPublicStateAreDifferent():boolean {
+    // neni nastaveny public stav ale ma kuratorsky stav NPA 
+    if (this.doc.kuratorstav && !this.doc.dntstav) {
+      return true; 
+    // verejny a kuratorsky stav je rozdilny
+    } else if (this.doc.kuratorstav && this.doc.dntstav &&  this.doc.kuratorstav[this.doc.kuratorstav.length-1] != this.doc.dntstav[this.doc.dntstav.length-1])  {
+      return true;
+    }
+    return false;
   }
 
   showIdentifiers() {

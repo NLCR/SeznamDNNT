@@ -232,7 +232,26 @@ export class ZadostComponent implements OnInit {
   showCorrespondence() {
     const dialogRef = this.dialog.open(DialogCorrespondenceComponent, {
       width: '750px',
-      panelClass: 'app-history-identifier'
+      panelClass: 'app-history-identifier',
+      data: this.zadost
+    });
+
+
+    dialogRef.afterClosed().subscribe(res => {
+        if (res?.result) {
+            this.zadost.email = res.result;
+
+            this.service.saveKuratorZadost(this.zadost).subscribe((res: any) => {
+              if (res.error) {
+                this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+              } else {
+                this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+                this.zadost = res;
+                this.getDocs(this.route.snapshot.queryParams);
+              }
+            });
+      
+        }
     });
   }
 

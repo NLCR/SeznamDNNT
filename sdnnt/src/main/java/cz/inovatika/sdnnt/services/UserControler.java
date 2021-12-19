@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public interface UserControler {
 
     public static final Logger LOGGER = Logger.getLogger(UserControler.class.getName());
-    public static final String AUTHENTICATED_USER = "user";
+
 
 
     public List<User> getAll() throws UserControlerException;

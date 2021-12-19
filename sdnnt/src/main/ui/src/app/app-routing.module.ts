@@ -10,6 +10,7 @@ import { ImportsComponent } from './pages/imports/imports.component';
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 import { SearchComponent } from './pages/search/search.component';
+import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
 import { UserResetPasswordComponent } from './pages/user-reset-password/user-reset-password.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 
@@ -25,6 +26,7 @@ const routes: Routes = [
    { path: 'pswd/:token', component: ResetPasswordComponent},
   { path: 'userpswd', component: UserResetPasswordComponent},
   { path: 'fgtpswd', component: InputLoginNameComponent},
+  { path: 'shibboleth-landing', component: ShibbolethLandingPageComponent},
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 

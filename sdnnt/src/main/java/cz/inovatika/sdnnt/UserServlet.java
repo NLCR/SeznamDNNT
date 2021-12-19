@@ -23,17 +23,20 @@ import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.rights.Role.admin;
 import static cz.inovatika.sdnnt.rights.Role.mainKurator;
+import static cz.inovatika.sdnnt.services.ApplicationUserLoginSupport.AUTHENTICATED_USER;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
@@ -67,7 +70,9 @@ public class UserServlet extends HttpServlet {
       if (actionNameParam != null) {
         Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
         JSONObject json = actionToDo.doPerform(request, response);
-        out.println(json.toString(2));
+        if (json != null) {
+          out.println(json.toString(2));
+        }
       } else {
 
         out.print("actionNameParam -> " + actionNameParam);
@@ -106,7 +111,6 @@ public class UserServlet extends HttpServlet {
               });
               retVal.put("zadost", jsonArray);
             }
-
           }
           return login.toJSONObject();
         } catch (UserControlerException e) {
@@ -127,6 +131,44 @@ public class UserServlet extends HttpServlet {
       }
     },
 
+    /** Redirect to IdentityProvider or wayfling */
+    SHIB_LOGIN_REDIRECT {
+        @Override
+        JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+          String shibboleth = Options.getInstance().getString("shibiplink");
+          if (shibboleth != null) {
+            response.sendRedirect(shibboleth);
+          } else {
+            LOGGER.warning("No link to shibboleth");
+          }
+          return null;
+        }
+    },
+
+    /** Callback from IP */
+    SHIB_LOGIN_CALLBACK {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        User user = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
+        req.getSession(true).setAttribute(AUTHENTICATED_USER, user);
+        TrackSessionUtils.touchSession(req.getSession());
+        // landing page must be aware that user info is needed - no login is here
+        response.sendRedirect("/shibboleth-landing");
+        return null;
+      }
+    },
+
+    /* User info */
+    SHIB_USER_INFO {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
+        if (logged.isThirdPartyUser()) {
+          JSONObject jsonObject = logged.toJSONObject();
+          return jsonObject;
+        } else return new JSONObject();
+      }
+    },
 
     PING {
       @Override

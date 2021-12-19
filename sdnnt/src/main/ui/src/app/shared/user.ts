@@ -37,5 +37,8 @@ export class User {
 
 
   registerOption: UserRegisterOption;
+
+  thirdpartyuser:boolean = false;
+
 }
 

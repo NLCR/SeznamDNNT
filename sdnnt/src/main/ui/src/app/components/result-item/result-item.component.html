@@ -28,7 +28,7 @@
       <div *ngIf="hasNavhr && !inZadost && state.logged && (state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
         {{  doc.zadost.navrh }}
       </div>
-      <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] != doc.dntstav[doc.dntstav.length-1]">
+      <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent()">
         <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.kuratorstav[doc.kuratorstav.length-1] | translate">
           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
         </div>

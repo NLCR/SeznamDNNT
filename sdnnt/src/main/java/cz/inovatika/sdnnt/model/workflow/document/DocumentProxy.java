@@ -42,13 +42,15 @@ public class DocumentProxy implements WorkflowOwner {
 
         List<String> dntstav = this.marcRecord.dntstav;
 
-        if (!dntstav.contains(itm.getPublicItemState(this).name()) || changingLicenseState) {
+        PublicItemState publicItemState = itm.getPublicItemState(this);
+
+        if (publicItemState != null && (!dntstav.contains(publicItemState.name()) || changingLicenseState)) {
             this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(itm.getPublicItemState(this).name()));
 
             this.marcRecord.datum_stavu = new Date(date.getTime());
 
             JSONObject historyObject = new JSONObject();
-            historyObject.put("stav", itm.getPublicItemState(this).name());
+            historyObject.put("stav", publicItemState);
             historyObject.put("date", MarcRecord.FORMAT.format(this.marcRecord.datum_stavu));
             if (user != null) {
                 historyObject.put("user", user);

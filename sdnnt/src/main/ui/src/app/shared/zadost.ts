@@ -28,6 +28,8 @@ export class Zadost {
   escalated: boolean = false;
   expired: boolean = false;
 
+  email: string;
+
   constructor(timestamp: string, user: string) {
     this.id = user + timestamp;
     this.user = user;

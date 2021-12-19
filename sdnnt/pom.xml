@@ -4,7 +4,7 @@
 
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt</artifactId>
-  <version>0.9</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
   <name>sdnnt</name>
@@ -20,7 +20,9 @@
     <swagger-core-version>2.0.0</swagger-core-version>
 
     <junit-version>4.13.1</junit-version>
+    <antlr-version>4.9.3</antlr-version>
 
+    <log4j-version>2.16.0</log4j-version>
   </properties>
     
   <dependencies>
@@ -36,6 +38,35 @@
       <groupId>org.apache.solr</groupId>
       <artifactId>solr-core</artifactId>
       <version>8.8.2</version>
+
+	  <exclusions>
+        <exclusion>
+          <groupId>org.antlr</groupId> 
+          <artifactId>antlr4-runtime</artifactId>
+        </exclusion>
+
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-slf4j-impl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-web</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-1.2-api</artifactId>
+        </exclusion>
+      </exclusions>
+	  
     </dependency>
 
 
@@ -179,6 +210,50 @@
     </dependency>
 
 
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>${antlr-version}</version>
+    </dependency>
+	
+
+
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>${antlr-version}</version>
+    </dependency>
+	
+    <dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-api</artifactId>
+		<version>${log4j-version}</version>
+	</dependency>
+	
+    <dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>${log4j-version}</version>
+	</dependency>
+
+    <dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-slf4j-impl</artifactId>
+		<version>${log4j-version}</version>
+	</dependency>
+
+    <dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-web</artifactId>
+		<version>${log4j-version}</version>
+	</dependency>
+
+    <dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-1.2-api</artifactId>
+		<version>${log4j-version}</version>
+	</dependency>
+
     <!--
     <dependency>
       <groupId>net.javacrumbs.json-unit</groupId>
@@ -217,7 +292,9 @@
             <always>false</always>
           </gitDescribe>
         </configuration>
-</plugin>
+      </plugin>
+
+
 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -469,6 +546,7 @@
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
+	  <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -494,6 +572,7 @@
           </execution>
         </executions>
       </plugin>
+	  -->
     </plugins>
   </build>
 

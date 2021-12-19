@@ -92,6 +92,9 @@ public class Zadost implements NotNullAwareObject{
   // typ prepnuti do stavu - Kurator nebo automat
   public static final String TRANSITION_TYPE_KEY = "type_of_transition";
 
+  // email
+  public static final String EMAIL_KEY = "email";
+
   public static final String DESIRED_ITEM_STATE_KEY = "desired_item_state";
   public static final String DESIRED_LICENSE_KEY = "desired_license";
 
@@ -122,6 +125,7 @@ public class Zadost implements NotNullAwareObject{
   private String desiredItemState;
   private String desiredLicense;
 
+  private String email;
 
   // version for
   private String version;
@@ -290,6 +294,14 @@ public class Zadost implements NotNullAwareObject{
   }
 
 
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
   public boolean isEscalated() {
     if (getDeadline() != null) {
       JSONObject jsonObject = Options.getInstance().getJSONObject("workflow").getJSONObject("escalation");
@@ -457,6 +469,11 @@ public class Zadost implements NotNullAwareObject{
       String desLicense = getDesiredLicense();
       sinput.addField(DESIRED_LICENSE_KEY, desLicense);
     }
+
+    if (getEmail() != null) {
+      String email = getEmail();
+      sinput.addField(EMAIL_KEY, email);
+    }
     return sinput;
 
   }
@@ -563,6 +580,10 @@ public class Zadost implements NotNullAwareObject{
 
       if (jsonobj.has(DESIRED_LICENSE_KEY)) {
         zadost.setDesiredLicense(jsonobj.getString(DESIRED_LICENSE_KEY));
+      }
+
+      if (jsonobj.has(EMAIL_KEY)) {
+        zadost.setEmail(jsonobj.getString(EMAIL_KEY));
       }
       return zadost;
 

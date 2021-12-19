@@ -3,6 +3,8 @@
   "lang": "cs",
   "snackDuration": 2000,
   "rows": 20,
+  "simplelogin":false,
+  
   "homeTabs": ["about", "news", "readers", "authors",  "libraries", "api"],
   "role": ["admin", "kurator", "mainKurator", "knihovna", "user"],
   "dntStates": {

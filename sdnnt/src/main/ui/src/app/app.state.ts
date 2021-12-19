@@ -44,11 +44,14 @@ export class AppState {
 
   public consent: boolean = true;
 
+  
+
   public usedFilters: Filter[] = [];
 
   public fullCatalog: boolean;
   public withNotification: boolean;
 
+  
   // Aktualni zadost kam se pridavaji navrhy; zmenit
   // NZN, VN, VN_, VNL (VNL a VNZ je typ na omezeni na terminal tedy jeden typ )
   // uzivatel ma jednu zadost na omezeni na terminal a rozhodne se podle ceho ji posle  

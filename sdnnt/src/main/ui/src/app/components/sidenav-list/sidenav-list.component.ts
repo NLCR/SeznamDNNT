@@ -6,6 +6,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SUPER_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Router } from '@angular/router';
+import { AppConfiguration } from 'src/app/app-configuration';
 
 @Component({
   selector: 'app-sidenav-list',
@@ -26,9 +27,10 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
     dialog: MatDialog,
     router: Router,
     service: AppService,
-    public state: AppState
+    public state: AppState,
+    public config: AppConfiguration
     ) { 
-      super(dialog,router,service,state);
+      super(dialog,router,service,state,config);
     }
 
   ngOnInit(): void {

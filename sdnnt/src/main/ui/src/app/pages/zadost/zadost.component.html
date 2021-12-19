@@ -36,7 +36,8 @@
                   ' + ('desc.pozadavek' | translate) + ': ' + zadost.pozadavek+' 
                   ' + (zadost.institution ?  ('desc.institution' | translate) + ': '+zadost.institution : '' )
                   ">info</mat-icon><span class="app-pipe"></span>
-                  <a (click)="showCorrespondence()" [matTooltip]="'desc.ukazat_korespondenci' | translate"><mat-icon class="material-icons-outlined">mail</mat-icon></a>
+
+                  <a  *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="showCorrespondence()" [matTooltip]="'desc.ukazat_korespondenci' | translate"><mat-icon class="material-icons-outlined">mail</mat-icon></a>
               </span>
             </ng-container>
           </div>

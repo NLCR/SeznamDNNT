@@ -65,8 +65,13 @@ import { User } from './shared/user';
         return this.config.pinginterval || 10;
     }
 
+    public get simplelogin() {
+        return this.config.simplelogin || false;
+    }
 
-    //pinginterval: number;
+
+
+    
 
     /**
      * List the files holding section configuration in assets/configs folder

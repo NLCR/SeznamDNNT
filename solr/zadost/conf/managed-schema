@@ -83,6 +83,9 @@
    <field name="deadline" type="date" indexed="true" stored="true" multiValued="false" docValues="true"   sortMissingLast="true" />
    <!--  typ lhuty; lhuta0, lhuta1.. atd-->
    <field name="type_of_period" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
+	
+   <!-- email snippets -->	
+   <field name="email" type="string" indexed="true" stored="true" multiValued="false" docValues="false"  />
 
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 

@@ -392,7 +392,7 @@ public class Indexer {
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
       PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
-      if (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+      if ( pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
         mr.license  = licence;
       }
       mr.setKuratorStav(kstav.name(),pstav.name(), licence , user, poznamka);

@@ -7,6 +7,7 @@ import { DialogLoginComponent } from '../dialog-login/dialog-login.component';
 import { DialogRegistrationComponent } from '../dialog-registration/dialog-registration.component';
 import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
+import { AppConfiguration } from 'src/app/app-configuration';
 
 @Component({
   selector: 'app-navbar',
@@ -20,11 +21,14 @@ export class NavbarComponent implements OnInit {
 
   now = new Date();
 
+  //simpleLogin: boolean = false;
+
   constructor(
     private dialog: MatDialog,
     private router: Router,
     private service: AppService,
-    public state: AppState
+    public state: AppState,
+    public config: AppConfiguration
     ) { }
 
   ngOnInit(): void {
@@ -33,6 +37,7 @@ export class NavbarComponent implements OnInit {
   changeLang(lang: string) {
     this.service.changeLang(lang);
   }
+
 
   showLogin() {
     this.dialog.open(DialogLoginComponent, {
@@ -43,27 +48,13 @@ export class NavbarComponent implements OnInit {
   }
 
   showUser() {
-    const d = this.dialog.open(DialogRegistrationComponent, {
-      width: '600px',
-      panelClass: 'app-dialog-login',
-      data: {isRegister: false}
-    });
-
-    // d.afterClosed().subscribe((result: User) => {
-    //   if (result) {
-    //     // result je user
-    //     result.isActive = false;
-    //     this.service.saveUser(result).subscribe((res: User) => {
-    //       if (res.error) {
-    //         this.service.showSnackBar('user_saving_error', res.error, true);
-    //       } else {
-    //         this.service.showSnackBar('Ulozeni probehlo v poradku', '', false);
-    //         this.state.user = JSON.parse(JSON.stringify(result));
-    //       }
-    //     });
-    //   }
-       
-    //  });
+    if (!this.state.user.thirdpartyuser) {
+      const d = this.dialog.open(DialogRegistrationComponent, {
+        width: '600px',
+        panelClass: 'app-dialog-login',
+        data: {isRegister: false}
+      });
+    }
   }
 
   logout() {
@@ -92,21 +83,24 @@ export class NavbarComponent implements OnInit {
       data: {isRegister: true}
     });
 
-    // d.afterClosed().subscribe((result: User) => {
-    //   if (result) {
-    //     // result je user
-    //     result.isActive = false;
-    //     this.service.saveUser(result).subscribe((res: User) => {
-    //       if (res.error) {
-    //         this.service.showSnackBar('user_saving_error', res.error, true);
-    //       } else {
-    //         this.service.showSnackBar('registrace uspesna', '', false);
-    //       }
-    //     });
-    //   }
-       
-    //  });
+
   }
+
+
+  wayfLink() {
+    // configuration is on the server its redirect to identity provider or wayflink
+    window.location.href = "/api/user/shib_login_redirect";
+  }
+
+  profileEnabled(): boolean {
+    if (this.state.user.thirdpartyuser) return false;
+    else return true;
+  }
+
+  changePassEnabled(): boolean {
+    if (this.state.user.thirdpartyuser) return false;
+    else return true;
+  } 
 
   // sidenav fuction
   public onToggleSidenav = () => {
@@ -114,7 +108,9 @@ export class NavbarComponent implements OnInit {
   }
   
   resetPasswd() {
-    this.router.navigate(['/userpswd'], {});
+    if (!this.state.user.thirdpartyuser) {
+      this.router.navigate(['/userpswd'], {});
+    }
   }
 
 }

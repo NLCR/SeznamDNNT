@@ -725,7 +725,9 @@
     "typ_zadosti": "Typ žádosti",
     "ukazat_korespondenci": "Ukázat korespondenci",
     "korespondence": "Korespondence",
-    "vlozit_korespondenci": "Vložit korespondenci ..."
+    "vlozit_korespondenci": "Vložit korespondenci ...",
+    "standardni_prihlaseni":"Standardní přihlášení ...",
+    "shibboleth_prihlaseni":"EDUId přihlášení ..."
   },
 
   "acts": {

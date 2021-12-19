@@ -33,7 +33,8 @@ public enum CuratorItemState {
     NPA {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
-            return PublicItemState.N;
+            if (owner.getPublicState() != null)  return PublicItemState.N;
+            else return null;
         }
     },
     // ceka na zarazeni  PA

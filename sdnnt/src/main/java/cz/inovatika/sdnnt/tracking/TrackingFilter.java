@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.tracking;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.UserControler;
 import org.json.JSONObject;
 
@@ -37,7 +38,7 @@ public class TrackingFilter implements javax.servlet.Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpReq = (HttpServletRequest) servletRequest;
         HttpSession session = httpReq.getSession();
-        if (session != null && session.getAttribute(UserControler.AUTHENTICATED_USER) != null) {
+        if (session != null && session.getAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER) != null) {
 
             int maxInactiveInterval = DEFAULT_MAX_INACTIVE_INTERVAL;
             JSONObject sessionConfiguration = Options.getInstance().getJSONObject("session");

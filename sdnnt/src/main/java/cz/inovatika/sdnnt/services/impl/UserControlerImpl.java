@@ -11,6 +11,8 @@ import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
+import cz.inovatika.sdnnt.services.impl.shib.ShibbolethUtils;
+import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
 import cz.inovatika.sdnnt.utils.SolrUtils;
@@ -23,7 +25,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,11 +71,10 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                 String username = json.getString("user");
                 String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"));
                 ret.put("username", username);
-                User user = findOneUser(client, "username:\"" + username + "\"");
+                User user = UsersUtils.findOneUser(client, "username:\"" + username + "\"");
                 if (user != null && user.getPwd() != null && user.getPwd().equals(pwdHashed)) {
                     setSessionObject(this.request, user);
-
-                    return toTOObject(user);
+                    return UsersUtils.toTOObject(user);
                 } else throw new UserControlerException("Cannot find user or invalid password");
             } catch (Exception ex) {
                 throw new UserControlerException(ex);
@@ -92,6 +92,9 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     @Override
     public User getUser() {
+
+
+
         return (User) this.request.getSession(true).getAttribute("user");
     }
 
@@ -102,7 +105,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     .setRows(USERS_LIMIT);
 
             QueryResponse users = solr.query("users", query);
-            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
             return collect;
         } catch (SolrServerException | IOException ex) {
@@ -113,7 +116,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
     @Override
     public User findUserByApiKey(String apikey) throws UserControlerException{
         try (SolrClient solr = buildClient()) {
-            return toTOObject(findOneUser(solr, "apikey:\"" + apikey + "\""));
+            return UsersUtils.toTOObject(UsersUtils.findOneUser(solr, "apikey:\"" + apikey + "\""));
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -126,7 +129,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             SolrQuery query = new SolrQuery(String.format("username:%s* OR jmeno:%s* OR prijmeni:%s*",  prefix, prefix, prefix))
                     .setRows(1000);
             QueryResponse users = solr.query("users", query);
-            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             return collect;
             //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
         } catch (SolrServerException | IOException ex) {
@@ -137,7 +140,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
     @Override
     public User findUser(String username) throws UserControlerException{
         try (SolrClient solr = buildClient()) {
-            return toTOObject(findOneUser(solr, "username:\"" + username + "\""));
+            return UsersUtils.toTOObject(UsersUtils.findOneUser(solr, "username:\"" + username + "\""));
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -165,7 +168,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             Pair<String,String> userRecepient = Pair.of(user.getEmail(), user.getJmeno() +" "+user.getPrijmeni());
             mailService.sendRegistrationMail(user, userRecepient,newPwd, user.getResetPwdToken());
 
-            return toTOObject(user);
+            return UsersUtils.toTOObject(user);
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw  new UserControlerException(ex);
@@ -182,7 +185,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             if (subject != null && subject.getEmail() != null) {
                 subject.setPwd(DigestUtils.sha256Hex(newPwd));
                 mailService.sendResetPasswordMail(subject, Pair.of(subject.getEmail(), subject.getJmeno() +" "+subject.getPrijmeni()), newPwd);
-                return  toTOObject(save(subject));
+                return  UsersUtils.toTOObject(save(subject));
             } else {
                 throw new UserControlerException("User's email must be specified");
             }
@@ -201,7 +204,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     .setRows(1);
 
             QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             //List<User> users = solr.query("users", query).getBeans(User.class);
             if (users.isEmpty()) {
                 throw new UserControlerException("Cannot find user");
@@ -249,7 +252,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             sender.setPwd(DigestUtils.sha256Hex(pwd));
             sender.setResetPwdToken(null);
             sender.setResetPwdExpiration(null);
-            return toTOObject(save(sender));
+            return UsersUtils.toTOObject(save(sender));
         } else {
             throw new NotAuthorizedException("not authorized");
         }
@@ -262,7 +265,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     .setRows(1);
 
             QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
 
             //List<User> users = solr.query("users", query).getBeans(User.class);
             solr.close();
@@ -274,7 +277,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     user.setPwd(DigestUtils.sha256Hex(pwd));
                     user.setResetPwdToken( null );
                     user.setResetPwdExpiration( null);
-                    return toTOObject(save(user));
+                    return UsersUtils.toTOObject(save(user));
                 } else {
                     throw new UserControlerExpiredTokenException("expired");
                 }
@@ -292,7 +295,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     .setRows(1000);
 
             QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             return users;
             //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
         } catch (SolrServerException | IOException ex) {
@@ -305,14 +308,14 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
     public User userSave(User user) throws UserControlerException, NotAuthorizedException {
         User found = null;
         try (SolrClient client = buildClient()) {
-            found = findOneUser(client, "username:\"" + user.getUsername() + "\"");
+            found = UsersUtils.findOneUser(client, "username:\"" + user.getUsername() + "\"");
         } catch (IOException | SolrServerException ex) {
             throw new UserControlerException(ex.getMessage());
         }
 
         if (found != null) {
             user.setPwd(found.getPwd());
-            return toTOObject(save(user));
+            return UsersUtils.toTOObject(save(user));
         } else {
             throw new UserControlerException(String.format("Cannot save user %s", user.getUsername()));
         }
@@ -350,7 +353,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
     private  User save(User user, SolrClient client) throws IOException, SolrServerException {
         try {
             client.add("users", user.toSolrInputDocument());
-            return toTOObject(user);
+            return UsersUtils.toTOObject(user);
         } finally {
             SolrUtils.quietCommit(client, "users");
         }
@@ -364,56 +367,11 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                     .setRows(1000);
 
             QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(this::toTOObject).collect(Collectors.toList());
+            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             return users;
 
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
-        }
-    }
-
-    User toTOObject(User user) {
-        if (user != null) {
-            User toObject = new User();
-            toObject.setUsername(user.getUsername());
-            toObject.setJmeno(user.getJmeno());
-            toObject.setPrijmeni(user.getPrijmeni());
-            toObject.setApikey(user.getApikey());
-            toObject.setResetPwdToken(user.getResetPwdToken());
-            toObject.setResetPwdExpiration(  user.getResetPwdExpiration());
-            toObject.setEmail( user.getEmail()) ;
-            toObject.setNotifikaceInterval(user.getNotifikaceInterval());
-            toObject.setNositel(user.getNositel());
-            toObject.setRole(user.getRole());
-            toObject.setInstitution( user.getInstitution());
-            toObject.setIco(user.getIco());
-            toObject.setPoznamka(user.getPoznamka());
-
-            toObject.setMesto(user.getMesto());
-            toObject.setAdresa(user.getAdresa());
-            toObject.setUlice(user.getUlice());
-            toObject.setCislo(user.getCislo());
-            toObject.setTelefon(user.getTelefon());
-            toObject.setPsc(user.getPsc());
-
-            return toObject;
-        } else {
-            return null;
-        }
-    }
-
-    User findOneUser(SolrClient solr, String q) throws SolrServerException, IOException {
-        SolrQuery query = new SolrQuery(q)
-                .setRows(1);
-
-        QueryResponse usersResult = solr.query("users", query);
-
-        long numFound = usersResult.getResults().getNumFound();
-        if (numFound >0 ) {
-            SolrDocument document = usersResult.getResults().get(0);
-            return User.fromSolrDocument(document);
-        } else {
-            return null;
         }
     }
 

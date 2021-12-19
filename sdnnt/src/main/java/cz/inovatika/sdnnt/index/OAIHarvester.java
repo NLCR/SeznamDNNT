@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.index.utils.HarvestDebug;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
@@ -168,105 +169,83 @@ public class OAIHarvester {
       try {
         long start = new Date().getTime();
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(url);
-        try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-          final HttpEntity entity = response1.getEntity();
-          if (entity != null) {
+        try {
 
-            InputStream dStream = null;
-            File dFile = null;
-
-            try(InputStream netStream = entity.getContent()) {
-
-                dFile = HarvestDebug.debugFile(type, netStream, url);
-                dStream = new FileInputStream(dFile);
-
-                reqTime += new Date().getTime() - start;
-                start = new Date().getTime();
-
-                resumptionToken = readFromXML(dStream);
-
-                procTime += new Date().getTime() - start;
-                start = new Date().getTime();
-                if (!recs.isEmpty()) {
-                    Indexer.add(collection, recs, merge, update, "harvester");
-                    indexed += recs.size();
-                    recs.clear();
-                }
-                if (!toDelete.isEmpty()) {
-                    solr.deleteById(collection, toDelete);
-                    deleted += toDelete.size();
-                    toDelete.clear();
-                }
-                solrTime += new Date().getTime() - start;
-
-              if (dStream != null ) {
-                IOUtils.closeQuietly(dStream);
-              }
-
-              Files.delete(dFile.toPath());
-              Files.delete(dFile.getParentFile().toPath());
-
-            } finally {
-                if (dStream != null) IOUtils.closeQuietly(dStream);
-            }
-          }
-        }
-        
-        while (resumptionToken != null) {
+          File dFile = throttle(client, type, url);
+          InputStream dStream = new FileInputStream(dFile);
+          reqTime += new Date().getTime() - start;
           start = new Date().getTime();
+          resumptionToken = readFromXML(dStream);
+          procTime += new Date().getTime() - start;
+          start = new Date().getTime();
+          if (!recs.isEmpty()) {
+            Indexer.add(collection, recs, merge, update, "harvester");
+            indexed += recs.size();
+            recs.clear();
+          }
+          if (!toDelete.isEmpty()) {
+            solr.deleteById(collection, toDelete);
+            deleted += toDelete.size();
+            toDelete.clear();
+          }
+          solrTime += new Date().getTime() - start;
+
+          if (dStream != null ) {
+            IOUtils.closeQuietly(dStream);
+          }
+
+
+          try {
+            Files.delete(dFile.toPath());
+            Files.delete(dFile.getParentFile().toPath());
+          } catch (IOException e) {
+            LOGGER.warning("Exception during deleting file");
+          }
+
+        } catch (MaximumIterationExceedException e) {
+          LOGGER.log(Level.SEVERE, e.getMessage(),e);
+        }
+
+
+        while (resumptionToken != null) {
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
           LOGGER.log(Level.INFO, "Getting {0}...", resumptionToken);
           ret.put("resumptionToken", resumptionToken);
-          httpGet = new HttpGet(url);
-          try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-            final HttpEntity entity = response1.getEntity();
-            if (entity != null) {
 
-                InputStream dStream = null;
-                File dFile = null;
-
-                try (InputStream netStream = entity.getContent()) {
-
-                    dFile = HarvestDebug.debugFile(type, netStream, url);
-                    dStream = new FileInputStream(dFile);
-
-
-                    reqTime += new Date().getTime() - start;
-                    start = new Date().getTime();
-
-                    resumptionToken = readFromXML(dStream);
-
-                    procTime += new Date().getTime() - start;
-                    start = new Date().getTime();
-                    if (recs.size() > batchSize) {
-                        Indexer.add(collection, recs, merge, update, "harvester");
-                        indexed += recs.size();
-                        solrTime += new Date().getTime() - start;
-                        LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
-                        indexed,
-                        DurationFormatUtils.formatDurationHMS(reqTime),
-                        DurationFormatUtils.formatDurationHMS(procTime),
-                        DurationFormatUtils.formatDurationHMS(solrTime)});
-                        recs.clear();
-                    }
-
-
-                  if (dStream != null ) {
-                    IOUtils.closeQuietly(dStream);
-                  }
-
-                  Files.delete(dFile.toPath());
-                  Files.delete(dFile.getParentFile().toPath());
-                } finally {
-
-                  if (dStream != null) {
-                    IOUtils.closeQuietly(dStream);
-                  }
-                }
+          try {
+            start = new Date().getTime();
+            File dFile = throttle(client, type, url);
+            InputStream dStream = new FileInputStream(dFile);
+            reqTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            resumptionToken = readFromXML(dStream);
+            procTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            if (recs.size() > batchSize) {
+              Indexer.add(collection, recs, merge, update, "harvester");
+              indexed += recs.size();
+              solrTime += new Date().getTime() - start;
+              LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                      indexed,
+                      DurationFormatUtils.formatDurationHMS(reqTime),
+                      DurationFormatUtils.formatDurationHMS(procTime),
+                      DurationFormatUtils.formatDurationHMS(solrTime)});
+              recs.clear();
             }
-          }
 
+            if (dStream != null ) {
+              IOUtils.closeQuietly(dStream);
+            }
+
+            try {
+              Files.delete(dFile.toPath());
+              Files.delete(dFile.getParentFile().toPath());
+            } catch (IOException e) {
+              LOGGER.warning("Exception during deleting file");
+            }
+          } catch (MaximumIterationExceedException e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+          }
         }
         start = new Date().getTime();
         if (!recs.isEmpty()) {
@@ -292,6 +271,56 @@ public class OAIHarvester {
       ret.put("error", ex);
     }
   }
+
+  private File throttle(CloseableHttpClient client, String type, String url) throws IOException, MaximumIterationExceedException {
+    int max_repetion = 3;
+    int seconds = 30;
+
+    JSONObject harvest = Options.getInstance().getJSONObject("OAIHavest");
+    if (harvest.has("numrepeat")) {
+      max_repetion = harvest.getInt("numrepeat");
+    }
+
+    if (harvest.has("seconds")) {
+      seconds = harvest.getInt("seconds");
+    }
+    for (int i=0;i<max_repetion;i++) {
+      HttpGet httpGet = new HttpGet(url);
+      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+        final HttpEntity entity = response1.getEntity();
+        if (entity != null) {
+          File dFile = null;
+          try (InputStream netStream = entity.getContent()) {
+            dFile = HarvestDebug.debugFile(type, netStream, url);
+            if(checkNotHTML(dFile)) {
+              return dFile;
+            } else {
+              try {
+                LOGGER.log(Level.INFO, "Suspending threads for "+seconds+"seconds ");
+                Thread.sleep(seconds*1000);
+              } catch (InterruptedException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(),e);
+              }
+            }
+          }
+        }
+      }
+    }
+    throw new MaximumIterationExceedException("Maximum number of waiting exceeed");
+  }
+
+  private boolean checkNotHTML(File dfile) throws IOException {
+    // read first
+    try(FileInputStream fis = new FileInputStream(dfile)) {
+      byte[] buffer = new byte[2048];
+      int read = IOUtils.read(fis, buffer);
+      if (read > 0) {
+        String s = new String(buffer, "UTF-8");
+        return !s.toLowerCase().contains("<html>");
+      } else return false;
+    }
+  }
+
 
   private String readFromXML(InputStream is) throws XMLStreamException {
 

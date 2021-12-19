@@ -56,6 +56,9 @@ public class User {
 
   public static final String INSTITUTION_KEY  = "institution";
 
+  public static final String THIRD_PARTY_USER_KEY  = "thirdpartyuser";
+
+
   private String username;
   private String pwd;
   private String role;
@@ -82,6 +85,7 @@ public class User {
   private String institution;
   private String notifikace_interval = NotificationInterval.none.name();
 
+  private boolean thirdPartyUser = false;
 
   public String getState() {
     return state;
@@ -278,6 +282,21 @@ public class User {
   }
 
 
+//  public boolean isProfileEditable() {
+//    return profileEditable;
+//  }
+//  public void setProfileEditable(boolean profileEditable) {
+//    this.profileEditable = profileEditable;
+//  }
+
+  public boolean isThirdPartyUser() {
+    return thirdPartyUser;
+  }
+
+  public void setThirdPartyUser(boolean thirdPartyUser) {
+    this.thirdPartyUser = thirdPartyUser;
+  }
+
   public JSONObject toJSONObject() {
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(USERNAME_KEY, this.username);
@@ -303,6 +322,8 @@ public class User {
     if (this.resetPwdToken !=null) jsonObject.put(RESET_PWD_KEY, this.resetPwdToken);
     if (this.resetPwdExpiration !=null) jsonObject.put(RESET_PWD_EXPIRATION_KEY, this.resetPwdExpiration);
     if (this.notifikace_interval != null) jsonObject.put(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
+    if (this.institution != null) jsonObject.put(INSTITUTION_KEY, this.institution);
+    if (this.thirdPartyUser) jsonObject.put(THIRD_PARTY_USER_KEY, this.thirdPartyUser);
     return jsonObject;
   }
 
@@ -391,6 +412,11 @@ public class User {
     if(jsonObject.has(NOTIFIKACE_INTERVAL_KEY)) {
       String string = jsonObject.getString(NOTIFIKACE_INTERVAL_KEY);
       user.setNotifikaceInterval(string);
+    }
+
+    if (jsonObject.has(INSTITUTION_KEY)) {
+      String inst = jsonObject.getString(INSTITUTION_KEY);
+      user.setInstitution(inst);
     }
 
     return user;
@@ -483,6 +509,11 @@ public class User {
     if(doc.containsKey(NOTIFIKACE_INTERVAL_KEY)) {
       String string = (String) doc.getFieldValue(NOTIFIKACE_INTERVAL_KEY);
       user.setNotifikaceInterval(string);
+    }
+
+    if (doc.containsKey(INSTITUTION_KEY)) {
+      String string = (String) doc.getFieldValue(NOTIFIKACE_INTERVAL_KEY);
+      user.setInstitution(string);
     }
 
     return user;

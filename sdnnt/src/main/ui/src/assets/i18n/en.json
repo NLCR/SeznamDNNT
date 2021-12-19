@@ -725,7 +725,10 @@
     "typ_zadosti": "Type of request",
     "ukazat_korespondenci": "Show correspondence",
     "korespondence": "Correspondence",
-    "vlozit_korespondenci": "Add correspondence ..."
+    "vlozit_korespondenci": "Add correspondence ...",
+    "standardni_prihlaseni":"Use application account ...",
+    "shibboleth_prihlaseni":"Use EDUid account ..."
+
   },
 
   "acts": {

@@ -13,7 +13,7 @@ export class HelpComponent implements OnInit {
 
 
   constructor(public state: AppState,
-    private service: AppService
+    private service: AppService,
     ) { }
 
   ngOnInit(): void {
@@ -26,7 +26,10 @@ export class HelpComponent implements OnInit {
   }
 
   helpContent() {
-    this.service.getText('help').subscribe(text => this.content = text);
-
+    if (this.state.user != null) {
+      this.service.getText('help_'+this.state.user.role).subscribe(text => this.content = text);
+    } else {
+      this.service.getText('help').subscribe(text => this.content = text);
+    }
   }
 }

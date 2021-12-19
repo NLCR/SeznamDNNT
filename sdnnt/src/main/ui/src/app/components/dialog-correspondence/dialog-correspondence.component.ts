@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
   selector: 'app-dialog-correspondence',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DialogCorrespondenceComponent implements OnInit {
 
-  constructor() { }
+  result: string;
+
+
+  constructor(
+    public dialogRef: MatDialogRef<DialogCorrespondenceComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Zadost) { 
+    
+      this.result = data.email;
+  }
 
   ngOnInit(): void {
   }
 
+  saveCorrespondence(): void {
+    this.dialogRef.close({result: this.result});
+  }
 }

@@ -55,6 +55,7 @@ import { CookieModule } from 'ngx-cookie';
 import { DialogSessionExpirationComponent } from './components/dialog-session-expiration/dialog-session-expiration.component';
 import { DialogDeleteRequestComponent } from './components/dialog-delete-request/dialog-delete-request.component';
 import { DialogCorrespondenceComponent } from './components/dialog-correspondence/dialog-correspondence.component';
+import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -112,6 +113,7 @@ const providers: any[] =[
     ConsentComponent,
     DialogDeleteRequestComponent,
     DialogCorrespondenceComponent,
+    ShibbolethLandingPageComponent,
   ],
   imports: [
     BrowserModule,

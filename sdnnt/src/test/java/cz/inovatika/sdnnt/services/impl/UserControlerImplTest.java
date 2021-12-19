@@ -5,6 +5,7 @@ import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -475,7 +476,7 @@ public class UserControlerImplTest {
         object.put("user", user.getUsername());
         object.put("pwd", pwd);
 
-        EasyMock.expect(session.getAttribute(UserControler.AUTHENTICATED_USER)).andReturn(null).anyTimes();
+        EasyMock.expect(session.getAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER)).andReturn(null).anyTimes();
         EasyMock.expect(request.getSession(true)).andReturn(session).anyTimes();
         EasyMock.expect(request.getSession()).andReturn(session).anyTimes();
         TestServletStream stream = new TestServletStream(new ByteArrayInputStream(object.toString().getBytes()));

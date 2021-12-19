@@ -3,11 +3,16 @@ import { User } from "./user";
 export interface Sort { field: string; dir: string};
 
 export interface Configuration {
+
   context: string;
   lang: string;
   snackDuration: number;
   homeTabs: string[];
   homeCards: string[];
+
+
+  simplelogin:boolean;
+
 
   // Seznam roli
   role: string[];
@@ -36,5 +41,7 @@ export interface Configuration {
 
   // ping interval
   pinginterval: number;
+
+
 
 }
