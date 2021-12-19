@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 public class AccountServiceImpl implements AccountService {
@@ -95,9 +96,10 @@ public class AccountServiceImpl implements AccountService {
                 query.addFilterQuery("state:" + state);
             }
             if (navrhy != null && !navrhy.isEmpty()) {
-                navrhy.stream().filter(Objects::nonNull).forEach(navrh -> {
-                    query.addFilterQuery("navrh:" + navrh);
-                });
+                String fq = navrhy.stream().filter(Objects::nonNull).map(navrh-> {
+                    return "navrh:" + navrh;
+                }).collect(Collectors.joining(" OR "));
+                query.addFilterQuery(fq);
             }
 
             if (institution != null) {
