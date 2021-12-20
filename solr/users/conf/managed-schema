@@ -63,6 +63,8 @@
     
     <field name="jmeno" type="string" indexed="true" stored="true"  />
     <field name="prijmeni" type="string" indexed="false" stored="true"  />
+	
+	
     <field name="titul" type="string" indexed="true" stored="true"  />
     <field name="ico" type="string" indexed="true" stored="true"  />
     <field name="adresa" type="string" indexed="true" stored="true"  />
@@ -84,6 +86,8 @@
     <field name="resetPwdExpiration" type="date" indexed="true" stored="true" multiValued="false"  />
     <field name="institution" type="string" indexed="true" stored="true" multiValued="false"  />
     
+	
+	<field name="nezevspolecnosti" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
     
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -268,6 +272,19 @@
 	       (empty by default), and down cases.  At query time only, it
 	       also applies synonyms.
 	  -->
+
+    <fieldType name="usernames" class="solr.TextField" positionIncrementGap="100" multiValued="false">
+      <analyzer type="index">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+    </fieldType>
+
+
     <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true">
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
