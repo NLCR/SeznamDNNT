@@ -370,7 +370,10 @@ public class CatalogSearcher {
               + (year - yearsSE) 
               + "])";
       String se = "(fmt:SE AND " + seDate + ")";
-      
+
+      // https://github.com/NLCR/SeznamDNNT/issues/164
+      query.addFilterQuery("place_of_pub:\"xr \"");
+
       query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
       
 
