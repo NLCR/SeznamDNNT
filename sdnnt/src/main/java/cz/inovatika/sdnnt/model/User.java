@@ -1,15 +1,8 @@
 package cz.inovatika.sdnnt.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
@@ -58,6 +51,9 @@ public class User {
 
   public static final String THIRD_PARTY_USER_KEY  = "thirdpartyuser";
 
+  public static final String NAZEV_SPOLECNOSTI_KEY = "nezevspolecnosti";
+
+  private String nazevSpolecnosti;
 
   private String username;
   private String pwd;
@@ -281,8 +277,15 @@ public class User {
     this.notifikace_interval = notifikace_interval;
   }
 
+  public String getNazevSpolecnosti() {
+    return nazevSpolecnosti;
+  }
 
-//  public boolean isProfileEditable() {
+  public void setNazevSpolecnosti(String nazevSpolecnosti) {
+    this.nazevSpolecnosti = nazevSpolecnosti;
+  }
+
+  //  public boolean isProfileEditable() {
 //    return profileEditable;
 //  }
 //  public void setProfileEditable(boolean profileEditable) {
@@ -324,6 +327,7 @@ public class User {
     if (this.notifikace_interval != null) jsonObject.put(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
     if (this.institution != null) jsonObject.put(INSTITUTION_KEY, this.institution);
     if (this.thirdPartyUser) jsonObject.put(THIRD_PARTY_USER_KEY, this.thirdPartyUser);
+    if (nazevSpolecnosti != null) jsonObject.put(NAZEV_SPOLECNOSTI_KEY, this.nazevSpolecnosti);
     return jsonObject;
   }
 
@@ -419,6 +423,10 @@ public class User {
       user.setInstitution(inst);
     }
 
+    if (jsonObject.has(NAZEV_SPOLECNOSTI_KEY)) {
+      String nazevSpolecnosti = jsonObject.getString(NAZEV_SPOLECNOSTI_KEY);
+      user.setNazevSpolecnosti(nazevSpolecnosti);
+    }
     return user;
   }
 
@@ -516,6 +524,11 @@ public class User {
       user.setInstitution(string);
     }
 
+    if (doc.containsKey(NAZEV_SPOLECNOSTI_KEY)) {
+      String string = (String) doc.getFieldValue(NAZEV_SPOLECNOSTI_KEY);
+      user.setNazevSpolecnosti(string);
+    }
+
     return user;
 
   }
@@ -597,6 +610,9 @@ public class User {
       sinput.addField(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
     }
 
+    if (this.nazevSpolecnosti != null) {
+      sinput.addField(NAZEV_SPOLECNOSTI_KEY, this.nazevSpolecnosti);
+    }
     return sinput;
 
   }

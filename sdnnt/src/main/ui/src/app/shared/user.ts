@@ -35,9 +35,11 @@ export class User {
   poznamka: string;
   error?: string;
 
+  nazevspolecnosti:string;
 
   registerOption: UserRegisterOption;
 
+  
   thirdpartyuser:boolean = false;
 
 }

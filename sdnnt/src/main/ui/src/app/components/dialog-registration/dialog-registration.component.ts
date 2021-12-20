@@ -48,6 +48,13 @@ export class DialogRegistrationComponent implements OnInit {
         return;
       }
 
+      if (!this.user.nazevspolecnosti) {
+        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_nazevspolecnosti', true);
+        this.focus = 'nazevspolecnosti';
+        return;
+
+      }
+
       const validEmail = (this.user.email && this.user.email != null && this.user.email.length > 3 ) ? this.user.email.trim().match(/^\S+@\S+\.\S+$/) : false;
       if ((!this.user.email  ||  (this.user.email && (!this.user.email.trim().includes('@')) || !validEmail))) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_email', true);

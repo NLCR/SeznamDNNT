@@ -3,7 +3,7 @@
     <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
       <mat-radio-group [(ngModel)]="formTypeSelected">
         <mat-radio-button [value]="1">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
-        <mat-radio-button [value]="2" disabled>{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
+        <mat-radio-button [value]="2">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
       </mat-radio-group>
     </div>
     <div fxFlex="50%" *ngIf="formTypeSelected === 1">
@@ -26,7 +26,7 @@
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
-          <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.jmeno" />
+          <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.nazevspolecnosti" />
         </mat-form-field>
       </div>
     </div>

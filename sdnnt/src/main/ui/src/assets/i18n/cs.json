@@ -145,6 +145,7 @@
     "forgot_password_error": "Nejde vyresetovat heslo, nemůžu najít účet.",
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
+    "invalid_nazevspolecnosti":"Špatné jméno společnosti",
     "invalid_jmeno": "Špatné jméno",
     "invalid_prijmeni": "Špatné příjmení",
     "invalid_email": "email adresa není validní",
@@ -600,8 +601,8 @@
 
     "navrzeno_na_zarazeni": "Zařazení",
     "navrzeno_na_vyrazeni": "Vyřazení",
-    "navrzeno_na_omezeni_vnl": "Terminál/VNL",
-    "navrzeno_na_omezeni_vnz": "Terminál/VNZ ",
+    "navrzeno_na_omezeni_vnl": "Výzva k omezení na terminál u vlastní produkce",
+    "navrzeno_na_omezeni_vnz": "Výzva k omezení na terminál na 18 měsíců, viz Nositelům práv",
 
     "nedoreseno": "Nedořešeno",
     "fyzicka_osoba": "Fyzická osoba",

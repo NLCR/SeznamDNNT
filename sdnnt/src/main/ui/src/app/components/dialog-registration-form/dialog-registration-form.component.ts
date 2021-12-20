@@ -22,6 +22,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
 
 
 
+  @ViewChild('nazevspolecnosti') nazevspolecnosti: MatInput;
 
   @ViewChild('username') username: MatInput;
   @ViewChild('email') email: MatInput;
@@ -71,8 +72,6 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       this.nakladatel = this.user.nositel?.includes('nakladatel');
     }
 
-    // @ViewChild('phonenumber') phonenumber: MatInput;
-    // @ViewChild('ico') ico: MatInput;
   
     this.inputFocusables = {
       username: this.username,
