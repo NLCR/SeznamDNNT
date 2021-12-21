@@ -601,8 +601,8 @@
 
     "navrzeno_na_zarazeni": "Zařazení",
     "navrzeno_na_vyrazeni": "Vyřazení",
-    "navrzeno_na_omezeni_vnl": "Výzva k omezení na terminál u vlastní produkce",
-    "navrzeno_na_omezeni_vnz": "Výzva k omezení na terminál na 18 měsíců, viz Nositelům práv",
+    "navrzeno_na_omezeni_vnl": "Terminál po 18 měsíců / nositele práv",
+    "navrzeno_na_omezeni_vnz": "Terminál / vlastní produkce",
 
     "nedoreseno": "Nedořešeno",
     "fyzicka_osoba": "Fyzická osoba",

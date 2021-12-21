@@ -60,7 +60,12 @@ export class ResultItemComponent implements OnInit {
     
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
-      this.processed = z.process[this.doc.identifier];
+      //let tablekey = this.doc.identifier;
+      let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
+      let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
+
+      let tablekey = this.doc.identifier +"_("+stateKey+","+licenseKey+")";
+      this.processed = z.process[tablekey];
       if (this.processed) {
         this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
           ${this.service.getTranslation('desc.datum')}: ${this.datePipe.transform(this.processed.date, 'dd.MM.yyyy')}`;
@@ -182,6 +187,14 @@ export class ResultItemComponent implements OnInit {
     });
 
     
+  }
+
+  public alreadyRejected() {
+      //let tablekey = this.doc.identifier;
+      // posledni zmena je v identifikatoru
+      if (this.zadost.process[this.doc.identifier]) {
+        return this.zadost.process[this.doc.identifier].state === 'rejected';
+      } else return true;
   }
 
   public showStates() {

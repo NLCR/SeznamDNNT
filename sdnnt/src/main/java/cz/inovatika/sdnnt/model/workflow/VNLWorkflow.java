@@ -31,7 +31,7 @@ public class VNLWorkflow extends Workflow {
             return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false);
         } else if (owner.getWorkflowState()== NLX) {
             //this.getOwner().getWorkflowState()
-            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), period, true,  true);
+            return new WorkflowState(this.owner, A, License.dnnto, owner.getWorkflowDate(), period, true,  true);
         }
         return null;
     }
@@ -53,7 +53,7 @@ public class VNLWorkflow extends Workflow {
     @Override
     public WorkflowState nextAlternativeState(String stateHint) {
         if (this.getOwner().getWorkflowState().equals(NLX) && stateHint != null && TITLE_RELEASED.equals(stateHint)) {
-            return new WorkflowState(this.owner, N, null, owner.getWorkflowDate(), null, true,  true);
+            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), null, true,  true);
         }
         return null;
 

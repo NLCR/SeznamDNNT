@@ -103,7 +103,6 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("*:*")
                     .setRows(USERS_LIMIT);
-
             QueryResponse users = solr.query("users", query);
             List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());

@@ -289,15 +289,44 @@ export class AccountComponent implements OnInit {
   }
 
   countProcessed(zadost: Zadost) {
-    return zadost.process ?  Object.keys(zadost.process).length : 0;
+    if (zadost.process) {
+      let count: number = 0;
+      let stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : "_");
+      let licenseKey = (zadost.desired_license ?  zadost.desired_license : "_");
+      zadost.identifiers.forEach(id => {
+        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        if ( !zadost.process[tablekey]) {
+          count  += 1;
+        }
+      });    
+      return count;
+    } else return 0;
+    //return zadost.process ?  Object.keys(zadost.process).length : 0;
   }
 
   process(zadost: Zadost) {
 
-    if (zadost.identifiers.length > Object.keys(zadost.process).length) {
+    let stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : "_");
+    let licenseKey = (zadost.desired_license ?  zadost.desired_license : "_");
+    let allProcessed: boolean = true;
+
+    if (zadost && zadost.process) {
+      zadost.identifiers.forEach(id => {
+        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        if ( !zadost.process[tablekey]) {
+          allProcessed = false;
+        }
+      });    
+    } else {
+      allProcessed = false;
+    }
+
+    if (!allProcessed) {
       this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
       return;
     }
+
+
     this.service.processZadost(zadost).subscribe(res => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);

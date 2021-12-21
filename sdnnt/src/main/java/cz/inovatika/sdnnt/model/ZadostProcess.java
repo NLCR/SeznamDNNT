@@ -20,10 +20,13 @@ public class ZadostProcess {
   public static final String REASON_KEY = "reason";
   public static final String STATE_KEY = "state";
 
+  public static final String TRANSITION_NAME_KEY = "transitionname";
+
   private Date date;
   private String user;
   private String reason;
   private String state;
+  private String transitionName;
 
   public ZadostProcess() {}
 
@@ -59,6 +62,14 @@ public class ZadostProcess {
     this.state = state;
   }
 
+  public String getTransitionName() {
+    return transitionName;
+  }
+
+  public void setTransitionName(String transitionName) {
+    this.transitionName = transitionName;
+  }
+
   public static ZadostProcess fromJSON(String json)  {
     JSONObject jsonObject = new JSONObject(json);
     ZadostProcess zp = new ZadostProcess();
@@ -75,6 +86,11 @@ public class ZadostProcess {
     if(jsonObject.has(STATE_KEY)) {
       zp.setState(jsonObject.optString(STATE_KEY));
     }
+
+    if (jsonObject.has(TRANSITION_NAME_KEY)) {
+      zp.setTransitionName(jsonObject.optString(TRANSITION_NAME_KEY));
+    }
+
     return zp;
   }
   
@@ -91,6 +107,9 @@ public class ZadostProcess {
     }
     if (getDate() != null) {
       jsonObject.put(DATE_KEY, getDate().getTime());
+    }
+    if (getTransitionName() != null) {
+      jsonObject.put(TRANSITION_NAME_KEY, getTransitionName());
     }
     return jsonObject;
   }

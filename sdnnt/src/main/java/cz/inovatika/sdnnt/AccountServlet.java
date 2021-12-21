@@ -287,7 +287,7 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
-    // odznaci zadost jako zprocesovanou
+    // posune zadost ve workflow
     PROCESS_ZADOST {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -295,6 +295,7 @@ public class AccountServlet extends HttpServlet {
           try {
             UserControlerImpl userControler = new UserControlerImpl(req);
             AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
+
             return service.curatorCloseRequest(readInputJSON(req).toString());
           } catch (IOException e) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
@@ -304,6 +305,8 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
+
+  
 
     APPROVE {
       @Override

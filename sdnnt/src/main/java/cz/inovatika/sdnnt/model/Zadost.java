@@ -343,6 +343,10 @@ public class Zadost implements NotNullAwareObject{
   public void addProcess(String id, ZadostProcess zp) {
     if (this.process == null) this.process = new HashMap<>();
     this.process.put(id, zp);
+
+    if (zp.getTransitionName() != null) {
+      this.process.put(id+"_"+zp.getTransitionName(), zp);
+    }
   }
 
   public void removeProcess(String id, ZadostProcess zp) {
@@ -538,12 +542,16 @@ public class Zadost implements NotNullAwareObject{
       if (jsonobj.has(PROCESS_KEY)) {
         Object object = jsonobj.get(PROCESS_KEY);
 
+        if (zadost.getProcess() == null) {
+          zadost.setProcess(new HashMap<>());
+        }
+
         // two type of synchronization as text as json
         if (object instanceof  JSONObject) {
           JSONObject jsonObject = (JSONObject) object;
           jsonObject.keySet().forEach(key-> {
             Object  process = jsonObject.get(key);
-            zadost.addProcess(key, ZadostProcess.fromJSON(process.toString()));
+            zadost.process.put(key, ZadostProcess.fromJSON(process.toString()));
           });
 
         } else if (object instanceof String) {
@@ -552,12 +560,9 @@ public class Zadost implements NotNullAwareObject{
           JSONObject processObject = new JSONObject(process);
           processObject.keySet().forEach(key-> {
             Object o = processObject.get(key);
-            zadost.addProcess(key, ZadostProcess.fromJSON(o.toString()));
+            zadost.process.put(key, ZadostProcess.fromJSON(o.toString()));
           });
 
-          if (zadost.getProcess() == null) {
-            zadost.setProcess(new HashMap<>());
-          }
 
         }
       }
@@ -741,24 +746,27 @@ public class Zadost implements NotNullAwareObject{
     }
   }
 
-  public static JSONObject approve(String identifier, String js, String komentar, String username, String approvestate) {
+  public static JSONObject approve(String identifier, String js, String komentar, String username, String approvestate, String transition) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-      return approve(solr, identifier, js, komentar, username, approvestate);
+      return approve(solr, identifier, js, komentar, username, approvestate, transition);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       return new JSONObject().put("error", ex);
     }
   }
-  public static JSONObject approve(SolrClient client, String identifier, String js, String komentar, String username, String approvestate) {
+  public static JSONObject approve(SolrClient client, String identifier, String js, String komentar, String username, String approvestate, String transition) {
     try {
       Zadost zadost = Zadost.fromJSON(js);
       String oldProcess = new JSONObject().put("process", zadost.process).toString();
+
       ZadostProcess zprocess = new ZadostProcess();
       zprocess.setState(approvestate != null ? approvestate : "approved");
       zprocess.setUser(username);
       zprocess.setReason(komentar);
       zprocess.setDate(new Date());
+      zprocess.setTransitionName(transition);
       zadost.addProcess(identifier, zprocess);
+
       String newProcess = new JSONObject().put("process", zadost.process).toString();
       // history must be updated after success
       new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost");
@@ -770,7 +778,7 @@ public class Zadost implements NotNullAwareObject{
   }
 
 
-  public static JSONObject reject(String identifier, String js, String reason, String username) {
+  public static JSONObject reject(String identifier, String js, String reason, String username, String transition) {
     try {
       
       Zadost zadost = Zadost.fromJSON(js);
@@ -783,7 +791,9 @@ public class Zadost implements NotNullAwareObject{
       zprocess.setUser(username);
       zprocess.setReason(reason);
       zprocess.setDate(new Date());
-      zadost.process.put(identifier, zprocess);
+      zprocess.setTransitionName(transition);
+      //zadost.process.put(identifier, zprocess);
+      zadost.addProcess(identifier, zprocess);
 
       String newProcess = new JSONObject().put("process", zadost.process).toString();
       new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost");

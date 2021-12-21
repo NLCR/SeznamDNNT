@@ -1,6 +1,9 @@
 package cz.inovatika.sdnnt.model.workflow;
 
 
+import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.License;
+
 /**
  * Reprezentuje workflow
  */
@@ -19,12 +22,12 @@ public abstract class Workflow {
      */
     public abstract WorkflowState nextState();
 
-
     /**
      * Vraci true pokud muzeme workflow povazovat za uzavrene / dostal se do konencneho stavu
      * @return
      */
     public abstract boolean isClosableState();
+
 
 
     public abstract  boolean isSwitchPossible();
@@ -41,4 +44,11 @@ public abstract class Workflow {
     public abstract WorkflowState nextAlternativeState(String alternative);
     public abstract  boolean isAlternativeSwitchPossible(String alternative);
 
+    public String createTransitionName(String currentState, String currentLicense) {
+
+        String currentStateName = currentState != null ? currentState : "_";
+        String currentLicenseName = currentLicense != null ? currentLicense : "_";
+
+        return String.format("(%s,%s)", currentStateName, currentLicenseName);
+    }
 }

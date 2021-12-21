@@ -136,10 +136,27 @@ export class ZadostComponent implements OnInit {
 
   process() {
 
-    if (this.zadost.identifiers.length > Object.keys(this.zadost.process).length) {
+
+    let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
+    let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
+    let allProcessed: boolean = true;
+
+    if (this.zadost && this.zadost.process) {
+      this.zadost.identifiers.forEach(id => {
+        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        if ( !this.zadost.process[tablekey]) {
+          allProcessed = false;
+        }
+      });    
+    } else {
+      allProcessed = false;
+    }
+
+    if (!allProcessed) {
       this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
       return;
     }
+
     this.service.processZadost(this.zadost).subscribe(res => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);

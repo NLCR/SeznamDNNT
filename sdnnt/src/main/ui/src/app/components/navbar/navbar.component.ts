@@ -93,12 +93,12 @@ export class NavbarComponent implements OnInit {
   }
 
   profileEnabled(): boolean {
-    if (this.state.user.thirdpartyuser) return false;
+    if (this.state.user && this.state.user.thirdpartyuser) return false;
     else return true;
   }
 
   changePassEnabled(): boolean {
-    if (this.state.user.thirdpartyuser) return false;
+    if (this.state.user && this.state.user.thirdpartyuser) return false;
     else return true;
   } 
 

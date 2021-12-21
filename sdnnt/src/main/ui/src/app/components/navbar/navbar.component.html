@@ -30,8 +30,8 @@
       </a>
  
       <mat-menu #userMenu="matMenu">
-        <button mat-menu-item (click)="showUser()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</button>
-        <button mat-menu-item (click)="resetPasswd()"><mat-icon class="material-icons-outlined" >vpn_key</mat-icon>{{ 'desc.zmenit_heslo' | translate }}</button>
+        <button mat-menu-item  *ngIf="profileEnabled()"  (click)="showUser()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</button>
+        <button mat-menu-item *ngIf="profileEnabled()" (click)="resetPasswd()"><mat-icon class="material-icons-outlined" >vpn_key</mat-icon>{{ 'desc.zmenit_heslo' | translate }}</button>
         <button mat-menu-item (click)="logout()"><mat-icon class="material-icons-outlined">logout</mat-icon>{{ 'desc.odhlasit' | translate }}</button>
       </mat-menu>
 

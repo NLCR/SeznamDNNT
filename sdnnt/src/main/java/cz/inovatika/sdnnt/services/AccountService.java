@@ -17,7 +17,7 @@ public interface AccountService {
     public static final int MAXIMUM_ITEMS_IN_ZADOST = 300;
 
     /**
-     * NAjde zadost dle id
+     * Najde zadost dle id
      * @param id Identifikator zadosti
      * @return
      * @throws SolrServerException
@@ -44,7 +44,15 @@ public interface AccountService {
     public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, int rows, int page) throws SolrServerException, IOException,AccountException;
 
 
-    //
+    /**
+     * Uzivatel muze mit pouze jednu navrh pro kazdy typ. Dela pripravu pro tuto situaci - vraci existujici otevrenou pokud neni, vytvori a vrati
+     * @param navrh Typ navrhu/vyrazeni
+     * @return
+     * @throws SolrServerException
+     * @throws IOException
+     * @throws AccountException
+     * @throws ConflictException
+     */
     public JSONObject prepare(String navrh) throws SolrServerException, IOException, AccountException, ConflictException;
 
 
@@ -92,15 +100,47 @@ public interface AccountService {
      */
     public JSONObject saveRequestWithFRBR(String payload, User user , String frbr, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException,AccountException;
 
+    /**
+     * Vraci zazany
+     * @param id
+     * @param rows
+     * @param page
+     * @return
+     * @throws SolrServerException
+     * @throws IOException
+     * @throws ConflictException
+     * @throws AccountException
+     */
     public JSONObject getRecords(String id, int rows, int page) throws SolrServerException, IOException, ConflictException,AccountException;
 
+    /**
+     * Zavreni pozadavku z pohledu uzivatele
+     * @param payload
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     */
     public JSONObject userCloseRequest(String payload) throws ConflictException,AccountException;
 
+    /**
+     * Zarvreni pozdadavku z pohledu kuratora
+     * @param payload
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     */
     public JSONObject curatorCloseRequest(String payload) throws ConflictException,AccountException;
+
+    /**
+     * Smaze pozadavek
+     * @param payload
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public JSONObject deleteRequest(String payload) throws ConflictException, AccountException, IOException, SolrServerException;
-    //public JSONObject curatorDeleteRequest(String payload) throws ConflictException, AccountException, IOException, SolrServerException;
-
-
 
     public JSONObject curatorSwitchState(String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
