@@ -194,6 +194,10 @@ export class ZadostComponent implements OnInit {
 
 
   processNavrh(data: { type: string, identifier: string, komentar: string }) {
+    if (!data.komentar) {
+      this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
+      return;
+    }
     switch (data.type) {
       case 'approve': 
        // approve navrh 

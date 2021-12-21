@@ -313,13 +313,13 @@ export class ResultItemComponent implements OnInit {
 
   approve() {
     
-    const dialogRef = this.dialog.open(DialogPromptComponent, {
+    const approveDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    approveDialogRef.afterClosed().subscribe(result => {
       if (result !== null) {
         this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier, komentar: result});
       }
@@ -331,47 +331,47 @@ export class ResultItemComponent implements OnInit {
   approveLib() {
     
     
-    const dialogRef = this.dialog.open(DialogPromptComponent, {
+    const approvedLibDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    approvedLibDialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.processZadostEvent.emit({type: 'approveLib', identifier: this.doc.identifier, komentar: result});
-      }
+     }
     });
   }
 
 
   releasedProved() {
         
-    const dialogRef = this.dialog.open(DialogPromptComponent, {
+    const releasedDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'komentar', label: 'komentar'},
       panelClass: 'app-register-dialog'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    releasedDialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.processZadostEvent.emit({type: 'releasedProved', identifier: this.doc.identifier, komentar: result});
-      }
+     }
     });
 
   }
 
   reject() {
-    const dialogRef = this.dialog.open(DialogPromptComponent, {
+    const rejectDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
       data: {caption: 'duvod_pro_odmitnuti', label: 'duvod'},
       panelClass: 'app-register-dialog'
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    rejectDialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.processZadostEvent.emit({type: 'reject', identifier: this.doc.identifier, komentar: result});
-      }
+     }
     });
 
   }

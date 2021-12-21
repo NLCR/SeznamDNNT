@@ -161,7 +161,8 @@
     "condition3": "Je nutné souhlasit s podmínkami registrace",
     "delete_request": "Opravdu chcete smazat tuto žádost",
     "smazani_zadosti_success": "Smazání žádosti proběhlo úspěšně.",
-    "smazani_zadosti_error": "Chyba při smazání žádosti."
+    "smazani_zadosti_error": "Chyba při smazání žádosti.",
+    "komentar_chybi":"Chybí komentář"
   },
 
   "sort": {
