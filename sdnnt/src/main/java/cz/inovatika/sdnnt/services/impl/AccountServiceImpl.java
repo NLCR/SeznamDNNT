@@ -284,7 +284,20 @@ public class AccountServiceImpl implements AccountService {
         Zadost zadost = Zadost.fromJSON(payload);
         zadost.setKurator(this.loginSupport.getUser().getUsername());
         zadost.setDatumVyrizeni(new Date());
-        return closeRequest(zadost, "processed");
+        Workflow wfl = ZadostWorkflowFactory.create(zadost);
+        String transitionName = wfl.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+        if (!zadost.allRejected(transitionName)) {
+            return closeRequest(zadost, "processed");
+        } else {
+            // no workflow
+            zadost.setState("processed");
+            zadost.setTypeOfPeriod(null);
+            zadost.setDeadline(null);
+            zadost.setDesiredItemState(null);
+            zadost.setDesiredLicense(null);
+            LOGGER.info(String.format("Closing zadost immediately %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
+            return  VersionStringCast.cast(saveRequest(zadost, null));
+        }
     }
 
 
@@ -324,8 +337,11 @@ public class AccountServiceImpl implements AccountService {
             zadost.setDesiredItemState(null);
             zadost.setDesiredLicense(null);
         }
+
         LOGGER.info(String.format("Deadline for zadost %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
         return  VersionStringCast.cast(saveRequest(zadost, null));
+        //if (possibleToClose.stream().filter(Boolean::booleanValue))
+
     }
 
 

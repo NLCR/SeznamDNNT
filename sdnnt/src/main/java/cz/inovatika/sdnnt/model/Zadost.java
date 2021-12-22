@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import cz.inovatika.sdnnt.model.workflow.Workflow;
+import cz.inovatika.sdnnt.model.workflow.zadost.ZadostWorkflowFactory;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.BeanUtilities;
 import cz.inovatika.sdnnt.utils.SolrUtils;
@@ -379,6 +381,30 @@ public class Zadost implements NotNullAwareObject{
       LOGGER.log(Level.SEVERE, e.getMessage(), e);
       return new ArrayList<>();
     }
+  }
+
+
+  public boolean allRejected(String transitionName) {
+    return allItemsInOneState(transitionName, "rejected");
+  }
+
+  private boolean allItemsInOneState(String transitionName, String itemState) {
+    List<String> identifiers = this.getIdentifiers() != null ? this.getIdentifiers() : new ArrayList<>();
+    List<Boolean> bools = new ArrayList<>();
+    Map<String, ZadostProcess> process = this.getProcess();
+    if (process != null) {
+      this.process.keySet().forEach(ident-> {
+        ZadostProcess zProcess = process.get(ident);
+        if (zProcess.getTransitionName() != null && ident.endsWith(transitionName) && zProcess.getTransitionName().equals(transitionName)) {
+          if (zProcess.getState().equals(itemState))  bools.add(zProcess.getState().equals(itemState));
+        }
+      });
+      return bools.size() == identifiers.size();
+    } else return false;
+  }
+
+  public boolean allApproved(String transitionName) {
+    return allItemsInOneState(transitionName, "approved");
   }
 
   public void setVersion(String v) {
