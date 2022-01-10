@@ -28,7 +28,16 @@ properties:
   stateshistory:
     type: array
     items:
-      type: string
+      type: object
+      properties:
+        date:
+          type: string
+        user:
+          type: string
+        state:
+          type: string
+        license:
+          type: string
   title:
     type: array
     items:

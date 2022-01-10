@@ -14,15 +14,14 @@ import org.json.JSONObject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -176,7 +175,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         List<String> nazev  = new ArrayList<>();
         List<String> autor  = new ArrayList<>();
         List<String> nakladatel  = new ArrayList<>();
-        List<String> historieStavu  = new ArrayList<>();
+        List<CatalogItemBaseStateshistory> historieStavu  = new ArrayList<>();
         List<String> sigla = new ArrayList<>();
         List<String> links = new ArrayList<>();
         List<String> pids = new ArrayList<>();
@@ -207,12 +206,35 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
         if (doc.has(HISTORIE_STAVU_FIELD)) {
             doc.getJSONArray(HISTORIE_STAVU_FIELD).forEach(o-> {
+                CatalogItemBaseStateshistory cs = new CatalogItemBaseStateshistory();
                 JSONObject object = (JSONObject)o;
                 if (object.has(DNTSTAV_FIELD)) {
-                    historieStavu.add(object.getString(DNTSTAV_FIELD));
+                    cs.setState(object.getString(DNTSTAV_FIELD));
+                    //historieStavu.add(object.getString(DNTSTAV_FIELD));
                 } else if (object.has("stav")) {
-                    historieStavu.add(object.getString("stav"));
+                    cs.setState(object.getString("stav"));
                 }
+
+                if (object.has("user")) {
+                    cs.setUser(object.getString("user"));
+                }
+                if (object.has("date")) {
+                    String date = object.getString("date");
+                    try {
+                        SimpleDateFormat parseFormat = new SimpleDateFormat("yyyyMMdd");
+                        SimpleDateFormat outputFormat = new SimpleDateFormat("dd.MM.yyyy");
+                        Date parsed = parseFormat.parse(date);
+                        cs.setDate(outputFormat.format(parsed));
+                    } catch (ParseException e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage());
+                        cs.setDate(object.getString("date"));
+                    }
+                }
+                if (object.has("license")) {
+                    cs.setLicense(object.getString("license"));
+                }
+
+                historieStavu.add(cs);
             });
 
         }
