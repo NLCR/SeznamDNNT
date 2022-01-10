@@ -1,12 +1,13 @@
 <ng-container *ngIf="user">
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
     <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
-      <mat-radio-group [(ngModel)]="formTypeSelected">
-        <mat-radio-button [value]="1">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
-        <mat-radio-button [value]="2">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
+      <!-- typ: string; //pravnicka/fyzicka osoba -->
+      <mat-radio-group [(ngModel)]="user.typ">
+        <mat-radio-button [value]="'fyzicka_osoba'">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
+        <mat-radio-button [value]="'pravnicka_osoba'">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
       </mat-radio-group>
     </div>
-    <div fxFlex="50%" *ngIf="formTypeSelected === 1">
+    <div fxFlex="50%" *ngIf="user.typ === 'fyzicka_osoba'">
       <div class="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
@@ -14,7 +15,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="formTypeSelected === 1">
+    <div fxFlex="50%" *ngIf="user.typ  === 'fyzicka_osoba'">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prijmeni' | translate }}*</mat-label>
@@ -22,7 +23,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="100%" *ngIf="formTypeSelected === 2">
+    <div fxFlex="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
@@ -121,19 +122,19 @@
       </div>
     </div>
 
-    <div fxFlex="50%" *ngIf="formTypeSelected === 2">
+    <div fxFlex="50%" *ngIf="user.typ  === 'pravnicka_osoba'">
       <div class="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}</mat-label>
-          <input matInput cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
+          <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}*</mat-label>
+          <input matInput #kontaktni_osoba_jmeno="matInput" cdkFocusInitial name="kontaktni_osoba_jmeno" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="formTypeSelected === 2">
+    <div fxFlex="50%" *ngIf="user.typ  === 'pravnicka_osoba'">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}</mat-label>
-          <input matInput name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
+          <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}*</mat-label>
+          <input matInput #kontaktni_osoba_prijmeni="matInput" name="kontaktni_osoba_prijmeni" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
         </mat-form-field>
       </div>
     </div>

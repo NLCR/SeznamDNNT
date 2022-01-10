@@ -27,12 +27,15 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @ViewChild('username') username: MatInput;
   @ViewChild('email') email: MatInput;
   @ViewChild('jmeno') jmeno: MatInput;
- 
   @ViewChild('prijmeni') prijmeni: MatInput;
+
+  @ViewChild('kontaktni_osoba_jmeno') kontaktniOsobaJmeno: MatInput;
+  @ViewChild('kontaktni_osoba_prijmeni') kontaktniOsobaPrijmeni: MatInput;
 
   @ViewChild('phonenumber') phonenumber: MatInput;
   @ViewChild('ico') ico: MatInput;
   @ViewChild('psc') psc: MatInput;
+
 
 
   @ViewChild('conditionOne') conditionOneCheck: MatCheckbox;
@@ -45,7 +48,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   inputFocusables: {[key: string] : MatInput};
   checkboxFocusables: {[key: string] : MatCheckbox};
 
-  formTypeSelected: number = 1;
+  //formTypeSelected: number = 1;
   isApiEnabled: boolean;
 
   autor: boolean;
@@ -80,7 +83,9 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       prijmeni: this.prijmeni,
       phonenumber: this.phonenumber,
       ico: this.ico,
-      psc: this.psc
+      psc: this.psc,
+      kontaktniOsobaJmeno: this.kontaktniOsobaJmeno,
+      kontaktniOsobaPrijmeni: this.kontaktniOsobaPrijmeni
     }
 
     this.checkboxFocusables = {
