@@ -48,7 +48,7 @@ export class DialogRegistrationComponent implements OnInit {
         return;
       }
 
-      if (!this.user.nazevspolecnosti) {
+      if (this.user.typ && this.user.typ === 'pravnicka_osoba' &&  !this.user.nazevspolecnosti) {
         this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_nazevspolecnosti', true);
         this.focus = 'nazevspolecnosti';
         return;
@@ -63,15 +63,28 @@ export class DialogRegistrationComponent implements OnInit {
       }
 
       if (!this.user.jmeno || this.user.jmeno.trim() === '')  {
-        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_jmeno', true);
-        this.focus = 'jmeno';
-        return;
+        if (this.user.typ === 'pravnicka_osoba') {
+          this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_kontaktni_osoba_jmeno', true);
+          this.focus = 'kontaktniOsobaJmeno';
+          return;
+        } else {
+          this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_jmeno', true);
+          this.focus = 'jmeno';
+          return;
+        }
+        
       }
 
       if (!this.user.prijmeni || this.user.prijmeni.trim() === '')  {
-        this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_prijmeni', true);
-        this.focus = 'prijmeni';
-        return;
+        if (this.user.typ === 'pravnicka_osoba') {
+          this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_kontaktni_osoba_prijmeni', true);
+          this.focus = 'kontaktniOsobaPrijmeni';
+          return;
+        } else {
+          this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.invalid_prijmeni', true);
+          this.focus = 'prijmeni';
+          return;
+        }
       }
 
       const validICO = (this.user.ico && this.user.ico != null) ? this.user.ico.trim().match(/^\d{2}\s*\d{2}\s*\d{2}\s*\d{2}$/) : true;
@@ -131,7 +144,7 @@ export class DialogRegistrationComponent implements OnInit {
     } else {
 
       const validUsername = this.user.username.trim() === this.user.username.trim().replace(/[^\S]/gi, '');
-      if (!this.user.username || this.user.username.trim() === '' ||!validUsername ) {
+      if (!this.user.username || this.user.username.trim() === '' || !validUsername ) {
         this.service.showSnackBar('alert.ulozeni_uzivatele_error', 'alert.invalid_username', true);
         this.focus = 'username';
         return;
