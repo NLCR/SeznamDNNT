@@ -87,7 +87,7 @@
     <field name="institution" type="string" indexed="true" stored="true" multiValued="false"  />
     
 	
-	<field name="nezevspolecnosti" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
+	<field name="nazevspolecnosti" type="string" indexed="true" stored="true" multiValued="false"   />
     
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -277,10 +277,12 @@
       <analyzer type="index">
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory"/>       
       </analyzer>
       <analyzer type="query">
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
+        <filter class="solr.ASCIIFoldingFilterFactory"/>       
       </analyzer>
     </fieldType>
 

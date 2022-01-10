@@ -44,13 +44,14 @@ public class UsersUtils {
             toObject.setInstitution( user.getInstitution());
             toObject.setIco(user.getIco());
             toObject.setPoznamka(user.getPoznamka());
-
+            toObject.setTyp(user.getTyp());
             toObject.setMesto(user.getMesto());
             toObject.setAdresa(user.getAdresa());
             toObject.setUlice(user.getUlice());
             toObject.setCislo(user.getCislo());
             toObject.setTelefon(user.getTelefon());
             toObject.setPsc(user.getPsc());
+            toObject.setNazevSpolecnosti(user.getNazevSpolecnosti());
 
             return toObject;
         } else {

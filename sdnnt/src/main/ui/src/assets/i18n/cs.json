@@ -20,7 +20,15 @@
     "authors": "Nositelům práv",
     "publishers": "Nakladatelům",
     "libraries": "Knihovnám",
-    "api": "Popis API"
+    "api": "Popis API",
+
+    "help":"Nápověda",
+    "help_user":"Nápověda (uživatel)",
+    "help_knihovna":"Nápověda (knihovna)",
+    "help_kurator":"Nápověda (kurator)",
+    "help_mainKurator":"Nápověda (hlavní kurator)",
+    "help_admin":"Nápověda (admin)"
+
   },
   "record": {
     "state": "stav"
@@ -149,6 +157,8 @@
     "invalid_jmeno": "Špatné jméno",
     "invalid_prijmeni": "Špatné příjmení",
     "invalid_email": "email adresa není validní",
+    "invalid_kontaktni_osoba_prijmeni": "Špatné příjmení kontaktní osoby",
+    "invalid_kontaktni_osoba_jmeno": "Špatné jméno kontaktní osoby",
     "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
     "sledovat_zaznam_error": "Chyba při sledování záznamu.",
     "odebrani_sledovaneho_zaznamu_success": "Odebrání sledovaného záznamu proběhlo úspěšně.",

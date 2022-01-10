@@ -4,7 +4,7 @@
       <div fxLayout="row" fxLayoutGap="32px">
         <div fxFlex="350px">
           <mat-list role="list">
-            <mat-list-item role="listitem" *ngFor="let t of config.homeTabs" (click)="selectText(t)"
+            <mat-list-item role="listitem" *ngFor="let t of editorTabs()" (click)="selectText(t)"
               [class.active]="t === selected">
               {{ 'home.' + t | translate }}
             </mat-list-item>

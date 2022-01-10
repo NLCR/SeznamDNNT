@@ -94,6 +94,11 @@ export class AdminComponent implements OnInit {
 
   }
 
+  editorTabs() :string[]{
+    let helpFiles: string[] = ['help', 'help_user', 'help_admin','help_knihovna','help_kurator', 'help_mainKurator'];
+    return this.config.homeTabs.concat(helpFiles);
+    //return this.config.homeTabs;
+  }
 
   selectText(id: string) {
     this.selected = id;

@@ -20,7 +20,15 @@
     "authors": "For authors",
     "publishers": "For libraries",
     "libraries": "For libraries",
-    "api": "API description"
+    "api": "API description",
+
+    "help":"Help",
+    "help_user":"Help (user)",
+    "help_knihovna":"Help (library)",
+    "help_kurator":"Help (curator)",
+    "help_mainKurator":"Help (main curator)",
+    "help_admin":"Help (admin)"
+
   },
   "record": {
     "state": "status"
@@ -149,6 +157,8 @@
     "invalid_jmeno": "Invalid name",
     "invalid_prijmeni": "Invalid surname",
     "invalid_email": "Invalid e-mail",
+    "invalid_kontaktni_osoba_prijmeni": "Špatné příjmení kontaktní osoby",
+    "invalid_kontaktni_osoba_jmeno": "Špatné jméno kontaktní osoby",
     "sledovat_zaznam_success": "Record tracking was successful.",
     "sledovat_zaznam_error": "Error tracking log.",
     "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",

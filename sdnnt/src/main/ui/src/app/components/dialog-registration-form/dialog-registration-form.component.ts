@@ -126,6 +126,11 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
     return retval;
   }
 
+  changeTypOfOsobyDisabled(): boolean {
+    const retval:boolean = !this.isRegister;
+    return retval;
+  }
+
   
   setNositel() {
     this.user.nositel = [];

@@ -348,7 +348,8 @@ public class UserServlet extends HttpServlet {
                 JSONObject retval = new JSONObject();
                 JSONArray docs = new JSONArray();
                 String prefix = req.getParameter("prefix");
-                new UserControlerImpl(req).findUsersByPrefix(prefix).stream().map(User::toJSONObject).forEach(docs::put);
+                List<User> usersByPrefix = new UserControlerImpl(req).findUsersByPrefix(prefix);
+                usersByPrefix.stream().map(User::toJSONObject).forEach(docs::put);
                 retval.put("docs", docs);
                 return retval;
             } else {

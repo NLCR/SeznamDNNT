@@ -16,6 +16,23 @@ import org.json.JSONObject;
 public class User {
 
 
+  public static enum Typ {
+    pravnickaOsoba {
+      @Override
+      public String getTyp() {
+        return "pravnicka_osoba";
+      }
+    },
+    fyzickaOsoba {
+      @Override
+      public String getTyp() {
+        return "fyzicka_osoba";
+      }
+    };
+
+    public abstract String getTyp();
+  }
+
   public static final String USERNAME_KEY  = "username";
   public static final String PWD_KEY  = "pwd";
   public static final String APIKEY_KEY  = "apikey";
@@ -51,7 +68,7 @@ public class User {
 
   public static final String THIRD_PARTY_USER_KEY  = "thirdpartyuser";
 
-  public static final String NAZEV_SPOLECNOSTI_KEY = "nezevspolecnosti";
+  public static final String NAZEV_SPOLECNOSTI_KEY = "nazevspolecnosti";
 
   private String nazevSpolecnosti;
 
@@ -60,7 +77,7 @@ public class User {
   private String role;
   private String state;
   private boolean isActive = true;
-  private String typ;
+  private String typ = Typ.fyzickaOsoba.getTyp();
   private String titul;
   private String jmeno;
   private String prijmeni;
@@ -520,7 +537,7 @@ public class User {
     }
 
     if (doc.containsKey(INSTITUTION_KEY)) {
-      String string = (String) doc.getFieldValue(NOTIFIKACE_INTERVAL_KEY);
+      String string = (String) doc.getFieldValue(INSTITUTION_KEY);
       user.setInstitution(string);
     }
 
@@ -609,7 +626,9 @@ public class User {
     if (this.notifikace_interval != null) {
       sinput.addField(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
     }
-
+    if (this.institution != null) {
+      sinput.addField(INSTITUTION_KEY, this.institution);
+    }
     if (this.nazevSpolecnosti != null) {
       sinput.addField(NAZEV_SPOLECNOSTI_KEY, this.nazevSpolecnosti);
     }

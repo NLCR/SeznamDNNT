@@ -128,7 +128,8 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             SolrQuery query = new SolrQuery(String.format("username:%s* OR jmeno:%s* OR prijmeni:%s*",  prefix, prefix, prefix))
                     .setRows(1000);
             QueryResponse users = solr.query("users", query);
-            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
+            List<User> userList = users.getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
+            List<User> collect = userList.stream().map(UsersUtils::toTOObject).collect(Collectors.toList());
             return collect;
             //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
         } catch (SolrServerException | IOException ex) {

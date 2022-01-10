@@ -1,11 +1,12 @@
 <ng-container *ngIf="user">
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
-    <div fxFlex="100%" class="app-mb-4" *ngIf="isRegister">
+    <div fxFlex="100%" class="app-mb-4">
       <!-- typ: string; //pravnicka/fyzicka osoba -->
-      <mat-radio-group [(ngModel)]="user.typ">
+      <mat-radio-group [(ngModel)]="user.typ" [disabled]=changeTypOfOsobyDisabled()>
         <mat-radio-button [value]="'fyzicka_osoba'">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
         <mat-radio-button [value]="'pravnicka_osoba'">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
       </mat-radio-group>
+
     </div>
     <div fxFlex="50%" *ngIf="user.typ === 'fyzicka_osoba'">
       <div class="app-mr-4">
