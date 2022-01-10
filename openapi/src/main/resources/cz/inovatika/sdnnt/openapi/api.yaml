@@ -46,7 +46,7 @@ paths:
           name: state
           schema:
             type: string
-            enum: ["A","PA","V","N"]
+            enum: ["A","PA","V","N", "X"]
           required: false
         - in: query
           name: license
