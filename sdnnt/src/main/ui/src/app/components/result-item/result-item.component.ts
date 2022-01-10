@@ -192,9 +192,9 @@ export class ResultItemComponent implements OnInit {
   public alreadyRejected() {
       //let tablekey = this.doc.identifier;
       // posledni zmena je v identifikatoru
-      if (this.zadost.process[this.doc.identifier]) {
+      if (this.zadost.process && this.zadost.process[this.doc.identifier]) {
         return this.zadost.process[this.doc.identifier].state === 'rejected';
-      } else return true;
+      } else return false;
   }
 
   public showStates() {
