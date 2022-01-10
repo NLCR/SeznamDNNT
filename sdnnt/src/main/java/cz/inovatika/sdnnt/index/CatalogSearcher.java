@@ -6,8 +6,10 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.utils.QueryUtils;
 import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +20,7 @@ import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -283,7 +286,7 @@ public class CatalogSearcher {
     if (q == null) {
       q = "*";
     } else {
-      q = ClientUtils.escapeQueryChars(q);
+      q = QueryUtils.query(q);
     }
     Options opts = Options.getInstance();
     int rows = opts.getClientConf().getInt("rows"); 
