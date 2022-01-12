@@ -14,6 +14,7 @@ import { DialogHistoryComponent } from '../dialog-history/dialog-history.compone
 import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 import { HttpErrorResponse } from '@angular/common/http';
+import { zip } from 'rxjs';
 
 @Component({
   selector: 'app-result-item',
@@ -61,11 +62,11 @@ export class ResultItemComponent implements OnInit {
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
       //let tablekey = this.doc.identifier;
-      let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
-      let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
+      let stateKey = (z.desired_item_state ?  z.desired_item_state : "_");
+      let licenseKey = (z.desired_license ?  z.desired_license : "_");
 
-      let tablekey = this.doc.identifier +"_("+stateKey+","+licenseKey+")";
-      this.processed = z.process[tablekey];
+      let fullTableKey = this.doc.identifier +"_("+stateKey+","+licenseKey+")";
+      this.processed = z.process[fullTableKey] ? z.process[fullTableKey] : z.process[this.doc.identifier];
       if (this.processed) {
         this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
           ${this.service.getTranslation('desc.datum')}: ${this.datePipe.transform(this.processed.date, 'dd.MM.yyyy')}`;

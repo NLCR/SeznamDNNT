@@ -194,7 +194,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     // moved from Zadost
-    private JSONObject saveRequest(Zadost zadost,AccountServiceInform inform) throws ConflictException {
+    public JSONObject saveRequest(Zadost zadost,AccountServiceInform inform) throws ConflictException {
         //SolrClient solr = null;
         try (SolrClient solr = buildClient()) {
 
@@ -340,8 +340,6 @@ public class AccountServiceImpl implements AccountService {
 
         LOGGER.info(String.format("Deadline for zadost %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
         return  VersionStringCast.cast(saveRequest(zadost, null));
-        //if (possibleToClose.stream().filter(Boolean::booleanValue))
-
     }
 
 

@@ -1,9 +1,14 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
 import cz.inovatika.sdnnt.model.*;
+import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
+import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class ZadostProxy implements WorkflowOwner  {
 
@@ -36,6 +41,33 @@ public class ZadostProxy implements WorkflowOwner  {
         if (changingLicenseState)  this.zadost.setDesiredLicense(license);
         // zadost, nova deadline
         zadost.setDeadline(new Date());
+
+        // prapagate rejected state
+        List<String> identifiers = zadost.getIdentifiers();
+        if (identifiers != null) {
+            Map<String, ZadostProcess> process = zadost.getProcess();
+            identifiers.stream().forEach(identifier-> {
+                if (process != null) {
+                    ZadostProcess zp = zadost.getProcess().get(identifier);
+
+                    // now in workflow and it is not accessible from here
+                    String currentStateName = zadost.getDesiredItemState() != null ? zadost.getDesiredItemState() : "_";
+                    String currentLicenseName = zadost.getDesiredLicense() != null ? zadost.getDesiredLicense() : "_";
+                    String transitionName = String.format("(%s,%s)", currentStateName, currentLicenseName);
+
+                    ZadostProcess zpCopy = new ZadostProcess();
+                    zpCopy.setTransitionName(transitionName);
+                    zpCopy.setUser(zp.getUser());
+                    zpCopy.setReason(zp.getReason());
+                    zpCopy.setState(zp.getState());
+                    zpCopy.setDate(zp.getDate());
+
+                    if (zpCopy.getState() != null && zpCopy.getState().equals("rejected")) {
+                        zadost.addProcess(identifier, zpCopy);
+                    }
+                }
+            });
+        }
     }
 
     @Override
