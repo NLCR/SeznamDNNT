@@ -637,6 +637,7 @@
     "reset_hesla": "Reset hesla",
     "poslat_zadost": "Poslat žádost",
     "send": "Poslat",
+    "duvod_pro_terminal": "Odůvodnění pro omezení na terminál",
     "duvod_pro_odmitnuti": "Odůvodnění pro odmítnutí",
     "duvod": "Odůvodnění",
     "radit_podle": "Řadit podle",
@@ -727,6 +728,8 @@
     "period" : "Lhůta",
     "deadline" : "Čas uzávěrky/přepnutí",
     "verze_zadosti": "Verze žádosti",
+    "cislo_zadosti": "Číslo žádosti",
+
     "id": "Id",
     "priorita": "Priorita",
     "vnz_memorandum": "VNZ Memorandum",

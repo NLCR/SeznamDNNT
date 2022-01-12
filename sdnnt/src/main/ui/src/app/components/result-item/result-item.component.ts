@@ -72,8 +72,14 @@ export class ResultItemComponent implements OnInit {
           ${this.service.getTranslation('desc.datum')}: ${this.datePipe.transform(this.processed.date, 'dd.MM.yyyy')}`;
 
         if (this.processed.reason) {
-          this.processedTooltip += `
+          if (this.processed.state === "rejected") {
+            this.processedTooltip += `
             ${this.service.getTranslation('desc.duvod')}: ${this.processed.reason}`
+
+          } else {
+            this.processedTooltip += `
+            ${this.service.getTranslation('desc.komentar')}: ${this.processed.reason}`
+          }
         }
       }
     }
