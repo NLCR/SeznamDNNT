@@ -218,6 +218,11 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
+  goto(url) {
+    window.open(url, "_blank", 'noreferrer');
+    return;
+  }
+
   addToZadostForReduction() {
     // prepare VNX
     const navrh = this.isZarazeno ? 'VN' : 'NZN';

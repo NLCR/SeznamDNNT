@@ -90,13 +90,13 @@
             <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
           </mat-menu>
         </button>
-        <button mat-menu-item *ngIf="dkLinks.length === 1">
+        <button mat-menu-item *ngIf="dkLinks.length === 1" (click)="goto(dkLinks[0])">
           <mat-icon>link</mat-icon>
           <a [href]="dkLinks[0]" target="_blank">
             {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
           </a>
         </button>
-        <button mat-menu-item *ngIf="doc.marc_998a">
+        <button mat-menu-item *ngIf="doc.marc_998a" (click)="goto(alephLink)">
           <mat-icon>link</mat-icon>
           <a [href]="alephLink" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
         </button>
