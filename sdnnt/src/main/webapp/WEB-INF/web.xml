@@ -112,6 +112,7 @@
         <url-pattern>/resetedpwd</url-pattern>
         <url-pattern>/resetedpwd/*</url-pattern>
         <url-pattern>/pswd</url-pattern>
+        <url-pattern>/pswd/*</url-pattern>
         <url-pattern>/shibboleth-landing</url-pattern>
     </servlet-mapping>
     <servlet>

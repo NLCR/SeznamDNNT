@@ -25,7 +25,7 @@ public class VNWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
 
-        if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA) {
+        if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
             return new WorkflowState(this.owner, N,null,owner.getWorkflowDate(), period, true,  true);
         }
         return null;

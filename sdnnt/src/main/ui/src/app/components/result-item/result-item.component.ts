@@ -381,9 +381,9 @@ export class ResultItemComponent implements OnInit {
     });
 
     rejectDialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      //if (result) {
         this.processZadostEvent.emit({type: 'reject', identifier: this.doc.identifier, komentar: result});
-     }
+     //}
     });
 
   }

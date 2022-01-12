@@ -153,6 +153,7 @@
     "forgot_password_error": "Nejde vyresetovat heslo, nemůžu najít účet.",
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
+    "username_exists": "Uživatelské jméno již existuje",
     "invalid_nazevspolecnosti":"Špatné jméno společnosti",
     "invalid_jmeno": "Špatné jméno",
     "invalid_prijmeni": "Špatné příjmení",

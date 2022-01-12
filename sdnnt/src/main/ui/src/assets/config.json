@@ -3,7 +3,7 @@
   "lang": "cs",
   "snackDuration": 2000,
   "rows": 20,
-  "simplelogin":false,
+  "simplelogin":true,
   
   "homeTabs": ["about", "news", "readers", "authors",  "libraries", "api"],
   "role": ["admin", "kurator", "mainKurator", "knihovna", "user"],

@@ -89,7 +89,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response addedDnntt(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList("marc_911a:"+institution, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
+        List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");

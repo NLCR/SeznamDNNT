@@ -135,7 +135,7 @@ export class DialogRegistrationComponent implements OnInit {
 
       this.service.registerUser(this.user).subscribe((res: User) => {
         if (res.error) {
-          this.service.showSnackBar('alert.registrace_uzivatele_error', res.error, true);
+          this.service.showSnackBar('alert.registrace_uzivatele_error', 'alert.'+res.error, true);
         } else {
           this.service.showSnackBar('alert.registrace_uzivatele_success', '', false);
           this.dialogRef.close();
