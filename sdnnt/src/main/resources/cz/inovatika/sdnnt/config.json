@@ -6,8 +6,18 @@
   "OAI": {
     "rowsPerPage": 100,
     "repositoryName": "Seznam děl nedostupných na trhu",
-    "adminEmail": "sdnnt@nkp.cz"
-  },
+    "adminEmail": "sdnnt@nkp.cz",
+    "sets": {
+      "SDNNT-ALL": { "name": "Seznam děl nedostupných na trhu (všechny stavy)", "filter": "dntstav:*"},
+      "SDNNT-A": { "name": "Seznam děl nedostupných na trhu (zařazeno)", "filter": "dntstav:A"},
+      "SDNNT-PA": { "name": "Seznam děl nedostupných na trhu (dílo publikováno jako návrh)", "filter": "dntstav:PA"},
+      "SDNNT-N": { "name": "Seznam děl nedostupných na trhu (ne zařazeno)", "filter": "dntstav:N"},
+      "SDNNT-NL": { "name": "Seznam děl nedostupných na trhu (omezení na terminál / plánované vydání po získání licence)", "filter": "dntstav:NL"},
+      "DNNTO": { "name": "Seznam děl nedostupných na trhu (Licence pro online přístup)", "filter": "license:dnnto"},
+      "DNNTT": { "name": "Seznam děl nedostupných na trhu (Licence pro terminálový přístup)", "filter": "license:dnntt"}
+    }
+  },        
+            
   "textsDir": "texts",
   "resetPwdExpirationDays": 3,
   "search": {

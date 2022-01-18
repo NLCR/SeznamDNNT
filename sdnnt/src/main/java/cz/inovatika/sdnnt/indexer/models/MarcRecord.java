@@ -222,8 +222,13 @@ public class MarcRecord {
       xml.append("<marc:controlfield tag=\"003\">").append(controlFields.get("003")).append("</marc:controlfield>");
       xml.append("<marc:controlfield tag=\"008\">").append(controlFields.get("008")).append("</marc:controlfield>");
 
-      ArrayList<String> keys = new ArrayList<String>(dataFields.keySet());
+      List<String> keys = new ArrayList<String>(dataFields.keySet());
       Collections.sort(keys);
+      
+      //Filtrujeme 956 -> granularita
+      keys = keys.stream()
+              .filter(x -> !"956".equals(x))
+              .collect(Collectors.toList());
 
       for (Object key : keys) {
         for (DataField df : dataFields.get(key)) {
@@ -243,11 +248,28 @@ public class MarcRecord {
       
       // Pridame dnt pole
       xml.append("<marc:datafield tag=\"990\" ind1=\" \" ind2=\" \">");
-      
       for (String sk : dntstav) {
           xml.append("<marc:subfield code=\"a\" >").append(sk).append("</marc:subfield>");
       }
       xml.append("</marc:datafield>");
+      
+      // Granularita
+      if (granularity != null) {
+        // u, 9, x, y
+        for (int i = 0; i<granularity.length(); i++) {
+        xml.append("<marc:datafield tag=\"956\" ind1=\" \" ind2=\" \">");
+          JSONObject gr = granularity.getJSONObject(i);
+            xml.append("<marc:subfield code=\"u\" >").append(gr.getString("link")).append("</marc:subfield>");
+            xml.append("<marc:subfield code=\"9\" >").append(gr.get("stav")).append("</marc:subfield>");
+            if (gr.has("cislo")) {
+              xml.append("<marc:subfield code=\"x\" >").append(gr.getString("cislo")).append("</marc:subfield>");
+            }
+            if (gr.has("rocnik")) {
+              xml.append("<marc:subfield code=\"y\" >").append(gr.getString("rocnik")).append("</marc:subfield>");
+            }
+        xml.append("</marc:datafield>");
+        }
+      }
 
       xml.append("</marc:record>");
       xml.append("</metadata>");

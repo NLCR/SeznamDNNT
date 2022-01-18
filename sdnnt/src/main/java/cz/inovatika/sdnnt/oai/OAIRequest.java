@@ -24,6 +24,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -79,12 +80,14 @@ public class OAIRequest {
 
   public static String listSets(HttpServletRequest req) {
     String xml = headerOAI() + responseDateTag() + requestTag(req)
-            + "<ListSets>"
-            + "<set><setSpec>SDNNT-ALL</setSpec><setName>Seznam děl nedostupných na trhu (všechny stavy)</setName></set>"
-            + "<set><setSpec>SDNNT-A</setSpec><setName>Seznam děl nedostupných na trhu (zařazeno)</setName></set>"
-            + "<set><setSpec>SDNNT-N</setSpec><setName>Seznam děl nedostupných na trhu (ne zařazeno)</setName></set>"
-            + "</ListSets>\n"
-            + "</OAI-PMH>";
+            + "<ListSets>";
+    JSONObject sets = Options.getInstance().getJSONObject("OAI").getJSONObject("sets");
+    for (Object spec: sets.keySet()) {
+      JSONObject set = sets.getJSONObject((String) spec);
+      xml += "<set><setSpec>"+spec+"</setSpec><setName>"+set.getString("name")+"</setName></set>\n";
+    }
+    xml += "</ListSets>\n"
+           + "</OAI-PMH>";
     return xml;
   }
 
@@ -112,7 +115,7 @@ public class OAIRequest {
       SolrQuery query = new SolrQuery("*")
               .setRows(rows)
               .setSort(SORT_FIELD, SolrQuery.ORDER.asc)
-              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu");
+              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
       if (req.getParameter("from") != null) {
         String from = req.getParameter("from");
         String until = "*";
@@ -123,13 +126,16 @@ public class OAIRequest {
       }
 
       String set = req.getParameter("set");
-      if ("SDNNT-A".equals(set)) {
-        query.addFilterQuery("dntstav:A");
-      } else if ("SDNNT-N".equals(set)) {
-        query.addFilterQuery("dntstav:N");
-      } else {
-        query.addFilterQuery("dntstav:*");
+      if (set != null) {
+        query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       }
+//      if ("SDNNT-A".equals(set)) {
+//        query.addFilterQuery("dntstav:A");
+//      } else if ("SDNNT-N".equals(set)) {
+//        query.addFilterQuery("dntstav:N");
+//      } else {
+//        query.addFilterQuery("dntstav:*");
+//      }
 
       if (req.getParameter("resumptionToken") != null) {
         String rt = req.getParameter("resumptionToken");
@@ -194,7 +200,7 @@ public class OAIRequest {
       SolrQuery query = new SolrQuery("*")
               .setRows(1)
               .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-              .setFields(SORT_FIELD, "identifier,raw");
+              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
 
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
@@ -223,8 +229,11 @@ public class OAIRequest {
                   .append("</datestamp>");
           ret.append("<setSpec>").append(set).append("</setSpec>");
           ret.append("</header>");
-          String raw = (String) doc.getFirstValue("raw");
-          MarcRecord mr = MarcRecord.fromRAWJSON(raw);
+          //String raw = (String) doc.getFirstValue("raw");
+          //MarcRecord mr = MarcRecord.fromRAWJSON(raw);
+          
+          MarcRecord mr = MarcRecord.fromDoc(doc);
+          
           ret.append(mr.toXml(false));
           ret.append("</record>");
         }
