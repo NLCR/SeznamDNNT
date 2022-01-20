@@ -399,4 +399,9 @@ export class AppService {
     let url = '/account/import_controlled';
     return this.post(url, doc);
   }
+
+  changeStavImport(doc): Observable<User> {
+    let url = '/account/import_stav';
+    return this.post(url, doc);
+  }
 }

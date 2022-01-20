@@ -1,10 +1,14 @@
 import { HttpParams } from '@angular/common/http';
+import { identifierModuleUrl } from '@angular/compiler';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DialogHistoryComponent } from 'src/app/components/dialog-history/dialog-history.component';
+import { DialogStatesComponent } from 'src/app/components/dialog-states/dialog-states.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
@@ -34,6 +38,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   filteredIds: { [id: string]: any[] };
 
   constructor(
+    public dialog: MatDialog,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private router: Router,
@@ -158,8 +163,12 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   }
 
-  showHistory() {
-
+  showHistory(doc) {
+    const dialogRef = this.dialog.open(DialogHistoryComponent, {
+      width: '750px',
+      data: doc,
+      panelClass: 'app-history-identifier'
+    });
   }
 
   hasGranularity(id) {
@@ -170,8 +179,28 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   }
 
-  showStates() {
+  showStates(doc, id) {
 
+    const dialogRef = this.dialog.open(DialogStatesComponent, {
+      width: '1150px',
+      data: id,
+      panelClass: 'app-dialog-states'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.change) {
+        this.service.changeStavDirect(id.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
+
+          if (res.response.docs.length > 0 ) {
+            id.dntstav = [result.newState];
+            this.service.changeStavImport(doc).subscribe(res => {
+              this.getDocs(this.route.snapshot.queryParams);
+            });
+          }
+        });
+      }
+
+    });
   }
 
   curatorAndPublicStateAreDifferent(doc: any) {
@@ -187,7 +216,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   setControlled(doc) {
     this.service.setImportControlled(doc).subscribe(res => {
-      
+      this.getDocs(this.route.snapshot.queryParams);
     });
   }
 

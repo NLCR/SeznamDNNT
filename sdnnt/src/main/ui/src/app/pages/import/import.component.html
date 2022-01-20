@@ -138,11 +138,11 @@
                             <mat-icon>fingerprint</mat-icon>
                             <a>{{ 'desc.identifikatory' | translate }}</a>
                           </button>
-                          <button mat-menu-item (click)="showHistory()">
+                          <button mat-menu-item (click)="showHistory(id)">
                             <mat-icon>update</mat-icon>
                             <a>{{ 'desc.historie_zmen' | translate }}</a>
                           </button>
-                          <button mat-menu-item (click)="showStates()">
+                          <button mat-menu-item (click)="showStates(doc,id)">
                             <mat-icon>edit</mat-icon>
                             <a>{{ 'desc.zmenit_stav'| translate }}</a>
                           </button>

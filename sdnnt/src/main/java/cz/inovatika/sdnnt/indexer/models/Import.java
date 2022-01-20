@@ -163,10 +163,6 @@ public class Import {
   
   public static JSONObject setControlled(String id, String user) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-//      DocumentObjectBinder dob = new DocumentObjectBinder();
-//      ObjectMapper mapper = new ObjectMapper();
-//      JSONObject p = new JSONObject(mapper.writeValueAsString(o.item));
-//      JSONArray ids = new JSONArray(mapper.writeValueAsString(o.identifiers));
       
       SolrInputDocument idoc = new SolrInputDocument();
       idoc.setField("id", id);
@@ -178,6 +174,33 @@ public class Import {
       Map<String,Object> fieldModifier2 = new HashMap<>(1);
       fieldModifier2.put("set",user);
       idoc.addField("controlled_user", fieldModifier2); 
+
+      solr.add("imports_documents", idoc);
+      solr.commit("imports_documents");
+      solr.close();
+      return new JSONObject().put("saved", true);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
+  
+  public static JSONObject changeStav(JSONObject input, String user) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      
+      SolrInputDocument idoc = new SolrInputDocument();
+      idoc.setField("id", input.getString("id"));
+      
+      Map<String,Object> fieldModifier = new HashMap<>(1);
+      List<String> l = new ArrayList();
+      JSONArray ids = input.getJSONArray("identifiers");
+      for (int i = 0; i < ids.length(); i++) {
+        l.add(ids.getJSONObject(i).toString());
+      }
+      fieldModifier.put("set", l);
+      
+      idoc.addField("identifiers", fieldModifier); 
 
       solr.add("imports_documents", idoc);
       solr.commit("imports_documents");
