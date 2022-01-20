@@ -394,4 +394,9 @@ export class AppService {
     // });
     return this.get(url, params, false);
   }
+
+  setImportControlled(doc): Observable<User> {
+    let url = '/account/import_controlled';
+    return this.post(url, doc);
+  }
 }

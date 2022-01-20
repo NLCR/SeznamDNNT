@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -121,8 +122,8 @@ public class Import {
       JSONObject i = new JSONObject(mapper.writeValueAsString(o.identifiers));
       idoc.setField("identifiers", i.toString());
       //solr.addBean("zadost", zadost);
-      //solr.add("imports", idoc);
-      //solr.commit("imports");
+      solr.add("imports_documents", idoc);
+      solr.commit("imports_documents");
       solr.close();
       return o.toJSON();
     } catch (Exception ex) {
@@ -159,4 +160,34 @@ public class Import {
       return new JSONObject().put("error", ex);
     }
   }
+  
+  public static JSONObject setControlled(String id, String user) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+//      DocumentObjectBinder dob = new DocumentObjectBinder();
+//      ObjectMapper mapper = new ObjectMapper();
+//      JSONObject p = new JSONObject(mapper.writeValueAsString(o.item));
+//      JSONArray ids = new JSONArray(mapper.writeValueAsString(o.identifiers));
+      
+      SolrInputDocument idoc = new SolrInputDocument();
+      idoc.setField("id", id);
+      
+      Map<String,Object> fieldModifier = new HashMap<>(1);
+      fieldModifier.put("set",true);
+      idoc.addField("controlled", fieldModifier); 
+      
+      Map<String,Object> fieldModifier2 = new HashMap<>(1);
+      fieldModifier2.put("set",user);
+      idoc.addField("controlled_user", fieldModifier2); 
+
+      solr.add("imports_documents", idoc);
+      solr.commit("imports_documents");
+      solr.close();
+      return new JSONObject().put("saved", true);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
+  
 }

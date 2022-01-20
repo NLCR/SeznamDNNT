@@ -12,7 +12,7 @@
     "user": ["undefined","PA", "N"]
   },
   "identifiers": ["015a", "020a", "022a"],
-  "filterFields": ["dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani"],
+  "filterFields": ["dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled"],
   "sorts":{
     "sort": [
       {"field": "score", "dir": "asc"},

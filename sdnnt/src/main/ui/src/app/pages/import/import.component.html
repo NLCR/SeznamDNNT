@@ -1,6 +1,6 @@
 <div class="app-container">
   <div fxLayout="row" fxLayoutGap="32px">
-    <div fxFlex="350px" class="app-left app-fx-facets">
+    <div fxFlex="300px" class="app-left app-fx-facets">
       <app-facets *ngIf="facets" [facet_fields]="facets" ></app-facets>
     </div>
     <div fxFlex class="app-right">
@@ -57,6 +57,12 @@
                   [matTooltip]="'desc.hledat_na_google' | translate">
                   <mat-icon>travel_explore</mat-icon>
                 </a><span class="app-pipe"></span></ng-container>
+
+               <a *ngIf="!doc.controlled" class="app-right" (click)="setControlled(doc)" 
+                  [matTooltip]="'desc.controlled' | translate">
+                  <mat-icon class="material-icons-outlined">done</mat-icon>
+                </a>
+                <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}}</span>
             </mat-card-content>
             <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0">
               <!-- puvodne *ngIf="doc.identifiers?.length > 0" -->

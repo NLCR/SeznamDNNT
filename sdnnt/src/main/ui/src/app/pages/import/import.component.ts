@@ -185,4 +185,10 @@ export class ImportComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  setControlled(doc) {
+    this.service.setImportControlled(doc).subscribe(res => {
+      
+    });
+  }
+
 }

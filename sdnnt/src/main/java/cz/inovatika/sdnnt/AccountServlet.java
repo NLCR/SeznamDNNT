@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt;
 
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
@@ -436,6 +437,26 @@ public class AccountServlet extends HttpServlet {
         }
       }
     },
+
+    IMPORT_CONTROLLED {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+          try {
+            User user = new UserControlerImpl(req).getUser();
+            JSONObject inputJs = ServletsSupport.readInputJSON(req);
+            // inputJs.put("controlled", true);
+            return Import.setControlled(inputJs.getString("id"), user.getUsername());
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+        }
+      }
+    },
+    
     ADD_ID {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

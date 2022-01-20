@@ -189,6 +189,7 @@ public class SearchServlet extends HttpServlet {
                     .addFilterQuery("import_id:" + req.getParameter("id"))
                     .setFacet(true)
                     .addFacetField("dntstav")
+                    .addFacetField("controlled")
                     .setParam("json.nl", "arrntv")
 //                    .setParam("stats", true)
 //                    .setParam("stats.field","na_vyrazeni")
@@ -196,6 +197,9 @@ public class SearchServlet extends HttpServlet {
             
             if (req.getParameter("dntstav") != null) {
               query.addFilterQuery("dntstav:" + req.getParameter("dntstav"));
+            }
+            if (req.getParameter("controlled") != null) {
+              query.addFilterQuery("controlled:" + req.getParameter("controlled"));
             }
             
             QueryRequest qreq = new QueryRequest(query);
