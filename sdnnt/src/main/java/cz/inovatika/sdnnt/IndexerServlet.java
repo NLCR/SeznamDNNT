@@ -287,7 +287,11 @@ public class IndexerServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
           try {
             XMLImporterDistri imp = new XMLImporterDistri();
-            return imp.fromFile(req.getParameter("url"), "distri.cz");
+            if (req.getParameter("url").startsWith("http")) {
+              return imp.fromUrl(req.getParameter("url"), "distri.cz");
+            } else {
+              return imp.fromFile(req.getParameter("url"), "distri.cz");
+            }
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
@@ -306,7 +310,13 @@ public class IndexerServlet extends HttpServlet {
             XMLImporterHeureka imp = new XMLImporterHeureka();
             // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
             // https://www.palmknihy.cz/heureka.xml
-            return imp.fromFile(req.getParameter("url"), "heureka");
+            
+            if (req.getParameter("url").startsWith("http")) {
+              return imp.fromUrl(req.getParameter("url"), "heureka", req.getParameter("from_id"));
+            } else {
+              return imp.fromFile(req.getParameter("url"), "heureka", req.getParameter("from_id"));
+            }
+            
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }

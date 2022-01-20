@@ -7,6 +7,8 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneOffset;
@@ -23,6 +25,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -67,8 +71,9 @@ public class XMLImporterDistri {
   List<String> elements = Arrays.asList("NAME", "EAN", "AUTHOR");
 
   public JSONObject fromUrl(String url) {
-    // https://www.distri.cz/xml-full/dd9ec6ef7f074bba90ee96edc1f72f62/
     //https://cdn.albatrosmedia.cz/Files/Secured/?token=1C7F915175139E5AF1A726FBB33F5EA4
+    
+    // https://www.distri.cz/xml-full/7f733777012748939368f67bd4663dd2/
     readUrl(url);
     return ret;
   }
@@ -97,7 +102,40 @@ public class XMLImporterDistri {
 
   }
 
-  public JSONObject fromFile(String uri, String origin) {
+  public JSONObject fromFile(String path, String origin) {
+  LOGGER.log(Level.INFO, "Processing {0}", path);
+    try {
+      long start = new Date().getTime();
+      // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+      ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+      import_date = now.format(DateTimeFormatter.ISO_INSTANT);
+      import_url = path;
+      import_origin = origin;
+      import_id = now.toEpochSecond() + "";
+
+      File f = new File(path);
+      try (InputStream is = new FileInputStream(f)) {
+        readXML(is);
+      } catch (XMLStreamException | IOException exc) {
+        LOGGER.log(Level.SEVERE, null, exc);
+        ret.put("error", exc);
+      }
+      getClient().commit(collection);
+      // solr.close();
+      ret.put("indexed", indexed);
+      ret.put("file", path);
+      ret.put("origin", origin);
+      String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
+      ret.put("ellapsed", ellapsed);
+      LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
+
+  public JSONObject fromUrl(String uri, String origin) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
     try {
       long start = new Date().getTime();
@@ -284,17 +322,19 @@ public class XMLImporterDistri {
       addFrbr(item);
       findInCatalog(item);
 
-      idoc.setField("identifiers", item.get("identifiers"));
-      idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
-      idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
-      // idoc.setField("catalog", item.get("catalog"));
-      idoc.setField("num_hits", item.get("num_hits"));
-      idoc.setField("hit_type", item.get("hit_type"));
-      idoc.setField("item", new JSONObject(item).toString());
+      if (item.containsKey("found") ) {
+        idoc.setField("identifiers", item.get("identifiers"));
+        idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
+        idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
+        // idoc.setField("catalog", item.get("catalog"));
+        idoc.setField("num_hits", item.get("num_hits"));
+        idoc.setField("hit_type", item.get("hit_type"));
+        idoc.setField("item", new JSONObject(item).toString());
 
-      getClient().add("imports", idoc);
-
+        getClient().add("imports", idoc);
       indexed++;
+      }
+
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     }
@@ -318,7 +358,7 @@ public class XMLImporterDistri {
   public void findInCatalog(Map item) {
     // JSONObject ret = new JSONObject();
     try {
-      
+      LOGGER.log(Level.INFO, "Processing {0}", item.get("EAN"));
       String title = "nazev:(" + ClientUtils.escapeQueryChars((String) item.get("NAME"));
       if (item.containsKey("AUTHOR")) {
         title += " " + ClientUtils.escapeQueryChars((String) item.get("AUTHOR"));
@@ -330,11 +370,10 @@ public class XMLImporterDistri {
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
-              // .setFields("*,score");
+              .addFilterQuery("dntstav:*")
               .setFields("identifier,nazev,score,ean,dntstav,rokvydani");
-//      SolrDocumentList docs = getClient().query("catalog", query).getResults();
-//      for (SolrDocument doc : docs) {
-//      }
+      
+      
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
       rParser.setWriterType("json");
@@ -347,7 +386,7 @@ public class XMLImporterDistri {
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
       if (docs.length() == 0) {
-        // System.out.println(title);
+        return;
       }
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
@@ -377,6 +416,7 @@ public class XMLImporterDistri {
         }
 
       }
+       item.put("found", true);
       item.put("hit_type", isEAN ? "ean" : "noean");
       item.put("num_hits", isEAN ? identifiers.size() : jresp.getInt("numFound"));
       item.put("identifiers", identifiers);

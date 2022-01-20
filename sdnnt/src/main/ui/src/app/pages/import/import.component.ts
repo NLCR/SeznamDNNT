@@ -30,7 +30,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   origin: string;
   uri: string;
   initialized = false;
-  filteredIds: {[id: string]: any[]};
+  filteredIds: { [id: string]: any[] };
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -49,7 +49,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.onlyEAN = this.route.snapshot.queryParamMap.get('onlyEAN') === 'true';
       this.onlyNoHits = this.route.snapshot.queryParamMap.get('onlyNoHits') === 'true';
       this.fullCatalog = this.route.snapshot.queryParamMap.get('fullCatalog') === 'true';
-      
+
       this.getDocs(val);
     }));
   }
@@ -70,7 +70,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   onlyEANChange(e) {
     this.onlyEAN = e.checked;
-    
+
     const params: any = {};
     params.onlyEAN = e.checked;
     params.page = 0;
@@ -138,11 +138,48 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   link(id: string) {
-    return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-')+1);
+    return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
   }
 
-  sanitize(url:string){
+  sanitize(url: string) {
     return this.sanitizer.bypassSecurityTrustUrl(url);
-}
+  }
+
+  
+  gotoAleph(id) {
+    window.open(this.link(id.identifier), "_blank", 'noreferrer');
+    return;
+  }
+
+  showIdentifiers() {
+
+  }
+
+  showHistory() {
+
+  }
+
+  hasGranularity(id) {
+    return false;
+  }
+
+  showGranularity() {
+
+  }
+
+  showStates() {
+
+  }
+
+  curatorAndPublicStateAreDifferent(doc: any) {
+    // neni nastaveny public stav ale ma kuratorsky stav NPA 
+    if (doc.kuratorstav && !doc.dntstav) {
+      return true; 
+    // verejny a kuratorsky stav je rozdilny
+    } else if (doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] != doc.dntstav[doc.dntstav.length-1])  {
+      return true;
+    }
+    return false;
+  }
 
 }

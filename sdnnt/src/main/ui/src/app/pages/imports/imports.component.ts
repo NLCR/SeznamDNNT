@@ -69,16 +69,16 @@ export class ImportsComponent implements OnInit {
     this.service.searchImports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
         this.searchResponse = resp;
-        //this.imports = resp.response.docs;
-        this.imports = [];
-        resp.grouped.import_id.groups.forEach(g => {
-          this.imports.push(g.doclist.docs[0]);
+        this.imports = resp.response.docs;
+        // this.imports = [];
+        // resp.grouped.import_id.groups.forEach(g => {
+        //   this.imports.push(g.doclist.docs[0]);
           
-        });
+        // });
 
-        resp.facets.import_id.buckets.forEach(b => {
-          this.stats[b.val] = {total: b.count, na_vyrazeni: b.hits_na_vyrazeni};
-        });
+        // resp.facets.import_id.buckets.forEach(b => {
+        //   this.stats[b.val] = {total: b.count, na_vyrazeni: b.hits_na_vyrazeni};
+        // });
 
         this.numFound = this.imports.length;
 
@@ -124,7 +124,7 @@ export class ImportsComponent implements OnInit {
   }
 
   showImport(imp: Import) {
-    this.router.navigate(['import', imp.import_id], {});
+    this.router.navigate(['import', imp.id], {});
   }
 
 }

@@ -11,23 +11,23 @@
     <table mat-table [dataSource]="imports" class="mat-elevation-z0">
       <ng-container matColumnDef="import_date">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_importu' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.import_date | date : 'dd.MM.yyyy HH:mm' }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.date | date : 'dd.MM.yyyy HH:mm' }}</td>
       </ng-container>
       <ng-container matColumnDef="import_url">
         <th mat-header-cell *matHeaderCellDef>{{ 'URL' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.import_url }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.url }}</td>
       </ng-container>
       <ng-container matColumnDef="import_origin">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.import_origin }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.origin }}</td>
       </ng-container>
       <ng-container matColumnDef="total">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.celkem' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ stats[element.import_id].total }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.num_docs }}</td>
       </ng-container>
       <ng-container matColumnDef="na_vyrazeni">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_vyrazeni' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ stats[element.import_id].na_vyrazeni }}</td>
+        <td mat-cell *matCellDef="let element"> </td>
       </ng-container>
       
       <ng-container matColumnDef="actions">

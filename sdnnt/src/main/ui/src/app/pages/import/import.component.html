@@ -51,21 +51,78 @@
                 <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
                   <tr>
                     <td [class.approved]="id.approved">
-                      <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container>
+                      <!-- <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container> -->
                       <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
-                      <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container>
+                      <!-- <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container> -->
                       <ng-container *ngIf="id.ean">
                         <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
                         <span class="app-pipe"></span>
                       </ng-container>
+
+                      <div fxFlex fxFlexAlign="flex-end">
+                        <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
+                          {{ id.dntstav[id.dntstav.length-1] }}
+                        </div>
+                        <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
+                          <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                          {{ 'license.' + id.license + '-badge' | translate }}
+                        </div>
+                        <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
+                          <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                            {{ id.kuratorstav[id.kuratorstav.length-1] }}   
+                          </div>
+                        </ng-container>    
+                      </div>
+
+
                     </td>
                     <td class="app-cell-action" [class.approved]="id.approved">
                       <ng-container *ngIf="id.approved">
                         {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
                       </ng-container>
-                      <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
+                      <!-- <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
                         {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
+                      </a>   -->
+
+                      <a [matMenuTriggerFor]="menuMore">
+                        <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
                       </a>
+
+                      <mat-menu #menuMore="matMenu">
+                        <!-- <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
+                          <mat-icon>link</mat-icon><a>{{ 'desc.odkazy_do_dk' | translate }}</a>
+                          <mat-menu #menuDKLinks="matMenu">
+                            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
+                          </mat-menu>
+                        </button>
+                        <button mat-menu-item *ngIf="dkLinks.length === 1" (click)="goto(dkLinks[0])">
+                          <mat-icon>link</mat-icon>
+                          <a [href]="dkLinks[0]" target="_blank">
+                            {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
+                          </a>
+                        </button> -->
+                        <button mat-menu-item *ngIf="doc.marc_998a" (click)="gotoAleph(id)">
+                          <mat-icon>link</mat-icon>
+                          <a [href]="link(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+                        </button>
+                        <button mat-menu-item (click)="showIdentifiers()">
+                          <mat-icon>fingerprint</mat-icon>
+                          <a>{{ 'desc.identifikatory' | translate }}</a>
+                        </button>
+                        <button mat-menu-item (click)="showHistory()">
+                          <mat-icon>update</mat-icon>
+                          <a>{{ 'desc.historie_zmen' | translate }}</a>
+                        </button>
+                        <button mat-menu-item (click)="showStates()">
+                          <mat-icon>edit</mat-icon>
+                          <a>{{ 'desc.zmenit_stav'| translate }}</a>
+                        </button>
+                        <button mat-menu-item *ngIf="hasGranularity(id)" (click)="showGranularity()">
+                          <mat-icon>format_list_numbered</mat-icon>
+                          <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
+                        </button>
+                      </mat-menu>
+
                     </td>
                   </tr>
                 </ng-container>

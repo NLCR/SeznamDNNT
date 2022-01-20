@@ -53,13 +53,20 @@
     <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
-    <field name="date" type="date" indexed="true" stored="true" />
-    <field name="url" type="string" indexed="true" stored="true"  />
-    <field name="origin" type="string" indexed="true" stored="true"  />
-    <field name="first_id" type="string" indexed="true" stored="true"  />
-    <field name="last_id" type="string" indexed="true" stored="true"  />
-    <field name="processed" type="boolean" indexed="true" stored="true"  />
-    <field name="num_docs" type="int" indexed="true" stored="true"  />
+    <field name="import_id" type="string" indexed="true" stored="true"  />
+    <field name="import_date" type="date" indexed="true" stored="true" />
+    <field name="ean" type="string" indexed="true" stored="true"  />
+    <field name="name" type="string" indexed="true" stored="true"  />
+    <field name="author" type="string" indexed="true" stored="true"  />
+    <field name="identifiers" type="string" indexed="true" stored="true" multiValued="true"  />
+    <field name="hit_type" type="string" indexed="true" stored="true"  />
+    <field name="num_hits" type="int" indexed="true" stored="true"  />
+    <field name="na_vyrazeni" type="string" indexed="true" stored="true" multiValued="true"  />
+    <field name="hits_na_vyrazeni" type="int" indexed="true" stored="true"  />
+    <field name="controlled" type="boolean" indexed="true" stored="true"  />
+    
+    <field name="item" type="text_big" indexed="false" stored="true"  />
+    <field name="catalog" type="text_big" indexed="false" stored="true"  />
     
     
     <!-- uncomment the following to ignore any fields that don't already match an existing 

@@ -210,7 +210,7 @@ public class SearchServlet extends HttpServlet {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "imports");
+            NamedList<Object> qresp = solr.request(qreq, "imports_documents");
 
             return new JSONObject((String) qresp.get("response"));
           } catch (SolrServerException | IOException ex) {
@@ -240,11 +240,7 @@ public class SearchServlet extends HttpServlet {
                     .setQuery("*:*")
                     .setLimit(100)
                     .setSort("indextime desc")
-                    .returnFields("import_id", "import_date", "import_url", "import_origin")
-                    .withParam("group", true)
-                    .withParam("group.field", "import_id")
-                    .withParam("group.ngroups", true)
-                    .withFacet("import_id", categoryFacet);
+                    .returnFields("*");
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             request.setResponseParser(rParser);
