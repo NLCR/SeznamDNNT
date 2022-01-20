@@ -18,6 +18,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   subs: Subscription[] = [];
   numFound: number;
   docs: SolrDocument[] = [];
+  facets: any;
   fullCatalog: boolean;
   onlyEAN: boolean;
   onlyNoHits: boolean;
@@ -94,10 +95,11 @@ export class ImportComponent implements OnInit, OnDestroy {
     p.id = this.importId;
     this.service.getImport(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
+      this.facets = resp.facet_counts.facet_fields;
       this.numFound = resp.response.numFound;
-      this.nejen_na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
-      this.ean = resp.facet_counts.facet_fields.hit_type.ean;
-      this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
+      // this.nejen_na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
+      // this.ean = resp.facet_counts.facet_fields.hit_type.ean;
+      // this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
       if (!this.initialized) {
         this.date = this.docs[0].import_date;
         this.uri = this.docs[0].import_uri;
@@ -137,8 +139,9 @@ export class ImportComponent implements OnInit, OnDestroy {
     });
   }
 
-  link(id: string) {
-    return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
+  alephLink(id: string) {
+    return 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
+    // return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
   }
 
   sanitize(url: string) {
@@ -147,7 +150,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   
   gotoAleph(id) {
-    window.open(this.link(id.identifier), "_blank", 'noreferrer');
+    window.open(this.alephLink(id.identifier), "_blank", 'noreferrer');
     return;
   }
 

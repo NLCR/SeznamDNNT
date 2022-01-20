@@ -188,24 +188,16 @@ public class SearchServlet extends HttpServlet {
                     .setSort("name", SolrQuery.ORDER.asc)
                     .addFilterQuery("import_id:" + req.getParameter("id"))
                     .setFacet(true)
-                    .addFacetField("hit_type")
-                    .addFacetField("num_hits")
-                    .setParam("json.nl", "map")
-                    .setParam("stats", true)
-                    .setParam("stats.field","na_vyrazeni")
+                    .addFacetField("dntstav")
+                    .setParam("json.nl", "arrntv")
+//                    .setParam("stats", true)
+//                    .setParam("stats.field","na_vyrazeni")
                     .setFields("*,identifiers:[json],catalog:[json],item:[json]");
-            if (Boolean.parseBoolean(req.getParameter("fullCatalog"))) {
-
-            } else {
-              query.addFilterQuery("na_vyrazeni:*");
+            
+            if (req.getParameter("dntstav") != null) {
+              query.addFilterQuery("dntstav:" + req.getParameter("dntstav"));
             }
-            if (Boolean.parseBoolean(req.getParameter("onlyEAN"))) {
-              query.addFilterQuery("hit_type:ean");
-              query.addFilterQuery("-num_hits:0");
-            }
-            if (Boolean.parseBoolean(req.getParameter("onlyNoHits"))) {
-              query.addFilterQuery("num_hits:0");
-            }
+            
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");

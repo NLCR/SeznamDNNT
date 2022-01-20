@@ -64,6 +64,7 @@
     <field name="na_vyrazeni" type="string" indexed="true" stored="true" multiValued="true"  />
     <field name="hits_na_vyrazeni" type="int" indexed="true" stored="true"  />
     <field name="controlled" type="boolean" indexed="true" stored="true"  />
+    <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
     
     <field name="item" type="text_big" indexed="false" stored="true"  />
     <field name="catalog" type="text_big" indexed="false" stored="true"  />

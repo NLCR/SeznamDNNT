@@ -1,95 +1,117 @@
 <div class="app-container">
-  <ng-container>
-    <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-      <div fxFlex>
-        {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
-      </div>
-      <div>
-        <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
-      </div>
+  <div fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex="350px" class="app-left app-fx-facets">
+      <app-facets *ngIf="facets" [facet_fields]="facets" ></app-facets>
     </div>
-    <div class="app-results-wrapper">
-      <mat-card>
-        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-          <div fxFlex>
-            <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
-            <span class="app-metadata">
-              <ng-container *ngIf="date">{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="uri">{{ uri }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="origin">{{ origin }}<span class="app-pipe"></span></ng-container>
-            </span>
-          </div>
-          <div>
+    <div fxFlex class="app-right">
+      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+        <div fxFlex>
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+        </div>
+        <div>
+          <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
+        </div>
+      </div>
+      <div class="app-results-wrapper">
+        <mat-card>
+          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+            <div fxFlex>
+              <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
+              <span class="app-metadata">
+                <ng-container *ngIf="date">{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
+                </ng-container>
+                <ng-container *ngIf="uri">{{ uri }}<span class="app-pipe"></span></ng-container>
+                <ng-container *ngIf="origin">{{ origin }}<span class="app-pipe"></span></ng-container>
+              </span>
+            </div>
+            <!-- <div>
             <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'desc.zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
             <mat-slide-toggle [checked]="onlyEAN" (change)="onlyEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_presne_shody' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
             <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'desc.zobrazit_nenalezene' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
+          </div> -->
           </div>
-        </div>
-      </mat-card>
-      <ng-container *ngFor="let doc of docs">
-        <mat-card class="app-view-import">
-          <mat-card-content>
-            <ng-container *ngIf="doc.name">
-              <strong class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below" style="max-width: 950px;">{{ doc.name }}</strong>
-              <span class="app-pipe"></span>
-            </ng-container>
-            <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
-            <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
-            <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
-            <ng-container *ngIf="doc.hit_type">
-              <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'" [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
-                {{  doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
-              </mat-icon>
-              <span class="app-pipe"></span>
-            </ng-container>
-            <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span></ng-container>
-            <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank" [matTooltip]="'desc.hledat_na_google' | translate"><mat-icon>travel_explore</mat-icon></a><span class="app-pipe"></span></ng-container>
-          </mat-card-content>
-          <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0"><!-- puvodne *ngIf="doc.identifiers?.length > 0" -->
-            <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
-              <tbody>
-                <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
-                  <tr>
-                    <td [class.approved]="id.approved">
-                      <!-- <ng-container *ngIf="id.identifier"><a [href]="link(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container> -->
-                      <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
-                      <!-- <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container> -->
-                      <ng-container *ngIf="id.ean">
-                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
-                        <span class="app-pipe"></span>
-                      </ng-container>
+        </mat-card>
+        <ng-container *ngFor="let doc of docs">
+          <mat-card class="app-view-import">
+            <mat-card-content>
+              <ng-container *ngIf="doc.name">
+                <strong class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below"
+                  style="max-width: 950px;">{{ doc.name }}</strong>
+                <span class="app-pipe"></span>
+              </ng-container>
+              <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.hit_type">
+                <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'"
+                  [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
+                  {{ doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
+                </mat-icon>
+                <span class="app-pipe"></span>
+              </ng-container>
+              <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank"
+                  [matTooltip]="'desc.otevrit_zdroj' | translate">
+                  <mat-icon>link</mat-icon>
+                </a><span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank"
+                  [matTooltip]="'desc.hledat_na_google' | translate">
+                  <mat-icon>travel_explore</mat-icon>
+                </a><span class="app-pipe"></span></ng-container>
+            </mat-card-content>
+            <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0">
+              <!-- puvodne *ngIf="doc.identifiers?.length > 0" -->
+              <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
+                <tbody>
+                  <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
+                    <tr>
+                      <td [class.approved]="id.approved">
+                        <!-- <ng-container *ngIf="id.identifier"><a [href]="alephLink(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container> -->
+                        <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
+                        <!-- <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container> -->
+                        <ng-container *ngIf="id.ean">
+                          <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below"
+                            matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
+                          <span class="app-pipe"></span>
+                        </ng-container>
 
-                      <div fxFlex fxFlexAlign="flex-end">
-                        <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
-                          {{ id.dntstav[id.dntstav.length-1] }}
-                        </div>
-                        <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
-                          <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
-                          {{ 'license.' + id.license + '-badge' | translate }}
-                        </div>
-                        <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
-                          <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
-                            {{ id.kuratorstav[id.kuratorstav.length-1] }}   
+                        <div fxFlex fxFlexAlign="flex-end">
+                          <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav"
+                            [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
+                            {{ id.dntstav[id.dntstav.length-1] }}
                           </div>
-                        </ng-container>    
-                      </div>
+                          <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1"
+                            [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
+                            <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ?
+                              'camera_alt' : 'no_photography' }}</mat-icon>
+                            {{ 'license.' + id.license + '-badge' | translate }}
+                          </div>
+                          <ng-container
+                            *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
+                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]"
+                              *ngIf="id.kuratorstav"
+                              [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                              {{ id.kuratorstav[id.kuratorstav.length-1] }}
+                            </div>
+                          </ng-container>
+                        </div>
 
 
-                    </td>
-                    <td class="app-cell-action" [class.approved]="id.approved">
-                      <ng-container *ngIf="id.approved">
-                        {{ id.approved ? ('desc.schvaleno' | translate) + ': ' +  id.approved_user : '' }}
-                      </ng-container>
-                      <!-- <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
+                      </td>
+                      <td class="app-cell-action" [class.approved]="id.approved">
+                        <ng-container *ngIf="id.approved">
+                          {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
+                        </ng-container>
+                        <!-- <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
                         {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
                       </a>   -->
 
-                      <a [matMenuTriggerFor]="menuMore">
-                        <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
-                      </a>
+                        <a [matMenuTriggerFor]="menuMore">
+                          <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' |
+                          translate }}
+                        </a>
 
-                      <mat-menu #menuMore="matMenu">
-                        <!-- <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
+                        <mat-menu #menuMore="matMenu">
+                          <!-- <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
                           <mat-icon>link</mat-icon><a>{{ 'desc.odkazy_do_dk' | translate }}</a>
                           <mat-menu #menuDKLinks="matMenu">
                             <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
@@ -101,40 +123,40 @@
                             {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
                           </a>
                         </button> -->
-                        <button mat-menu-item *ngIf="doc.marc_998a" (click)="gotoAleph(id)">
-                          <mat-icon>link</mat-icon>
-                          <a [href]="link(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
-                        </button>
-                        <button mat-menu-item (click)="showIdentifiers()">
-                          <mat-icon>fingerprint</mat-icon>
-                          <a>{{ 'desc.identifikatory' | translate }}</a>
-                        </button>
-                        <button mat-menu-item (click)="showHistory()">
-                          <mat-icon>update</mat-icon>
-                          <a>{{ 'desc.historie_zmen' | translate }}</a>
-                        </button>
-                        <button mat-menu-item (click)="showStates()">
-                          <mat-icon>edit</mat-icon>
-                          <a>{{ 'desc.zmenit_stav'| translate }}</a>
-                        </button>
-                        <button mat-menu-item *ngIf="hasGranularity(id)" (click)="showGranularity()">
-                          <mat-icon>format_list_numbered</mat-icon>
-                          <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
-                        </button>
-                      </mat-menu>
+                          <button mat-menu-item *ngIf="id.identifier"  (click)="gotoAleph(id)">
+                            <mat-icon>link</mat-icon>
+                            <a [href]="alephLink(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate
+                              }}</a>
+                          </button>
+                          <button mat-menu-item (click)="showIdentifiers()">
+                            <mat-icon>fingerprint</mat-icon>
+                            <a>{{ 'desc.identifikatory' | translate }}</a>
+                          </button>
+                          <button mat-menu-item (click)="showHistory()">
+                            <mat-icon>update</mat-icon>
+                            <a>{{ 'desc.historie_zmen' | translate }}</a>
+                          </button>
+                          <button mat-menu-item (click)="showStates()">
+                            <mat-icon>edit</mat-icon>
+                            <a>{{ 'desc.zmenit_stav'| translate }}</a>
+                          </button>
+                          <button mat-menu-item *ngIf="hasGranularity(id)" (click)="showGranularity()">
+                            <mat-icon>format_list_numbered</mat-icon>
+                            <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
+                          </button>
+                        </mat-menu>
 
-                    </td>
-                  </tr>
-                </ng-container>
-              </tbody>
-            </table>
-          </mat-card-actions>
-        </mat-card>
-      </ng-container>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </mat-card-actions>
+          </mat-card>
+        </ng-container>
+      </div>
+      <div class="app-mt-4">
+        <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
+      </div>
     </div>
-    <div class="app-mt-4">
-      <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
-    </div>
-  </ng-container>
-</div>
-
+  </div>

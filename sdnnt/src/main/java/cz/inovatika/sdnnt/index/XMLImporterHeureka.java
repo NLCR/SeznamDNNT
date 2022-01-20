@@ -241,6 +241,7 @@ public class XMLImporterHeureka {
         idoc.setField("catalog", item.get("catalog"));
         idoc.setField("num_hits", item.get("num_hits"));
         idoc.setField("hit_type", item.get("hit_type"));
+        idoc.setField("dntstav", item.get("dntstav"));
 
         getClient().add(IMPORTS_DOCUMENTS, idoc);
       indexed++;
@@ -270,10 +271,23 @@ public class XMLImporterHeureka {
     // JSONObject ret = new JSONObject();
     try {
       String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
-      String title = " OR nazev:(" + ClientUtils.escapeQueryChars(name) + ")";
+      
+      String[] parts = name.split(" - ");
+      String nazev = parts[0].trim();
+      String title = "";
+      if (nazev.isEmpty()) {
+        if (parts.length > 1) {
+          title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+        }
+      } else {
+        title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
+        if (parts.length > 1) {
+          title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+        }
+      }
+      
 
-      String q = "ean:\"" + item.get("EAN") + "\"^100.0"
-              + title;
+      String q = "ean:\"" + item.get("EAN") + "\" OR (" + title + ")";
 
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
@@ -325,6 +339,7 @@ public class XMLImporterHeureka {
           identifiers.add(doc.toString());
         }
 
+        item.put("dntstav", doc.getJSONArray("dntstav").toList());
       }
       item.put("found", true);
       item.put("hit_type", isEAN ? "ean" : "noean");
