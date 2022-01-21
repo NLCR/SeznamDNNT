@@ -438,7 +438,7 @@ public class AccountServlet extends HttpServlet {
       }
     },
 
-    IMPORT_CONTROLLED {
+    IMPORT_DOCUMENT_CONTROLLED {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
         if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
@@ -447,6 +447,25 @@ public class AccountServlet extends HttpServlet {
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // inputJs.put("controlled", true);
             return Import.setControlled(inputJs.getString("id"), user.getUsername());
+          } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+        }
+      }
+    },
+
+    IMPORT_PROCESSED {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+          try {
+            User user = new UserControlerImpl(req).getUser();
+            JSONObject inputJs = ServletsSupport.readInputJSON(req);
+            // inputJs.put("controlled", true);
+            return Import.setProcessed(inputJs.getString("id"), user.getUsername());
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());

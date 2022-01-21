@@ -31,7 +31,7 @@ export class ImportsComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['import_date', 'import_url', 'import_origin', 'total', 'na_vyrazeni', 'actions'];
+  displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_vyrazeni', 'actions'];
   imports: Import[] = [];
   stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 
@@ -125,6 +125,12 @@ export class ImportsComponent implements OnInit {
 
   showImport(imp: Import) {
     this.router.navigate(['import', imp.id], {});
+  }
+
+  process(imp: Import) {
+    this.service.setImportProcessed(imp.id).subscribe(res => {
+      this.search(this.route.snapshot.queryParams);
+    });
   }
 
 }

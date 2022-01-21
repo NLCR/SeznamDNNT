@@ -749,7 +749,8 @@
     "korespondence": "Correspondence",
     "vlozit_korespondenci": "Add correspondence ...",
     "standardni_prihlaseni":"Use application account ...",
-    "shibboleth_prihlaseni":"Use EDUid account ..."
+    "shibboleth_prihlaseni":"Use EDUid account ...",
+    "Zdroj": "Source"
   },
 
   "acts": {

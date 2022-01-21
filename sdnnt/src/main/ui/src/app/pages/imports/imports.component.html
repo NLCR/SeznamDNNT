@@ -18,8 +18,17 @@
         <td mat-cell *matCellDef="let element">{{ element.url }}</td>
       </ng-container>
       <ng-container matColumnDef="import_origin">
-        <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.Zdroj' | translate }}</th>
         <td mat-cell *matCellDef="let element">{{ element.origin }}</td>
+      </ng-container>
+      <ng-container matColumnDef="stav">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <mat-icon class="material-icons-outlined" [class]="element.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (element.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
+            <ng-container *ngIf="!element.processed">lock_open</ng-container>
+            <ng-container *ngIf="element.processed">lock</ng-container>
+          </mat-icon>
+        </td>
       </ng-container>
       <ng-container matColumnDef="total">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.celkem' | translate }}</th>
@@ -34,9 +43,12 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" class="app-text-right">
           <mat-button-toggle-group>
-            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.prehled_importu' | translate" matTooltipPosition="above">
+            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.vysledek_importu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">visibility</mat-icon>
-            </mat-button-toggle>        
+            </mat-button-toggle>    
+            <mat-button-toggle *ngIf="!element.processed" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
+              <mat-icon class="material-icons-outlined">done</mat-icon>
+            </mat-button-toggle>    
           </mat-button-toggle-group>
         </td>
       </ng-container>

@@ -18,10 +18,13 @@
             <div fxFlex>
               <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
               <span class="app-metadata">
-                <ng-container *ngIf="date">{{ date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
+                <ng-container *ngIf="import.date">{{ import.date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
                 </ng-container>
-                <ng-container *ngIf="uri">{{ uri }}<span class="app-pipe"></span></ng-container>
-                <ng-container *ngIf="origin">{{ origin }}<span class="app-pipe"></span></ng-container>
+                <ng-container *ngIf="import.origin">{{ import.origin }}<span class="app-pipe"></span></ng-container>
+                <ng-container><mat-icon class="material-icons-outlined" [class]="import.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (import.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
+                  <ng-container *ngIf="!import.processed">lock_open</ng-container>
+                  <ng-container *ngIf="import.processed">lock</ng-container>
+                </mat-icon><span class="app-pipe"></span></ng-container>
               </span>
             </div>
             <!-- <div>

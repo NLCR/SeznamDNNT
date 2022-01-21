@@ -12,6 +12,7 @@ import { DialogHistoryComponent } from 'src/app/components/dialog-history/dialog
 import { DialogIdentifierComponent } from 'src/app/components/dialog-identifier/dialog-identifier.component';
 import { DialogStatesComponent } from 'src/app/components/dialog-states/dialog-states.component';
 import { GranularityComponent } from 'src/app/components/granularity/granularity.component';
+import { Import } from 'src/app/shared/import';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
@@ -40,6 +41,8 @@ export class ImportComponent implements OnInit, OnDestroy {
   initialized = false;
   filteredIds: { [id: string]: any[] };
 
+  import: Import;
+
   constructor(
     public dialog: MatDialog,
     private sanitizer: DomSanitizer,
@@ -61,6 +64,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.fullCatalog = this.route.snapshot.queryParamMap.get('fullCatalog') === 'true';
 
       this.getDocs(val);
+      this.getImport();
     }));
   }
 
@@ -97,12 +101,18 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }
 
+  getImport() {
+    this.service.getImport(this.importId).subscribe((resp: any) => {
+      this.import = resp.response.docs[0];
+    });
+  }
+
   getDocs(params: Params) {
     this.docs = [];
     this.filteredIds = {};
     const p = Object.assign({}, params);
     p.id = this.importId;
-    this.service.getImport(p as HttpParams).subscribe((resp: any) => {
+    this.service.getImportDocuments(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.facets = resp.facet_counts.facet_fields;
       this.numFound = resp.response.numFound;

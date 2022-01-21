@@ -185,6 +185,30 @@ public class Import {
     }
   }
   
+  public static JSONObject setProcessed(String id, String user) {
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      
+      SolrInputDocument idoc = new SolrInputDocument();
+      idoc.setField("id", id);
+      
+      Map<String,Object> fieldModifier = new HashMap<>(1);
+      fieldModifier.put("set",true);
+      idoc.addField("processed", fieldModifier); 
+      
+      Map<String,Object> fieldModifier2 = new HashMap<>(1);
+      fieldModifier2.put("set",user);
+      idoc.addField("processed_user", fieldModifier2); 
+
+      solr.add("imports", idoc);
+      solr.commit("imports");
+      solr.close();
+      return new JSONObject().put("saved", true);
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      return new JSONObject().put("error", ex);
+    }
+  }
+  
   
   public static JSONObject changeStav(JSONObject input, String user) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {

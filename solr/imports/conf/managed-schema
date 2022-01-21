@@ -59,6 +59,7 @@
     <field name="first_id" type="string" indexed="true" stored="true"  />
     <field name="last_id" type="string" indexed="true" stored="true"  />
     <field name="processed" type="boolean" indexed="true" stored="true"  />
+    <field name="processed_user" type="string" indexed="true" stored="true"  />
     <field name="num_docs" type="int" indexed="true" stored="true"  />
     
     

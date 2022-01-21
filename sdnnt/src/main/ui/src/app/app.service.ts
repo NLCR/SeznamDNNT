@@ -132,9 +132,14 @@ export class AppService {
     return this.get(url, params);
   }
 
-  // getImport(id: string, onlyA: boolean, onlyNoEAN: boolean, onlyNoHits: boolean): Observable<any> {
-  getImport(params: HttpParams): Observable<any> {
+  getImport(id: string): Observable<any> {
     let url = 'search/import';
+    const params: HttpParams = new HttpParams().set('id', id);
+    return this.get(url, params);
+  }
+
+  getImportDocuments(params: HttpParams): Observable<any> {
+    let url = 'search/import_documents';
     // const params: HttpParams = new HttpParams().set('id', id)
     // .set('onlyA', onlyA+'').set('onlyNoEAN', onlyNoEAN+'').set('onlyNoHits', onlyNoHits+'');
     return this.get(url, params);
@@ -402,8 +407,13 @@ export class AppService {
   }
 
   setImportControlled(doc): Observable<User> {
-    let url = '/account/import_controlled';
+    let url = '/account/import_document_controlled';
     return this.post(url, doc);
+  }
+
+  setImportProcessed(id: string): Observable<User> {
+    let url = '/account/import_processed';
+    return this.post(url, {id});
   }
 
   changeStavImport(doc): Observable<User> {

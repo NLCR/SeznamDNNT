@@ -749,7 +749,8 @@
     "korespondence": "Korespondence",
     "vlozit_korespondenci": "Vložit korespondenci ...",
     "standardni_prihlaseni":"Standardní přihlášení ...",
-    "shibboleth_prihlaseni":"EDUId přihlášení ..."
+    "shibboleth_prihlaseni":"EDUId přihlášení ...",
+    "Zdroj": "Zdroj"
   },
 
   "acts": {
