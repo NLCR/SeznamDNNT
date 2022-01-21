@@ -59,7 +59,7 @@
                 </a><span class="app-pipe"></span></ng-container>
 
                <a *ngIf="!doc.controlled" class="app-right" (click)="setControlled(doc)" 
-                  [matTooltip]="'desc.controlled' | translate">
+                  [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
                   <mat-icon class="material-icons-outlined">done</mat-icon>
                 </a>
                 <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}}</span>
@@ -134,7 +134,7 @@
                             <a [href]="alephLink(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate
                               }}</a>
                           </button>
-                          <button mat-menu-item (click)="showIdentifiers()">
+                          <button mat-menu-item (click)="showIdentifiers(id)">
                             <mat-icon>fingerprint</mat-icon>
                             <a>{{ 'desc.identifikatory' | translate }}</a>
                           </button>
@@ -146,7 +146,7 @@
                             <mat-icon>edit</mat-icon>
                             <a>{{ 'desc.zmenit_stav'| translate }}</a>
                           </button>
-                          <button mat-menu-item *ngIf="hasGranularity(id)" (click)="showGranularity()">
+                          <button mat-menu-item *ngIf="id.granularity && id.granularity.length > 1" (click)="showGranularity(id)">
                             <mat-icon>format_list_numbered</mat-icon>
                             <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
                           </button>

@@ -143,6 +143,28 @@ public class SearchServlet extends HttpServlet {
         }
       }
     },
+    CATALOG_DOC {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("*")
+                  .setRows(100)
+                  .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
+                  .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+        }
+      }
+    },
     HISTORY {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

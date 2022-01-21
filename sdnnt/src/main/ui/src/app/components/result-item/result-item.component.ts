@@ -192,8 +192,6 @@ export class ResultItemComponent implements OnInit {
       data: data,
       panelClass: 'app-dialog-states'
     });
-
-    
   }
 
   public alreadyRejected() {

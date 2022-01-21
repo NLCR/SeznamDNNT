@@ -5,10 +5,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DialogHistoryComponent } from 'src/app/components/dialog-history/dialog-history.component';
+import { DialogIdentifierComponent } from 'src/app/components/dialog-identifier/dialog-identifier.component';
 import { DialogStatesComponent } from 'src/app/components/dialog-states/dialog-states.component';
+import { GranularityComponent } from 'src/app/components/granularity/granularity.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
@@ -42,6 +45,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private router: Router,
+    private config: AppConfiguration,
     private service: AppService,
     public state: AppState) { }
 
@@ -153,30 +157,67 @@ export class ImportComponent implements OnInit, OnDestroy {
     return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
-  
+
   gotoAleph(id) {
     window.open(this.alephLink(id.identifier), "_blank", 'noreferrer');
     return;
   }
 
-  showIdentifiers() {
+  showIdentifiers(id) {
+
+    this.service.getCatalogDoc(id.identifier).subscribe(res => {
+      if (res.response.docs.length > 0) {
+
+        const data = {
+          title: res.response.docs[0].title,
+          items: [],
+        }
+        data.items.push({ label: 'Aleph identifier', value: res.response.docs[0]['identifier'] })
+
+        this.config.identifiers.forEach(f => {
+          if (res.response.docs[0]['marc_' + f]) {
+            data.items.push({ label: 'field.' + f, value: res.response.docs[0]['marc_' + f] })
+          }
+        });
+
+
+        const dialogRef = this.dialog.open(DialogIdentifierComponent, {
+          width: '750px',
+          data,
+          panelClass: 'app-dialog-identifier'
+        });
+      }
+    });
 
   }
 
   showHistory(doc) {
-    const dialogRef = this.dialog.open(DialogHistoryComponent, {
-      width: '750px',
-      data: doc,
-      panelClass: 'app-history-identifier'
+    this.service.getCatalogDoc(doc.identifier).subscribe(res => {
+      if (res.response.docs.length > 0) {
+
+        const dialogRef = this.dialog.open(DialogHistoryComponent, {
+          width: '750px',
+          data: res.response.docs[0],
+          panelClass: 'app-history-identifier'
+        });
+
+      }
     });
   }
 
-  hasGranularity(id) {
-    return false;
-  }
+  showGranularity(id) {
+    // this.service.getCatalogDoc(doc.identifier).subscribe(res => {
+    //   if (res.response.docs.length > 0) {
 
-  showGranularity() {
+        const data = { title: id.nazev, items: id.granularity };
 
+        const dialogRef = this.dialog.open(GranularityComponent, {
+          width: '1150px',
+          data: data,
+          panelClass: 'app-dialog-states'
+        });
+    //   }
+    // });
   }
 
   showStates(doc, id) {
@@ -191,7 +232,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       if (result && result.change) {
         this.service.changeStavDirect(id.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
 
-          if (res.response.docs.length > 0 ) {
+          if (res.response.docs.length > 0) {
             id.dntstav = [result.newState];
             this.service.changeStavImport(doc).subscribe(res => {
               this.getDocs(this.route.snapshot.queryParams);
@@ -206,9 +247,9 @@ export class ImportComponent implements OnInit, OnDestroy {
   curatorAndPublicStateAreDifferent(doc: any) {
     // neni nastaveny public stav ale ma kuratorsky stav NPA 
     if (doc.kuratorstav && !doc.dntstav) {
-      return true; 
-    // verejny a kuratorsky stav je rozdilny
-    } else if (doc.kuratorstav && doc.dntstav &&  doc.kuratorstav[doc.kuratorstav.length-1] != doc.dntstav[doc.dntstav.length-1])  {
+      return true;
+      // verejny a kuratorsky stav je rozdilny
+    } else if (doc.kuratorstav && doc.dntstav && doc.kuratorstav[doc.kuratorstav.length - 1] != doc.dntstav[doc.dntstav.length - 1]) {
       return true;
     }
     return false;

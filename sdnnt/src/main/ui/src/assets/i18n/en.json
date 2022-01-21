@@ -103,6 +103,7 @@
     "license": "Associated license",
     "sigla": "Sigla",
     "rokvydani": "Year of publication",
+    "controlled": "Controlled",
 
     "undefined": "unclassified",
     "NNN": "Not in List",
@@ -120,6 +121,11 @@
     "VNZ": "Call for on on-site terminal license",
     "NL":"On-site terminal license, internal state",
     "NLX":"On-site terminal license, internal state"
+  },
+
+  "controlled": {
+    "true": "Controlled",
+    "false": "Not Controlled"
   },
 
   "fmt": {

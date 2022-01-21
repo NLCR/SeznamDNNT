@@ -301,6 +301,9 @@ public class IndexerServlet extends HttpServlet {
       }
     },
     // import zaznamu z palmknihy.cz - uzivatelske api
+    // url: muze byt url nebo cesta file na serveru
+    // from_id: pocatecni id pro import
+    // resume: pokud true, cte posledni importovani id, a pokracuje
     IMPORT_HEUREKA {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -311,11 +314,7 @@ public class IndexerServlet extends HttpServlet {
             // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
             // https://www.palmknihy.cz/heureka.xml
             
-            if (req.getParameter("url").startsWith("http")) {
-              return imp.fromUrl(req.getParameter("url"), "heureka", req.getParameter("from_id"));
-            } else {
-              return imp.fromFile(req.getParameter("url"), "heureka", req.getParameter("from_id"));
-            }
+            return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
             
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());

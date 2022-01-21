@@ -5,12 +5,16 @@
  */
 package cz.inovatika.sdnnt.index;
 
+import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import static cz.inovatika.sdnnt.index.OAIHarvester.LOGGER;
 import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -34,11 +39,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
@@ -55,17 +63,17 @@ import org.xml.sax.SAXException;
 public class XMLImporterHeureka {
 
   public static final Logger LOGGER = Logger.getLogger(XMLImporterHeureka.class.getName());
-  JSONObject ret = new JSONObject();
+
   final String IMPORTS = "imports";
   final String IMPORTS_DOCUMENTS = "imports_documents";
 
   String import_id;
   String import_date;
   String import_url;
-  String import_origin;
+  final String import_origin = "heureka";
   String first_id;
   String last_id;
-  
+
   int from_id = -1;
 
   int indexed;
@@ -74,36 +82,72 @@ public class XMLImporterHeureka {
           new AbstractMap.SimpleEntry<>("NAME", "PRODUCTNAME"),
           new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
   List<String> elements = Arrays.asList("NAME", "EAN");
+
+  public JSONObject doImport(String path, String from_id, boolean resume) {
+    JSONObject ret = new JSONObject();
+    long start = new Date().getTime();
+    // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+    import_date = now.format(DateTimeFormatter.ISO_INSTANT);
+    import_url = path;
+    import_id = now.toEpochSecond() + "";
+    if (resume) {
+      this.from_id = getLastId();
+    } else if (from_id != null) {
+      this.from_id = Integer.parseInt(from_id);
+    }
+    if (path.startsWith("http")) {
+      ret = fromUrl(path, from_id);
+    } else {
+      ret = fromFile(path, from_id);
+    }
+    ret.put("indexed", indexed);
+    ret.put("file", path);
+    ret.put("origin", import_origin);
+    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
+    ret.put("ellapsed", ellapsed);
+    LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+    return ret;
+  }
   
+  private int getLastId() {
+    int last = -1;
+    Options opts = Options.getInstance();
+    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+      SolrQuery q = new SolrQuery("*").setRows(1)
+              .addFilterQuery("origin:" + import_origin)
+              .setFields("last_id")
+              .setSort("indextime", SolrQuery.ORDER.desc);
+      SolrDocumentList docs = solr.query("imports", q).getResults();
+      if (docs.getNumFound() > 0) {
+        last = Integer.parseInt((String) docs.get(0).getFirstValue("last_id")) + 1;
+      }
+      solr.close();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
+    return last;
+  }
+
   private void indexImportSummary() throws SolrServerException, IOException {
-      SolrInputDocument idoc = new SolrInputDocument();
-      idoc.setField("id", import_id);
-      idoc.setField("date", import_date);
-      idoc.setField("url", import_url);
-      idoc.setField("origin", import_origin);
-      idoc.setField("first_id", first_id);
-      idoc.setField("last_id", last_id);
-      idoc.setField("processed", false);
-      idoc.setField("num_docs", indexed);
-      getClient().add(IMPORTS, idoc);
-      getClient().commit(IMPORTS);
+    SolrInputDocument idoc = new SolrInputDocument();
+    idoc.setField("id", import_id);
+    idoc.setField("date", import_date);
+    idoc.setField("url", import_url);
+    idoc.setField("origin", import_origin);
+    idoc.setField("first_id", first_id);
+    idoc.setField("last_id", last_id);
+    idoc.setField("processed", false);
+    idoc.setField("num_docs", indexed);
+    getClient().add(IMPORTS, idoc);
+    getClient().commit(IMPORTS);
   }
 
   // https://www.palmknihy.cz/heureka.xml
-  public JSONObject fromFile(String path, String origin, String from_id) {
-  LOGGER.log(Level.INFO, "Processing {0}", path);
+  public JSONObject fromFile(String path, String from_id) {
+    LOGGER.log(Level.INFO, "Processing {0}", path);
+    JSONObject ret = new JSONObject();
     try {
-      long start = new Date().getTime();
-      // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-      ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-      import_date = now.format(DateTimeFormatter.ISO_INSTANT);
-      import_url = path;
-      import_origin = origin;
-      import_id = now.toEpochSecond() + "";
-      if (from_id != null) {
-        this.from_id = Integer.parseInt(from_id);
-      }
-
       File f = new File(path);
       try (InputStream is = new FileInputStream(f)) {
         readXML(is, "SHOPITEM");
@@ -113,14 +157,7 @@ public class XMLImporterHeureka {
       }
       getClient().commit(IMPORTS_DOCUMENTS);
       indexImportSummary();
-      
-      // solr.close();
-      ret.put("indexed", indexed);
-      ret.put("file", path);
-      ret.put("origin", origin);
-      String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-      ret.put("ellapsed", ellapsed);
-      LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -128,19 +165,10 @@ public class XMLImporterHeureka {
     return ret;
   }
 
-  public JSONObject fromUrl(String uri, String origin, String from_id) {
+  public JSONObject fromUrl(String uri, String from_id) {
     LOGGER.log(Level.INFO, "Processing {0}", uri);
+    JSONObject ret = new JSONObject();
     try {
-      long start = new Date().getTime();
-      // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-      ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-      import_date = now.format(DateTimeFormatter.ISO_INSTANT);
-      import_url = uri;
-      import_origin = origin;
-      import_id = now.toEpochSecond() + "";
-      if (from_id != null) {
-        this.from_id = Integer.parseInt(from_id);
-      }
 
       CloseableHttpClient client = HttpClients.createDefault();
       HttpGet httpGet = new HttpGet(uri);
@@ -157,12 +185,6 @@ public class XMLImporterHeureka {
       }
       getClient().commit(IMPORTS_DOCUMENTS);
       indexImportSummary();
-      ret.put("indexed", indexed);
-      ret.put("file", uri);
-      ret.put("origin", origin);
-      String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-      ret.put("ellapsed", ellapsed);
-      LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -197,18 +219,18 @@ public class XMLImporterHeureka {
 
   private void toIndex(Map<String, String> item) {
     try {
-      if (from_id > Integer.parseInt(item.get("ITEM_ID"))) {
-        return;
-      }
       if (first_id == null) {
         first_id = item.get("ITEM_ID");
       }
-      
+      last_id = item.get("ITEM_ID");
+      if (from_id > Integer.parseInt(item.get("ITEM_ID"))) {
+        return;
+      }
+
       SolrInputDocument idoc = new SolrInputDocument();
       idoc.setField("import_id", import_id);
       idoc.setField("import_date", import_date);
       idoc.setField("id", import_id + "_" + item.get("ITEM_ID"));
-      last_id = item.get("ITEM_ID");
 
       if (item.containsKey("ISBN")) {
 
@@ -228,7 +250,7 @@ public class XMLImporterHeureka {
       addFrbr(item);
       findInCatalog(item);
 
-      if (item.containsKey("found") ) {
+      if (item.containsKey("found")) {
         idoc.setField("ean", item.get("EAN"));
         idoc.setField("name", item.get(fieldsMap.get("NAME")));
         if (item.containsKey(fieldsMap.get("AUTHOR"))) {
@@ -244,7 +266,7 @@ public class XMLImporterHeureka {
         idoc.setField("dntstav", item.get("dntstav"));
 
         getClient().add(IMPORTS_DOCUMENTS, idoc);
-      indexed++;
+        indexed++;
       }
 
     } catch (Exception ex) {
@@ -271,7 +293,7 @@ public class XMLImporterHeureka {
     // JSONObject ret = new JSONObject();
     try {
       String name = ((String) item.get(fieldsMap.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
-      
+
       String[] parts = name.split(" - ");
       String nazev = parts[0].trim();
       String title = "";
@@ -285,15 +307,14 @@ public class XMLImporterHeureka {
           title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
         }
       }
-      
 
-      String q = "ean:\"" + item.get("EAN") + "\" OR (" + title + ")";
+      String q = "ean:\"" + item.get("EAN") + "\"^10.0 OR (" + title + ")";
 
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
               .addFilterQuery("dntstav:*")
-              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav");
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }

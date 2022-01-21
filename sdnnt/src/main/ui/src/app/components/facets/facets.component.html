@@ -30,6 +30,7 @@
                 {{ ('field.' + f.name | translate) }}
               </a>
 
+              <a *ngSwitchCase="'controlled'" (click)="addFilter(facet, f)">{{ 'controlled.' + f.name | translate }}</a>
               <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
               <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
               <a *ngSwitchCase="'sigla'" (click)="addFilter(facet, f)">{{ 'sigla.' + f.name | translate }}</a>

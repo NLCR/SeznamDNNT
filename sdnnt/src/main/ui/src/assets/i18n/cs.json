@@ -103,6 +103,7 @@
     "license": "Přiřazená licence",
     "sigla": "Sigla",
     "rokvydani": "Rok vydání",
+    "controlled": "Kontrolováno",
 
     "undefined": "nezařazeno",
     "NNN": "není na seznamu",
@@ -119,6 +120,11 @@
     "VNZ": "Výzva k licenci pro terminál na místě samém",
     "NL":"omezení na terminál / plánované vydání po získání licence",
     "NLX":"omezeno na terminál"
+  },
+
+  "controlled": {
+    "true": "Kontrolováno",
+    "false": "Nekontrolováno"
   },
 
   "fmt": {

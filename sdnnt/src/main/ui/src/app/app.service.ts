@@ -158,6 +158,12 @@ export class AppService {
     return this.get(url, params);
   }
 
+  getCatalogDoc(identifier: string): Observable<any> {
+    let url = 'search/catalog_doc';
+    const params: HttpParams = new HttpParams().set('identifier', identifier);
+    return this.get(url, params);
+  }
+
   getExpression(frbr: string): Observable<any> {
     let url = 'search/frbr';
     const params: HttpParams = new HttpParams().set('frbr', frbr);
