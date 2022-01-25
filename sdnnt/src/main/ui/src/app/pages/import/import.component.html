@@ -17,7 +17,7 @@
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
               <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
-              <span class="app-metadata">
+              <span class="app-metadata" *ngIf="import">
                 <ng-container *ngIf="import.date">{{ import.date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
                 </ng-container>
                 <ng-container *ngIf="import.origin">{{ import.origin }}<span class="app-pipe"></span></ng-container>
@@ -56,6 +56,10 @@
                   [matTooltip]="'desc.otevrit_zdroj' | translate">
                   <mat-icon>link</mat-icon>
                 </a><span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="doc.eanAlephLink"><a [href]="sanitize(doc.eanAlephLink)" target="_blank"
+                  [matTooltip]="'desc.otevrit_zdroj' | translate">SKC</a><span class="app-pipe"></span></ng-container>
+
+
               <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank"
                   [matTooltip]="'desc.hledat_na_google' | translate">
                   <mat-icon>travel_explore</mat-icon>

@@ -256,19 +256,20 @@ public class SearchServlet extends HttpServlet {
                     .setStart(start)
                     .setSort("name", SolrQuery.ORDER.asc)
                     .addFilterQuery("import_id:" + req.getParameter("id"))
+                    .addFilterQuery("dntstav:*")
                     .setFacet(true)
-                    .addFacetField("dntstav")
-                    .addFacetField("controlled")
+                    .addFacetField("{!ex=dntstav}dntstav")
+                    .addFacetField("{!ex=ct}controlled")
                     .setParam("json.nl", "arrntv")
 //                    .setParam("stats", true)
 //                    .setParam("stats.field","na_vyrazeni")
                     .setFields("*,identifiers:[json],catalog:[json],item:[json]");
             
             if (req.getParameter("dntstav") != null) {
-              query.addFilterQuery("dntstav:" + req.getParameter("dntstav"));
+              query.addFilterQuery("{!tag=dntstav}dntstav:" + req.getParameter("dntstav"));
             }
             if (req.getParameter("controlled") != null) {
-              query.addFilterQuery("controlled:" + req.getParameter("controlled"));
+              query.addFilterQuery("{!tag=ct}controlled:" + req.getParameter("controlled"));
             }
             
             QueryRequest qreq = new QueryRequest(query);

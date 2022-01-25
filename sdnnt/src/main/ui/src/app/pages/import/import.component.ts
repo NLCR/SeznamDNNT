@@ -41,6 +41,8 @@ export class ImportComponent implements OnInit, OnDestroy {
   initialized = false;
   filteredIds: { [id: string]: any[] };
 
+  eanAlephLink: string = '';
+
   import: Import;
 
   constructor(
@@ -119,12 +121,22 @@ export class ImportComponent implements OnInit, OnDestroy {
       // this.nejen_na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
       // this.ean = resp.facet_counts.facet_fields.hit_type.ean;
       // this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
-      if (!this.initialized) {
-        this.date = this.docs[0].import_date;
-        this.uri = this.docs[0].import_uri;
-        this.origin = this.docs[0].import_origin;
-      }
+      // if (!this.initialized) {
+      //   this.date = this.docs[0].import_date;
+      //   this.uri = this.docs[0].import_uri;
+      //   this.origin = this.docs[0].import_origin;
+      // }
+      
       this.docs.forEach(doc => {
+        doc.identifiers.forEach(id => {
+          if (doc.ean && id.ean && id.ean.includes(doc.ean)) {
+            doc.eanAlephLink = 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.identifier.substr(id.identifier.lastIndexOf('-') + 1);
+            return;
+          }
+        });
+      });
+      this.docs.forEach(doc => {
+
         const f = doc.identifiers.filter(id => {
           if (this.fullCatalog) {
             return true;

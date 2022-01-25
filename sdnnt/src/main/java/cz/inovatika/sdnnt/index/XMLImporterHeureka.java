@@ -109,7 +109,7 @@ public class XMLImporterHeureka {
     LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
     return ret;
   }
-  
+
   private int getLastId() {
     int last = -1;
     Options opts = Options.getInstance();
@@ -313,7 +313,7 @@ public class XMLImporterHeureka {
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
-              .addFilterQuery("dntstav:*")
+              //.addFilterQuery("dntstav:*")
               .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
@@ -325,7 +325,6 @@ public class XMLImporterHeureka {
       NamedList<Object> qresp = getClient().request(qreq, "catalog");
       JSONObject jresp = (new JSONObject((String) qresp.get("response"))).getJSONObject("response");
       JSONArray docs = jresp.getJSONArray("docs");
-      // item.put("catalog", docs.toString());
       List<String> identifiers = new ArrayList<>();
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
@@ -336,31 +335,22 @@ public class XMLImporterHeureka {
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
 
+        if (doc.has("dntstav")) {
+          item.put("dntstav", doc.getJSONArray("dntstav").toList());
+          List<Object> stavy = doc.getJSONArray("dntstav").toList();
+          if (stavy.contains("A") || stavy.contains("PA")) {
+            na_vyrazeni.add(doc.getString("identifier"));
+          }
+        }
+        identifiers.add(doc.toString());
+
         if (doc.has("ean")) {
           List<Object> eans = doc.getJSONArray("ean").toList();
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
 
-            if (doc.has("dntstav")) {
-              List<Object> stavy = doc.getJSONArray("dntstav").toList();
-              if (stavy.contains("A") || stavy.contains("PA")) {
-                na_vyrazeni.add(doc.getString("identifier"));
-              }
-            }
-            identifiers.add(doc.toString());
           }
         }
-        if (!isEAN) {
-          if (doc.has("dntstav")) {
-            List<Object> stavy = doc.getJSONArray("dntstav").toList();
-            if (stavy.contains("A") || stavy.contains("PA")) {
-              na_vyrazeni.add(doc.getString("identifier"));
-            }
-          }
-          identifiers.add(doc.toString());
-        }
-
-        item.put("dntstav", doc.getJSONArray("dntstav").toList());
       }
       item.put("found", true);
       item.put("hit_type", isEAN ? "ean" : "noean");
