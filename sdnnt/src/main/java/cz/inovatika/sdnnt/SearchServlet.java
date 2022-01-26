@@ -235,6 +235,39 @@ public class SearchServlet extends HttpServlet {
         //return ret;
       }
     },
+    IMPORT_NOT_CONTROLLED {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+          JSONObject ret = new JSONObject();
+          Options opts = Options.getInstance();
+          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+            SolrQuery query = new SolrQuery("*")
+                    .setRows(0)
+                    .addFilterQuery("import_id:" + req.getParameter("id"))
+                    .addFilterQuery("controlled:false")
+                    .addFilterQuery("dntstav:*")
+                    .setFields("*,identifiers:[json],catalog:[json],item:[json]");
+            
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, "imports_documents");
+
+            return new JSONObject((String) qresp.get("response"));
+          } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+          }
+        } else {
+          return errorJson(response, SC_FORBIDDEN, "not allowed");
+        }
+
+
+        //return ret;
+      }
+    },
     IMPORT_DOCUMENTS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

@@ -140,8 +140,12 @@ export class AppService {
 
   getImportDocuments(params: HttpParams): Observable<any> {
     let url = 'search/import_documents';
-    // const params: HttpParams = new HttpParams().set('id', id)
-    // .set('onlyA', onlyA+'').set('onlyNoEAN', onlyNoEAN+'').set('onlyNoHits', onlyNoHits+'');
+    return this.get(url, params);
+  }
+
+  getImportNotControlled(id: string): Observable<any> {
+    let url = 'search/import_not_controlled';
+    const params: HttpParams = new HttpParams().set('id', id);
     return this.get(url, params);
   }
 

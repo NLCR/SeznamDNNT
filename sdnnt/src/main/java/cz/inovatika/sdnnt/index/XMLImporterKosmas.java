@@ -5,7 +5,9 @@
  */
 package cz.inovatika.sdnnt.index;
 
+import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import static cz.inovatika.sdnnt.index.XMLImporterHeureka.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,11 +33,14 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
@@ -52,13 +57,19 @@ import org.xml.sax.SAXException;
 public class XMLImporterKosmas {
 
   public static final Logger LOGGER = Logger.getLogger(XMLImporterKosmas.class.getName());
-  JSONObject ret = new JSONObject();
-  String collection = "imports";
+
+  final String IMPORTS = "imports";
+  final String IMPORTS_DOCUMENTS = "imports_documents";
 
   String import_id;
   String import_date;
   String import_url;
-  String import_origin;
+  int in_sdnnt;
+  final String import_origin = "kosmas";
+  String first_id;
+  String last_id;
+
+  long from_id = -1;
 
   int indexed;
 
@@ -67,47 +78,108 @@ public class XMLImporterKosmas {
 //          new AbstractMap.SimpleEntry<>("ISBN", "ISBN"));
 //  List<String> elements = Arrays.asList("NAME", "AUTHOR", "EAN");
   // https://www.kosmas.cz/atl_shop/nkp.xml
-  public JSONObject fromFile(String uri, String origin) {
-    LOGGER.log(Level.INFO, "Processing {0}", uri);
-    try {
-      long start = new Date().getTime();
-      // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-      ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-      import_date = now.format(DateTimeFormatter.ISO_INSTANT);
-      import_url = uri;
-      import_origin = origin;
-      import_id = now.toEpochSecond() + "";
+  public JSONObject doImport(String path, String from_id, boolean resume) {
+    JSONObject ret = new JSONObject();
+    long start = new Date().getTime();
+    // solr = new ConcurrentUpdateSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+    import_date = now.format(DateTimeFormatter.ISO_INSTANT);
+    import_url = path;
+    import_id = now.toEpochSecond() + "";
+    if (resume) {
+      this.from_id = getLastId();
+    } else if (from_id != null) {
+      this.from_id = Long.parseLong(from_id);
+    }
+    if (path.startsWith("http")) {
+      ret = fromUrl(path, from_id);
+    } else {
+      ret = fromFile(path, from_id);
+    }
+    ret.put("indexed", indexed);
+    ret.put("file", path);
+    ret.put("origin", import_origin);
+    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
+    ret.put("ellapsed", ellapsed);
+    LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+    return ret;
+  }
 
-//      CloseableHttpClient client = HttpClients.createDefault();
-//      HttpGet httpGet = new HttpGet(uri);
-//      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-//        final HttpEntity entity = response1.getEntity();
-//        if (entity != null) {
-//          try (InputStream is = entity.getContent()) {
-//            readXML(is, "ARTICLE");
-//          }
-//        }
-//      } catch (XMLStreamException | IOException exc) {
-//        LOGGER.log(Level.SEVERE, null, exc);
-//        ret.put("error", exc);
-//      }
-      try {
-        File f = new File(uri);
-        InputStream is = new FileInputStream(f);
+  private long getLastId() {
+    long last = -1;
+    Options opts = Options.getInstance();
+    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+      SolrQuery q = new SolrQuery("*").setRows(1)
+              .addFilterQuery("origin:" + import_origin)
+              .setFields("last_id")
+              .setSort("indextime", SolrQuery.ORDER.desc);
+      SolrDocumentList docs = solr.query("imports", q).getResults();
+      if (docs.getNumFound() > 0) {
+        last = Long.parseLong((String) docs.get(0).getFirstValue("last_id")) + 1;
+      }
+      solr.close();
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
+    return last;
+  }
+
+  private void indexImportSummary() throws SolrServerException, IOException {
+    SolrInputDocument idoc = new SolrInputDocument();
+    idoc.setField("id", import_id);
+    idoc.setField("date", import_date);
+    idoc.setField("url", import_url);
+    idoc.setField("origin", import_origin);
+    idoc.setField("first_id", first_id);
+    idoc.setField("last_id", last_id);
+    idoc.setField("processed", false);
+    idoc.setField("num_docs", indexed);
+    idoc.setField("num_in_sdnnt", in_sdnnt);
+    getClient().add(IMPORTS, idoc);
+    getClient().commit(IMPORTS);
+  }
+
+  public JSONObject fromFile(String path, String from_id) {
+    LOGGER.log(Level.INFO, "Processing {0}", path);
+    JSONObject ret = new JSONObject();
+    try {
+      File f = new File(path);
+      try (InputStream is = new FileInputStream(f)) {
         readXML(is, "ARTICLE");
       } catch (XMLStreamException | IOException exc) {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
+      getClient().commit(IMPORTS_DOCUMENTS);
+      indexImportSummary();
 
-      getClient().commit(collection);
+    } catch (SolrServerException | IOException ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+      ret.put("error", ex);
+    }
+    return ret;
+  }
 
-      ret.put("indexed", indexed);
-      ret.put("file", uri);
-      ret.put("origin", origin);
-      String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-      ret.put("ellapsed", ellapsed);
-      LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+  public JSONObject fromUrl(String uri, String from_id) {
+    LOGGER.log(Level.INFO, "Processing {0}", uri);
+    JSONObject ret = new JSONObject();
+    try {
+
+      CloseableHttpClient client = HttpClients.createDefault();
+      HttpGet httpGet = new HttpGet(uri);
+      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+        final HttpEntity entity = response1.getEntity();
+        if (entity != null) {
+          try (InputStream is = entity.getContent()) {
+            readXML(is, "ARTICLE");
+          }
+        }
+      } catch (XMLStreamException | IOException exc) {
+        LOGGER.log(Level.SEVERE, null, exc);
+        ret.put("error", exc);
+      }
+      getClient().commit(IMPORTS_DOCUMENTS);
+      indexImportSummary();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -144,36 +216,52 @@ public class XMLImporterKosmas {
 
   private void toIndex(Map<String, String> item) {
     try {
+      long id = indexed;
+      if (item.containsKey("EAN")) {
+        id = Long.parseLong(item.get("EAN"));
+      }
+      if (first_id == null) {
+        first_id = id+"";
+      }
+      last_id = id+"";
+      if (from_id > id) {
+        return;
+      }
+
       SolrInputDocument idoc = new SolrInputDocument();
       idoc.setField("import_id", import_id);
       idoc.setField("import_date", import_date);
-      idoc.setField("import_url", import_url);
-      idoc.setField("import_origin", import_origin);
 
-      idoc.setField("id", import_id + "_" + item.get("EAN"));
+      idoc.setField("id", import_id + "_" + id);
 
       idoc.setField("item", new JSONObject(item).toString());
 
       addDedup(item);
       addFrbr(item);
-      findInCatalog(item);
 
       idoc.setField("ean", item.get("EAN"));
       idoc.setField("name", item.get("NAME"));
       if (item.containsKey("AUTHOR")) {
         idoc.setField("author", item.get("AUTHOR"));
       }
+      
+      findInCatalog(item);
 
-      idoc.setField("identifiers", item.get("identifiers"));
-      idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
-      idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
-      idoc.setField("catalog", item.get("catalog"));
-      idoc.setField("num_hits", item.get("num_hits"));
-      idoc.setField("hit_type", item.get("hit_type"));
+      if (item.containsKey("found")) {
+        idoc.setField("identifiers", item.get("identifiers"));
+        idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
+        idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
+        // idoc.setField("catalog", item.get("catalog"));
+        idoc.setField("num_hits", item.get("num_hits"));
+        idoc.setField("hit_type", item.get("hit_type"));
+        idoc.setField("item", new JSONObject(item).toString());
+        idoc.setField("dntstav", item.get("dntstav"));
 
-      getClient().add("imports", idoc);
+        getClient().add(IMPORTS_DOCUMENTS, idoc);
+        indexed++;
+      }
 
-      indexed++;
+      
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     }
@@ -197,20 +285,19 @@ public class XMLImporterKosmas {
   public void findInCatalog(Map item) {
     // JSONObject ret = new JSONObject();
     try {
-      String name = ((String) item.get("NAME"));
-      String title = "nazev:(" + ClientUtils.escapeQueryChars(name);
-      if (item.containsKey("AUTHOR")) {
-        title += " " + ClientUtils.escapeQueryChars((String) item.get("AUTHOR"));
+      
+      String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
+      if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
+        title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
       }
-      title += ")";
 
-      String q = "ean:\"" + item.get("EAN") + "\"^100.0 OR " + title;
+      String q = "ean:\"" + item.get("EAN") + "\"^10.0 OR (" + title + ")";
 
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
-              // .setFields("*,score");
-              .setFields("identifier,nazev,score,ean,dntstav,rokvydani");
+              // .addFilterQuery("dntstav:*")
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }
@@ -226,7 +313,7 @@ public class XMLImporterKosmas {
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
       if (docs.length() == 0) {
-        // System.out.println(title);
+        return;
       }
       
       for (Object o : docs) {
@@ -257,6 +344,7 @@ public class XMLImporterKosmas {
         }
 
       }
+      item.put("found", true);
       item.put("hit_type", isEAN ? "ean" : "noean");
       item.put("num_hits", isEAN ? identifiers.size() : jresp.getInt("numFound"));
       item.put("identifiers", identifiers);

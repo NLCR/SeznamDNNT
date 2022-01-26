@@ -31,7 +31,7 @@ export class ImportsComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_vyrazeni', 'actions'];
+  displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_seznamu', 'actions'];
   imports: Import[] = [];
   stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 
@@ -62,7 +62,6 @@ export class ImportsComponent implements OnInit {
     this.loading = true;
     const p = Object.assign({}, params);
 
-    // Docasne pro testovani
     this.imports = [];
     this.searchResponse = null;
     this.facets = null;
@@ -70,19 +69,11 @@ export class ImportsComponent implements OnInit {
       if (!resp.error) {
         this.searchResponse = resp;
         this.imports = resp.response.docs;
-        // this.imports = [];
-        // resp.grouped.import_id.groups.forEach(g => {
-        //   this.imports.push(g.doclist.docs[0]);
-          
-        // });
-
-        // resp.facets.import_id.buckets.forEach(b => {
-        //   this.stats[b.val] = {total: b.count, na_vyrazeni: b.hits_na_vyrazeni};
+        // this.imports.forEach(doc => {
+        //   this.imports.push(doc);
         // });
 
         this.numFound = this.imports.length;
-
-        
         this.loading = false;
       }
     });
@@ -128,9 +119,17 @@ export class ImportsComponent implements OnInit {
   }
 
   process(imp: Import) {
-    this.service.setImportProcessed(imp.id).subscribe(res => {
-      this.search(this.route.snapshot.queryParams);
-    });
+    
+    this.service.getImportNotControlled(imp.id).subscribe(resp => {
+
+      if (resp.response.numFound > 0) {
+        this.service.showSnackBar('nejsou vsechny zkontrollovane');
+      } else {
+        this.service.setImportProcessed(imp.id).subscribe(res => {
+          this.search(this.route.snapshot.queryParams);
+        });
+      }
+  });
   }
 
 }

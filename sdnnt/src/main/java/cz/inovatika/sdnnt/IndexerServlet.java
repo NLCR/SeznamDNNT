@@ -271,7 +271,7 @@ public class IndexerServlet extends HttpServlet {
             JSONObject json = new JSONObject();
             XMLImporterKosmas imp = new XMLImporterKosmas();
             // https://www.kosmas.cz/atl_shop/nkp.xml
-            return imp.fromFile(req.getParameter("url"), "kosmas");
+            return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }
@@ -287,11 +287,7 @@ public class IndexerServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
           try {
             XMLImporterDistri imp = new XMLImporterDistri();
-            if (req.getParameter("url").startsWith("http")) {
-              return imp.fromUrl(req.getParameter("url"), "distri.cz");
-            } else {
-              return imp.fromFile(req.getParameter("url"), "distri.cz");
-            }
+            return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
           } catch (Exception ex) {
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
           }

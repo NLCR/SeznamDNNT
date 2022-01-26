@@ -7,5 +7,6 @@ export class Import {
   first_id: string;
   last_id: string;
   num_docs: number;
+  num_in_sdnnt: number;
 }
 

@@ -34,6 +34,10 @@
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.celkem' | translate }}</th>
         <td mat-cell *matCellDef="let element">{{ element.num_docs }}</td>
       </ng-container>
+      <ng-container matColumnDef="na_seznamu">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_seznamu' | translate }}</th>
+        <td mat-cell *matCellDef="let element">{{ element.num_in_sdnnt }}</td>
+      </ng-container>
       <ng-container matColumnDef="na_vyrazeni">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_vyrazeni' | translate }}</th>
         <td mat-cell *matCellDef="let element"> </td>

@@ -1,20 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import static cz.inovatika.sdnnt.index.OAIHarvester.LOGGER;
-import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -70,6 +61,7 @@ public class XMLImporterHeureka {
   String import_id;
   String import_date;
   String import_url;
+  int in_sdnnt;
   final String import_origin = "heureka";
   String first_id;
   String last_id;
@@ -139,6 +131,7 @@ public class XMLImporterHeureka {
     idoc.setField("last_id", last_id);
     idoc.setField("processed", false);
     idoc.setField("num_docs", indexed);
+    idoc.setField("num_in_sdnnt", in_sdnnt);
     getClient().add(IMPORTS, idoc);
     getClient().commit(IMPORTS);
   }
@@ -341,6 +334,7 @@ public class XMLImporterHeureka {
           if (stavy.contains("A") || stavy.contains("PA")) {
             na_vyrazeni.add(doc.getString("identifier"));
           }
+          in_sdnnt++;
         }
         identifiers.add(doc.toString());
 
