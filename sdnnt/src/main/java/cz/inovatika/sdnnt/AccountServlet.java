@@ -446,7 +446,7 @@ public class AccountServlet extends HttpServlet {
             User user = new UserControlerImpl(req).getUser();
             JSONObject inputJs = ServletsSupport.readInputJSON(req);
             // inputJs.put("controlled", true);
-            return Import.setControlled(inputJs.getString("id"), user.getUsername());
+            return Import.setControlled(inputJs.getString("id"), inputJs.getString("controlled_note"), user.getUsername()); 
           } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());

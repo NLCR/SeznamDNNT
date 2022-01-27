@@ -161,7 +161,7 @@ public class Import {
     }
   }
   
-  public static JSONObject setControlled(String id, String user) {
+  public static JSONObject setControlled(String id, String note, String user) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       
       SolrInputDocument idoc = new SolrInputDocument();
@@ -170,6 +170,9 @@ public class Import {
       Map<String,Object> fieldModifier = new HashMap<>(1);
       fieldModifier.put("set",true);
       idoc.addField("controlled", fieldModifier); 
+      Map<String,Object> fieldModifier1 = new HashMap<>(1);
+      fieldModifier1.put("set", note);
+      idoc.addField("controlled_note", fieldModifier1); 
       
       Map<String,Object> fieldModifier2 = new HashMap<>(1);
       fieldModifier2.put("set",user);

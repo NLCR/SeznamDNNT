@@ -10,6 +10,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DialogHistoryComponent } from 'src/app/components/dialog-history/dialog-history.component';
 import { DialogIdentifierComponent } from 'src/app/components/dialog-identifier/dialog-identifier.component';
+import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from 'src/app/components/dialog-states/dialog-states.component';
 import { GranularityComponent } from 'src/app/components/granularity/granularity.component';
 import { Import } from 'src/app/shared/import';
@@ -257,7 +258,7 @@ export class ImportComponent implements OnInit, OnDestroy {
           if (res.response.docs.length > 0) {
             id.dntstav = [result.newState];
             this.service.changeStavImport(doc).subscribe(res => {
-              this.getDocs(this.route.snapshot.queryParams);
+              // this.getDocs(this.route.snapshot.queryParams);
             });
           }
         });
@@ -278,11 +279,28 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   setControlled(doc) {
-    this.service.setImportControlled(doc).subscribe(res => {
-      doc.controlled = true;
-      doc.controlled_user = this.state.user.username;
-      // this.getDocs(this.route.snapshot.queryParams);
+
+    const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+      width: '700px',
+      data: {caption: 'komentar', label: 'komentar'},
+      panelClass: 'app-register-dialog'
     });
+
+    approveDialogRef.afterClosed().subscribe(result => {
+      const note = result !== null ? result : '';
+
+      doc.controlled_note = note;
+      this.service.setImportControlled(doc).subscribe(res => {
+        doc.controlled = true;
+        doc.controlled_user = this.state.user.username;
+        // this.getDocs(this.route.snapshot.queryParams);
+      });
+
+
+    });
+
+
+    
   }
 
 }

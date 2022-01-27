@@ -65,6 +65,7 @@
     <field name="hits_na_vyrazeni" type="int" indexed="true" stored="true"  />
     <field name="controlled" type="boolean" indexed="true" stored="true" default="false" />
     <field name="controlled_user" type="string" indexed="true" stored="true"  />
+    <field name="controlled_note" type="string" indexed="true" stored="true"  />
     <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
     
     <field name="item" type="text_big" indexed="false" stored="true"  />

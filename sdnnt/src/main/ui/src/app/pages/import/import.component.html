@@ -69,7 +69,7 @@
                   [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
                   <mat-icon class="material-icons-outlined">done</mat-icon>
                 </a>
-                <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}}</span>
+                <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}} <mat-icon *ngIf="doc.controlled_note" [matTooltip]="doc.controlled_note">info</mat-icon></span>
             </mat-card-content>
             <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0">
               <!-- puvodne *ngIf="doc.identifiers?.length > 0" -->
