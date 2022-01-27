@@ -182,6 +182,8 @@
   <field name="indextime" type="date" default="NOW" multiValued="false" indexed="true" stored="true"/>
   <field name="last_id" type="string" indexed="true" stored="true"/>
   <field name="num_docs" type="int" indexed="true" stored="true"/>
+  <field name="skipped" type="int" indexed="true" stored="true"/>
+  <field name="num_items" type="int" indexed="true" stored="true"/>
   <field name="num_in_sdnnt" type="int" indexed="true" stored="true"/>
   <field name="origin" type="string" indexed="true" stored="true"/>
   <field name="processed" type="boolean" indexed="true" stored="true"/>

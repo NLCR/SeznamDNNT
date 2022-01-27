@@ -279,7 +279,9 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   setControlled(doc) {
     this.service.setImportControlled(doc).subscribe(res => {
-      this.getDocs(this.route.snapshot.queryParams);
+      doc.controlled = true;
+      doc.controlled_user = this.state.user.username;
+      // this.getDocs(this.route.snapshot.queryParams);
     });
   }
 

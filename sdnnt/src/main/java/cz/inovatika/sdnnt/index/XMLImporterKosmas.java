@@ -7,7 +7,6 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import static cz.inovatika.sdnnt.index.XMLImporterHeureka.LOGGER;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,7 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -70,7 +68,9 @@ public class XMLImporterKosmas {
   String last_id;
 
   long from_id = -1;
-
+  
+  int total;
+  int skipped;
   int indexed;
 
 //  Map<String, String> fieldsMap = Map.ofEntries(
@@ -97,6 +97,8 @@ public class XMLImporterKosmas {
       ret = fromFile(path, from_id);
     }
     ret.put("indexed", indexed);
+    ret.put("total", total);
+    ret.put("skipped", skipped);
     ret.put("file", path);
     ret.put("origin", import_origin);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
@@ -133,7 +135,9 @@ public class XMLImporterKosmas {
     idoc.setField("first_id", first_id);
     idoc.setField("last_id", last_id);
     idoc.setField("processed", false);
+    idoc.setField("num_items", total);
     idoc.setField("num_docs", indexed);
+    idoc.setField("skipped", skipped);
     idoc.setField("num_in_sdnnt", in_sdnnt);
     getClient().add(IMPORTS, idoc);
     getClient().commit(IMPORTS);
@@ -216,7 +220,8 @@ public class XMLImporterKosmas {
 
   private void toIndex(Map<String, String> item) {
     try {
-      long id = indexed;
+      total++;
+      long id = total;
       if (item.containsKey("EAN")) {
         id = Long.parseLong(item.get("EAN"));
       }

@@ -68,6 +68,8 @@ public class XMLImporterHeureka {
 
   int from_id = -1;
 
+  int total;
+  int skipped;
   int indexed;
 
   Map<String, String> fieldsMap = Map.ofEntries(
@@ -94,11 +96,13 @@ public class XMLImporterHeureka {
       ret = fromFile(path, from_id);
     }
     ret.put("indexed", indexed);
+    ret.put("total", total);
+    ret.put("skipped", skipped);
     ret.put("file", path);
     ret.put("origin", import_origin);
     String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
     ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "FINISHED {0}", indexed);
+    LOGGER.log(Level.INFO, "FINISHED. Total: {0}, Indexed: {1}, Skipped: {2}", new Object[]{total, indexed, skipped});
     return ret;
   }
 
@@ -130,7 +134,9 @@ public class XMLImporterHeureka {
     idoc.setField("first_id", first_id);
     idoc.setField("last_id", last_id);
     idoc.setField("processed", false);
+    idoc.setField("num_items", total);
     idoc.setField("num_docs", indexed);
+    idoc.setField("skipped", skipped);
     idoc.setField("num_in_sdnnt", in_sdnnt);
     getClient().add(IMPORTS, idoc);
     getClient().commit(IMPORTS);
@@ -212,11 +218,18 @@ public class XMLImporterHeureka {
 
   private void toIndex(Map<String, String> item) {
     try {
+      total++;
       if (first_id == null) {
         first_id = item.get("ITEM_ID");
       }
       last_id = item.get("ITEM_ID");
       if (from_id > Integer.parseInt(item.get("ITEM_ID"))) {
+        return;
+      }
+      
+      if (item.containsKey(fieldsMap.get("NAME")) && item.get(fieldsMap.get("NAME")).toLowerCase().contains("[audiokniha]")) {
+        LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", last_id);
+        skipped++;
         return;
       }
 
