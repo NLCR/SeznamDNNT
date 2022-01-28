@@ -189,13 +189,14 @@ public class SearchServlet extends HttpServlet {
         //&facet.range.end=NOW&facet.pivot={!range=r1}dntstav
         JSONObject ret = new JSONObject();
         Options opts = Options.getInstance();
+        String interval = req.getParameter("interval");
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
           SolrQuery query = new SolrQuery("*")
                   .setRows(0)
                   .setFacet(true).setParam("json.nl", "arrntv")
                   .addFacetField("user")
                   .setParam("facet.range", "{!tag=r1}indextime")
-                  .setParam("facet.range.gap", "+1MONTH")
+                  .setParam("facet.range.gap", "+" + interval)
                   .setParam("facet.range.start", "NOW-1YEAR")
                   .setParam("facet.range.end", "NOW")
                   .setParam("facet.range.other", "all")

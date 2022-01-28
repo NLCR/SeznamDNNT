@@ -50,6 +50,8 @@ export class GraphsComponent implements OnInit {
     xaxis: {}
   }
 
+  interval: string = '1MONTH';
+
 
   constructor(private service: AppService) { }
 
@@ -89,8 +91,12 @@ export class GraphsComponent implements OnInit {
       },
       labels: this.facets.license.map(e => this.service.getTranslation('license.' + e.name))
     }
+    this.getStatsHistory();
 
-    this.service.getStatsHistory().subscribe(res => {
+  }
+
+  getStatsHistory() {
+    this.service.getStatsHistory(this.interval).subscribe(res => {
 
       const stats = res.facet_counts.facet_pivot.type;
       this.historyStavOpts = this.setHistoryStats(stats, 'History by type');
@@ -101,7 +107,6 @@ export class GraphsComponent implements OnInit {
   }
 
   setHistoryStats(stats, title): any {
-
     const series = [];
 
     stats.forEach(t => {
@@ -132,10 +137,10 @@ export class GraphsComponent implements OnInit {
 
     // const data= stats.map(e => { return { x: e.name, y: e.value } });
     const data = stats.map(e => e.value);
-    const categories = stats.map(e => e.name );
-    
+    const categories = stats.map(e => e.name);
+
     const opts: any = {};
-    opts.series = [{name: title, data}];
+    opts.series = [{ name: title, data }];
     opts.chart = {
       toolbar: {
         show: false

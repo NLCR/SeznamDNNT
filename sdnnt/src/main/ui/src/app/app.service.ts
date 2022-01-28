@@ -426,9 +426,9 @@ export class AppService {
     return this.get(url, params, false);
   }
 
-  getStatsHistory(): Observable<any> {
+  getStatsHistory(interval: string): Observable<any> {
     let url = 'search/stats_history';
-    const params: HttpParams = new HttpParams();
+    const params: HttpParams = new HttpParams().set('interval', interval);
     return this.get(url, params, false);
   }
 

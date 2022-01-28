@@ -16,6 +16,17 @@
 </div>
 <div fxLayout="row" fxLayoutGap="32px">
   <div fxFlex="100%">
+    <h4>Interval</h4>
+    <mat-form-field appearance="fill">
+      <mat-label>Select interval</mat-label>
+      <mat-select matNativeControl required [(value)]="interval" (valueChange)="getStatsHistory()">
+        <mat-option value="1YEAR">{{ 'year' | translate }}</mat-option>
+        <mat-option value="6MONTH">{{ 'quarter' | translate }}</mat-option>
+        <mat-option value="1MONTH">{{ 'month' | translate }}</mat-option>
+        <mat-option value="7DAYS">{{ 'week' | translate }}</mat-option>
+        <mat-option value="1DAY">{{ 'day' | translate }}</mat-option>
+      </mat-select>
+    </mat-form-field>
     <apx-chart *ngIf="historyUserOpts?.series" [series]="historyUserOpts.series" [chart]="historyUserOpts.chart"
       [title]="historyUserOpts.title" [labels]="historyUserOpts.labels" [xaxis]="historyUserOpts.xaxis"></apx-chart>
   </div>
