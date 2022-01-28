@@ -752,7 +752,8 @@
     "vlozit_korespondenci": "Add correspondence ...",
     "standardni_prihlaseni":"Use application account ...",
     "shibboleth_prihlaseni":"Use EDUid account ...",
-    "Zdroj": "Source"
+    "Zdroj": "Source",
+    "provest_hromadny_navrh": "Make a bulk proposal"
   },
 
   "acts": {

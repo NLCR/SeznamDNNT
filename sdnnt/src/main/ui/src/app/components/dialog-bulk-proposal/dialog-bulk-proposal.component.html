@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>{{ 'desc.hromadny_navrh' | translate }}</h1>
+<div mat-dialog-content>
+  <mat-radio-group class="app-radio-group-vertical">
+    <mat-radio-button value="1">{{ 'desc.navrh_na_zarazeni' | translate }}</mat-radio-button>
+    <mat-radio-button value="2">{{ 'desc.navrh_na_vyrazeni' | translate }}</mat-radio-button>
+    <mat-radio-button value="3">{{ 'desc.omezit_na_terminal' | translate }}</mat-radio-button>
+  </mat-radio-group>
+</div>
+<div mat-dialog-actions>
+  <button mat-flat-button mat-dialog-close  color="primary" (click)="setBulkProposal()">{{ 'desc.provest_hromadny_navrh' | translate }}</button>
+  <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
+</div>

@@ -1,9 +1,12 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDatepickerContent } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DialogBulkProposalComponent } from 'src/app/components/dialog-bulk-proposal/dialog-bulk-proposal.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
@@ -34,7 +37,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
-    public state: AppState
+    public state: AppState,
+    public dialog: MatDialog
   ) { }
 
 
@@ -178,6 +182,14 @@ export class SearchComponent implements OnInit, OnDestroy {
     q.withNotification = this.state.withNotification;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
+
+  openBulkProposal() {
+    const dialogRef = this.dialog.open(DialogBulkProposalComponent, {
+      width: '450px',
+      panelClass: 'app-dialog-bulk-proposal'
+    });
   }
 
 }

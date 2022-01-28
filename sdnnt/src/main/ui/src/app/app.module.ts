@@ -56,6 +56,7 @@ import { DialogSessionExpirationComponent } from './components/dialog-session-ex
 import { DialogDeleteRequestComponent } from './components/dialog-delete-request/dialog-delete-request.component';
 import { DialogCorrespondenceComponent } from './components/dialog-correspondence/dialog-correspondence.component';
 import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
+import { DialogBulkProposalComponent } from './components/dialog-bulk-proposal/dialog-bulk-proposal.component';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -114,6 +115,7 @@ const providers: any[] =[
     DialogDeleteRequestComponent,
     DialogCorrespondenceComponent,
     ShibbolethLandingPageComponent,
+    DialogBulkProposalComponent,
   ],
   imports: [
     BrowserModule,

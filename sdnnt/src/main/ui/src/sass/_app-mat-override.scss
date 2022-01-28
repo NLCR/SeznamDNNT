@@ -202,6 +202,13 @@
         top: calc(50% - 16px);  
       } */
   }
+
+  &.app-radio-group-vertical {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    align-items: flex-start;
+  }
 }
 
 // tooltip
