@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -152,18 +153,6 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(req, new MustBeLogged()).permit()) {
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
 
-            /*
-            SolrQuery query = new SolrQuery("id:" + req.getParameter("id"))
-                    .setRows(1).setFields("*,process:[json]");
-
-            QueryRequest qreq = new QueryRequest(query);
-            NoOpResponseParser rParser = new NoOpResponseParser();
-            rParser.setWriterType("json");
-            qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "zadost");
-
-            return new JSONObject((String) qresp.get("response"));
-            */
             UserControlerImpl uc = new UserControlerImpl(req);
             AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
             return service.getRequest(req.getParameter("id"));
@@ -315,18 +304,23 @@ public class AccountServlet extends HttpServlet {
         if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
             JSONObject inputJs = ServletsSupport.readInputJSON(request);
-            String identifier = inputJs.getString("identifier");
             String zadostJSON = inputJs.getJSONObject("zadost").toString();
             Zadost zadost = Zadost.fromJSON(zadostJSON);
 
-            UserControlerImpl userControler = new UserControlerImpl(request);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
-            String alternativeState = request.getParameter("alternative");
-            if (alternativeState != null) {
-              return service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
-            } else {
-              return service.curatorSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+            List<String> identifiers = Actions.identifiers(inputJs);
+            JSONObject retObject = null;
+            for (String identifier: identifiers) {
+              UserControlerImpl userControler = new UserControlerImpl(request);
+              AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
+              String alternativeState = request.getParameter("alternative");
+              if (alternativeState != null) {
+                retObject = service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
+              } else {
+                retObject = service.curatorSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+              }
             }
+            return retObject;
+
           } catch (ConflictException e) {
             return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
           } catch (AccountException e) {
@@ -345,14 +339,17 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           JSONObject inputJs = ServletsSupport.readInputJSON(request);
-          String identifier = inputJs.getString("identifier");
           String zadostJSON = inputJs.getJSONObject("zadost").toString();
           Zadost zadost = Zadost.fromJSON(zadostJSON);
 
-          UserControlerImpl userControler = new UserControlerImpl(request);
-          AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
-          return service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
-
+          List<String> identifiers = Actions.identifiers(inputJs);
+          JSONObject retObject = null;
+          for (String identifier: identifiers) {
+            UserControlerImpl userControler = new UserControlerImpl(request);
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
+            retObject = service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+          }
+          return retObject;
         } else {
           return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
         }
@@ -559,6 +556,21 @@ public class AccountServlet extends HttpServlet {
         }
       }
     };
+
+    private static List<String> identifiers(JSONObject inputJs) {
+      List<String> identifiers = new ArrayList<>();
+      //String identifier = inputJs.optString("identifier");
+      if (inputJs.has("identifier")) {
+        identifiers.add(inputJs.getString("identifier"));
+      }  else if (inputJs.has("identifiers")) {
+        JSONArray identifiersJsonArray = inputJs.getJSONArray("identifiers");
+        identifiersJsonArray.forEach(id-> {
+          identifiers.add(id.toString());
+        });
+      }
+      return identifiers;
+    }
+
     abstract JSONObject doPerform( HttpServletRequest request, HttpServletResponse response) throws Exception;
   }
 

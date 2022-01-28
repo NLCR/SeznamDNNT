@@ -229,7 +229,7 @@ export class ResultItemComponent implements OnInit {
 
   addToZadostForReduction() {
     // prepare VNX
-    const navrh = this.isZarazeno ? 'VN' : 'NZN';
+    //const navrh = this.isZarazeno ? 'VN' : 'NZN';
     this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
       this.state.currentZadost['VNX']= res;
       this.addToZadostInternal(res.navrh);
