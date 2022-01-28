@@ -752,7 +752,11 @@
     "vlozit_korespondenci": "Vložit korespondenci ...",
     "standardni_prihlaseni":"Standardní přihlášení ...",
     "shibboleth_prihlaseni":"EDUId přihlášení ...",
-    "Zdroj": "Zdroj"
+    "Zdroj": "Zdroj",
+    "provest_hromadny_navrh": "Provést hromadný návrh",
+    "vyrizeni_zadosti": "Vyřízení žádosti",
+    "hromadne_schvalit": "Hromadně schválit",
+    "hromadne_odmitnout": "Hromadně odmítnout"
   },
 
   "acts": {
