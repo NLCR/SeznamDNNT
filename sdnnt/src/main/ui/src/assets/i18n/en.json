@@ -753,7 +753,10 @@
     "standardni_prihlaseni":"Use application account ...",
     "shibboleth_prihlaseni":"Use EDUid account ...",
     "Zdroj": "Source",
-    "provest_hromadny_navrh": "Make a bulk proposal"
+    "provest_hromadny_navrh": "Make a bulk proposal",
+    "vyrizeni_zadosti": "Processing of the application",
+    "hromadne_schvalit": "Bulk approve",
+    "hromadne_odmitnout": "Reject en masse"
   },
 
   "acts": {

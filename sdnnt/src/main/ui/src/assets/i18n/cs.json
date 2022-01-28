@@ -753,7 +753,10 @@
     "standardni_prihlaseni":"Standardní přihlášení ...",
     "shibboleth_prihlaseni":"EDUId přihlášení ...",
     "Zdroj": "Zdroj",
-    "provest_hromadny_navrh": "Provést hromadný návrh"
+    "provest_hromadny_navrh": "Provést hromadný návrh",
+    "vyrizeni_zadosti": "Vyřízení žádosti",
+    "hromadne_schvalit": "Hromadně schválit",
+    "hromadne_odmitnout": "Hromadně odmítnout"
   },
 
   "acts": {
