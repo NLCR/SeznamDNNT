@@ -188,6 +188,38 @@ public class SearchServlet extends HttpServlet {
       }
 
     },
+    STATS_HISTORY {
+      @Override
+      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+         
+        //facet.range={!tag=r1}datum_stavu&facet.range.gap=+1MONTH&facet.range.start=NOW-1YEAR
+        //&facet.range.end=NOW&facet.pivot={!range=r1}dntstav
+        JSONObject ret = new JSONObject();
+        Options opts = Options.getInstance();
+        try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+          SolrQuery query = new SolrQuery("*")
+                  .setRows(0)
+                  .setFacet(true).setParam("json.nl", "arrntv")
+                  .addFacetField("user")
+                  .setParam("facet.range", "{!tag=r1}indextime")
+                  .setParam("facet.range.gap", "+1MONTH")
+                  .setParam("facet.range.start", "NOW-1YEAR")
+                  .setParam("facet.range.end", "NOW")
+                  .setParam("facet.range.other", "all")
+                  .setParam("facet.pivot", "{!range=r1}type","{!range=r1}user");
+          QueryRequest qreq = new QueryRequest(query);
+          NoOpResponseParser rParser = new NoOpResponseParser();
+          rParser.setWriterType("json");
+          qreq.setResponseParser(rParser);
+          NamedList<Object> qresp = solr.request(qreq, "history"); 
+          return new JSONObject((String) qresp.get("response"));
+        } catch (SolrServerException | IOException ex) {
+          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+        }
+      }
+
+    },
     IMPORT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

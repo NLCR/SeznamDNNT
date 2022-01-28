@@ -410,6 +410,12 @@ export class AppService {
     return this.get(url, params, false);
   }
 
+  getStatsHistory(): Observable<any> {
+    let url = 'search/stats_history';
+    const params: HttpParams = new HttpParams();
+    return this.get(url, params, false);
+  }
+
   setImportControlled(doc): Observable<User> {
     let url = '/account/import_document_controlled';
     return this.post(url, doc);

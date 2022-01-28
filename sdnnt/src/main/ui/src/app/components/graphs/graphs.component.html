@@ -1,0 +1,28 @@
+<div fxLayout="row" fxLayoutGap="32px">
+  <div fxFlex="50%">
+    <apx-chart [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
+    </apx-chart>
+  </div>
+  <div fxFlex="50%">
+    <apx-chart [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
+      [labels]="licenseOpts.labels"></apx-chart>
+  </div>
+</div>
+<div fxLayout="row" fxLayoutGap="32px">
+  <div fxFlex="100%">
+    <apx-chart *ngIf="historyUserActivityOpts?.series" [series]="historyUserActivityOpts.series" [chart]="historyUserActivityOpts.chart"
+      [title]="historyUserActivityOpts.title" [labels]="historyUserActivityOpts.labels" [xaxis]="historyUserActivityOpts.xaxis"></apx-chart>
+  </div>
+</div>
+<div fxLayout="row" fxLayoutGap="32px">
+  <div fxFlex="100%">
+    <apx-chart *ngIf="historyUserOpts?.series" [series]="historyUserOpts.series" [chart]="historyUserOpts.chart"
+      [title]="historyUserOpts.title" [labels]="historyUserOpts.labels" [xaxis]="historyUserOpts.xaxis"></apx-chart>
+  </div>
+</div>
+<div fxLayout="row" fxLayoutGap="32px">
+  <div fxFlex="100%">
+    <apx-chart *ngIf="historyStavOpts?.series" [series]="historyStavOpts.series" [chart]="historyStavOpts.chart"
+      [title]="historyStavOpts.title" [labels]="historyStavOpts.labels" [xaxis]="historyStavOpts.xaxis"></apx-chart>
+  </div>
+</div>
