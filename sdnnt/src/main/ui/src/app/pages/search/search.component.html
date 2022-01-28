@@ -20,7 +20,7 @@
               <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox>
             </div>
             <div>
-              <button mat-flat-button color="primary" *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna') && hromadnaZadostEnabled()" (click)="openBulkProposal()">
+              <button mat-stroked-button *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna') && hromadnaZadostEnabled()" (click)="openBulkProposal()">
                 <mat-icon class="material-icons-outlined app-mr-1">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
               </button>
             </div>
