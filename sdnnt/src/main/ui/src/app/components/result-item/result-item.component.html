@@ -87,7 +87,7 @@
         <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
           <mat-icon>link</mat-icon><a>{{ 'desc.odkazy_do_dk' | translate }}</a>
           <mat-menu #menuDKLinks="matMenu">
-            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
+            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank" [matTooltip]="link" matTooltipClass="app-clean-truncated">{{ link }}</a>
           </mat-menu>
         </button>
         <button mat-menu-item *ngIf="dkLinks.length === 1" (click)="goto(dkLinks[0])">
