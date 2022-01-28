@@ -50,3 +50,12 @@
     }
   }
 }
+
+// mat dialog scrollbar fix -> https://github.com/angular/components/issues/8798
+.mat-dialog-content--scrollbar-fix {
+  &:after {
+    content: " ";
+    display: block;
+    height: 10px;
+  }
+}
