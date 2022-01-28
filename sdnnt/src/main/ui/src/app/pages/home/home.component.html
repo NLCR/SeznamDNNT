@@ -21,6 +21,11 @@
       </mat-card>
     </ng-container>
   </div>
+    <mat-card>
+    <mat-card-content>
+      <app-graphs *ngIf="facets" [facets]="facets"></app-graphs>
+    </mat-card-content>
+    </mat-card>
   <mat-tab-group (selectedTabChange)="selectTab($event)"><!--mat-align-tabs="center"-->
     <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
       <div [innerHTML]="tabContent"></div>

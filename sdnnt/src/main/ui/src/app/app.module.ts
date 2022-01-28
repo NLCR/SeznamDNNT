@@ -57,6 +57,8 @@ import { DialogDeleteRequestComponent } from './components/dialog-delete-request
 import { DialogCorrespondenceComponent } from './components/dialog-correspondence/dialog-correspondence.component';
 import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
 import { DialogBulkProposalComponent } from './components/dialog-bulk-proposal/dialog-bulk-proposal.component';
+import { GraphsComponent } from './components/graphs/graphs.component';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -116,6 +118,7 @@ const providers: any[] =[
     DialogCorrespondenceComponent,
     ShibbolethLandingPageComponent,
     DialogBulkProposalComponent,
+    GraphsComponent,
   ],
   imports: [
     BrowserModule,
@@ -137,7 +140,8 @@ const providers: any[] =[
     MatPasswordStrengthModule.forRoot(),
     BrowserAnimationsModule,
     AngularEditorModule,
-    CookieModule.forRoot()
+    CookieModule.forRoot(),
+    NgApexchartsModule
 
     //UserIdleModule.forRoot({idle: 600, timeout: 300, ping: 120})
   ],

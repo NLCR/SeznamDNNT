@@ -15,6 +15,8 @@ export class HomeComponent implements OnInit {
   activeTab: string;
   tabContent: string;
 
+  facets: any;
+
   cardsFacets: object = {
     'A':0,
     'PA':0,
@@ -38,6 +40,8 @@ export class HomeComponent implements OnInit {
 
     const p = Object.assign({}, {});
     this.service.search(p as HttpParams).subscribe((res)=>{
+
+      this.facets = res.facet_counts.facet_fields;
 
       for (let dntstav of res.facet_counts.facet_fields.dntstav) {
         this.cardsFacets[dntstav.name] = dntstav.value;          
