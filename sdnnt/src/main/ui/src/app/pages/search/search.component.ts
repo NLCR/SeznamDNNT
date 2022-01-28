@@ -16,6 +16,7 @@ import { Zadost } from 'src/app/shared/zadost';
 export class SearchComponent implements OnInit, OnDestroy {
 
   subs: Subscription[] = [];
+  actions: string[] = [];
 
   loading: boolean;
   docs: SolrDocument[];
@@ -68,6 +69,21 @@ export class SearchComponent implements OnInit, OnDestroy {
             }  
           });
         });
+      }
+      // global actions
+      if (resp.actions) {
+        for (let key in resp.actions) {
+          let object = resp.actions[key];
+          if (object.workflows) {
+            let workflows: string[] = object.workflows;
+            object.workflows.forEach(workflow=> {
+              let acts: string[] = this.actions;
+              if (acts.indexOf(workflow) > -1) {
+                this.actions.push(workflow);
+              }
+            });
+          }
+        }
       }
       if (resp.notifications) {
         this.docs.forEach(doc => {

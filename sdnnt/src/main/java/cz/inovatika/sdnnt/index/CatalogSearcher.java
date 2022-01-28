@@ -16,8 +16,11 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
+import cz.inovatika.sdnnt.model.workflow.ZadostType;
+import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import org.apache.commons.lang.WordUtils;
@@ -76,15 +79,44 @@ public class CatalogSearcher {
       NamedList<Object> qresp = solr.request(qreq, "catalog");
       ret = new JSONObject((String) qresp.get("response"));
       if (ret.getJSONObject("response").getInt("numFound") > 0) {
+
         List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
         JSONArray zadosti = findZadosti(user, ids);
         ret.put("zadosti", zadosti);
         if (user != null) {
-          JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
-          ret.put("notifications", notifications);
+            JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
+            ret.put("notifications", notifications);
         }
-      }
 
+        // pouze typy
+        JSONObject groupActions = new JSONObject();
+
+        SearchResultsUtils.iterateResult(ret, (doc)->{
+            String key = doc.getString(MarcRecordFields.IDENTIFIER_FIELD);
+
+            JSONObject jsonObject = new JSONObject();
+            JSONArray license = doc.optJSONArray(MarcRecordFields.LICENSE_FIELD);
+            JSONArray dntStavyJSONArray = doc.optJSONArray(MarcRecordFields.DNTSTAV_FIELD);
+            JSONArray kuratorStavyJSONArray = doc.optJSONArray(MarcRecordFields.KURATORSTAV_FIELD);
+
+            List<String> publicStates = new ArrayList<>();
+            dntStavyJSONArray.forEach(o-> {publicStates.add(o.toString());});
+
+            List<String> curatorStates = new ArrayList<>();
+          kuratorStavyJSONArray.forEach(o-> {curatorStates.add(o.toString());});
+
+            if (dntStavyJSONArray != null) {
+              List<ZadostType> zadostTypes = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null ? license.getString(0) : null);
+              JSONArray actions = new JSONArray();
+              zadostTypes.stream().map(ZadostType::name).forEach(actions::put);
+              jsonObject.put("workflows",actions);
+            }
+            jsonObject.put(MarcRecordFields.DNTSTAV_FIELD, dntStavyJSONArray != null ? dntStavyJSONArray : new JSONArray());
+            groupActions.put(key, jsonObject);
+        });
+        ret.put("actions", groupActions);
+
+      }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
@@ -179,6 +211,7 @@ public class CatalogSearcher {
       if (req.containsKey("page")) {
         start = Integer.parseInt(req.get("page")) * rows;
       }
+
       SolrQuery query = new SolrQuery("*")
             .setRows(rows)
             .setStart(start) 

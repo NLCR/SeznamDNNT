@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /** Search results utils */
@@ -18,6 +19,11 @@ public class SearchResultsUtils {
 
     private SearchResultsUtils() {}
 
+    /**
+     * Returns ids from result
+     * @param ret List of ids
+     * @return
+     */
     public static List<String> getIdsFromResult(JSONObject ret) {
       List<String> ids = new ArrayList<>();
       for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
@@ -27,14 +33,14 @@ public class SearchResultsUtils {
       return ids;
     }
 
-    public static List<JSONObject> getDocsFromResult(JSONObject ret) {
-        List<JSONObject> res = new ArrayList<>();
+    public static void  iterateResult(JSONObject ret, Consumer<JSONObject> consumer) {
+        List<String> ids = new ArrayList<>();
         for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
             JSONObject doc = (JSONObject) o;
-            res.add(doc);
+            consumer.accept(doc);
         }
-        return res;
     }
+
 
 
     public static  void removePublicStatesFromCuratorStatesFacets(JSONObject ret) {

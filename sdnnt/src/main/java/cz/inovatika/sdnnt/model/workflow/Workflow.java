@@ -41,9 +41,26 @@ public abstract class Workflow {
     }
 
 
+    /**
+     * Pokud ma alternativni prechod, umozni ho
+     * @param alternative Nazev alternativniho prechodu
+     * @return
+     */
     public abstract WorkflowState nextAlternativeState(String alternative);
+
+    /**
+     * Vraci true, pokud existuje alternativni prechod
+     * @param alternative
+     * @return
+     */
     public abstract  boolean isAlternativeSwitchPossible(String alternative);
 
+    /**
+     * Vytvari jmeno prechodu, uklada se do historie
+     * @param currentState Jmeno prechodu
+     * @param currentLicense Jmeno licence
+     * @return Formatovane jmeno prechodu
+     */
     public String createTransitionName(String currentState, String currentLicense) {
 
         String currentStateName = currentState != null ? currentState : "_";

@@ -2,9 +2,11 @@ package cz.inovatika.sdnnt.model.workflow.document;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,6 +24,50 @@ public class DocumentWorkflowFactory {
         return null;
     }
 
+    public static List<ZadostType> canBePartOfZadost(List<String> kuratorstav, List<String> stav, String license) {
+        CuratorItemState curatorItemState = null;
+        if (kuratorstav != null && !kuratorstav.isEmpty()) {
+            curatorItemState = CuratorItemState.valueOf(kuratorstav.get(0));
+        }
+
+        PublicItemState publicItemState = null;
+        if (stav != null && !stav.isEmpty()) {
+            publicItemState = PublicItemState.valueOf(stav.get(0));
+        }
+
+        DocumentCheckProxy checkProxy = new DocumentCheckProxy(curatorItemState, publicItemState, license);
+
+        List<ZadostType> zadostTypes = new ArrayList<>();
+        if(nznDocument(kuratorstav)) {
+            NZNWorkflow nznWorkflow = new NZNWorkflow(checkProxy);
+            WorkflowState workflowState = nznWorkflow.nextState();
+            if (workflowState != null) {
+                zadostTypes.add(ZadostType.NZN);
+            }
+        }
+        if (vnlDocument(kuratorstav)) {
+            VNLWorkflow vnlWorkflow = new VNLWorkflow(checkProxy);
+            WorkflowState workflowState = vnlWorkflow.nextState();
+            if (workflowState != null) {
+                zadostTypes.add(ZadostType.VNL);
+            }
+        }
+        if (vnzDocument(kuratorstav)) {
+            VNZWorkflow vnzWorkflow = new VNZWorkflow(checkProxy);
+            WorkflowState workflowState = vnzWorkflow.nextState();
+            if (workflowState != null) {
+                zadostTypes.add(ZadostType.VNZ);
+            }
+        }
+        if (vnDocument(kuratorstav)) {
+            VNZWorkflow pxWorkflow = new VNZWorkflow(checkProxy);
+            WorkflowState workflowState = pxWorkflow.nextState();
+            if (workflowState != null) {
+                zadostTypes.add(ZadostType.VN);
+            }
+        }
+        return  zadostTypes;
+   }
 
     public static Workflow create(MarcRecord record, Zadost zadost) {
         List<String> kuratorstav = record.kuratorstav;
@@ -51,6 +97,7 @@ public class DocumentWorkflowFactory {
         return null;
     }
 
+    // jakykoliv stav ve workflow
     private static boolean vnlDocument(List<String> kuratorstav) {
 
         return  kuratorstav.contains(CuratorItemState.NL.name()) ||

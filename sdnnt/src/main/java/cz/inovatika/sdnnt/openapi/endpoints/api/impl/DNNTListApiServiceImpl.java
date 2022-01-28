@@ -68,6 +68,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
 
+
+
         final ListitemResponse response = new ListitemResponse();
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
@@ -345,7 +347,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Collection<Object> mlinks956u =  doc.getFieldValues("marc_956u");
 
         Collection<Object> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD);
-        //Collection<Object> minstitutions910a = doc.getFieldValues("marc_910a");
 
         final List<String> links = new ArrayList<>();
         if (mlinks911u != null && !mlinks911u.isEmpty()) {

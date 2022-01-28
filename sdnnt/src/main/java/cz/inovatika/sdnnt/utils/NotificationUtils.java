@@ -23,7 +23,6 @@ public class NotificationUtils {
     public static JSONArray findNotifications(List<String> identifiers, String user, SolrClient solr) {
       try {
         if (!identifiers.isEmpty()) {
-          //SolrClient solr = Indexer.getClient();
           String q = identifiers.toString().replace("[", "(").replace("]", ")").replaceAll(",", "");
           SolrQuery query = new SolrQuery("identifier:" + q)
                   .addFilterQuery("user:" + user)
