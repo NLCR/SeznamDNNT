@@ -16,7 +16,12 @@ import { Zadost } from 'src/app/shared/zadost';
 export class SearchComponent implements OnInit, OnDestroy {
 
   subs: Subscription[] = [];
+  // all actions
   actions: string[] = [];
+  // ident x actions mapping
+  identifiersAndActionsMapping = new Map<string, string[]>(); 
+
+
 
   loading: boolean;
   docs: SolrDocument[];
@@ -70,15 +75,19 @@ export class SearchComponent implements OnInit, OnDestroy {
           });
         });
       }
+
       // global actions
+      this.actions = [];
+      this.identifiersAndActionsMapping = new Map<string, string[]>(); 
       if (resp.actions) {
         for (let key in resp.actions) {
           let object = resp.actions[key];
           if (object.workflows) {
             let workflows: string[] = object.workflows;
+            this.identifiersAndActionsMapping.set(key, workflows);
             object.workflows.forEach(workflow=> {
               let acts: string[] = this.actions;
-              if (acts.indexOf(workflow) > -1) {
+              if (acts.indexOf(workflow) < 0 ) {
                 this.actions.push(workflow);
               }
             });
@@ -98,37 +107,64 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;
-      // this.service.stopLoading();
     });
 
   }
 
-  /*
-  addToZadost() {
-    if (!this.hasStateFilter) {
-      return;
-    }
-    let isZarazeno = false;
-    isZarazeno = this.state.usedFilters.find(f => f.field === 'dntstav').value.includes('A');
-    const new_stav = isZarazeno ? 'VVS' : 'NZN'
+  hromadnaZadostEnabled() {
+    return this.identifiersAndActionsMapping.size  > 0;
+  } 
 
-    if (!this.state.currentZadost[new_stav]) {
-        
-      const z = new Zadost(new Date().getTime() + '', this.state.user.username);
-      z.navrh = new_stav;
-      z.identifiers = [];
-      this.state.currentZadost[new_stav] = z;
-    }
+  /** Pripravi a ulozi zadost po te reload */
+  saveZadost(navrh: string, identifiers: string[]) {
+    const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
+    if  (!this.state.currentZadost[key].identifiers) {
+      this.state.currentZadost[key].identifiers = [];
+    }    
+    identifiers.forEach(ident=> {
+      this.state.currentZadost[key].identifiers.push(ident);
+    });
 
-    this.state.currentZadost[new_stav].identifiers = this.state.currentZadost[new_stav].identifiers.concat(this.docs.map(doc => doc.identifier));
-    this.service.saveZadost(this.state.currentZadost[new_stav]).subscribe((res: any) => {
+    this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+
+        // reload docs
+        this.subs.push(this.route.queryParams.subscribe(val => {
+          this.search(val);
+        }));
+
       }
     });
-  }*/
+  }
+
+  /**
+   * Hromadna zadost 
+   */
+  addHromadnaZadost() {
+    let identiefiers = [];
+    let selectedAction = this.actions[0];
+    this.identifiersAndActionsMapping.forEach((actions: string[], ident: string) => {
+        if(actions.indexOf(selectedAction) > -1 ) {
+          identiefiers.push(ident);
+        }
+    });
+    if (identiefiers && identiefiers.length > 0) {
+      if (selectedAction === 'VNZ' || selectedAction === 'VNL') {
+        this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
+          this.state.currentZadost['VNX']= res;
+          this.saveZadost(selectedAction, identiefiers);
+        });
+      } else {
+        this.service.prepareZadost([selectedAction]).subscribe((res: Zadost) => {
+          this.state.currentZadost[selectedAction]= res;
+          this.saveZadost(selectedAction, identiefiers);
+        });
+      }
+    }
+  }
 
   viewFullCatalog() {
     const q: any = {};

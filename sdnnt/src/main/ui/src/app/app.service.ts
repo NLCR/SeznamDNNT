@@ -242,10 +242,26 @@ export class AppService {
     return this.post(url, { identifier, zadost, reason }, params);
   }
 
+  approveItems(identifiers: string[], zadost: Zadost, reason: string, alternative: string): Observable<string> {
+    let url = '/account/approve';
+    let params: HttpParams = new HttpParams();
+    if (alternative != null) {
+      params = params.append('alternative', alternative);
+    }
+    return this.post(url, { identifiers, zadost, reason }, params);
+  }
+
+
   rejectItem(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject';
     const params: HttpParams = new HttpParams();
     return this.post(url, { identifier, zadost, reason }, params);
+  }
+
+  rejectItems(identifiers: string[], zadost: Zadost, reason: string): Observable<string> {
+    let url = '/account/reject';
+    const params: HttpParams = new HttpParams();
+    return this.post(url, { identifiers, zadost, reason }, params);
   }
 
   // rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
