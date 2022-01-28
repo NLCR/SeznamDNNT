@@ -121,10 +121,14 @@ table {
   
     tbody {
       tr {
+        background-color: $app-gray-1;
+
+        &:nth-child(even) {
+          background-color: $app-color-lightnes;
+        }
+
         &:hover {
-          td {
-            background-color: $app-gray-2;
-          }
+          background-color: $app-gray-2;
         }
   
         td {
@@ -132,7 +136,6 @@ table {
           border-width: 0 1px 1px 0;
           border-style: solid;
           border-color: $app-tbc;
-          background-color: $app-gray-1;
           padding: 4px 8px;
           vertical-align: top;
   
@@ -146,8 +149,9 @@ table {
           }
   
           &.app-cell-action {
+            @extend .app-text-right;
             @include setStateColor(color);
-            width: 180px;
+            width: 60px;
             font-weight: 500;
   
             a {

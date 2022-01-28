@@ -37,129 +37,98 @@
         <ng-container *ngFor="let doc of docs">
           <mat-card class="app-view-import">
             <mat-card-content>
-              <ng-container *ngIf="doc.name">
-                <strong class="app-text-cutter" [matTooltip]="doc.name" matTooltipPosition="below"
-                  style="max-width: 950px;">{{ doc.name }}</strong>
-                <span class="app-pipe"></span>
-              </ng-container>
-              <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.hit_type">
-                <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'"
-                  [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
-                  {{ doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
-                </mat-icon>
-                <span class="app-pipe"></span>
-              </ng-container>
-              <ng-container *ngIf="doc.item.URL"><a [href]="sanitize(doc.item.URL)" target="_blank"
-                  [matTooltip]="'desc.otevrit_zdroj' | translate">
-                  <mat-icon>link</mat-icon>
-                </a><span class="app-pipe"></span></ng-container>
-              <ng-container *ngIf="doc.eanAlephLink"><a [href]="sanitize(doc.eanAlephLink)" target="_blank"
-                  [matTooltip]="'desc.otevrit_zdroj' | translate">SKC</a><span class="app-pipe"></span></ng-container>
-
-
-              <ng-container *ngIf="doc.ean"><a [href]="'http://google.com/search?q=' + doc.ean" target="_blank"
-                  [matTooltip]="'desc.hledat_na_google' | translate">
-                  <mat-icon>travel_explore</mat-icon>
-                </a><span class="app-pipe"></span></ng-container>
-
-               <a *ngIf="!doc.controlled" class="app-right" (click)="setControlled(doc)" 
-                  [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
-                  <mat-icon class="material-icons-outlined">done</mat-icon>
-                </a>
-                <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}} <mat-icon *ngIf="doc.controlled_note" [matTooltip]="doc.controlled_note">info</mat-icon></span>
+              <div fxLayout="row" fxLayoutGap="32px">
+                <div fxFlex="calc(100% - 400px)">
+                  <ng-container *ngIf="doc.name">
+                    <strong [matTooltip]="doc.name" matTooltipPosition="below">{{ doc.name }}</strong><br />
+                  </ng-container>
+                </div>
+                <div>
+                  <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
+                  <ng-container *ngIf="doc.hit_type">
+                    <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'"
+                      [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
+                      {{ doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
+                    </mat-icon>
+                    <span class="app-pipe"></span>
+                  </ng-container>
+                  <ng-container *ngIf="doc.item.URL">
+                    <a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span>
+                  </ng-container>
+                  <ng-container *ngIf="doc.eanAlephLink">
+                    <a [href]="sanitize(doc.eanAlephLink)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate">SKC</a><span class="app-pipe"></span>
+                  </ng-container>
+                  <ng-container *ngIf="doc.ean">
+                    <a [href]="'http://google.com/search?q=' + doc.ean" target="_blank" [matTooltip]="'desc.hledat_na_google' | translate"><mat-icon>travel_explore</mat-icon></a><span class="app-pipe"></span>
+                  </ng-container>
+                  <a *ngIf="!doc.controlled" class="app-right" (click)="setControlled(doc)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
+                    <mat-icon class="material-icons-outlined">done</mat-icon>
+                  </a>
+                  <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}} <mat-icon *ngIf="doc.controlled_note" [matTooltip]="doc.controlled_note">info</mat-icon></span>
+                </div>
+              </div>
             </mat-card-content>
             <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0">
-              <!-- puvodne *ngIf="doc.identifiers?.length > 0" -->
               <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
                 <tbody>
                   <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
                     <tr>
-                      <td [class.approved]="id.approved">
-                        <!-- <ng-container *ngIf="id.identifier"><a [href]="alephLink(id.identifier)" target="_blank">{{ id.identifier }}</a><span class="app-pipe"></span></ng-container> -->
-                        <ng-container *ngIf="id.nazev">{{ id.nazev }}<span class="app-pipe"></span></ng-container>
-                        <!-- <ng-container *ngIf="id.dntstav"><span [class]="id.dntstav[0]">{{ id.dntstav }}</span><span class="app-pipe"></span></ng-container> -->
-                        <ng-container *ngIf="id.ean">
-                          <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below"
-                            matTooltipClass="app-clean-truncated" style="max-width: 600px;">{{ id.ean }}</span>
-                          <span class="app-pipe"></span>
-                        </ng-container>
-
-                        <div fxFlex fxFlexAlign="flex-end">
-                          <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav"
-                            [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
-                            {{ id.dntstav[id.dntstav.length-1] }}
-                          </div>
-                          <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1"
-                            [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
-                            <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ?
-                              'camera_alt' : 'no_photography' }}</mat-icon>
-                            {{ 'license.' + id.license + '-badge' | translate }}
-                          </div>
-                          <ng-container
-                            *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
-                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]"
-                              *ngIf="id.kuratorstav"
-                              [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
-                              {{ id.kuratorstav[id.kuratorstav.length-1] }}
-                            </div>
-                          </ng-container>
+                      <td [class.approved]="id.approved" colspan="2">
+                        <div>
+                          <ng-container *ngIf="id.nazev">{{ id.nazev }}</ng-container>
                         </div>
-
-
+                        <div fxLayout="row" fxLayoutGap="32px" class="app-pt-1 app-pb-1">
+                          <div fxFlex>
+                            <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
+                              {{ id.dntstav[id.dntstav.length-1] }}
+                            </div>
+                            <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
+                              <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                              {{ 'license.' + id.license + '-badge' | translate }}
+                            </div>
+                            <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
+                              <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                                {{ id.kuratorstav[id.kuratorstav.length-1] }}
+                              </div>
+                            </ng-container>
+                          </div>
+                          <div>
+                            <!-- <ng-container *ngIf="id.approved">
+                              {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
+                            </ng-container> -->
+                            <a [matMenuTriggerFor]="menuMore">
+                              <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
+                            </a>
+                            <mat-menu #menuMore="matMenu">
+                              <button mat-menu-item *ngIf="id.identifier"  (click)="gotoAleph(id)">
+                                <mat-icon>link</mat-icon>
+                                <a [href]="alephLink(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+                              </button>
+                              <button mat-menu-item (click)="showIdentifiers(id)">
+                                <mat-icon>fingerprint</mat-icon>
+                                <a>{{ 'desc.identifikatory' | translate }}</a>
+                              </button>
+                              <button mat-menu-item (click)="showHistory(id)">
+                                <mat-icon>update</mat-icon>
+                                <a>{{ 'desc.historie_zmen' | translate }}</a>
+                              </button>
+                              <button mat-menu-item (click)="showStates(doc,id)">
+                                <mat-icon>edit</mat-icon>
+                                <a>{{ 'desc.zmenit_stav'| translate }}</a>
+                              </button>
+                              <button mat-menu-item *ngIf="id.granularity && id.granularity.length > 1" (click)="showGranularity(id)">
+                                <mat-icon>format_list_numbered</mat-icon>
+                                <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
+                              </button>
+                            </mat-menu>
+                          </div>
+                        </div>
                       </td>
-                      <td class="app-cell-action" [class.approved]="id.approved">
-                        <ng-container *ngIf="id.approved">
-                          {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
-                        </ng-container>
-                        <!-- <a *ngIf="!id.approved && id.dntstav && (id.dntstav.includes('A') || id.dntstav.includes('PA'))" (click)="approve(doc, id.identifier)">
-                        {{ 'desc.schvalit_zmenu_na_vyrazeni' | translate }}
-                      </a>   -->
-
-                        <a [matMenuTriggerFor]="menuMore">
-                          <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' |
-                          translate }}
-                        </a>
-
-                        <mat-menu #menuMore="matMenu">
-                          <!-- <button mat-menu-item *ngIf="dkLinks.length > 1" [matMenuTriggerFor]="menuDKLinks">
-                          <mat-icon>link</mat-icon><a>{{ 'desc.odkazy_do_dk' | translate }}</a>
-                          <mat-menu #menuDKLinks="matMenu">
-                            <a mat-menu-item *ngFor="let link of dkLinks" [href]="link" target="_blank">{{ link }}</a>
-                          </mat-menu>
-                        </button>
-                        <button mat-menu-item *ngIf="dkLinks.length === 1" (click)="goto(dkLinks[0])">
-                          <mat-icon>link</mat-icon>
-                          <a [href]="dkLinks[0]" target="_blank">
-                            {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
-                          </a>
-                        </button> -->
-                          <button mat-menu-item *ngIf="id.identifier"  (click)="gotoAleph(id)">
-                            <mat-icon>link</mat-icon>
-                            <a [href]="alephLink(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate
-                              }}</a>
-                          </button>
-                          <button mat-menu-item (click)="showIdentifiers(id)">
-                            <mat-icon>fingerprint</mat-icon>
-                            <a>{{ 'desc.identifikatory' | translate }}</a>
-                          </button>
-                          <button mat-menu-item (click)="showHistory(id)">
-                            <mat-icon>update</mat-icon>
-                            <a>{{ 'desc.historie_zmen' | translate }}</a>
-                          </button>
-                          <button mat-menu-item (click)="showStates(doc,id)">
-                            <mat-icon>edit</mat-icon>
-                            <a>{{ 'desc.zmenit_stav'| translate }}</a>
-                          </button>
-                          <button mat-menu-item *ngIf="id.granularity && id.granularity.length > 1" (click)="showGranularity(id)">
-                            <mat-icon>format_list_numbered</mat-icon>
-                            <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
-                          </button>
-                        </mat-menu>
-
-                      </td>
+                     <!--  <td *ngIf="id.ean" class="app-cell-ean">
+                        <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated">{{ id.ean }}</span>
+                      </td> -->
                     </tr>
                   </ng-container>
                 </tbody>
