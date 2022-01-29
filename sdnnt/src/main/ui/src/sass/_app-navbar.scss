@@ -34,5 +34,12 @@ app-navbar {
         border: 1px solid $app-color-primary;
       }
     }
+
+    &.app-nav-mobile {
+      .mat-stroked-button {
+        @extend .app-pl-0, .app-pr-0;
+        min-width: 40px;
+      }
+    }
   }
 }
