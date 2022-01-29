@@ -1,19 +1,27 @@
 <mat-toolbar>
   <div fxLayout="row" fxFlexFill fxLayoutAlign="start center" fxLayoutGap="32px">
-    <div class="app-left">
+    <div class="app-left" [class.app-logo-hide]="isSearchBar">
         <a routerLink="/" fxFlexAlign="center" [title]="'app_title' | translate">
           <div class="app-logo"></div>
         </a>
     </div>
-    <div fxFlex>
-      <app-searchbar></app-searchbar>
+    <div fxFlex class="app-mr-4">
+      <app-searchbar [class.app-searchbar-hide]="!isSearchBar"></app-searchbar>
     </div>
-    <div class="app-right app-nav-mobile"><!--fxHide.gt-sm-->
+    <div class="app-right app-nav-mobile">
+      <a mat-stroked-button class="app-search" (click)="showingSearchBar()">
+        <mat-icon>
+          <ng-container [ngSwitch]="isSearchBar">
+            <ng-container *ngSwitchCase="false">search</ng-container>
+            <ng-container *ngSwitchDefault>search_off</ng-container>
+          </ng-container>
+        </mat-icon>
+      </a>  
       <a mat-stroked-button (click)="onToggleSidenav()" class="app-menu">
         <mat-icon>menu</mat-icon>
       </a>  
     </div>
-    <div class="app-right app-nav-desktop"><!-- fxHide.sm fxHide.xs -->
+    <div class="app-right app-nav-desktop">
       <!-- <a mat-stroked-button routerLink="home" routerLinkActive="app-active" [title]="'Home' | translate">
         <mat-icon class="material-icons-outlined">home</mat-icon> {{ 'desc.domu' | translate }}
       </a> -->

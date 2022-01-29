@@ -24,7 +24,7 @@ app-navbar {
         }
 
         .mat-icon {
-          &:not(.app-menu .mat-icon) {
+          &:not(.app-menu .mat-icon, .app-search .mat-icon) {
             @include setIcon($size: 20, $position: sub);
           }
         }

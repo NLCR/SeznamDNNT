@@ -21,6 +21,8 @@ export class NavbarComponent implements OnInit {
 
   now = new Date();
 
+  public isSearchBar: boolean = false;
+
   //simpleLogin: boolean = false;
 
   constructor(
@@ -111,6 +113,10 @@ export class NavbarComponent implements OnInit {
     if (!this.state.user.thirdpartyuser) {
       this.router.navigate(['/userpswd'], {});
     }
+  }
+
+  showingSearchBar() {
+    this.isSearchBar =! this.isSearchBar;
   }
 
 }

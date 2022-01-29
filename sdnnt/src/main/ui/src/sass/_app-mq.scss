@@ -1,15 +1,33 @@
 // --- MEDIA QUERIES ---
 
 app-navbar {
-  .app-nav-mobile {
-    @media #{$gt-sm} {
+  @media #{$gt-sm} {
+    .app-nav-mobile {
       display: none;
     }
   }
 
-  .app-nav-desktop {
-    @media #{$lt-md} {
+  @media #{$gt-xs} {
+    .app-search {
       display: none;
+    }
+  }
+
+  @media #{$lt-md} {
+    .app-nav-desktop {
+      display: none;
+    }
+  }
+
+  @media #{$lt-sm} {
+    .app-logo-hide {
+      display: none;
+    }
+
+    app-searchbar {
+      &.app-searchbar-hide {
+        display: none;
+      }
     }
   }
 }
