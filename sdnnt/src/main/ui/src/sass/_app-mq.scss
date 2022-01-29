@@ -1,20 +1,20 @@
 // --- MEDIA QUERIES ---
 
 app-navbar {
-  @media #{$gt-sm} {
+  @media only screen and (min-width: 1100px){
     .app-nav-mobile {
+      display: none;
+    }
+  }
+
+  @media only screen and (max-width: 1099px) {
+    .app-nav-desktop {
       display: none;
     }
   }
 
   @media #{$gt-xs} {
     .app-search {
-      display: none;
-    }
-  }
-
-  @media #{$lt-md} {
-    .app-nav-desktop {
       display: none;
     }
   }
