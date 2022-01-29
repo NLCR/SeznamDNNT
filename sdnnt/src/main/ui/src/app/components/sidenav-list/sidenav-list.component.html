@@ -1,4 +1,7 @@
 <mat-nav-list>
+  <a mat-list-item routerLink="/" fxFlexAlign="center" [title]="'app_title' | translate" class="app-mb-2">
+    <div class="app-logo"></div>
+  </a>
   <a mat-list-item routerLink="home" (click)="onSidenavClose()" routerLinkActive="app-active" [title]="'Home' | translate">
     <mat-icon>home</mat-icon> {{ 'desc.domu' | translate }}
   </a>

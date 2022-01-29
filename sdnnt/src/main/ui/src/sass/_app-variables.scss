@@ -89,4 +89,23 @@ $app-footer-bg: $app-gray-9 !default;
 $app-footer-color: rgba($app-color-lightnes, .6) !default;
 
 // mat radio button
-$app-mat-radio-button-size: 16px !default
+$app-mat-radio-button-size: 16px !default;
+
+// mq break point
+$xxs: 'only screen and (min-width: 400px) and (max-width: 599px)';
+$xs: 'only screen and (max-width: 599px)';
+$sm: 'only screen and (min-width: 600px) and (max-width: 959px)';
+$md: 'only screen and (min-width: 960px) and (max-width: 1279px)';
+$lg: 'only screen and (min-width: 1280px) and (max-width: 1919px)';
+$xl: 'only screen and (min-width: 1920px) and (max-width: 5000px)';
+
+$lt-660: 'only screen and (max-width: 660px)';
+$lt-sm: 'only screen and (max-width: 599px)';
+$lt-md:	'only screen and (max-width: 959px)';
+$lt-lg:	'only screen and (max-width: 1279px)';
+$lt-xl:	'only screen and (max-width: 1919px)';
+
+$gt-xs:	'only screen and (min-width: 600px)';
+$gt-sm:	'only screen and (min-width: 960px)';
+$gt-md:	'only screen and (min-width: 1280px)';
+$gt-lg:	'only screen and (min-width: 1920px)';

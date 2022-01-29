@@ -293,3 +293,10 @@ table {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+// common elements
+.app-logo {
+  width: 130px;
+  height: 30px;
+  background-image: url(#{$app-logo});
+}

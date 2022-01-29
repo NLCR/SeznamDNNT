@@ -2,6 +2,7 @@
   "q" : {
     "placeholder": "Browse documents ..."
   },
+  "app_title": "List of works not available on the market",
   "consent": {
     "text": "This website uses cookies to provide services, personalize ads and analyze traffic. By using this website, you agree to this.",
     "button": "I agree"

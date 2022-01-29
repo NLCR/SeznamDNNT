@@ -1,0 +1,16 @@
+// --- MEDIA QUERIES ---
+
+app-navbar {
+  .app-nav-mobile {
+    @media #{$gt-sm} {
+      display: none;
+    }
+  }
+
+  .app-nav-desktop {
+    @media #{$lt-md} {
+      display: none;
+    }
+  }
+}
+

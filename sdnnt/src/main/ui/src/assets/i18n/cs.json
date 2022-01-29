@@ -2,6 +2,7 @@
   "q" : {
     "placeholder": "Procházet dokumenty ..."
   },
+  "app_title": "Seznam děl nedostupných na trhu",
   "consent": {
     "text": "Tento web používá k poskytování služeb, personalizaci reklam a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.",
     "button": "Souhlasím"
