@@ -795,7 +795,7 @@ public class Zadost implements NotNullAwareObject{
 
       String newProcess = new JSONObject().put("process", zadost.process).toString();
       // history must be updated after success
-      new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost");
+      new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId());
       return save(client, zadost);
     } catch (JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -822,7 +822,7 @@ public class Zadost implements NotNullAwareObject{
       zadost.addProcess(identifier, zprocess);
 
       String newProcess = new JSONObject().put("process", zadost.process).toString();
-      new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost");
+      new HistoryImpl(Indexer.getClient()).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId());
       return save(zadost);
     } catch (JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);

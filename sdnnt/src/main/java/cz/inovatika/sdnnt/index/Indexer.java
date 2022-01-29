@@ -248,7 +248,7 @@ public class Indexer {
       SolrQuery q = new SolrQuery("*").setRows(1)
               .addFilterQuery("id:\"" + impNew.id + "\"");
       Import impOld = getClient().query("imports", q).getBeans(Import.class).get(0);
-      new HistoryImpl(getClient()).log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import");
+      new HistoryImpl(getClient()).log(identifier, impOld.toJSONString(), impNew.toJSONString(), user, "import", null);
 
       // Update record in imports
       ret = Import.approve(impNew, identifier, user);
@@ -468,7 +468,7 @@ public class Indexer {
       SolrDocument docOld = solr.query("catalog", q).getResults().get(0);
       String oldRaw = (String) docOld.getFirstValue("raw");
 
-      new HistoryImpl(getClient()).log(id, oldRaw, newRaw.toString(), user, "catalog");
+      new HistoryImpl(getClient()).log(id, oldRaw, newRaw.toString(), user, "catalog", null);
 
       // Update record in catalog
       MarcRecord mr = MarcRecord.fromRAWJSON(newRaw.toString());

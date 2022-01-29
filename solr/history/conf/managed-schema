@@ -58,7 +58,8 @@
    <field name="changes" type="text_big" indexed="false" stored="true"  />
    <field name="type" type="string" indexed="true" stored="true"  />
    <field name="user" type="string" indexed="true" stored="true"  />
-  
+   <field name="workflowid" type="string" indexed="true" stored="true"  />
+
     <!--dynamicField name="*" type="ignored" multiValued="true" /-->
 
     <!-- Field to use to determine and enforce document uniqueness.

@@ -119,56 +119,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     return this.identifiersAndActionsMapping.size  > 0;
   } 
 
-  /** Pripravi a ulozi zadost po te reload */
-  saveZadost(navrh: string, identifiers: string[]) {
-    const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
-    if  (!this.state.currentZadost[key].identifiers) {
-      this.state.currentZadost[key].identifiers = [];
-    }    
-    identifiers.forEach(ident=> {
-      this.state.currentZadost[key].identifiers.push(ident);
-    });
-
-    this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-
-        // reload docs
-        this.subs.push(this.route.queryParams.subscribe(val => {
-          this.search(val);
-        }));
-
-      }
-    });
-  }
-
-  /**
-   * Hromadna zadost 
-   */
-  addHromadnaZadost() {
-    let identiefiers = [];
-    let selectedAction = this.actions[0];
-    this.identifiersAndActionsMapping.forEach((actions: string[], ident: string) => {
-        if(actions.indexOf(selectedAction) > -1 ) {
-          identiefiers.push(ident);
-        }
-    });
-    if (identiefiers && identiefiers.length > 0) {
-      if (selectedAction === 'VNZ' || selectedAction === 'VNL') {
-        this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
-          this.state.currentZadost['VNX']= res;
-          this.saveZadost(selectedAction, identiefiers);
-        });
-      } else {
-        this.service.prepareZadost([selectedAction]).subscribe((res: Zadost) => {
-          this.state.currentZadost[selectedAction]= res;
-          this.saveZadost(selectedAction, identiefiers);
-        });
-      }
-    }
-  }
 
   viewFullCatalog() {
     const q: any = {};
@@ -186,10 +136,27 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 
   openBulkProposal() {
+    const data = {};
+    this.actions.forEach(action => {
+      data[action] = true;
+    });
+    
+    data["docs"] = this.docs;
+    data["actions"] = this.actions;
+    data["identifiersAndActionsMapping"] = this.identifiersAndActionsMapping; 
+    
     const dialogRef = this.dialog.open(DialogBulkProposalComponent, {
       width: '450px',
+      data,
       panelClass: 'app-dialog-bulk-proposal'
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.route.queryParams.subscribe(val => {
+        this.search(val);
+      });
+    });
+
   }
 
 }

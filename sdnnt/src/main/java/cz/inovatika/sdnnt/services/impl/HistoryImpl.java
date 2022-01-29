@@ -30,7 +30,7 @@ public class HistoryImpl implements History {
     }
 
     @Override
-    public void log(String identifier, String oldRaw, String newRaw, String user, String type) {
+    public void log(String identifier, String oldRaw, String newRaw, String user, String type, String workflowId) {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
@@ -50,6 +50,9 @@ public class HistoryImpl implements History {
             idoc.setField("identifier", identifier);
             idoc.setField("user", user);
             idoc.setField("type", type);
+            if (workflowId != null) {
+                idoc.setField("workflowid", type);
+            }
             idoc.setField("changes", changes.toString());
             // all dnnt state rename to stav
             solr.add("history", idoc);

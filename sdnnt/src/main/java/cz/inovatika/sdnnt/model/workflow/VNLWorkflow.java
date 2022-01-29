@@ -25,7 +25,7 @@ public class VNLWorkflow extends Workflow {
     public WorkflowState nextState() {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
-        if (owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) {
+        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() == null || owner.getLicense().equals(License.dnnto.name()))){
             return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true,  false);
         } else if (owner.getWorkflowState()== NL) {
             return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false);

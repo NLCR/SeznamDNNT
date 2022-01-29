@@ -547,14 +547,13 @@ public class AccountServiceImpl implements AccountService {
                                 // stav musi existovat a musi byt typu scheduler
                                 if (workflowState != null && workflowState.getPeriod() !=null && workflowState.getPeriod().getTransitionType().equals(TransitionType.scheduler)) {
 
-
                                     //marcRecord.toSolrDoc();
                                     String oldRaw = marcRecord.toJSON().toString();
                                     // prepnuti stavu
                                     workflowState.switchState(id, zadost.getUser(), "");
                                     try {
                                         try (SolrClient docClient = buildClient()) {
-                                            new HistoryImpl(docClient).log(marcRecord.identifier, oldRaw, marcRecord.toJSON().toString(), zadost.getId(), "catalog");
+                                            new HistoryImpl(docClient).log(marcRecord.identifier, oldRaw, marcRecord.toJSON().toString(), zadost.getUser(), "catalog", zadost.getId());
                                             docClient.add("catalog", marcRecord.toSolrDoc());
                                             docClient.commit("catalog");
                                         }

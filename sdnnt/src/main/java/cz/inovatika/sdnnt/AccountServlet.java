@@ -303,6 +303,9 @@ public class AccountServlet extends HttpServlet {
       JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
         if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
           try {
+            UserControlerImpl userControler = new UserControlerImpl(request);
+            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
+
             JSONObject inputJs = ServletsSupport.readInputJSON(request);
             String zadostJSON = inputJs.getJSONObject("zadost").toString();
             Zadost zadost = Zadost.fromJSON(zadostJSON);
@@ -310,8 +313,7 @@ public class AccountServlet extends HttpServlet {
             List<String> identifiers = Actions.identifiers(inputJs);
             JSONObject retObject = null;
             for (String identifier: identifiers) {
-              UserControlerImpl userControler = new UserControlerImpl(request);
-              AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
+              //Zadost zadost = Zadost.fromJSON(service.getRequest(zadostFromReq.getId()).toString());
               String alternativeState = request.getParameter("alternative");
               if (alternativeState != null) {
                 retObject = service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));

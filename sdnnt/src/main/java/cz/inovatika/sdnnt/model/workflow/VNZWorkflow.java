@@ -20,7 +20,7 @@ public class VNZWorkflow extends Workflow {
     @Override
     public WorkflowState nextState() {
         Period period = getPeriod(owner.getWorkflowState(), owner.getLicense() != null ? License.valueOf(owner.getLicense()) : null);
-        if (owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) {
+        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() ==null || owner.getLicense().equals(License.dnnto.name()))) {
             if (owner.getWorkflowState() == null) {
                 return new WorkflowState(this.owner, A, License.dnntt,owner.getWorkflowDate(), period, true,  true);
             } else {

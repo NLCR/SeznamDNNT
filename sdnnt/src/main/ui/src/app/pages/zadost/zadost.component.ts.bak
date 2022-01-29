@@ -10,7 +10,6 @@ import { User } from 'src/app/shared/user';
 import { Zadost } from 'src/app/shared/zadost';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
-import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
 
 @Component({
   selector: 'app-zadost',
@@ -135,13 +134,25 @@ export class ZadostComponent implements OnInit {
     });
   }
 
-
-
   process() {
 
-    let allP: boolean = this.allProcessed();
 
-    if (!allP) {
+    let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
+    let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
+    let allProcessed: boolean = true;
+
+    if (this.zadost && this.zadost.process) {
+      this.zadost.identifiers.forEach(id => {
+        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        if ( !this.zadost.process[tablekey]) {
+          allProcessed = false;
+        }
+      });    
+    } else {
+      allProcessed = false;
+    }
+
+    if (!allProcessed) {
       this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
       return;
     }
@@ -154,24 +165,6 @@ export class ZadostComponent implements OnInit {
         this.zadost.state = 'processed';
       }
     });
-  }
-
-  allProcessed(): boolean {
-    let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
-    let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
-    let allProcessed: boolean = true;
-
-    if (this.zadost && this.zadost.process) {
-      this.zadost.identifiers.forEach(id => {
-        let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
-        if (!this.zadost.process[tablekey]) {
-          allProcessed = false;
-        }
-      });
-    } else {
-      allProcessed = false;
-    }
-    return allProcessed;
   }
 
   removeDoc(identifier: string) {
@@ -201,10 +194,6 @@ export class ZadostComponent implements OnInit {
 
 
   processNavrh(data: { type: string, identifier: string, komentar: string }) {
-    if (!data.komentar) {
-      this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
-      return;
-    }
     switch (data.type) {
       case 'approve': 
        // approve navrh 
@@ -256,38 +245,6 @@ export class ZadostComponent implements OnInit {
         break;
     }
   }
-
-  isItemProcessed(id:string): boolean {
-    let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
-    let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
-    let tablekey = id +"_("+stateKey+","+licenseKey+")";
-    if (this.zadost.process) return this.zadost.process[tablekey];
-    else return false;
-  }
-
-
-  aproveAll() {
-    const approveDialogRef = this.dialog.open(DialogPromptComponent, {
-      width: '700px',
-      data: {caption: 'komentar', label: 'komentar'},
-      panelClass: 'app-register-dialog'
-    });
-    approveDialogRef.afterClosed().subscribe(result => {
-      if (result !== null) {
-        let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
-        this.service.approveItems(items, this.zadost,result, null).subscribe((res: any) => {
-          if (res.error) {
-            this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
-          } else {
-            this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
-            this.zadost = res;
-            this.getDocs(this.route.snapshot.queryParams);
-          }
-        });
-      }
-    });
-  }
-
 
   showCorrespondence() {
     const dialogRef = this.dialog.open(DialogCorrespondenceComponent, {

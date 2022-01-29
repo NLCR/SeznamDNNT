@@ -1,0 +1,45 @@
+<div class="app-container">
+  <div fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex="350px" class="app-left app-fx-facets">
+      <app-facets *ngIf="facets" [facet_fields]="facets" [stats]="searchResponse.stats.stats_fields"></app-facets>
+    </div>
+    <div fxFlex class="app-right">
+      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+        <div fxFlex>
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+        </div>
+        <div>
+          <app-paginator [numFound]="numFound"  [showSort]="true"></app-paginator>
+        </div>
+      </div>
+      <div class="app-results-wrapper">
+        <mat-card *ngIf="this.state.user">
+          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+            <div fxFlex>
+              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4"
+              (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
+              <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox>
+            </div>
+            <div>
+              <mat-button-toggle-group>
+                <mat-button-toggle   value="bold"><mat-icon class="material-icons-outlined app-mr-1">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}</mat-button-toggle>
+                <!-- <mat-button-toggle *ngIf="hasStateFilter" (click)="addToZadost()" value="bold"><mat-icon class="material-icons-outlined app-mr-1">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}</mat-button-toggle> -->
+                <!-- mat-button-toggle value="italic"><mat-icon class="material-icons-outlined app-mr-1">file_download</mat-icon>{{ 'desc.export' | translate }}</mat-button-toggle -->
+              </mat-button-toggle-group>
+
+              <mat-menu #priorityMenu="matMenu">
+                <ng-container *ngFor="let d of actions">
+                  <button  mat-menu-item>{{d}}</button>
+                </ng-container>
+              </mat-menu>
+            </div>
+          </div>
+        </mat-card>
+        <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+      </div>
+      <div class="app-mt-4">
+        <app-paginator [numFound]="numFound" [showSort]="true"></app-paginator>
+      </div>
+    </div>
+  </div>
+</div>
