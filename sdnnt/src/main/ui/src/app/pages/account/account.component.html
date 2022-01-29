@@ -1,6 +1,6 @@
 <div class="app-container">
-  <div fxLayout="row" fxLayoutGap="32px">
-    <div fxFlex="200px" class="app-left app-fx-facets">
+  <div fxLayout="row" fxLayoutGap="32px" class="app-account-wrapper">
+    <div class="app-left app-fx-facets">
       <div class="app-facets-used">
         <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length || delegatedFilter?.length || priorityFilter?.length">
           <h3 matSubheader fxLayout="row">
@@ -131,29 +131,16 @@
 
 
     <div fxFlex class="app-right">
-
-      <!--      
-      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-        <div>
-          <mat-button-toggle-group>
-            <mat-button-toggle (click)="refresh()"  matTooltipPosition="above">
-              <mat-icon class="material-icons-outlined" >refresh</mat-icon>
-            </mat-button-toggle>
-          </mat-button-toggle-group>   
-        </div>
-      </div>
-      -->
-
-      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-        <div fxFlex>
+      <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+        <div fxFlex class="app-left">
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
-        <div>
+        <div class="app-right">
           <app-paginator [numFound]="numFound"  [showSort]="true" [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
         </div>
       </div>
 
-      <div class="app-results-wrapper">
+      <div class="app-results-wrapper app-overflow-x-auto">
         <table mat-table [dataSource]="zadosti" class="mat-elevation-z0">
           <ng-container matColumnDef="id">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.id' | translate }}</th>
