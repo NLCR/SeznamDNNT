@@ -80,3 +80,22 @@ app-search {
   }
 }
 
+app-zadost {
+  @media only screen and (max-width: 620px) {
+    .app-toolbar {
+      .app-left {
+        flex: 1 1 100% !important;
+      }
+    }
+    
+    .mat-paginator {
+      flex: 1 1 100% !important;
+      margin-left: -12px;
+
+      .mat-paginator-container {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+

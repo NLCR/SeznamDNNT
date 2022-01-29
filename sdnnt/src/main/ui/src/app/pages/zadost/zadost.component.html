@@ -1,10 +1,10 @@
 <div class="app-container">  
   <ng-container *ngIf="zadost">
-    <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-      <div fxFlex>
+    <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+      <div fxFlex class="app-left">
         {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
       </div>
-      <div>
+      <div class="app-right">
         <app-paginator [numFound]="numFound" [showSort]="false"></app-paginator>
       </div>
     </div>
