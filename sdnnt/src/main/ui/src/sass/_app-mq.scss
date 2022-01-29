@@ -56,8 +56,19 @@ app-search {
       flex-wrap: wrap;
 
       .app-fx-facets {
+        padding-top: 0 !important;
         margin-right: 0 !important;
+        margin-bottom: 16px;
         flex: 1 1 100%;
+
+        .mat-expansion-panel-header {
+          padding-left: 0;
+        }
+
+        .mat-expansion-panel-body {
+          padding-left: 0;
+          padding-right: 0;
+        }
       }
     }
   }
