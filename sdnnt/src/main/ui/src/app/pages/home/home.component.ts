@@ -62,5 +62,5 @@ export class HomeComponent implements OnInit {
     const tab = this.config.homeTabs[selected.index];
     this.getText(tab);
   }
-
+  
 }
