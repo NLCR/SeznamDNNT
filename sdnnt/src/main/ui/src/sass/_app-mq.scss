@@ -33,6 +33,50 @@ app-navbar {
 }
 
 app-home {
-  
+  .app-card-wrapper {
+    @media #{$gt-xss} {
+      @include setFlexBreakpointGap(50);
+      min-height: 150px;
+    }
+
+    @media #{$gt-xs} {
+      @include setFlexBreakpointGap(33.3333);
+      min-height: 170px;
+    }
+
+    @media #{$gt-sm} {
+      @include setFlexBreakpointGap(20);
+    }
+  }
+}
+
+app-search {
+  @media #{$lt-md} {
+    .app-search-wrapper {
+      flex-wrap: wrap;
+
+      .app-fx-facets {
+        margin-right: 0 !important;
+        flex: 1 1 100%;
+      }
+    }
+  }
+
+  @media only screen and (max-width: 720px) {
+    .app-toolbar {
+      .app-left {
+        flex: 1 1 100% !important;
+      }
+    }
+
+    .mat-paginator {
+      flex: 1 1 100% !important;
+      margin-left: -12px;
+
+      .mat-paginator-container {
+        justify-content: flex-start;
+      }
+    }
+  }
 }
 

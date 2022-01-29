@@ -1,13 +1,15 @@
 // --- SEARCH ---
 
 app-search {
-  .app-left {
-    
-  }
-
-  .app-right {    
-    .app-results-wrapper {
-      @import "app-result-item";
+  .app-search-wrapper {
+    .app-fx-facets {
+      width: $app-facet-width;
+    }
+  
+    .app-fx-results {    
+      .app-results-wrapper {
+        @import "app-result-item";
+      }
     }
   }
 }

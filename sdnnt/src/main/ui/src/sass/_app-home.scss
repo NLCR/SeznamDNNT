@@ -4,21 +4,7 @@ app-home {
   .app-cards-wrapper {
     margin-left: -#{$app-gap-card};
 
-    .app-card-wrapper {
-      @media #{$gt-xss} {
-        @include setFlexBreakpointGap(50);
-        min-height: 150px;
-      }
-
-      @media #{$gt-xs} {
-        @include setFlexBreakpointGap(33.3333);
-        min-height: 170px;
-      }
-
-      @media #{$gt-sm} {
-        @include setFlexBreakpointGap(20);
-      }
-      
+    .app-card-wrapper { 
       flex: 0 0 calc(100% - #{$app-gap-card});
       margin: 0 0 $app-gap-card $app-gap-card;
 
@@ -30,7 +16,6 @@ app-home {
         display: flex;
         flex-direction: column;
         height: calc(100% - 32px);
-        //margin-bottom: 32px;
   
         .mat-card-header {
           flex-grow: 1;
