@@ -60,7 +60,7 @@ public class DocumentWorkflowFactory {
             }
         }
         if (vnDocument(kuratorstav)) {
-            VNZWorkflow pxWorkflow = new VNZWorkflow(checkProxy);
+            VNWorkflow pxWorkflow = new VNWorkflow(checkProxy);
             WorkflowState workflowState = pxWorkflow.nextState();
             if (workflowState != null) {
                 zadostTypes.add(ZadostType.VN);

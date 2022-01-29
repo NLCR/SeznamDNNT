@@ -9,10 +9,8 @@ export interface Configuration {
   snackDuration: number;
   homeTabs: string[];
   homeCards: string[];
-
-
   simplelogin:boolean;
-
+  maximumItemInRequest: number;
 
   // Seznam roli
   role: string[];

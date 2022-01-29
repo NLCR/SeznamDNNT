@@ -144,6 +144,7 @@
   "alert": {
     "ulozeni_zadosti_success": "Uložení žádosti proběhlo úspěšně.",
     "ulozeni_zadosti_error": "Chyba při uložení žádosti.",
+    "maximalni_pocet_polozek_v_zadosti_prekrocen": "Překročen maximální počet položek v žádosti",
     "odstraneni_zadosti_success": "Odstranění dokumentu z žádosti proběhlo úspěšně.",
     "odstraneni_zadosti_error": "Chyba při odstranění dokumentu z žádosti.",
     "schvaleni_navrhu_success": "Schválení návrhu proběhlo úspěšně.",

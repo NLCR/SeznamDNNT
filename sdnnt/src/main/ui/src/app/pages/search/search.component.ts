@@ -41,7 +41,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     public dialog: MatDialog
   ) { }
 
-
   ngOnInit(): void {
     this.state.activePage = 'Search';
     this.subs.push(this.route.queryParams.subscribe(val => {
@@ -116,7 +115,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   hromadnaZadostEnabled() {
-    return this.identifiersAndActionsMapping.size  > 0;
+    return this.identifiersAndActionsMapping.size  > 0 && this.actions.length > 0;
   } 
 
 

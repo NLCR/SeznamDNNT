@@ -69,9 +69,9 @@ import { User } from './shared/user';
         return this.config.simplelogin || false;
     }
 
-
-
-    
+    public get maximumItemInRequest() {
+        return this.config.maximumItemInRequest || 60;
+    }    
 
     /**
      * List the files holding section configuration in assets/configs folder

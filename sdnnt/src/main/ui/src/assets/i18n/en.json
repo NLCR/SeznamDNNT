@@ -145,6 +145,7 @@
   "alert": {
     "ulozeni_zadosti_success": "The request was saved successfully.",
     "ulozeni_zadosti_error": "Error saving request.",
+    "maximalni_pocet_polozek_v_zadosti_prekrocen": "Maximum number of items in request exceeded",
     "odstraneni_zadosti_success": "The document was successfully removed from the application.",
     "odstraneni_zadosti_error": "Error deleting document from request.",
     "schvaleni_navrhu_success": "The approval of the proposal was successful.",

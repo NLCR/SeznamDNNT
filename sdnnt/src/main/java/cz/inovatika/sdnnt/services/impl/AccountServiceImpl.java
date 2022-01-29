@@ -396,9 +396,8 @@ public class AccountServiceImpl implements AccountService {
                 try (SolrClient solr = buildClient()) {
                     MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
                     Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-
-                    String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
-
+                    // odmitnuout z duvodu, ze jiz neexistuje workflow
+                    String transitionName = workflow != null ? workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense()) : "noworkflow";
                     Zadost.reject(documentId,zadostJSON.toString(),  reason, username, transitionName);
                     return VersionStringCast.cast(getRequest(zadostId));
                 }

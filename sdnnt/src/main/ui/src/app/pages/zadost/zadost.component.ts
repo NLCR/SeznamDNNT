@@ -289,6 +289,30 @@ export class ZadostComponent implements OnInit {
   }
 
 
+  rejectAll() {
+    const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+      width: '700px',
+      data: {caption: 'komentar', label: 'komentar'},
+      panelClass: 'app-register-dialog'
+    });
+    approveDialogRef.afterClosed().subscribe(result => {
+      if (result !== null) {
+        let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
+        this.service.rejectItems(items, this.zadost,result).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs(this.route.snapshot.queryParams);
+          }
+        });
+      }
+    });
+  }
+
+
+
   showCorrespondence() {
     const dialogRef = this.dialog.open(DialogCorrespondenceComponent, {
       width: '750px',

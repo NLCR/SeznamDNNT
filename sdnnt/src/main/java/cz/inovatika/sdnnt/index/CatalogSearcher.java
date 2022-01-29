@@ -82,7 +82,7 @@ public class CatalogSearcher {
             if (ret.getJSONObject("response").getInt("numFound") > 0) {
 
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
-                JSONArray zadosti = findZadosti(user, ids);
+                JSONArray zadosti = findZadosti(user, ids, "NOT state:processed");
                 ret.put("zadosti", zadosti);
                 if (user != null) {
                     JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
@@ -240,7 +240,7 @@ public class CatalogSearcher {
     }
 
 
-    private JSONArray findZadosti(User user, List<String> identifiers) {
+    private JSONArray findZadosti(User user, List<String> identifiers, String... additionalFilters) {
         try {
             if (!identifiers.isEmpty()) {
                 SolrClient solr = Indexer.getClient();
@@ -251,6 +251,10 @@ public class CatalogSearcher {
                 // u uzivatele filtrujeme jenom pro konkrentniho uzivatele
                 if (user != null && (user.getRole().equals(Role.user.name()) || user.getRole().equals(Role.knihovna.name()))) {
                     query = query.addFilterQuery("user:\"" + user.getUsername() + "\"");
+                }
+
+                for (String filter :  additionalFilters) {
+                    query = query.addFilterQuery(filter);
                 }
 
                 QueryRequest qreq = new QueryRequest(query);

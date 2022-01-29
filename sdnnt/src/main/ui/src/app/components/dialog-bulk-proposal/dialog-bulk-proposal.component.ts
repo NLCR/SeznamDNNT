@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
@@ -29,6 +30,7 @@ export class DialogBulkProposalComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
+    private config: AppConfiguration,
     public state: AppState,
     @Inject(MAT_DIALOG_DATA) public data:  any) {
     if (data.VN) {
@@ -61,7 +63,7 @@ export class DialogBulkProposalComponent implements OnInit {
 
 
   /** Pripravi a ulozi zadost po te reload */
-  saveZadost(navrh: string, identifiers: string[]) {
+  saveZadost(navrh: string, identifiers: string[], customSuccess:string, customError:string, forceError: boolean=false) {
     const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
     if  (!this.state.currentZadost[key].identifiers) {
       this.state.currentZadost[key].identifiers = [];
@@ -72,9 +74,14 @@ export class DialogBulkProposalComponent implements OnInit {
 
     this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', customError ? customError : res.error , true);
       } else {
-        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+        if (forceError) {
+          // ulozeno ale stejne error
+          this.service.showSnackBar('alert.ulozeni_zadosti_error', customError ? customError : res.error , true);
+        } else {
+          this.service.showSnackBar('alert.ulozeni_zadosti_success', customSuccess ? customSuccess : '', false);
+        }
       }
     });
   }
@@ -91,16 +98,33 @@ export class DialogBulkProposalComponent implements OnInit {
           }
       });
       if (identiefiers && identiefiers.length > 0) {
+        
         if (selectedAction === 'VNZ' || selectedAction === 'VNL') {
           this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
-            this.state.currentZadost['VNX']= res;
-            this.saveZadost(selectedAction, identiefiers);
+            let resNumberOfItems:number = res.identifiers?.length | 0;
+            if ((identiefiers.length+ resNumberOfItems) < this.config.maximumItemInRequest) {
+              this.state.currentZadost['VNX']= res;
+              this.saveZadost(selectedAction, identiefiers, null, null);
+            }  else {
+              // remove identifiers from zadost 
+              this.state.currentZadost['VNX']= res;
+              let diff:number = this.config.maximumItemInRequest - resNumberOfItems;
+              this.saveZadost(selectedAction, identiefiers.slice(0, diff), null, 'alert.maximalni_pocet_polozek_v_zadosti_prekrocen', true);
+            }
             this.dialogRef.close();
           });
         } else {
           this.service.prepareZadost([selectedAction]).subscribe((res: Zadost) => {
-            this.state.currentZadost[selectedAction]= res;
-            this.saveZadost(selectedAction, identiefiers);
+            let resNumberOfItems:number = res.identifiers?.length | 0;
+            if ((identiefiers.length+ resNumberOfItems) < this.config.maximumItemInRequest) {
+              this.state.currentZadost[selectedAction]= res;
+              this.saveZadost(selectedAction, identiefiers,null, null);
+            } else {
+              let diff:number = this.config.maximumItemInRequest - resNumberOfItems;
+              this.state.currentZadost[selectedAction]= res;
+              this.saveZadost(selectedAction, identiefiers.slice(0, diff),null, 'alert.maximalni_pocet_polozek_v_zadosti_prekrocen', true);
+              //this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.maximalni_pocet_polozek_v_zadosti_prekrocen',  true);
+            }
             this.dialogRef.close();
           });
         }

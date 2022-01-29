@@ -287,24 +287,31 @@ export class ResultItemComponent implements OnInit {
     if  (!this.state.currentZadost[key].identifiers) {
       this.state.currentZadost[key].identifiers = [];
     }    
-    if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)){
-      this.state.currentZadost[key].identifiers.push(this.doc.identifier);
-    }
-    
-    this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
-      if (res.error) {
-        this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
-      } else {
-        this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-        if (!this.doc.zadost) {
-            this.doc.zadost = this.state.currentZadost[key];
-            this.hasNavhr = !!this.doc.zadost && !this.processed;
-          } else if (this.doc.zadost.identifiers) {
-            this.doc.zadost.identifiers.push(this.doc.identifier);;
-            this.hasNavhr = !!this.doc.zadost && !this.processed;
-        }
+    // check maxium
+    if (this.state.currentZadost[key].identifiers && this.state.currentZadost[key].identifiers.length >= this.config.maximumItemInRequest) {
+      this.service.showSnackBar('alert.maximalni_pocet_polozek_v_zadosti_prekrocen', '', false);
+    } else {
+      if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)){
+        this.state.currentZadost[key].identifiers.push(this.doc.identifier);
       }
-    });
+      this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
+        if (res.error) {
+          this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+        } else {
+          this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
+          if (!this.doc.zadost) {
+              this.doc.zadost = this.state.currentZadost[key];
+              // TODO: ??  
+              this.hasNavhr = !!this.doc.zadost && !this.processed;
+            } else if (this.doc.zadost.identifiers) {
+              this.doc.zadost.identifiers.push(this.doc.identifier);;
+              // TODO: ??  
+              this.hasNavhr = !!this.doc.zadost && !this.processed;
+          }
+        }
+      });
+  
+    }
   }
 
   addFRBRToZadost(navrh: string) {
