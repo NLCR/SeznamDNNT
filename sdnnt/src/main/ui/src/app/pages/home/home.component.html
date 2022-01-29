@@ -1,31 +1,33 @@
 <div class="app-container">
-  <div fxLayout="row" fxLayoutGap="32px" class="app-mb-8">
+  <div fxLayout="row wrap" class="app-mb-8" class="app-cards-wrapper">
     <ng-container *ngFor="let card of config.homeCards">
-      <mat-card *ngIf="card['visible']" fxFlex="20%" [class]="'app-card-home ' + card['field']" routerLink="/search" [queryParams]="card['type'] === 'stav' ? {dntstav: card['field']} : {license: card['field']}">
-        <mat-card-header>
-          <div mat-card-avatar [ngSwitch]="card['type']">
-            <ng-container *ngSwitchCase="'licence'">
-              <mat-icon class="material-icons-outlined">{{ card['field'] === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
-            </ng-container>
-            <ng-container *ngSwitchDefault>{{ card['field'] }}</ng-container>
-          </div>
-          <mat-card-title>{{ 'desc.' + card['type'] | translate }}</mat-card-title>
-          <mat-card-subtitle [ngSwitch]="card['type']">
-            <ng-container *ngSwitchCase="'stav'">{{ 'field.' + card['field'] | translate }}</ng-container>
-            <ng-container *ngSwitchDefault>{{ 'license.' + card['field'] | translate }}</ng-container>
-          </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-actions>
-          <button mat-button><strong>{{ cardsFacets[card['field']]}}</strong> {{ 'desc.zaznamu' | translate }}</button>
-        </mat-card-actions>
-      </mat-card>
+      <div *ngIf="card['visible']" class="app-card-wrapper">
+        <mat-card [class]="'app-card-home ' + card['field']" routerLink="/search" [queryParams]="card['type'] === 'stav' ? {dntstav: card['field']} : {license: card['field']}">
+          <mat-card-header>
+            <div mat-card-avatar [ngSwitch]="card['type']">
+              <ng-container *ngSwitchCase="'licence'">
+                <mat-icon class="material-icons-outlined">{{ card['field'] === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+              </ng-container>
+              <ng-container *ngSwitchDefault>{{ card['field'] }}</ng-container>
+            </div>
+            <mat-card-title>{{ 'desc.' + card['type'] | translate }}</mat-card-title>
+            <mat-card-subtitle [ngSwitch]="card['type']">
+              <ng-container *ngSwitchCase="'stav'">{{ 'field.' + card['field'] | translate }}</ng-container>
+              <ng-container *ngSwitchDefault>{{ 'license.' + card['field'] | translate }}</ng-container>
+            </mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-actions>
+            <button mat-button><strong>{{ cardsFacets[card['field']]}}</strong> {{ 'desc.zaznamu' | translate }}</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
     </ng-container>
   </div>
-    <mat-card>
+  <!-- <mat-card>
     <mat-card-content>
       <app-graphs *ngIf="facets" [facets]="facets"></app-graphs>
     </mat-card-content>
-    </mat-card>
+  </mat-card> -->
   <mat-tab-group (selectedTabChange)="selectTab($event)"><!--mat-align-tabs="center"-->
     <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
       <div [innerHTML]="tabContent"></div>

@@ -1,36 +1,45 @@
 // --- HOME ---
 
 app-home {
-  .app-card-home {
-    @extend .app-clean-shadow;
-    @include setStateColor(card);
-    border-radius: $app-badge-height;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 32px;
+  .app-cards-wrapper {
+    margin-left: -#{$app-gap-card};
 
-    .mat-card-header {
-      flex-grow: 1;
+    .app-card-wrapper { 
+      flex: 0 0 calc(100% - #{$app-gap-card});
+      margin: 0 0 $app-gap-card $app-gap-card;
 
-      .mat-card-avatar {
-        background-color: rgba($app-color-lightnes, .2);
+      .app-card-home {
+        @extend .app-clean-shadow;
+        @include setStateColor(card);
+        border-radius: $app-badge-height;
+        cursor: pointer;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 900;
-        font-size: 18px;
-      }
-
-      .mat-card-subtitle {
-        color: rgba($app-color-lightnes, .7);
-      }
-    }
-
-    .mat-card-actions {
-      strong {
-        font-size: 16px;
-      }
+        flex-direction: column;
+        height: calc(100% - 32px);
+  
+        .mat-card-header {
+          flex-grow: 1;
+  
+          .mat-card-avatar {
+            background-color: rgba($app-color-lightnes, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+          }
+  
+          .mat-card-subtitle {
+            color: rgba($app-color-lightnes, .7);
+          }
+        }
+  
+        .mat-card-actions {
+          strong {
+            font-size: 16px;
+          }
+        }
+      }    
     }
   }
 

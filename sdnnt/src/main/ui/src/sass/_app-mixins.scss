@@ -155,3 +155,14 @@
     }
   }
 }
+
+// set flex breakpoing
+@mixin setFlexBreakpointGap($val, $gap: null) {
+  @if ($gap == null) {
+    flex: 0 0 calc(#{$val}% - #{$app-gap-card});
+    max-width: calc(#{$val}% - #{$app-gap-card});
+  } @else {
+    flex: 0 0 calc(#{$val}% - #{$gap}px);
+    max-width: calc(#{$val}% - #{$gap}px);
+  }
+}

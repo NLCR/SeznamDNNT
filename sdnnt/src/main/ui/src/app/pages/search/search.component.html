@@ -1,14 +1,14 @@
 <div class="app-container">
-  <div fxLayout="row" fxLayoutGap="32px">
-    <div fxFlex="350px" class="app-left app-fx-facets">
+  <div fxLayout="row" fxLayoutGap="32px" class="app-search-wrapper">
+    <div class="app-left app-fx-facets">
       <app-facets *ngIf="facets" [facet_fields]="facets" [stats]="searchResponse.stats.stats_fields"></app-facets>
     </div>
-    <div fxFlex class="app-right">
-      <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-        <div fxFlex>
+    <div fxFlex class="app-right app-fx-results">
+      <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+        <div fxFlex class="app-left">
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
-        <div>
+        <div class="app-right">
           <app-paginator [numFound]="numFound"  [showSort]="true"></app-paginator>
         </div>
       </div>
