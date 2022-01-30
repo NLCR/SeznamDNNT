@@ -8,15 +8,15 @@
       </mat-radio-group>
 
     </div>
-    <div fxFlex="50%" *ngIf="user.typ === 'fyzicka_osoba'">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ === 'fyzicka_osoba'">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
           <input matInput #jmeno="matInput" cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="user.typ  === 'fyzicka_osoba'">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'fyzicka_osoba'">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prijmeni' | translate }}*</mat-label>
@@ -32,8 +32,8 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}*</mat-label>
           <input #username="matInput" matInput [(ngModel)]="user.username" 
@@ -42,7 +42,7 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>Email*</mat-label>
@@ -50,15 +50,15 @@
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
           <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" #phonenumber="matInput" />
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>IČO</mat-label>
@@ -76,8 +76,8 @@
       </div>
     </div> -->
 
-    <div fxFlex="50%">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.mesto' | translate }}</mat-label>
           <input matInput name="mesto" [placeholder]="'desc.mesto' | translate" [(ngModel)]="user.mesto" />
@@ -85,7 +85,7 @@
       </div>
     </div>
 
-    <div fxFlex="50%">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.ulice' | translate }}</mat-label>
@@ -94,8 +94,8 @@
       </div>
     </div>
 
-    <div fxFlex="50%">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.cislo_domu' | translate }}</mat-label>
           <input matInput name="cislo_domu" [placeholder]="'desc.cislo_domu' | translate" [(ngModel)]="user.cislo" />
@@ -103,7 +103,7 @@
       </div>
     </div>
 
-    <div fxFlex="50%">
+    <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.psc' | translate }}</mat-label>
@@ -123,15 +123,15 @@
       </div>
     </div>
 
-    <div fxFlex="50%" *ngIf="user.typ  === 'pravnicka_osoba'">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}*</mat-label>
           <input matInput #kontaktni_osoba_jmeno="matInput" cdkFocusInitial name="kontaktni_osoba_jmeno" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="user.typ  === 'pravnicka_osoba'">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}*</mat-label>
@@ -149,14 +149,14 @@
     </div>
 
 
-    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
-      <div class="app-mr-4">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="state.user?.role === 'admin'">
+      <div ngClass.gt-xs="app-mr-4">
         <mat-form-field appearance="outline" class="app-w-100">
           <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey" disabled></textarea>
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" *ngIf="state.user?.role === 'admin'">
+    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="state.user?.role === 'admin'">
       <div>
         <mat-checkbox name="apienabled" [(ngModel)]="isApiEnabled" class="app-ml-8" (change)="switchEnableApi()">{{ 'desc.apienabled' | translate }}</mat-checkbox>
       </div>
