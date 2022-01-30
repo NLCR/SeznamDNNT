@@ -211,3 +211,17 @@ app-import {
   }
 }
 
+app-admin {
+  @media #{$lt-md} {
+    .app-admin-wrapper {
+      flex-wrap: wrap;
+
+      .app-fx-facets {
+        padding-top: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 16px;
+        flex: 1 1 100%;
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 <div class="app-container" *ngIf="state.user && state.user.role === 'admin'">
   <mat-tab-group>
     <mat-tab [label]="'desc.editace_stranek' | translate">
-      <div fxLayout="row" fxLayoutGap="32px">
-        <div fxFlex="350px">
+      <div fxLayout="row" fxLayoutGap="32px" class="app-admin-wrapper">
+        <div class="app-left app-fx-facets">
           <mat-list role="list">
             <mat-list-item role="listitem" *ngFor="let t of editorTabs()" (click)="selectText(t)"
               [class.active]="t === selected">
@@ -10,7 +10,7 @@
             </mat-list-item>
           </mat-list>
         </div>
-        <div>
+        <div fxFlex class="app-right app-fx-results">
           <div class="app-mb-4">
             <angular-editor [placeholder]="'Enter text here...'" [(ngModel)]="htmlContent" [config]="editorConfig"></angular-editor>
           </div>
@@ -25,15 +25,12 @@
             <mat-list-item role="listitem" *ngFor="let role of config.role">{{ role }}</mat-list-item>
           </mat-list>
         </mat-tab>
-        <!--
-        <mat-tab [label]="'desc.formular' | translate">Nejaky formular</mat-tab>
-        -->
       </mat-tab-group>
     </mat-tab>
 
     <mat-tab [label]="'desc.usersAdmin' | translate">
-      <div fxLayout="row" fxLayoutGap="32px">
-        <div fxFlex="350px">
+      <div fxLayout="row" fxLayoutGap="32px" class="app-admin-wrapper">
+        <div class="app-left app-fx-facets">
           <form>
             <mat-form-field class="app-w-100 app-mb-1" appearance="outline">
               <mat-label>{{ 'desc.filter_uzivatele' | translate }}</mat-label>
@@ -47,13 +44,12 @@
             </mat-list-item>
           </mat-list>
         </div>
-        <div fxFlex="2 2 auto">
+        <div fxFlex class="app-right app-fx-results">
           <app-dialog-registration-form [user]="selUser"></app-dialog-registration-form>
           <button mat-stroked-button (click)="saveUser()" class="app-mr-2">{{ 'desc.ulozit' | translate }}</button>
           <button mat-stroked-button (click)="resetPwd()">{{ 'desc.reset_hesla' | translate }}</button>
         </div>
       </div>
-    </mat-tab>
-    
+    </mat-tab>   
   </mat-tab-group>
 </div>
