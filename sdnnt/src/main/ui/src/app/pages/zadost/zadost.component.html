@@ -49,7 +49,7 @@
               </mat-button-toggle>
               <mat-button-toggle *ngIf="state.user.role === 'mainKurator' && zadost.state==='waiting'" value="" [matMenuTriggerFor]="priorityMenu" [matTooltip]="'desc.nastavit_prioritu' | translate">
                 <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
-                <ng-container *ngIf="zadost.priority?.length">{{ zadost.priority }}</ng-container>
+                <ng-container *ngIf="zadost.priority?.length">{{ 'field.' + zadost.priority | translate }}</ng-container>
               </mat-button-toggle>
 
               <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">

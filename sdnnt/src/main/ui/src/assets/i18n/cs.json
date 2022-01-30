@@ -121,7 +121,11 @@
     "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",
     "VNZ": "Výzva k licenci pro terminál na místě samém",
     "NL":"omezení na terminál / plánované vydání po získání licence",
-    "NLX":"omezeno na terminál"
+    "NLX":"omezeno na terminál",
+
+    "Priorita 1": "Priorita 1",
+    "Priorita 2": "Priorita 2",
+    "Priorita 3": "Priorita 3"
   },
 
   "controlled": {
