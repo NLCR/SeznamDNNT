@@ -56,8 +56,19 @@ app-search {
       flex-wrap: wrap;
 
       .app-fx-facets {
+        padding-top: 0 !important;
         margin-right: 0 !important;
+        margin-bottom: 16px;
         flex: 1 1 100%;
+
+        .mat-expansion-panel-header {
+          padding-left: 0;
+        }
+
+        .mat-expansion-panel-body {
+          padding-left: 0;
+          padding-right: 0;
+        }
       }
     }
   }
@@ -81,6 +92,66 @@ app-search {
 }
 
 app-zadost {
+  @media only screen and (max-width: 620px) {
+    .app-toolbar {
+      .app-left {
+        flex: 1 1 100% !important;
+      }
+    }
+    
+    .mat-paginator {
+      flex: 1 1 100% !important;
+      margin-left: -12px;
+
+      .mat-paginator-container {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+app-account {
+  @media #{$lt-md} {
+    .app-account-wrapper {
+      flex-flow: column !important;
+
+      .app-fx-facets {
+        padding-top: 0 !important;
+        margin-right: 0 !important;
+        margin-bottom: 16px;
+        width: 100% !important;
+
+        .mat-expansion-panel-header {
+          padding-left: 0;
+        }
+
+        .mat-expansion-panel-body {
+          padding-left: 0;
+          padding-right: 0;
+        }
+      }
+    }
+  }
+
+  @media only screen and (max-width: 620px) {
+    .app-toolbar {
+      .app-left {
+        flex: 1 1 100% !important;
+      }
+    }
+    
+    .mat-paginator {
+      flex: 1 1 100% !important;
+      margin-left: -12px;
+
+      .mat-paginator-container {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+app-imports {
   @media only screen and (max-width: 620px) {
     .app-toolbar {
       .app-left {
