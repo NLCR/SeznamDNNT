@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>{{ 'desc.historie_zmen' | translate }}: <span>{{ data.title }}</span></h1>
 <div mat-dialog-content>
   <mat-tab-group>
-    <mat-tab label="Historie stavu">
+    <mat-tab [label]="'desc.historie_stavu' | translate">
       <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
         <thead>
           <tr>
@@ -9,8 +9,7 @@
             <th>{{ 'desc.kdo' | translate }}</th>
             <th>{{ 'desc.stav' | translate }}</th>
             <th>{{ 'desc.licence' | translate }}</th>
-            <th>{{ 'desc.komentar' | translate }}</th>
-            
+            <th>{{ 'desc.komentar' | translate }}</th>           
             <th *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>
           </tr>
         </thead>
@@ -27,10 +26,8 @@
           </tr>
         </tbody>
       </table>
-    </mat-tab>
-
-    
-    <mat-tab label="Historie  kuratorskeho stavu" *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">
+    </mat-tab>    
+    <mat-tab [label]="'desc.historie_kuratorskeho_stavu' | translate" *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">
       <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
         <thead>
           <tr>
@@ -38,8 +35,7 @@
             <th>{{ 'desc.kdo' | translate }}</th>
             <th>{{ 'desc.stav' | translate }}</th>
             <th>{{ 'desc.licence' | translate }}</th>
-            <th>{{ 'desc.komentar' | translate }}</th>
-            
+            <th>{{ 'desc.komentar' | translate }}</th>           
             <th>{{ 'desc.cislo_zadosti' | translate }}</th>
           </tr>
         </thead>
@@ -57,9 +53,7 @@
         </tbody>
       </table>
     </mat-tab>
-
-
-    <mat-tab label="Historie bibliografickeho zaznamu">
+    <mat-tab [label]="'desc.historie_bibliografickeho_zaznamu' | translate">
       <ul>
         <li *ngFor="let item of history">
           {{item.indextime | date : 'DD.mm.YYYY'}} | {{ item.user }} | {{ item.type }}
@@ -67,7 +61,6 @@
       </ul>
     </mat-tab>
   </mat-tab-group>
-  
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>

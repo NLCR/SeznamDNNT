@@ -111,6 +111,7 @@
     "NPA": "návrh na zařazení",
     "PA": "dílo publikováno jako návrh",
     "A": "zařazeno",
+    "VS": "Vyřazeno",
     "VN": "Vyřazení",
     "N": "vyřazeno",
     "X": "volná díla",
@@ -645,7 +646,7 @@
     "zpracovani_zadosti": "Zpracování žádostí",
     "reset_hesla": "Reset hesla",
     "poslat_zadost": "Poslat žádost",
-    "send": "Poslat",
+    "poslat": "Poslat",
     "duvod_pro_terminal": "Odůvodnění pro omezení na terminál",
     "duvod_pro_odmitnuti": "Odůvodnění pro odmítnutí",
     "duvod": "Odůvodnění",
@@ -758,7 +759,10 @@
     "provest_hromadny_navrh": "Provést hromadný návrh",
     "vyrizeni_zadosti": "Vyřízení žádosti",
     "hromadne_schvalit": "Hromadně schválit",
-    "hromadne_odmitnout": "Hromadně odmítnout"
+    "hromadne_odmitnout": "Hromadně odmítnout",
+    "historie_stavu": "Historie stavu",
+    "historie_kuratorskeho_stavu": "Historie kurátorského stavu",
+    "historie_bibliografickeho_zaznamu": "Historie bibliografického stavu"
   },
 
   "acts": {
