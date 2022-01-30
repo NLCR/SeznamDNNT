@@ -156,11 +156,12 @@ export class ZadostComponent implements OnInit {
     });
   }
 
+  
+
   allProcessed(): boolean {
     let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
     let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
     let allProcessed: boolean = true;
-
     if (this.zadost && this.zadost.process) {
       this.zadost.identifiers.forEach(id => {
         let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";

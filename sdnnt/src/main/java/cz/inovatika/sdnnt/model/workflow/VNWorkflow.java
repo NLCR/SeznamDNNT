@@ -83,4 +83,8 @@ public class VNWorkflow extends Workflow {
         }
     }
 
+    @Override
+    public boolean userDefinedWorkflow() {
+        return true;
+    }
 }

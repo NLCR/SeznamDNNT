@@ -214,7 +214,6 @@ public class DntAlephImporter {
   }
 
 
-
   static SolrInputDocument toSolrDoc(MarcRecord rec) {
     SolrInputDocument sdoc = new SolrInputDocument();
     if (sdoc.isEmpty()) {
@@ -225,9 +224,6 @@ public class DntAlephImporter {
     sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
     sdoc.setField(LEADER_FIELD, rec.leader);
     sdoc.setField(RAW_FIELD, rec.toJSON().toString());
-
-//    sdoc.setField(HISTORIE_STAVU_FIELD, rec.historie_stavu.toString());
-//    sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, rec.historie_kurator_stavu.toString());
 
     // Control fields
     for (String cf : rec.controlFields.keySet()) {
@@ -307,7 +303,7 @@ public class DntAlephImporter {
   }
 
 
-// Commented by ps
+// Commented by ps ??
 //  private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
 //    List<SolrInputDocument> idocs = new ArrayList<>();
 //

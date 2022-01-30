@@ -103,22 +103,23 @@ public class CatalogSearcher {
                     String key = doc.getString(MarcRecordFields.IDENTIFIER_FIELD);
                     if (!usedIdentifiers.contains(key)) {
                         JSONObject jsonObject = new JSONObject();
+
                         JSONArray license = doc.optJSONArray(MarcRecordFields.LICENSE_FIELD);
                         JSONArray dntStavyJSONArray = doc.optJSONArray(MarcRecordFields.DNTSTAV_FIELD);
                         JSONArray kuratorStavyJSONArray = doc.optJSONArray(MarcRecordFields.KURATORSTAV_FIELD);
 
-                        List<String> publicStates = new ArrayList<>();
-                        dntStavyJSONArray.forEach(o -> {
-                            publicStates.add(o.toString());
-                        });
-
-                        List<String> curatorStates = new ArrayList<>();
-                        kuratorStavyJSONArray.forEach(o -> {
-                            curatorStates.add(o.toString());
-                        });
-
                         if (dntStavyJSONArray != null) {
-                            List<ZadostType> zadostTypes = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null ? license.getString(0) : null);
+                            List<String> publicStates = new ArrayList<>();
+                            dntStavyJSONArray.forEach(o -> {
+                                publicStates.add(o.toString());
+                            });
+
+                            List<String> curatorStates = new ArrayList<>();
+                            kuratorStavyJSONArray.forEach(o -> {
+                                curatorStates.add(o.toString());
+                            });
+
+                            List<ZadostType> zadostTypes = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null && license.length() > 0 ? license.getString(0) : null);
                             JSONArray actions = new JSONArray();
                             zadostTypes.stream().map(ZadostType::name).forEach(actions::put);
                             jsonObject.put("workflows", actions);
@@ -253,7 +254,7 @@ public class CatalogSearcher {
                     query = query.addFilterQuery("user:\"" + user.getUsername() + "\"");
                 }
 
-                for (String filter :  additionalFilters) {
+                for (String filter : additionalFilters) {
                     query = query.addFilterQuery(filter);
                 }
 
@@ -337,6 +338,9 @@ public class CatalogSearcher {
         if (req.containsKey("page")) {
             start = Integer.parseInt(req.get("page")) * rows;
         }
+        // select from identifiers;
+        // fulltext or id_pid or id_all_identifiers or id_all_identifiers_cuts
+        //String modifiedQuery = String.format("fullText:%s OR id_pid:%s OR id_all_identifiers:%s OR id_all_identifiers_cuts:%s", q,q,q,q);
         SolrQuery query = new SolrQuery(q)
                 .setRows(rows)
                 .setStart(start)
@@ -349,9 +353,10 @@ public class CatalogSearcher {
                 .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
 
 
-        if (req.containsKey("q")) {
-            query.setParam("df", "fullText");
-        }
+        query.set("defType", "edismax");
+        query.set("qf", "title^3 id_pid^4 id_all_identifiers^4 id_all_identifiers_cuts^4 fullText");
+
+
         if (req.containsKey("sort")) {
             if (req.get("sort").startsWith("date1")) {
                 String dir = req.get("sort").split(" ")[1];

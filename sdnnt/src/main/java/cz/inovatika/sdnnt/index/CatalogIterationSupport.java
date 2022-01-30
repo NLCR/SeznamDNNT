@@ -68,7 +68,7 @@ public class CatalogIterationSupport {
             rows = Integer.parseInt(req.get("rows"));
         }
         SolrClient solr = Indexer.getClient();
-
+        LOGGER.info("Iteration rows "+rows);
         try {
             SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc("identifier"));
 

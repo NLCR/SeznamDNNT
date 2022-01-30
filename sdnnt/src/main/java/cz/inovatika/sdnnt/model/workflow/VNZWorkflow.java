@@ -66,4 +66,8 @@ public class VNZWorkflow extends Workflow {
         }
     }
 
+    @Override
+    public boolean userDefinedWorkflow() {
+        return true;
+    }
 }

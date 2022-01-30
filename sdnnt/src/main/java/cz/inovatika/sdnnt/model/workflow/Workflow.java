@@ -55,6 +55,9 @@ public abstract class Workflow {
      */
     public abstract  boolean isAlternativeSwitchPossible(String alternative);
 
+
+    public abstract boolean userDefinedWorkflow();
+
     /**
      * Vytvari jmeno prechodu, uklada se do historie
      * @param currentState Jmeno prechodu

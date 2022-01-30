@@ -110,7 +110,22 @@
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
   
    <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
+	
+   <!-- identifikatory --> 
+   <!-- vsechny identifikatory - raw -->
+   <field name="id_all_identifiers" type="string" indexed="true" stored="false" multiValued="true"  />
+   <!-- vsechny identifikatory - zbaveny pomlcek -->
+   <field name="id_all_identifiers_cuts" type="cut-character" indexed="true" stored="false" multiValued="true"  />
+	
+   <!-- pid, vyhledava dle konkrentniho pidu plne casti za uuid nebo vraci vsechny pri zadani uuid -->	
+   <field name="id_pid" type="cut-pid" indexed="true" stored="false" multiValued="true"  />
+   <field name="id_ccnb" type="string" indexed="true" stored="false" multiValued="true"  />
+   <field name="id_isbn" type="string" indexed="true" stored="false" multiValued="true"  />
+   <field name="id_issn" type="string" indexed="true" stored="false" multiValued="true"  />
+   <field name="id_ismn" type="string" indexed="true" stored="false" multiValued="true"  />
+   <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
    
+   <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
    
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
@@ -132,10 +147,61 @@
 	<!-- must be preprocessed fields marc_260 and marc_264
     <copyField source="marc_260b" dest="nakladatel"/>
 	--> 
-    <copyField source="marc_*" dest="fullText"/>
+    <copyField source="marc_03*" dest="fullText"/>
+    <copyField source="marc_040*" dest="fullText"/>
+    <copyField source="marc_040*" dest="fullText"/>
+    <copyField source="marc_1*" dest="fullText"/>
+    <copyField source="marc_2*" dest="fullText"/>
+    <copyField source="marc_3*" dest="fullText"/>
+    <copyField source="marc_7*" dest="fullText"/>
+    <copyField source="marc_8563" dest="fullText"/>
+    <copyField source="marc_8564" dest="fullText"/>
+    <copyField source="marc_856q" dest="fullText"/>
+    <copyField source="marc_856y" dest="fullText"/>
+    <copyField source="marc_856z" dest="fullText"/>
+    <copyField source="marc_856y" dest="fullText"/>
+    <copyField source="marc_910*" dest="fullText"/>
+    <copyField source="marc_911a" dest="fullText"/>
+    <copyField source="marc_911d" dest="fullText"/>
+    <copyField source="marc_911p" dest="fullText"/>
+    <copyField source="marc_911p" dest="fullText"/>
+    <copyField source="marc_911r" dest="fullText"/>
+    <copyField source="marc_911s" dest="fullText"/>
+    <copyField source="marc_9569" dest="fullText"/>
+    <copyField source="marc_956y" dest="fullText"/>
+    <copyField source="marc_99*" dest="fullText"/>
+
     <copyField source="controlfield_*" dest="fullText"/>
+	<!--
     <copyField source="ean" dest="fullText"/>
+	-->
     <copyField source="identifier" dest="fullText"/>
+	
+	<!-- ccnb -->
+	<copyField source="marc_015a" dest="id_ccnb"/>
+	<copyField source="marc_015a" dest="id_all_identifiers"/>
+	<copyField source="marc_015a" dest="id_all_identifiers_cuts"/>
+		
+	<!-- ean -->
+    <copyField source="ean" dest="id_ean"/>
+    <copyField source="ean" dest="id_all_identifiers"/>
+    <copyField source="ean" dest="id_all_identifiers_cuts"/>
+
+	<!-- links / pids (TODO: preprocess it) -->
+	<copyField source="marc_911u" dest="id_pid" />
+	<copyField source="marc_956u" dest="id_pid" />
+	<copyField source="marc_856u" dest="id_pid" />
+	
+	<!-- issn -->
+	<copyField source="marc_022a" dest="id_issn" />
+	<copyField source="marc_022a" dest="id_all_identifiers" />
+	<copyField source="marc_022a" dest="id_all_identifiers_cuts" />
+
+	<!-- isbn -->
+	<copyField source="marc_020a" dest="id_isbn" />
+	<copyField source="marc_020a" dest="id_all_identifiers" />
+	<copyField source="marc_020a" dest="id_all_identifiers_cuts" />
+	
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
@@ -575,6 +641,31 @@
 
       </analyzer>
     </fieldType>
+		
+	<!-- remove '-' string -->	
+	<fieldType name="cut-character"  class="solr.TextField" positionIncrementGap="100">
+		<analyzer>
+			<charFilter class="solr.PatternReplaceCharFilterFactory"
+              pattern="([^a-z0-9])"
+              replacement=""/>
+		<tokenizer class="solr.StandardTokenizerFactory"/>
+		</analyzer>
+	</fieldType>
+
+
+	
+	<!-- pid analyzer -->
+	<fieldType name="cut-pid"  class="solr.TextField" positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.KeywordTokenizerFactory"/>
+			<filter class="solr.PatternCaptureGroupFilterFactory" pattern="((uuid):([A-Za-z0-9\-]+))" preserve_original="false"/>
+			<filter class="solr.LowerCaseFilterFactory"/>
+			<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>			
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.KeywordTokenizerFactory"/>
+		</analyzer>
+	</fieldType>
     
     <fieldType name="icu_sort_cs" class="solr.ICUCollationField"  locale="cs" strength="tertiary">
     </fieldType>

@@ -92,4 +92,9 @@ public class NZNWorkflow extends Workflow {
         CuratorItemState workflowState = getOwner().getWorkflowState();
         return workflowState != null && workflowState.equals(A);
     }
+
+    @Override
+    public boolean userDefinedWorkflow() {
+        return true;
+    }
 }

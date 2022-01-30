@@ -91,4 +91,9 @@ public class VNLWorkflow extends Workflow {
         return workflowState != null &&
                 (workflowState.equals(A) || workflowState.equals(PA) || workflowState.equals(N));
     }
+
+    @Override
+    public boolean userDefinedWorkflow() {
+        return true;
+    }
 }

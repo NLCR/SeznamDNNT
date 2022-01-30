@@ -57,8 +57,8 @@
               </mat-button-toggle>
               <mat-menu #menuVyrizeniZadosti="matMenu">
                 <button mat-menu-item (click)="process()">{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
-                <button mat-menu-item *ngIf="!allProcessed()" (click)="aproveAll()">{{ 'desc.hromadne_schvalit' | translate }}</button>
-                <button mat-menu-item *ngIf="!allProcessed()" (click)="rejectAll()">{{ 'desc.hromadne_odmitnout' | translate }}</button>
+                <button mat-menu-item *ngIf="!allProcessed() && zadost.navrh !== 'VNL'" (click)="aproveAll()">{{ 'desc.hromadne_schvalit' | translate }}</button>
+                <button mat-menu-item *ngIf="!allProcessed()  && zadost.navrh !== 'VNL'" (click)="rejectAll()">{{ 'desc.hromadne_odmitnout' | translate }}</button>
               </mat-menu>
 
               <mat-button-toggle *ngIf="(zadost.navrh === 'VNZ' || zadost.navrh === 'VNL') && zadost.state === 'open'"  value="" [matMenuTriggerFor]="typeVNXMenu" [matTooltip]="'desc.typ_zadosti' | translate">
