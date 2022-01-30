@@ -1,6 +1,15 @@
 // --- ADMIN ---
 
 app-admin {
+  .app-admin-wrapper {
+    .app-fx-facets {
+      @extend .app-pt-0;
+      width: $app-search-facet-width;
+    }
+  }
+
+
+
   .mat-list {
     @extend .app-clean-pd;
     border: 1px solid $app-brand-border-color;
