@@ -43,7 +43,7 @@
     "N": "vyřazeno",
     "X": "volné dílo",
     "PX": "pravděpodobná volné dílo",
-    "NL":"omezení na terminál / plánované vydání po získání licence",
+    "NL": "omezení na terminál / plánované vydání po získání licence",
     "NLX":"omezeno na terminál",
 
     "VN": "výzva pro vyřazení",
@@ -121,8 +121,8 @@
     "NZN": "návrh k zařazení",
     "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",
     "VNZ": "Výzva k licenci pro terminál na místě samém",
-    "NL":"omezení na terminál / plánované vydání po získání licence",
-    "NLX":"omezeno na terminál",
+    "NL": "Plánované vydání díla",
+    "NLX": "omezeno na terminál",
 
     "Priorita 1": "Priorita 1",
     "Priorita 2": "Priorita 2",
