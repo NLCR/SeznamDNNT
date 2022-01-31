@@ -65,11 +65,12 @@ export class AccountComponent implements OnInit {
   institutionFilter:string;
   delegatedFilter: string;
   priorityFilter: string;
-
+  typeOfRequestFilter: string;
 
   allResultInstitutions:string[] = [];
   allPriorities:string[] = [];
   allDelegated:string[] = [];
+  allTypes:string[] = [];
 
 
   constructor(
@@ -92,7 +93,6 @@ export class AccountComponent implements OnInit {
         'id',
         'datum_zadani',
         'user', 
-        //'institution', 
         'state', 
         'navrh',
         'datum_vyrizeni',
@@ -154,6 +154,9 @@ export class AccountComponent implements OnInit {
         });
 
         this.allDelegated = resp.facet_counts.facet_fields.delegated.filter((itm) => itm.value > 0 ).map( function(val, index){
+          return val.name;
+        });
+        this.allTypes = resp.facet_counts.facet_fields.type_of_request.filter((itm) => itm.value > 0 ).map( function(val, index){
           return val.name;
         });
       }
@@ -227,6 +230,21 @@ export class AccountComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+  setTypeOfRequest(typeOfReq: string) {
+    const q: any = {};
+    q.type_of_request = typeOfReq;
+    if (this.typeOfRequestFilter === typeOfReq) {
+      q.type_of_request = null;
+      this.typeOfRequestFilter = null;
+    } else {
+      q.type_of_request = typeOfReq;
+      this.typeOfRequestFilter  = typeOfReq;
+    }
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+
+  }
+
   setPriority(priority: string) {
     const q: any = {};
     q.priority = priority;
@@ -247,6 +265,7 @@ export class AccountComponent implements OnInit {
     this.institutionFilter = null; 
     this.priorityFilter = null;
     this.delegatedFilter = null;
+    this.typeOfRequestFilter = null;
 
     const q: any = {};
     q.navrh = null;
@@ -255,7 +274,7 @@ export class AccountComponent implements OnInit {
     q.priority = null;
     q.delegated = null;
     q.page = null;
-
+    q.type_of_request = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 

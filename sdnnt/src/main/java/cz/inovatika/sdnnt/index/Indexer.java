@@ -27,7 +27,7 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -285,7 +285,7 @@ public class Indexer {
 //        }
 //      });
 //    } finally {
-//      SolrUtils.quietCommit(client, "catalog");
+//      SolrJUtilities.quietCommit(client, "catalog");
 //    }
 //    return ret;
   }
@@ -404,7 +404,7 @@ public class Indexer {
       if (!granularity.isEmpty()) {  mr.setGranularity(granularity, poznamka, user); }
       getClient().add("catalog", mr.toSolrDoc());
     } finally {
-      SolrUtils.quietCommit(getClient(),"catalog" );
+      SolrJUtilities.quietCommit(getClient(),"catalog" );
     }
     return ret;
   }
@@ -444,7 +444,7 @@ public class Indexer {
 //        }
 //      });
     } finally {
-      SolrUtils.quietCommit(client,"catalog" );
+      SolrJUtilities.quietCommit(client,"catalog" );
     }
     return ret;
   }

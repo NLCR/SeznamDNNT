@@ -11,19 +11,16 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Solr utils; utility methods for working with solr */
-public class SolrUtils {
+public class SolrJUtilities {
 
-    public static final Logger LOGGER = Logger.getLogger(SolrUtils.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(SolrJUtilities.class.getName());
 
-    private SolrUtils() {}
+    private SolrJUtilities() {}
 
     public static void quietCommit(SolrClient client, String collection) {
         try {

@@ -11,11 +11,10 @@ import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
-import cz.inovatika.sdnnt.services.impl.shib.ShibbolethUtils;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -92,9 +91,6 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     @Override
     public User getUser() {
-
-
-
         return (User) this.request.getSession(true).getAttribute("user");
     }
 
@@ -339,7 +335,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             //List<Zadost> zadost = solr.query("zadost", query).getBeans(Zadost.class);
 
             List<Zadost> zadosti = new ArrayList<>();
-            SolrUtils.jsonDocsFromResult(solr, query, "zadost").forEach(z-> {
+            SolrJUtilities.jsonDocsFromResult(solr, query, "zadost").forEach(z-> {
                 zadosti.add(Zadost.fromJSON(z.toString()));
             });
 
@@ -355,7 +351,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             client.add("users", user.toSolrInputDocument());
             return UsersUtils.toTOObject(user);
         } finally {
-            SolrUtils.quietCommit(client, "users");
+            SolrJUtilities.quietCommit(client, "users");
         }
     }
 

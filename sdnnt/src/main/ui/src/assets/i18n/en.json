@@ -75,7 +75,9 @@
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
-      "NLX":"On-site terminal license, internal state"
+      "NLX":"On-site terminal license, internal state",
+      "PXN":"Public work suggestion"
+
     }
   },
   "license": {
@@ -534,6 +536,8 @@
   },
 
   "desc": {
+    "scheduler_type_request":"Scheduler generated requests", 
+    "user_type_request":"Users' requests", 
     "institution": "Institution",
     "notifikace_interval": "Notification interval",
     "none": "Not set",
@@ -758,7 +762,10 @@
     "provest_hromadny_navrh": "Make a bulk proposal",
     "vyrizeni_zadosti": "Processing of the application",
     "hromadne_schvalit": "Bulk approve",
-    "hromadne_odmitnout": "Reject en masse"
+    "hromadne_odmitnout": "Reject en masse",
+
+    "type_of_request" : "Type of request"
+
   },
 
   "acts": {

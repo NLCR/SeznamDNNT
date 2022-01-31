@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.ZadostProcess;
 import cz.inovatika.sdnnt.model.workflow.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -80,7 +81,7 @@ public class ZadostWorkflowTest {
     }
 
     @Test
-    public void testVNNWorkflow() {
+    public void testVNLWorkflow() {
         System.out.println(" VNN >> ");
         Zadost zadost = new Zadost("mojeid");
         WorkflowOwner owner = new ZadostProxy(zadost);
@@ -155,4 +156,61 @@ public class ZadostWorkflowTest {
 
     }
 
+
+    @Test
+    public void testVNLWorkflow_AcceptedRejected() {
+        //System.out.println(" VNL >> ");
+        Zadost zadost = new Zadost("mojeid");
+        zadost.addIdentifier("ident1");
+        zadost.addIdentifier("ident2");
+
+        WorkflowOwner owner = new ZadostProxy(zadost);
+        WorkflowState state = null;
+        // send
+        VNLWorkflow workflow = new VNLWorkflow(owner);
+
+        //owner.switchWorkflowState(workflow.nextState());
+
+
+        while((state = workflow.nextState()) != null && !state.isFinalSate()) {
+            System.out.println(state.getCuratorState());
+
+            String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+            System.out.println(transitionName);
+            //zadost.addProcess();
+            owner.switchWorkflowState(state.getCuratorState(), state.getLicense().name(), true,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            System.out.println("======== -------- ==========");
+        }
+        System.out.println("======== Konecny stav ==========");
+
+        if (state.isFinalSate()) {
+            System.out.println("Setting workflow owner state to "+state.getCuratorState());
+            System.out.println("Setting licence to "+state.getLicense());
+            System.out.println("Lhuta "+state.getPeriod());
+            System.out.println("Typ prechodu: "+state.getPeriod().getTransitionType());
+
+//            String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+//            System.out.println(transitionName);
+
+            System.out.println("Setting deadline "+state.getDate());
+            owner.switchWorkflowState(state.getCuratorState(),null ,false ,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+
+            String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+            System.out.println(transitionName);
+
+        }
+
+    }
+
+    private void zProcess(String identifier, Zadost z, String approvestate, String username, String comment, String transition) {
+
+        ZadostProcess zprocess = new ZadostProcess();
+        zprocess.setState(approvestate != null ? approvestate : "approved");
+        zprocess.setUser(username);
+        zprocess.setReason(comment);
+        zprocess.setDate(new Date());
+        zprocess.setTransitionName(transition);
+        z.addProcess(identifier, zprocess);
+
+    }
 }

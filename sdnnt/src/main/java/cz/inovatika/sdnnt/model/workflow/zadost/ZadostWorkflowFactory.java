@@ -17,12 +17,14 @@ public class ZadostWorkflowFactory {
         Options instance = Options.getInstance();
 
         String navrh = zadost.getNavrh();
-        if (navrh != null && ZadostType.find(navrh) != null) {
-            switch (ZadostType.find(navrh)) {
+        if (navrh != null && ZadostTypNavrh.find(navrh) != null) {
+            switch (ZadostTypNavrh.find(navrh)) {
                 case NZN: return new NZNWorkflow(new ZadostProxy(zadost));
                 case VN: return new VNWorkflow(new ZadostProxy(zadost));
                 case VNZ: return new VNZWorkflow(new ZadostProxy(zadost));
                 case VNL: return new VNLWorkflow(new ZadostProxy(zadost));
+                // zadosti generovane systemem
+                case PXN: return new PXWorkflow(new ZadostProxy(zadost));
                 default: new NZNWorkflow(new ZadostProxy(zadost));
             }
         }

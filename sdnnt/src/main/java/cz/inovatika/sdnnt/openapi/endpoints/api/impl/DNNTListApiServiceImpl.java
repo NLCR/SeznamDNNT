@@ -42,6 +42,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     // number of concurrent clients in case of exporting long csv file
     public static final int DEFAULT_CONCURRENT_CLIENTS = 3;
+    public static final int MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST = 10000;
+
     protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
@@ -53,7 +55,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             MARC_902_A
     );
 
-    public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY);
+    public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD);
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
@@ -70,24 +72,26 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
 
-
-
         final ListitemResponse response = new ListitemResponse();
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
+        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+                String nextCursorMark = rsp.getNextCursorMark();
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc: rsp.getResults()) {
+                    Object fieldValue = resultDoc.getFieldValue(LICENSE_FIELD);
+                    emitDocument(instituion, fieldValue != null ? fieldValue.toString() : "", false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>());
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
 
-        this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
-            String nextCursorMark = rsp.getNextCursorMark();
-            SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
-            for (SolrDocument resultDoc: rsp.getResults()) {
-                emitDocument(instituion, License.dnnto.name(), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>());
-            }
-            response.setNumFound((int) rsp.getResults().getNumFound());
+                response.setResumptiontoken(nextCursorMark);
+            });
 
-            response.setResumptiontoken(nextCursorMark);
-        });
-
-        return Response.ok().entity(response).build();
+            return Response.ok().entity(response).build();
+        } else {
+            return Response.status(400).entity("Maximum number of items exceeded").build();
+        }
     }
 
     @Override
@@ -105,17 +109,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
 
-        this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
-            String nextCursorMark = rsp.getNextCursorMark();
-            SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
-            for (SolrDocument resultDoc: rsp.getResults()) {
-                emitDocument(institution, License.dnntt.name(), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
-            }
-            response.setNumFound((int) rsp.getResults().getNumFound());
-            response.setResumptiontoken(nextCursorMark);
-        });
-
-        return Response.ok().entity(response).build();
+        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+                String nextCursorMark = rsp.getNextCursorMark();
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc: rsp.getResults()) {
+                    Object fieldValue = resultDoc.getFieldValue(LICENSE_FIELD);
+                    emitDocument(institution, fieldValue != null ? fieldValue.toString() : "", false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
+                response.setResumptiontoken(nextCursorMark);
+            });
+            return Response.ok().entity(response).build();
+        } else {
+            return Response.status(400).entity("Maximum number of items exceeded").build();
+        }
     }
 
     @Override
@@ -132,17 +140,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
 
-        this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
-            String nextCursorMark = rsp.getNextCursorMark();
-            SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
-            for (SolrDocument resultDoc: rsp.getResults()) {
-                emitDocument(institution, License.dnntt.name(), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
-            }
-            response.setNumFound((int) rsp.getResults().getNumFound());
-            response.setResumptiontoken(nextCursorMark);
-        });
-
-        return Response.ok().entity(response).build();
+        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String, String>(), null, plusList, new ArrayList<String>(), CATALOG_FIELDS, (rsp) -> {
+                String nextCursorMark = rsp.getNextCursorMark();
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc : rsp.getResults()) {
+                    Object fieldValue = resultDoc.getFieldValue(LICENSE_FIELD);
+                    emitDocument(institution, fieldValue != null ? fieldValue.toString() : "", false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
+                response.setResumptiontoken(nextCursorMark);
+            });
+            return Response.ok().entity(response).build();
+        } else {
+            return Response.status(400).entity("Maximum number of items exceeded").build();
+        }
     }
 
     @Override
@@ -160,17 +172,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
 
-        this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
-            String nextCursorMark = rsp.getNextCursorMark();
-            SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
-            for (SolrDocument resultDoc: rsp.getResults()) {
-                emitDocument(institution, License.dnntt.name(), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
-            }
-            response.setNumFound((int) rsp.getResults().getNumFound());
-            response.setResumptiontoken(nextCursorMark);
-        });
-
-        return Response.ok().entity(response).build();
+        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+                String nextCursorMark = rsp.getNextCursorMark();
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc: rsp.getResults()) {
+                    Object fieldValue = resultDoc.getFieldValue(LICENSE_FIELD);
+                    emitDocument(institution, fieldValue != null ? fieldValue.toString() : "", false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS);
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
+                response.setResumptiontoken(nextCursorMark);
+            });
+            return Response.ok().entity(response).build();
+        } else {
+            return Response.status(400).entity("Maximum number of items exceeded").build();
+        }
     }
 
 
@@ -300,10 +316,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     // TODO: Prodisktuovat instituce, marc911a,u, marc956u, marc856u a vazby na digitalni instance krameria
     private Response fullCSV( String selectedInstitution, String label, Boolean onlyUniqPids, List<String> plusList, List<String> minusList, List<String> fetchingFields, List<String> outputFields) {
         try {
-
-
             Set<String> uniqe = new HashSet<>();
-
             File csvFile = File.createTempFile("temp","csv");
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(csvFile), Charset.forName("UTF-8"));
 
@@ -378,8 +391,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }).collect(Collectors.toList());
 
 
-
-
             if (minstitutions !=null && !minstitutions.isEmpty()) {
 
                 List<String> institutions = new ArrayList(minstitutions);
@@ -396,11 +407,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     if (indexOf > -1 && indexOf< pids.size()) {
                         String pid = pids.get(indexOf);
                         if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
-                            //pidsForInstitution(selectedInstitution, label, printer, nazev, identifier, pid);
-
-                            //doc(selectedInstitution, label, nazev, identifier, pid);
-
-
                             documentOutput.output(doc(selectedInstitution, label, nazev, identifier, pid), outputFields);
                             uniqe.add(pid);
                         }

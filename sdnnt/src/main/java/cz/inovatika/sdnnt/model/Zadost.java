@@ -10,11 +10,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import cz.inovatika.sdnnt.model.workflow.Workflow;
-import cz.inovatika.sdnnt.model.workflow.zadost.ZadostWorkflowFactory;
+import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.BeanUtilities;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -100,6 +99,8 @@ public class Zadost implements NotNullAwareObject{
   public static final String DESIRED_ITEM_STATE_KEY = "desired_item_state";
   public static final String DESIRED_LICENSE_KEY = "desired_license";
 
+  // typ zadosti; pokud je generovany systemem nebo uzivatelem
+  public static final String TYPE_OF_REQUEST = "type_of_request";
 
   // historie zadosti
   private String id;
@@ -131,6 +132,8 @@ public class Zadost implements NotNullAwareObject{
 
   // version for
   private String version;
+
+  private String typeOfRequest = ZadostTyp.user.name();
 
   public Zadost(String id) {
     this.id = id;
@@ -304,6 +307,15 @@ public class Zadost implements NotNullAwareObject{
     this.email = email;
   }
 
+
+  public void setTypeOfRequest(String typeOfRequest) {
+    this.typeOfRequest = typeOfRequest;
+  }
+
+  public String getTypeOfRequest() {
+    return typeOfRequest;
+  }
+
   public boolean isEscalated() {
     if (getDeadline() != null) {
       JSONObject jsonObject = Options.getInstance().getJSONObject("workflow").getJSONObject("escalation");
@@ -426,10 +438,10 @@ public class Zadost implements NotNullAwareObject{
       sinput.addField(TYP_KEY, getTyp());
     }
     if (getDatumVyrizeni() != null) {
-      sinput.addField(DATUM_VYRIZENI_KEY, SolrUtils.solrDateString(getDatumVyrizeni()));
+      sinput.addField(DATUM_VYRIZENI_KEY, SolrJUtilities.solrDateString(getDatumVyrizeni()));
     }
     if (getDatumZadani() != null) {
-      sinput.addField(DATUM_ZADANI_KEY, SolrUtils.solrDateString(getDatumZadani()));
+      sinput.addField(DATUM_ZADANI_KEY, SolrJUtilities.solrDateString(getDatumZadani()));
     }
     if(getDelegated() != null) {
       sinput.addField(DELEGATED_KEY, getDelegated());
@@ -504,6 +516,12 @@ public class Zadost implements NotNullAwareObject{
       String email = getEmail();
       sinput.addField(EMAIL_KEY, email);
     }
+
+    if (getTypeOfRequest() != null) {
+      String typeOfREquest = getTypeOfRequest();
+      sinput.addField(TYPE_OF_REQUEST, typeOfREquest);
+    }
+
     return sinput;
 
   }
@@ -535,10 +553,10 @@ public class Zadost implements NotNullAwareObject{
         zadost.setPozadavek(jsonobj.getString(POZADAVEK_KEY));
       }
       if (jsonobj.has(DATUM_ZADANI_KEY)) {
-        zadost.setDatumZadani(SolrUtils.solrDate(jsonobj.getString(DATUM_ZADANI_KEY)));
+        zadost.setDatumZadani(SolrJUtilities.solrDate(jsonobj.getString(DATUM_ZADANI_KEY)));
       }
       if (jsonobj.has(DATUM_VYRIZENI_KEY)) {
-        zadost.setDatumVyrizeni(SolrUtils.solrDate(jsonobj.getString(DATUM_VYRIZENI_KEY)));
+        zadost.setDatumVyrizeni(SolrJUtilities.solrDate(jsonobj.getString(DATUM_VYRIZENI_KEY)));
       }
       if (jsonobj.has(FORMULAR_KEY)) {
         zadost.setFormular(jsonobj.getString(FORMULAR_KEY));
@@ -602,7 +620,7 @@ public class Zadost implements NotNullAwareObject{
       }
 
       if (jsonobj.has(DEADLINE_KEY)) {
-        zadost.setDeadline(SolrUtils.solrDate(jsonobj.getString(DEADLINE_KEY)));
+        zadost.setDeadline(SolrJUtilities.solrDate(jsonobj.getString(DEADLINE_KEY)));
       }
 
       if (jsonobj.has(DESIRED_ITEM_STATE_KEY)) {
@@ -615,6 +633,10 @@ public class Zadost implements NotNullAwareObject{
 
       if (jsonobj.has(EMAIL_KEY)) {
         zadost.setEmail(jsonobj.getString(EMAIL_KEY));
+      }
+
+      if (jsonobj.has(TYPE_OF_REQUEST)) {
+        zadost.setTypeOfRequest(jsonobj.getString(TYPE_OF_REQUEST));
       }
       return zadost;
 
@@ -630,10 +652,10 @@ public class Zadost implements NotNullAwareObject{
       jsonObject.put(TYP_KEY, getTyp());
     }
     if (getDatumVyrizeni() != null) {
-      jsonObject.put(DATUM_VYRIZENI_KEY, SolrUtils.solrDateString(getDatumVyrizeni()));
+      jsonObject.put(DATUM_VYRIZENI_KEY, SolrJUtilities.solrDateString(getDatumVyrizeni()));
     }
     if (getDatumZadani() != null) {
-      jsonObject.put(DATUM_ZADANI_KEY, SolrUtils.solrDateString(getDatumZadani()));
+      jsonObject.put(DATUM_ZADANI_KEY, SolrJUtilities.solrDateString(getDatumZadani()));
     }
     if(getDelegated() != null) {
       jsonObject.put(DELEGATED_KEY, getDelegated());
@@ -688,7 +710,7 @@ public class Zadost implements NotNullAwareObject{
     }
 
     if (getDeadline() != null) {
-      jsonObject.put(DEADLINE_KEY, SolrUtils.solrDateString(getDeadline()));
+      jsonObject.put(DEADLINE_KEY, SolrJUtilities.solrDateString(getDeadline()));
     }
 
     if (getTransitionType() != null) {
@@ -705,6 +727,10 @@ public class Zadost implements NotNullAwareObject{
 
     if (getDesiredLicense() != null) {
       jsonObject.put(DESIRED_LICENSE_KEY, getDesiredLicense());
+    }
+
+    if (getTypeOfRequest() != null) {
+      jsonObject.put(TYPE_OF_REQUEST, getTypeOfRequest());
     }
     return jsonObject;
 

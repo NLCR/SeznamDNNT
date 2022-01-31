@@ -33,6 +33,7 @@ public interface AccountService {
      * @param institution Filtr pro instituci
      * @param priority Filtr pro prioritu
      * @param delegated Filtr pro delegovanou osobu
+     * @param typeOfReq
      * @param sort Sortovani dle (u uzivatele datum vytvoreni a zpracovani, u kuratoru - deadline, priority atd.. )
      * @param rows
      * @param page
@@ -41,7 +42,7 @@ public interface AccountService {
      * @throws IOException IO chyba
      * @throws AccountException Genericka vyjimka pri ukladani zadosti
      */
-    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, int rows, int page) throws SolrServerException, IOException,AccountException;
+    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String typeOfReq, String sort, int rows, int page) throws SolrServerException, IOException,AccountException;
 
 
     /**
@@ -121,6 +122,15 @@ public interface AccountService {
      * @throws AccountException
      */
     public JSONObject userCloseRequest(String payload) throws ConflictException,AccountException;
+
+    /**
+     * Zavreni pozadavku generovaneho systemem
+     * @param payload
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     */
+    public JSONObject schedulerDefinedCloseRequest(String payload) throws ConflictException,AccountException;
 
     /**
      * Zarvreni pozdadavku z pohledu kuratora

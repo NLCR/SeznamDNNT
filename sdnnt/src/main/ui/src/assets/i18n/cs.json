@@ -75,7 +75,8 @@
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
-      "NLX":"Omezeno na terminál, interní stav"
+      "NLX":"Omezeno na terminál, interní stav",
+      "PXN":"Návrhy na veřejné dílo"
     }
   },
   "license": {
@@ -533,6 +534,8 @@
   },
 
   "desc": {
+    "scheduler_type_request":"Systémem generované žádosti", 
+    "user_type_request":"Uživatelské žádosti", 
     "institution": "Instituce",
     "notifikace_interval": "Interval notifikace",
     "none": "Nenastaveno",
@@ -758,7 +761,8 @@
     "provest_hromadny_navrh": "Provést hromadný návrh",
     "vyrizeni_zadosti": "Vyřízení žádosti",
     "hromadne_schvalit": "Hromadně schválit",
-    "hromadne_odmitnout": "Hromadně odmítnout"
+    "hromadne_odmitnout": "Hromadně odmítnout",
+    "type_of_request" : "Typ žádosti"
   },
 
   "acts": {

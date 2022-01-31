@@ -24,7 +24,7 @@ public class DocumentWorkflowFactory {
         return null;
     }
 
-    public static List<ZadostType> canBePartOfZadost(List<String> kuratorstav, List<String> stav, String license) {
+    public static List<ZadostTypNavrh> canBePartOfZadost(List<String> kuratorstav, List<String> stav, String license) {
         CuratorItemState curatorItemState = null;
         if (kuratorstav != null && !kuratorstav.isEmpty()) {
             curatorItemState = CuratorItemState.valueOf(kuratorstav.get(0));
@@ -37,44 +37,44 @@ public class DocumentWorkflowFactory {
 
         DocumentCheckProxy checkProxy = new DocumentCheckProxy(curatorItemState, publicItemState, license);
 
-        List<ZadostType> zadostTypes = new ArrayList<>();
+        List<ZadostTypNavrh> zadostTypNavrhs = new ArrayList<>();
         if(nznDocument(kuratorstav)) {
             NZNWorkflow nznWorkflow = new NZNWorkflow(checkProxy);
             WorkflowState workflowState = nznWorkflow.nextState();
             if (workflowState != null) {
-                zadostTypes.add(ZadostType.NZN);
+                zadostTypNavrhs.add(ZadostTypNavrh.NZN);
             }
         }
         if (vnlDocument(kuratorstav)) {
             VNLWorkflow vnlWorkflow = new VNLWorkflow(checkProxy);
             WorkflowState workflowState = vnlWorkflow.nextState();
             if (workflowState != null) {
-                zadostTypes.add(ZadostType.VNL);
+                zadostTypNavrhs.add(ZadostTypNavrh.VNL);
             }
         }
         if (vnzDocument(kuratorstav)) {
             VNZWorkflow vnzWorkflow = new VNZWorkflow(checkProxy);
             WorkflowState workflowState = vnzWorkflow.nextState();
             if (workflowState != null) {
-                zadostTypes.add(ZadostType.VNZ);
+                zadostTypNavrhs.add(ZadostTypNavrh.VNZ);
             }
         }
         if (vnDocument(kuratorstav)) {
             VNWorkflow pxWorkflow = new VNWorkflow(checkProxy);
             WorkflowState workflowState = pxWorkflow.nextState();
             if (workflowState != null) {
-                zadostTypes.add(ZadostType.VN);
+                zadostTypNavrhs.add(ZadostTypNavrh.VN);
             }
         }
-        return  zadostTypes;
+        return zadostTypNavrhs;
    }
 
     public static Workflow create(MarcRecord record, Zadost zadost) {
         List<String> kuratorstav = record.kuratorstav;
         String navrh = zadost.getNavrh();
-        if (navrh != null && ZadostType.find(navrh) != null) {
+        if (navrh != null && ZadostTypNavrh.find(navrh) != null) {
 
-            switch (ZadostType.find(navrh)) {
+            switch (ZadostTypNavrh.find(navrh)) {
                 case NZN: {
                     if (nznDocument(kuratorstav)) { return new NZNWorkflow(new DocumentProxy(record)); }
                     else return null;
@@ -89,6 +89,10 @@ public class DocumentWorkflowFactory {
                 }
                 case VN: {
                     if (vnDocument(kuratorstav)) { return new VNWorkflow(new DocumentProxy(record));}
+                    else return null;
+                }
+                case PXN: {
+                    if (pxnDocument(kuratorstav)) { return new PXWorkflow(new DocumentProxy(record));}
                     else return null;
                 }
                 default:  return null;
@@ -118,6 +122,10 @@ public class DocumentWorkflowFactory {
                 kuratorstav.contains(CuratorItemState.NLX.name());
     }
 
+    private static boolean pxnDocument(List<String> kuratorstav) {
+        return  !kuratorstav.contains(CuratorItemState.X.name()) &&
+                !kuratorstav.contains(CuratorItemState.PX.name());
+    }
 
     private static boolean nznDocument(List<String> kuratorstav) {
         if (kuratorstav.isEmpty()) return true;

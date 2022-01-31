@@ -64,7 +64,7 @@ public class HistoryTest {
 
         EasyMock.replay( mockClient, mockUpdateResponse);
         History history = new HistoryImpl(mockClient);
-        history.log("oai:aleph-nkp.cz:DNT01-000106789",stream("history/old"), stream("history/new"), "user","catalog");
+        history.log("oai:aleph-nkp.cz:DNT01-000106789",stream("history/old"), stream("history/new"), "user","catalog", null);
 
         EasyMock.verify(mockClient, mockUpdateResponse);
     }

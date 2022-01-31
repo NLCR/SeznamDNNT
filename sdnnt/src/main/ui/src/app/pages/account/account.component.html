@@ -2,7 +2,7 @@
   <div fxLayout="row" fxLayoutGap="32px" class="app-account-wrapper">
     <div class="app-left app-fx-facets">
       <div class="app-facets-used">
-        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length || delegatedFilter?.length || priorityFilter?.length">
+        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length || delegatedFilter?.length || priorityFilter?.length || typeOfRequestFilter?.length">
           <h3 matSubheader fxLayout="row">
             <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
             <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
@@ -44,8 +44,15 @@
               <mat-list-item>
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setPriority(priorityFilter)"><mat-icon>clear</mat-icon></a>
                 <div>
-                  test
                   <span>{{ 'desc.priority' | translate }}:</span> {{priorityFilter }}
+                </div>
+              </mat-list-item>
+            </ng-container>
+            <ng-container *ngIf="typeOfRequestFilter">
+              <mat-list-item>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setTypeOfRequest(typeOfRequestFilter)"><mat-icon>clear</mat-icon></a>
+                <div>
+                  <span>{{ 'desc.type_of_request' | translate }}:</span> {{ 'desc.'+typeOfRequestFilter+'_type_request' | translate }}
                 </div>
               </mat-list-item>
             </ng-container>  
@@ -126,6 +133,18 @@
             <a (click)="setDelegated(d)">{{ d }}</a>
           </div>
         </mat-expansion-panel>
+
+        <mat-expansion-panel [expanded]="true"  *ngIf="allTypes.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
+          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+            <mat-panel-title>
+              {{ 'desc.typ_zadosti' | translate }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div *ngFor="let d of allTypes">
+            <a (click)="setTypeOfRequest(d)">{{ 'desc.'+d+'_type_request' | translate }}</a>
+          </div>
+        </mat-expansion-panel>
+
       </mat-accordion>
     </div>
 

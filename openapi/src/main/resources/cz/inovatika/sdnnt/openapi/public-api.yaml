@@ -171,6 +171,8 @@ paths:
             application/json:
               schema:
                 $ref: './schemas/lists/ListitemResponse.yaml'
+        '400':
+          description: Špatný dotaz; Překročen maximální počet záznamů.
 
   # CSV export dnnto
   /lists/added/dnnto/csvexport:
@@ -267,6 +269,8 @@ paths:
             application/json:
               schema:
                 $ref: './schemas/lists/ListitemResponse.yaml'
+        '400':
+          description: Špatný dotaz; Překročen maximální počet záznamů.
 
   # CSV Export stazenych del
   /lists/removed/dnntt/csvexport:
@@ -365,6 +369,8 @@ paths:
             application/json:
               schema:
                 $ref: './schemas/lists/ListitemResponse.yaml'
+        '400':
+          description: Špatný dotaz; Překročen maximální počet záznamů.
 
   #CSV export stazenych del dntto
   /lists/removed/dnnto/csvexport:

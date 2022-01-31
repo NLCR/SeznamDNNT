@@ -165,9 +165,11 @@ export class ZadostComponent implements OnInit {
     if (this.zadost && this.zadost.process) {
       this.zadost.identifiers.forEach(id => {
         let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
-        if (!this.zadost.process[tablekey]) {
+        let noworkflowkey =id+"_noworkflow";
+        if (!this.zadost.process[tablekey] && !this.zadost.process[noworkflowkey]) {
           allProcessed = false;
         }
+
       });
     } else {
       allProcessed = false;

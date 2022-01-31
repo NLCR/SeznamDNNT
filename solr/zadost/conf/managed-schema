@@ -55,6 +55,7 @@
     
     
     <field name="identifiers" type="string" indexed="true" stored="true" multiValued="true"  />
+	<!-- TODO: vyhodit --> 
     <field name="typ" type="string" indexed="true" stored="true"  />
     <field name="user" type="string" indexed="true" stored="true"  />
 	<field name="institution" type="string" indexed="true" stored="true" multiValued="false" docValues="true" />
@@ -87,6 +88,9 @@
    <!-- email snippets -->	
    <field name="email" type="string" indexed="true" stored="true" multiValued="false" docValues="false"  />
 
+
+   <!-- type of requests -->	
+   <field name="type_of_request" type="string" indexed="true" stored="true" multiValued="false" docValues="true"  />
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 

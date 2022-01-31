@@ -109,12 +109,24 @@ public class Job implements InterruptableJob {
   
   enum Actions {
 
+    PX_CHECK {
+      @Override
+      void doPerform(JSONObject jobData) {
+//        try {
+//    //
+////          AccountServiceImpl accountService = new AccountServiceImpl(null, null, null);
+////          accountService.schedulerSwitchStates();
+//        } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+//          LOGGER.log(Level.SEVERE, e.getMessage(),e);
+//        }
+      }
+    },
 
     WORKFLOW {
       @Override
       void doPerform(JSONObject jobData) {
         try {
-            AccountServiceImpl accountService = new AccountServiceImpl(null, null, null);
+            AccountServiceImpl accountService = new AccountServiceImpl( null, null);
             accountService.schedulerSwitchStates();
         } catch (ConflictException | AccountException | IOException | SolrServerException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);

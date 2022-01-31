@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
@@ -18,11 +17,9 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
@@ -82,8 +79,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
                 try {
 
-                    AccountService accountService = new AccountServiceImpl(userControler, loginSupport , new ResourceBundleServiceImpl(containerRequestContext));
-                    JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null ,null , LIMIT, 0);
+                    AccountService accountService = new AccountServiceImpl( loginSupport , new ResourceBundleServiceImpl(containerRequestContext));
+                    JSONObject search = accountService.search(null, status, Arrays.asList(navrh), null, null, null, null, null, LIMIT, 0);
                     JSONObject response = search.getJSONObject("response");
                     JSONArray docs = response.getJSONArray("docs");
                     for (int i = 0, ll = docs.length();i<ll;i++) {
@@ -162,7 +159,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
                 OpenApiLoginSupportImpl openApiLoginSupport = new OpenApiLoginSupportImpl(headerString);
 
-                AccountService accountService = new AccountServiceImpl(userControler, openApiLoginSupport, new ResourceBundleServiceImpl(crc));
+                AccountService accountService = new AccountServiceImpl( openApiLoginSupport, new ResourceBundleServiceImpl(crc));
 
                 if (openApiLoginSupport.getUser() != null) {
                     List<Request> batch = body.getBatch();

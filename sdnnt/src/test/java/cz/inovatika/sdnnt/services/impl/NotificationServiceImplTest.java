@@ -7,7 +7,7 @@ import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
@@ -71,7 +71,7 @@ public class NotificationServiceImplTest {
         prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
         prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrUtils.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
 
         // catalog prepared
 

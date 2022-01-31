@@ -14,26 +14,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 import cz.inovatika.sdnnt.utils.SimplePOST;
-import netscape.javascript.JSObject;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -137,6 +132,7 @@ public class IndexerServlet extends HttpServlet {
     enum Actions {
 
         TOUCH {
+
             private static final int LIMIT = 1000;
 
             @Override
@@ -148,27 +144,23 @@ public class IndexerServlet extends HttpServlet {
                         Map<String,String> reqMap = new HashMap<>();
                         reqMap.put("rows", ""+LIMIT);
                         CatalogIterationSupport support = new CatalogIterationSupport();
-                        List<String> listIds = new ArrayList<>();
-                        Set<String> setIds = new HashSet<>();
 
                         List<String> bulk = new ArrayList<>();
                         support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("identifier"), (rsp) -> {
                             Object identifier = rsp.getFieldValue("identifier");
-                            listIds.add(identifier.toString());
-                            setIds.add(identifier.toString());
 
                             bulk.add(identifier.toString());
                             if (bulk.size() >= LIMIT) {
                                 number.addAndGet(bulk.size());
                                 LOGGER.info(String.format("Bulk update %d", number.get()));
-                                JSONObject returnFromPost = post(bulk);
+                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
                                 jsonArray.put(returnFromPost);
                                 bulk.clear();
                             }
                         });
                         if (!bulk.isEmpty()) {
                             number.addAndGet(bulk.size());
-                            JSONObject returnFromPost = post(bulk);
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
                             bulk.clear();
                             jsonArray.put(returnFromPost);
                         }
@@ -181,47 +173,13 @@ public class IndexerServlet extends HttpServlet {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
-                        commit();
+                        PureHTTPSolrUtils.commit();
                     }
-
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");
                 }
             }
-            public void commit() {
-                try {
-                    String solrHosts = Options.getInstance().getString("solr.host", "http://localhost:8983/solr/");
-                    SimplePOST.post(solrHosts + (solrHosts.endsWith("/") ? "" : "/") + "catalog/update", "<commit/>");
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(),e);
-                }
-            }
 
-            public JSONObject post(List<String> bulk) {
-                try {
-                    StringBuilder builder = new StringBuilder("<add>\n");
-                    bulk.stream().forEach(identifier-> {
-                        String document = String.format("<doc><field name=\"identifier\">%s</field><field name=\"touch\" update=\"set\">true</field></doc>", identifier);
-                        builder.append(document);
-                    });
-
-                    builder.append("\n</add>");
-                    String solrHosts = Options.getInstance().getString("solr.host", "http://localhost:8983/solr/");
-                    Pair<Integer, String> post = SimplePOST.post(solrHosts + (solrHosts.endsWith("/") ? "" : "/") + "catalog/update", builder.toString());
-
-                    JSONObject returnFromBulk = new JSONObject();
-                    returnFromBulk.put("statusCode", post.getLeft());
-                    returnFromBulk.put("message", post.getRight());
-
-                    return returnFromBulk;
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(),e);
-                    JSONObject returnFromBulk = new JSONObject();
-                    returnFromBulk.put("statusCode", -1);
-                    returnFromBulk.put("message", e.getMessage());
-                    return returnFromBulk;
-                }
-            }
        },
 
         // pro interni ucely

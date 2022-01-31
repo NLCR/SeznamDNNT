@@ -10,7 +10,6 @@ import cz.inovatika.sdnnt.index.utils.QueryUtils;
 import cz.inovatika.sdnnt.model.User;
 
 import java.io.IOException;
-import java.text.BreakIterator;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,21 +17,19 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.workflow.ZadostType;
+import cz.inovatika.sdnnt.model.workflow.ZadostTypNavrh;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
-import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -119,9 +116,9 @@ public class CatalogSearcher {
                                 curatorStates.add(o.toString());
                             });
 
-                            List<ZadostType> zadostTypes = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null && license.length() > 0 ? license.getString(0) : null);
+                            List<ZadostTypNavrh> zadostTypNavrhs = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null && license.length() > 0 ? license.getString(0) : null);
                             JSONArray actions = new JSONArray();
-                            zadostTypes.stream().map(ZadostType::name).forEach(actions::put);
+                            zadostTypNavrhs.stream().map(ZadostTypNavrh::name).forEach(actions::put);
                             jsonObject.put("workflows", actions);
                         }
                         jsonObject.put(MarcRecordFields.DNTSTAV_FIELD, dntStavyJSONArray != null ? dntStavyJSONArray : new JSONArray());
@@ -354,7 +351,7 @@ public class CatalogSearcher {
 
 
         query.set("defType", "edismax");
-        query.set("qf", "title^3 id_pid^4 id_all_identifiers^4 id_all_identifiers_cuts^4 fullText");
+        query.set("qf", "title^3 id_pid^4 id_all_identifiers^4 id_all_identifiers_cuts^4 fullText license");
 
 
         if (req.containsKey("sort")) {

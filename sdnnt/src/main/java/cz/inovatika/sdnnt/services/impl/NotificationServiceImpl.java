@@ -9,7 +9,7 @@ import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
@@ -58,7 +58,7 @@ public class NotificationServiceImpl implements NotificationsService  {
 
                 return notifications;
             } finally {
-                SolrUtils.quietCommit(client, "notifications");
+                SolrJUtilities.quietCommit(client, "notifications");
             }
         } catch (IOException | SolrServerException e) {
             LOGGER.log(Level.SEVERE,e.getMessage());
@@ -91,7 +91,7 @@ public class NotificationServiceImpl implements NotificationsService  {
 
                 return notifications;
             } finally {
-                SolrUtils.quietCommit(client, "notifications");
+                SolrJUtilities.quietCommit(client, "notifications");
             }
         } catch (IOException | SolrServerException e) {
             LOGGER.log(Level.SEVERE,e.getMessage());
@@ -105,7 +105,7 @@ public class NotificationServiceImpl implements NotificationsService  {
             try {
                 client.addBean("notifications", notification);
             } finally {
-                SolrUtils.quietCommit(client, "notifications");
+                SolrJUtilities.quietCommit(client, "notifications");
             }
         } catch (IOException | SolrServerException e) {
             LOGGER.log(Level.SEVERE,e.getMessage());

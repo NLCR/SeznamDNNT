@@ -7,6 +7,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -27,6 +28,8 @@ public class ZadostTest {
         Assert.assertTrue(zadost.getId().equals("pokusny1631526967544"));
         Assert.assertTrue(zadost.getState().equals("open"));
         Assert.assertTrue(zadost.getUser().equals("pokusny"));
+        Assert.assertTrue(zadost.getTypeOfRequest().equals("user"));
+
 
         JSONObject object = zadost.toJSON();
 
@@ -44,6 +47,8 @@ public class ZadostTest {
 
         Assert.assertTrue(object.has("user"));
         Assert.assertTrue(object.getString("user").equals("pokusny"));
+
+        Assert.assertTrue(object.has("type_of_request"));
     }
 
 
@@ -58,6 +63,7 @@ public class ZadostTest {
         Assert.assertTrue(zadost.getId().equals("pokusny16315269675442"));
         Assert.assertTrue(zadost.getState().equals("open"));
         Assert.assertTrue(zadost.getUser().equals("pokusny"));
+        Assert.assertTrue(zadost.getTypeOfRequest().equals("user"));
 
         JSONObject object = zadost.toJSON();
 
@@ -75,6 +81,9 @@ public class ZadostTest {
 
         Assert.assertTrue(object.has("user"));
         Assert.assertTrue(object.getString("user").equals("pokusny"));
+
+        Assert.assertTrue(object.has("type_of_request"));
+        Assert.assertTrue(object.getString("type_of_request").equals("user"));
     }
 
     @Test
@@ -161,6 +170,7 @@ public class ZadostTest {
         Assert.assertNotNull(fieldValue);
     }
 
+    @Ignore
     @Test
     public void testDeserializeAndSerializeBigSet() throws IOException, SolrServerException {
         InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream("zadost_index.json");

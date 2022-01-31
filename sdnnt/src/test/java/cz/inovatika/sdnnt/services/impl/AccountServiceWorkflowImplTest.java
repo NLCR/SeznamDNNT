@@ -55,9 +55,6 @@ public class AccountServiceWorkflowImplTest {
     }
 
 
-    public void testVNWorkflow() {
-
-    }
 
     @Test
     public void testNZNWorkflow() throws AccountException, IOException, ConflictException, SolrServerException {

@@ -6,9 +6,9 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.ZadostProcess;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowState;
+import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.model.workflow.zadost.ZadostWorkflowFactory;
 import cz.inovatika.sdnnt.rights.Role;
@@ -48,13 +48,13 @@ public class AccountServiceImpl implements AccountService {
 
     private static final int DEFAULT_SEARCH_RESULT_SIZE = 20;
 
-    private UserControler userControler;
+    //private UserControler userControler;
     private ApplicationUserLoginSupport loginSupport;
 
     private ResourceServiceService resourceServiceService;
 
-    public AccountServiceImpl(UserControler userControler, ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
-        this.userControler = userControler;
+    public AccountServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
+        //this.userControler = userControler;
         this.loginSupport = loginSupport;
         this.resourceServiceService = res;
     }
@@ -63,14 +63,12 @@ public class AccountServiceImpl implements AccountService {
 //        this.resourceServiceService = res;
 //    }
 
-    public AccountServiceImpl(UserControler userControler) {
-        this.userControler = userControler;
-    }
+
 
     public AccountServiceImpl() {}
 
     @Override
-    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String sort, int rows, int page) throws SolrServerException, IOException {
+    public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String typeOfReq, String sort, int rows, int page) throws SolrServerException, IOException {
 
         User user = this.loginSupport.getUser();
 
@@ -85,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
 
             SolrQuery query = new SolrQuery(q)
                     .setParam("df", "fullText")
-                    .setFacet(true).addFacetField("typ", "state", "navrh","institution", "delegated", "priority")
+                    .setFacet(true).addFacetField("typ", "state", "navrh","institution", "delegated", "priority","type_of_request")
                     .setParam("json.nl", "arrntv")
                     .setFields("*,process:[json]");
 
@@ -112,6 +110,10 @@ public class AccountServiceImpl implements AccountService {
             }
             if (priority != null) {
                 query.addFilterQuery("priority:\""+priority+"\"");
+            }
+
+            if (typeOfReq != null) {
+                query.addFilterQuery("type_of_request:\""+typeOfReq+"\"");
             }
 
             if (sort != null) {
@@ -188,6 +190,7 @@ public class AccountServiceImpl implements AccountService {
         return jsonZadost;
     }
 
+
     public JSONObject saveCuratorRequest(String payload, AccountServiceInform inform) throws JsonProcessingException, ConflictException {
        Zadost zadost = Zadost.fromJSON(payload);
        return saveRequest(zadost, inform);
@@ -217,7 +220,7 @@ public class AccountServiceImpl implements AccountService {
                 // inform saved
                 inform.saved(zadost);
             }
-            SolrUtils.quietCommit(solr, "zadost");
+            SolrJUtilities.quietCommit(solr, "zadost");
             return VersionStringCast.cast(getRequest(zadost.getId()));
             //return VersionStringCast.cast(zadost.toJSON());
         } catch(BaseHttpSolrClient.RemoteSolrException ex) {
@@ -307,11 +310,20 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public JSONObject userCloseRequest(String payload) throws ConflictException{
         Zadost zadost = Zadost.fromJSON(payload);
+        zadost.setTypeOfRequest(ZadostTyp.user.name());
         zadost.setUser(this.loginSupport.getUser().getUsername());
         zadost.setDatumZadani(new Date());
         return closeRequest(zadost, "waiting");
     }
 
+    @Override
+    public JSONObject schedulerDefinedCloseRequest(String payload) throws ConflictException, AccountException {
+        Zadost zadost = Zadost.fromJSON(payload);
+        zadost.setTypeOfRequest(ZadostTyp.scheduler.name());
+        zadost.setUser(this.loginSupport.getUser().getUsername());
+        zadost.setDatumZadani(new Date());
+        return closeRequest(zadost, "waiting");
+    }
 
 
     private JSONObject closeRequest(Zadost zadost, String requestCloseState) throws ConflictException {
@@ -354,7 +366,7 @@ public class AccountServiceImpl implements AccountService {
                 updateRequest.setParam("_version_", "" + zadost.getVersion());
             }
             UpdateResponse uResponse = updateRequest.process(solr, "zadost");
-            SolrUtils.quietCommit(solr, "zadost");
+            SolrJUtilities.quietCommit(solr, "zadost");
         }
         return  new JSONObject(payload);
     }

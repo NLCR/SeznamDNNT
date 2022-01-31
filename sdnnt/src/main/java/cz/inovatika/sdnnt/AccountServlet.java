@@ -1,16 +1,17 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.AccountIterationSupport;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
+
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -30,6 +31,7 @@ import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 import cz.inovatika.sdnnt.utils.VersionStringCast;
 import org.apache.solr.client.solrj.SolrClient;
@@ -46,573 +48,625 @@ import static cz.inovatika.sdnnt.rights.Role.*;
 
 
 /**
- *
  * @author alberto
  */
 @WebServlet(value = "/account/*")
 public class AccountServlet extends HttpServlet {
 
-  public static final Logger LOGGER = Logger.getLogger(AccountServlet.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(AccountServlet.class.getName());
 
 
-
-  /**
-   * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-   * methods.
-   *
-   * @param request servlet request
-   * @param response servlet response
-   * @throws ServletException if a servlet-specific error occurs
-   * @throws IOException if an I/O error occurs
-   */
-  protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-    response.setContentType("application/json;charset=UTF-8");
-    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
-    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
-    response.setDateHeader("Expires", 0); // Proxies.
-    PrintWriter out = response.getWriter();
-    try {
-      String actionNameParam = request.getPathInfo().substring(1);
-      if (actionNameParam != null) {
-        Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
-        JSONObject json = actionToDo.doPerform( request, response);
-        out.println(json.toString(2));
-      } else {
-        out.print("actionNameParam -> " + actionNameParam);
-      }
-    } catch (IOException e1) {
-      LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
-      out.print(e1.toString());
-    } catch (SecurityException e1) {
-      LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-    } catch (Exception e1) {
-      LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
-      response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
-      out.print(e1.toString());
-    }
-
-  }
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-  }
-
-  @Override
-  public void init() throws ServletException {
-    super.init();
-  }
-
-  enum Actions {
-    // vyhledava zadosti
-    SEARCH {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-
-
-          User user = new UserControlerImpl(req).getUser();
-          String q = req.getParameter("q");
-          String state = req.getParameter("state");
-          String navrh = req.getParameter("navrh");
-          String institution = req.getParameter("institution");
-          String delegated = req.getParameter("delegated");
-          String priority = req.getParameter("priority");
-
-          String sort = req.getParameter("sort_account");
-          if (sort == null) {
-            sort = req.getParameter("user_sort_account");
-          }
-
-          String page = req.getParameter("page");
-          String rows = req.getParameter("rows");
-
-          try {
-            UserControlerImpl uc = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
-            return VersionStringCast.cast(service.search(q, state, Arrays.asList(navrh), institution, priority, delegated, sort, rows != null ? Integer.parseInt(rows): -1, page != null ? Integer.parseInt(page) : -1));
-          } catch (SolrServerException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN,"notallowed", "not allowed");
-        }
-      }
-    },
-    // ziskani konkretni zadosti, vypisou se zaznamy
-    GET_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        Options opts = Options.getInstance();
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-
-            UserControlerImpl uc = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
-            return service.getRequest(req.getParameter("id"));
-
-          } catch (SolrServerException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-    // dotazovani do druheho indexu
-    GET_ZADOST_RECORDS {
-      @Override
-      JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
-
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          Options opts = Options.getInstance();
-          int rows = opts.getClientConf().getInt("rows");
-          if (req.getParameter("rows") != null) {
-            rows = Integer.parseInt(req.getParameter("rows"));
-          }
-          int start = 0;
-          if (req.getParameter("page") != null) {
-            start = Integer.parseInt(req.getParameter("page")) * rows;
-          }
-          try {
-            UserControlerImpl uc = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(uc, uc, new ResourceBundleServiceImpl(req));
-            return service.getRecords(req.getParameter("id"),rows, start );
-          } catch (SolrServerException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    // ulozeni zadosti
-    SEND_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          try {
-            UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
-            return service.userCloseRequest(readInputJSON(req).toString());
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    // ulozeni zadosti
-    SAVE_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          try {
-
-            UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
-            return service.saveRequest(readInputJSON(req).toString(), null);
-
-          } catch(ConflictException cex) {
-            LOGGER.log(Level.SEVERE, null, cex);
-            return errorJson(response, SC_CONFLICT,cex.getKey(), cex.getMessage());
-          } catch(AccountException cex) {
-            LOGGER.log(Level.SEVERE, null, cex);
-            return errorJson(response, SC_FORBIDDEN,cex.getKey(), cex.getMessage());
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-    // ulozeni zadosti
-    SAVE_KURATOR_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
-          try {
-            UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
-            return service.saveCuratorRequest(readInputJSON(req).toString(), null);
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-
-    // pridava vsechny zaznamy jednoho vyjadreni do zadosti
-    // dilo -> vyjadreni -> provedeni
-    ADD_FRBR_TO_ZADOST {
-      @Override
-      JSONObject doPerform( HttpServletRequest req, HttpServletResponse response) throws Exception {
-
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          try {
-            return Zadost.saveWithFRBR(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().getUsername(), req.getParameter("frbr"));
-          } catch (Exception e) {
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
-        }
-      }
-    },
-    // posune zadost ve workflow
-    PROCESS_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            UserControlerImpl userControler = new UserControlerImpl(req);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
-
-            return service.curatorCloseRequest(readInputJSON(req).toString());
-          } catch (IOException e) {
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
-        }
-      }
-    },
-
-  
-
-    APPROVE {
-      @Override
-      JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            UserControlerImpl userControler = new UserControlerImpl(request);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
-
-            JSONObject inputJs = ServletsSupport.readInputJSON(request);
-            String zadostJSON = inputJs.getJSONObject("zadost").toString();
-            Zadost zadost = Zadost.fromJSON(zadostJSON);
-
-            List<String> identifiers = Actions.identifiers(inputJs);
-            JSONObject retObject = null;
-            for (String identifier: identifiers) {
-              //Zadost zadost = Zadost.fromJSON(service.getRequest(zadostFromReq.getId()).toString());
-              String alternativeState = request.getParameter("alternative");
-              if (alternativeState != null) {
-                retObject = service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
-              } else {
-                retObject = service.curatorSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
-              }
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request  servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+        response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+        response.setDateHeader("Expires", 0); // Proxies.
+        PrintWriter out = response.getWriter();
+        try {
+            String actionNameParam = request.getPathInfo().substring(1);
+            if (actionNameParam != null) {
+                Actions actionToDo = Actions.valueOf(actionNameParam.toUpperCase());
+                JSONObject json = actionToDo.doPerform(request, response);
+                out.println(json.toString(2));
+            } else {
+                out.print("actionNameParam -> " + actionNameParam);
             }
-            return retObject;
-
-          } catch (ConflictException e) {
-            return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
-          } catch (AccountException e) {
-            return errorJson(response, SC_BAD_REQUEST, e.getKey(), e.getMessage());
-          } catch (JSONException | SolrServerException e) {
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
+        } catch (IOException e1) {
+            LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
+            out.print(e1.toString());
+        } catch (SecurityException e1) {
+            LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        } catch (Exception e1) {
+            LOGGER.log(Level.SEVERE, e1.getMessage(), e1);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
+            out.print(e1.toString());
         }
-      }
-    },
 
-    REJECT {
-      @Override
-      JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          JSONObject inputJs = ServletsSupport.readInputJSON(request);
-          String zadostJSON = inputJs.getJSONObject("zadost").toString();
-          Zadost zadost = Zadost.fromJSON(zadostJSON);
-
-          List<String> identifiers = Actions.identifiers(inputJs);
-          JSONObject retObject = null;
-          for (String identifier: identifiers) {
-            UserControlerImpl userControler = new UserControlerImpl(request);
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
-            retObject = service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
-          }
-          return retObject;
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
-        }
-      }
-    },
-
-    DELETE {
-      @Override
-      JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(user,knihovna, mainKurator, kurator, admin)).permit()) {
-          JSONObject inputJs = ServletsSupport.readInputJSON(request);
-
-          Zadost zadost = Zadost.fromJSON(inputJs.toString());
-
-          UserControlerImpl userControler = new UserControlerImpl(request);
-          User user = userControler.getUser();
-
-          List<String> ordinaryUsers = Arrays.asList(Role.user.name(), Role.knihovna.name());
-          List<String> kuratorsAndAdmins = Arrays.asList(Role.admin.name(), Role.kurator.name(), Role.mainKurator.name());
-
-          boolean deleteIsPossible = (ordinaryUsers.contains(user.getRole()) && zadost.getState().equals("open")) ||
-                  (kuratorsAndAdmins.contains(user.getRole()));
-
-          if (deleteIsPossible) {
-            AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(request));
-            return service.deleteRequest(zadost.toJSON().toString());
-          } else {
-            return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed","not allowed");
-        }
-      }
-    },
-
-
-    // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
-    CHANGE_STAV_DIRECT {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            // TODO: transactions (optimistic locking)
-            Indexer.changeStavDirect(inputJs.getString("identifier"),
-                    inputJs.getString("newStav"),
-                    inputJs.optString("newLicense"),
-                    inputJs.getString("poznamka"),
-                    inputJs.getJSONArray("granularity"), 
-                    user.getUsername());
-
-
-            CatalogSearcher searcher = new CatalogSearcher();
-            return searcher.getById(inputJs.getString("identifier"), user);
-
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    APPROVE_NAVRH_IN_IMPORT {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.getUsername());
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    IMPORT_DOCUMENT_CONTROLLED {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            // inputJs.put("controlled", true);
-            return Import.setControlled(inputJs.getString("id"), inputJs.getString("controlled_note"), user.getUsername()); 
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    IMPORT_PROCESSED {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            // inputJs.put("controlled", true);
-            return Import.setProcessed(inputJs.getString("id"), user.getUsername());
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-    IMPORT_STAV {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            JSONObject inputJs = ServletsSupport.readInputJSON(req);
-            // inputJs.put("controlled", true);
-            return Import.changeStav(inputJs, user.getUsername());
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-    
-    ADD_ID {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin, user)).permit()) {
-          try {
-            // TODO: What is it ??
-            return new JSONObject();
-          } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-    FOLLOW_RECORD {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-          try {
-            User user = new UserControlerImpl(req).getUser();
-            return Indexer.followRecord(req.getParameter("identifier"),  user.getUsername(),  NotificationInterval.mesic.valueOf(user.getNotifikaceInterval()),  "true".equals(req.getParameter("follow")));
-          } catch (Exception e) {
-            return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
-        }
-      }
-    },
-
-
-    PREPARE_ZADOST {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-
-        if (new RightsResolver(req, new MustBeLogged()).permit()) {
-
-          UserControlerImpl userControler = new UserControlerImpl(req);
-          AccountService service = new AccountServiceImpl(userControler, userControler, new ResourceBundleServiceImpl(req));
-
-          String[] navrhy = req.getParameterValues("navrh");
-          if (navrhy != null && navrhy.length >0 ) {
-              //String navrh = req.getParameter("navrh");
-              JSONObject result = service.search(null, "open", Arrays.asList(navrhy), null, null, null ,null, 100, 0);
-              if (result.has("response") && result.getJSONObject("response").has("numFound")) {
-                  int numFound = result.getJSONObject("response").getInt("numFound");
-                  if (numFound > 0) {
-                      JSONArray docs = result.getJSONObject("response").getJSONArray("docs");
-                      Zadost zadost = Zadost.fromJSON(docs.getJSONObject(0).toString());
-                      return zadost.toJSON();
-                  }
-              }
-              String navrh = navrhy[0];
-              return service.prepare(navrh);
-          } else {
-              return errorJson(response, SC_BAD_REQUEST, "missing navrh parameter");
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "not allowed");
-        }
-      }
-    };
-
-    private static List<String> identifiers(JSONObject inputJs) {
-      List<String> identifiers = new ArrayList<>();
-      //String identifier = inputJs.optString("identifier");
-      if (inputJs.has("identifier")) {
-        identifiers.add(inputJs.getString("identifier"));
-      }  else if (inputJs.has("identifiers")) {
-        JSONArray identifiersJsonArray = inputJs.getJSONArray("identifiers");
-        identifiersJsonArray.forEach(id-> {
-          identifiers.add(id.toString());
-        });
-      }
-      return identifiers;
     }
 
-    abstract JSONObject doPerform( HttpServletRequest request, HttpServletResponse response) throws Exception;
-  }
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+    }
 
-  // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-  /**
-   * Handles the HTTP <code>GET</code> method.
-   *
-   * @param request servlet request
-   * @param response servlet response
-   * @throws ServletException if a servlet-specific error occurs
-   * @throws IOException if an I/O error occurs
-   */
-  @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-    processRequest(request, response);
-  }
+    @Override
+    public void init() throws ServletException {
+        super.init();
+    }
 
-  /**
-   * Handles the HTTP <code>POST</code> method.
-   *
-   * @param request servlet request
-   * @param response servlet response
-   * @throws ServletException if a servlet-specific error occurs
-   * @throws IOException if an I/O error occurs
-   */
-  @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response)
-          throws ServletException, IOException {
-    processRequest(request, response);
-  }
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request  servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
 
-  /**
-   * Returns a short description of the servlet.
-   *
-   * @return a String containing servlet description
-   */
-  @Override
-  public String getServletInfo() {
-    return "Short description";
-  }// </editor-fold>
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request  servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException      if an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
+    enum Actions {
+
+        // vyhledava zadosti
+        TOUCH {
+
+            private static final int LIMIT = 1000;
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try {
+                        JSONArray jsonArray = new JSONArray();
+                        AtomicInteger number = new AtomicInteger(0);
+                        Map<String, String> reqMap = new HashMap<>();
+                        reqMap.put("rows", "" + LIMIT);
+                        AccountIterationSupport support = new AccountIterationSupport();
+
+                        List<String> bulk = new ArrayList<>();
+                        support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("identifier"), (rsp) -> {
+                            Object identifier = rsp.getFieldValue("identifier");
+
+                            bulk.add(identifier.toString());
+                            if (bulk.size() >= LIMIT) {
+                                number.addAndGet(bulk.size());
+                                LOGGER.info(String.format("Bulk update %d", number.get()));
+                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                                jsonArray.put(returnFromPost);
+                                bulk.clear();
+                            }
+                        });
+                        if (!bulk.isEmpty()) {
+                            number.addAndGet(bulk.size());
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                            bulk.clear();
+                            jsonArray.put(returnFromPost);
+                        }
+
+                        JSONObject object = new JSONObject();
+                        object.put("numberOfObjects", number.get());
+                        object.put("bulkResults", jsonArray);
+                        return object;
+
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+                    } finally {
+                        PureHTTPSolrUtils.commit();
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        // vyhledava zadosti
+        SEARCH {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+
+
+                    User user = new UserControlerImpl(req).getUser();
+                    String q = req.getParameter("q");
+                    String state = req.getParameter("state");
+                    String navrh = req.getParameter("navrh");
+                    String institution = req.getParameter("institution");
+                    String delegated = req.getParameter("delegated");
+                    String priority = req.getParameter("priority");
+                    String typeOfReq = req.getParameter("type_of_request");
+
+                    String sort = req.getParameter("sort_account");
+                    if (sort == null) {
+                        sort = req.getParameter("user_sort_account");
+                    }
+
+                    String page = req.getParameter("page");
+                    String rows = req.getParameter("rows");
+
+                    try {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return VersionStringCast.cast(service.search(q, state, Arrays.asList(navrh), institution, priority, delegated, typeOfReq, sort, rows != null ? Integer.parseInt(rows) : -1, page != null ? Integer.parseInt(page) : -1));
+                    } catch (SolrServerException | IOException ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+        // ziskani konkretni zadosti, vypisou se zaznamy
+        GET_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                Options opts = Options.getInstance();
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return service.getRequest(req.getParameter("id"));
+
+                    } catch (SolrServerException | IOException ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+        // dotazovani do druheho indexu
+        GET_ZADOST_RECORDS {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    Options opts = Options.getInstance();
+                    int rows = opts.getClientConf().getInt("rows");
+                    if (req.getParameter("rows") != null) {
+                        rows = Integer.parseInt(req.getParameter("rows"));
+                    }
+                    int start = 0;
+                    if (req.getParameter("page") != null) {
+                        start = Integer.parseInt(req.getParameter("page")) * rows;
+                    }
+                    try {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return service.getRecords(req.getParameter("id"), rows, start);
+                    } catch (SolrServerException | IOException ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        // ulozeni zadosti
+        SEND_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try {
+                        UserControlerImpl userControler = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+                        return service.userCloseRequest(readInputJSON(req).toString());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        // ulozeni zadosti
+        SAVE_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try {
+
+                        UserControlerImpl userControler = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+                        return service.saveRequest(readInputJSON(req).toString(), null);
+
+                    } catch (ConflictException cex) {
+                        LOGGER.log(Level.SEVERE, null, cex);
+                        return errorJson(response, SC_CONFLICT, cex.getKey(), cex.getMessage());
+                    } catch (AccountException cex) {
+                        LOGGER.log(Level.SEVERE, null, cex);
+                        return errorJson(response, SC_FORBIDDEN, cex.getKey(), cex.getMessage());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+        // ulozeni zadosti
+        SAVE_KURATOR_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    try {
+                        UserControlerImpl userControler = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+                        return service.saveCuratorRequest(readInputJSON(req).toString(), null);
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+
+        // pridava vsechny zaznamy jednoho vyjadreni do zadosti
+        // dilo -> vyjadreni -> provedeni
+        ADD_FRBR_TO_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try {
+                        return Zadost.saveWithFRBR(readInputJSON(req).toString(), new UserControlerImpl(req).getUser().getUsername(), req.getParameter("frbr"));
+                    } catch (Exception e) {
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+        // posune zadost ve workflow
+        PROCESS_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        UserControlerImpl userControler = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+
+                        return service.curatorCloseRequest(readInputJSON(req).toString());
+                    } catch (IOException e) {
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+
+        APPROVE {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        UserControlerImpl userControler = new UserControlerImpl(request);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+
+                        JSONObject inputJs = ServletsSupport.readInputJSON(request);
+                        String zadostJSON = inputJs.getJSONObject("zadost").toString();
+                        Zadost zadost = Zadost.fromJSON(zadostJSON);
+
+                        List<String> identifiers = Actions.identifiers(inputJs);
+                        JSONObject retObject = null;
+                        for (String identifier : identifiers) {
+                            //Zadost zadost = Zadost.fromJSON(service.getRequest(zadostFromReq.getId()).toString());
+                            String alternativeState = request.getParameter("alternative");
+                            if (alternativeState != null) {
+                                retObject = service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
+                            } else {
+                                retObject = service.curatorSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+                            }
+                        }
+                        return retObject;
+
+                    } catch (ConflictException e) {
+                        return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
+                    } catch (AccountException e) {
+                        return errorJson(response, SC_BAD_REQUEST, e.getKey(), e.getMessage());
+                    } catch (JSONException | SolrServerException e) {
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        REJECT {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    JSONObject inputJs = ServletsSupport.readInputJSON(request);
+                    String zadostJSON = inputJs.getJSONObject("zadost").toString();
+                    Zadost zadost = Zadost.fromJSON(zadostJSON);
+
+                    List<String> identifiers = Actions.identifiers(inputJs);
+                    JSONObject retObject = null;
+                    for (String identifier : identifiers) {
+                        UserControlerImpl userControler = new UserControlerImpl(request);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+                        retObject = service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+                    }
+                    return retObject;
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        DELETE {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(user, knihovna, mainKurator, kurator, admin)).permit()) {
+                    JSONObject inputJs = ServletsSupport.readInputJSON(request);
+
+                    Zadost zadost = Zadost.fromJSON(inputJs.toString());
+
+                    UserControlerImpl userControler = new UserControlerImpl(request);
+                    User user = userControler.getUser();
+
+                    List<String> ordinaryUsers = Arrays.asList(Role.user.name(), Role.knihovna.name());
+                    List<String> kuratorsAndAdmins = Arrays.asList(Role.admin.name(), Role.kurator.name(), Role.mainKurator.name());
+
+                    boolean deleteIsPossible = (ordinaryUsers.contains(user.getRole()) && zadost.getState().equals("open")) ||
+                            (kuratorsAndAdmins.contains(user.getRole()));
+
+                    if (deleteIsPossible) {
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+                        return service.deleteRequest(zadost.toJSON().toString());
+                    } else {
+                        return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+
+        // schvalit navrh - na vyrazeni, na zarazeni - pouze kurator - ne do api
+        CHANGE_STAV_DIRECT {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        JSONObject inputJs = ServletsSupport.readInputJSON(req);
+                        // TODO: transactions (optimistic locking)
+                        Indexer.changeStavDirect(inputJs.getString("identifier"),
+                                inputJs.getString("newStav"),
+                                inputJs.optString("newLicense"),
+                                inputJs.getString("poznamka"),
+                                inputJs.getJSONArray("granularity"),
+                                user.getUsername());
+
+
+                        CatalogSearcher searcher = new CatalogSearcher();
+                        return searcher.getById(inputJs.getString("identifier"), user);
+
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        APPROVE_NAVRH_IN_IMPORT {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        JSONObject inputJs = ServletsSupport.readInputJSON(req);
+                        return Indexer.approveInImport(inputJs.getString("identifier"), inputJs.getJSONObject("importId").toString(), user.getUsername());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        IMPORT_DOCUMENT_CONTROLLED {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        JSONObject inputJs = ServletsSupport.readInputJSON(req);
+                        // inputJs.put("controlled", true);
+                        return Import.setControlled(inputJs.getString("id"), inputJs.getString("controlled_note"), user.getUsername());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        IMPORT_PROCESSED {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        JSONObject inputJs = ServletsSupport.readInputJSON(req);
+                        // inputJs.put("controlled", true);
+                        return Import.setProcessed(inputJs.getString("id"), user.getUsername());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        IMPORT_STAV {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        JSONObject inputJs = ServletsSupport.readInputJSON(req);
+                        // inputJs.put("controlled", true);
+                        return Import.changeStav(inputJs, user.getUsername());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        ADD_ID {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin, user)).permit()) {
+                    try {
+                        // TODO: What is it ??
+                        return new JSONObject();
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+        FOLLOW_RECORD {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    try {
+                        User user = new UserControlerImpl(req).getUser();
+                        return Indexer.followRecord(req.getParameter("identifier"), user.getUsername(), NotificationInterval.mesic.valueOf(user.getNotifikaceInterval()), "true".equals(req.getParameter("follow")));
+                    } catch (Exception e) {
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+
+        PREPARE_ZADOST {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+
+                    UserControlerImpl userControler = new UserControlerImpl(req);
+                    AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(req));
+
+                    String[] navrhy = req.getParameterValues("navrh");
+                    if (navrhy != null && navrhy.length > 0) {
+                        //String navrh = req.getParameter("navrh");
+                        JSONObject result = service.search(null, "open", Arrays.asList(navrhy), null, null, null, null, null, 100, 0);
+                        if (result.has("response") && result.getJSONObject("response").has("numFound")) {
+                            int numFound = result.getJSONObject("response").getInt("numFound");
+                            if (numFound > 0) {
+                                JSONArray docs = result.getJSONObject("response").getJSONArray("docs");
+                                Zadost zadost = Zadost.fromJSON(docs.getJSONObject(0).toString());
+                                return zadost.toJSON();
+                            }
+                        }
+                        String navrh = navrhy[0];
+                        return service.prepare(navrh);
+                    } else {
+                        return errorJson(response, SC_BAD_REQUEST, "missing navrh parameter");
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "not allowed");
+                }
+            }
+        };
+
+        private static List<String> identifiers(JSONObject inputJs) {
+            List<String> identifiers = new ArrayList<>();
+            //String identifier = inputJs.optString("identifier");
+            if (inputJs.has("identifier")) {
+                identifiers.add(inputJs.getString("identifier"));
+            } else if (inputJs.has("identifiers")) {
+                JSONArray identifiersJsonArray = inputJs.getJSONArray("identifiers");
+                identifiersJsonArray.forEach(id -> {
+                    identifiers.add(id.toString());
+                });
+            }
+            return identifiers;
+        }
+
+        abstract JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    }
 
 }

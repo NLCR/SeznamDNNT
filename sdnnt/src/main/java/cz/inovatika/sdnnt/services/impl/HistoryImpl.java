@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.services.History;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.utils.SolrUtils;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -61,7 +60,7 @@ public class HistoryImpl implements History {
         } catch (IOException | SolrServerException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            SolrUtils.quietCommit(solr, "history");
+            SolrJUtilities.quietCommit(solr, "history");
         }
 
     }
