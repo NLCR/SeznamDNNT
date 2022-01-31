@@ -247,3 +247,18 @@ app-admin {
     }
   }
 }
+
+
+app-footer {
+  @media only screen and (max-width: 500px) {
+    footer {
+      & > div {
+        flex-direction: column !important;
+
+        .app-right {
+          margin-top: 4px;
+        }
+      }
+    }
+  }
+}
