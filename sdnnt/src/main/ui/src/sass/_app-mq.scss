@@ -51,7 +51,7 @@ app-home {
 }
 
 app-search {
-  @media #{$lt-md} {
+  @media only screen and (max-width: 1040px)  {
     .app-search-wrapper {
       flex-wrap: wrap;
 
@@ -89,7 +89,31 @@ app-search {
       }
     }
   }
+
+  .app-results-wrapper {
+    &.app-role-user,
+    &.app-role-knihovna,
+    &.app-role-admin {
+      @media only screen and (max-width: 660px) {
+        .mat-card-actions {
+          display: block !important;
+
+          .mat-button-toggle-group {
+            margin-top: 16px;
+            flex-direction: column;
+            width: 100%;
+
+            .mat-button-toggle + .mat-button-toggle {
+              border-top: 1px solid $app-gray-3;
+              border-left: 0 !important;
+            }
+          }
+        }
+      }
+    }
+  }
 }
+
 
 app-zadost {
   @media only screen and (max-width: 620px) {
@@ -221,6 +245,21 @@ app-admin {
         margin-right: 0 !important;
         margin-bottom: 16px;
         flex: 1 1 100%;
+      }
+    }
+  }
+}
+
+
+app-footer {
+  @media only screen and (max-width: 500px) {
+    footer {
+      & > div {
+        flex-direction: column !important;
+
+        .app-right {
+          margin-top: 4px;
+        }
       }
     }
   }
