@@ -91,7 +91,9 @@ app-search {
   }
 
   .app-results-wrapper {
-    &.app-role-user {
+    &.app-role-user,
+    &.app-role-knihovna,
+    &.app-role-admin {
       @media only screen and (max-width: 660px) {
         .mat-card-actions {
           display: block !important;
