@@ -10,6 +10,7 @@
     <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
       <thead>
         <tr>
+          <th  *ngIf="data.isNavrh"></th>
           <th>{{ 'desc.rocnik' | translate }}</th>
           <th>{{ 'desc.cislo' | translate }}</th>
           <th>{{ 'desc.odkaz' | translate }}</th>
@@ -20,6 +21,7 @@
       <tbody>
         <ng-container *ngFor="let item of data.items">
           <tr *ngIf="item.rocnik" >
+            <td *ngIf="data.isNavrh"><input [disabled]="isWhole" type="checkbox" (change)="setSelection(item)" [(ngModel)]="item.selected"  /></td>
             <td>{{ item.rocnik }}</td>
             <td>{{ item.cislo }}</td>
             <td>{{ item.link }}</td>
