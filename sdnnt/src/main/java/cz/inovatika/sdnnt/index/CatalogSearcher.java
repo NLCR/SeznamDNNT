@@ -105,7 +105,7 @@ public class CatalogSearcher {
                         JSONArray dntStavyJSONArray = doc.optJSONArray(MarcRecordFields.DNTSTAV_FIELD);
                         JSONArray kuratorStavyJSONArray = doc.optJSONArray(MarcRecordFields.KURATORSTAV_FIELD);
 
-                        if (dntStavyJSONArray != null) {
+                        if (dntStavyJSONArray != null && kuratorStavyJSONArray != null) {
                             List<String> publicStates = new ArrayList<>();
                             dntStavyJSONArray.forEach(o -> {
                                 publicStates.add(o.toString());
