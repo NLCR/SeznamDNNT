@@ -70,6 +70,23 @@ app-search {
           padding-right: 0;
         }
       }
+
+      app-facets-used {
+        .mat-list {
+          .mat-subheader {
+            padding-left: 0 !important;
+            padding-right: 16px !important;
+          }
+
+          .app-list-content-wrapper {
+            padding-left: 0 !important;
+            
+            .mat-list-item-content {
+              padding-left: 0 !important;
+            }
+          }
+        }
+      }
     }
   }
 
