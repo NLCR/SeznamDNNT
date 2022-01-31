@@ -1,10 +1,10 @@
 <div fxLayout="row" fxLayoutGap="32px">
   <div fxFlex="50%">
-    <apx-chart [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
+    <apx-chart *ngIf="stavOpts?.series" [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
     </apx-chart>
   </div>
   <div fxFlex="50%">
-    <apx-chart [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
+    <apx-chart *ngIf="licenseOpts?.series" [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
       [labels]="licenseOpts.labels"></apx-chart>
   </div>
 </div>

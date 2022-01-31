@@ -42,6 +42,8 @@ export class AppComponent {
         const params = this.route.snapshot.queryParamMap;
         if (params.has('lang')) {
           this.service.changeLang(params.get('lang'));
+        } else if (localStorage.getItem('lang')) {
+          this.service.changeLang(localStorage.getItem('lang'));
         }
         this.state.processParams(params);
       }

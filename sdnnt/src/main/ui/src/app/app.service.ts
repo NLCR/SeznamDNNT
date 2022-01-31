@@ -113,6 +113,7 @@ export class AppService {
   changeLang(lang: string) {
     this.translate.use(lang).subscribe(val => {
       this.state.currentLang = lang;
+      localStorage.setItem("lang", this.state.currentLang);
       this.langSubject.next();
     });
   }
