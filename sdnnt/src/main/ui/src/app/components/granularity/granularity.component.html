@@ -7,32 +7,30 @@
 </h1>
 <div mat-dialog-content>
   <div class="app-overflow-x-auto">
-  <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
-    <thead>
-      <tr>
-        <th *ngIf="data.isNavrh">{{ 'desc.selection' | translate }}</th>
-        <th>{{ 'desc.rocnik' | translate }}</th>
-        <th>{{ 'desc.cislo' | translate }}</th>
-        <th>{{ 'desc.odkaz' | translate }}</th>
-        <th>{{ 'desc.stav' | translate }}</th>
-        <th>{{ 'desc.licence' | translate }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let item of data.items">
-        <tr *ngIf="item.rocnik" >
-          <td *ngIf="data.isNavrh"><input type="checkbox" [disabled]="isWhole" (change)="setSelection(item)" /></td>
-          <td>{{ item.rocnik }}</td>
-          <td>{{ item.cislo }}</td>
-          <td>{{ item.link }}</td>
-          <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
-          <td *ngIf="item.stav.includes('NZ')">dnntt</td>
-          <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
-          <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+    <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
+      <thead>
+        <tr>
+          <th>{{ 'desc.rocnik' | translate }}</th>
+          <th>{{ 'desc.cislo' | translate }}</th>
+          <th>{{ 'desc.odkaz' | translate }}</th>
+          <th>{{ 'desc.stav' | translate }}</th>
+          <th>{{ 'desc.licence' | translate }}</th>
         </tr>
-      </ng-container>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of data.items">
+          <tr *ngIf="item.rocnik" >
+            <td>{{ item.rocnik }}</td>
+            <td>{{ item.cislo }}</td>
+            <td>{{ item.link }}</td>
+            <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
+            <td *ngIf="item.stav.includes('NZ')">dnntt</td>
+            <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
+            <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
   </div>
 </div>
 <div mat-dialog-actions>
