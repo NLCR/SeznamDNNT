@@ -51,6 +51,7 @@ a {
   display: none;
 }
 
+
 // colors
 .app-color-warning {
   color: $app-color-warning !important;
@@ -81,6 +82,10 @@ a {
 
 .app-cursor-pointer {
   cursor: pointer;
+}
+
+.app-d-in-block {
+  display: inline-block;
 }
 
 .app-results-wrapper {

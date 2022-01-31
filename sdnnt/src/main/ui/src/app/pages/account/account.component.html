@@ -233,8 +233,9 @@
           <ng-container matColumnDef="poznamka">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.poznamka" matTooltipPosition="above">
-              <div class="app-text-cutter">
-                {{ element.poznamka }}
+              <mat-icon [cdkCopyToClipboard]="element.poznamka" class="app-icon-copy">content_copy</mat-icon>
+              <div class="app-text-cutter app-d-in-block">
+               {{ element.poznamka }}
               </div>
             </td>
           </ng-container>

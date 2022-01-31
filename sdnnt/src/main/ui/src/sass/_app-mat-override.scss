@@ -256,4 +256,12 @@
 // mat icon
 .mat-icon {
   @include setStateColor(color);
+
+  &.app-icon-copy {
+    @extend .app-mr-1, .app-cursor-pointer;
+    $size: 16px;
+    font-size: $size !important;
+    height: $size !important;
+    width: $size !important;
+  }
 }
