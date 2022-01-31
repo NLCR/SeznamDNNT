@@ -770,7 +770,8 @@
     "type_of_request" : "Type of request",
     "historie_stavu": "Status history",
     "historie_kuratorskeho_stavu": "History of curatorial status",
-    "historie_bibliografickeho_zaznamu": "History of bibliographic status"
+    "historie_bibliografickeho_zaznamu": "History of bibliographic status",
+    "statistiky": "Statistics"
   },
 
   "acts": {

@@ -1,29 +1,31 @@
 <h1 mat-dialog-title>{{ 'desc.granularita' | translate }}: <span>{{ data.title }}</span></h1>
 <div mat-dialog-content>
-  <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
-    <thead>
-      <tr>
-        <th>{{ 'desc.rocnik' | translate }}</th>
-        <th>{{ 'desc.cislo' | translate }}</th>
-        <th>{{ 'desc.odkaz' | translate }}</th>
-        <th>{{ 'desc.stav' | translate }}</th>
-        <th>{{ 'desc.licence' | translate }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <ng-container *ngFor="let item of data.items">
-        <tr *ngIf="item.rocnik" >
-          <td>{{ item.rocnik }}</td>
-          <td>{{ item.cislo }}</td>
-          <td>{{ item.link }}</td>
-          <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
-          <td *ngIf="item.stav.includes('NZ')">dnntt</td>
-          <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
-          <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+  <div class="app-overflow-x-auto">
+    <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
+      <thead>
+        <tr>
+          <th>{{ 'desc.rocnik' | translate }}</th>
+          <th>{{ 'desc.cislo' | translate }}</th>
+          <th>{{ 'desc.odkaz' | translate }}</th>
+          <th>{{ 'desc.stav' | translate }}</th>
+          <th>{{ 'desc.licence' | translate }}</th>
         </tr>
-      </ng-container>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of data.items">
+          <tr *ngIf="item.rocnik" >
+            <td>{{ item.rocnik }}</td>
+            <td>{{ item.cislo }}</td>
+            <td>{{ item.link }}</td>
+            <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
+            <td *ngIf="item.stav.includes('NZ')">dnntt</td>
+            <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
+            <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
