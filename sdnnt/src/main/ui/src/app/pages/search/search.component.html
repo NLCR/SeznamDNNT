@@ -12,7 +12,7 @@
           <app-paginator [numFound]="numFound"  [showSort]="true"></app-paginator>
         </div>
       </div>
-      <div class="app-results-wrapper">
+      <div class="app-results-wrapper" [ngClass]="state.logged ? 'app-role-' + state.user.role : null">
         <mat-card *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
