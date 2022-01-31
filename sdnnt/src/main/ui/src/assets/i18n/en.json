@@ -43,7 +43,7 @@
     "N": "discarded",
     "X": "free",
     "PX": "probably free work",
-    "NL":"On-site terminal license, internal state",
+    "NL":"Scheduled release of the work",
     "NLX":"On-site terminal license, internal state",
 
     "VN": "call for decommissioning",
@@ -71,7 +71,7 @@
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
-      "NL":"On-site terminal license, internal state",
+      "NL":"Scheduled release of the worke",
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
