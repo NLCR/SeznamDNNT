@@ -6,6 +6,7 @@
   {{ 'desc.granularita' | translate }}: <span>{{ data.title }}</span>
 </h1>
 <div mat-dialog-content>
+  <div class="app-overflow-x-auto">
   <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
     <thead>
       <tr>
@@ -32,6 +33,7 @@
       </ng-container>
     </tbody>
   </table>
+  </div>
 </div>
 <div mat-dialog-actions>
   <button mat-flat-button color="primary" (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
