@@ -27,7 +27,7 @@ export class ResultItemComponent implements OnInit {
   @Input() inZadost: boolean;
   @Input() zadost: Zadost;
   @Output() removeFromZadostEvent = new EventEmitter<string>();
-  @Output() processZadostEvent = new EventEmitter<{type: string, identifier: string, komentar: string}>();
+  @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string }>();
 
   newState = new FormControl();
   isZarazeno: boolean;
@@ -51,21 +51,21 @@ export class ResultItemComponent implements OnInit {
   ngOnInit(): void {
 
     if (this.doc.marc_998a) {
-    this.alephLink = this.doc.marc_998a[0];
-    if (!this.alephLink.startsWith('http')) {
-      this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
-    }
+      this.alephLink = this.doc.marc_998a[0];
+      if (!this.alephLink.startsWith('http')) {
+        this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
+      }
     }
     this.newState.setValue(this.doc.dntstav);
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
-    
+
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
       //let tablekey = this.doc.identifier;
-      let stateKey = (z.desired_item_state ?  z.desired_item_state : "_");
-      let licenseKey = (z.desired_license ?  z.desired_license : "_");
+      let stateKey = (z.desired_item_state ? z.desired_item_state : "_");
+      let licenseKey = (z.desired_license ? z.desired_license : "_");
 
-      let fullTableKey = this.doc.identifier +"_("+stateKey+","+licenseKey+")";
+      let fullTableKey = this.doc.identifier + "_(" + stateKey + "," + licenseKey + ")";
       this.processed = z.process[fullTableKey] ? z.process[fullTableKey] : z.process[this.doc.identifier];
       if (this.processed) {
         this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
@@ -96,7 +96,7 @@ export class ResultItemComponent implements OnInit {
         });
       }
     });
-    
+
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
     if (this.doc.marc_956u) {
@@ -118,7 +118,7 @@ export class ResultItemComponent implements OnInit {
       }
 
     } else if (this.doc.marc_856u) {
-      
+
       if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
         // google books
         const link: string = this.doc.marc_856u[0];
@@ -136,12 +136,12 @@ export class ResultItemComponent implements OnInit {
     }
   }
 
-  curatorAndPublicStateAreDifferent():boolean {
+  curatorAndPublicStateAreDifferent(): boolean {
     // neni nastaveny public stav ale ma kuratorsky stav NPA 
     if (this.doc.kuratorstav && !this.doc.dntstav) {
-      return true; 
-    // verejny a kuratorsky stav je rozdilny
-    } else if (this.doc.kuratorstav && this.doc.dntstav &&  this.doc.kuratorstav[this.doc.kuratorstav.length-1] != this.doc.dntstav[this.doc.dntstav.length-1])  {
+      return true;
+      // verejny a kuratorsky stav je rozdilny
+    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] != this.doc.dntstav[this.doc.dntstav.length - 1]) {
       return true;
     }
     return false;
@@ -181,11 +181,11 @@ export class ResultItemComponent implements OnInit {
     // });
   }
 
-  changeStav() {}
+  changeStav() { }
 
-  public showGranularity(isNavrh: boolean) {
+  public showGranularity() {
 
-    const data = {title: this.doc.nazev, items: this.doc.granularity, isNavrh: isNavrh };
+    const data = { title: this.doc.nazev, items: this.doc.granularity };
 
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',
@@ -195,11 +195,11 @@ export class ResultItemComponent implements OnInit {
   }
 
   public alreadyRejected() {
-      //let tablekey = this.doc.identifier;
-      // posledni zmena je v identifikatoru
-      if (this.zadost.process && this.zadost.process[this.doc.identifier]) {
-        return this.zadost.process[this.doc.identifier].state === 'rejected';
-      } else return false;
+    //let tablekey = this.doc.identifier;
+    // posledni zmena je v identifikatoru
+    if (this.zadost.process && this.zadost.process[this.doc.identifier]) {
+      return this.zadost.process[this.doc.identifier].state === 'rejected';
+    } else return false;
   }
 
   public showStates() {
@@ -213,8 +213,8 @@ export class ResultItemComponent implements OnInit {
       if (result && result.change) {
         this.service.changeStavDirect(this.doc.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
 
-          if (res.response.docs.length > 0 ) {
-            this.doc= res.response.docs[0];
+          if (res.response.docs.length > 0) {
+            this.doc = res.response.docs[0];
           }
         });
       }
@@ -230,20 +230,44 @@ export class ResultItemComponent implements OnInit {
   addToZadostForReduction() {
     // prepare VNX
     //const navrh = this.isZarazeno ? 'VN' : 'NZN';
-    this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
-      this.state.currentZadost['VNX']= res;
+    this.service.prepareZadost(['VNZ', 'VNL']).subscribe((res: Zadost) => {
+      this.state.currentZadost['VNX'] = res;
       this.addToZadostInternal(res.navrh);
     });
   }
 
   addToZadost() {
 
-    if (this.hasGranularity) {
-      this.showGranularity(true);
-    }
+    // if (this.hasGranularity) {
+    //   const data = { title: this.doc.nazev, items: this.doc.granularity, isNavrh: true };
+
+    //   const dialogRef = this.dialog.open(GranularityComponent, {
+    //     width: '1150px',
+    //     data: data,
+    //     panelClass: 'app-dialog-states'
+    //   });
+    //   dialogRef.afterClosed().subscribe(result => {
+    //     if (result) {
+          
+    //       console.log(result);
+    //       // const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
+    //       // this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
+    //       //   this.state.currentZadost[res.navrh] = res;
+    //       //   this.addToZadostInternal(res.navrh);
+    //       // });
+    //     }
+    //   });
+    // } else {
+    //   const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
+    //   this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
+    //     this.state.currentZadost[res.navrh] = res;
+    //     this.addToZadostInternal(res.navrh);
+    //   });
+    // }
+
     const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
     this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-      this.state.currentZadost[res.navrh]= res;
+      this.state.currentZadost[res.navrh] = res;
       this.addToZadostInternal(res.navrh);
     });
   }
@@ -287,15 +311,15 @@ export class ResultItemComponent implements OnInit {
 
 
   saveZadost(navrh: string) {
-    const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
-    if  (!this.state.currentZadost[key].identifiers) {
+    const key = navrh === 'VNL' || navrh === 'VNZ' ? 'VNX' : navrh;
+    if (!this.state.currentZadost[key].identifiers) {
       this.state.currentZadost[key].identifiers = [];
-    }    
+    }
     // check maxium
     if (this.state.currentZadost[key].identifiers && this.state.currentZadost[key].identifiers.length >= this.config.maximumItemInRequest) {
       this.service.showSnackBar('alert.maximalni_pocet_polozek_v_zadosti_prekrocen', '', false);
     } else {
-      if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)){
+      if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)) {
         this.state.currentZadost[key].identifiers.push(this.doc.identifier);
       }
       this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
@@ -304,17 +328,17 @@ export class ResultItemComponent implements OnInit {
         } else {
           this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
           if (!this.doc.zadost) {
-              this.doc.zadost = this.state.currentZadost[key];
-              // TODO: ??  
-              this.hasNavhr = !!this.doc.zadost && !this.processed;
-            } else if (this.doc.zadost.identifiers) {
-              this.doc.zadost.identifiers.push(this.doc.identifier);;
-              // TODO: ??  
-              this.hasNavhr = !!this.doc.zadost && !this.processed;
+            this.doc.zadost = this.state.currentZadost[key];
+            // TODO: ??  
+            this.hasNavhr = !!this.doc.zadost && !this.processed;
+          } else if (this.doc.zadost.identifiers) {
+            this.doc.zadost.identifiers.push(this.doc.identifier);;
+            // TODO: ??  
+            this.hasNavhr = !!this.doc.zadost && !this.processed;
           }
         }
       });
-  
+
     }
   }
 
@@ -333,16 +357,16 @@ export class ResultItemComponent implements OnInit {
   }
 
   approve() {
-    
+
     const approveDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
-      data: {caption: 'komentar', label: 'komentar'},
+      data: { caption: 'komentar', label: 'komentar' },
       panelClass: 'app-register-dialog'
     });
 
     approveDialogRef.afterClosed().subscribe(result => {
       if (result !== null) {
-        this.processZadostEvent.emit({type: 'approve', identifier: this.doc.identifier, komentar: result});
+        this.processZadostEvent.emit({ type: 'approve', identifier: this.doc.identifier, komentar: result });
       }
     });
 
@@ -350,34 +374,34 @@ export class ResultItemComponent implements OnInit {
   }
 
   approveLib() {
-    
-    
+
+
     const approvedLibDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
-      data: {caption: 'komentar', label: 'komentar'},
+      data: { caption: 'komentar', label: 'komentar' },
       panelClass: 'app-register-dialog'
     });
 
     approvedLibDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.processZadostEvent.emit({type: 'approveLib', identifier: this.doc.identifier, komentar: result});
-     }
+        this.processZadostEvent.emit({ type: 'approveLib', identifier: this.doc.identifier, komentar: result });
+      }
     });
   }
 
 
   releasedProved() {
-        
+
     const releasedDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
-      data: {caption: 'komentar', label: 'komentar'},
+      data: { caption: 'komentar', label: 'komentar' },
       panelClass: 'app-register-dialog'
     });
 
     releasedDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.processZadostEvent.emit({type: 'releasedProved', identifier: this.doc.identifier, komentar: result});
-     }
+        this.processZadostEvent.emit({ type: 'releasedProved', identifier: this.doc.identifier, komentar: result });
+      }
     });
 
   }
@@ -385,14 +409,14 @@ export class ResultItemComponent implements OnInit {
   reject() {
     const rejectDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
-      data: {caption: 'duvod_pro_odmitnuti', label: 'duvod'},
+      data: { caption: 'duvod_pro_odmitnuti', label: 'duvod' },
       panelClass: 'app-register-dialog'
     });
 
     rejectDialogRef.afterClosed().subscribe(result => {
       //if (result) {
-        this.processZadostEvent.emit({type: 'reject', identifier: this.doc.identifier, komentar: result});
-     //}
+      this.processZadostEvent.emit({ type: 'reject', identifier: this.doc.identifier, komentar: result });
+      //}
     });
 
   }
@@ -419,12 +443,12 @@ export class ResultItemComponent implements OnInit {
 
   //(zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')
 
-  curratorInteractionNeedAfterProcessed(zadost:Zadost, doc: SolrDocument): boolean {
-    return (zadost && zadost.navrh && zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX');
+  curratorInteractionNeedAfterProcessed(zadost: Zadost, doc: SolrDocument): boolean {
+    return (zadost && zadost.navrh && zadost.navrh === 'VNL' && doc.kuratorstav && doc.kuratorstav[doc.kuratorstav.length - 1] === 'NLX');
   }
 
   notPublic(doc: SolrDocument) {
-    return doc.dntstav == null || doc.dntstav[doc.dntstav.length-1] !== 'X';
+    return doc.dntstav == null || doc.dntstav[doc.dntstav.length - 1] !== 'X';
   }
 }
 
