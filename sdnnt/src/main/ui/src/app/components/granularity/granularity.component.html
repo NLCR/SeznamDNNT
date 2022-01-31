@@ -1,8 +1,15 @@
-<h1 mat-dialog-title>{{ 'desc.granularita' | translate }}: <span>{{ data.title }}</span></h1>
+<h1 mat-dialog-title>
+  <ng-container  *ngIf="data.isNavrh">
+    <label for="wholeTitle">{{'desc.na_cely_titul' | translate }}</label>
+    <input type="checkbox" (change)="setWhole($event)" [(ngModel)]="isWhole" />
+  </ng-container>
+  {{ 'desc.granularita' | translate }}: <span>{{ data.title }}</span>
+</h1>
 <div mat-dialog-content>
   <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
     <thead>
       <tr>
+        <th *ngIf="data.isNavrh">{{ 'desc.selection' | translate }}</th>
         <th>{{ 'desc.rocnik' | translate }}</th>
         <th>{{ 'desc.cislo' | translate }}</th>
         <th>{{ 'desc.odkaz' | translate }}</th>
@@ -13,6 +20,7 @@
     <tbody>
       <ng-container *ngFor="let item of data.items">
         <tr *ngIf="item.rocnik" >
+          <td *ngIf="data.isNavrh"><input type="checkbox" [disabled]="isWhole" (change)="setSelection(item)" /></td>
           <td>{{ item.rocnik }}</td>
           <td>{{ item.cislo }}</td>
           <td>{{ item.link }}</td>
@@ -26,5 +34,6 @@
   </table>
 </div>
 <div mat-dialog-actions>
+  <button mat-flat-button color="primary" (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
 </div>

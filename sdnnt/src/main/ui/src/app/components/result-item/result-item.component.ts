@@ -183,9 +183,9 @@ export class ResultItemComponent implements OnInit {
 
   changeStav() {}
 
-  public showGranularity() {
+  public showGranularity(isNavrh: boolean) {
 
-    const data = {title: this.doc.nazev, items: this.doc.granularity };
+    const data = {title: this.doc.nazev, items: this.doc.granularity, isNavrh: isNavrh };
 
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',
@@ -237,6 +237,10 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
+
+    if (this.hasGranularity) {
+      this.showGranularity(true);
+    }
     const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
     this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
       this.state.currentZadost[res.navrh]= res;
