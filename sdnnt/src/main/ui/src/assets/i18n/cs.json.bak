@@ -2,7 +2,6 @@
   "q" : {
     "placeholder": "Procházet dokumenty ..."
   },
-  "app_title": "Seznam děl nedostupných na trhu",
   "consent": {
     "text": "Tento web používá k poskytování služeb, personalizaci reklam a analýze návštěvnosti soubory cookie. Používáním tohoto webu s tím souhlasíte.",
     "button": "Souhlasím"
@@ -27,7 +26,7 @@
     "help_user":"Nápověda (uživatel)",
     "help_knihovna":"Nápověda (knihovna)",
     "help_kurator":"Nápověda (kurator)",
-    "help_mainKurator":"Nápověda (hlavní kurator)",
+    "help_mainKurator":"Nápověda (kurator)",
     "help_admin":"Nápověda (admin)"
 
   },
@@ -41,8 +40,8 @@
     "NNN": "není na seznamu",
     "A": "zařazeno",
     "N": "vyřazeno",
-    "X": "volné dílo",
-    "PX": "pravděpodobná volné dílo",
+    "X": "volné",
+    "PX": "pravděpodobná volná díla",
     "NL":"omezení na terminál / plánované vydání po získání licence",
     "NLX":"omezeno na terminál",
 
@@ -69,14 +68,13 @@
       "VNL": "Výzva k omezení na terminál",
       "VNZ": "Výzva k omezení na terminál",
       "N": "Vyřazeno",
-      "X": "Volné dílo",
-      "PX": "Pravděpodobná volné dílo",
+      "X": "Volné",
+      "PX": "Pravděpodobná volná díla",
       "NL":"omezení na terminál / plánované vydání po získání licence",
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
-      "NLX":"Omezeno na terminál, interní stav",
-      "PXN":"Návrhy na veřejné dílo"
+      "NLX":"Omezeno na terminál, interní stav"
     }
   },
   "license": {
@@ -105,33 +103,22 @@
     "license": "Přiřazená licence",
     "sigla": "Sigla",
     "rokvydani": "Rok vydání",
-    "controlled": "Kontrolováno",
 
     "undefined": "nezařazeno",
     "NNN": "není na seznamu",
     "NPA": "návrh na zařazení",
     "PA": "dílo publikováno jako návrh",
     "A": "zařazeno",
-    "VS": "Vyřazeno",
     "VN": "Vyřazení",
     "N": "vyřazeno",
-    "X": "volná díla",
-    "PX": "pravděpodobně volná díla",
+    "X": "volné",
+    "PX": "pravděpodobná volné",
     "NZ": "zařazeno s omezením",
     "NZN": "návrh k zařazení",
     "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",
     "VNZ": "Výzva k licenci pro terminál na místě samém",
     "NL":"omezení na terminál / plánované vydání po získání licence",
-    "NLX":"omezeno na terminál",
-
-    "Priorita 1": "Priorita 1",
-    "Priorita 2": "Priorita 2",
-    "Priorita 3": "Priorita 3"
-  },
-
-  "controlled": {
-    "true": "Kontrolováno",
-    "false": "Nekontrolováno"
+    "NLX":"omezeno na terminál"
   },
 
   "fmt": {
@@ -150,7 +137,6 @@
   "alert": {
     "ulozeni_zadosti_success": "Uložení žádosti proběhlo úspěšně.",
     "ulozeni_zadosti_error": "Chyba při uložení žádosti.",
-    "maximalni_pocet_polozek_v_zadosti_prekrocen": "Překročen maximální počet položek v žádosti",
     "odstraneni_zadosti_success": "Odstranění dokumentu z žádosti proběhlo úspěšně.",
     "odstraneni_zadosti_error": "Chyba při odstranění dokumentu z žádosti.",
     "schvaleni_navrhu_success": "Schválení návrhu proběhlo úspěšně.",
@@ -167,7 +153,6 @@
     "forgot_password_error": "Nejde vyresetovat heslo, nemůžu najít účet.",
     "forgot_password_success": "Na email jsme Vám poslali odkaz pro reset hesla.",
     "invalid_username": "Špatné přihlašovací jméno",
-    "username_exists": "Uživatelské jméno již existuje",
     "invalid_nazevspolecnosti":"Špatné jméno společnosti",
     "invalid_jmeno": "Špatné jméno",
     "invalid_prijmeni": "Špatné příjmení",
@@ -539,8 +524,6 @@
   },
 
   "desc": {
-    "scheduler_type_request":"Systémem generované žádosti", 
-    "user_type_request":"Uživatelské žádosti", 
     "institution": "Instituce",
     "notifikace_interval": "Interval notifikace",
     "none": "Nenastaveno",
@@ -653,8 +636,7 @@
     "zpracovani_zadosti": "Zpracování žádostí",
     "reset_hesla": "Reset hesla",
     "poslat_zadost": "Poslat žádost",
-    "poslat": "Poslat",
-    "duvod_pro_terminal": "Odůvodnění pro omezení na terminál",
+    "send": "Poslat",
     "duvod_pro_odmitnuti": "Odůvodnění pro odmítnutí",
     "duvod": "Odůvodnění",
     "radit_podle": "Řadit podle",
@@ -667,9 +649,7 @@
     "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Zobrazit i dokumenty, které nejsou zařazeny na seznamu",
     "datum_importu": "Datum importu",
     "celkem": "Celkem",
-    "na_seznamu": "Na seznamu",
     "na_vyrazeni": "Na vyřazení",
-    "controlled_by": "Zkontroloval",
     "prehled_importu": "Přehled importů",
     "vysledek_importu": "Výsledek importu",
     "schvalit_zmenu_na_vyrazeni": "Schválit změnu / na vyřazení",
@@ -747,8 +727,6 @@
     "period" : "Lhůta",
     "deadline" : "Čas uzávěrky/přepnutí",
     "verze_zadosti": "Verze žádosti",
-    "cislo_zadosti": "Číslo žádosti",
-
     "id": "Id",
     "priorita": "Priorita",
     "vnz_memorandum": "VNZ Memorandum",
@@ -761,16 +739,7 @@
     "korespondence": "Korespondence",
     "vlozit_korespondenci": "Vložit korespondenci ...",
     "standardni_prihlaseni":"Standardní přihlášení ...",
-    "shibboleth_prihlaseni":"EDUId přihlášení ...",
-    "Zdroj": "Zdroj",
-    "provest_hromadny_navrh": "Provést hromadný návrh",
-    "vyrizeni_zadosti": "Vyřízení žádosti",
-    "hromadne_schvalit": "Hromadně schválit",
-    "hromadne_odmitnout": "Hromadně odmítnout",
-    "type_of_request" : "Typ žádosti",
-    "historie_stavu": "Historie stavu",
-    "historie_kuratorskeho_stavu": "Historie kurátorského stavu",
-    "historie_bibliografickeho_zaznamu": "Historie bibliografického stavu"
+    "shibboleth_prihlaseni":"EDUId přihlášení ..."
   },
 
   "acts": {

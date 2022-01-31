@@ -119,7 +119,7 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div *ngFor="let p of allPriorities">
-            <a (click)="setPriority(p)">{{ p }}</a>
+            <a (click)="setPriority(p)">{{ 'field.' + p | translate }}</a>
           </div>
         </mat-expansion-panel>
 

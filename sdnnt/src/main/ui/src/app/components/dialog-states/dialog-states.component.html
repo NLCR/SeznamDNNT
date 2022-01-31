@@ -3,7 +3,7 @@
   <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap app-mb-4">
     <mat-label>{{ 'desc.stav' | translate }}</mat-label>
     <mat-select name="newState" [(ngModel)]="newState" (selectionChange)="changeState($event)">
-      <mat-option *ngFor="let stav of dntStates" [value]="stav" >
+      <mat-option *ngFor="let stav of dntStates" [value]="stav" [matTooltip]="'state.tooltip.' + stav | translate">
         {{ stav }} - {{ 'state.tooltip.' + stav | translate }}
       </mat-option>
     </mat-select>

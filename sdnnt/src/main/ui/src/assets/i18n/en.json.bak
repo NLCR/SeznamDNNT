@@ -2,7 +2,6 @@
   "q" : {
     "placeholder": "Browse documents ..."
   },
-  "app_title": "List of works not available on the market",
   "consent": {
     "text": "This website uses cookies to provide services, personalize ads and analyze traffic. By using this website, you agree to this.",
     "button": "I agree"
@@ -21,15 +20,7 @@
     "authors": "For authors",
     "publishers": "For libraries",
     "libraries": "For libraries",
-    "api": "API description",
-
-    "help":"Help",
-    "help_user":"Help (user)",
-    "help_knihovna":"Help (library)",
-    "help_kurator":"Help (curator)",
-    "help_mainKurator":"Help (main curator)",
-    "help_admin":"Help (admin)"
-
+    "api": "API description"
   },
   "record": {
     "state": "status"
@@ -75,9 +66,7 @@
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
-      "NLX":"On-site terminal license, internal state",
-      "PXN":"Public work suggestion"
-
+      "NLX":"On-site terminal license, internal state"
     }
   },
   "license": {
@@ -102,17 +91,15 @@
     "language": "Document language",
     "nakladatel": "Publisher",
     "dntstav": "Document status",
-    "kuratorstav": "Curatorial status",
     "license": "Associated license",
     "sigla": "Sigla",
     "rokvydani": "Year of publication",
-    "controlled": "Controlled",
 
     "undefined": "unclassified",
     "NNN": "Not in List",
     "NPA": "Call for title classification",
     "PA": "Work published as a draft",
-    "A": "Included",
+    "A": "Classified",
     "VS": "Discarded",
     "VN": "Request for discard",
     "N": "Discared",
@@ -123,16 +110,7 @@
     "VNL": "Call for on on-site terminal license",
     "VNZ": "Call for on on-site terminal license",
     "NL":"On-site terminal license, internal state",
-    "NLX":"On-site terminal license, internal state",
-
-    "Priorita 1": "Priority 1",
-    "Priorita 2": "Priority 2",
-    "Priorita 3": "Priority 3"
-  },
-
-  "controlled": {
-    "true": "Controlled",
-    "false": "Not Controlled"
+    "NLX":"On-site terminal license, internal state"
   },
 
   "fmt": {
@@ -151,7 +129,6 @@
   "alert": {
     "ulozeni_zadosti_success": "The request was saved successfully.",
     "ulozeni_zadosti_error": "Error saving request.",
-    "maximalni_pocet_polozek_v_zadosti_prekrocen": "Maximum number of items in request exceeded",
     "odstraneni_zadosti_success": "The document was successfully removed from the application.",
     "odstraneni_zadosti_error": "Error deleting document from request.",
     "schvaleni_navrhu_success": "The approval of the proposal was successful.",
@@ -168,13 +145,9 @@
     "forgot_password_error": "Cannot change password. User account not found",
     "forgot_password_success": "The reset password link has been sent.",
     "invalid_username": "Invalid user name",
-    "username_exists": "User name already exists",
-    "invalid_nazevspolecnosti":"Invalid company name",
     "invalid_jmeno": "Invalid name",
     "invalid_prijmeni": "Invalid surname",
     "invalid_email": "Invalid e-mail",
-    "invalid_kontaktni_osoba_prijmeni": "Špatné příjmení kontaktní osoby",
-    "invalid_kontaktni_osoba_jmeno": "Špatné jméno kontaktní osoby",
     "sledovat_zaznam_success": "Record tracking was successful.",
     "sledovat_zaznam_error": "Error tracking log.",
     "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",
@@ -187,12 +160,11 @@
     "condition3": "You must agree to the terms at the bottom of the dialog",
     "delete_request": "Are you sure you want to delete this request",
     "smazani_zadosti_success": "The request was deleted successfully.",
-    "smazani_zadosti_error": "Error deleting request.",
-    "komentar_chybi":"Note is missing"
+    "smazani_zadosti_error": "Error deleting request."
   },
 
   "sort": {
-    "score": "Relevancy",
+    "score": "Score",
     "title_sort": "Title",
     "rokvydani": "Year of issue",
     "date1_int": "Year of issue",
@@ -540,8 +512,6 @@
   },
 
   "desc": {
-    "scheduler_type_request":"Scheduler generated requests", 
-    "user_type_request":"Users' requests", 
     "institution": "Institution",
     "notifikace_interval": "Notification interval",
     "none": "Not set",
@@ -618,20 +588,20 @@
     "uzivatel": "User",
     "navhr_na_stav": "Status proposal",
     "datum_vyrizeni": "Date of settlement",
-    "pocet_zadosti": "Num. of requirements",
+    "pocet_zadosti": "Num. of applications",
     "pozadavek": "Requirement",
-    "stav_zadosti": "Requirement status",
+    "stav_zadosti": "Application status",
     "neodeslano": "Not sent",
     "ceka_na_posouzeni": "Awaiting review",
     "ceka_na_automaticke_zpracovani": "Awaiting automatic process",
 
     "zpracovano": "Processed",
-    "typ_navrhu": "Type of proposal",
+    "typ_navrhu": "Design type",
+    "navrzeno_na_zarazeni": "Designed for inclusion",
+    "navrzeno_na_vyrazeni": "Designed to be discarded",
 
-    "navrzeno_na_zarazeni": "Inclusion",
-    "navrzeno_na_vyrazeni": "Elimination",
-    "navrzeno_na_omezeni_vnl": "Terminal after 18 months / rights holder",
-    "navrzeno_na_omezeni_vnz": "Terminal / own production",
+    "navrzeno_na_omezeni_vnl": "License reduction, article 8",
+    "navrzeno_na_omezeni_vnz": "License reduction, article X",
 
     "nedoreseno": "Unresolved",
     "fyzicka_osoba": "Individual",
@@ -647,7 +617,7 @@
     "kontaktni_osoba_prijmeni": "Contact person - surname",
     "narodni_knihovna_ceske_republiky": "National Library od the Czech Republic",
     "zaznam_ma_navrh": "The record has a proposal",
-    "prehled_zadosti": "Overview of requirement",
+    "prehled_zadosti": "Overview of applications",
     "skryt_zpracovane": "Hide processed",
     "hromadny_navrh": "Bulk proposal",
     "oznacit_jako_zpracovane": "Mark as processed",
@@ -655,7 +625,6 @@
     "reset_hesla": "Password reset",
     "poslat_zadost": "Send a request",
     "poslat": "Send",
-    "duvod_pro_terminal": "Reason for terminal approval",
     "duvod_pro_odmitnuti": "Reason for rejection",
     "duvod": "Reason",
     "radit_podle": "Sort by",
@@ -665,12 +634,10 @@
     "cs": "Český jazyk",
     "registrovat_se": "To register",
     "pouze_zaznamy_na_seznamu": "Only entries in the list",
-    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Also display documents that are not in the list",
+    "zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu": "Show documents that are not listed",
     "datum_importu": "Date of import",
     "celkem": "Total",
-    "na_seznamu": "In the list",
     "na_vyrazeni": "For elimination",
-    "controlled_by": "Controlled by",
     "prehled_importu": "Imports overview",
     "vysledek_importu": "Import result",
     "schvalit_zmenu_na_vyrazeni": "Approve the change / for elimination",
@@ -681,7 +648,7 @@
     "zobrazit_nenalezene": "Show not found",
     "apienabled": "Enable API",
     "apikey": "API Key",
-    "sledovat": "Watch record",
+    "sledovat": "Follow record",
     "ne_sledovat": "Unfollow record",
     "granularita": "Granularity",
     "rocnik": "Grade",
@@ -699,9 +666,9 @@
     "rok_od": "Year from",
     "rok_do": "Year to",
     "komentar": "Comment",
-    "delegated_kurator": "Delegated curator",
-    "priority": "Priority",
-    "zobrazit_zaznamy_s_notifikaci": "Show records with notifications",
+    "delegated_kurator": "Delegovaný kurátor",
+    "priority": "Priorita",
+    "zobrazit_zaznamy_s_notifikaci": "Show notifications with notifications",
     "registracni_formular": "Registration form",
     "hledat_uzivatele": "Search user",
     "mesto": "City",
@@ -747,8 +714,7 @@
     "desiredstate" : "Feature state/license",
     "period" : "Period",
     "deadline" : "Deadline/State switch",
-    "verze_zadosti": "Request's version",
-    "cislo_zadosti": "Request's number",
+    "verze_zadosti": "He carries requests",
     "id": "Id",
     "priorita": "Priority",
     "vnz_memorandum": "VNZ Memorandum",
@@ -761,16 +727,8 @@
     "korespondence": "Correspondence",
     "vlozit_korespondenci": "Add correspondence ...",
     "standardni_prihlaseni":"Use application account ...",
-    "shibboleth_prihlaseni":"Use EDUid account ...",
-    "Zdroj": "Source",
-    "provest_hromadny_navrh": "Make a bulk proposal",
-    "vyrizeni_zadosti": "Processing of the application",
-    "hromadne_schvalit": "Bulk approve",
-    "hromadne_odmitnout": "Reject en masse",
-    "type_of_request" : "Type of request",
-    "historie_stavu": "Status history",
-    "historie_kuratorskeho_stavu": "History of curatorial status",
-    "historie_bibliografickeho_zaznamu": "History of bibliographic status"
+    "shibboleth_prihlaseni":"Use EDUid account ..."
+
   },
 
   "acts": {
