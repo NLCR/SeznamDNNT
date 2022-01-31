@@ -28,7 +28,7 @@
       <div [innerHTML]="tabContent"></div>
     </mat-tab>
     <mat-tab [label]="'desc.statistiky' | translate">
-      <app-graphs *ngIf="facets" [facets]="facets"></app-graphs>   
+      <app-graphs *ngIf="showStats"></app-graphs>   
     </mat-tab>
   </mat-tab-group>
 </div>

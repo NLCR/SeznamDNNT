@@ -14,6 +14,7 @@ export class HomeComponent implements OnInit {
   
   activeTab: string;
   tabContent: string;
+  showStats = false;
 
   facets: any;
 
@@ -60,7 +61,12 @@ export class HomeComponent implements OnInit {
 
   selectTab(selected) {
     const tab = this.config.homeTabs[selected.index];
-    this.getText(tab);
+    if (tab) {
+      this.getText(tab);
+    } else {
+      this.showStats = true;
+    }
+    
   }
   
 }

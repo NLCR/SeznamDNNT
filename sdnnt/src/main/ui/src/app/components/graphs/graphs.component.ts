@@ -1,3 +1,4 @@
+import { HttpParams } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { ApexChart } from 'ng-apexcharts';
 import { timeInterval } from 'rxjs/operators';
@@ -10,8 +11,7 @@ import { AppService } from 'src/app/app.service';
 })
 export class GraphsComponent implements OnInit {
 
-  @Input() facets: any;
-
+  facets: any;
   stavOpts: {
     series: number[],
     chart: ApexChart,
@@ -56,11 +56,8 @@ export class GraphsComponent implements OnInit {
   constructor(private service: AppService) { }
 
   ngOnInit(): void {
-    this.setSeries();
-  }
-
-  ngOnChanges(e): void {
-    this.setSeries();
+    this.getFacets();
+    
   }
 
   setSeries() {
@@ -97,6 +94,14 @@ export class GraphsComponent implements OnInit {
     }
     this.getStatsHistory();
 
+  }
+
+  getFacets() {
+    const p = Object.assign({}, {});
+    this.service.search(p as HttpParams).subscribe((res)=>{
+      this.facets = res.facet_counts.facet_fields;
+      this.setSeries();
+    });
   }
 
   getStatsHistory() {
