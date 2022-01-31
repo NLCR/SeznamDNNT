@@ -112,7 +112,7 @@
           </div>
         </mat-expansion-panel>
 
-        <mat-expansion-panel [expanded]="true"  *ngIf="allPriorities.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
+        <mat-expansion-panel [expanded]="true" *ngIf="allPriorities.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
           <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
             <mat-panel-title>
               {{ 'desc.priority' | translate }}

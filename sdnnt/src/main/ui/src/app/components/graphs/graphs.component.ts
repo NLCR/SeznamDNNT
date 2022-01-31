@@ -59,6 +59,10 @@ export class GraphsComponent implements OnInit {
     this.setSeries();
   }
 
+  ngOnChanges(e): void {
+    this.setSeries();
+  }
+
   setSeries() {
     this.stavOpts =
     {
