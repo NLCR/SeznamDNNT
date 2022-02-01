@@ -276,7 +276,7 @@ export class ZadostComponent implements OnInit {
       panelClass: 'app-register-dialog'
     });
     approveDialogRef.afterClosed().subscribe(result => {
-      if (result !== null) {
+      if (result) {
         let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
         this.service.approveItems(items, this.zadost,result, null).subscribe((res: any) => {
           if (res.error) {
@@ -287,19 +287,23 @@ export class ZadostComponent implements OnInit {
             this.getDocs(this.route.snapshot.queryParams);
           }
         });
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
       }
     });
   }
 
 
   rejectAll() {
-    const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+
+    const rejectDialogRef = this.dialog.open(DialogPromptComponent, {
       width: '700px',
-      data: {caption: 'komentar', label: 'komentar'},
+      data: { caption: 'duvod_pro_odmitnuti', label: 'duvod' },
       panelClass: 'app-register-dialog'
     });
-    approveDialogRef.afterClosed().subscribe(result => {
-      if (result !== null) {
+
+    rejectDialogRef.afterClosed().subscribe(result => {
+      if (result) {
         let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
         this.service.rejectItems(items, this.zadost,result).subscribe((res: any) => {
           if (res.error) {
@@ -310,10 +314,24 @@ export class ZadostComponent implements OnInit {
             this.getDocs(this.route.snapshot.queryParams);
           }
         });
+      } else {
+        this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.oduvodneni_chybi', true);
       }
     });
   }
 
+  /** Pokud je navrh vnl, respektujeme pouze prvni prechod - cilovy stav NL*/
+  enBlockActionEnabled() {
+    let allprocessed = this.allProcessed();
+    if (this.zadost.navrh == 'VNL'){
+      if (this.zadost.desired_item_state == 'NL') {
+        return !allprocessed;
+      } else return false;
+    } else {
+      return !allprocessed;
+    }
+
+  }
 
 
   showCorrespondence() {
