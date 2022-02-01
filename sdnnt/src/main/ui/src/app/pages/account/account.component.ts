@@ -135,6 +135,12 @@ export class AccountComponent implements OnInit {
     this.loading = true;
     const p = Object.assign({}, params);
 
+    if (this.state.user?.role === 'kurator' || this.state.user?.role === 'main_kurator') {
+      p.sort_account = this.state.sort.sort_account.field + " " + this.state.sort.sort_account.dir;
+    } else {
+      p.user_sort_account = this.state.sort.user_sort_account.field + " " + this.state.sort.user_sort_account.dir;
+    }
+
     
     this.items = [];
     this.searchResponse = null;
