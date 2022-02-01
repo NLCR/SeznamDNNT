@@ -784,5 +784,24 @@
   "account":{
     "noworkflow":"Not possible to approve state",
     "noworkflowstates": "Not possible to switch to next state "
+  },
+
+  "graph": {
+    "title": {
+      "States": "States",
+      "Licenses": "License",
+      "User activity": "User activity",
+      "History by user": "History by user",
+      "History by type": "History by type"
+    },
+    "desc": {
+      "interval": "Interval",
+      "select_interval": "Select interval",
+      "year": "Year",
+      "quarter": "Quarter",
+      "month": "Month",
+      "week": "Week",
+      "day": "Day"
+    }
   }
 }

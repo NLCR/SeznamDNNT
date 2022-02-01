@@ -74,7 +74,7 @@ export class GraphsComponent implements OnInit {
         type: "donut"
       },
       title: {
-        text: this.service.getTranslation("graphs.States")
+        text: this.service.getTranslation("graph.title.States")
       },
       labels: this.facets.dntstav.map(e => e.name + ' ' + this.service.getTranslation('state.' + e.name))
     }
@@ -90,7 +90,7 @@ export class GraphsComponent implements OnInit {
         type: "donut"
       },
       title: {
-        text: this.service.getTranslation("graphs.Licenses")
+        text: this.service.getTranslation("graph.title.Licenses")
       },
       labels: this.facets.license.map(e => this.service.getTranslation('license.' + e.name))
     }
@@ -136,7 +136,7 @@ export class GraphsComponent implements OnInit {
       type: "line"
     };
     opts.title = {
-      text: this.service.getTranslation('graphs.' + title)
+      text: this.service.getTranslation('graph.title.' + title)
     };
     opts.xaxis = {
       type: 'datetime'
@@ -160,7 +160,7 @@ export class GraphsComponent implements OnInit {
       type: "bar"
     };
     opts.title = {
-      text: this.service.getTranslation('graphs.' + title)  
+      text: this.service.getTranslation('graph.title.' + title)  
     };
     opts.xaxis = {
       categories: categories

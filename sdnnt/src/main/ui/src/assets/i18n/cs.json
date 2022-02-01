@@ -784,5 +784,24 @@
   "account":{
     "noworkflow":"Není možné schválit stav",
     "noworkflowstates": "Není možné schválit stav"
+  },
+
+  "graph": {
+    "title": {
+      "States": "Stavy",
+      "Licenses": "Licence",
+      "User activity": "Activita uživatele",
+      "History by user": "Historie uživatele",
+      "History by type": "Historie dle typu"
+    },
+    "desc": {
+      "interval": "Rozmezí",
+      "select_interval": "Vyber rozmezí",
+      "year": "Rok",
+      "quarter": "Čtvrtletí",
+      "month": "Měsíc",
+      "week": "Týden",
+      "day": "Den"
+    }
   }
 }

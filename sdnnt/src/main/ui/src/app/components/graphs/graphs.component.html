@@ -19,15 +19,15 @@
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <h4>Interval</h4>
+      <h4>{{ 'graph.desc.interval' | translate }}</h4>
       <mat-form-field appearance="fill">
-        <mat-label>Select interval</mat-label>
+        <mat-label>{{ 'graph.desc.select_interval' | translate }}</mat-label>
         <mat-select matNativeControl required [(value)]="interval" (valueChange)="getStatsHistory()">
-          <mat-option value="1YEAR">{{ 'year' | translate }}</mat-option>
-          <mat-option value="3MONTHS">{{ 'quarter' | translate }}</mat-option>
-          <mat-option value="1MONTH">{{ 'month' | translate }}</mat-option>
-          <mat-option value="7DAYS">{{ 'week' | translate }}</mat-option>
-          <mat-option value="1DAY">{{ 'day' | translate }}</mat-option>
+          <mat-option value="1YEAR">{{ 'graph.desc.year' | translate }}</mat-option>
+          <mat-option value="3MONTHS">{{ 'graph.desc.quarter' | translate }}</mat-option>
+          <mat-option value="1MONTH">{{ 'graph.desc.month' | translate }}</mat-option>
+          <mat-option value="7DAYS">{{ 'graph.desc.week' | translate }}</mat-option>
+          <mat-option value="1DAY">{{ 'graph.desc.day' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
       <apx-chart *ngIf="historyUserOpts?.series" [series]="historyUserOpts.series" [chart]="historyUserOpts.chart"
