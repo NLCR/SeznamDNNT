@@ -1,5 +1,9 @@
 <div class="app-container">  
   <ng-container *ngIf="zadost">
+    <ul class="app-breadcrumb">
+      <li><a routerLink="/account">{{ 'desc.moje_pozadavky' | translate }}</a></li>
+      <li>{{ 'desc.prehled_zadosti' | translate }}</li>
+    </ul>
     <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
       <div fxFlex class="app-left">
         {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>

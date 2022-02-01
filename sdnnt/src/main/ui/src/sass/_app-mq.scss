@@ -142,6 +142,10 @@ app-search {
 
 app-zadost {
   @media only screen and (max-width: 620px) {
+    .app-breadcrumb {
+      margin-bottom: 16px !important;
+    }
+
     .app-toolbar {
       .app-left {
         flex: 1 1 100% !important;

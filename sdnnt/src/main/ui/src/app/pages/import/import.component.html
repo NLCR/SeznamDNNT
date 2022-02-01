@@ -1,4 +1,8 @@
 <div class="app-container">
+  <ul class="app-breadcrumb">
+    <li><a routerLink="/imports">{{ 'desc.imports' | translate }}</a></li>
+    <li>{{ 'desc.vysledek_importu' | translate }}</li>
+  </ul>
   <div fxLayout="row" fxLayoutGap="32px" class="app-import-wrapper">
     <div class="app-left app-fx-facets">
       <app-facets *ngIf="facets" [facet_fields]="facets" ></app-facets>
