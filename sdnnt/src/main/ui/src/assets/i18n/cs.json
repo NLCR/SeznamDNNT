@@ -187,7 +187,8 @@
     "delete_request": "Opravdu chcete smazat tuto žádost",
     "smazani_zadosti_success": "Smazání žádosti proběhlo úspěšně.",
     "smazani_zadosti_error": "Chyba při smazání žádosti.",
-    "komentar_chybi":"Chybí komentář"
+    "komentar_chybi":"Chybí komentář",
+    "doduvodneni_chybi": "Chybí odůvodnění"
   },
 
   "sort": {
