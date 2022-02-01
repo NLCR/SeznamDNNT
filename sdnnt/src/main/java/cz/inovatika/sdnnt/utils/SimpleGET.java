@@ -10,7 +10,9 @@ import java.net.URL;
 
 public class SimpleGET {
 
-    public static String getFinalURL(String url) throws IOException {
+    public static final int MAXIMUM_ITERATION = 20;
+
+    public static String getFinalURL(String url, int counter) throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
         con.setInstanceFollowRedirects(false);
         con.connect();
@@ -18,14 +20,15 @@ public class SimpleGET {
 
         if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
             String redirectUrl = con.getHeaderField("Location");
-            return getFinalURL(redirectUrl);
+            if (counter > MAXIMUM_ITERATION) return redirectUrl;
+            return getFinalURL(redirectUrl, counter++);
         }
         return url;
     }
 
     public static String get(String u) throws IOException {
 
-        URL url = new URL( getFinalURL(u) );
+        URL url = new URL( getFinalURL(u,0) );
         HttpURLConnection conn= (HttpURLConnection) url.openConnection();
         conn.setInstanceFollowRedirects( true);
         conn.setRequestProperty("Content-Type", "application/json");

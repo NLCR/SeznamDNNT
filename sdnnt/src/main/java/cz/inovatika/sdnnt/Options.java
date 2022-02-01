@@ -40,6 +40,8 @@ public class Options {
 
   public Options() throws IOException, JSONException {
 
+    // v servletu prenastaveno
+
     File fdef = new File(InitServlet.DEFAULT_CONFIG_FILE);
 
     if (fdef.exists()) {

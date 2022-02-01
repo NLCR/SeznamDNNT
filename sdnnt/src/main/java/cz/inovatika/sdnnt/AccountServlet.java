@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.Role;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.AccountService;
@@ -150,37 +151,40 @@ public class AccountServlet extends HttpServlet {
 
     enum Actions {
 
+
         // vyhledava zadosti
-        TOUCH {
+        _UPDATE_ZADOST {
 
             private static final int LIMIT = 1000;
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    final AccountIterationSupport support = new AccountIterationSupport();
                     try {
                         JSONArray jsonArray = new JSONArray();
                         AtomicInteger number = new AtomicInteger(0);
                         Map<String, String> reqMap = new HashMap<>();
                         reqMap.put("rows", "" + LIMIT);
-                        AccountIterationSupport support = new AccountIterationSupport();
 
                         List<String> bulk = new ArrayList<>();
-                        support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("identifier"), (rsp) -> {
-                            Object identifier = rsp.getFieldValue("identifier");
+                        support.iterate(reqMap, null, Arrays.asList(), Arrays.asList("type_of_request:*"), Arrays.asList("id"), (rsp) -> {
+                            Object identifier = rsp.getFieldValue("id");
 
                             bulk.add(identifier.toString());
                             if (bulk.size() >= LIMIT) {
                                 number.addAndGet(bulk.size());
                                 LOGGER.info(String.format("Bulk update %d", number.get()));
-                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                                JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
+                                    "<field name="+"\"type_of_request\">user</feild>"
+                                );
                                 jsonArray.put(returnFromPost);
                                 bulk.clear();
                             }
-                        });
+                        }, "id");
                         if (!bulk.isEmpty()) {
                             number.addAndGet(bulk.size());
-                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
                             bulk.clear();
                             jsonArray.put(returnFromPost);
                         }
@@ -194,7 +198,59 @@ public class AccountServlet extends HttpServlet {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
-                        PureHTTPSolrUtils.commit();
+                        PureHTTPSolrUtils.commit(support.getCollection());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
+        // vyhledava zadosti
+        TOUCH {
+
+            private static final int LIMIT = 1000;
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    final AccountIterationSupport support = new AccountIterationSupport();
+                    try {
+                        JSONArray jsonArray = new JSONArray();
+                        AtomicInteger number = new AtomicInteger(0);
+                        Map<String, String> reqMap = new HashMap<>();
+                        reqMap.put("rows", "" + LIMIT);
+
+                        List<String> bulk = new ArrayList<>();
+                        support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id"), (rsp) -> {
+                            Object identifier = rsp.getFieldValue("id");
+
+                            bulk.add(identifier.toString());
+                            if (bulk.size() >= LIMIT) {
+                                number.addAndGet(bulk.size());
+                                LOGGER.info(String.format("Bulk update %d", number.get()));
+                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                                jsonArray.put(returnFromPost);
+                                bulk.clear();
+                            }
+                        }, "id");
+                        if (!bulk.isEmpty()) {
+                            number.addAndGet(bulk.size());
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                            bulk.clear();
+                            jsonArray.put(returnFromPost);
+                        }
+
+                        JSONObject object = new JSONObject();
+                        object.put("numberOfObjects", number.get());
+                        object.put("bulkResults", jsonArray);
+                        return object;
+
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+                    } finally {
+                        PureHTTPSolrUtils.commit(support.getCollection());
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
@@ -400,8 +456,8 @@ public class AccountServlet extends HttpServlet {
                         AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
 
                         JSONObject inputJs = ServletsSupport.readInputJSON(request);
-                        String zadostJSON = inputJs.getJSONObject("zadost").toString();
-                        Zadost zadost = Zadost.fromJSON(zadostJSON);
+                        JSONObject zadostJSON = inputJs.getJSONObject("zadost");
+                        Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
 
                         List<String> identifiers = Actions.identifiers(inputJs);
                         JSONObject retObject = null;
@@ -409,12 +465,17 @@ public class AccountServlet extends HttpServlet {
                             //Zadost zadost = Zadost.fromJSON(service.getRequest(zadostFromReq.getId()).toString());
                             String alternativeState = request.getParameter("alternative");
                             if (alternativeState != null) {
-                                retObject = service.curatorSwitchAlternativeState(alternativeState, zadost.getId(), identifier, inputJs.getString("reason"));
+                                zadostJSON = service.curatorSwitchAlternativeState(alternativeState, zadostJSON, identifier, inputJs.getString("reason"));
                             } else {
-                                retObject = service.curatorSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+                                zadostJSON = service.curatorSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
                             }
                         }
-                        return retObject;
+
+
+                        service.commit("catalog","zadost","history");
+
+                        // Musim cekat na komit
+                        return VersionStringCast.cast(service.getRequest(zadost.getId()));
 
                     } catch (ConflictException e) {
                         return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
@@ -433,18 +494,19 @@ public class AccountServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    UserControlerImpl userControler = new UserControlerImpl(request);
+                    AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
                     JSONObject inputJs = ServletsSupport.readInputJSON(request);
-                    String zadostJSON = inputJs.getJSONObject("zadost").toString();
-                    Zadost zadost = Zadost.fromJSON(zadostJSON);
-
+                    JSONObject zadostJSON = inputJs.getJSONObject("zadost");
+                    Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
                     List<String> identifiers = Actions.identifiers(inputJs);
                     JSONObject retObject = null;
                     for (String identifier : identifiers) {
-                        UserControlerImpl userControler = new UserControlerImpl(request);
-                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
-                        retObject = service.curatorRejectSwitchState(zadost.getId(), identifier, inputJs.getString("reason"));
+                        zadostJSON = service.curatorRejectSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
                     }
-                    return retObject;
+
+                    service.commit("catalog","zadost","history");
+                    return VersionStringCast.cast(service.getRequest(zadost.getId()));
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
                 }

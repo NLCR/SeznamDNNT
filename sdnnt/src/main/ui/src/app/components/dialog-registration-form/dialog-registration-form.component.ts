@@ -122,8 +122,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
 
 
   intitutionChangeEnabled(): boolean {
-    const retval:boolean = this.user.role == 'admin' || this.isRegister;
-    return retval;
+    return true;
   }
 
   changeTypOfOsobyDisabled(): boolean {

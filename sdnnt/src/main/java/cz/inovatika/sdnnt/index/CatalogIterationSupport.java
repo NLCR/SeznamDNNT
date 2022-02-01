@@ -7,7 +7,7 @@ public class CatalogIterationSupport extends IterationSupport{
 
     public static final String CATALOG_INDEX = "catalog";
 
-    protected String getCollection() {
+    public String getCollection() {
         return CATALOG_INDEX;
     }
 }

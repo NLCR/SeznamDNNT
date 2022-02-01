@@ -138,12 +138,12 @@ public class IndexerServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    CatalogIterationSupport support = new CatalogIterationSupport();
                     try {
                         JSONArray jsonArray = new JSONArray();
                         AtomicInteger number = new AtomicInteger(0);
                         Map<String,String> reqMap = new HashMap<>();
                         reqMap.put("rows", ""+LIMIT);
-                        CatalogIterationSupport support = new CatalogIterationSupport();
 
                         List<String> bulk = new ArrayList<>();
                         support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("identifier"), (rsp) -> {
@@ -153,14 +153,14 @@ public class IndexerServlet extends HttpServlet {
                             if (bulk.size() >= LIMIT) {
                                 number.addAndGet(bulk.size());
                                 LOGGER.info(String.format("Bulk update %d", number.get()));
-                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk, "identifier", support.getCollection());
                                 jsonArray.put(returnFromPost);
                                 bulk.clear();
                             }
-                        });
+                        }, "identifier");
                         if (!bulk.isEmpty()) {
                             number.addAndGet(bulk.size());
-                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk);
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk, "identifier", support.getCollection());
                             bulk.clear();
                             jsonArray.put(returnFromPost);
                         }
@@ -173,7 +173,7 @@ public class IndexerServlet extends HttpServlet {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
-                        PureHTTPSolrUtils.commit();
+                        PureHTTPSolrUtils.commit(support.getCollection());
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");

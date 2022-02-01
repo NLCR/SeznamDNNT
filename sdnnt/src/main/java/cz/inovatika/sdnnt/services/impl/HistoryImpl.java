@@ -30,6 +30,11 @@ public class HistoryImpl implements History {
 
     @Override
     public void log(String identifier, String oldRaw, String newRaw, String user, String type, String workflowId) {
+        this.log(identifier,oldRaw, newRaw, user, type, workflowId, true);
+    }
+
+    @Override
+    public void log(String identifier, String oldRaw, String newRaw, String user, String type, String workflowId, boolean commit) {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
@@ -60,7 +65,7 @@ public class HistoryImpl implements History {
         } catch (IOException | SolrServerException ex) {
             Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            SolrJUtilities.quietCommit(solr, "history");
+            if (commit) SolrJUtilities.quietCommit(solr, "history");
         }
 
     }

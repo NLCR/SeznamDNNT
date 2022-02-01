@@ -88,7 +88,11 @@
     
 	
 	<field name="nazevspolecnosti" type="string" indexed="true" stored="true" multiValued="false"   />
-    
+
+    <field name="fullText" type="text_lowercase" indexed="true" stored="false" multiValued="true" />
+
+    <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
+	 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
@@ -103,6 +107,14 @@
     -->
     <uniqueKey>username</uniqueKey>
     
+	<copyField source="username" dest="fullText"/>
+	<copyField source="jmeno" dest="fullText"/>
+	<copyField source="prijmeni" dest="fullText"/>
+	<copyField source="email" dest="fullText"/>
+
+
+	
+	
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"

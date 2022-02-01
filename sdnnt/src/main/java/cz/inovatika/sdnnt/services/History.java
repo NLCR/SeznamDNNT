@@ -4,4 +4,5 @@ public interface History {
 
     public void log(String identifier, String oldRaw, String newRaw, String user, String type, String workflowId);
 
+    public void log(String identifier, String oldRaw, String newRaw, String user, String type, String workflowId,boolean commit);
 }

@@ -61,7 +61,7 @@ public abstract class IterationSupport {
      * @param fields Returning fields
      * @param consumer Consumer closure
      */
-    public  void iterate(Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer) {
+    public  void iterate(Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer, String identifierField) {
         int rows = 3000;//opts.getClientConf().getInt("rows");
         if (req.containsKey("rows")) {
             rows = Integer.parseInt(req.get("rows"));
@@ -69,7 +69,7 @@ public abstract class IterationSupport {
         SolrClient solr = Indexer.getClient();
         LOGGER.info("Iteration rows "+rows);
         try {
-            SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc("identifier"));
+            SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc(identifierField));
 
             plusFilter.stream().forEach(q::addFilterQuery);
             minusFilter.stream().map(it-> "NOT "+it).forEach(q::addFilterQuery);
@@ -98,7 +98,7 @@ public abstract class IterationSupport {
         }
     }
 
-    protected abstract String getCollection();
+    public abstract String getCollection();
 
 }
 

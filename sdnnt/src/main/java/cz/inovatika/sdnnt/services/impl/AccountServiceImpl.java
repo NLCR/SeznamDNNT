@@ -398,94 +398,80 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public JSONObject curatorRejectSwitchState(String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
-        JSONObject zadostJSON = getRequest(zadostId);
-        if (zadostJSON != null) {
-            try {
-                String username = this.loginSupport.getUser().getUsername();
-
-                Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
-                try (SolrClient solr = buildClient()) {
-                    MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
-                    Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                    // odmitnuout z duvodu, ze jiz neexistuje workflow
-                    String transitionName = workflow != null ? workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense()) : "noworkflow";
-                    Zadost.reject(documentId,zadostJSON.toString(),  reason, username, transitionName);
-                    return VersionStringCast.cast(getRequest(zadostId));
-                }
-
-            } catch (JSONException e) {
-                throw new AccountException("account.rejecterror", "account.rejecterror");
+    public JSONObject curatorRejectSwitchState(JSONObject zadostJSON, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
+        try {
+            String username = this.loginSupport.getUser().getUsername();
+            Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+            try (SolrClient solr = buildClient()) {
+                MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
+                Workflow workflow = DocumentWorkflowFactory.create(marcRecord,zadost);
+                // odmitnuout z duvodu, ze jiz neexistuje workflow
+                String transitionName = workflow != null ? workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense()) : "noworkflow";
+                return Zadost.reject(documentId,zadostJSON.toString(),  reason, username, transitionName);
             }
-        } else {
-            throw new AccountException("account.notfound", "account.notfound");
+            //return VersionStringCast.cast(getRequest(zadostId));
+
+        } catch (JSONException e) {
+            throw new AccountException("account.rejecterror", "account.rejecterror");
         }
     }
 
     @Override
-    public JSONObject curatorSwitchAlternativeState(String alternative, String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
-        JSONObject zadostJSON = getRequest(zadostId);
-        if (zadostJSON != null) {
+    public JSONObject curatorSwitchAlternativeState(String alternative, JSONObject zadostJSON, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
+        try (SolrClient solr = buildClient()) {
+            MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
             Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
-            try (SolrClient solr = buildClient()) {
-                MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
+            Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
+            if (workflow.isAlternativeSwitchPossible(alternative)) {
 
-                Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                if (workflow.isAlternativeSwitchPossible(alternative)) {
+                // prene se a
+                WorkflowState workflowState = workflow.nextAlternativeState(alternative);
+                workflowState.switchState(zadost.getId(), this.loginSupport.getUser().getUsername(), reason);
 
-                    // prene se a
-                    WorkflowState workflowState = workflow.nextAlternativeState(alternative);
-                    workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
+                solr.add("catalog", marcRecord.toSolrDoc());
+                //solr.commit("catalog");
 
-                    solr.add("catalog", marcRecord.toSolrDoc());
-                    solr.commit("catalog");
+                String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+                return Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
+                        reason, this.loginSupport.getUser().getUsername(), null, transitionName);
 
-                    String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
-                    Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
-                            reason,this.loginSupport.getUser().getUsername(),null, transitionName);
-
-                }
+            } else {
+                return getRequest(zadost.getId());
             }
         }
-
-        return getRequest(zadostId);
     }
 
-    public JSONObject curatorSwitchState(String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
-        JSONObject zadostJSON = getRequest(zadostId);
-        if (zadostJSON != null) {
-            LOGGER.info(String.format("Processing zadost id %s", zadostId));
-            Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
-            try (SolrClient solr = buildClient()) {
-                MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
+    public JSONObject curatorSwitchState(JSONObject zadostJSON, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
+        Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+        String zadostId = zadost.getId();
+        LOGGER.info(String.format("Processing zadost id %s", zadostId));
+        //JSONObject zadostJSON = zadost.toJSON();
+        try (SolrClient solr = buildClient()) {
+            MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
 
-                Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                if (workflow != null) {
-                    if (workflow.isSwitchPossible()) {
+            Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
+            if (workflow != null) {
+                if (workflow.isSwitchPossible()) {
 
-                        // prene se a
-                        WorkflowState workflowState = workflow.nextState();
-                        if (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
-                            workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
+                    // prene se a
+                    WorkflowState workflowState = workflow.nextState();
+                    if (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
+                        workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
-                            solr.add("catalog", marcRecord.toSolrDoc());
-                            solr.commit("catalog");
+                        solr.add("catalog", marcRecord.toSolrDoc());
+                        //solr.commit("catalog");
 
-                            String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+                        String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
 
-                            Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
-                                    reason,this.loginSupport.getUser().getUsername(),null, transitionName);
+                        zadostJSON = Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
+                                reason,this.loginSupport.getUser().getUsername(),null, transitionName);
 
-                        } else  throw new AccountException("account.nocuratorworkflow", "account.nocuratorworkflow");
-                    } else throw new AccountException("account.noworkflowstates", "account.noworkflowstates");
-                } else throw new AccountException("account.noworkflow", "account.noworkflow");
-
-            }
+                    } else  throw new AccountException("account.nocuratorworkflow", "account.nocuratorworkflow");
+                } else throw new AccountException("account.noworkflowstates", "account.noworkflowstates");
+            } else throw new AccountException("account.noworkflow", "account.noworkflow");
 
         }
-
-        return getRequest(zadostId);
-
+        return zadostJSON;
     }
 
     public void schedulerSwitchStates() throws ConflictException, AccountException, IOException, SolrServerException {
@@ -611,6 +597,15 @@ public class AccountServiceImpl implements AccountService {
 
             try (SolrClient solr = buildClient()) {
                 Zadost.save(solr, zadost);
+            }
+        }
+    }
+
+    @Override
+    public void commit(String... indicies) throws ConflictException, AccountException, IOException, SolrServerException {
+        try (SolrClient solr = buildClient()) {
+            for (int i = 0; i < indicies.length; i++) {
+                SolrJUtilities.quietCommit(solr, indicies[i]);
             }
         }
     }

@@ -121,7 +121,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
     @Override
     public List<User> findUsersByPrefix(String prefix) throws UserControlerException {
         try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery(String.format("username:%s* OR jmeno:%s* OR prijmeni:%s*",  prefix, prefix, prefix))
+            SolrQuery query = new SolrQuery(String.format("fullText:%s*",  prefix))
                     .setRows(1000);
             QueryResponse users = solr.query("users", query);
             List<User> userList = users.getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());

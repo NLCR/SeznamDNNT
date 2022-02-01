@@ -107,8 +107,8 @@ public class AccountServiceWorkflowImplTest {
         Assert.assertTrue(fromIndex2.getDesiredItemState().equals("NPA"));
 
         // schvaleni kuratorem
-        service.curatorSwitchState("01234", "oai:aleph-nkp.cz:DNT01-000157742", "Reason 1");
-        service.curatorSwitchState("01234", "oai:aleph-nkp.cz:DNT01-000157765", "Reason 2 " );
+        service.curatorSwitchState(fromIndex.toJSON(), "oai:aleph-nkp.cz:DNT01-000157742", "Reason 1");
+        service.curatorSwitchState(fromIndex.toJSON(), "oai:aleph-nkp.cz:DNT01-000157765", "Reason 2 " );
 
         // Posunuti zaznamu z duvodu spusteni scheduleru
         try (SolrClient client = SolrTestServer.getClient()) {

@@ -330,7 +330,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 this.catalogIterationSupport.iterate(map, null, plusList, minusList,fetchingFields, (doc)->{
 
                     emitDocument(selectedInstitution, label, onlyUniqPids, uniqe, doc, documentOutput, outputFields);
-                });
+                }, "identifier");
             }
 
             ContentDisposition contentDisposition = ContentDisposition.type("attachment")

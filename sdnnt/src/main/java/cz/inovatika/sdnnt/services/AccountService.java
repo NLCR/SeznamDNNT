@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.services;
 
 import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -152,15 +153,15 @@ public interface AccountService {
      */
     public JSONObject deleteRequest(String payload) throws ConflictException, AccountException, IOException, SolrServerException;
 
-    public JSONObject curatorSwitchState(String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
+    public JSONObject curatorSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
-    public JSONObject curatorSwitchAlternativeState(String alternative, String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
+    public JSONObject curatorSwitchAlternativeState(String alternative, JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
-    public JSONObject curatorRejectSwitchState(String zadostId, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
-
+    public JSONObject curatorRejectSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
     public void schedulerSwitchStates() throws ConflictException, AccountException, IOException, SolrServerException;
 
     public void schedulerSwitchStates(String id) throws ConflictException, AccountException, IOException, SolrServerException;
 
+    public void commit(String ... indicies) throws ConflictException, AccountException, IOException, SolrServerException;
 }

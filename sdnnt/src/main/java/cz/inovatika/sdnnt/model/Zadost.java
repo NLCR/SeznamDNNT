@@ -821,7 +821,7 @@ public class Zadost implements NotNullAwareObject{
 
       String newProcess = new JSONObject().put("process", zadost.process).toString();
       // history must be updated after success
-      new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId());
+      new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId(), false);
       return save(client, zadost);
     } catch (JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);

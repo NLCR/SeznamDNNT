@@ -15,21 +15,21 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.PXService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
-import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
-import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.*;
+import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONException;
@@ -112,13 +112,16 @@ public class Job implements InterruptableJob {
     PX_CHECK {
       @Override
       void doPerform(JSONObject jobData) {
-//        try {
-//    //
-////          AccountServiceImpl accountService = new AccountServiceImpl(null, null, null);
-////          accountService.schedulerSwitchStates();
-//        } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-//          LOGGER.log(Level.SEVERE, e.getMessage(),e);
-//        }
+        try {
+          HttpsTrustManager.allowAllSSL();
+          PXService service = new PXServiceImpl();
+          List<String> check = service.check();
+          if (!check.isEmpty()) {
+            service.request(check);
+          }
+        } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+          LOGGER.log(Level.SEVERE, e.getMessage(),e);
+        }
       }
     },
 
