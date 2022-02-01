@@ -223,6 +223,30 @@ table {
   }
 }
 
+// breadcumbs
+.app-breadcrumb {
+  @extend .app-m-0;
+  padding: 8px 16px;
+  list-style: none;
+  background-color: $app-gray-1;
+
+  li {
+    display: inline;
+
+    & + li {
+      &:before {
+        font-family: "Material Icons";
+        padding: 8px;
+        color: $app-gray-5;
+        //content: "/\00a0";
+        //content: '\003E';
+        content: '\e409';
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
 
 // utility
 .app-font-bold {
