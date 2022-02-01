@@ -5,6 +5,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.PXService;
@@ -35,13 +36,19 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
 public class PXServiceImpl implements PXService {
 
-    public static final Logger LOGGER = Logger.getLogger(PXServiceImpl.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(PXService.class.getName());
 
     public static final int CHECK_SIZE = 10;
     public static final int LIMIT = 1000;
 
     private Map<String,String> mappingHosts = new HashMap<>();
     private Map<String,String> mappingApi = new HashMap<>();
+
+    private String yearConfiguration = null;
+
+    public PXServiceImpl(String yearConfiguration) {
+        this.yearConfiguration = yearConfiguration;
+    }
 
     protected void initialize() {
         JSONObject checkKamerius = Options.getInstance().getJSONObject("check_kramerius");
@@ -71,8 +78,13 @@ public class PXServiceImpl implements PXService {
         Map<String,String> reqMap = new HashMap<>();
         reqMap.put("rows", ""+LIMIT);
 
+        List<String> plusFilter = new ArrayList<>(Arrays.asList("id_pid:uuid","fmt:BK"));
 
-        support.iterate(reqMap, null, Arrays.asList("id_pid:uuid"), Arrays.asList("dntstav:X", "dntstav:PX"), Arrays.asList(
+        if (yearConfiguration != null) {
+            plusFilter.add("rokvydani:"+ yearConfiguration);
+        }
+        LOGGER.info("Current iteration filter "+plusFilter);
+        support.iterate(reqMap, null, plusFilter, Arrays.asList("dntstav:X", "dntstav:PX"), Arrays.asList(
                 IDENTIFIER_FIELD,
                 SIGLA_FIELD,
                 MARC_911_U,
@@ -95,25 +107,25 @@ public class PXServiceImpl implements PXService {
 
 
         try (final SolrClient solr = buildClient()) {
+
             List<String> keys = new ArrayList<>(mapping.keySet());
-            int numberOfBatches = keys.size() / 100;
-            if (keys.size() % 100 > 0) {
+            int batchSize = 40;
+            int numberOfBatches = keys.size() / batchSize;
+            if (keys.size() % batchSize > 0) {
                 numberOfBatches += 1;
             }
             for (int i = 0; i < numberOfBatches; i++) {
-                int startIndex = i*100;
-                int endIndex = (i+1)*100;
+                int startIndex = i*batchSize;
+                int endIndex = (i+1)*batchSize;
                 List<String> batch = keys.subList(startIndex, Math.min(endIndex, keys.size()));
                 Set<String> used = usedInRequest(solr, batch);
                 used.stream().forEach(mapping::remove);
             }
-
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);
         }
 
         Map<String, List<Pair<String,String>>> buffer = new HashMap<>();
-
         for (String key : mapping.keySet()) {
             List<String> links = mapping.get(key);
 
@@ -135,16 +147,17 @@ public class PXServiceImpl implements PXService {
         return foundCandidates;
     }
 
-    private Set<String>  usedInRequest(SolrClient solr, List<String> identifiers) {
+    public static Set<String>  usedInRequest(SolrClient solr, List<String> identifiers) {
         try {
             Set<String> retval = new HashSet<>();
             SolrQuery query = new SolrQuery("*")
-                    .setFields("id")
+                    .setFields("id","identifiers")
                     .addFilterQuery("navrh:PXN")
-                    .setRows(100);
-            identifiers.forEach(i-> {
-                query.addFilterQuery("identifiers:"+identifiers);
-            });
+                    .setRows(3000);
+
+            String collected = identifiers.stream().map(id -> '"' + id + '"').collect(Collectors.joining(" OR "));
+            query.addFilterQuery("identifiers:("+collected+")");
+
             SolrDocumentList zadost = solr.query("zadost", query).getResults();
             zadost.stream().forEach(solrDoc-> {
                 Collection<Object> identsFromZadost = solrDoc.getFieldValues("identifiers");
@@ -183,22 +196,6 @@ public class PXServiceImpl implements PXService {
                     String encodedCondition = URLEncoder.encode("PID:(" + condition + ")", "UTF-8");
                     String url = baseUrl + "api/v5.0/search?q="+"PID:(" + encodedCondition + ")"+"&wt=json";
 
-                    LOGGER.info(String.format("Checking url %s",url));
-                    if (url.contains("krameriusndk"))  {
-                        LOGGER.info("Skipping nkp site");
-                        continue;
-                    }
-
-                    if (url.contains("kramerius5.nkp.cz")) {
-                        LOGGER.info("kramerius5 site site");
-                        continue;
-
-                    }
-                    if (url.contains("kramerius4.nkp.cz")) {
-                        LOGGER.info("kramerius5 site site");
-                        continue;
-
-                    }
                     try {
                         String result = SimpleGET.get(url);
                         JSONObject object = new JSONObject(result);
@@ -273,24 +270,6 @@ public class PXServiceImpl implements PXService {
     }
 
 
-    public static void main(String[] args) throws AccountException, IOException, ConflictException, SolrServerException {
-        InitServlet.CONFIG_DIR = System.getProperty("user.home")+ File.separator+InitServlet.CONFIG_DIR;
-        HttpsTrustManager.allowAllSSL();
-        PXService service = new PXServiceImpl();
-        List<String> check = service.check();
-        if (!check.isEmpty()) {
-            int numberOfBatch = check.size() / AccountService.MAXIMUM_ITEMS_IN_ZADOST;
-            if (check.size() % AccountService.MAXIMUM_ITEMS_IN_ZADOST >0) {
-                numberOfBatch = numberOfBatch +1;
-            }
-            for (int i = 0; i < numberOfBatch; i++) {
-                int startIndex = i*AccountService.MAXIMUM_ITEMS_IN_ZADOST;
-                int endIndex = Math.min((i+1)*AccountService.MAXIMUM_ITEMS_IN_ZADOST, check.size());
-                List<String> subList = check.subList(startIndex, endIndex);
-                service.request(subList);
-            }
-        }
-    }
 
 
     @Override
@@ -300,6 +279,7 @@ public class PXServiceImpl implements PXService {
             AccountService accountService = new AccountServiceImpl(appSupport, null);
             JSONObject px = accountService.prepare("PXN");
             Zadost zadost = Zadost.fromJSON(px.toString());
+            zadost.setTypeOfRequest(ZadostTyp.scheduler.name());
             identifiers.stream().forEach(zadost::addIdentifier);
             zadost.setState("waiting");
             accountService.schedulerDefinedCloseRequest(zadost.toJSON().toString());
@@ -316,7 +296,7 @@ public class PXServiceImpl implements PXService {
         return user;
     }
 
-    SolrClient buildClient() {
+    static SolrClient buildClient() {
         return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
     }
 

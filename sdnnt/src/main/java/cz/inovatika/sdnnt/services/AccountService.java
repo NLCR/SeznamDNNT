@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface AccountService {
 
-    public static final int MAXIMUM_ITEMS_IN_ZADOST = 300;
+    public static final int MAXIMUM_ITEMS_IN_ZADOST = 3000;
 
     /**
      * Najde zadost dle id

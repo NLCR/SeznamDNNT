@@ -20,10 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.services.MailService;
-import cz.inovatika.sdnnt.services.NotificationsService;
-import cz.inovatika.sdnnt.services.PXService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.*;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
@@ -113,11 +110,28 @@ public class Job implements InterruptableJob {
       @Override
       void doPerform(JSONObject jobData) {
         try {
+          String range = jobData.optString("range");
           HttpsTrustManager.allowAllSSL();
-          PXService service = new PXServiceImpl();
+          PXService service = new PXServiceImpl(range);
           List<String> check = service.check();
           if (!check.isEmpty()) {
-            service.request(check);
+            // maximum is one third of total maximum
+            JSONObject checkKamerius = Options.getInstance().getJSONObject("check_kramerius");
+            int maximum = 100;
+            if (checkKamerius.has("itemsInRequest")) {
+              maximum = checkKamerius.getInt("itemsInRequest");
+            }
+            int numberOfBatch = check.size() / maximum;
+            if (check.size() % maximum >0) {
+              numberOfBatch = numberOfBatch +1;
+            }
+            for (int i = 0; i < numberOfBatch; i++) {
+
+              int startIndex = i*maximum;
+              int endIndex = Math.min((i+1)*maximum, check.size());
+              List<String> subList = check.subList(startIndex, endIndex);
+              service.request(subList);
+            }
           }
         } catch (ConflictException | AccountException | IOException | SolrServerException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);

@@ -7,7 +7,9 @@ properties:
   license:
     type: string
   sigla:
-    type: string
+    type: array
+    items:
+      type: string
   title:
     type: string
   type:
@@ -42,7 +44,7 @@ properties:
             type: string
         license:
           type: string
-        link:
+        pid:
           type: string
         number:
           type: string
