@@ -235,10 +235,13 @@ table {
 
     & + li {
       &:before {
+        font-family: "Material Icons";
         padding: 8px;
         color: $app-gray-5;
         //content: "/\00a0";
-        content: '\003E'
+        //content: '\003E';
+        content: '\e409';
+        vertical-align: middle;
       }
     }
   }
