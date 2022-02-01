@@ -125,7 +125,11 @@
    <field name="id_ismn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
    
+   <!-- ukladani licenci z granularity -->
+   <field name="granularity_license_cut" type="cut-license" indexed="true" stored="false" multiValued="true" />
+   
    <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
+   
    
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
@@ -201,7 +205,10 @@
 	<copyField source="marc_020a" dest="id_isbn" />
 	<copyField source="marc_020a" dest="id_all_identifiers" />
 	<copyField source="marc_020a" dest="id_all_identifiers_cuts" />
-	
+		
+	<!-- license information from granularity field -->	
+	<copyField source="granularity" dest="granularity_license_cut" />
+
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
@@ -661,6 +668,17 @@
 			<filter class="solr.PatternCaptureGroupFilterFactory" pattern="((uuid):([A-Za-z0-9\-]+))" preserve_original="false"/>
 			<filter class="solr.LowerCaseFilterFactory"/>
 			<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>			
+		</analyzer>
+		<analyzer type="query">
+			<tokenizer class="solr.KeywordTokenizerFactory"/>
+		</analyzer>
+	</fieldType>
+
+	<!-- licence analyzer -->
+	<fieldType name="cut-license"  class="solr.TextField" positionIncrementGap="100">
+		<analyzer type="index">
+			<tokenizer class="solr.KeywordTokenizerFactory"/>
+			<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(dnnto|dnntt)" preserve_original="false"/>
 		</analyzer>
 		<analyzer type="query">
 			<tokenizer class="solr.KeywordTokenizerFactory"/>

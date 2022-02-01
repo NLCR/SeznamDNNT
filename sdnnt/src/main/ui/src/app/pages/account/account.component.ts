@@ -128,6 +128,7 @@ export class AccountComponent implements OnInit {
       this.priorityFilter = val.priority;
       this.institutionFilter = val.institution;
       this.delegatedFilter = val.delegated;
+      this.typeOfRequestFilter = val.type_of_request;
     });
   }
 
