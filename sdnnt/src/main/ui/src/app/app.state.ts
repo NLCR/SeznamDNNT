@@ -33,7 +33,7 @@ export class AppState {
   // sort for results
   //public sort: Sort;
   
-  public sort: {[key: string]: Sort};
+  public sort: {[key: string]: Sort} = {};
 
 
   // Seznam stavu zaznamu pro uzivatel
@@ -72,11 +72,17 @@ export class AppState {
     this.page = 0;
     this.usedFilters = [];
     //this.sort = this.config.sorts[0];
-    this.sort = {};
+    // this.sort = {};
 
-    this.sort['sort'] = this.config.sorts.sort[0];
-    this.sort['sort_account'] = this.config.sorts.sort_account.find(s => s.field === "deadline" && s.dir==='asc');
-    this.sort['user_sort_account'] = this.config.sorts.user_sort_account.find(s => s.field === "datum_zadani" && s.dir==='asc');
+    if (!this.sort['sort']) {
+      this.sort['sort'] = this.config.sorts.sort[0];
+    }
+    if (!this.sort['sort_account']) {
+      this.sort['sort_account'] = this.config.sorts.sort_account[0];
+    }
+    if (!this.sort['user_sort_account']) {
+      this.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+    }
  
 
     this.fullCatalog = false;
