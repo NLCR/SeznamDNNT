@@ -57,7 +57,9 @@ export class GraphsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getFacets();
-    
+    this.service.langChanged.subscribe(res => {
+      this.getFacets();
+    })
   }
 
   setSeries() {
@@ -72,7 +74,7 @@ export class GraphsComponent implements OnInit {
         type: "donut"
       },
       title: {
-        text: "Stavy"
+        text: this.service.getTranslation("graphs.States")
       },
       labels: this.facets.dntstav.map(e => e.name + ' ' + this.service.getTranslation('state.' + e.name))
     }
@@ -88,7 +90,7 @@ export class GraphsComponent implements OnInit {
         type: "donut"
       },
       title: {
-        text: "Licenses"
+        text: this.service.getTranslation("graphs.Licenses")
       },
       labels: this.facets.license.map(e => this.service.getTranslation('license.' + e.name))
     }
@@ -134,7 +136,7 @@ export class GraphsComponent implements OnInit {
       type: "line"
     };
     opts.title = {
-      text: title
+      text: this.service.getTranslation('graphs.' + title)
     };
     opts.xaxis = {
       type: 'datetime'
@@ -158,7 +160,7 @@ export class GraphsComponent implements OnInit {
       type: "bar"
     };
     opts.title = {
-      text: title
+      text: this.service.getTranslation('graphs.' + title)  
     };
     opts.xaxis = {
       categories: categories

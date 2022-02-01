@@ -1,6 +1,8 @@
 // --- HOME ---
 
 app-home {
+  @import "app-graphs";
+
   .app-cards-wrapper {
     margin-left: -#{$app-gap-card};
 
@@ -48,6 +50,10 @@ app-home {
 
       .mat-tab-body {
         padding: $app-gap-double 0;
+
+        .mat-tab-body-content {
+          overflow: unset;
+        }
       } 
     }
   }

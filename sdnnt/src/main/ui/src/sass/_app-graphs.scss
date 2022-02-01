@@ -1,0 +1,22 @@
+// --- GRAPHS ---
+
+app-graphs {
+  .app-graphs-wrapper {
+    margin-left: -#{$app-gap-card};
+
+    .app-graph-wrapper {
+      border: 1px solid $app-brand-border-color;
+      border-radius: $app-border-radius;
+      flex: 0 0 calc(100% - #{$app-gap-card} - 2px); // 2px border
+      margin: 0 0 $app-gap-card $app-gap-card;
+
+      &.app-fx-50 {
+        flex: 0 0 calc(50% - #{$app-gap-card} - 2px); // 2px border
+      }
+
+      & > div {
+        @extend .app-p-4;
+      }
+    }
+  }
+}

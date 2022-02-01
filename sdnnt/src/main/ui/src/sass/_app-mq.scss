@@ -48,6 +48,14 @@ app-home {
       @include setFlexBreakpointGap(20);
     }
   }
+
+  app-graphs {
+    @media #{$lt-md} {
+      .app-fx-50 {
+        flex: 0 0 calc(100% - #{$app-gap-card} - 2px) !important;
+      }
+    }
+  }
 }
 
 app-search {

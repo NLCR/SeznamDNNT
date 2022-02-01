@@ -18,8 +18,6 @@ import { Zadost } from 'src/app/shared/zadost';
 })
 export class AccountComponent implements OnInit {
 
-  value = 'test';
-
   filterState = [
     {id: "open", val: "neodeslano"},
     {id: "waiting", val: "ceka_na_posouzeni"},

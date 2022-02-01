@@ -1,21 +1,54 @@
-<div fxLayout="row" fxLayoutGap="32px">
-  <div fxFlex="50%">
-    <apx-chart *ngIf="stavOpts?.series" [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
-    </apx-chart>
+<div fxLayout="row wrap" class="app-graphs-wrapper">
+  <div class="app-graph-wrapper app-fx-50">
+    <div>
+      <apx-chart *ngIf="stavOpts?.series" [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
+      </apx-chart>
+    </div>
   </div>
-  <div fxFlex="50%">
-    <apx-chart *ngIf="licenseOpts?.series" [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
+  <div class="app-graph-wrapper app-fx-50">
+    <div>
+      <apx-chart *ngIf="licenseOpts?.series" [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
       [labels]="licenseOpts.labels"></apx-chart>
+    </div>
+  </div>
+  <div class="app-graph-wrapper">
+    <div>
+      <apx-chart *ngIf="historyUserActivityOpts?.series" [series]="historyUserActivityOpts.series" [chart]="historyUserActivityOpts.chart"
+      [title]="historyUserActivityOpts.title" [labels]="historyUserActivityOpts.labels" [xaxis]="historyUserActivityOpts.xaxis"></apx-chart>
+    </div>
+  </div>
+  <div class="app-graph-wrapper">
+    <div>
+      <h4>Interval</h4>
+      <mat-form-field appearance="fill">
+        <mat-label>Select interval</mat-label>
+        <mat-select matNativeControl required [(value)]="interval" (valueChange)="getStatsHistory()">
+          <mat-option value="1YEAR">{{ 'year' | translate }}</mat-option>
+          <mat-option value="3MONTHS">{{ 'quarter' | translate }}</mat-option>
+          <mat-option value="1MONTH">{{ 'month' | translate }}</mat-option>
+          <mat-option value="7DAYS">{{ 'week' | translate }}</mat-option>
+          <mat-option value="1DAY">{{ 'day' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <apx-chart *ngIf="historyUserOpts?.series" [series]="historyUserOpts.series" [chart]="historyUserOpts.chart"
+        [title]="historyUserOpts.title" [labels]="historyUserOpts.labels" [xaxis]="historyUserOpts.xaxis"></apx-chart>
+    </div>
+  </div>
+  <div class="app-graph-wrapper">
+    <div>
+      <apx-chart *ngIf="historyStavOpts?.series" [series]="historyStavOpts.series" [chart]="historyStavOpts.chart"
+      [title]="historyStavOpts.title" [labels]="historyStavOpts.labels" [xaxis]="historyStavOpts.xaxis"></apx-chart>
+    </div>
   </div>
 </div>
-<div fxLayout="row" fxLayoutGap="32px">
-  <div fxFlex="100%">
+<!-- <div fxLayout="row">
+  <div fxFlex>
     <apx-chart *ngIf="historyUserActivityOpts?.series" [series]="historyUserActivityOpts.series" [chart]="historyUserActivityOpts.chart"
       [title]="historyUserActivityOpts.title" [labels]="historyUserActivityOpts.labels" [xaxis]="historyUserActivityOpts.xaxis"></apx-chart>
   </div>
 </div>
-<div fxLayout="row" fxLayoutGap="32px">
-  <div fxFlex="100%">
+<div fxLayout="row">
+  <div fxFlex>
     <h4>Interval</h4>
     <mat-form-field appearance="fill">
       <mat-label>Select interval</mat-label>
@@ -31,9 +64,9 @@
       [title]="historyUserOpts.title" [labels]="historyUserOpts.labels" [xaxis]="historyUserOpts.xaxis"></apx-chart>
   </div>
 </div>
-<div fxLayout="row" fxLayoutGap="32px">
-  <div fxFlex="100%">
+<div fxLayout="row">
+  <div fxFlex>
     <apx-chart *ngIf="historyStavOpts?.series" [series]="historyStavOpts.series" [chart]="historyStavOpts.chart"
       [title]="historyStavOpts.title" [labels]="historyStavOpts.labels" [xaxis]="historyStavOpts.xaxis"></apx-chart>
   </div>
-</div>
+</div> -->
