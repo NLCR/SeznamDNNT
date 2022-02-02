@@ -404,4 +404,8 @@ export class AccountComponent implements OnInit {
 
   }
 
+  showCopyAlert() {
+    this.service.showSnackBar('alert.text_byl_zkopirovan_do_schranky');
+  }
+
 }

@@ -225,7 +225,8 @@
           <ng-container matColumnDef="pozadavek">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.pozadavek" matTooltipPosition="above">
-              <div class="app-text-cutter">
+              <mat-icon [cdkCopyToClipboard]="element.pozadavek" class="app-icon-copy" (click)="showCopyAlert()">content_copy</mat-icon>
+              <div class="app-text-cutter app-d-in-block">
                 {{ element.pozadavek }}
               </div>
             </td>
@@ -233,7 +234,7 @@
           <ng-container matColumnDef="poznamka">
             <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
             <td mat-cell *matCellDef="let element" [matTooltip]="element.poznamka" matTooltipPosition="above">
-              <mat-icon [cdkCopyToClipboard]="element.poznamka" class="app-icon-copy">content_copy</mat-icon>
+              <mat-icon [cdkCopyToClipboard]="element.poznamka" class="app-icon-copy" (click)="showCopyAlert()">content_copy</mat-icon>
               <div class="app-text-cutter app-d-in-block">
                {{ element.poznamka }}
               </div>
