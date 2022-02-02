@@ -48,7 +48,7 @@
         {{ 'field.rokvydani' | translate }}
       </mat-panel-title>
     </mat-expansion-panel-header>
-    <div fxLayout="row" fxLayoutGap="16px">
+    <div fxLayout="row" fxLayoutGap="16px" class="app-facet-date-wrapper">
       <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
         <mat-label>{{ 'desc.rok_od' | translate }}</mat-label>
         <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true"  >

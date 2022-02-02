@@ -76,6 +76,27 @@ app-search {
         .mat-expansion-panel-body {
           padding-left: 0;
           padding-right: 0;
+
+          @media only screen and (max-width: 380px)  {
+            .app-facet-date-wrapper {
+              flex-direction: column !important;
+
+              .mat-form-field,
+              .mat-button-base {
+                margin-right: 0 !important;
+                flex: 1 1 100%;
+              }
+
+              .mat-form-field {
+                margin-bottom: 16px;
+              }
+
+              .mat-button-base {
+                width: 100% !important;
+                max-width: 100% !important;
+              }
+            }
+          }
         }
       }
 
