@@ -139,7 +139,10 @@ export class GraphsComponent implements OnInit {
       text: this.service.getTranslation('graph.title.' + title)
     };
     opts.xaxis = {
-      type: 'datetime'
+      type: 'datetime',
+      labels: {
+        format: 'MM.yyyy',
+      }
     }
     return opts;
   }

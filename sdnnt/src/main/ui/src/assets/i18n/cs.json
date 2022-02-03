@@ -188,7 +188,25 @@
     "smazani_zadosti_success": "Smazání žádosti proběhlo úspěšně.",
     "smazani_zadosti_error": "Chyba při smazání žádosti.",
     "komentar_chybi":"Chybí komentář",
-    "doduvodneni_chybi": "Chybí odůvodnění"
+    "doduvodneni_chybi": "Chybí odůvodnění",
+    "text_byl_zkopirovan_do_schranky": "Text byl zkopírován do schránky"
+  },
+
+  "paginator": {
+    "desc": {
+      "Číslo stránky": "Číslo stránky",
+      "Řazení": "Řadit podle",
+      "itemsPerPageLabel" : "Počet záznamů na stránce",
+      "nextPageLabel" : "Následující stránka",
+      "previousPageLabel" : "Předchozí stránka",
+      "firstPageLabel": "První stránka",
+      "lastPageLabel": "Poslední stránka",
+      "rangeLabel1": "0 z {{length}}",
+      "rangeLabel2": "{{startIndex}} - {{endIndex}} z {{length}}"
+    },
+    "tooltip": {
+      "Přejděte číslo stránky": "Přejít na stránku"
+    }
   },
 
   "sort": {
@@ -771,8 +789,7 @@
     "historie_stavu": "Historie stavu",
     "historie_kuratorskeho_stavu": "Historie kurátorského stavu",
     "historie_bibliografickeho_zaznamu": "Historie bibliografického stavu",
-    "statistiky": "Statistiky",
-    "zadost": "Žádost"
+    "statistiky": "Statistiky"
   },
 
   "acts": {
