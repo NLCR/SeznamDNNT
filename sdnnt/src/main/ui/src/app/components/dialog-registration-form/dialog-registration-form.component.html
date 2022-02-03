@@ -2,11 +2,11 @@
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
     <div fxFlex="100%" class="app-mb-4">
       <!-- typ: string; //pravnicka/fyzicka osoba -->
-      <mat-radio-group [(ngModel)]="user.typ" [disabled]=changeTypOfOsobyDisabled()>
+      <mat-radio-group [(ngModel)]="user.typ" *ngIf="!changeTypOfOsobyDisabled()">
         <mat-radio-button [value]="'fyzicka_osoba'">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
         <mat-radio-button [value]="'pravnicka_osoba'">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
       </mat-radio-group>
-
+      <span *ngIf="changeTypOfOsobyDisabled()">{{ 'desc.' + user.typ | translate }}</span>
     </div>
     <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ === 'fyzicka_osoba'">
       <div ngClass.gt-xs="app-mr-4">
