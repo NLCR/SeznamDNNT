@@ -1,4 +1,7 @@
-<h1 mat-dialog-title>{{ 'desc.registracni_formular' | translate }}</h1>
+<h1 mat-dialog-title [ngSwitch]="data.isRegister">
+  <ng-container *ngSwitchCase="true">{{ 'desc.registracni_formular' | translate }}</ng-container>
+  <ng-container *ngSwitchDefault>{{ 'desc.zmenit_osobni_udaje' | translate }}</ng-container>
+</h1>
 <div mat-dialog-content>
   <app-dialog-registration-form [user]="user" [isRegister]="data.isRegister" [focus]="focus"></app-dialog-registration-form>
 </div>
