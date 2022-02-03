@@ -24,19 +24,19 @@ public class NZNWorkflow extends Workflow {
         PublicItemState pState = owner.getPublicState();
         Period period = getPeriod(currentState);
         if (currentState == null) {
-            return new WorkflowState(owner, NPA,null, owner.getWorkflowDate(), period,true,  false);
+            return new WorkflowState(owner, NPA,null, owner.getWorkflowDate(), period,true,  true, false);
         } else {
             switch(currentState) {
                 case N:
-                    return new WorkflowState(owner,NPA, null, owner.getWorkflowDate(), period, false, false);
+                    return new WorkflowState(owner,NPA, null, owner.getWorkflowDate(), period, false,true, false);
                 case NPA:
-                    return new WorkflowState(owner, PA, License.dnnto, owner.getWorkflowDate() ,period, true ,  false);
+                    return new WorkflowState(owner, PA, License.dnnto, owner.getWorkflowDate() ,period, true ,false,  false);
                 case PA:
-                    return new WorkflowState(owner, A, License.dnnto, owner.getWorkflowDate(), period, false,  true);
+                    return new WorkflowState(owner, A, License.dnnto, owner.getWorkflowDate(), period, false,false,  true);
                 case NL:
                 case NLX:
                     if (pState != null && pState.equals(PublicItemState.PA)) {
-                        return new WorkflowState(owner, A, License.valueOf(owner.getLicense()), owner.getWorkflowDate(), period, false,  true);
+                        return new WorkflowState(owner, A, License.valueOf(owner.getLicense()), owner.getWorkflowDate(), period, false,false,  true);
                     } else return null;
                 default:
                     return null;

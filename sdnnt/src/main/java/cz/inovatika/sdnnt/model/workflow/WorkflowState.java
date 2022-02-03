@@ -35,14 +35,17 @@ public class WorkflowState {
     // priznak zda je stav finalni
     private boolean finalSate;
 
+    private boolean firstTransition;
+
     //private String transitionName;
 
-    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date, Period period, boolean changingLicense, boolean finalSate/*, String transitionName*/) {
+    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date, Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
         this.workflowOwner = workflowOwner;
         this.curatorState = cstate;
         this.date = date;
         this.period = period;
         this.finalSate = finalSate;
+        this.firstTransition = startTransition;
         this.changingLicence = changingLicense;
         this.license = license;
 
@@ -74,6 +77,9 @@ public class WorkflowState {
     }
 
 
+    public boolean isFirstTransition() {
+        return this.firstTransition;
+    }
 
     public void switchState(String originator, String user, String poznamka) {
 

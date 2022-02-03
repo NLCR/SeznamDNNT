@@ -20,8 +20,6 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @Input() focus: string;
   @Input() scroll: string;
 
-
-
   @ViewChild('nazevspolecnosti') nazevspolecnosti: MatInput;
 
   @ViewChild('username') username: MatInput;
@@ -35,8 +33,6 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @ViewChild('phonenumber') phonenumber: MatInput;
   @ViewChild('ico') ico: MatInput;
   @ViewChild('psc') psc: MatInput;
-
-
 
   @ViewChild('conditionOne') conditionOneCheck: MatCheckbox;
   @ViewChild('conditionTwo') conditionTwoCheck: MatCheckbox;

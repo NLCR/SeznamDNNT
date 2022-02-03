@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -33,6 +34,11 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserValidation;
+import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
+import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
+import cz.inovatika.sdnnt.services.impl.users.validations.EmptyFieldsValidation;
+import cz.inovatika.sdnnt.services.impl.users.validations.UserValidationResult;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
@@ -43,6 +49,7 @@ import static cz.inovatika.sdnnt.rights.Role.admin;
 import static cz.inovatika.sdnnt.rights.Role.mainKurator;
 import static cz.inovatika.sdnnt.services.ApplicationUserLoginSupport.AUTHENTICATED_USER;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 /**
@@ -379,8 +386,23 @@ public class UserServlet extends HttpServlet {
                     User sender = new UserControlerImpl(req).getUser();
                     JSONObject savingUser = readInputJSON(req);
                     if (sender.getUsername().equals(savingUser.optString("username"))) {
-                        // ok
-                        return new UserControlerImpl(req).userSave(User.fromJSON(savingUser.toString())).toJSONObject();
+                        AtomicReference<String> errorMessage = new AtomicReference<>();
+                        UsersUtils.userValidation(savingUser, (errorFields, validationId) -> {
+                            if (validationId.equals(EmptyFieldsValidation.class.getName())) {
+                                String message = String.format("Fields %s cannot be empty", errorFields);
+                                errorMessage.set(message);
+                            }
+                            if (validationId.equals(EmailValidation.class.getName())) {
+                                String message = String.format("email field %s is not valid %s", User.EMAIL_KEY, savingUser.getString(User.EMAIL_KEY));
+                                errorMessage.set(message);
+                            }
+                        });
+
+                        if (errorMessage.get() != null) {
+                            return errorJson(response, SC_BAD_REQUEST, errorMessage.get());
+                        } else {
+                            return new UserControlerImpl(req).userSave(User.fromJSON(savingUser.toString())).toJSONObject();
+                        }
                     } else {
                         // must be admin
                         if (new RightsResolver(req, new UserMustBeInRole(admin)).permit()) {

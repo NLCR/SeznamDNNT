@@ -45,7 +45,7 @@
           </mat-list>
         </div>
         <div fxFlex class="app-right app-fx-results">
-          <app-dialog-registration-form [user]="selUser"></app-dialog-registration-form>
+          <app-dialog-registration-form [user]="selUser" [focus]="focus"></app-dialog-registration-form>
           <button mat-stroked-button (click)="saveUser()" class="app-mr-2">{{ 'desc.ulozit' | translate }}</button>
           <button mat-stroked-button (click)="resetPwd()">{{ 'desc.reset_hesla' | translate }}</button>
         </div>

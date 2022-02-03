@@ -22,7 +22,8 @@ public class PXWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         if (owner.getWorkflowState() == null || (currentState != X && currentState != PX) ) {
-            return new WorkflowState(this.owner, X, null,owner.getWorkflowDate(), period, false, true);
+            return new WorkflowState(this.owner, X, null,owner.getWorkflowDate(), period, false,true
+                    , true);
         }
         return null;
     }

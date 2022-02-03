@@ -26,12 +26,12 @@ public class VNLWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() == null || owner.getLicense().equals(License.dnnto.name()))){
-            return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true,  false);
+            return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true,true,  false);
         } else if (owner.getWorkflowState()== NL) {
-            return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false);
+            return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false,false);
         } else if (owner.getWorkflowState()== NLX) {
             //this.getOwner().getWorkflowState()
-            return new WorkflowState(this.owner, A, License.dnnto, owner.getWorkflowDate(), period, true,  true);
+            return new WorkflowState(this.owner, A, License.dnnto, owner.getWorkflowDate(), period, true,false,  true);
         }
         return null;
     }
@@ -53,7 +53,7 @@ public class VNLWorkflow extends Workflow {
     @Override
     public WorkflowState nextAlternativeState(String stateHint) {
         if (this.getOwner().getWorkflowState().equals(NLX) && stateHint != null && TITLE_RELEASED.equals(stateHint)) {
-            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), null, true,  true);
+            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), null, true,  false, true);
         }
         return null;
 

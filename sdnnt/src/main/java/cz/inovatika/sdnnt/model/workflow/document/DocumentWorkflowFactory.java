@@ -41,28 +41,28 @@ public class DocumentWorkflowFactory {
         if(nznDocument(kuratorstav)) {
             NZNWorkflow nznWorkflow = new NZNWorkflow(checkProxy);
             WorkflowState workflowState = nznWorkflow.nextState();
-            if (workflowState != null) {
+            if (workflowState != null && workflowState.isFirstTransition()) {
                 zadostTypNavrhs.add(ZadostTypNavrh.NZN);
             }
         }
         if (vnlDocument(kuratorstav)) {
             VNLWorkflow vnlWorkflow = new VNLWorkflow(checkProxy);
             WorkflowState workflowState = vnlWorkflow.nextState();
-            if (workflowState != null) {
+            if (workflowState != null && workflowState.isFirstTransition()) {
                 zadostTypNavrhs.add(ZadostTypNavrh.VNL);
             }
         }
         if (vnzDocument(kuratorstav)) {
             VNZWorkflow vnzWorkflow = new VNZWorkflow(checkProxy);
             WorkflowState workflowState = vnzWorkflow.nextState();
-            if (workflowState != null) {
+            if (workflowState != null && workflowState.isFirstTransition()) {
                 zadostTypNavrhs.add(ZadostTypNavrh.VNZ);
             }
         }
         if (vnDocument(kuratorstav)) {
             VNWorkflow pxWorkflow = new VNWorkflow(checkProxy);
             WorkflowState workflowState = pxWorkflow.nextState();
-            if (workflowState != null) {
+            if (workflowState != null && workflowState.isFirstTransition()) {
                 zadostTypNavrhs.add(ZadostTypNavrh.VN);
             }
         }

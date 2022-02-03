@@ -57,8 +57,9 @@ export class ResultItemComponent implements OnInit {
       }
     }
     this.newState.setValue(this.doc.dntstav);
-    this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
 
+    // TODO: Prepsat, neprehledne 
+    this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
     const z = this.inZadost ? this.zadost : this.doc.zadost;
     if (z?.process) {
       //let tablekey = this.doc.identifier;
@@ -83,7 +84,9 @@ export class ResultItemComponent implements OnInit {
         }
       }
     }
-    this.hasNavhr = !!this.doc.zadost && !this.processed;
+
+    this.setHasNavrhFlag();
+
     this.hasGranularity = this.doc.granularity && this.doc.granularity.length > 1;
     this.dkLinks = [];
     const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
@@ -135,6 +138,20 @@ export class ResultItemComponent implements OnInit {
 
     }
   }
+
+
+  setHasNavrhFlag() {
+    //this.doc.dntstav?
+    const z = this.inZadost ? this.zadost : this.doc.zadost;
+    if (z && z?.state == 'waiting') {
+      this.hasNavhr = true;
+    } else {
+      this.hasNavhr = false;
+    }
+  }
+
+//  this.hasNavhr = !!this.doc.zadost && !this.processed;
+
 
   curatorAndPublicStateAreDifferent(): boolean {
     // neni nastaveny public stav ale ma kuratorsky stav NPA 
@@ -329,12 +346,10 @@ export class ResultItemComponent implements OnInit {
           this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
           if (!this.doc.zadost) {
             this.doc.zadost = this.state.currentZadost[key];
-            // TODO: ??  
-            this.hasNavhr = !!this.doc.zadost && !this.processed;
+            this.setHasNavrhFlag();
           } else if (this.doc.zadost.identifiers) {
             this.doc.zadost.identifiers.push(this.doc.identifier);;
-            // TODO: ??  
-            this.hasNavhr = !!this.doc.zadost && !this.processed;
+            this.setHasNavrhFlag();
           }
         }
       });

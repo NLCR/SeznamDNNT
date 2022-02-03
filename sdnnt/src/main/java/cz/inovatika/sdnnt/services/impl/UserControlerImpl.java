@@ -310,6 +310,7 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
         }
 
         if (found != null) {
+            user.setTyp(found.getTyp());
             user.setPwd(found.getPwd());
             user.setRole(found.getRole());
             return UsersUtils.toTOObject(save(user));

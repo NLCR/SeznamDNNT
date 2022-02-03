@@ -7,6 +7,7 @@ import { User } from 'src/app/shared/user';
 import {FormControl} from '@angular/forms'; // autocomplete
 import {Observable, Subject} from 'rxjs'; // autocomplete
 import {map, startWith,debounce, debounceTime} from 'rxjs/operators'; // autocomplete
+import { UserValidators } from 'src/app/shared/uservalidators';
 
 
 @Component({
@@ -70,6 +71,7 @@ export class AdminComponent implements OnInit {
 
   public users: User[];
   selUser : User;
+  focus:string;
   //userFilterValue: string ="";
 
   constructor(
@@ -127,6 +129,16 @@ export class AdminComponent implements OnInit {
   }
 
   saveUser() {
+
+    let basicFieldsValidators:UserValidators = new UserValidators();
+    let result =  basicFieldsValidators.basicFieldsValidation(this.selUser);
+    if (result) {
+      this.service.showSnackBar(result.errorTitle, result.errorMessag, true);
+      this.focus = result.focus;
+      return;
+    }
+
+
     this.service.saveUser(this.selUser).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_uzivatele_error', res.error, true);
