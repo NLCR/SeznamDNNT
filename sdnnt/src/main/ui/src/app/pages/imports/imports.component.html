@@ -8,52 +8,76 @@
     </div>
   </div>
   <div class="app-results-wrapper app-overflow-x-auto">
-    <table mat-table [dataSource]="imports" class="mat-elevation-z0">
+    <table mat-table [dataSource]="imports" class="mat-elevation-z0 app-table-responsive">
       <ng-container matColumnDef="import_date">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_importu' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.date | date : 'dd.MM.yyyy HH:mm' }}</td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.datum_importu' | translate }}</span>
+          <span class="app-fx-right">{{ element.date | date : 'dd.MM.yyyy HH:mm' }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="import_url">
         <th mat-header-cell *matHeaderCellDef>{{ 'URL' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.url }}</td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'URL' | translate }}</span>
+          <span class="app-fx-right">{{ element.url }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="import_origin">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.Zdroj' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.origin }}</td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.Zdroj' | translate }}</span>
+          <span class="app-fx-right">{{ element.origin }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="stav">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          <mat-icon class="material-icons-outlined" [class]="element.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (element.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
-            <ng-container *ngIf="!element.processed">lock_open</ng-container>
-            <ng-container *ngIf="element.processed">lock</ng-container>
-          </mat-icon>
+          <span class="app-fx-left mat-header-cell">{{ 'desc.stav' | translate }}</span>
+          <span class="app-fx-right">
+            <mat-icon class="material-icons-outlined" [class]="element.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (element.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
+              <ng-container *ngIf="!element.processed">lock_open</ng-container>
+              <ng-container *ngIf="element.processed">lock</ng-container>
+            </mat-icon>
+          </span>
         </td>
       </ng-container>
       <ng-container matColumnDef="total">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.celkem' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.num_docs }}</td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.celkem' | translate }}</span>
+          <span class="app-fx-right">{{ element.num_docs }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="na_seznamu">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_seznamu' | translate }}</th>
-        <td mat-cell *matCellDef="let element">{{ element.num_in_sdnnt }}</td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.na_seznamu' | translate }}</span>
+          <span class="app-fx-right">{{ element.num_in_sdnnt }}</span>
+        </td>
       </ng-container>
       <ng-container matColumnDef="na_vyrazeni">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.na_vyrazeni' | translate }}</th>
-        <td mat-cell *matCellDef="let element"> </td>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.na_vyrazeni' | translate }}</span>
+          <span class="app-fx-right"></span>
+        </td>
       </ng-container>
       
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" class="app-text-right">
-          <mat-button-toggle-group>
-            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.vysledek_importu' | translate" matTooltipPosition="above">
-              <mat-icon class="material-icons-outlined">visibility</mat-icon>
-            </mat-button-toggle>    
-            <mat-button-toggle *ngIf="!element.processed" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
-              <mat-icon class="material-icons-outlined">done</mat-icon>
-            </mat-button-toggle>    
-          </mat-button-toggle-group>
+          <span class="app-fx-left"></span>
+          <span class="app-fx-right">
+            <mat-button-toggle-group>
+              <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.vysledek_importu' | translate" matTooltipPosition="above">
+                <mat-icon class="material-icons-outlined">visibility</mat-icon>
+              </mat-button-toggle>    
+              <mat-button-toggle *ngIf="!element.processed" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
+                <mat-icon class="material-icons-outlined">done</mat-icon>
+              </mat-button-toggle>    
+            </mat-button-toggle-group>
+          </span>
         </td>
       </ng-container>
 
