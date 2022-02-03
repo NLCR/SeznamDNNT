@@ -192,6 +192,23 @@
     "text_byl_zkopirovan_do_schranky": "The text has been copied to the clipboard"
   },
 
+  "paginator": {
+    "desc": {
+      "Číslo stránky": "Page number",
+      "Řazení": "Order by",
+      "itemsPerPageLabel" : "Records per page",
+      "nextPageLabel" : "Next page",
+      "previousPageLabel" : "Previous page",
+      "firstPageLabel": "First page",
+      "lastPageLabel": "Last page",
+      "rangeLabel1": "0 of {{length}}",
+      "rangeLabel2": "{{startIndex}} - {{endIndex}} of {{length}}"
+    },
+    "tooltip": {
+      "Přejděte číslo stránky": "Go to page"
+    }
+  },
+
   "sort": {
     "score": "Relevancy",
     "title_sort": "Title",

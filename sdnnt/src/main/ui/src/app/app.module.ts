@@ -22,11 +22,12 @@ import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
 import { AppState } from './app.state';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { TranslateModule, TranslateLoader, TranslateService } from '@ngx-translate/core';
 import { AppMaterialModule } from './app-material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { PaginatorComponent } from './components/paginator/paginator.component';
+import { PaginatorI18n } from './components/paginator/paginator-i18n';
 import { DialogHistoryComponent } from './components/dialog-history/dialog-history.component';
 import { DialogStatesComponent } from './components/dialog-states/dialog-states.component';
 import { DialogLoginComponent } from './components/dialog-login/dialog-login.component';
@@ -59,6 +60,7 @@ import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/
 import { DialogBulkProposalComponent } from './components/dialog-bulk-proposal/dialog-bulk-proposal.component';
 import { GraphsComponent } from './components/graphs/graphs.component';
 import { NgApexchartsModule } from 'ng-apexcharts';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 
 
 export function HttpLoaderFactory(http: HttpClient) {
@@ -69,10 +71,19 @@ export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
 }
 
+export function createCustomMatPaginatorIntl(
+  translateService: TranslateService
+  ) {return new PaginatorI18n(translateService);}
+
 const providers: any[] =[
   { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
   AppState, AppConfiguration, HttpClient, 
   { provide: APP_INITIALIZER, useFactory: (config: AppConfiguration) => () => config.load(), deps: [AppConfiguration], multi: true },
+  TranslateService,
+  {
+    provide: MatPaginatorIntl, deps: [TranslateService],
+    useFactory: createCustomMatPaginatorIntl
+  },
   DatePipe, DecimalPipe, AppService
 ];
 
