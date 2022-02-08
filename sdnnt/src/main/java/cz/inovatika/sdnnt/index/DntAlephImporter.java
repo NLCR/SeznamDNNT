@@ -1,7 +1,9 @@
 package cz.inovatika.sdnnt.index;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import cz.inovatika.sdnnt.index.utils.HarvestDebug;
+import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
+import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
@@ -12,12 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,21 +23,18 @@ import java.util.stream.Collectors;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -53,99 +47,171 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
  */
 public class DntAlephImporter {
 
-  public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+    public static final int DEFAULT_CONNECT_TIMEOUT = 5;
+    public static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
+    public static final String CONNECTION_REQUEST_TIMEOUT_KEY = "connectionRequestTimeout";
+        public static final String SOCKET_TIMEOUT_KEY = "socketTimeout";
 
-  JSONObject ret = new JSONObject();
-  String collection = "catalog";
-  List<MarcRecord> recs = new ArrayList();
-  List<String> toDelete = new ArrayList();
-  int indexed = 0;
-  int deleted = 0;
-  int batchSize = 100;
+    JSONObject ret = new JSONObject();
+    String collection = "catalog";
+    List<MarcRecord> recs = new ArrayList();
+    List<String> toDelete = new ArrayList();
+    int indexed = 0;
+    int deleted = 0;
+    int batchSize = 100;
 
-  long reqTime = 0;
-  long procTime = 0;
-  long solrTime = 0;
+    long reqTime = 0;
+    long procTime = 0;
+    long solrTime = 0;
 
-  public JSONObject run() {
-    getRecords("http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL");
-    return ret;
-  }
+    static SolrInputDocument toSolrDoc(MarcRecord rec) {
+        SolrInputDocument sdoc = new SolrInputDocument();
+        if (sdoc.isEmpty()) {
+            MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);
+        }
+        sdoc.setField(IDENTIFIER_FIELD, rec.identifier);
+        sdoc.setField(DATESTAMP_FIELD, rec.datestamp);
+        sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
+        sdoc.setField(LEADER_FIELD, rec.leader);
+        sdoc.setField(RAW_FIELD, rec.toJSON().toString());
 
-  public JSONObject run(String from) {
-    String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL";
-    if (from != null) {
-      url += "&from=" + from;
+        // Control fields
+        for (String cf : rec.controlFields.keySet()) {
+            sdoc.addField("controlfield_" + cf, rec.controlFields.get(cf));
+        }
+
+        sdoc.setField(RECORD_STATUS_FIELD, rec.leader.substring(5, 6));
+        sdoc.setField(TYPE_OF_RESOURCE_FIELD, rec.leader.substring(6, 7));
+        sdoc.setField(ITEM_TYPE_FIELD, rec.leader.substring(7, 8));
+
+        MarcRecordUtilsToRefactor.setFMT(sdoc, rec.leader.substring(6, 7), rec.leader.substring(7, 8));
+
+
+        if (sdoc.containsKey(MARC_264_B)) {
+            String val = (String) sdoc.getFieldValue(MARC_264_B);
+            sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
+        } else if (sdoc.containsKey(MARC_260_B)) {
+            String val = (String) sdoc.getFieldValue(MARC_260_B);
+            sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
+        }
+
+        if (sdoc.containsKey(MARC_910_A)) {
+            List<String> collected = sdoc.getFieldValues(MARC_910_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+            collected.forEach(it -> sdoc.addField(SIGLA_FIELD, it));
+        } else if (sdoc.containsKey(MARC_040_A)) {
+            List<String> collected = sdoc.getFieldValues(MARC_040_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
+            collected.forEach(it -> sdoc.addField(SIGLA_FIELD, it));
+        }
+
+        // https://www.loc.gov/marc/bibliographic/bd008a.html
+        if (rec.controlFields.containsKey("008") && rec.controlFields.get("008").length() > 37) {
+            sdoc.setField("language", rec.controlFields.get("008").substring(35, 38));
+            sdoc.setField("place_of_pub", rec.controlFields.get("008").substring(15, 18));
+            sdoc.setField("type_of_date", rec.controlFields.get("008").substring(6, 7));
+            String date1 = rec.controlFields.get("008").substring(7, 11);
+            String date2 = rec.controlFields.get("008").substring(11, 15);
+            sdoc.setField("date1", date1);
+            sdoc.setField("date2", date2);
+            try {
+                sdoc.setField("date1_int", Integer.parseInt(date1));
+            } catch (NumberFormatException ex) {
+            }
+            try {
+                sdoc.setField("date2_int", Integer.parseInt(date2));
+            } catch (NumberFormatException ex) {
+            }
+        }
+
+        MarcRecordUtilsToRefactor.setIsProposable(sdoc);
+
+        sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
+
+        //245a (název): 245b (podnázev). 245n (číslo dílu/části), 245p (název části/dílu) / 245c (autoři, překlad, ilustrátoři apod.)
+        String nazev = "";
+        if (sdoc.containsKey("marc_245a")) {
+            nazev += sdoc.getFieldValue("marc_245a") + " ";
+        }
+        if (sdoc.containsKey("marc_245b")) {
+            nazev += sdoc.getFieldValue("marc_245b") + " ";
+        }
+        if (sdoc.containsKey("marc_245p")) {
+            nazev += sdoc.getFieldValue("marc_245p") + " ";
+        }
+        if (sdoc.containsKey("marc_245c")) {
+            nazev += sdoc.getFieldValue("marc_245c") + " ";
+        }
+        if (sdoc.containsKey("marc_245i")) {
+            nazev += sdoc.getFieldValue("marc_245i") + " ";
+        }
+        if (sdoc.containsKey("marc_245n")) {
+            nazev += sdoc.getFieldValue("marc_245n") + " ";
+        }
+        sdoc.setField("nazev", nazev.trim());
+        MarcRecordUtilsToRefactor.addRokVydani(sdoc);
+
+        return sdoc;
     }
-    getRecords(url);
-    return ret;
-  }
 
-  public JSONObject resume(String token) {
-    String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + token;
-    getRecords(url);
-    return ret;
-  }
+    public JSONObject run() {
+        getRecords("http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL");
+        return ret;
+    }
 
-  private void getRecords(String url) {
-    LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
-    String resumptionToken = null;
-    try {
-      try {
-        long start = new Date().getTime();
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(url);
-        try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-          final HttpEntity entity = response1.getEntity();
-          if (entity != null) {
+    public JSONObject run(String from) {
+        String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL";
+        if (from != null) {
+            url += "&from=" + from;
+        }
+        getRecords(url);
+        return ret;
+    }
 
-            InputStream dStream = null;
-            File dFile = null;
+    public JSONObject resume(String token) {
+        String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + token;
+        getRecords(url);
+        return ret;
+    }
 
-            try (InputStream is = entity.getContent()) {
+    private void getRecords(String url) {
+        LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
+        String resumptionToken = null;
+        File dFile = null;
+        InputStream dStream = null;
+        try {
+            long start = new Date().getTime();
+            CloseableHttpClient client = buildOAIClient();
+            //HttpGet httpGet = new HttpGet(url);
+            dFile = HarvestUtils.throttle(client, "import_dnt", url);
+            dStream = new FileInputStream(dFile);
 
-              dFile = HarvestDebug.debugFile("dnt", is, url);
-              dStream = new FileInputStream(dFile);
-
-              reqTime += new Date().getTime() - start;
-              start = new Date().getTime();
-              resumptionToken = readFromXML(dStream);
-              procTime += new Date().getTime() - start;
-              start = new Date().getTime();
-              if (!recs.isEmpty()) {
+            reqTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            resumptionToken = readFromXML(dStream);
+            procTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            if (!recs.isEmpty()) {
                 addToCatalog(recs);
                 indexed += recs.size();
                 recs.clear();
-              }
-
-              solrTime += new Date().getTime() - start;
-
-              dStream.close();
-
-              Files.delete(dFile.toPath());
-              Files.delete(dFile.getParentFile().toPath());
-
             }
-          }
-        }
 
-        while (resumptionToken != null) {
+            solrTime += new Date().getTime() - start;
 
-          start = new Date().getTime();
-          url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
-          LOGGER.log(Level.INFO, "Getting {0}...", resumptionToken);
-          ret.put("resumptionToken", resumptionToken);
-          httpGet = new HttpGet(url);
-          try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-            final HttpEntity entity = response1.getEntity();
-            if (entity != null) {
+            if (dStream != null ) {
+                IOUtils.closeQuietly(dStream);
+            }
+            deletePaths(dFile);
 
-              InputStream dStream = null;
-              File dFile = null;
+            while (resumptionToken != null) {
 
-              try (InputStream is = entity.getContent()) {
+                start = new Date().getTime();
+                url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;
 
-                dFile = HarvestDebug.debugFile("dnt", is, url);
+                LOGGER.log(Level.INFO, "Getting {0}...", resumptionToken);
+                ret.put("resumptionToken", resumptionToken);
+
+                dFile = HarvestUtils.throttle(client, "import_dnt", url);
                 dStream = new FileInputStream(dFile);
 
                 reqTime += new Date().getTime() - start;
@@ -155,152 +221,88 @@ public class DntAlephImporter {
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
-                  addToCatalog(recs);
-                  indexed += recs.size();
-                  solrTime += new Date().getTime() - start;
-                  LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                    addToCatalog(recs);
+                    indexed += recs.size();
+                    solrTime += new Date().getTime() - start;
+                    LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                            indexed,
+                            DurationFormatUtils.formatDurationHMS(reqTime),
+                            DurationFormatUtils.formatDurationHMS(procTime),
+                            DurationFormatUtils.formatDurationHMS(solrTime)});
+                    recs.clear();
+                }
+                if (dStream != null ) {
+                    IOUtils.closeQuietly(dStream);
+                }
+                deletePaths(dFile);
+            }
+            start = new Date().getTime();
+            if (!recs.isEmpty()) {
+                addToCatalog(recs);
+                indexed += recs.size();
+                recs.clear();
+            }
+
+            solrTime += new Date().getTime() - start;
+            LOGGER.log(Level.INFO, "FINISHED: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
                     indexed,
                     DurationFormatUtils.formatDurationHMS(reqTime),
                     DurationFormatUtils.formatDurationHMS(procTime),
                     DurationFormatUtils.formatDurationHMS(solrTime)});
-                  recs.clear();
-                }
-
-                dStream.close();
-
-                Files.delete(dFile.toPath());
-                Files.delete(dFile.getParentFile().toPath());
-
-              }
-            }
-          }
-
+            ret.put("indexed", indexed);
+        } catch (SolrServerException | XMLStreamException | MaximumIterationExceedException  | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        } finally {
+            SolrJUtilities.quietCommit(Indexer.getClient(), collection);
         }
-        start = new Date().getTime();
-        if (!recs.isEmpty()) {
-          addToCatalog(recs);
-          indexed += recs.size();
-          recs.clear();
+    }
+
+    private void deletePaths(File dFile) {
+        try {
+            Files.delete(dFile.toPath());
+            Files.delete(dFile.getParentFile().toPath());
+        } catch (IOException e) {
+            LOGGER.warning("Exception during deleting file");
         }
-        
-        solrTime += new Date().getTime() - start;
-        LOGGER.log(Level.INFO, "FINISHED: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
-          indexed,
-          DurationFormatUtils.formatDurationHMS(reqTime),
-          DurationFormatUtils.formatDurationHMS(procTime),
-          DurationFormatUtils.formatDurationHMS(solrTime)});
-        ret.put("indexed", indexed);
-      } catch (XMLStreamException | IOException exc) {
-        LOGGER.log(Level.SEVERE, null, exc);
-        ret.put("error", exc);
-      }
-      Indexer.getClient().commit(collection);
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      ret.put("error", ex);
-    }
-  }
-
-  private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
-    List<SolrInputDocument> idocs = new ArrayList<>();
-
-    for (MarcRecord rec : recs) {
-      idocs.add(toSolrDoc(rec));
-    }
-    if (!idocs.isEmpty()) {
-      Indexer.getClient().add("catalog", idocs);
-      idocs.clear();
-    }
-  }
-
-
-  static SolrInputDocument toSolrDoc(MarcRecord rec) {
-    SolrInputDocument sdoc = new SolrInputDocument();
-    if (sdoc.isEmpty()) {
-      MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);
-    }
-    sdoc.setField(IDENTIFIER_FIELD, rec.identifier);
-    sdoc.setField(DATESTAMP_FIELD, rec.datestamp);
-    sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
-    sdoc.setField(LEADER_FIELD, rec.leader);
-    sdoc.setField(RAW_FIELD, rec.toJSON().toString());
-
-    // Control fields
-    for (String cf : rec.controlFields.keySet()) {
-      sdoc.addField("controlfield_" + cf, rec.controlFields.get(cf));
     }
 
-    sdoc.setField(RECORD_STATUS_FIELD, rec.leader.substring(5, 6));
-    sdoc.setField(TYPE_OF_RESOURCE_FIELD, rec.leader.substring(6, 7));
-    sdoc.setField(ITEM_TYPE_FIELD, rec.leader.substring(7, 8));
+    private CloseableHttpClient buildOAIClient() {
+        JSONObject harvest = Options.getInstance().getJSONObject("OAIHavest");
+        int connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+        if (harvest.has(CONNECTION_TIMEOUT_KEY)) {
+            connectTimeout = harvest.getInt(CONNECTION_TIMEOUT_KEY);
+        }
 
-    MarcRecordUtilsToRefactor.setFMT(sdoc, rec.leader.substring(6, 7), rec.leader.substring(7, 8));
+        int connectionRequestTimeout = DEFAULT_CONNECT_TIMEOUT;
+        if (harvest.has(CONNECTION_REQUEST_TIMEOUT_KEY)) {
+            connectionRequestTimeout = harvest.getInt(CONNECTION_REQUEST_TIMEOUT_KEY);
+        }
 
+        int socketTimeout = DEFAULT_CONNECT_TIMEOUT;
+        if (harvest.has(SOCKET_TIMEOUT_KEY)) {
+            socketTimeout = harvest.getInt(SOCKET_TIMEOUT_KEY);
+        }
 
-    if (sdoc.containsKey(MARC_264_B)) {
-      String val = (String) sdoc.getFieldValue(MARC_264_B);
-      sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
-    } else if (sdoc.containsKey(MARC_260_B)) {
-      String val = (String) sdoc.getFieldValue(MARC_260_B);
-      sdoc.setField(NAKLADATEL_FIELD, MarcRecord.nakladatelFormat(val));
+        RequestConfig config = RequestConfig.custom()
+            .setConnectTimeout(connectTimeout*1000)
+            .setConnectionRequestTimeout(connectionRequestTimeout*1000)
+            .setSocketTimeout(socketTimeout*1000).build();
+
+        return HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }
 
-    if (sdoc.containsKey(MARC_910_A)) {
-      List<String> collected = sdoc.getFieldValues(MARC_910_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
-      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
-    } else if (sdoc.containsKey(MARC_040_A)) {
-      List<String> collected = sdoc.getFieldValues(MARC_040_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
-      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
-    }
+    private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
+        List<SolrInputDocument> idocs = new ArrayList<>();
 
-    // https://www.loc.gov/marc/bibliographic/bd008a.html
-    if (rec.controlFields.containsKey("008") && rec.controlFields.get("008").length() > 37) {
-      sdoc.setField("language", rec.controlFields.get("008").substring(35, 38));
-      sdoc.setField("place_of_pub", rec.controlFields.get("008").substring(15, 18));
-      sdoc.setField("type_of_date", rec.controlFields.get("008").substring(6, 7));
-      String date1 = rec.controlFields.get("008").substring(7, 11);
-      String date2 = rec.controlFields.get("008").substring(11, 15);
-      sdoc.setField("date1", date1);
-      sdoc.setField("date2", date2);
-      try {
-        sdoc.setField("date1_int", Integer.parseInt(date1));
-      } catch (NumberFormatException ex) {
-      }
-      try {
-        sdoc.setField("date2_int", Integer.parseInt(date2));
-      } catch (NumberFormatException ex) {
-      }
+        for (MarcRecord rec : recs) {
+            idocs.add(toSolrDoc(rec));
+        }
+        if (!idocs.isEmpty()) {
+            Indexer.getClient().add("catalog", idocs);
+            idocs.clear();
+        }
     }
-
-    MarcRecordUtilsToRefactor.setIsProposable(sdoc);
-
-    sdoc.setField("title_sort", sdoc.getFieldValue("marc_245a"));
-
-    //245a (název): 245b (podnázev). 245n (číslo dílu/části), 245p (název části/dílu) / 245c (autoři, překlad, ilustrátoři apod.)
-    String nazev = "";
-    if (sdoc.containsKey("marc_245a")) {
-      nazev += sdoc.getFieldValue("marc_245a") + " ";
-    }
-    if (sdoc.containsKey("marc_245b")) {
-      nazev += sdoc.getFieldValue("marc_245b") + " ";
-    }
-    if (sdoc.containsKey("marc_245p")) {
-      nazev += sdoc.getFieldValue("marc_245p") + " ";
-    }
-    if (sdoc.containsKey("marc_245c")) {
-      nazev += sdoc.getFieldValue("marc_245c") + " ";
-    }
-    if (sdoc.containsKey("marc_245i")) {
-      nazev += sdoc.getFieldValue("marc_245i") + " ";
-    }
-    if (sdoc.containsKey("marc_245n")) {
-      nazev += sdoc.getFieldValue("marc_245n") + " ";
-    }
-    sdoc.setField("nazev", nazev.trim());
-    MarcRecordUtilsToRefactor.addRokVydani(sdoc);
-
-    return sdoc;
-  }
 
 
 // Commented by ps ??
@@ -448,212 +450,212 @@ public class DntAlephImporter {
 //    // return ret;
 //  }
 
-  private String readFromXML(InputStream is) throws XMLStreamException {
+    private String readFromXML(InputStream is) throws XMLStreamException {
 
-    XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-    XMLStreamReader reader = null;
-    try {
-      reader = inputFactory.createXMLStreamReader(is);
-      return readDocument(reader);
-    } catch (IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-    } finally {
-      if (reader != null) {
-        reader.close();
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Reads OAI XML document
-   *
-   * @param reader
-   * @return resuptionToken or null
-   * @throws XMLStreamException
-   * @throws IOException
-   */
-  private String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
-    String resumptionToken = null;
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("record")) {
-            readMarcRecords(reader);
-          } else if (elementName.equals("resumptionToken")) {
-            resumptionToken = reader.getElementText();
-          } else if (elementName.equals("error")) {
-            ret.put("error", reader.getElementText());
-          }
-          break;
-        case XMLStreamReader.END_ELEMENT:
-          break;
-      }
-    }
-    return resumptionToken;
-    //throw new XMLStreamException("Premature end of file");
-  }
-
-  private void readMarcRecords(XMLStreamReader reader) throws XMLStreamException, IOException {
-    MarcRecord mr = new MarcRecord();
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("header")) {
-            String status = reader.getAttributeValue(null, "status");
-            if (!"deleted".equals(status)) {
-              readRecordHeader(reader, mr);
-            } else {
-              mr.isDeleted = true;
+        XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        XMLStreamReader reader = null;
+        try {
+            reader = inputFactory.createXMLStreamReader(is);
+            return readDocument(reader);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } finally {
+            if (reader != null) {
+                reader.close();
             }
-          } else if (elementName.equals("metadata")) {
-            readRecordMetadata(reader, mr);
-            if (!mr.isDeleted) {
+        }
+        return null;
+    }
 
-              recs.add(mr);
-            } else {
-              LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
-              toDelete.add(mr.identifier);
+    /**
+     * Reads OAI XML document
+     *
+     * @param reader
+     * @return resuptionToken or null
+     * @throws XMLStreamException
+     * @throws IOException
+     */
+    private String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
+        String resumptionToken = null;
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("record")) {
+                        readMarcRecords(reader);
+                    } else if (elementName.equals("resumptionToken")) {
+                        resumptionToken = reader.getElementText();
+                    } else if (elementName.equals("error")) {
+                        ret.put("error", reader.getElementText());
+                    }
+                    break;
+                case XMLStreamReader.END_ELEMENT:
+                    break;
             }
-            // ret.append("records", mr.toJSON());
-          } else {
-            skipElement(reader, elementName);
-          }
-          break;
-        case XMLStreamReader.END_ELEMENT:
-          return;
-      }
-    }
-    throw new XMLStreamException("Premature end of ListRecords");
-  }
-
-  private void readRecordHeader(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
-
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("identifier")) {
-            mr.identifier = reader.getElementText();
-          } else if (elementName.equals("datestamp")) {
-            mr.datestamp = reader.getElementText();
-          } else if (elementName.equals("setSpec")) {
-            mr.setSpec = reader.getElementText();
-          }
-        case XMLStreamReader.END_ELEMENT:
-          elementName = reader.getLocalName();
-          if (elementName.equals("header")) {
-            return;
-          }
-      }
+        }
+        return resumptionToken;
+        //throw new XMLStreamException("Premature end of file");
     }
 
-    throw new XMLStreamException("Premature end of header");
-  }
+    private void readMarcRecords(XMLStreamReader reader) throws XMLStreamException, IOException {
+        MarcRecord mr = new MarcRecord();
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("header")) {
+                        String status = reader.getAttributeValue(null, "status");
+                        if (!"deleted".equals(status)) {
+                            readRecordHeader(reader, mr);
+                        } else {
+                            mr.isDeleted = true;
+                        }
+                    } else if (elementName.equals("metadata")) {
+                        readRecordMetadata(reader, mr);
+                        if (!mr.isDeleted) {
 
-  private void readRecordMetadata(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
-
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("record")) {
-            readMarcRecord(reader, mr);
-          }
-        case XMLStreamReader.END_ELEMENT:
-          elementName = reader.getLocalName();
-          if (elementName.equals("metadata")) {
-            return;
-          }
-      }
-    }
-
-    throw new XMLStreamException("Premature end of metadata");
-  }
-
-  private MarcRecord readMarcRecord(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("leader")) {
-            mr.leader = reader.getElementText();
-
-          } else if (elementName.equals("controlfield")) {
-            // <marc:controlfield tag="003">CZ PrDNT</marc:controlfield>
-            String tag = reader.getAttributeValue(null, "tag");
-            String v = reader.getElementText();
-            mr.controlFields.put(tag, v);
-          } else if (elementName.equals("datafield")) {
-            readDatafields(reader, mr);
-          }
-        case XMLStreamReader.END_ELEMENT:
-          elementName = reader.getLocalName();
-          if (elementName.equals("record")) {
-            return mr;
-          }
-      }
-    }
-    throw new XMLStreamException("Premature end of marc:record");
-  }
-
-  private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
-    String tag = reader.getAttributeValue(null, "tag");
-    if (!mr.dataFields.containsKey(tag)) {
-      mr.dataFields.put(tag, new ArrayList());
-    }
-    List<DataField> dfs = mr.dataFields.get(tag);
-
-    DataField df = new DataField(tag, reader.getAttributeValue(null, "ind1"), reader.getAttributeValue(null, "ind2"));
-    dfs.add(df);
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.START_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals("subfield")) {
-            // readSubFields(reader, df);
-
-            String code = reader.getAttributeValue(null, "code");
-            if (!df.subFields.containsKey(code)) {
-              df.getSubFields().put(code, new ArrayList());
+                            recs.add(mr);
+                        } else {
+                            LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
+                            toDelete.add(mr.identifier);
+                        }
+                        // ret.append("records", mr.toJSON());
+                    } else {
+                        skipElement(reader, elementName);
+                    }
+                    break;
+                case XMLStreamReader.END_ELEMENT:
+                    return;
             }
-            List<SubField> sfs = df.getSubFields().get(code);
-            String val = reader.getElementText();
-            sfs.add(new SubField(code, val));
-            //mr.sdoc.addField("" + tag + code, val);
-          }
-        case XMLStreamReader.END_ELEMENT:
-          elementName = reader.getLocalName();
-          if (elementName.equals("datafield")) {
-            return mr;
-          }
-      }
+        }
+        throw new XMLStreamException("Premature end of ListRecords");
     }
 
-    throw new XMLStreamException("Premature end of datafield");
-  }
+    private void readRecordHeader(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
 
-  private void skipElement(XMLStreamReader reader, String name) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("identifier")) {
+                        mr.identifier = reader.getElementText();
+                    } else if (elementName.equals("datestamp")) {
+                        mr.datestamp = reader.getElementText();
+                    } else if (elementName.equals("setSpec")) {
+                        mr.setSpec = reader.getElementText();
+                    }
+                case XMLStreamReader.END_ELEMENT:
+                    elementName = reader.getLocalName();
+                    if (elementName.equals("header")) {
+                        return;
+                    }
+            }
+        }
 
-    while (reader.hasNext()) {
-      int eventType = reader.next();
-      switch (eventType) {
-        case XMLStreamReader.END_ELEMENT:
-          String elementName = reader.getLocalName();
-          if (elementName.equals(name)) {
-            //LOGGER.log(Level.INFO, "eventType: {0}, elementName: {1}", new Object[]{eventType, elementName});
-            return;
-          }
-      }
+        throw new XMLStreamException("Premature end of header");
     }
+
+    private void readRecordMetadata(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("record")) {
+                        readMarcRecord(reader, mr);
+                    }
+                case XMLStreamReader.END_ELEMENT:
+                    elementName = reader.getLocalName();
+                    if (elementName.equals("metadata")) {
+                        return;
+                    }
+            }
+        }
+
+        throw new XMLStreamException("Premature end of metadata");
+    }
+
+    private MarcRecord readMarcRecord(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("leader")) {
+                        mr.leader = reader.getElementText();
+
+                    } else if (elementName.equals("controlfield")) {
+                        // <marc:controlfield tag="003">CZ PrDNT</marc:controlfield>
+                        String tag = reader.getAttributeValue(null, "tag");
+                        String v = reader.getElementText();
+                        mr.controlFields.put(tag, v);
+                    } else if (elementName.equals("datafield")) {
+                        readDatafields(reader, mr);
+                    }
+                case XMLStreamReader.END_ELEMENT:
+                    elementName = reader.getLocalName();
+                    if (elementName.equals("record")) {
+                        return mr;
+                    }
+            }
+        }
+        throw new XMLStreamException("Premature end of marc:record");
+    }
+
+    private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
+        String tag = reader.getAttributeValue(null, "tag");
+        if (!mr.dataFields.containsKey(tag)) {
+            mr.dataFields.put(tag, new ArrayList());
+        }
+        List<DataField> dfs = mr.dataFields.get(tag);
+
+        DataField df = new DataField(tag, reader.getAttributeValue(null, "ind1"), reader.getAttributeValue(null, "ind2"));
+        dfs.add(df);
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.START_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("subfield")) {
+                        // readSubFields(reader, df);
+
+                        String code = reader.getAttributeValue(null, "code");
+                        if (!df.subFields.containsKey(code)) {
+                            df.getSubFields().put(code, new ArrayList());
+                        }
+                        List<SubField> sfs = df.getSubFields().get(code);
+                        String val = reader.getElementText();
+                        sfs.add(new SubField(code, val));
+                        //mr.sdoc.addField("" + tag + code, val);
+                    }
+                case XMLStreamReader.END_ELEMENT:
+                    elementName = reader.getLocalName();
+                    if (elementName.equals("datafield")) {
+                        return mr;
+                    }
+            }
+        }
+
+        throw new XMLStreamException("Premature end of datafield");
+    }
+
+    private void skipElement(XMLStreamReader reader, String name) throws XMLStreamException {
+
+        while (reader.hasNext()) {
+            int eventType = reader.next();
+            switch (eventType) {
+                case XMLStreamReader.END_ELEMENT:
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals(name)) {
+                        //LOGGER.log(Level.INFO, "eventType: {0}, elementName: {1}", new Object[]{eventType, elementName});
+                        return;
+                    }
+            }
+        }
 //    throw new XMLStreamException("Premature end of file");
-  }
+    }
 }

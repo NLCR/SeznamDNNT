@@ -143,7 +143,7 @@ export class ResultItemComponent implements OnInit {
   setHasNavrhFlag() {
     //this.doc.dntstav?
     const z = this.inZadost ? this.zadost : this.doc.zadost;
-    if (z && z?.state == 'waiting') {
+    if (z && z?.state !== 'processed') {
       this.hasNavhr = true;
     } else {
       this.hasNavhr = false;

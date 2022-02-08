@@ -2,7 +2,8 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
-import cz.inovatika.sdnnt.index.utils.HarvestDebug;
+import cz.inovatika.sdnnt.index.utils.HTTPClientsUtils;
+import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
@@ -27,9 +28,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.solr.client.solrj.SolrClient;
@@ -165,13 +163,13 @@ public class OAIHarvester {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
     Options opts = Options.getInstance();
     String resumptionToken = null;
+    CloseableHttpClient client = null;
     try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(opts.getString("solr.host")).build()) {
       try {
         long start = new Date().getTime();
-        CloseableHttpClient client = HttpClients.createDefault();
+        client = HttpClients.createDefault();
         try {
-
-          File dFile = throttle(client, type, url);
+          File dFile = HarvestUtils.throttle(client, type, url);
           InputStream dStream = new FileInputStream(dFile);
           reqTime += new Date().getTime() - start;
           start = new Date().getTime();
@@ -214,7 +212,7 @@ public class OAIHarvester {
 
           try {
             start = new Date().getTime();
-            File dFile = throttle(client, type, url);
+            File dFile = HarvestUtils.throttle(client, type, url);
             InputStream dStream = new FileInputStream(dFile);
             reqTime += new Date().getTime() - start;
             start = new Date().getTime();
@@ -264,60 +262,14 @@ public class OAIHarvester {
         LOGGER.log(Level.SEVERE, null, exc);
         ret.put("error", exc);
       }
+      // ??
       solr.commit(collection);
       solr.close();
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
-    }
-  }
-
-  private File throttle(CloseableHttpClient client, String type, String url) throws IOException, MaximumIterationExceedException {
-    int max_repetion = 3;
-    int seconds = 30;
-
-    JSONObject harvest = Options.getInstance().getJSONObject("OAIHavest");
-    if (harvest.has("numrepeat")) {
-      max_repetion = harvest.getInt("numrepeat");
-    }
-
-    if (harvest.has("seconds")) {
-      seconds = harvest.getInt("seconds");
-    }
-    for (int i=0;i<max_repetion;i++) {
-      HttpGet httpGet = new HttpGet(url);
-      try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-        final HttpEntity entity = response1.getEntity();
-        if (entity != null) {
-          File dFile = null;
-          try (InputStream netStream = entity.getContent()) {
-            dFile = HarvestDebug.debugFile(type, netStream, url);
-            if(checkNotHTML(dFile)) {
-              return dFile;
-            } else {
-              try {
-                LOGGER.log(Level.INFO, "Suspending threads for "+seconds+"seconds ");
-                Thread.sleep(seconds*1000);
-              } catch (InterruptedException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(),e);
-              }
-            }
-          }
-        }
-      }
-    }
-    throw new MaximumIterationExceedException("Maximum number of waiting exceeed");
-  }
-
-  private boolean checkNotHTML(File dfile) throws IOException {
-    // read first
-    try(FileInputStream fis = new FileInputStream(dfile)) {
-      byte[] buffer = new byte[2048];
-      int read = IOUtils.read(fis, buffer);
-      if (read > 0) {
-        String s = new String(buffer, "UTF-8");
-        return !s.toLowerCase().contains("<html>");
-      } else return false;
+    } finally {
+        HTTPClientsUtils.quiteClose(client);
     }
   }
 
