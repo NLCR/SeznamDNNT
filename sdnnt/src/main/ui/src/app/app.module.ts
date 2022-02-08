@@ -59,9 +59,18 @@ import { DialogCorrespondenceComponent } from './components/dialog-correspondenc
 import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
 import { DialogBulkProposalComponent } from './components/dialog-bulk-proposal/dialog-bulk-proposal.component';
 import { GraphsComponent } from './components/graphs/graphs.component';
-import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 
+import { NgxEchartsModule } from 'ngx-echarts';
+import * as echarts from 'echarts/core';
+import { BarChart } from 'echarts/charts';
+import { LineChart } from 'echarts/charts';
+import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/components';
+// Import the Canvas renderer, note that introducing the CanvasRenderer or SVGRenderer is a required step
+import { CanvasRenderer } from 'echarts/renderers';
+import 'echarts/theme/macarons.js';
+
+echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -152,7 +161,10 @@ const providers: any[] =[
     BrowserAnimationsModule,
     AngularEditorModule,
     CookieModule.forRoot(),
-    NgApexchartsModule
+    
+    NgxEchartsModule.forRoot({ 
+      echarts
+    }),
 
     //UserIdleModule.forRoot({idle: 600, timeout: 300, ping: 120})
   ],

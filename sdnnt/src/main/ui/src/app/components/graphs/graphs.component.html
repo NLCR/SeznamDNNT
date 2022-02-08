@@ -1,20 +1,17 @@
 <div fxLayout="row wrap" class="app-graphs-wrapper">
   <div class="app-graph-wrapper app-fx-50">
     <div>
-      <apx-chart *ngIf="stavOpts?.series" [series]="stavOpts.series" [chart]="stavOpts.chart" [title]="stavOpts.title" [labels]="stavOpts.labels">
-      </apx-chart>
+      <div *ngIf="stavOpts.series" class="app-graph" echarts [options]="stavOpts" style="height: 350px;" ></div>
     </div>
   </div>
   <div class="app-graph-wrapper app-fx-50">
     <div>
-      <apx-chart *ngIf="licenseOpts?.series" [series]="licenseOpts.series" [chart]="licenseOpts.chart" [title]="licenseOpts.title"
-      [labels]="licenseOpts.labels"></apx-chart>
+      <div *ngIf="licenseOpts.series" class="app-graph" echarts [options]="licenseOpts" style="height: 350px;" ></div>
     </div>
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <apx-chart *ngIf="historyUserActivityOpts?.series" [series]="historyUserActivityOpts.series" [chart]="historyUserActivityOpts.chart"
-      [title]="historyUserActivityOpts.title" [labels]="historyUserActivityOpts.labels" [xaxis]="historyUserActivityOpts.xaxis"></apx-chart>
+      <div *ngIf="historyUserActivityOpts.series" class="app-graph" echarts [options]="historyUserActivityOpts" style="height: 350px;" ></div>
     </div>
   </div>
   <div class="app-graph-wrapper">
@@ -30,14 +27,12 @@
           <mat-option value="1DAY">{{ 'graph.desc.day' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <apx-chart *ngIf="historyUserOpts?.series" [series]="historyUserOpts.series" [chart]="historyUserOpts.chart"
-        [title]="historyUserOpts.title" [labels]="historyUserOpts.labels" [xaxis]="historyUserOpts.xaxis"></apx-chart>
+      <div *ngIf="historyUserOpts.series" class="app-graph" echarts [options]="historyUserOpts" style="height: 350px;" ></div>
     </div>
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <apx-chart *ngIf="historyStavOpts?.series" [series]="historyStavOpts.series" [chart]="historyStavOpts.chart"
-      [title]="historyStavOpts.title" [labels]="historyStavOpts.labels" [xaxis]="historyStavOpts.xaxis"></apx-chart>
+      <div *ngIf="historyStavOpts.series" class="app-graph" echarts [options]="historyStavOpts" style="height: 350px;" ></div>
     </div>
   </div>
 </div>

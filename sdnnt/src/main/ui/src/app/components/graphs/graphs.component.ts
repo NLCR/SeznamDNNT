@@ -1,7 +1,7 @@
+import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { ApexChart } from 'ng-apexcharts';
-import { timeInterval } from 'rxjs/operators';
+import { EChartsOption } from 'echarts';
 import { AppService } from 'src/app/app.service';
 
 @Component({
@@ -12,48 +12,18 @@ import { AppService } from 'src/app/app.service';
 export class GraphsComponent implements OnInit {
 
   facets: any;
-  stavOpts: {
-    series: number[],
-    chart: ApexChart,
-    title: {},
-    labels: string[]
-  }
-
-  licenseOpts: {
-    series: number[],
-    chart: ApexChart,
-    title: {},
-    labels: string[]
-  }
-
-  historyStavOpts: {
-    series: any[],
-    chart: ApexChart,
-    title: {},
-    labels: string[],
-    xaxis: {}
-  }
-
-  historyUserOpts: {
-    series: any[],
-    chart: ApexChart,
-    title: {},
-    labels: string[],
-    xaxis: {}
-  }
-
-  historyUserActivityOpts: {
-    series: any[],
-    chart: ApexChart,
-    title: {},
-    labels: string[],
-    xaxis: {}
-  }
+  stavOpts: EChartsOption = {};
+  licenseOpts: EChartsOption = {};
+  historyStavOpts: EChartsOption = {};
+  historyUserOpts: EChartsOption = {};
+  historyUserActivityOpts: EChartsOption = {};
 
   interval: string = '1MONTH';
 
 
-  constructor(private service: AppService) { }
+  constructor(
+    private datePipe: DatePipe,
+    private service: AppService) { }
 
   ngOnInit(): void {
     this.getFacets();
@@ -63,44 +33,113 @@ export class GraphsComponent implements OnInit {
   }
 
   setSeries() {
-    this.stavOpts =
-    {
-      series: this.facets.dntstav.map(e => e.value),
-      chart: {
-        toolbar: {
-          show: false
-        },
-        height: 350,
-        type: "donut"
-      },
+    this.stavOpts = {
       title: {
         text: this.service.getTranslation("graph.title.States")
       },
-      labels: this.facets.dntstav.map(e => e.name + ' ' + this.service.getTranslation('state.' + e.name))
-    }
-
-    this.licenseOpts =
-    {
-      series: this.facets.license.map(e => e.value),
-      chart: {
-        toolbar: {
-          show: false
-        },
-        height: 350,
-        type: "donut"
+      tooltip: {
+        trigger: 'item',
       },
+      series: {
+        name: this.service.getTranslation("graph.title.States"),
+        type: 'pie',
+        radius: ['40%', '70%'],
+
+        label: {
+          show: false,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontWeight: 'bold'
+          }
+        },
+        data: this.facets.dntstav.map(e => {
+          return {
+            value: e.value,
+            name: e.name + ' ' + this.service.getTranslation('state.' + e.name),
+            name1: e.name
+          }
+        }),
+        itemStyle: {
+          color: (params) => {
+            const paramsExt: any = params;
+            if (paramsExt?.data?.name1 === 'A') {
+              return '#3949ab';
+            } else if (paramsExt?.data?.name1 === 'NZ') {
+              return '#546e7a'
+            } else if (paramsExt?.data?.name1 === 'N') {
+              return '#43a047'
+            } else if (paramsExt?.data?.name1 === 'PA') {
+              return '#8e24aa'
+            } else {
+              return params.color
+            }
+
+          }
+        },
+      },
+      legend: {
+        right: 0,
+        orient: 'vertical'
+      }
+    };
+
+    this.licenseOpts =  {
       title: {
         text: this.service.getTranslation("graph.title.Licenses")
       },
-      labels: this.facets.license.map(e => this.service.getTranslation('license.' + e.name))
-    }
+      tooltip: {
+        trigger: 'item',
+      },
+      series: {
+        name: this.service.getTranslation("graph.title.Licenses"),
+        type: 'pie',
+        radius: ['40%', '70%'],
+
+        label: {
+          show: false,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontWeight: 'bold'
+          }
+        },
+        data: this.facets.license.map(e => {
+          return {
+            value: e.value,
+            name: e.name + ' ' + this.service.getTranslation('license.' + e.name),
+            name1: e.name
+          }
+        }),
+        itemStyle: {
+          color: (params) => {
+            const paramsExt: any = params;
+            if (paramsExt?.data?.name1 === 'dnnto') {
+              return '#5e35b1';
+            } else if (paramsExt?.data?.name1 === 'dnntt') {
+              return '#f4511e'
+            } else {
+              return params.color
+            }
+
+          }
+        },
+      },
+      legend: {
+        right: 0,
+        orient: 'vertical'
+      },
+    };
+
     this.getStatsHistory();
 
   }
 
   getFacets() {
     const p = Object.assign({}, {});
-    this.service.search(p as HttpParams).subscribe((res)=>{
+    this.service.search(p as HttpParams).subscribe((res) => {
       this.facets = res.facet_counts.facet_fields;
       this.setSeries();
     });
@@ -113,61 +152,71 @@ export class GraphsComponent implements OnInit {
       this.historyStavOpts = this.setHistoryStats(stats, 'History by type');
       this.historyUserOpts = this.setHistoryStats(res.facet_counts.facet_pivot.user, 'History by user');
       this.historyUserActivityOpts = this.setUserActivity(res.facet_counts.facet_fields.user.filter(e => e.name !== 'harvester'), "User activity");
-      console.log(this.historyUserActivityOpts)
     });
   }
 
   setHistoryStats(stats, title): any {
     const series = [];
+    const legend = [];
 
     stats.forEach(t => {
       if (t.value !== 'app' && t.value !== 'harvester') {
-        const s = t.ranges.indextime.counts.map(e => { return { x: new Date(e.name).getTime(), y: e.value } });
-        series.push({ data: s, name: t.value })
+        // const s = t.ranges.indextime.counts.map(e => { return { x: new Date(e.name).getTime(), y: e.value } });
+        series.push({ 
+          data: t.ranges.indextime.counts.map(e => e.value ), 
+          type: 'line',
+          name: t.value 
+        });
+        legend.push(t.value);
       }
     });
-    const opts: any = {};
-    opts.series = series;
-    opts.chart = {
-      toolbar: {
-        show: false
+    const opts: any = {
+      title: {
+        text: this.service.getTranslation('graph.title.' + title)
       },
-      height: 350,
-      type: "line"
-    };
-    opts.title = {
-      text: this.service.getTranslation('graph.title.' + title)
-    };
-    opts.xaxis = {
-      type: 'datetime',
-      labels: {
-        format: 'MM.yyyy',
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        type: 'category',
+        data: stats[0].ranges.indextime.counts.map(e => this.datePipe.transform(new Date(e.name), 'MM.yyyy')),
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: series,
+      legend: {
+        data: legend,
+        bottom: 0,
       }
-    }
+    };
     return opts;
   }
 
   setUserActivity(stats, title): any {
 
-    // const data= stats.map(e => { return { x: e.name, y: e.value } });
     const data = stats.map(e => e.value);
-    const categories = stats.map(e => e.name);
 
-    const opts: any = {};
-    opts.series = [{ name: title, data }];
-    opts.chart = {
-      toolbar: {
-        show: false
+    const opts: any = {
+      title: {
+        text: this.service.getTranslation('graph.title.' + title)
       },
-      height: 350,
-      type: "bar"
+      tooltip: {
+        trigger: 'axis',
+      },
+      xAxis: {
+        type: 'category',
+        data: stats.map(e => e.name),
+      },
+      yAxis: {
+        type: 'value',
+      },
+      series: [{ name: title, data, type: 'bar' }],
+      legend: {
+        data: stats.map(e => e.name),
+        bottom: 0,
+      }
     };
-    opts.title = {
-      text: this.service.getTranslation('graph.title.' + title)  
-    };
-    opts.xaxis = {
-      categories: categories
-    }
     return opts;
   }
 
