@@ -36,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,7 +103,7 @@ public class AccountServiceImpl implements AccountService {
             }
 
             if (institution != null) {
-                query.addFilterQuery("institution:"+institution);
+                query.addFilterQuery("institution:\""+institution+"\"");
             }
 
             if (delegated != null) {
