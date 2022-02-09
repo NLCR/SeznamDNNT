@@ -120,6 +120,12 @@ public class CatalogSearcher {
                             JSONArray actions = new JSONArray();
                             zadostTypNavrhs.stream().map(ZadostTypNavrh::name).forEach(actions::put);
                             jsonObject.put("workflows", actions);
+                        } else {
+                            // out of list
+                            List<ZadostTypNavrh> zadostTypNavrhs = DocumentWorkflowFactory.canBePartOfZadost(new ArrayList<>(), new ArrayList<>(), null);
+                            JSONArray actions = new JSONArray();
+                            zadostTypNavrhs.stream().map(ZadostTypNavrh::name).forEach(actions::put);
+                            jsonObject.put("workflows", actions);
                         }
                         jsonObject.put(MarcRecordFields.DNTSTAV_FIELD, dntStavyJSONArray != null ? dntStavyJSONArray : new JSONArray());
                         groupActions.put(key, jsonObject);
