@@ -407,7 +407,8 @@ public class UserServlet extends HttpServlet {
                         // must be admin
                         if (new RightsResolver(req, new UserMustBeInRole(admin)).permit()) {
                             // must be load first and then
-                            return new UserControlerImpl(req).userSave(User.fromJSON(savingUser.toString())).toJSONObject();
+
+                            return new UserControlerImpl(req).adminSave(User.fromJSON(savingUser.toString())).toJSONObject();
                         } else {
                             return errorJson(response, SC_FORBIDDEN, "not allowed");
                         }

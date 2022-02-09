@@ -301,6 +301,22 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
 
     @Override
+    public User adminSave(User user) throws UserControlerException, NotAuthorizedException {
+        User found = null;
+        try (SolrClient client = buildClient()) {
+            found = UsersUtils.findOneUser(client, "username:\"" + user.getUsername() + "\"");
+        } catch (IOException | SolrServerException ex) {
+            throw new UserControlerException(ex.getMessage());
+        }
+
+        if (found != null) {
+            user.setPwd(found.getPwd());
+            return UsersUtils.toTOObject(save(user));
+        } else {
+            throw new UserControlerException(String.format("Cannot save user %s", user.getUsername()));
+        }
+    }
+        @Override
     public User userSave(User user) throws UserControlerException, NotAuthorizedException {
         User found = null;
         try (SolrClient client = buildClient()) {

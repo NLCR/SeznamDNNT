@@ -38,6 +38,8 @@ public interface UserControler {
     public User changePwdToken( String token, String pwd ) throws UserControlerInvalidPwdTokenException, UserControlerException, UserControlerExpiredTokenException;
 
     public User userSave(User user) throws UserControlerException, NotAuthorizedException;
+    public User adminSave(User user) throws UserControlerException, NotAuthorizedException;
+
 
     public List<Zadost> getZadost(String username) throws UserControlerException;
 }

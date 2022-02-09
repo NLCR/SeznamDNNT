@@ -160,6 +160,10 @@ export class AccountComponent implements OnInit {
           return val.name;
         });
 
+        if (this.allPriorities?.length>0) {
+          this.allPriorities.sort((a, b) => a.localeCompare(b));
+        }
+
         this.allDelegated = resp.facet_counts.facet_fields.delegated.filter((itm) => itm.value > 0 ).map( function(val, index){
           return val.name;
         });
