@@ -66,8 +66,8 @@
       "PA": "Work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
       "A": "Included - the work is included in the List and has assigned licenses for use. In the case of the digital version, a link to the work in a Kramerius digital library (DK) is available",
       "VN": "Discarded - the work was on the Draft List (PA), but is discarded; the work may be subject to NZN or administrative corrections",
-      "VNL": "Call for on on-site terminal license",
-      "VNZ": "Call for on on-site terminal license",
+      "VNL": "Call for restrictions on the terminal for upcoming production",
+      "VNZ": "Call for restrictions on the terminal for own production",
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
@@ -648,7 +648,7 @@
 
     "navrzeno_na_zarazeni": "Inclusion",
     "navrzeno_na_vyrazeni": "Elimination",
-    "navrzeno_na_omezeni_vnl": "Terminal after 18 months / rights holder",
+    "navrzeno_na_omezeni_vnl": "Terminal / upcoming production",
     "navrzeno_na_omezeni_vnz": "Terminal / own production",
 
     "nedoreseno": "Unresolved",
