@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.document;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.*;
@@ -52,7 +53,7 @@ public class DocumentWorkflowFactory {
                 zadostTypNavrhs.add(ZadostTypNavrh.VNL);
             }
         }
-        if (vnzDocument(kuratorstav)) {
+        if (vnzDocument(kuratorstav, license)) {
             VNZWorkflow vnzWorkflow = new VNZWorkflow(checkProxy);
             WorkflowState workflowState = vnzWorkflow.nextState();
             if (workflowState != null && workflowState.isFirstTransition()) {
@@ -71,6 +72,7 @@ public class DocumentWorkflowFactory {
 
     public static Workflow create(MarcRecord record, Zadost zadost) {
         List<String> kuratorstav = record.kuratorstav;
+        String license = record.license;
         String navrh = zadost.getNavrh();
         if (navrh != null && ZadostTypNavrh.find(navrh) != null) {
 
@@ -84,7 +86,7 @@ public class DocumentWorkflowFactory {
                     else return null;
                 }
                 case VNZ: {
-                    if (vnzDocument(kuratorstav)) { return new VNZWorkflow(new DocumentProxy(record));}
+                    if (vnzDocument(kuratorstav, license)) { return new VNZWorkflow(new DocumentProxy(record));}
                     else return null;
                 }
                 case VN: {
@@ -110,9 +112,11 @@ public class DocumentWorkflowFactory {
                 kuratorstav.contains(CuratorItemState.PA.name());
     }
 
-    private static boolean vnzDocument(List<String> kuratorstav) {
-        return  kuratorstav.contains(CuratorItemState.A.name()) ||
+    private static boolean vnzDocument(List<String> kuratorstav, String license) {
+        boolean inState =  kuratorstav.contains(CuratorItemState.A.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name());
+        boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
+        return inState && isCorrectLicense;
     }
 
     private static boolean vnDocument(List<String> kuratorstav) {

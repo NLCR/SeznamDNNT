@@ -1,8 +1,12 @@
 package cz.inovatika.sdnnt.model;
 
+import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
+import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -269,4 +273,7 @@ public class ZadostTest {
         Assert.assertTrue(process.get("oai:aleph-nkp.cz:SKC01-005516208").getDate().equals(new Date(1626784478698L)));
 
     }
+
+
+ 
 }

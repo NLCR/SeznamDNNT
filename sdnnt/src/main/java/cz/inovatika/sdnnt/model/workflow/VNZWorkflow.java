@@ -4,6 +4,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.PublicItemState;
 
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
@@ -43,7 +44,9 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
-        return true;
+        if ((owner.getWorkflowState() != null) &&  (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
+            return true;
+        } else return false;
     }
 
     @Override

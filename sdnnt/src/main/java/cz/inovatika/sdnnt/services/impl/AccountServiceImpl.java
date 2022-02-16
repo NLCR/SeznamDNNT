@@ -36,7 +36,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -285,22 +284,28 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public JSONObject curatorCloseRequest(String payload) throws ConflictException, AccountException {
-        Zadost zadost = Zadost.fromJSON(payload);
-        zadost.setKurator(this.loginSupport.getUser().getUsername());
-        zadost.setDatumVyrizeni(new Date());
-        Workflow wfl = ZadostWorkflowFactory.create(zadost);
-        String transitionName = wfl.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
-        if (!zadost.allRejected(transitionName)) {
-            return closeRequest(zadost, "processed");
-        } else {
-            // no workflow
-            zadost.setState("processed");
-            zadost.setTypeOfPeriod(null);
-            zadost.setDeadline(null);
-            zadost.setDesiredItemState(null);
-            zadost.setDesiredLicense(null);
-            LOGGER.info(String.format("Closing zadost immediately %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
-            return  VersionStringCast.cast(saveRequest(zadost, null));
+        try {
+            Zadost zadost = Zadost.fromJSON(payload);
+            zadost.setKurator(this.loginSupport.getUser().getUsername());
+            zadost.setDatumVyrizeni(new Date());
+            Workflow wfl = ZadostWorkflowFactory.create(zadost);
+            String transitionName = wfl.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
+            //
+            // bud odmitnuto nebo a nebo neni workflow?? Je to vubec mozne
+            if (!zadost.allRejected(transitionName)) {
+                return closeRequest(zadost, "processed");
+            } else {
+                // no workflow
+                zadost.setState("processed");
+                zadost.setTypeOfPeriod(null);
+                zadost.setDeadline(null);
+                zadost.setDesiredItemState(null);
+                zadost.setDesiredLicense(null);
+                LOGGER.info(String.format("Closing zadost immediately %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
+                return  VersionStringCast.cast(saveRequest(zadost, null));
+            }
+        } catch (Exception e) {
+            throw new AccountException("account.closeRequestError", e.getMessage());
         }
     }
 
@@ -408,10 +413,8 @@ public class AccountServiceImpl implements AccountService {
                 Workflow workflow = DocumentWorkflowFactory.create(marcRecord,zadost);
                 // odmitnuout z duvodu, ze jiz neexistuje workflow
                 String transitionName = workflow != null ? workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense()) : "noworkflow";
-                return Zadost.reject(documentId,zadostJSON.toString(),  reason, username, transitionName);
+                return Zadost.reject(solr,documentId,zadostJSON.toString(),  reason, username, transitionName);
             }
-            //return VersionStringCast.cast(getRequest(zadostId));
-
         } catch (JSONException e) {
             throw new AccountException("account.rejecterror", "account.rejecterror");
         }
@@ -442,6 +445,8 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+
+
     public JSONObject curatorSwitchState(JSONObject zadostJSON, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
         Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
         String zadostId = zadost.getId();
@@ -449,19 +454,16 @@ public class AccountServiceImpl implements AccountService {
         //JSONObject zadostJSON = zadost.toJSON();
         try (SolrClient solr = buildClient()) {
             MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
-
             Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
             if (workflow != null) {
                 if (workflow.isSwitchPossible()) {
 
                     // prene se a
                     WorkflowState workflowState = workflow.nextState();
-                    if (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
+                    if (workflowState != null && workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
                         workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
                         solr.add("catalog", marcRecord.toSolrDoc());
-                        //solr.commit("catalog");
-
                         String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
 
                         zadostJSON = Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),

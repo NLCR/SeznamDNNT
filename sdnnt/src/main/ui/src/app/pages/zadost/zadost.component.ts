@@ -284,6 +284,10 @@ export class ZadostComponent implements OnInit {
         this.service.approveItems(items, this.zadost,result, null).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+            if (res.payload) {
+              this.zadost = res.payload;
+              this.getDocs(this.route.snapshot.queryParams);
+            }
           } else {
             this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
             this.zadost = res;

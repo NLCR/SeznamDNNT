@@ -284,10 +284,15 @@ public class DntAlephImporter {
             socketTimeout = harvest.getInt(SOCKET_TIMEOUT_KEY);
         }
 
+
+        int ct = connectTimeout * 1000;
+        int crt = connectionRequestTimeout * 1000;
+        int st = socketTimeout * 1000;
+        LOGGER.info(String.format("Creating client with (connectionTimeout=%d, connectionRequestTimeout=%d, socketTimeout=%d", ct, crt, st));
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(connectTimeout*1000)
-            .setConnectionRequestTimeout(connectionRequestTimeout*1000)
-            .setSocketTimeout(socketTimeout*1000).build();
+            .setConnectTimeout(ct)
+            .setConnectionRequestTimeout(crt)
+            .setSocketTimeout(st).build();
 
         return HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }

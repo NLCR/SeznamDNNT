@@ -9,30 +9,22 @@ import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.easymock.EasyMock;
-import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class AccountServiceWorkflowImplTest {
 
     public static final Logger LOGGER = Logger.getLogger(AccountServiceWorkflowImplTest.class.getName());
 
-
-    public static final List<String> A_IDENTIFIERS = Arrays.asList("oai:aleph-nkp.cz:DNT01-000008874", "oai:aleph-nkp.cz:DNT01-000008884", "oai:aleph-nkp.cz:DNT01-000008886");
-    public static final List<String> N_IDENTIFIERS = Arrays.asList("oai:aleph-nkp.cz:DNT01-000157742", "oai:aleph-nkp.cz:DNT01-000157765");
 
     public static SolrTestServer prepare;
 
@@ -63,9 +55,7 @@ public class AccountServiceWorkflowImplTest {
             return;
         }
 
-        N_IDENTIFIERS.stream().forEach(it-> {
-            insertCatalog("n", it);
-        });
+        CatalogSupport.inserNIdentifiers();
 
         User user = testUser();
         UserControler controler  = EasyMock.createMock(UserControler.class);
@@ -86,14 +76,14 @@ public class AccountServiceWorkflowImplTest {
 
         // vytvoreni zadosti
         Zadost zadost = new Zadost("01234");
-        zadost.setIdentifiers(N_IDENTIFIERS);
+        zadost.setIdentifiers(CatalogSupport.N_IDENTIFIERS);
         zadost.setState("open");
         zadost.setNavrh("NZN");
         service.saveRequest(zadost.toJSON().toString(), null);
 
         Zadost fromIndex = Zadost.fromJSON(service.getRequest("01234").toString());
         Assert.assertTrue(fromIndex.getNavrh().equals("NZN"));
-        Assert.assertTrue(fromIndex.getIdentifiers().size() == N_IDENTIFIERS.size());
+        Assert.assertTrue(fromIndex.getIdentifiers().size() == CatalogSupport.N_IDENTIFIERS.size());
         Assert.assertNull(fromIndex.getDeadline());
         Assert.assertNull(fromIndex.getDesiredItemState());
 
@@ -101,7 +91,7 @@ public class AccountServiceWorkflowImplTest {
 
         Zadost fromIndex2 = Zadost.fromJSON(service.getRequest("01234").toString());
         Assert.assertTrue(fromIndex2.getNavrh().equals("NZN"));
-        Assert.assertTrue(fromIndex2.getIdentifiers().size() == N_IDENTIFIERS.size());
+        Assert.assertTrue(fromIndex2.getIdentifiers().size() == CatalogSupport.N_IDENTIFIERS.size());
         Assert.assertNotNull(fromIndex2.getDeadline());
         Assert.assertNotNull(fromIndex2.getDesiredItemState());
         Assert.assertTrue(fromIndex2.getDesiredItemState().equals("NPA"));
@@ -172,23 +162,6 @@ public class AccountServiceWorkflowImplTest {
         SolrInputDocument sdoc = oneRecord.toSolrDoc();
         client.add("catalog", sdoc);
         if (commit) client.commit("catalog");
-    }
-
-    static void insertCatalog(String states, String id) {
-        try {
-            String path = String.format("cz/inovatika/sdnnt/services/catalog/%s/%s.json", states,id.replaceAll(":","_"));
-            InputStream stream1 = AccountServiceWorkflowImplTest.class.getClassLoader().getResourceAsStream(path);
-            Assert.assertNotNull(stream1);
-            String json1 = IOUtils.toString(stream1, "UTF-8");
-            MarcRecord marcRecord1 = MarcRecord.fromRAWJSON(new JSONObject(new JSONObject(json1).getString("raw")).toString());
-            try (SolrClient client = SolrTestServer.getClient()){
-                client.add("catalog", marcRecord1.toSolrDoc());
-                client.commit("catalog");
-
-            }
-        } catch (IOException |  SolrServerException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     static void insertCatalogOneRecord(String states, MarcRecord mr) throws IOException, SolrServerException {

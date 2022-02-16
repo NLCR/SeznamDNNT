@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -460,23 +461,34 @@ public class AccountServlet extends HttpServlet {
                         Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
 
                         List<String> identifiers = Actions.identifiers(inputJs);
-                        JSONObject retObject = null;
+                        Map<String, AccountException> failedIdentifiers = new HashMap<>();
                         for (String identifier : identifiers) {
-                            //Zadost zadost = Zadost.fromJSON(service.getRequest(zadostFromReq.getId()).toString());
-                            String alternativeState = request.getParameter("alternative");
-                            if (alternativeState != null) {
-                                zadostJSON = service.curatorSwitchAlternativeState(alternativeState, zadostJSON, identifier, inputJs.getString("reason"));
-                            } else {
-                                zadostJSON = service.curatorSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
+                            // pokracovat, pokud identifier nemuze zmenit stav
+                            try {
+                                String alternativeState = request.getParameter("alternative");
+                                if (alternativeState != null) {
+                                    zadostJSON = service.curatorSwitchAlternativeState(alternativeState, zadostJSON, identifier, inputJs.getString("reason"));
+                                } else {
+                                    zadostJSON = service.curatorSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
+                                }
+                            } catch (AccountException e) {
+                                failedIdentifiers.put(identifier, e);
                             }
                         }
-
-
                         service.commit("catalog","zadost","history");
-
-                        // Musim cekat na komit
-                        return VersionStringCast.cast(service.getRequest(zadost.getId()));
-
+                        JSONObject payload = VersionStringCast.cast(service.getRequest(zadost.getId()));
+                        if (!failedIdentifiers.isEmpty()) {
+                            // TODO: Multiple exceptions
+                            List<AccountException> exceptionList = failedIdentifiers.values().stream().collect(Collectors.toList());
+                            if (!exceptionList.isEmpty()) {
+                                //AccountException ex = exceptionList.get(0);
+                                return errorJson(response,SC_BAD_REQUEST, "account.noworkflowstates","account.noworkflowstates", payload);
+                            } else {
+                                return errorJson(response,SC_BAD_REQUEST, "account.noworkflowstates","account.noworkflowstates", payload);
+                            }
+                        } else {
+                            return payload;
+                        }
                     } catch (ConflictException e) {
                         return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
                     } catch (AccountException e) {

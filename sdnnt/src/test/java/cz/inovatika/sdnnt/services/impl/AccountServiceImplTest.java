@@ -1,18 +1,23 @@
 package cz.inovatika.sdnnt.services.impl;
 
+import cz.inovatika.sdnnt.AccountServlet;
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.ZadostProcess;
+import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.utils.ServletsSupport;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.easymock.EasyMock;
+import org.json.JSONObject;
 import org.junit.*;
 
 import java.io.IOException;
@@ -20,6 +25,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class AccountServiceImplTest {
 
@@ -364,8 +370,119 @@ public class AccountServiceImplTest {
         Assert.assertTrue(Long.parseLong(savedZadost.getVersion()) > 0);
     }
 
+    // Po zavreni kuratorem ceka na uatomaticke zpracovani
+    @Test
+    public void testZadostProcessedApproveNZN_WaitingState() throws IOException, SolrServerException, ConflictException, AccountException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+        AccountServiceImpl service = zadostProcessPrepare();
+        CatalogSupport.inserNIdentifiers();
+        // Zadost
+        Zadost zadost = new Zadost("pokusny11234");
+        zadost.setIdentifiers(CatalogSupport. N_IDENTIFIERS);
+        zadost.setInstitution("NKP");
+        zadost.setUser("pokusny");
+        zadost.setNavrh("NZN");
+        zadost.setDatumZadani(new Date());
+
+        service.commit("catalog","zadost","history");
 
 
+        JSONObject zadostJSON = service.userCloseRequest(zadost.toJSON().toString());
+        for (String identifier : CatalogSupport.N_IDENTIFIERS) {
+            try {
+                zadostJSON = service.curatorSwitchState(zadostJSON, identifier, "Test reason");
+                // committing
+                service.commit("catalog","zadost","history");
+            } catch (AccountException e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+
+        JSONObject nZadost = service.getRequest(zadost.getId());
+        // kuratorske zavreni zadosti
+        service.curatorCloseRequest(nZadost.toString());
+        // po schvaleni, waiting for automatic process
+        Zadost approvedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
+        Assert.assertNotNull(approvedZadost.getState());
+        Assert.assertEquals(approvedZadost.getState(), "waiting_for_automatic_process");
+    }
+
+    // Po zavreni kuratorem je ve stavu processed
+    @Test
+    public void testZadostProcessedRejectNZN() throws IOException, SolrServerException, ConflictException, AccountException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning("TestSaveZadost is skipping");
+            return;
+        }
+        AccountServiceImpl service = zadostProcessPrepare();
+        CatalogSupport.inserNIdentifiers();
+
+        // Zadost
+        Zadost zadost = new Zadost("pokusny11234");
+        zadost.setIdentifiers(CatalogSupport. N_IDENTIFIERS);
+        zadost.setInstitution("NKP");
+        zadost.setUser("pokusny");
+        zadost.setNavrh("NZN");
+        zadost.setDatumZadani(new Date());
+
+        service.commit("catalog","zadost","history");
+
+        JSONObject zadostJSON = service.userCloseRequest(zadost.toJSON().toString());
+        for (String identifier : CatalogSupport.N_IDENTIFIERS) {
+            try {
+                zadostJSON = service.curatorRejectSwitchState(zadostJSON, identifier, "Test reason");
+                // committing
+                service.commit("catalog","zadost","history");
+            } catch (AccountException e) {
+                Assert.fail(e.getMessage());
+            }
+        }
+
+        JSONObject nZadost = service.getRequest(zadost.getId());
+        // kuratorske zavreni zadosti
+        service.curatorCloseRequest(nZadost.toString());
+        // po schvaleni, waiting for automatic process
+        Zadost rejectedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
+        Assert.assertNotNull(rejectedZadost.getState());
+        System.out.println(rejectedZadost.getState());
+        Assert.assertEquals(rejectedZadost.getState(), "processed");
+    }
+
+
+    private AccountServiceImpl zadostProcessPrepare() throws SolrServerException, IOException {
+        User user = testUser();
+        UserControler controler  = EasyMock.createMock(UserControler.class);
+        ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
+        AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
+                .withConstructor(appSupport, bservice)
+                .addMockedMethod("buildClient").createMock();
+
+        EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+
+        EasyMock.replay(controler, service,appSupport);
+
+        prepare.getClient().deleteByQuery("zadost", "*:*");
+        prepare.getClient().commit("zadost");
+
+        prepare.getClient().deleteByQuery("catalog", "*:*");
+        prepare.getClient().commit("catalog");
+        return service;
+    }
+
+
+    @Test
+    public void testZadostProcessedApprove() throws IOException, SolrServerException, ConflictException, AccountException {
+    }
 
     private User testUser() {
         User user = new User();
