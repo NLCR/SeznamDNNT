@@ -32,7 +32,7 @@
                   </mat-icon><span class="app-pipe"></span>
                 </ng-container>
                 <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh" [matTooltip]="'state.tooltip.' + zadost.navrh | translate">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>
-                <mat-icon class="material-icons-outlined" 
+                <mat-icon class="material-icons-outlined" matTooltipClass="app-separated-line"
                   [matTooltip]="('desc.verze_zadosti' | translate) + ': ' + zadost.version + '
                   ' + ('desc.uzivatel' | translate) + ': ' + zadost.user + '
                   ' + ('desc.datum_zadani' | translate) + ': ' + (zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm')+ '

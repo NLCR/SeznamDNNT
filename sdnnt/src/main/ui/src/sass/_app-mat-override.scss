@@ -218,6 +218,11 @@
   width: auto !important;
   //word-break: break-all !important;
 
+  &.app-separated-line {
+    white-space: pre-line !important;
+    word-break: break-all !important;
+  }
+
   &.app-clean-truncated {
     word-break: break-all !important;
     white-space: normal !important;
