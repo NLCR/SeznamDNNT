@@ -5,13 +5,18 @@ app-facets {
     max-height: 250px;
     overflow-y: auto;
 
-    a {
-      line-height: 22px;
+    .app-facet-item-wrapper {
+      &::first-letter {
+        text-transform: capitalize;
+      }
 
-      /* .mat-icon {
-        @include setStateColor(color);
-        @include setIcon(20, $position: sub);
-      } */
+      a {
+        line-height: 22px;
+  
+        &::first-letter {
+          text-transform: capitalize;
+        }
+      }
     }
   }
 }
