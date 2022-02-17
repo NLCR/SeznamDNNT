@@ -343,8 +343,6 @@ table {
 }
 
 // common elements
-.app-logo-sdnnt {
-  width: 130px;
-  height: 30px;
-  background-image: url(#{$app-logo});
+.app-logo {
+  display: flex;
 }
