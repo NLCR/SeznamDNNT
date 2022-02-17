@@ -268,5 +268,9 @@
     font-size: $size !important;
     height: $size !important;
     width: $size !important;
+
+    &:hover {
+      color: $app-color-primary;
+    }
   }
 }
