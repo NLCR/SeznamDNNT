@@ -303,7 +303,6 @@ table {
     @extend .app-clean-bg;
     height: calc(#{$app-badge-height} - 2px);
     color: $app-color-kramerius;
-    font-weight: 900;
     border: 1px solid #{$app-color-kramerius};
   }
 }
