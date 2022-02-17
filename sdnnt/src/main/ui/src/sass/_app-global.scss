@@ -345,4 +345,6 @@ table {
 // common elements
 .app-logo {
   display: flex;
+  max-width: $app-logo-max-width;
+  max-height: $app-logo-max-height;
 }
