@@ -41,6 +41,7 @@ $app-color-warning: mat-color($app-warn) !default;
 $app-color-info: mat-color($mat-amber, 900) !default;
 $app-color-fav: mat-color($mat-yellow, 800) !default;
 $app-color-success: mat-color($mat-green, 800) !default;
+$app-color-kramerius: #0277bd !default;
 
 $alerts: (
   warning: $app-color-warning,

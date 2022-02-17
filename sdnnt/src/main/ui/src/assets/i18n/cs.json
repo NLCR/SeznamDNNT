@@ -790,7 +790,9 @@
     "historie_kuratorskeho_stavu": "Historie kurátorského stavu",
     "historie_bibliografickeho_zaznamu": "Historie bibliografického stavu",
     "statistiky": "Statistiky",
-    "zkopirovat_cely_text": "Zkopírovat celý text"
+    "zkopirovat_cely_text": "Zkopírovat celý text",
+    "kramerius_badge": "Volné dílo v DK",
+    "kramerius_badge_tooltip": "Volné dílo v Digitální knihovně"
   },
 
   "acts": {

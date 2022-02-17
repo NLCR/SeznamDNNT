@@ -13,7 +13,7 @@ app-home {
       .app-card-home {
         @extend .app-clean-shadow;
         @include setStateColor(card);
-        border-radius: $app-badge-height;
+        border-radius: $app-home-card-radius;
         cursor: pointer;
         display: flex;
         flex-direction: column;

@@ -790,7 +790,9 @@
     "historie_kuratorskeho_stavu": "History of curatorial status",
     "historie_bibliografickeho_zaznamu": "History of bibliographic status",
     "statistiky": "Statistics",
-    "zkopirovat_cely_text": "Copy whole text"
+    "zkopirovat_cely_text": "Copy whole text",
+    "kramerius_badge": "Free work in the DL",
+    "kramerius_badge_tooltip": "Free work in the Digital Library"
   },
 
   "acts": {
