@@ -259,13 +259,13 @@ public class MarcRecord {
         for (int i = 0; i<granularity.length(); i++) {
         xml.append("<marc:datafield tag=\"956\" ind1=\" \" ind2=\" \">");
           JSONObject gr = granularity.getJSONObject(i);
-            xml.append("<marc:subfield code=\"u\" >").append(gr.getString("link")).append("</marc:subfield>");
+            xml.append("<marc:subfield code=\"u\" >").append(gr.optString("link")).append("</marc:subfield>");
             xml.append("<marc:subfield code=\"9\" >").append(gr.get("stav")).append("</marc:subfield>");
             if (gr.has("cislo")) {
-              xml.append("<marc:subfield code=\"x\" >").append(gr.getString("cislo")).append("</marc:subfield>");
+              xml.append("<marc:subfield code=\"x\" >").append(gr.optString("cislo")).append("</marc:subfield>");
             }
             if (gr.has("rocnik")) {
-              xml.append("<marc:subfield code=\"y\" >").append(gr.getString("rocnik")).append("</marc:subfield>");
+              xml.append("<marc:subfield code=\"y\" >").append(gr.optString("rocnik")).append("</marc:subfield>");
             }
         xml.append("</marc:datafield>");
         }
