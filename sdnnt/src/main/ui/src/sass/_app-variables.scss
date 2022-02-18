@@ -67,13 +67,17 @@ $app-container: 1280px !default;
 $app-border-radius: 4px !default;
 
 // custom
-$app-badge-height: 34px !default;
+$app-badge-height: 20px !default;
 
 // brand
 $app-brand-border-color: $app-gray-3 !default;
 
 // navbar
 $app-navbar-height: 90px !default;
+
+// logo
+$app-logo-max-width: 130px !default;
+$app-logo-max-height: 30px !default;
 
 // searchbar
 $app-searchbar-height: 110px !default;
@@ -84,6 +88,9 @@ $app-searchbar-field-max-width: 100% !default;
 $app-searchbar-field-color: $app-color-darknes !default;
 $app-searchbar-field-bg: $app-gray-2 !default;
 $app-searchbar-field-icon-gap: calc(#{$app-gap-icon} * 2) !default;
+
+// home card
+$app-home-card-radius: 34px !default;
 
 // search
 $app-search-facet-width: 350px !default;

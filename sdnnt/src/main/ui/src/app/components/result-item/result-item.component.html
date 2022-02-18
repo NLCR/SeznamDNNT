@@ -32,7 +32,10 @@
         <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.kuratorstav[doc.kuratorstav.length-1] | translate">
           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
         </div>
-      </ng-container>    
+      </ng-container>
+      <div class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
+        {{ 'desc.kramerius_badge' | translate }}
+      </div>
     </div>
     <div fxLayout="row">   
       <mat-button-toggle-group *ngIf="state.logged">

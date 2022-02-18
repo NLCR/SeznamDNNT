@@ -22,7 +22,7 @@ $nkp: (
   )
 );
 
-$app-logo: "~/assets/img/logo-sdnnt-" + $app-brand + ".png" !default;
+//$app-logo: "~/assets/img/logo-sdnnt-" + $app-brand + ".png" !default;
 
 $app-primary: mat-palette($nkp, 50);
 $app-accent: mat-palette($mat-pink, A200, A100, A400);
@@ -41,6 +41,7 @@ $app-color-warning: mat-color($app-warn) !default;
 $app-color-info: mat-color($mat-amber, 900) !default;
 $app-color-fav: mat-color($mat-yellow, 800) !default;
 $app-color-success: mat-color($mat-green, 800) !default;
+$app-color-kramerius: #0277bd !default;
 
 $alerts: (
   warning: $app-color-warning,

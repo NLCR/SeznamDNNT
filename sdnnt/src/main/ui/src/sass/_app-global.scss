@@ -276,9 +276,9 @@ table {
   display: inline-flex;
   align-self: end;
   padding: 0 8px;
-  height: 20px;
+  height: $app-badge-height;
   align-items: center;
-  border-radius: $app-badge-height;
+  border-radius: calc(#{$app-badge-height} / 2);
   min-width: 15px;
   justify-content: center;
 
@@ -297,6 +297,13 @@ table {
 
   .mat-icon {
     margin-right: $app-gap-icon;
+  }
+
+  &.app-kramerius {
+    @extend .app-clean-bg;
+    height: calc(#{$app-badge-height} - 2px);
+    color: $app-color-kramerius;
+    border: 1px solid #{$app-color-kramerius};
   }
 }
 
@@ -336,8 +343,8 @@ table {
 }
 
 // common elements
-.app-logo-sdnnt {
-  width: 130px;
-  height: 30px;
-  background-image: url(#{$app-logo});
+.app-logo {
+  display: flex;
+  max-width: $app-logo-max-width;
+  max-height: $app-logo-max-height;
 }

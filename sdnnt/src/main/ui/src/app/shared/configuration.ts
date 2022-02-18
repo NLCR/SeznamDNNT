@@ -7,6 +7,7 @@ export interface Configuration {
   context: string;
   lang: string;
   snackDuration: number;
+  logo: string;
   homeTabs: string[];
   homeCards: string[];
   simplelogin:boolean;
