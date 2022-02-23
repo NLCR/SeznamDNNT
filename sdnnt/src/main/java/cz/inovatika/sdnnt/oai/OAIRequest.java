@@ -18,6 +18,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
+
+import cz.inovatika.sdnnt.model.DataCollections;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -147,7 +149,7 @@ public class OAIRequest {
         query.addFilterQuery(SORT_FIELD + ":{" + zonedDateTime.format(DateTimeFormatter.ISO_INSTANT) + " TO *]");
       }
 
-      SolrDocumentList docs = solr.query("catalog", query).getResults();
+      SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
       if (docs.getNumFound() == 0) {
         ret.append("<error code=\"noRecordsMatch\">no record match the search criteria</error>");
       } else {
@@ -211,7 +213,7 @@ public class OAIRequest {
         query.addFilterQuery("dntstav:*");
       }
 
-      SolrDocumentList docs = solr.query("catalog", query).getResults();
+      SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
       if (docs.getNumFound() == 0) {
         ret.append("<error code=\"idDoesNotExist\">No matching identifier</error>");
       } else {
