@@ -6,6 +6,7 @@
 package cz.inovatika.sdnnt.oai;
 
 import cz.inovatika.sdnnt.Options;
+import static cz.inovatika.sdnnt.index.Indexer.getClient;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import static cz.inovatika.sdnnt.oai.OAIServlet.LOGGER;
 import java.io.IOException;
@@ -24,8 +25,10 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -37,6 +40,7 @@ public class OAIRequest {
 
   // Muze byt indextime nebo datestamp
   static String SORT_FIELD = "indextime";
+  static String CURSOR_FIELD = "identifier";
 
   public static String headerOAI() {
     return "<OAI-PMH xmlns=\"http://www.openarchives.org/OAI/2.0/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd\">\n";
@@ -113,10 +117,12 @@ public class OAIRequest {
             .append(responseDateTag())
             .append(requestTag(req));
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-
+      
+      String cursorMark = CursorMarkParams.CURSOR_MARK_START;
       SolrQuery query = new SolrQuery("*")
               .setRows(rows)
-              .setSort(SORT_FIELD, SolrQuery.ORDER.asc)
+              .addSort(SORT_FIELD, SolrQuery.ORDER.asc)
+              .addSort(CURSOR_FIELD, SolrQuery.ORDER.asc)
               .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
       if (req.getParameter("from") != null) {
         String from = req.getParameter("from");
@@ -131,25 +137,23 @@ public class OAIRequest {
       if (set != null) {
         query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       }
-//      if ("SDNNT-A".equals(set)) {
-//        query.addFilterQuery("dntstav:A");
-//      } else if ("SDNNT-N".equals(set)) {
-//        query.addFilterQuery("dntstav:N");
-//      } else {
-//        query.addFilterQuery("dntstav:*");
-//      }
 
       if (req.getParameter("resumptionToken") != null) {
-        String rt = req.getParameter("resumptionToken");
+        String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]");
-
-        LocalDateTime d = LocalDateTime.parse(rt, formatter);
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(d, ZoneId.systemDefault());
-        query.addFilterQuery(SORT_FIELD + ":{" + zonedDateTime.format(DateTimeFormatter.ISO_INSTANT) + " TO *]");
+        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, rt);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]");
+//
+//        LocalDateTime d = LocalDateTime.parse(rt, formatter);
+//        ZonedDateTime zonedDateTime = ZonedDateTime.of(d, ZoneId.systemDefault());
+//        query.addFilterQuery(SORT_FIELD + ":{" + zonedDateTime.format(DateTimeFormatter.ISO_INSTANT) + " TO *]");
+      } else {
+        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       }
 
-      SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
+      QueryResponse qr = getClient().query(DataCollections.catalog.name(), query);
+      String nextCursorMark = qr.getNextCursorMark();
+      SolrDocumentList docs = qr.getResults();
       if (docs.getNumFound() == 0) {
         ret.append("<error code=\"noRecordsMatch\">no record match the search criteria</error>");
       } else {
@@ -178,7 +182,8 @@ public class OAIRequest {
           Date last = (Date) docs.get(docs.size() - 1).getFieldValue(SORT_FIELD);
 
           ret.append("<resumptionToken completeListSize=\"" + docs.getNumFound() + "\">")
-                  .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
+                  //.append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
+                  .append(nextCursorMark)
                   .append("</resumptionToken>");
         }
         ret.append("</" + verb + ">");

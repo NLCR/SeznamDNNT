@@ -28,6 +28,10 @@ import { User } from './shared/user';
         return this.config.rows;
     }
 
+    public get logo() {
+        return this.config.logo;
+    }
+
     public get homeTabs() {
         return this.config.homeTabs;
     }

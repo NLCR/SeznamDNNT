@@ -50,7 +50,7 @@
                 <div>
                   <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
                   <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
-                  <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container>
+                  <!-- <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container> -->
                   <ng-container *ngIf="doc.hit_type">
                     <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'"
                       [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">

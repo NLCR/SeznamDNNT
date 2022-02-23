@@ -35,32 +35,32 @@
     "state": "status"
   },
   "state": {
-    "undefined": "unclassified",
-    "PA": "work published as draft",
-    "NPA": "work is going to be published as draft",
-    "NNN": "not in List",
-    "A": "included",
-    "N": "discarded",
-    "X": "free",
-    "PX": "probably free work",
+    "undefined": "Unclassified",
+    "PA": "Work published as draft",
+    "NPA": "Work is going to be published as draft",
+    "NNN": "Not in List",
+    "A": "Included",
+    "N": "Discarded",
+    "X": "Free",
+    "PX": "Probably free work",
     "NL":"Scheduled release of the work",
     "NLX":"On-site terminal license, internal state",
 
-    "VN": "call for decommissioning",
-    "NZN": "proposal for inclusion",
+    "VN": "Call for decommissioning",
+    "NZN": "Proposal for inclusion",
     "VNL": "Call for on on-site terminal license",
     "VNZ": "Call for on on-site terminal license",
 
-    "waiting": "waiting",
-    "processed": "processed",
-    "open": "open",
-    "rejected": "rejected",
-    "approved": "approved",
-    "approvedlib": "approved for terminal",
+    "waiting": "Waiting",
+    "processed": "Processed",
+    "open": "Open",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "approvedlib": "Approved for terminal",
     "waiting_for_automatic_process": "Awaiting automatic process",
 
     "tooltip": {
-      "undefined": "unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
+      "undefined": "Unclassified - the work is not included in the List, it is freely available for proposal for inclusion",
       "NNN": "Not in List",
       "NPA": "Work will published as Proposal for inclusion in the list, it switches on 1.2 or 1.8",
       "PA": "Work published as Proposal for inclusion in the list, it runs for 6 months until reassignment to status A",
@@ -107,7 +107,7 @@
     "rokvydani": "Year of publication",
     "controlled": "Controlled",
 
-    "undefined": "unclassified",
+    "undefined": "Unclassified",
     "NNN": "Not in List",
     "NPA": "Call for title classification",
     "PA": "Work published as a draft",
@@ -138,7 +138,8 @@
     "BK": "Books",
     "SE": "Serials",
     "MP": "Maps",
-    "MU": "Music"
+    "MU": "Music",
+    "VM": "Graphic"
   },
 
   "registracni_podminky": {
