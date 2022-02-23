@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
 // Methods in this class has been moved from MarcRecord and will be rewritten in future
+// TODO: Rewrite
 public class MarcRecordUtilsToRefactor {
 
     public static void fillSolrDoc(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {

@@ -8,36 +8,35 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 /**
- * Reprezentuje workflow stav
+ * This class represents one state in workflow
  */
 public class WorkflowState {
 
     public static final Logger LOGGER = Logger.getLogger(WorkflowState.class.getName());
 
-    // Kuratorsky stav objektu
+    /** Curator state */
     private CuratorItemState curatorState;
 
-    // workflow owner - zadost nebo dokument
+    /** workflow owner - Dokument, Zadost */
     private WorkflowOwner workflowOwner;
 
-    // perioda ktera je mezi stavy
+    /** Period between bound to transition betewwn previous and this state*/
     private Period period;
 
-    // datum vypocitane z periody
+    /** Calculated date between transition */
     private Date date;
 
-    // licence odpovidajici stavu
+    /** License associated with the state*/
     private License license;
 
-    // zda se meni licence
+    /** Flag - true if this workflow transition is changing license*/
     private boolean changingLicence;
 
-    // priznak zda je stav finalni
+    /** Flag - true if this workflow state is final state */
     private boolean finalSate;
 
+    /** Flag - true if this workflow state is first state - first transition */
     private boolean firstTransition;
-
-    //private String transitionName;
 
     public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date, Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
         this.workflowOwner = workflowOwner;

@@ -51,6 +51,7 @@ export class ResultItemComponent implements OnInit {
   ngOnInit(): void {
 
     if (this.doc.marc_998a) {
+      // TODO: Vypnout dnt
       this.alephLink = this.doc.marc_998a[0];
       if (!this.alephLink.startsWith('http')) {
         this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
@@ -297,8 +298,8 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('', res.error, true);
       } else {
         if (res.response.numFound > 1) {
-          // docasne vypnuto 
-          // Je vice zaznamu pro toto vyjadreni. Zeptame se
+          // TODO: tempory disabled 
+          // More items for one request. To disscuss
           /*
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
             width: '750px',

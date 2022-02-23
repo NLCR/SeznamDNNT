@@ -7,6 +7,7 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
 
         } catch (SolrServerException | IOException ex) {
@@ -74,13 +75,14 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
             if (ret.getJSONObject("response").getInt("numFound") > 0) {
 
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
-                JSONArray zadosti = findZadosti(user, ids, "NOT state:processed");
+                JSONArray zadosti = user != null ? findZadosti(user, ids, "NOT state:processed") : new JSONArray();
                 ret.put("zadosti", zadosti);
+
                 if (user != null) {
                     JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
                     ret.put("notifications", notifications);
@@ -157,7 +159,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
             if (ret.getJSONObject("response").getInt("numFound") > 0) {
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
@@ -233,7 +235,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
 
         } catch (SolrServerException | IOException ex) {
@@ -304,7 +306,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             JSONArray jsonArray = (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject doc = jsonArray.getJSONObject(i);

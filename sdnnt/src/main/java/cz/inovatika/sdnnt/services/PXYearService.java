@@ -7,8 +7,12 @@ import org.apache.solr.client.solrj.SolrServerException;
 import java.io.IOException;
 import java.util.List;
 
-public interface PXService {
+public interface PXYearService {
+
     public List<String> check();
+
     public void request(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
+
+    public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
 }

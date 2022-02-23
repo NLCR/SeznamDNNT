@@ -45,7 +45,9 @@ export class AppComponent {
         } else if (localStorage.getItem('lang')) {
           this.service.changeLang(localStorage.getItem('lang'));
         }
-        this.state.processParams(params);
+
+
+        this.state.processParams(params, this.router.url);
       }
     });
 
@@ -103,5 +105,11 @@ export class AppComponent {
     return consent != null;
   }
 
+  private rootRoute(route: ActivatedRoute): ActivatedRoute {
+    while (route.firstChild) {
+      route = route.firstChild;
+    }
+    return route;
+  }
 
 }

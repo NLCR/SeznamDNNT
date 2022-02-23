@@ -33,7 +33,7 @@
           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
         </div>
       </ng-container>
-      <div class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
+      <div *ngIf="doc.flag_public_in_dl" class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
         {{ 'desc.kramerius_badge' | translate }}
       </div>
     </div>
@@ -126,26 +126,6 @@
         </button>
       </mat-menu>
     
-     <!--  <ng-container *ngIf="state.user && inZadost && (!processed?.state || (doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX'))">
-        <mat-button-toggle-group class="app-ml-3" *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" [value]="processed?.state">
-          <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu na NPA'" matTooltipPosition="above">
-            <mat-icon class="material-icons-outlined">check</mat-icon>
-          </mat-button-toggle>
-          <mat-button-toggle value="approved" *ngIf="(zadost.navrh === 'VN' || (zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] !=='NLX' ) || zadost.navrh === 'VNZ')" (click)="approve()" [matTooltip]="'Schvalit zmenu stavu'" matTooltipPosition="above">
-            <mat-icon class="material-icons-outlined">check</mat-icon>
-          </mat-button-toggle>
-          <mat-button-toggle value="approvedLib" *ngIf="(zadost.navrh === 'VN') && doc.license !== null && doc.license == 'dnnto'" (click)="approveLib()" [matTooltip]="'Schvalit zmenu pouze na terminalu '" matTooltipPosition="above">
-            <mat-icon class="material-icons-outlined">local_library</mat-icon>
-          </mat-button-toggle>
-          <mat-button-toggle value="rejected" *ngIf="!(zadost.navrh === 'VNL' && doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX')" (click)="reject()" [matTooltip]="'Odmitnout zmenu stavu'" matTooltipPosition="above">
-            <mat-icon class="material-icons-outlined">not_interested</mat-icon>
-          </mat-button-toggle> -->
-          <!-- VNL / dilo bylo  vydano = vyradit -->
-         <!--  <mat-button-toggle value="releasedProved" *ngIf="(zadost.navrh === 'VNL'&& doc.kuratorstav[doc.kuratorstav.length-1] ==='NLX') && doc.license !== null && doc.license == 'dnntt'" (click)="releasedProved()" [matTooltip]="'Dilo bylo vydano'" matTooltipPosition="above">
-            <mat-icon class="material-icons-outlined">library_books</mat-icon>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-      </ng-container> -->
     </div>
   </mat-card-actions>
 </mat-card>

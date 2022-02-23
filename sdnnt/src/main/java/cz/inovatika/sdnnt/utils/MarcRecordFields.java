@@ -24,6 +24,9 @@ public class MarcRecordFields {
     public static final String TYPE_OF_RESOURCE_FIELD = "type_of_resource";
     public static final String ITEM_TYPE_FIELD = "item_type";
 
+    
+    // context information
+    public static final String CTX_FIELD = "ctx";
 
     public static final String LEGACY_STAV_FIELD = "dntstav";
 
@@ -63,6 +66,14 @@ public class MarcRecordFields {
 
     //rocniky
     public static final String MARC_2643 = "marc_2643";
+
+    // priznaky; verejne v dk
+    public static final String FLAG_PUBLIC_IN_DL= "flag_public_in_dl";
+
+
+    public static final String YEAR_OF_PUBLICATION="rokvydani";
+    public static final String YEAR_OF_PUBLICATION_1="date1_int";
+    public static final String YEAR_OF_PUBLICATION_2="date2_int";
 
     private MarcRecordFields() {}
 }

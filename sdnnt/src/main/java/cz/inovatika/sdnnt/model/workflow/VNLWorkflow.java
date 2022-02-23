@@ -11,7 +11,7 @@ import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
 /**
- * Workflow pro omezeni na terminal s lhutou 18 mesicu
+ * Workflow for terminal
  */
 public class VNLWorkflow extends Workflow {
 

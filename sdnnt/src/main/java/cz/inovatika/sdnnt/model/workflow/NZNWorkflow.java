@@ -10,7 +10,7 @@ import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
 /**
- * Workflow pro zadost typu NZN - navrh na zarazeni
+ * NZN Workfow
  */
 public class NZNWorkflow extends Workflow {
 

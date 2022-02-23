@@ -61,10 +61,9 @@ public class UserControlerImplTest {
     @Test
     public void testRegistrationAndLogin() throws NotAuthorizedException, UserControlerException, IOException, SolrServerException, EmailException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
-
 
         // delete solr
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
@@ -120,17 +119,14 @@ public class UserControlerImplTest {
 
         Assert.assertTrue(login.getUsername().equals(users.get(0).getUsername()));
         Assert.assertTrue(login.getPwd() == null);
-
         Assert.assertTrue(login.getNositel().size() == 2);
-
-
     }
 
     /** Test get users  by role*/
     @Test
     public void testGetByRole() throws EmailException, IOException, UserControlerException, SolrServerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -177,7 +173,7 @@ public class UserControlerImplTest {
     @Test
     public void testGetByFindByPrefix() throws EmailException, IOException, UserControlerException, SolrServerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -225,7 +221,7 @@ public class UserControlerImplTest {
     @Test
     public void testGetAll() throws EmailException, IOException, UserControlerException, SolrServerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -270,7 +266,7 @@ public class UserControlerImplTest {
     @Test
     public void testSaveAndGetByApiKey() throws IOException, SolrServerException, EmailException, UserControlerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -308,7 +304,7 @@ public class UserControlerImplTest {
     @Test
     public void testSaveAndGetByInterval() throws IOException, SolrServerException, EmailException, UserControlerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -363,7 +359,7 @@ public class UserControlerImplTest {
     public void testAdminResetPswd() throws IOException, SolrServerException, EmailException, UserControlerException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 

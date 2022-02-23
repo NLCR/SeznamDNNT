@@ -37,7 +37,7 @@ public class DocumentProxy implements WorkflowOwner {
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState,  Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         Date date = new Date();
 
         List<String> dntstav = this.marcRecord.dntstav;
@@ -72,7 +72,7 @@ public class DocumentProxy implements WorkflowOwner {
         this.marcRecord.datum_krator_stavu = new Date(date.getTime());
 
         JSONObject historyObject = new JSONObject();
-        historyObject.put("stav",itm.name());
+        historyObject.put("stav", itm.name());
         historyObject.put("date", MarcRecord.FORMAT.format(this.marcRecord.datum_krator_stavu));
         if (user != null) {
             historyObject.put("user", user);
@@ -125,14 +125,13 @@ public class DocumentProxy implements WorkflowOwner {
         // nepotrebuju nastavit, vypocitava se dynamicky
     }
 
+    @Override
+    public String getLicense() {
+        return marcRecord.license;
+    }
 
     @Override
     public void setLicense(String l) {
         this.marcRecord.license = l;
-    }
-
-    @Override
-    public String getLicense() {
-        return marcRecord.license;
     }
 }

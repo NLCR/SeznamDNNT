@@ -15,10 +15,11 @@ export class PaginatorComponent implements OnInit {
   @Input() numFound;
   @Input() showSort: boolean ;
   @Input() sortType: string = 'sort'; // sort vs sort_account
-
-  
+  @Input() storeStateKey: string;
   
   pageIndex: number;
+  rows: number;
+  page: number;
 
   constructor(
     private route: ActivatedRoute,
@@ -28,6 +29,15 @@ export class PaginatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageIndex = this.state.page + 1;
+ 
+    if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
+      this.rows = this.state.navigationstore.getRows(this.storeStateKey);
+      this.page = this.state.navigationstore.getPage(this.storeStateKey);
+    } else {
+      this.rows = this.state.config.rows;
+      this.page = 0;
+    }
+
   }
 
   pageChanged(e: PageEvent) {
@@ -35,6 +45,12 @@ export class PaginatorComponent implements OnInit {
     params.rows = e.pageSize;
     params.page = e.pageIndex;
     this.pageIndex = e.pageIndex + 1;
+
+    if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
+      this.state.navigationstore.setPage(this.storeStateKey, params.page);
+      this.state.navigationstore.setRows(this.storeStateKey, params.rows);
+    }
+
     // document.getElementById('scroll-wrapper').scrollTop = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }
@@ -56,22 +72,8 @@ export class PaginatorComponent implements OnInit {
   }
 
 
-  // get currentSort(): Sort {
-  //   return this.state.sortmap.get(this.sortType);
-  // }
   
-  // set currentSort(s: Sort) {
-  //   // this.state.sortmap.set(this.sortType, s);
-  //   // // console.log("current sort map is "+this.state.sortmap)
-  //   // // console.log("Setting current  sort to "+this.state.sortmap.get(this.sortType))
-  // }
 
-  // getSorts():Sort[] {
-  //   if (this.sortType === 'sort') {
-  //     return this.config.sorts
-  //   } else {
-  //     return this.config.sortsAccount;
-  //   }
-  // }
+ 
 
 }

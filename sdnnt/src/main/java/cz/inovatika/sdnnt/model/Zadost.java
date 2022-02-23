@@ -285,7 +285,7 @@ public class Zadost implements NotNullAwareObject {
             SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
                     .setFields("identifier")
                     .setRows(10000);
-            SolrDocumentList docs = solr.query("catalog", query).getResults();
+            SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
             for (SolrDocument doc : docs) {
                 zadost.identifiers.add((String) doc.getFirstValue("identifier"));
             }

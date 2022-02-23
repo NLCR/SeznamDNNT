@@ -59,7 +59,7 @@ public class AccountServiceImplTest {
     public void testSaveZadost() throws IOException, SolrServerException, ConflictException, AccountException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -68,8 +68,10 @@ public class AccountServiceImplTest {
         ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
+            //public AccountServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
+
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler, appLogin, bservice)
+                .withConstructor( appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -108,7 +110,7 @@ public class AccountServiceImplTest {
     @Test
     public void testSaveAndLoadVersionAndPeriods() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         User user = testUser();
@@ -117,7 +119,7 @@ public class AccountServiceImplTest {
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler, appLogin, bservice)
+                .withConstructor(appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -172,7 +174,7 @@ public class AccountServiceImplTest {
     @Test
     public void testZadostKuratorProcess() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("testZadostProcess is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         User user = testUser();
@@ -182,7 +184,7 @@ public class AccountServiceImplTest {
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler,appLogin, bservice)
+                .withConstructor(appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -231,7 +233,7 @@ public class AccountServiceImplTest {
     @Test
     public void testSendZadostNZN() throws IOException, SolrServerException, ConflictException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         User user = testUser();
@@ -240,7 +242,7 @@ public class AccountServiceImplTest {
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler, appLogin, bservice)
+                .withConstructor(appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -287,7 +289,7 @@ public class AccountServiceImplTest {
     @Test
     public void testSendZadostVN() throws IOException, SolrServerException, ConflictException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         User user = testUser();
@@ -297,7 +299,7 @@ public class AccountServiceImplTest {
 
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler,appLogin, bservice)
+                .withConstructor(appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -333,7 +335,7 @@ public class AccountServiceImplTest {
     @Test
     public void testSendZadostVNZ() throws IOException, SolrServerException, ConflictException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         User user = testUser();
@@ -343,7 +345,7 @@ public class AccountServiceImplTest {
 
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler, appSupport, bservice)
+                .withConstructor(appSupport, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
@@ -374,7 +376,7 @@ public class AccountServiceImplTest {
     @Test
     public void testZadostProcessedApproveNZN_WaitingState() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         AccountServiceImpl service = zadostProcessPrepare();
@@ -414,7 +416,7 @@ public class AccountServiceImplTest {
     @Test
     public void testZadostProcessedRejectNZN() throws IOException, SolrServerException, ConflictException, AccountException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
         AccountServiceImpl service = zadostProcessPrepare();
@@ -480,9 +482,6 @@ public class AccountServiceImplTest {
     }
 
 
-    @Test
-    public void testZadostProcessedApprove() throws IOException, SolrServerException, ConflictException, AccountException {
-    }
 
     private User testUser() {
         User user = new User();
@@ -493,7 +492,7 @@ public class AccountServiceImplTest {
         return user;
     }
 
-    protected class BuildSolrClientSupport extends AccountServiceImpl {
+    public static class BuildSolrClientSupport extends AccountServiceImpl {
         @Override
         SolrClient buildClient() {
             return SolrTestServer.getClient();

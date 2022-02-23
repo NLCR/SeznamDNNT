@@ -3,11 +3,12 @@ package cz.inovatika.sdnnt.model.workflow;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * Type of request
+ */
 public enum ZadostTypNavrh {
 
-    VN, VNZ, VNL, NZN,
-
-    PXN;
+    VN, VNZ, VNL, NZN, PXN;
 
     public static ZadostTypNavrh find(String type) {
         if (type != null) {
