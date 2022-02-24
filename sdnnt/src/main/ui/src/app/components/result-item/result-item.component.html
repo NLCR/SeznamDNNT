@@ -38,27 +38,28 @@
       </div>
     </div>
     <div fxLayout="row">   
-      <mat-button-toggle-group *ngIf="state.logged">
-        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
+      <!--   -->
+      <mat-button-toggle-group>
+        <mat-button-toggle *ngIf="!hasNavhr && (state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
           <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!hasNavhr && (state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && !inZadost && notPublic(doc)" (click)="addToZadost()">
+        <mat-button-toggle *ngIf="!hasNavhr && (state.logged &&  state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && !inZadost && notPublic(doc)" (click)="addToZadost()">
           <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
+        <mat-button-toggle *ngIf="(state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
           <mat-icon>close</mat-icon>{{ 'desc.odstranit_z_zadosti' | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="doc.hasNotifications" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
+        <mat-button-toggle *ngIf="state.logged && doc.hasNotifications" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
           <mat-icon class="app-color-warning">notifications_active</mat-icon>
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!doc.hasNotifications" (click)="setFollow(true)" [matTooltip]="'desc.sledovat' | translate">
+        <mat-button-toggle *ngIf="state.logged &&  !doc.hasNotifications" (click)="setFollow(true)" [matTooltip]="'desc.sledovat' | translate">
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
         <!-- TODO: Do it more general; set of actions from server. Client will dont't care about them -->
         <ng-container *ngIf="(state.user && inZadost && !processed?.state) || (curratorInteractionNeedAfterProcessed(zadost, doc))">
-          <ng-container *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'">
-            <!-- TODO change it ; cannot be dependent on type of request-->  
+          <ng-container *ngIf="(state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && zadost.state === 'waiting'">
 
+            <!-- TODO change it ; cannot be dependent on type of request-->  
 
             <mat-button-toggle value="approved" *ngIf="zadost.navrh === 'NZN'" (click)="approve()" 
             [matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above">
@@ -112,15 +113,15 @@
           <mat-icon>fingerprint</mat-icon>
           <a>{{ 'desc.identifikatory' | translate }}</a>
         </button>
-        <button mat-menu-item (click)="showHistory()">
+        <button mat-menu-item *ngIf="state.logged"  (click)="showHistory()">
           <mat-icon>update</mat-icon>
           <a>{{ 'desc.historie_zmen' | translate }}</a>
         </button>
-        <button mat-menu-item *ngIf="state.logged && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && !inZadost" (click)="showStates()">
+        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost" (click)="showStates()">
           <mat-icon>edit</mat-icon>
           <a>{{ 'desc.zmenit_stav'| translate }}</a>
         </button>
-        <button mat-menu-item *ngIf="hasGranularity" (click)="showGranularity()">
+        <button mat-menu-item *ngIf="state.logged && hasGranularity" (click)="showGranularity()">
           <mat-icon>format_list_numbered</mat-icon>
           <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
         </button>
