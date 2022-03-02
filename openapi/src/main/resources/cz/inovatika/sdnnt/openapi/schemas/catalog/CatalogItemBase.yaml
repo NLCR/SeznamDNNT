@@ -65,7 +65,12 @@ properties:
   license:
     type: array
     items:
-      type: string
+      type: object
+      properties:
+        name:
+          type: string
+        territoriality:
+          type: string
   frbr:
     type: string
   fmt:

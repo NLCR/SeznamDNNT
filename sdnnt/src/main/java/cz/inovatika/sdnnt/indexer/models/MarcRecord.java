@@ -220,7 +220,8 @@ public class MarcRecord {
     json.put(DNTSTAV_FIELD, dntstav);
     json.put(KURATORSTAV_FIELD, kuratorstav);
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
-
+    json.put(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu);
+    json.put(GRANULARITY_FIELD, granularity);
 
     json.put("controlFields", controlFields);
 

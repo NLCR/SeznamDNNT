@@ -24,6 +24,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
@@ -35,6 +36,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
     public static final Logger LOGGER = Logger.getLogger(DNNTCatalogApiServiceImpl.class.getName());
 
     public static final String SE_FMT_VALUE = "SE";
+    public static final String CZE = "CZE";
 
 
     CatalogSearcher catalogSearcher = new CatalogSearcher();
@@ -329,7 +331,14 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
 
         if (!licenses.isEmpty()) {
-            item.license(licenses);
+
+            List<CatalogItemBaseLicense> czechLicenses = licenses.stream().map(name -> {
+                CatalogItemBaseLicense baseLicense = new CatalogItemBaseLicense();
+                baseLicense.territoriality(CZE).name(name);
+                return baseLicense;
+            }).collect(Collectors.toList());
+
+            item.license(czechLicenses);
         }
 
         if (!autor.isEmpty()) {

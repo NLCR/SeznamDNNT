@@ -76,5 +76,10 @@ public class MarcRecordFields {
     public static final String YEAR_OF_PUBLICATION_1="date1_int";
     public static final String YEAR_OF_PUBLICATION_2="date2_int";
 
+    // CCNB pole
+    public static final String ID_CCNB_FIELD = "id_ccnb";
+
+    public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
+
     private MarcRecordFields() {}
 }

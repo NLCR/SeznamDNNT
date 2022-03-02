@@ -581,6 +581,7 @@
     "poslat_nove_heslo": "Send new password",
     "zmena_stavu": "Status change",
     "zaznam_z_katalogu": "Catalog entry",
+    "alternativni_zaznam_z_katalogu": "Catalog entry (the same CNB)",
     "identifikatory": "Identifiers",
     "identifikatory_zaznamu": "Record identifiers",
     "odkaz_do_dk": "Link to dig. library",

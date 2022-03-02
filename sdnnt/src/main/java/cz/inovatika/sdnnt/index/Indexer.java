@@ -15,20 +15,19 @@ import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.*;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -119,12 +118,16 @@ public class Indexer {
                     user, update, ret);
             
             // Nechame puvodni hodnoty "DNT" poli
-            cDoc.setField("dntstav", doc.getFieldValue("dntstav"));
-            cDoc.setField("datum_stavu", doc.getFieldValue("datum_stavu"));
-            cDoc.setField("historie_stavu", doc.getFieldValue("historie_stavu"));
-            cDoc.setField("license", doc.getFieldValue("license"));
-            cDoc.setField("license_history", doc.getFieldValue("license_history"));
-            cDoc.setField("granularity", doc.getFieldValue("granularity"));
+            cDoc.setField(MarcRecordFields.DNTSTAV_FIELD, doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD));
+            cDoc.setField(MarcRecordFields.KURATORSTAV_FIELD, doc.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD));
+            cDoc.setField(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD));
+            cDoc.setField(MarcRecordFields.DATUM_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_STAVU_FIELD));
+            cDoc.setField(MarcRecordFields.DATUM_KURATOR_STAV_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_KURATOR_STAV_FIELD));
+            cDoc.setField(MarcRecordFields.HISTORIE_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
+
+            cDoc.setField(MarcRecordFields.LICENSE_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_FIELD));
+            cDoc.setField(MarcRecordFields.LICENSE_HISTORY_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_HISTORY_FIELD));
+            cDoc.setField(MarcRecordFields.GRANULARITY_FIELD, doc.getFieldValue(MarcRecordFields.GRANULARITY_FIELD));
             
             if (cDoc != null) {
               hDocs.add(hDoc);
@@ -151,7 +154,7 @@ public class Indexer {
 
   // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
   // keepDNTFields = false => zmena pouze DNT (990, 992) poli
-  private static SolrInputDocument mergeWithHistory(String jsTarget,
+  static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
           String user, boolean keepDNTFields, JSONObject ret) {
 
@@ -389,6 +392,7 @@ public class Indexer {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
+      JSONObject before = mr.toJSON();
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
@@ -423,6 +427,7 @@ public class Indexer {
         mr.setGranularity(granularity, poznamka, user);
       }
       solrClient.add("catalog", mr.toSolrDoc());
+      new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user, DataCollections.catalog.name(), null);
     } finally {
       SolrJUtilities.quietCommit(solrClient, "catalog");
     }

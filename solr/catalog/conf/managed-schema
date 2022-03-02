@@ -115,10 +115,16 @@
    	
    <dynamicField name="controlfield_*" type="string" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
-	
  	
    <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
 
+
+
+   <!-- sjednocovani dle ccnb -->
+   <!-- alternativni link -->
+   <field name="alternative_aleph_link" type="string" indexed="true" stored="true" multiValued="false" />
+   <!-- alternativni identifikator -->
+   <field name="alternative_identifier" type="string" indexed="true" stored="true" multiValued="false" />
 
 	
    <!-- identifikatory --> 

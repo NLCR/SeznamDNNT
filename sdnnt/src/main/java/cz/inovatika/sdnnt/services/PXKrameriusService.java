@@ -8,13 +8,12 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * PX service, checking title against kramerius
+ * Service responsible for creating reuests or updating titles which should be public according to the state in digital library
  */
 public interface PXKrameriusService {
-
     /**
-     * Iterate over filter fields and check states against kramerius
-     * @return
+     * Check titles and returns all possible candidates
+     * @return List of candidates
      */
     public List<String> check();
 
@@ -29,7 +28,7 @@ public interface PXKrameriusService {
     public void request(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
     /**
-     * Update
+     * Update titles
      * @param identifiers
      * @throws AccountException
      * @throws IOException

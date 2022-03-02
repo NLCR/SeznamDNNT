@@ -105,10 +105,17 @@
             {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
           </a>
         </button>
-        <button mat-menu-item *ngIf="state.logged && doc.marc_998a" (click)="goto(alephLink)">
+
+        <button mat-menu-item *ngIf="state.logged && showAlephLink && doc.marc_998a" (click)="goto(alephLink)">
           <mat-icon>link</mat-icon>
           <a [href]="alephLink" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
         </button>
+
+        <button mat-menu-item *ngIf="(state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && this.doc.alternative_aleph_link)" (click)="goto(doc.alternative_aleph_link)">
+          <mat-icon>link</mat-icon>
+          <a [href]="doc.alternative_aleph_link" target="_blank">{{ 'desc.alternativni_zaznam_z_katalogu' | translate }}</a>
+        </button>
+
         <button mat-menu-item (click)="showIdentifiers()">
           <mat-icon>fingerprint</mat-icon>
           <a>{{ 'desc.identifikatory' | translate }}</a>

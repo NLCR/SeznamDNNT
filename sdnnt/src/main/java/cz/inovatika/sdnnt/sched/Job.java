@@ -101,6 +101,15 @@ public class Job implements InterruptableJob {
 
     enum Actions {
 
+
+        ALTERNATIVE_LINKS_UPDATE {
+            @Override
+            void doPerform(JSONObject jobData) {
+                UpdateAlternativeAlephLinksImpl impl = new UpdateAlternativeAlephLinksImpl();
+                impl.updateLinks();
+            }
+        },
+
         /**
          * Kontrola oproti datumu vydani
          */
