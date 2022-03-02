@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.model.workflow.document;
 
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.PublicItemState;
@@ -71,22 +72,7 @@ public class DocumentProxy implements WorkflowOwner {
         this.marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(itm.name()));
         this.marcRecord.datum_krator_stavu = new Date(date.getTime());
 
-        JSONObject historyObject = new JSONObject();
-        historyObject.put("stav", itm.name());
-        historyObject.put("date", MarcRecord.FORMAT.format(this.marcRecord.datum_krator_stavu));
-        if (user != null) {
-            historyObject.put("user", user);
-        }
-        if (poznamka != null) {
-            historyObject.put("comment", poznamka);
-        }
-        if (license != null) {
-            historyObject.put("license", license);
-        }
-        if (originator != null) {
-            historyObject.put("zadost", originator);
-        }
-
+        JSONObject historyObject = HistoryObjectUtils.historyObjectParent(itm.name(), license, originator, user, poznamka, MarcRecord.FORMAT.format(this.marcRecord.datum_krator_stavu));
         this.marcRecord.historie_kurator_stavu.put(historyObject);
 
         if (changingLicenseState) {

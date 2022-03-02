@@ -11,6 +11,7 @@ import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -294,7 +295,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
             CuratorItemState cState = null;
             PublicItemState pState = null;
-            if (this.destinationState != null) {
+            if (this.destinationState != null && StringUtils.isAnyString(this.destinationState)) {
                 cState = CuratorItemState.valueOf(this.destinationState);
                 pState = cState.getPublicItemState(null);
             }
@@ -304,14 +305,17 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 for (String identifier : identifiers) {
                     SolrInputDocument idoc = new SolrInputDocument();
                     idoc.setField(IDENTIFIER_FIELD, identifier);
-
+                    LOGGER.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
+                        LOGGER.fine(String.format("Setting curator state %s", cState.name()));
                         atomicUpdate(idoc, cState.name(), KURATORSTAV_FIELD);
                     }
                     if (pState != null) {
+                        LOGGER.fine(String.format("Setting public state %s", pState.name()));
                         atomicUpdate(idoc, pState.name(), DNTSTAV_FIELD);
                     }
                     if (contextInformation) {
+                        LOGGER.fine("Setting context information ");
                         atomicUpdate(idoc, true, FLAG_PUBLIC_IN_DL);
                     }
                     solr.add(DataCollections.catalog.name(), idoc);

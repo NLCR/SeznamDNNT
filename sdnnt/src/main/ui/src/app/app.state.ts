@@ -31,7 +31,7 @@ export class AppState {
   public rows: number = 20;
 
  
-
+  
   public navigationstore: NavigationStore = new NavigationStore();
 
   public sort: {[key: string]: Sort} = {};

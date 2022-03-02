@@ -1,4 +1,5 @@
-<h1 mat-dialog-title>{{ 'desc.zmena_stavu_pro' | translate }}: <span>{{ data.title }}</span></h1>
+<h1 mat-dialog-title>{{ 'desc.zmena_stavu_pro' | translate }}: <span>{{ data.marc_245a }} {{ data.marc_245b }} {{ data.marc_245n }} {{ data.marc_245p }} {{ data.marc_245c }} {{ data.marc_245i }}</span></h1>
+
 <mat-dialog-content>
   <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap app-mb-4">
     <mat-label>{{ 'desc.stav' | translate }}</mat-label>
@@ -38,7 +39,7 @@
             <td>{{ itm.link }}</td>
             <td class="app-col-stav">
               <mat-select name="newState" [(ngModel)]="itm.kuratorstav"  >
-                <mat-option *ngFor="let stav of dntStates" [value]="stav">
+                <mat-option *ngFor="let stav of dntStatesItem" [value]="stav">
                   {{ stav }}
                 </mat-option>
               </mat-select>

@@ -16,7 +16,12 @@ export class DialogStatesComponent implements OnInit {
   newState: string;
   newLicense: string;
   poznamka: string;
+  // stavy parent polozky
   public dntStates: string[] = [ 'A', 'PA', 'NPA', 'N',  'NL', 'X', 'PX'];
+
+  // stavy rocniku
+  public dntStatesItem: string[] = [ 'A', 'PA', 'NPA', 'N',  'X', 'PX'];
+
   granularity: any[] = [];
   
   //ngranularity: any[] = [];

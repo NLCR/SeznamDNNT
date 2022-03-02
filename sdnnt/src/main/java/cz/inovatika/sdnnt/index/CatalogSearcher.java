@@ -38,6 +38,7 @@ import org.json.JSONObject;
 /**
  * @author alberto
  */
+// TODO: Rewrite
 public class CatalogSearcher {
 
     public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
@@ -47,7 +48,7 @@ public class CatalogSearcher {
         try {
             SolrClient solr = Indexer.getClient();
             SolrQuery query = new SolrQuery("frbr:\"" + id + "\"")
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             // 50 is a maximum
             query.setRows(50);
@@ -153,7 +154,7 @@ public class CatalogSearcher {
                     .setRows(1)
                     .setStart(0)
                     .setSort("identifier", SolrQuery.ORDER.asc)
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
@@ -355,7 +356,7 @@ public class CatalogSearcher {
                 .setParam("stats", true)
                 .setParam("stats.field", "rokvydani")
                 .setParam("q.op", "AND")
-                .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
 
         query.set("defType", "edismax");
@@ -425,7 +426,7 @@ public class CatalogSearcher {
         String se = "(fmt:SE AND " + seDate + ")";
 
         // https://github.com/NLCR/SeznamDNNT/issues/164
-        query.addFilterQuery("place_of_pub:\"xr \"");
+        query.addFilterQuery("(place_of_pub:\"xr \" OR dntstav:*)");
 
         query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
 

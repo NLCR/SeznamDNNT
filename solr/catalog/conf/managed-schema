@@ -99,6 +99,9 @@
    <!--  historie kurator stavu -->	
    <field name="historie_kurator_stavu" type="string" indexed="true" stored="true"  />
 
+   <!--  historie stavu rocniku -->	
+   <field name="historie_granulovaneho_stavu" type="string" indexed="true" stored="true"  />
+
    <!-- License --> 
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
    <!-- License history -->

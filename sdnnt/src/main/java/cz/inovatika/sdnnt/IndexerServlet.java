@@ -326,7 +326,6 @@ public class IndexerServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
                     try {
-                        JSONObject json = new JSONObject();
                         DntAlephImporter imp = new DntAlephImporter();
                         return imp.run(req.getParameter("from"));
                     } catch (Exception ex) {

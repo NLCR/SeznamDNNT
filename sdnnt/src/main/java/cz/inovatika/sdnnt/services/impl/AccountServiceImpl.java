@@ -55,16 +55,9 @@ public class AccountServiceImpl implements AccountService {
     private ResourceServiceService resourceServiceService;
 
     public AccountServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
-        //this.userControler = userControler;
         this.loginSupport = loginSupport;
         this.resourceServiceService = res;
     }
-
-//    public AccountServiceImpl(ResourceServiceService res) {
-//        this.resourceServiceService = res;
-//    }
-
-
 
     public AccountServiceImpl() {}
 
@@ -294,7 +287,9 @@ public class AccountServiceImpl implements AccountService {
             //
             // bud odmitnuto nebo a nebo neni workflow?? Je to vubec mozne
             if (!zadost.allRejected(transitionName)) {
-                return closeRequest(zadost, "processed");
+                JSONObject retval = closeRequest(zadost, "processed");
+                new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getKurator(), "zadost", null, false);
+                return retval;
             } else {
                 // no workflow
                 zadost.setState("processed");
@@ -303,6 +298,7 @@ public class AccountServiceImpl implements AccountService {
                 zadost.setDesiredItemState(null);
                 zadost.setDesiredLicense(null);
                 LOGGER.info(String.format("Closing zadost immediately %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
+                new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getKurator(), "zadost", null, false);
                 return  VersionStringCast.cast(saveRequest(zadost, null));
             }
         } catch (Exception e) {
@@ -320,7 +316,9 @@ public class AccountServiceImpl implements AccountService {
         zadost.setTypeOfRequest(ZadostTyp.user.name());
         zadost.setUser(this.loginSupport.getUser().getUsername());
         zadost.setDatumZadani(new Date());
-        return closeRequest(zadost, "waiting");
+        JSONObject retval = closeRequest(zadost, "waiting");
+        new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getUser(), "zadost", null, false);
+        return retval;
     }
 
     @Override
@@ -600,6 +598,8 @@ public class AccountServiceImpl implements AccountService {
 
             try (SolrClient solr = buildClient()) {
                 Zadost.save(solr, zadost);
+                // history save
+                new HistoryImpl(buildClient()).log(zadost.getId(), request.toString(), zadost.toJSON().toString(), zadost.getUser(), "zadost", null, false);
             }
         }
     }

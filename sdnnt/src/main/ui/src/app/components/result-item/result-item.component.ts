@@ -15,6 +15,7 @@ import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component'
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { zip } from 'rxjs';
+import { DocsUtils } from 'src/app/shared/docutils';
 
 @Component({
   selector: 'app-result-item',
@@ -165,9 +166,11 @@ export class ResultItemComponent implements OnInit {
     return false;
   }
 
+
   showIdentifiers() {
+    let ctitle = DocsUtils.title(this.doc);
     const data = {
-      title: this.doc.title,
+      title:ctitle,
       items: [],
     }
     data.items.push({ label: 'Aleph identifier', value: this.doc['identifier'] })

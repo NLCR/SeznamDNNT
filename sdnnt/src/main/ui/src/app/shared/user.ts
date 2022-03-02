@@ -10,7 +10,6 @@ export class User {
   isActive: boolean;
   notifikace_interval:string;
   
-
   typ: string = 'fyzicka_osoba'; //pravnicka/fyzicka osoba
 
   titul: string;

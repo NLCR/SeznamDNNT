@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
+import cz.inovatika.sdnnt.index.utils.GranularityUtils;
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
@@ -383,9 +385,7 @@ public class Indexer {
   }
 
 
-
-  //
-  public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user ) throws IOException, SolrServerException {
+  public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
@@ -393,20 +393,45 @@ public class Indexer {
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
       PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
-      if ( pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
-        mr.license  = licence;
+      if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+        mr.license = licence;
       } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
         mr.license = License.dnntt.name();
       }
 
-      mr.setKuratorStav(kstav.name(),pstav.name(), licence , user, poznamka);
+      mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularity);
 
-      if (!granularity.isEmpty()) {  mr.setGranularity(granularity, poznamka, user); }
-      getClient().add("catalog", mr.toSolrDoc());
+      if (!granularity.isEmpty()) {
+        JSONArray granularityFromIndex = mr.granularity;
+        int commonIndex = Math.min(granularityFromIndex.length(), granularity.length());
+        for (int i = 0; i < commonIndex; i++) {
+          JSONObject fromParam = granularity.getJSONObject(i);
+          JSONObject fromIndex = granularityFromIndex.getJSONObject(i);
+          if (!GranularityUtils.eqGranularityObject(fromParam, fromIndex)) {
+            String formatted = MarcRecord.FORMAT.format(new Date());
+            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(fromParam, user, poznamka, formatted));
+          }
+        }
+        // pridano
+        if (granularity.length() > commonIndex) {
+          for (int i = commonIndex; i < granularity.length(); i++) {
+            String formatted = MarcRecord.FORMAT.format(new Date());
+            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(granularity.getJSONObject(i), user, poznamka, formatted));
+          }
+        }
+
+        mr.setGranularity(granularity, poznamka, user);
+      }
+      solrClient.add("catalog", mr.toSolrDoc());
     } finally {
-      SolrJUtilities.quietCommit(getClient(),"catalog" );
+      SolrJUtilities.quietCommit(solrClient, "catalog");
     }
     return ret;
+  }
+
+  // TODO: Move to service
+  public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
+    return changeStavDirect(getClient(), identifier, newStav, licence, poznamka, granularity, user);
   }
 
   //

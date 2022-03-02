@@ -84,8 +84,9 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
 
     @Override
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException {
-        if (!identifiers.isEmpty()) {
 
+        if (!identifiers.isEmpty()) {
+            LOGGER.info("Updating identifiers :"+identifiers);
             CuratorItemState cState = null;
             PublicItemState pState = null;
             if (this.destinationState != null) {

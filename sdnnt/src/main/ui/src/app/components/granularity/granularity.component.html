@@ -24,11 +24,9 @@
             <td *ngIf="data.isNavrh"><input [disabled]="isWhole" type="checkbox" (change)="setSelection(item)" [(ngModel)]="item.selected"  /></td>
             <td>{{ item.rocnik }}</td>
             <td>{{ item.cislo }}</td>
-            <td>{{ item.link }}</td>
+            <td> <a  [href]="item.link" target="_blank" >{{item.link }}</a>   </td>
             <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
-            <td *ngIf="item.stav.includes('NZ')">dnntt</td>
-            <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
-            <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+            <td>{{item.license}}</td>
           </tr>
         </ng-container>
       </tbody>

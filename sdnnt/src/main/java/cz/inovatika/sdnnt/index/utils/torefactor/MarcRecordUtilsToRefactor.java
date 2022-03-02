@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -26,6 +27,8 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 // Methods in this class has been moved from MarcRecord and will be rewritten in future
 // TODO: Rewrite
 public class MarcRecordUtilsToRefactor {
+
+    public static final Logger LOGGER = Logger.getLogger(MarcRecordUtilsToRefactor.class.getName());
 
     public static void fillSolrDoc(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {
       for (String tag : tagsToIndex) {
@@ -91,41 +94,54 @@ public class MarcRecordUtilsToRefactor {
 
           // String dntstav = rec.dataFields.get("990").get(0).subFields.get("a").get(0).value;
           if (dataFields.containsKey("990")) {
+            List<String> states = new ArrayList<>();
             for (DataField df : dataFields.get("990")) {
-              //JSONObject h = new JSONObject();
               if (df.getSubFields().containsKey("a")) {
-                //String stav = df.getSubFields().get("a").get(0).getValue();
-                List<String> states = df.getSubFields().get("a").stream().map(SubField::getValue).collect(Collectors.toList());
+                List<String> subFieldsStates = df.getSubFields().get("a").stream().map(SubField::getValue).collect(Collectors.toList());
+                states.addAll(subFieldsStates);
+              }
+            }
+            if (!states.isEmpty()) {
+              if (isANZCombination(states)) {
+                sdoc.setField("license", "dnntt");
 
-                //states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
-                if (isANZCombination(states)) {
-                  sdoc.setField("license", "dnntt");
-                  sdoc.setField("dntstav", "A");
-                  sdoc.setField(KURATORSTAV_FIELD, "A");
-                } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
-                  sdoc.setField("license", "dnnto");
-                  sdoc.setField("dntstav", "A");
-                  sdoc.setField(KURATORSTAV_FIELD, "A");
+                sdoc.setField("dntstav", aOrPa(states));
+                sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
 
-                } else {
-                  states.forEach(oneState -> {sdoc.addField("dntstav", oneState);});
-                  states.forEach(oneState -> {sdoc.addField(KURATORSTAV_FIELD, oneState);});
-                }
+              } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
+                sdoc.setField("license", "dnnto");
 
-                // history license
-                if (states.size() == 1 && states.contains("N")) {
-                  List<String> removedLicences = new ArrayList<>();
-                  hs.forEach(jsonObj-> {
-                    JSONObject json = (JSONObject) jsonObj;
-                    if (json.has("license")) {
-                      removedLicences.add(json.getString("license"));
-                    }
-                  });
-                  if (!removedLicences.isEmpty()) {
-                    removedLicences.stream().forEach(l-> {sdoc.addField("license_history", l);});
+                sdoc.setField("dntstav", aOrPa(states));
+                sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
+
+              } else {
+                states.forEach(oneState -> {
+                  sdoc.addField("dntstav", oneState);
+                });
+                states.forEach(oneState -> {
+                  sdoc.addField(KURATORSTAV_FIELD, oneState);
+                });
+              }
+
+              // history license
+              if (states.size() == 1 && states.contains("N")) {
+                List<String> removedLicences = new ArrayList<>();
+                hs.forEach(jsonObj -> {
+                  JSONObject json = (JSONObject) jsonObj;
+                  if (json.has("license")) {
+                    removedLicences.add(json.getString("license"));
                   }
+                });
+                if (!removedLicences.isEmpty()) {
+                  removedLicences.stream().forEach(l -> {
+                    sdoc.addField("license_history", l);
+                  });
                 }
               }
+            }
+          } else {
+            if (sdoc.containsKey(IDENTIFIER_FIELD)) {
+              LOGGER.warning(String.format("No state for record %s", sdoc.getFieldValue(IDENTIFIER_FIELD).toString()));
             }
           }
 
@@ -168,12 +184,22 @@ public class MarcRecordUtilsToRefactor {
             }
 
           }
+
+
+
     }
 
     public static boolean isANZCombination(List<String> states) {
       if (states.size() == 2 ) return states.contains("NZ") && (states.contains("A") || (states.contains("PA")));
       else return states.contains("NZ");
     }
+
+    public static String aOrPa(List<String> states) {
+      if (states.contains("PA")) return "PA";
+      else if (states.contains("A")) return "A";
+      return null;
+    }
+
 
     public static boolean isOnlyACombiation(List<String> states) {
       return states.size() == 1 && (states.get(0).equals("A") || (states.get(0).equals("PA")));

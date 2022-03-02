@@ -105,7 +105,7 @@
             {{ dkLinks[0].substring(dkLinks[0].indexOf('://')+3,dkLinks[0].indexOf("cz")+2) }}
           </a>
         </button>
-        <button mat-menu-item *ngIf="doc.marc_998a" (click)="goto(alephLink)">
+        <button mat-menu-item *ngIf="state.logged && doc.marc_998a" (click)="goto(alephLink)">
           <mat-icon>link</mat-icon>
           <a [href]="alephLink" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
         </button>

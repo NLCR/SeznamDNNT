@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.it.SolrTestServer;
+import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.*;
@@ -97,7 +98,116 @@ public class PXServiceImplTest {
     }
 
     @Test
-    public void testUpdate() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, AccountException, ConflictException {
+    public void testUpdateState() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, AccountException, ConflictException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        CatalogSupport.inserAIdentifiers();
+
+        String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+        JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
+
+        String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 1900]\",\"states\":[\"A\",\"PA\",\"NL\"]},\"results\":{\"state\":\"PX\",\"request\":{\"type\":\"PXN\",\"items\":50}}}";
+        JSONObject jobJSONObject = new JSONObject(jonbConfig);
+
+        PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
+                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .addMockedMethod("getOptions")
+                .addMockedMethod("buildClient")
+                .createMock();
+
+
+        Options options = EasyMock.createMock(Options.class);
+        EasyMock.expect(options.getJSONObject("check_kramerius")).andReturn(optionsConfigJSONObject.getJSONObject("check_kramerius")).anyTimes();
+
+        EasyMock.expect(pxService.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+        EasyMock.expect(pxService.getOptions()).andReturn(options).anyTimes();
+
+        EasyMock.replay(pxService, options);
+
+        pxService.update(CatalogSupport.A_IDENTIFIERS);
+
+        final SolrClient client = SolrTestServer.getClient();
+        CatalogSupport.A_IDENTIFIERS.stream().forEach(identifier-> {
+
+            SolrQuery query = new SolrQuery("identifier:\"" + identifier + "\"")
+                    .setRows(1)
+                    .setStart(0)
+                    .setFields(String.format("%s, %s", MarcRecordFields.FLAG_PUBLIC_IN_DL, MarcRecordFields.KURATORSTAV_FIELD));
+            try {
+                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
+                Assert.assertTrue(docs.getNumFound() == 1);
+                SolrDocument document = docs.get(0);
+                Object flag = document.getFieldValue(MarcRecordFields.FLAG_PUBLIC_IN_DL);
+                Assert.assertNull(flag);
+                Object cStav = document.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD);
+                Assert.assertNotNull(cStav);
+            } catch (SolrServerException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Test
+    public void testUpdateContext() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, AccountException, ConflictException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        CatalogSupport.inserAIdentifiers();
+
+        String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+        JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
+
+        String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 1900]\",\"states\":[\"A\",\"PA\",\"NL\"]},\"results\":{\"ctx\":true,\"request\":{\"type\":\"PXN\",\"items\":50}}}";
+        JSONObject jobJSONObject = new JSONObject(jonbConfig);
+
+        PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
+                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .addMockedMethod("getOptions")
+                .addMockedMethod("buildClient")
+                .createMock();
+
+
+        Options options = EasyMock.createMock(Options.class);
+        EasyMock.expect(options.getJSONObject("check_kramerius")).andReturn(optionsConfigJSONObject.getJSONObject("check_kramerius")).anyTimes();
+
+        EasyMock.expect(pxService.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+        EasyMock.expect(pxService.getOptions()).andReturn(options).anyTimes();
+
+        EasyMock.replay(pxService, options);
+
+        pxService.update(CatalogSupport.A_IDENTIFIERS);
+
+        final SolrClient client = SolrTestServer.getClient();
+        CatalogSupport.A_IDENTIFIERS.stream().forEach(identifier-> {
+
+            SolrQuery query = new SolrQuery("identifier:\"" + identifier + "\"")
+                    .setRows(1)
+                    .setStart(0)
+                    .setFields(String.format("%s, %s", MarcRecordFields.FLAG_PUBLIC_IN_DL, MarcRecordFields.KURATORSTAV_FIELD));
+            try {
+                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
+                Assert.assertTrue(docs.getNumFound() == 1);
+                SolrDocument document = docs.get(0);
+                Object flag = document.getFieldValue(MarcRecordFields.FLAG_PUBLIC_IN_DL);
+                Assert.assertNotNull(flag);
+                Object cStav = document.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD);
+                Assert.assertFalse(cStav.equals(CuratorItemState.PX));
+            } catch (SolrServerException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+        @Test
+    public void testUpdateStateAndContext() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, AccountException, ConflictException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;

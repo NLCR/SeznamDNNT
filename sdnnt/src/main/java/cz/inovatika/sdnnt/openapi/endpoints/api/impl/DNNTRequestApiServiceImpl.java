@@ -87,12 +87,12 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                         JSONObject jsonObject = docs.getJSONObject(i);
                         ArrayOfDetails details = details(jsonObject, internalStatus);
+                        ObjectMapper objectMapper = getObjectMapper();
+                        SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
                         if (!details.isEmpty()) {
-                            ObjectMapper objectMapper = getObjectMapper();
-                            SuccessRequestSaved savedRequest = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
                             savedRequest.setDetails(details);
-                            arrayOfSavedRequest.add(savedRequest);
                         }
+                        arrayOfSavedRequest.add(savedRequest);
                     }
                     return Response.ok().entity(arrayOfSavedRequest).build();
 
@@ -156,7 +156,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             String headerString = crc.getHeaderString(API_KEY_HEADER);
             if (headerString != null) {
 
-                UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
+                //UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
                 OpenApiLoginSupportImpl openApiLoginSupport = new OpenApiLoginSupportImpl(headerString);
 
                 AccountService accountService = new AccountServiceImpl( openApiLoginSupport, new ResourceBundleServiceImpl(crc));

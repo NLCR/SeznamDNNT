@@ -79,7 +79,7 @@ public class HarvestUtils {
             seconds = harvest.getInt("seconds");
         }
         for (int i = 0; i < max_repetion; i++) {
-            LOGGER.log(Level.FINE, "throttling url: "+url+" iteration:"+i);
+            LOGGER.log(Level.FINE, "Throttling url: "+url+" iteration:"+i);
             HttpGet httpGet = new HttpGet(url);
             try (CloseableHttpResponse response1 = client.execute(httpGet)) {
                 final HttpEntity entity = response1.getEntity();

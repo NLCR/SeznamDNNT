@@ -10,6 +10,7 @@ public class MarcRecordFields {
     public static final String KURATORSTAV_FIELD = "kuratorstav";
     public static final String DATUM_KURATOR_STAV_FIELD = "datum_kurator_stav";
     public static final String HISTORIE_KURATORSTAVU_FIELD = "historie_kurator_stavu";
+    public static final String HISTORIE_GRANULOVANEHOSTAVU_FIELD = "historie_granulovaneho_stavu";
 
     public static final String LICENSE_FIELD = "license";
     public static final String LICENSE_HISTORY_FIELD = "license_history";

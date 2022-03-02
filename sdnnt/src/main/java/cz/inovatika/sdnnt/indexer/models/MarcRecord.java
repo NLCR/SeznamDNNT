@@ -56,13 +56,15 @@ public class MarcRecord {
 
   @JsonIgnore
   public JSONArray historie_stavu = new JSONArray();
+  @JsonIgnore
+  public JSONArray historie_kurator_stavu = new JSONArray();
+  @JsonIgnore
+  public JSONArray historie_granulovaneho_stavu = new JSONArray();
 
   // kuratorsky stav
   public List<String> kuratorstav = new ArrayList<>();
   public Date datum_krator_stavu;
 
-  @JsonIgnore
-  public JSONArray historie_kurator_stavu = new JSONArray();
 
   // licence
   public String license;
@@ -129,6 +131,7 @@ public class MarcRecord {
                     KURATORSTAV_FIELD+" "+
                     HISTORIE_STAVU_FIELD+" " +
                     HISTORIE_KURATORSTAVU_FIELD+" " +
+                    HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
                     LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+ GRANULARITY_FIELD+":[json]");
@@ -177,6 +180,10 @@ public class MarcRecord {
         mr.historie_stavu = new JSONArray();
       }
 
+      if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
+        mr.historie_granulovaneho_stavu =  new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
+      }
+
       if (doc.containsKey(LICENSE_FIELD)) {
         mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
       }
@@ -190,9 +197,13 @@ public class MarcRecord {
         // mr.granularity = new JSONArray();
       }
 
+      if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
+        JSONArray jsonArray = new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
+        mr.historie_granulovaneho_stavu = jsonArray;
+      }
+
       // flags
       mr.recordsFlags = MarcRecordFlags.fromSolrDoc(doc);
-
 
       return mr;
     } else return null;
@@ -302,12 +313,14 @@ public class MarcRecord {
 
     sdoc.setField(HISTORIE_STAVU_FIELD, historie_stavu.toString());
     sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, historie_kurator_stavu.toString());
+    sdoc.setField(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu.toString());
 
     sdoc.setField(LICENSE_FIELD, license);
     sdoc.setField(LICENSE_HISTORY_FIELD, licenseHistory);
 
     sdoc.setField(DATUM_STAVU_FIELD, datum_stavu);
     sdoc.setField(DATUM_KURATOR_STAV_FIELD, datum_krator_stavu);
+
 
     if (granularity != null) {
       if (sdoc.containsKey(GRANULARITY_FIELD)) {
@@ -430,26 +443,10 @@ public class MarcRecord {
     } else return null;
   }
 
-  //  // pouze pro reducki viditelnosti
-//  public void enhanceState(List<String> newStates, String user) {
-//    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
-//    statesArray.addAll(newStates);
-//    changedState( user, statesArray, null, newStates.toArray(new String[newStates.size()]));
-//    // sync solr doc
-//    toSolrDoc();
-//  }
-//
-//  public void enhanceState(String newState, String user) {
-//    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
-//    statesArray.add(newState);
-//    changedState( user, statesArray,null,newState);
-//    // sync solr doc
-//    toSolrDoc();
-//  }
 
-  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka) {
+  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka, JSONArray granularity) {
     CuratorItemState curatorItemState = CuratorItemState.valueOf(kstav);
-    changedState( user, pstav, curatorItemState.name(), license, poznamka);
+    changedState( user, pstav, curatorItemState.name(), license, poznamka, granularity);
     toSolrDoc();
   }
 
@@ -467,7 +464,7 @@ public class MarcRecord {
   }
 
 
-  private void changedState( String user, String publicState, String kuratorState, String license, String comment) {
+  private void changedState( String user, String publicState, String kuratorState, String license, String comment, JSONArray granularity) {
     toSolrDoc();
     Date now = Calendar.getInstance().getTime();
     if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty())) {

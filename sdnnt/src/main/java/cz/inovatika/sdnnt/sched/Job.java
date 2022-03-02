@@ -121,6 +121,7 @@ public class Job implements InterruptableJob {
 
                     PXYearService service = new PXYearServiceImpl(iteration, results);
                     List<String> check = service.check();
+                    LOGGER.info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
                         int maximum = 100;
                         if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
@@ -138,6 +139,7 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
+                                LOGGER.info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
@@ -175,6 +177,7 @@ public class Job implements InterruptableJob {
                     PXKrameriusService service = new PXKrameriusServiceImpl(iteration, results);
 
                     List<String> check = service.check();
+                    LOGGER.info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
 
                         int maximum = 100;
@@ -193,10 +196,12 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
+                                LOGGER.info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
                             if (results.has("state") || results.has("ctx")) {
+                                LOGGER.info("Updating sublist "+subList);
                                 service.update(subList);
                             }
                         }
