@@ -36,7 +36,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
     public static final Logger LOGGER = Logger.getLogger(DNNTCatalogApiServiceImpl.class.getName());
 
     public static final String SE_FMT_VALUE = "SE";
-    public static final String CZE = "CZE";
+    public static final String CZE = "CZ";
 
 
     CatalogSearcher catalogSearcher = new CatalogSearcher();
@@ -285,11 +285,14 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                     if (itemObject.has("rocnik")) {
                         //granularity.year(itemObject.getString("rocnik"));
                     }
-                    if (states.contains("A") && states.contains("NZ")) {
-                        granularity.license(License.dnntt.name());
-                    } else if (states.contains("A")) {
-                        granularity.license(License.dnnto.name());
+
+                    if (itemObject.has("license")) {
+
+                        CatalogItemBaseLicense license = new CatalogItemBaseLicense();
+                        license.name(itemObject.getString("license")).territoriality(CZE);
+                        granularity.addLicenseItem( license.name(itemObject.getString("license")).territoriality(CZE) );
                     }
+
                     granularities.add(granularity);
 
                 }
