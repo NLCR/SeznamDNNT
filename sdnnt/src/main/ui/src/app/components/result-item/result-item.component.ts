@@ -14,8 +14,10 @@ import { DialogHistoryComponent } from '../dialog-history/dialog-history.compone
 import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { zip } from 'rxjs';
+import { Subject, zip } from 'rxjs';
 import { DocsUtils } from 'src/app/shared/docutils';
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
+
 
 @Component({
   selector: 'app-result-item',
@@ -30,6 +32,7 @@ export class ResultItemComponent implements OnInit {
   @Output() removeFromZadostEvent = new EventEmitter<string>();
   @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string }>();
 
+
   newState = new FormControl();
   isZarazeno: boolean;
   hasNavhr: boolean;
@@ -40,11 +43,11 @@ export class ResultItemComponent implements OnInit {
 
   alephLink: string;
   alternativeAlephLink:string;
-
   showAlephLink : boolean = true;
 
 
   dkLinks: string[] = [];
+
 
   constructor(
     private datePipe: DatePipe,
@@ -55,6 +58,7 @@ export class ResultItemComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+
 
     if (this.doc.marc_998a) {
 
@@ -155,6 +159,8 @@ export class ResultItemComponent implements OnInit {
       }
 
     }
+
+  
   }
 
 
@@ -259,8 +265,10 @@ export class ResultItemComponent implements OnInit {
     });
   }
 
-  goto(url) {
+
+  goto(url, event) {
     window.open(url, "_blank", 'noreferrer');
+    if (event) {event.stopPropagation(); }
     return;
   }
 
