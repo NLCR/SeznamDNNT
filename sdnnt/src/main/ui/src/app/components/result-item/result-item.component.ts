@@ -17,6 +17,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, zip } from 'rxjs';
 import { DocsUtils } from 'src/app/shared/docutils';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
+import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 
 
 @Component({
@@ -259,6 +260,13 @@ export class ResultItemComponent implements OnInit {
           if (res.response.docs.length > 0) {
             this.doc = res.response.docs[0];
           }
+          let utls:SearchResultsUtils = new SearchResultsUtils();
+          if (res.zadosti) {
+            utls.enhanceByRequest([this.doc], res.zadosti);            
+          }
+          if (res.notifications) {
+            utls.enhanceByNotifications([this.doc], res.notifications);            
+          }
         });
       }
 
@@ -282,34 +290,6 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-
-    // if (this.hasGranularity) {
-    //   const data = { title: this.doc.nazev, items: this.doc.granularity, isNavrh: true };
-
-    //   const dialogRef = this.dialog.open(GranularityComponent, {
-    //     width: '1150px',
-    //     data: data,
-    //     panelClass: 'app-dialog-states'
-    //   });
-    //   dialogRef.afterClosed().subscribe(result => {
-    //     if (result) {
-          
-    //       console.log(result);
-    //       // const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
-    //       // this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-    //       //   this.state.currentZadost[res.navrh] = res;
-    //       //   this.addToZadostInternal(res.navrh);
-    //       // });
-    //     }
-    //   });
-    // } else {
-    //   const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
-    //   this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-    //     this.state.currentZadost[res.navrh] = res;
-    //     this.addToZadostInternal(res.navrh);
-    //   });
-    // }
-
     const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
     this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
       this.state.currentZadost[res.navrh] = res;

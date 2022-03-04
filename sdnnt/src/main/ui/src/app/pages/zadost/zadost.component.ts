@@ -60,6 +60,9 @@ export class ZadostComponent implements OnInit {
         this.getDocs(val);
       });
     }));
+
+
+
   }
 
   ngOnDestroy(): void {
