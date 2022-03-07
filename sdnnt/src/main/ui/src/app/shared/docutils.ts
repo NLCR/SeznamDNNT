@@ -1,5 +1,6 @@
 import { SolrDocument } from "./solr-document";
 
+/** Doc title utils */
 export class DocsUtils {
 
       // move to utils

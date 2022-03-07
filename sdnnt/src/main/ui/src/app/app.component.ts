@@ -35,6 +35,7 @@ export class AppComponent {
 
   ngOnInit() {
 
+    /** Handle language */
     this.service.changeLang(this.state.currentLang);
 
     this.router.events.subscribe(val => {
@@ -45,13 +46,11 @@ export class AppComponent {
         } else if (localStorage.getItem('lang')) {
           this.service.changeLang(localStorage.getItem('lang'));
         }
-
-
         this.state.processParams(params, this.router.url);
       }
     });
 
-
+    /** Handling sessions */
     interval(this.config.pinginterval*1000).subscribe(x => {
       if (this.state.user != null) {
         this.service.ping().subscribe((res)=>{
@@ -88,16 +87,14 @@ export class AppComponent {
               this.state.logged = false;
               this.state.user = null;
               localStorage.removeItem('user');
-
               this.router.navigate(['/home'], {});
 
             });
-            console.log("Expired; user is log out")
           }
-
         });
       }    
     });
+
   }
 
   isConsentEnabled() {
