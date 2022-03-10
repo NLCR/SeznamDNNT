@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
@@ -11,6 +11,8 @@ import { Filter } from 'src/app/shared/filter';
   styleUrls: ['./facets.component.scss']
 })
 export class FacetsComponent implements OnInit {
+  public getScreenWidth: any;
+  public facetBreakpoint: number = 1040; 
 
   @Input() facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
   @Input() stats:{ [field: string]: {min: any, max: any, count: number, from: any, until: any}};
@@ -30,6 +32,9 @@ export class FacetsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // get breakpoint
+    this.getScreenWidth = window.innerWidth;
+
     this.facets = [];
     // filter kurator stav for users 
     this.config.filterFields.forEach(f => {
@@ -83,6 +88,20 @@ export class FacetsComponent implements OnInit {
     params['rokvydani'] = this.rokod + ',' + this.rokdo;
     params.page = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
+  }
+
+  // get breakpoint
+  @HostListener('window:resize', ['$event'])
+  onWindowResize() {
+    this.getScreenWidth = window.innerWidth;
+  }
+
+  getPanelExpansion() {
+    if (this.getScreenWidth <= this.facetBreakpoint) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
 }
