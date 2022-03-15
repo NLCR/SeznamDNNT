@@ -386,7 +386,7 @@ public class XMLImporterDistri {
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
-              // .addFilterQuery("dntstav:*")
+              // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
               .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
 
       QueryRequest qreq = new QueryRequest(query);
