@@ -319,7 +319,7 @@ public class XMLImporterHeureka {
       SolrQuery query = new SolrQuery(q)
               .setRows(100)
               .setParam("q.op", "AND")
-              //.addFilterQuery("dntstav:*")
+              // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
               .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
@@ -335,7 +335,6 @@ public class XMLImporterHeureka {
       List<String> na_vyrazeni = new ArrayList<>();
       boolean isEAN = false;
       if (docs.length() == 0) {
-        // System.out.println(title);
         return;
       }
       for (Object o : docs) {
