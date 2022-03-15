@@ -169,6 +169,7 @@ public class Import {
       
       Map<String,Object> fieldModifier = new HashMap<>(1);
       fieldModifier.put("set",true);
+
       idoc.addField("controlled", fieldModifier); 
       Map<String,Object> fieldModifier1 = new HashMap<>(1);
       fieldModifier1.put("set", note);

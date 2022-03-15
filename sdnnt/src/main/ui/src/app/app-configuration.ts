@@ -77,6 +77,10 @@ import { User } from './shared/user';
         return this.config.maximumItemInRequest || 60;
     }    
 
+    public get dntSetAlpehLinks() {
+        return this.config.dntSetAlpehLinks;
+    }    
+
     /**
      * List the files holding section configuration in assets/configs folder
      * ['search'] will look for /assets/configs/search.json

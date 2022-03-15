@@ -14,7 +14,11 @@ import { DialogHistoryComponent } from '../dialog-history/dialog-history.compone
 import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
 import { HttpErrorResponse } from '@angular/common/http';
-import { zip } from 'rxjs';
+import { Subject, zip } from 'rxjs';
+import { DocsUtils } from 'src/app/shared/docutils';
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
+import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
+
 
 @Component({
   selector: 'app-result-item',
@@ -29,6 +33,7 @@ export class ResultItemComponent implements OnInit {
   @Output() removeFromZadostEvent = new EventEmitter<string>();
   @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string }>();
 
+
   newState = new FormControl();
   isZarazeno: boolean;
   hasNavhr: boolean;
@@ -36,9 +41,14 @@ export class ResultItemComponent implements OnInit {
   imgSrc: string;
   processed: { date: Date, state: string, user: string, reason?: string };
   processedTooltip: string;
+
   alephLink: string;
+  alternativeAlephLink:string;
+  showAlephLink : boolean = true;
+
 
   dkLinks: string[] = [];
+
 
   constructor(
     private datePipe: DatePipe,
@@ -50,10 +60,23 @@ export class ResultItemComponent implements OnInit {
 
   ngOnInit(): void {
 
+
     if (this.doc.marc_998a) {
+
+      // vypnout 
+      if (this.doc.setSpec && this.doc.setSpec.startsWith("DNT-ALL")) {
+          this.showAlephLink = this.config.dntSetAlpehLinks;
+      }
+
       this.alephLink = this.doc.marc_998a[0];
+      // dnt base will be disabled
       if (!this.alephLink.startsWith('http')) {
         this.alephLink = 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + this.doc.marc_998a[0].split('-')[1];
+      }
+
+      // alternative aleph link for dnt titles
+      if (this.doc.alternative_aleph_link) {
+        this.alternativeAlephLink = this.doc.alternative_aleph_link;
       }
     }
     this.newState.setValue(this.doc.dntstav);
@@ -137,6 +160,8 @@ export class ResultItemComponent implements OnInit {
       }
 
     }
+
+  
   }
 
 
@@ -164,9 +189,11 @@ export class ResultItemComponent implements OnInit {
     return false;
   }
 
+
   showIdentifiers() {
+    let ctitle = DocsUtils.title(this.doc);
     const data = {
-      title: this.doc.title,
+      title:ctitle,
       items: [],
     }
     data.items.push({ label: 'Aleph identifier', value: this.doc['identifier'] })
@@ -233,14 +260,23 @@ export class ResultItemComponent implements OnInit {
           if (res.response.docs.length > 0) {
             this.doc = res.response.docs[0];
           }
+          let utls:SearchResultsUtils = new SearchResultsUtils();
+          if (res.zadosti) {
+            utls.enhanceByRequest([this.doc], res.zadosti);            
+          }
+          if (res.notifications) {
+            utls.enhanceByNotifications([this.doc], res.notifications);            
+          }
         });
       }
 
     });
   }
 
-  goto(url) {
+
+  goto(url, event) {
     window.open(url, "_blank", 'noreferrer');
+    if (event) {event.stopPropagation(); }
     return;
   }
 
@@ -254,34 +290,6 @@ export class ResultItemComponent implements OnInit {
   }
 
   addToZadost() {
-
-    // if (this.hasGranularity) {
-    //   const data = { title: this.doc.nazev, items: this.doc.granularity, isNavrh: true };
-
-    //   const dialogRef = this.dialog.open(GranularityComponent, {
-    //     width: '1150px',
-    //     data: data,
-    //     panelClass: 'app-dialog-states'
-    //   });
-    //   dialogRef.afterClosed().subscribe(result => {
-    //     if (result) {
-          
-    //       console.log(result);
-    //       // const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
-    //       // this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-    //       //   this.state.currentZadost[res.navrh] = res;
-    //       //   this.addToZadostInternal(res.navrh);
-    //       // });
-    //     }
-    //   });
-    // } else {
-    //   const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
-    //   this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-    //     this.state.currentZadost[res.navrh] = res;
-    //     this.addToZadostInternal(res.navrh);
-    //   });
-    // }
-
     const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
     this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
       this.state.currentZadost[res.navrh] = res;
@@ -297,8 +305,8 @@ export class ResultItemComponent implements OnInit {
         this.service.showSnackBar('', res.error, true);
       } else {
         if (res.response.numFound > 1) {
-          // docasne vypnuto 
-          // Je vice zaznamu pro toto vyjadreni. Zeptame se
+          // TODO: tempory disabled 
+          // More items for one request. To disscuss
           /*
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
             width: '750px',

@@ -51,6 +51,9 @@ public abstract class IterationSupport {
         }
     }
 
+    public  void iterate(Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer, String identifierField) {
+        this.iterate(Indexer.getClient(), req, user, plusFilter, minusFilter, fields, consumer, identifierField);
+    }
 
     /**
      * Full index iteration
@@ -61,12 +64,12 @@ public abstract class IterationSupport {
      * @param fields Returning fields
      * @param consumer Consumer closure
      */
-    public  void iterate(Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer, String identifierField) {
+    public  void iterate(SolrClient solr, Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter,List<String> fields, Consumer<SolrDocument> consumer, String identifierField) {
         int rows = 3000;//opts.getClientConf().getInt("rows");
         if (req.containsKey("rows")) {
             rows = Integer.parseInt(req.get("rows"));
         }
-        SolrClient solr = Indexer.getClient();
+        //SolrClient solr = Indexer.getClient();
         LOGGER.info("Iteration rows "+rows);
         try {
             SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc(identifierField));

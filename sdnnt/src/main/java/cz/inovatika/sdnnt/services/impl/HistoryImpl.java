@@ -55,7 +55,7 @@ public class HistoryImpl implements History {
             idoc.setField("user", user);
             idoc.setField("type", type);
             if (workflowId != null) {
-                idoc.setField("workflowid", type);
+                idoc.setField("workflowid", workflowId);
             }
             idoc.setField("changes", changes.toString());
             // all dnnt state rename to stav

@@ -24,6 +24,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -45,13 +46,17 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
  *
  * @author alberto
  */
+// TODO: Rewrite
 public class DntAlephImporter {
 
     public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
     public static final int DEFAULT_CONNECT_TIMEOUT = 5;
     public static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
     public static final String CONNECTION_REQUEST_TIMEOUT_KEY = "connectionRequestTimeout";
-        public static final String SOCKET_TIMEOUT_KEY = "socketTimeout";
+    public static final String SOCKET_TIMEOUT_KEY = "socketTimeout";
+
+    protected boolean debug = false;
+
 
     JSONObject ret = new JSONObject();
     String collection = "catalog";
@@ -65,6 +70,19 @@ public class DntAlephImporter {
     long procTime = 0;
     long solrTime = 0;
 
+    static SolrInputDocument toSolrDoc(MarcRecord rec, boolean debug) {
+        SolrInputDocument sDoc = toSolrDoc(rec);
+        if (debug) {
+            Object identifier = sDoc.containsKey(IDENTIFIER_FIELD) ? sDoc.getFieldValue(IDENTIFIER_FIELD) : "";
+            Object dntstav = sDoc.containsKey(DNTSTAV_FIELD) ? sDoc.getFieldValue(DNTSTAV_FIELD) : "";
+            Object kuratorstav = sDoc.containsKey(KURATORSTAV_FIELD) ? sDoc.getFieldValue(KURATORSTAV_FIELD) : "";
+            Object license = sDoc.containsKey(LICENSE_FIELD) ? sDoc.getFieldValue(LICENSE_FIELD) : "";
+
+            String formatted = String.format("Identifier: %s, dntstav: %s, kuratorstav %s, license %s", identifier, dntstav, kuratorstav, license);
+            LOGGER.fine(formatted);
+        }
+        return sDoc;
+    }
     static SolrInputDocument toSolrDoc(MarcRecord rec) {
         SolrInputDocument sdoc = new SolrInputDocument();
         if (sdoc.isEmpty()) {
@@ -150,6 +168,9 @@ public class DntAlephImporter {
         sdoc.setField("nazev", nazev.trim());
         MarcRecordUtilsToRefactor.addRokVydani(sdoc);
 
+
+
+
         return sdoc;
     }
 
@@ -159,11 +180,17 @@ public class DntAlephImporter {
     }
 
     public JSONObject run(String from) {
+        JSONObject oaiHavest = Options.getInstance().getJSONObject("OAIHavest");
+        if (oaiHavest.has("debug")) {
+            debug = oaiHavest.getBoolean("debug");
+            LOGGER.info("DNT Aleph importer is in debug mode !");
+        }
         String url = "http://aleph.nkp.cz/OAI?verb=ListRecords&metadataPrefix=marc21&set=DNT-ALL";
         if (from != null) {
             url += "&from=" + from;
         }
         getRecords(url);
+
         return ret;
     }
 
@@ -191,7 +218,7 @@ public class DntAlephImporter {
             procTime += new Date().getTime() - start;
             start = new Date().getTime();
             if (!recs.isEmpty()) {
-                addToCatalog(recs);
+                addToCatalog(recs, this.debug);
                 indexed += recs.size();
                 recs.clear();
             }
@@ -221,7 +248,8 @@ public class DntAlephImporter {
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
                 if (recs.size() > batchSize) {
-                    addToCatalog(recs);
+                    LOGGER.fine(String.format("Indexing batch, number of items %d", recs.size()));
+                    addToCatalog(recs, this.debug);
                     indexed += recs.size();
                     solrTime += new Date().getTime() - start;
                     LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
@@ -238,7 +266,7 @@ public class DntAlephImporter {
             }
             start = new Date().getTime();
             if (!recs.isEmpty()) {
-                addToCatalog(recs);
+                addToCatalog(recs, this.debug);
                 indexed += recs.size();
                 recs.clear();
             }
@@ -253,17 +281,23 @@ public class DntAlephImporter {
         } catch (SolrServerException | XMLStreamException | MaximumIterationExceedException  | IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             ret.put("error", ex);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
         } finally {
+            LOGGER.fine("Commit to solr");
             SolrJUtilities.quietCommit(Indexer.getClient(), collection);
         }
     }
 
     private void deletePaths(File dFile) {
-        try {
-            Files.delete(dFile.toPath());
-            Files.delete(dFile.getParentFile().toPath());
-        } catch (IOException e) {
-            LOGGER.warning("Exception during deleting file");
+        if (!debug) {
+            try {
+                Files.delete(dFile.toPath());
+                Files.delete(dFile.getParentFile().toPath());
+            } catch (IOException e) {
+                LOGGER.warning("Exception during deleting file");
+            }
         }
     }
 
@@ -297,11 +331,11 @@ public class DntAlephImporter {
         return HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }
 
-    private void addToCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
+    private void addToCatalog(List<MarcRecord> recs, boolean debug) throws JsonProcessingException, SolrServerException, IOException {
         List<SolrInputDocument> idocs = new ArrayList<>();
 
         for (MarcRecord rec : recs) {
-            idocs.add(toSolrDoc(rec));
+            idocs.add(toSolrDoc(rec, debug));
         }
         if (!idocs.isEmpty()) {
             Indexer.getClient().add("catalog", idocs);
@@ -480,7 +514,7 @@ public class DntAlephImporter {
      * @throws XMLStreamException
      * @throws IOException
      */
-    private String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
+    String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
         String resumptionToken = null;
         while (reader.hasNext()) {
             int eventType = reader.next();
@@ -503,7 +537,8 @@ public class DntAlephImporter {
         //throw new XMLStreamException("Premature end of file");
     }
 
-    private void readMarcRecords(XMLStreamReader reader) throws XMLStreamException, IOException {
+    // TODO: JUNIt test
+    void readMarcRecords(XMLStreamReader reader) throws XMLStreamException, IOException {
         MarcRecord mr = new MarcRecord();
         while (reader.hasNext()) {
             int eventType = reader.next();
@@ -520,7 +555,6 @@ public class DntAlephImporter {
                     } else if (elementName.equals("metadata")) {
                         readRecordMetadata(reader, mr);
                         if (!mr.isDeleted) {
-
                             recs.add(mr);
                         } else {
                             LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);

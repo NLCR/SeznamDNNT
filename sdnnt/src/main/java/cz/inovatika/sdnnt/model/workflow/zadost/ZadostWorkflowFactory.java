@@ -14,7 +14,7 @@ public class ZadostWorkflowFactory {
      * @return
      */
     public static Workflow create(Zadost zadost) {
-        Options instance = Options.getInstance();
+        //Options instance = Options.getInstance();
 
         String navrh = zadost.getNavrh();
         if (navrh != null && ZadostTypNavrh.find(navrh) != null) {

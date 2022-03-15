@@ -285,7 +285,7 @@ public class Zadost implements NotNullAwareObject {
             SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
                     .setFields("identifier")
                     .setRows(10000);
-            SolrDocumentList docs = solr.query("catalog", query).getResults();
+            SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
             for (SolrDocument doc : docs) {
                 zadost.identifiers.add((String) doc.getFirstValue("identifier"));
             }
@@ -335,9 +335,8 @@ public class Zadost implements NotNullAwareObject {
             zprocess.setTransitionName(transition);
             zadost.addProcess(identifier, zprocess);
 
-            String newProcess = new JSONObject().put("process", zadost.process).toString();
             // history must be updated after success
-            new HistoryImpl(client).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId(), false);
+            new HistoryImpl(client).log(zadost.id, js, zadost.toJSON().toString(), username, "zadost", transition, false);
             return save(client, zadost);
         } catch (JSONException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
@@ -362,8 +361,7 @@ public class Zadost implements NotNullAwareObject {
             //zadost.process.put(identifier, zprocess);
             zadost.addProcess(identifier, zprocess);
 
-            String newProcess = new JSONObject().put("process", zadost.process).toString();
-            new HistoryImpl(solr).log(zadost.id, oldProcess, newProcess, username, "zadost", zadost.getId());
+            new HistoryImpl(solr).log(zadost.id, js, zadost.toJSON().toString(), username, "zadost", transition);
             return save(solr, zadost);
         } catch (JSONException ex) {
             LOGGER.log(Level.SEVERE, null, ex);

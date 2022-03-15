@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -138,6 +139,19 @@ public class MarcModelTests {
         JSONObject object =  marcRecord.toJSON();
         Assert.assertNotNull(MarcRecord.fromRAWJSON(object.toString()));
     }
+
+
+    @Test
+    public void testRecordFields() throws JsonProcessingException {
+        MarcRecord marcRecord = new MarcRecord();
+        marcRecord.identifier = "oai:aleph-nkp.cz:DNT01-000157317";
+        marcRecord.historie_stavu = new JSONArray();
+        marcRecord.recordsFlags = new MarcRecordFlags(true);
+
+        SolrInputDocument solrInputFields = marcRecord.toSolrDoc();
+        Assert.assertTrue(solrInputFields.containsKey(FLAG_PUBLIC_IN_DL));
+    }
+
 
     public static SolrDocumentList prepareResultList(String ident) throws IOException {
         SolrDocumentList documentList = new SolrDocumentList();

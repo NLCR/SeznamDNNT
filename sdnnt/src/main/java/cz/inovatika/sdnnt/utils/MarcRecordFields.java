@@ -10,6 +10,7 @@ public class MarcRecordFields {
     public static final String KURATORSTAV_FIELD = "kuratorstav";
     public static final String DATUM_KURATOR_STAV_FIELD = "datum_kurator_stav";
     public static final String HISTORIE_KURATORSTAVU_FIELD = "historie_kurator_stavu";
+    public static final String HISTORIE_GRANULOVANEHOSTAVU_FIELD = "historie_granulovaneho_stavu";
 
     public static final String LICENSE_FIELD = "license";
     public static final String LICENSE_HISTORY_FIELD = "license_history";
@@ -24,6 +25,9 @@ public class MarcRecordFields {
     public static final String TYPE_OF_RESOURCE_FIELD = "type_of_resource";
     public static final String ITEM_TYPE_FIELD = "item_type";
 
+    
+    // context information
+    public static final String CTX_FIELD = "ctx";
 
     public static final String LEGACY_STAV_FIELD = "dntstav";
 
@@ -63,6 +67,19 @@ public class MarcRecordFields {
 
     //rocniky
     public static final String MARC_2643 = "marc_2643";
+
+    // priznaky; verejne v dk
+    public static final String FLAG_PUBLIC_IN_DL= "flag_public_in_dl";
+
+
+    public static final String YEAR_OF_PUBLICATION="rokvydani";
+    public static final String YEAR_OF_PUBLICATION_1="date1_int";
+    public static final String YEAR_OF_PUBLICATION_2="date2_int";
+
+    // CCNB pole
+    public static final String ID_CCNB_FIELD = "id_ccnb";
+
+    public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
 
     private MarcRecordFields() {}
 }

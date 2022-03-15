@@ -7,6 +7,7 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 
 import java.io.IOException;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 /**
  * @author alberto
  */
+// TODO: Rewrite
 public class CatalogSearcher {
 
     public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
@@ -46,7 +48,7 @@ public class CatalogSearcher {
         try {
             SolrClient solr = Indexer.getClient();
             SolrQuery query = new SolrQuery("frbr:\"" + id + "\"")
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             // 50 is a maximum
             query.setRows(50);
@@ -54,7 +56,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
 
         } catch (SolrServerException | IOException ex) {
@@ -74,13 +76,14 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
             if (ret.getJSONObject("response").getInt("numFound") > 0) {
 
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
-                JSONArray zadosti = findZadosti(user, ids, "NOT state:processed");
+                JSONArray zadosti = user != null ? findZadosti(user, ids, "NOT state:processed") : new JSONArray();
                 ret.put("zadosti", zadosti);
+
                 if (user != null) {
                     JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
                     ret.put("notifications", notifications);
@@ -151,13 +154,13 @@ public class CatalogSearcher {
                     .setRows(1)
                     .setStart(0)
                     .setSort("identifier", SolrQuery.ORDER.asc)
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
             if (ret.getJSONObject("response").getInt("numFound") > 0) {
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
@@ -233,7 +236,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             ret = new JSONObject((String) qresp.get("response"));
 
         } catch (SolrServerException | IOException ex) {
@@ -304,7 +307,7 @@ public class CatalogSearcher {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             JSONArray jsonArray = (new JSONObject((String) qresp.get("response"))).getJSONObject("response").getJSONArray("docs");
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject doc = jsonArray.getJSONObject(i);
@@ -353,7 +356,7 @@ public class CatalogSearcher {
                 .setParam("stats", true)
                 .setParam("stats.field", "rokvydani")
                 .setParam("q.op", "AND")
-                .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
 
         query.set("defType", "edismax");
@@ -423,7 +426,7 @@ public class CatalogSearcher {
         String se = "(fmt:SE AND " + seDate + ")";
 
         // https://github.com/NLCR/SeznamDNNT/issues/164
-        query.addFilterQuery("place_of_pub:\"xr \"");
+        query.addFilterQuery("(place_of_pub:\"xr \" OR dntstav:*)");
 
         query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
 

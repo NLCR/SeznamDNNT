@@ -1,6 +1,33 @@
 // --- CONSENT ---
 
-app-consent {
+html {
+  &.force--consent {
+    &.show--consent {
+      height: 100% !important;
+
+      body {
+        height: 100% !important;
+
+        .cc_div {
+          .bar {
+            #s-inr {
+              max-width: 35em;
+
+              #s-bns {
+                #s-sv-bn {
+                  float: none;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/* app-consent {
   @extend .app-w-100;
   display: block;
   position: fixed;
@@ -50,4 +77,4 @@ app-consent {
               transform: translateY(0);
     }
   }
-}
+} */

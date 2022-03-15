@@ -10,23 +10,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
+import cz.inovatika.sdnnt.index.utils.GranularityUtils;
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
-import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.*;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -117,12 +118,16 @@ public class Indexer {
                     user, update, ret);
             
             // Nechame puvodni hodnoty "DNT" poli
-            cDoc.setField("dntstav", doc.getFieldValue("dntstav"));
-            cDoc.setField("datum_stavu", doc.getFieldValue("datum_stavu"));
-            cDoc.setField("historie_stavu", doc.getFieldValue("historie_stavu"));
-            cDoc.setField("license", doc.getFieldValue("license"));
-            cDoc.setField("license_history", doc.getFieldValue("license_history"));
-            cDoc.setField("granularity", doc.getFieldValue("granularity"));
+            cDoc.setField(MarcRecordFields.DNTSTAV_FIELD, doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD));
+            cDoc.setField(MarcRecordFields.KURATORSTAV_FIELD, doc.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD));
+            cDoc.setField(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD));
+            cDoc.setField(MarcRecordFields.DATUM_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_STAVU_FIELD));
+            cDoc.setField(MarcRecordFields.DATUM_KURATOR_STAV_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_KURATOR_STAV_FIELD));
+            cDoc.setField(MarcRecordFields.HISTORIE_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
+
+            cDoc.setField(MarcRecordFields.LICENSE_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_FIELD));
+            cDoc.setField(MarcRecordFields.LICENSE_HISTORY_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_HISTORY_FIELD));
+            cDoc.setField(MarcRecordFields.GRANULARITY_FIELD, doc.getFieldValue(MarcRecordFields.GRANULARITY_FIELD));
             
             if (cDoc != null) {
               hDocs.add(hDoc);
@@ -149,7 +154,7 @@ public class Indexer {
 
   // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
   // keepDNTFields = false => zmena pouze DNT (990, 992) poli
-  private static SolrInputDocument mergeWithHistory(String jsTarget,
+  static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
           String user, boolean keepDNTFields, JSONObject ret) {
 
@@ -383,30 +388,55 @@ public class Indexer {
   }
 
 
-
-  //
-  public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user ) throws IOException, SolrServerException {
+  public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);
+      JSONObject before = mr.toJSON();
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
       PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
-      if ( pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
-        mr.license  = licence;
+      if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+        mr.license = licence;
       } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
         mr.license = License.dnntt.name();
       }
 
-      mr.setKuratorStav(kstav.name(),pstav.name(), licence , user, poznamka);
+      mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularity);
 
-      if (!granularity.isEmpty()) {  mr.setGranularity(granularity, poznamka, user); }
-      getClient().add("catalog", mr.toSolrDoc());
+      if (!granularity.isEmpty()) {
+        JSONArray granularityFromIndex = mr.granularity;
+        int commonIndex = Math.min(granularityFromIndex.length(), granularity.length());
+        for (int i = 0; i < commonIndex; i++) {
+          JSONObject fromParam = granularity.getJSONObject(i);
+          JSONObject fromIndex = granularityFromIndex.getJSONObject(i);
+          if (!GranularityUtils.eqGranularityObject(fromParam, fromIndex)) {
+            String formatted = MarcRecord.FORMAT.format(new Date());
+            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(fromParam, user, poznamka, formatted));
+          }
+        }
+        // pridano
+        if (granularity.length() > commonIndex) {
+          for (int i = commonIndex; i < granularity.length(); i++) {
+            String formatted = MarcRecord.FORMAT.format(new Date());
+            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(granularity.getJSONObject(i), user, poznamka, formatted));
+          }
+        }
+
+        mr.setGranularity(granularity, poznamka, user);
+      }
+      solrClient.add("catalog", mr.toSolrDoc());
+      new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user, DataCollections.catalog.name(), null);
     } finally {
-      SolrJUtilities.quietCommit(getClient(),"catalog" );
+      SolrJUtilities.quietCommit(solrClient, "catalog");
     }
     return ret;
+  }
+
+  // TODO: Move to service
+  public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
+    return changeStavDirect(getClient(), identifier, newStav, licence, poznamka, granularity, user);
   }
 
   //

@@ -24,11 +24,9 @@
             <td *ngIf="data.isNavrh"><input [disabled]="isWhole" type="checkbox" (change)="setSelection(item)" [(ngModel)]="item.selected"  /></td>
             <td>{{ item.rocnik }}</td>
             <td>{{ item.cislo }}</td>
-            <td>{{ item.link }}</td>
+            <td> <a  [href]="item.link" target="_blank" >{{item.link }}</a>   </td>
             <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
-            <td *ngIf="item.stav.includes('NZ')">dnntt</td>
-            <td *ngIf="item.stav.includes('A') && !item.stav.includes('NZ')">dnnto</td>
-            <td *ngIf="!item.stav.includes('A') && !item.stav.includes('NZ')">---</td>  
+            <td>{{item.license}}</td>
           </tr>
         </ng-container>
       </tbody>
@@ -36,6 +34,5 @@
   </div>
 </div>
 <div mat-dialog-actions>
-  <button mat-flat-button color="primary" (click)="change()" cdkFocusInitial>{{ 'desc.zmenit_stav' | translate }}</button>
-  <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
+  <button mat-flat-button mat-dialog-close color="primary" cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
 </div>

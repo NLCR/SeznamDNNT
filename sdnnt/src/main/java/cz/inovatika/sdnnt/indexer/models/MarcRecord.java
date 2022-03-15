@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 
 import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -54,20 +56,24 @@ public class MarcRecord {
 
   @JsonIgnore
   public JSONArray historie_stavu = new JSONArray();
+  @JsonIgnore
+  public JSONArray historie_kurator_stavu = new JSONArray();
+  @JsonIgnore
+  public JSONArray historie_granulovaneho_stavu = new JSONArray();
 
   // kuratorsky stav
   public List<String> kuratorstav = new ArrayList<>();
   public Date datum_krator_stavu;
 
-  @JsonIgnore
-  public JSONArray historie_kurator_stavu = new JSONArray();
 
+  // licence
   public String license;
+  // historie licenci
   public List<String> licenseHistory;
 
+  @JsonIgnore
+  public MarcRecordFlags recordsFlags;
 
-  // for standaalone
-  //public Date workflowDeadline;
 
   @JsonIgnore
   public JSONArray granularity; 
@@ -125,6 +131,7 @@ public class MarcRecord {
                     KURATORSTAV_FIELD+" "+
                     HISTORIE_STAVU_FIELD+" " +
                     HISTORIE_KURATORSTAVU_FIELD+" " +
+                    HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
                     LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+ GRANULARITY_FIELD+":[json]");
@@ -134,7 +141,7 @@ public class MarcRecord {
   // testable method
   static MarcRecord fromIndex( SolrClient client, SolrQuery q) throws SolrServerException, IOException {
 
-    SolrDocumentList dlist = client.query("catalog", q).getResults();
+    SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();
     if (dlist.getNumFound() > 0) {
       SolrDocument doc = dlist.get(0);;
       //.get(0);
@@ -173,11 +180,15 @@ public class MarcRecord {
         mr.historie_stavu = new JSONArray();
       }
 
+      if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
+        mr.historie_granulovaneho_stavu =  new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
+      }
+
       if (doc.containsKey(LICENSE_FIELD)) {
         mr.license = (String) doc.getFirstValue(LICENSE_FIELD);
       }
-      mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
+      mr.licenseHistory = doc.getFieldValues(LICENSE_HISTORY_FIELD) != null ? doc.getFieldValues(LICENSE_HISTORY_FIELD).stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
 
       if (doc.containsKey(GRANULARITY_FIELD)) {
         JSONArray ja = new JSONArray( doc.getFieldValue(GRANULARITY_FIELD).toString());
@@ -185,10 +196,20 @@ public class MarcRecord {
       } else {
         // mr.granularity = new JSONArray();
       }
+
+      if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
+        JSONArray jsonArray = new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
+        mr.historie_granulovaneho_stavu = jsonArray;
+      }
+
+      // flags
+      mr.recordsFlags = MarcRecordFlags.fromSolrDoc(doc);
+
       return mr;
     } else return null;
   }
 
+  // raw field json
   public JSONObject toJSON() {
     JSONObject json = new JSONObject();
     json.put(IDENTIFIER_FIELD, identifier);
@@ -199,7 +220,8 @@ public class MarcRecord {
     json.put(DNTSTAV_FIELD, dntstav);
     json.put(KURATORSTAV_FIELD, kuratorstav);
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
-
+    json.put(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu);
+    json.put(GRANULARITY_FIELD, granularity);
 
     json.put("controlFields", controlFields);
 
@@ -292,6 +314,7 @@ public class MarcRecord {
 
     sdoc.setField(HISTORIE_STAVU_FIELD, historie_stavu.toString());
     sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, historie_kurator_stavu.toString());
+    sdoc.setField(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu.toString());
 
     sdoc.setField(LICENSE_FIELD, license);
     sdoc.setField(LICENSE_HISTORY_FIELD, licenseHistory);
@@ -299,30 +322,35 @@ public class MarcRecord {
     sdoc.setField(DATUM_STAVU_FIELD, datum_stavu);
     sdoc.setField(DATUM_KURATOR_STAV_FIELD, datum_krator_stavu);
 
-    if (granularity != null ) {
+
+    if (granularity != null) {
       if (sdoc.containsKey(GRANULARITY_FIELD)) {
         sdoc.removeField(GRANULARITY_FIELD);
       }
-      for (int i = 0; i<granularity.length(); i++)  sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
+      for (int i = 0; i < granularity.length(); i++)
+        sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
     }
-    
+
     // Control fields
     for (String cf : controlFields.keySet()) {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
     }
 
-    sdoc.setField(RECORD_STATUS_FIELD, leader.substring(5, 6));
-    sdoc.setField(TYPE_OF_RESOURCE_FIELD, leader.substring(6, 7));
-    sdoc.setField(ITEM_TYPE_FIELD, leader.substring(7, 8));
+    if (leader != null) {
+      sdoc.setField(RECORD_STATUS_FIELD, leader.substring(5, 6));
+      sdoc.setField(TYPE_OF_RESOURCE_FIELD, leader.substring(6, 7));
+      sdoc.setField(ITEM_TYPE_FIELD, leader.substring(7, 8));
 
-    MarcRecordUtilsToRefactor.setFMT(sdoc, leader.substring(6, 7), leader.substring(7, 8));
+      MarcRecordUtilsToRefactor.setFMT(sdoc, leader.substring(6, 7), leader.substring(7, 8));
+    }
+
 
     if (dntstav != null && !dntstav.isEmpty()) {
       sdoc.setField(DNTSTAV_FIELD, dntstav);
     } else {
       if (!sdoc.containsKey(DNTSTAV_FIELD)) {
-          MarcRecordUtilsToRefactor.addStavFromMarc(sdoc, dataFields);
-          this.dntstav = sdoc.getFieldValues(DNTSTAV_FIELD) != null  ?  new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD)) : null;
+        MarcRecordUtilsToRefactor.addStavFromMarc(sdoc, dataFields);
+        this.dntstav = sdoc.getFieldValues(DNTSTAV_FIELD) != null ? new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD)) : null;
       }
     }
 
@@ -345,10 +373,10 @@ public class MarcRecord {
 
     if (sdoc.containsKey(MARC_910_A)) {
       List<String> collected = sdoc.getFieldValues(MARC_910_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
-      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+      collected.forEach(it -> sdoc.addField(SIGLA_FIELD, it));
     } else if (sdoc.containsKey(MARC_040_A)) {
       List<String> collected = sdoc.getFieldValues(MARC_040_A).stream().map(Object::toString).map(String::trim).collect(Collectors.toList());
-      collected.forEach(it-> sdoc.addField(SIGLA_FIELD, it));
+      collected.forEach(it -> sdoc.addField(SIGLA_FIELD, it));
     }
 
     // https://www.loc.gov/marc/bibliographic/bd008a.html
@@ -397,6 +425,9 @@ public class MarcRecord {
     sdoc.setField("nazev", nazev.trim());
     MarcRecordUtilsToRefactor.addRokVydani(sdoc);
 
+    // store flags
+    if (this.recordsFlags != null) this.recordsFlags.enhanceDoc(sdoc);
+
     return sdoc;
   }
 
@@ -413,26 +444,10 @@ public class MarcRecord {
     } else return null;
   }
 
-  //  // pouze pro reducki viditelnosti
-//  public void enhanceState(List<String> newStates, String user) {
-//    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
-//    statesArray.addAll(newStates);
-//    changedState( user, statesArray, null, newStates.toArray(new String[newStates.size()]));
-//    // sync solr doc
-//    toSolrDoc();
-//  }
-//
-//  public void enhanceState(String newState, String user) {
-//    List<String> statesArray = this.dntstav != null ? new ArrayList<>(this.dntstav) : new ArrayList<>();
-//    statesArray.add(newState);
-//    changedState( user, statesArray,null,newState);
-//    // sync solr doc
-//    toSolrDoc();
-//  }
 
-  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka) {
+  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka, JSONArray granularity) {
     CuratorItemState curatorItemState = CuratorItemState.valueOf(kstav);
-    changedState( user, pstav, curatorItemState.name(), license, poznamka);
+    changedState( user, pstav, curatorItemState.name(), license, poznamka, granularity);
     toSolrDoc();
   }
 
@@ -450,7 +465,7 @@ public class MarcRecord {
   }
 
 
-  private void changedState( String user, String publicState, String kuratorState, String license, String comment) {
+  private void changedState( String user, String publicState, String kuratorState, String license, String comment, JSONArray granularity) {
     toSolrDoc();
     Date now = Calendar.getInstance().getTime();
     if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty())) {

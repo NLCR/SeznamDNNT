@@ -19,7 +19,7 @@ package cz.inovatika.sdnnt.model;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 
 /**
- * Represents currator states enhanced public item states
+ * Represents curator states enhanced public item states
  */
 public enum CuratorItemState {
 
@@ -78,7 +78,11 @@ public enum CuratorItemState {
     PX {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
-            return owner.getPublicState();
+            if (owner != null) {
+                return owner.getPublicState();
+            } else {
+                return null;
+            }
         }
     },
     X {
@@ -89,5 +93,10 @@ public enum CuratorItemState {
     };
 
 
+    /**
+     * Curator and public state association
+     * @param owner Given owner
+     * @return Appropriate public state
+     */
     public abstract PublicItemState getPublicItemState(WorkflowOwner owner);
 }

@@ -12,6 +12,7 @@ export interface Configuration {
   homeCards: string[];
   simplelogin:boolean;
   maximumItemInRequest: number;
+  dntSetAlpehLinks: boolean;
 
   // Seznam roli
   role: string[];

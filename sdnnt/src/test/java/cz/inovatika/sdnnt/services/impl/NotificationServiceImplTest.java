@@ -50,7 +50,7 @@ public class NotificationServiceImplTest {
     public void testNotificationDen() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 

@@ -9,7 +9,7 @@ import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
 /**
- * Z nezarazenych
+ * PXN Workflow
  */
 public class PXWorkflow extends Workflow {
 

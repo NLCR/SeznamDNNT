@@ -155,7 +155,7 @@
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div class="app-right">
-          <app-paginator [numFound]="numFound"  [showSort]="true" [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
+          <app-paginator  [storeStateKey]="'account'"  [numFound]="numFound"  [showSort]="true"  [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
         </div>
       </div>
 
@@ -304,7 +304,7 @@
         </table>
       </div>
       <div class="app-mt-4">
-        <app-paginator [numFound]="numFound" [showSort]="false" ></app-paginator>
+        <app-paginator [storeStateKey]="'account'" [numFound]="numFound" [showSort]="false" ></app-paginator>
       </div>
     </div>
   </div>

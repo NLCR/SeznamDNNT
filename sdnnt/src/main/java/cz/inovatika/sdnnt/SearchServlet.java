@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
@@ -150,7 +151,7 @@ public class SearchServlet extends HttpServlet {
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");
           qreq.setResponseParser(rParser);
-          NamedList<Object> qresp = solr.request(qreq, "catalog"); 
+          NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
           return new JSONObject((String) qresp.get("response"));
         } catch (SolrServerException | IOException ex) {
           LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

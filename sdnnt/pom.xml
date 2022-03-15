@@ -4,7 +4,7 @@
 
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3</version>
   <packaging>war</packaging>
 
   <name>sdnnt</name>
@@ -26,6 +26,14 @@
   </properties>
     
   <dependencies>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.apache.solr</groupId>

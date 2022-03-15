@@ -65,7 +65,12 @@ properties:
   license:
     type: array
     items:
-      type: string
+      type: object
+      properties:
+        name:
+          type: string
+        territoriality:
+          type: string
   frbr:
     type: string
   fmt:
@@ -80,7 +85,14 @@ properties:
           items:
             type: string
         license:
-          type: string
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              territoriality:
+                type: string
         link:
           type: string
         number:

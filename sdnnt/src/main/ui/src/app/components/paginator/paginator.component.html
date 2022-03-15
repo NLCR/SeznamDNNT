@@ -1,8 +1,8 @@
 <div fxLayout="row wrap" fxLayoutAlign="start baseline">
   <mat-paginator fxFlex class="app-clean-bg"
     [length]="numFound"
-    [pageSize]="state.rows"
-    [pageIndex]="state.page"
+    [pageSize]="rows"
+    [pageIndex]="page"
     [pageSizeOptions]="[5, 10, 25, 50, 100]"
     (page)="pageChanged($event)"
     class="app-clean-bg">

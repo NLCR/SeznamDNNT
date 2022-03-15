@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.Zadost;
@@ -9,6 +10,7 @@ import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -51,7 +53,7 @@ public class AccountServiceWorkflowImplTest {
     @Test
     public void testNZNWorkflow() throws AccountException, IOException, ConflictException, SolrServerException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
-            LOGGER.warning("TestSaveZadost is skipping");
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
 
@@ -63,7 +65,7 @@ public class AccountServiceWorkflowImplTest {
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
-                .withConstructor(controler,appLogin, bservice)
+                .withConstructor(appLogin, bservice)
                 .addMockedMethod("buildClient").createMock();
 
         EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
@@ -97,8 +99,11 @@ public class AccountServiceWorkflowImplTest {
         Assert.assertTrue(fromIndex2.getDesiredItemState().equals("NPA"));
 
         // schvaleni kuratorem
-        service.curatorSwitchState(fromIndex.toJSON(), "oai:aleph-nkp.cz:DNT01-000157742", "Reason 1");
-        service.curatorSwitchState(fromIndex.toJSON(), "oai:aleph-nkp.cz:DNT01-000157765", "Reason 2 " );
+        service.curatorSwitchState(service.getRequest("01234"), "oai:aleph-nkp.cz:DNT01-000157742", "Reason 1");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
+
+        service.curatorSwitchState(service.getRequest("01234"), "oai:aleph-nkp.cz:DNT01-000157765", "Reason 2 " );
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
 
         // Posunuti zaznamu z duvodu spusteni scheduleru
         try (SolrClient client = SolrTestServer.getClient()) {
@@ -123,6 +128,7 @@ public class AccountServiceWorkflowImplTest {
 
         // NPA -> PA
         service.schedulerSwitchStates("01234");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
 
         try (SolrClient client = SolrTestServer.getClient()) {
 
@@ -144,6 +150,8 @@ public class AccountServiceWorkflowImplTest {
 
         // PA -> A
         service.schedulerSwitchStates("01234");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
+
         try (SolrClient client = SolrTestServer.getClient()) {
 
             MarcRecord oneRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157742");

@@ -1,9 +1,8 @@
 <app-facets-used></app-facets-used>
 
 <mat-accordion multi>
-  
-  <ng-container *ngFor="let facet of facets">
-    <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="true">
+    <ng-container *ngFor="let facet of facets">
+    <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="getPanelExpansion()">
       <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
         <mat-panel-title>
           {{ 'field.' + facet | translate }}
@@ -43,7 +42,7 @@
     </mat-expansion-panel>
   </ng-container>
 
-  <mat-expansion-panel *ngIf="showRoky" [expanded]="true">
+  <mat-expansion-panel *ngIf="showRoky" [expanded]="getPanelExpansion()">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>
         {{ 'field.rokvydani' | translate }}

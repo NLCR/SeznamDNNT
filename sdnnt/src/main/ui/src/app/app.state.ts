@@ -4,6 +4,7 @@ import { Configuration, Sort } from './shared/configuration';
 import { User } from './shared/user';
 import { Filter } from './shared/filter';
 import { Zadost } from './shared/zadost';
+import { NavigationStore } from './shared/navigationstore';
 
 export class AppState {
 
@@ -28,12 +29,17 @@ export class AppState {
   public q: string;
   public page: number = 0;
   public rows: number = 20;
+
+ 
   
-  public rokvydani:string;
-  // sort for results
-  //public sort: Sort;
-  
+  public navigationstore: NavigationStore = new NavigationStore();
+
   public sort: {[key: string]: Sort} = {};
+
+
+  // vyhodit ?? 
+  public rokvydani:string;
+  
 
 
   // Seznam stavu zaznamu pro uzivatel
@@ -67,9 +73,25 @@ export class AppState {
     this.currentLang = cfg.lang;
   }
 
-  processParams(searchParams: ParamMap) {
-    this.rows = this.config.rows;
-    this.page = 0;
+  processParams(searchParams: ParamMap, url: string) {
+
+    let navigationKey = this.navigationstore.findKey(url);
+
+    //url.indexOf("imports")
+
+    //default
+   // posledni stav z minuleho prochazeni
+
+    // if (this.navigateUIKey) {
+    //   let cfg = this.navigationUIStore.get(this.navigateUIKey);
+    //   this.rows = cfg.rows ? cfg.rows : this.config.rows;
+    //   this.page =  cfg.page ? cfg.page :  0;
+    // } else {
+    //   this.rows = this.config.rows;
+    //   this.page = 0;
+    // }
+
+
     this.usedFilters = [];
     //this.sort = this.config.sorts[0];
     // this.sort = {};
@@ -93,8 +115,14 @@ export class AppState {
         this.q = param;
       } else if (p === 'rows') {
         this.rows = parseInt(param);
+        if (navigationKey) {
+          this.navigationstore.setRows(navigationKey, this.rows);
+        }
       } else if (p === 'page') {
         this.page = parseInt(param);
+        if (navigationKey) {
+          this.navigationstore.setPage(navigationKey, this.page);
+        }
       } else if (p === 'fullCatalog') {
         this.fullCatalog = param === 'true';
       } else if (p === 'withNotification') {
@@ -116,6 +144,11 @@ export class AppState {
       }
     });
     this._paramsProcessed.next();
+  }
+
+
+  setNavigationStateUI() {
+
   }
 
   setLogged(res: any) {

@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
@@ -54,16 +55,9 @@ public class AccountServiceImpl implements AccountService {
     private ResourceServiceService resourceServiceService;
 
     public AccountServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
-        //this.userControler = userControler;
         this.loginSupport = loginSupport;
         this.resourceServiceService = res;
     }
-
-//    public AccountServiceImpl(ResourceServiceService res) {
-//        this.resourceServiceService = res;
-//    }
-
-
 
     public AccountServiceImpl() {}
 
@@ -251,7 +245,7 @@ public class AccountServiceImpl implements AccountService {
                 SolrQuery query = new SolrQuery("frbr:\"" + frbr + "\"")
                         .setFields("identifier")
                         .setRows(10000);
-                SolrDocumentList docs = solr.query("catalog", query).getResults();
+                SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
                 for (SolrDocument doc : docs) {
                     zadost.addIdentifier((String) doc.getFirstValue("identifier"));
                 }
@@ -293,7 +287,9 @@ public class AccountServiceImpl implements AccountService {
             //
             // bud odmitnuto nebo a nebo neni workflow?? Je to vubec mozne
             if (!zadost.allRejected(transitionName)) {
-                return closeRequest(zadost, "processed");
+                JSONObject retval = closeRequest(zadost, "processed");
+                new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getKurator(), "zadost", null, false);
+                return retval;
             } else {
                 // no workflow
                 zadost.setState("processed");
@@ -302,6 +298,7 @@ public class AccountServiceImpl implements AccountService {
                 zadost.setDesiredItemState(null);
                 zadost.setDesiredLicense(null);
                 LOGGER.info(String.format("Closing zadost immediately %s", zadost.getDeadline() != null ? zadost.getDeadline().toString() : null));
+                new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getKurator(), "zadost", null, false);
                 return  VersionStringCast.cast(saveRequest(zadost, null));
             }
         } catch (Exception e) {
@@ -319,7 +316,9 @@ public class AccountServiceImpl implements AccountService {
         zadost.setTypeOfRequest(ZadostTyp.user.name());
         zadost.setUser(this.loginSupport.getUser().getUsername());
         zadost.setDatumZadani(new Date());
-        return closeRequest(zadost, "waiting");
+        JSONObject retval = closeRequest(zadost, "waiting");
+        new HistoryImpl(buildClient()).log(zadost.getId(), payload, zadost.toJSON().toString(), zadost.getUser(), "zadost", null, false);
+        return retval;
     }
 
     @Override
@@ -390,7 +389,7 @@ public class AccountServiceImpl implements AccountService {
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "catalog");
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
             JSONObject ret = new JSONObject((String) qresp.get("response"));
 
             List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
@@ -432,8 +431,7 @@ public class AccountServiceImpl implements AccountService {
                 WorkflowState workflowState = workflow.nextAlternativeState(alternative);
                 workflowState.switchState(zadost.getId(), this.loginSupport.getUser().getUsername(), reason);
 
-                solr.add("catalog", marcRecord.toSolrDoc());
-                //solr.commit("catalog");
+                solr.add(DataCollections.catalog.name(), marcRecord.toSolrDoc());
 
                 String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
                 return Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
@@ -463,7 +461,7 @@ public class AccountServiceImpl implements AccountService {
                     if (workflowState != null && workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
                         workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
-                        solr.add("catalog", marcRecord.toSolrDoc());
+                        solr.add(DataCollections.catalog.name(), marcRecord.toSolrDoc());
                         String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
 
                         zadostJSON = Zadost.approve(solr, marcRecord.identifier, zadostJSON.toString(),
@@ -524,7 +522,7 @@ public class AccountServiceImpl implements AccountService {
                         .setRows(MAXIMUM_ITEMS_IN_ZADOST)
                         .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:"+'"' + id+'"');
 
-                QueryResponse response =  solr.query("catalog", query);
+                QueryResponse response =  solr.query(DataCollections.catalog.name(), query);
                 SolrDocumentList results = response.getResults();
                 for (long i=0,ll=results.getNumFound();i<ll;i++) {
                     docsFromResult.add(results.get((int)i));
@@ -553,9 +551,9 @@ public class AccountServiceImpl implements AccountService {
                                     workflowState.switchState(id, zadost.getUser(), "");
                                     try {
                                         try (SolrClient docClient = buildClient()) {
-                                            new HistoryImpl(docClient).log(marcRecord.identifier, oldRaw, marcRecord.toJSON().toString(), zadost.getUser(), "catalog", zadost.getId());
-                                            docClient.add("catalog", marcRecord.toSolrDoc());
-                                            docClient.commit("catalog");
+                                            new HistoryImpl(docClient).log(marcRecord.identifier, oldRaw, marcRecord.toJSON().toString(), zadost.getUser(), DataCollections.catalog.name(), zadost.getId());
+                                            docClient.add(DataCollections.catalog.name(), marcRecord.toSolrDoc());
+                                            docClient.commit(DataCollections.catalog.name());
                                         }
                                     } catch (IOException | SolrServerException e) {
                                         LOGGER.log(Level.SEVERE, e.getMessage(),e);
@@ -600,6 +598,8 @@ public class AccountServiceImpl implements AccountService {
 
             try (SolrClient solr = buildClient()) {
                 Zadost.save(solr, zadost);
+                // history save
+                new HistoryImpl(buildClient()).log(zadost.getId(), request.toString(), zadost.toJSON().toString(), zadost.getUser(), "zadost", null, false);
             }
         }
     }

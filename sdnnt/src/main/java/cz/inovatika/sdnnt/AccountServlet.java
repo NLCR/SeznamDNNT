@@ -5,6 +5,7 @@ import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 
@@ -475,7 +476,7 @@ public class AccountServlet extends HttpServlet {
                                 failedIdentifiers.put(identifier, e);
                             }
                         }
-                        service.commit("catalog","zadost","history");
+                        service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(), DataCollections.history.name());
                         JSONObject payload = VersionStringCast.cast(service.getRequest(zadost.getId()));
                         if (!failedIdentifiers.isEmpty()) {
                             // TODO: Multiple exceptions
@@ -517,7 +518,7 @@ public class AccountServlet extends HttpServlet {
                         zadostJSON = service.curatorRejectSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
                     }
 
-                    service.commit("catalog","zadost","history");
+                    service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(),DataCollections.history.name());
                     return VersionStringCast.cast(service.getRequest(zadost.getId()));
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");

@@ -10,6 +10,7 @@ import { DialogBulkProposalComponent } from 'src/app/components/dialog-bulk-prop
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
+import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 
 @Component({
   selector: 'app-search',
@@ -56,6 +57,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   search(params: Params) {
+    let utils:SearchResultsUtils = new SearchResultsUtils();
+
     this.loading = true;
     // this.service.showLoading();
     const p = Object.assign({}, params);
@@ -67,16 +70,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.searchResponse = resp;
       this.docs = resp.response.docs;
       if (resp.zadosti) {
-        this.docs.forEach(doc => {
-          const identifier = doc.identifier;
-          resp.zadosti.forEach(z => {
-            if (z.state !== 'processed') {
-              if (z.identifiers.includes(identifier)) {
-                doc.zadost = z;
-              }
-            }  
-          });
-        });
+        utils.enhanceByRequest(this.docs, resp.zadosti);
       }
 
       // global actions
@@ -98,6 +92,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         }
       }
       if (resp.notifications) {
+        utils.enhanceByNotifications(this.docs, resp.notifications);
+        /*
         this.docs.forEach(doc => {
           const identifier = doc.identifier;
           resp.notifications.forEach(z => {
@@ -106,7 +102,9 @@ export class SearchComponent implements OnInit, OnDestroy {
             }
           });
         });
+        */
       }
+
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;

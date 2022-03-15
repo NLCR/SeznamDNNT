@@ -55,11 +55,7 @@
       "type": "workflow",
       "cron": "0 * * * * ?"
     },
-    "kramerius_check_1900": {
-      "type": "px_check",
-      "range":"[* TO 1900]",
-      "cron": "0 15 22 ? * 6L"
-    },
+    
     "notifikace_den": {
       "type": "notifications",
       "interval": "den",

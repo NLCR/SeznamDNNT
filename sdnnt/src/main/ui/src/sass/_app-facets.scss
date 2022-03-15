@@ -16,6 +16,10 @@ app-facets {
         &::first-letter {
           text-transform: capitalize;
         }
+
+        &:hover {
+          color: $app-gray-9;
+        }
       }
     }
   }

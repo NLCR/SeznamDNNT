@@ -1,23 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-    <!-- mock filter - mocking identity provider -->
-
-    <filter>
-        <filter-name>mockShib</filter-name>
-        <filter-class>cz.inovatika.sdnnt.services.impl.shib.mock.MockShibFilter</filter-class>
-    </filter>
-
-    <filter-mapping>
-        <filter-name>mockShib</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
 
     <filter>
         <filter-name>ShibbolethFilter</filter-name>
         <filter-class>cz.inovatika.sdnnt.services.impl.shib.ShibbolethFilter</filter-class>
     </filter>
+
     <filter-mapping>
         <filter-name>ShibbolethFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -115,6 +104,17 @@
         <url-pattern>/pswd/*</url-pattern>
         <url-pattern>/shibboleth-landing</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>consent_init</servlet-name>
+        <servlet-class>cz.inovatika.sdnnt.ConsentConfigurationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>consent_init</servlet-name>
+        <url-pattern>/cookieconsent/embedded_consent_init</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>ConfigServlet</servlet-name>
         <servlet-class>cz.inovatika.sdnnt.ConfigServlet</servlet-class>

@@ -99,17 +99,33 @@
    <!--  historie kurator stavu -->	
    <field name="historie_kurator_stavu" type="string" indexed="true" stored="true"  />
 
+   <!--  historie stavu rocniku -->	
+   <field name="historie_granulovaneho_stavu" type="string" indexed="true" stored="true"  />
 
+   <!-- License --> 
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
+   <!-- License history -->
    <field name="license_history" type="string" indexed="true" stored="true" multiValued="true" />
+
+
    <field name="granularity" type="string" indexed="true" stored="true" multiValued="true"  />
-   
+
    <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
-   
+	
+   	
    <dynamicField name="controlfield_*" type="string" indexed="true" stored="true" multiValued="true" />
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
-  
+ 	
    <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
+
+
+
+   <!-- sjednocovani dle ccnb -->
+   <!-- alternativni link -->
+   <field name="alternative_aleph_link" type="string" indexed="true" stored="true" multiValued="false" />
+   <!-- alternativni identifikator -->
+   <field name="alternative_identifier" type="string" indexed="true" stored="true" multiValued="false" />
+
 	
    <!-- identifikatory --> 
    <!-- vsechny identifikatory - raw -->
@@ -128,8 +144,13 @@
    <!-- ukladani licenci z granularity -->
    <field name="granularity_license_cut" type="cut-license" indexed="true" stored="false" multiValued="true" />
    
+   <!-- Pomocne pole pro reindexaci v pripade zmeny schematu -->
    <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
-   
+	
+   <!-- Priznaky -->
+
+   <!-- priznak; bylo ztotozneno z volnym dilem v krameriovi -->
+   <field name="flag_public_in_dl" type="boolean" indexed="true" stored="true" multiValued="false"  />
    
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
