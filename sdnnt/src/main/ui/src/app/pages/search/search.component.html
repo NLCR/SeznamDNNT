@@ -20,9 +20,22 @@
               <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox>
             </div>
             <div>
-              <button mat-stroked-button *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna') && hromadnaZadostEnabled()" (click)="openBulkProposal()">
+              <!-- <button mat-stroked-button *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna') && hromadnaZadostEnabled()" (click)="openBulkProposal()">
                 <mat-icon class="material-icons-outlined app-mr-1">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
+              </button> -->
+              <button mat-stroked-button *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna')" [matMenuTriggerFor]="menuMassAction">
+                <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.hromadne_akce' | translate }}
               </button>
+              <mat-menu #menuMassAction="matMenu">
+                <button mat-menu-item *ngIf="hromadnaZadostEnabled()" (click)="openBulkProposal()">
+                  <mat-icon class="material-icons-outlined">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
+                </button>
+                <span [matTooltip]="!hasStateFilter ? ('tooltip.hromadne_notifikace_disabled' | translate) : null">
+                  <button mat-menu-item (click)="openBulkNotifications()" [disabled]="!hasStateFilter">
+                    <mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.hromadne_notifikace' | translate }}
+                  </button>
+                </span>
+              </mat-menu>
             </div>
           </div>
         </mat-card>

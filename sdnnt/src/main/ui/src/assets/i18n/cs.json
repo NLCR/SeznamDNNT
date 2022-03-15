@@ -670,7 +670,9 @@
     "zaznam_ma_navrh": "Záznam má návrh",
     "prehled_zadosti": "Přehled žádostí",
     "skryt_zpracovane": "Skrýt zpracované",
+    "hromadne_akce": "Hromadné akce",
     "hromadny_navrh": "Hromadný návrh",
+    "hromadne_notifikace": "Hromadné notifikace",
     "oznacit_jako_zpracovane": "Označit jako zpracované",
     "zpracovani_zadosti": "Zpracování žádostí",
     "reset_hesla": "Reset hesla",
@@ -795,7 +797,21 @@
     "statistiky": "Statistiky",
     "zkopirovat_cely_text": "Zkopírovat celý text",
     "kramerius_badge": "Volné dílo v DK",
-    "kramerius_badge_tooltip": "Volné dílo v Digitální knihovně"
+    "kramerius_badge_tooltip": "Volné dílo v Digitální knihovně",
+    "provest_hromadnou_notifikaci": "Provést hromadnou notifikaci",
+    "nazev_notifikace": "Název notifikace",
+    "zadejte_nazev_notifikace": "Zadejte název notifikace",
+    "hledany_vyraz": "Hledaný výraz"
+  },
+
+  "tooltip": {
+    "hromadne_notifikace_disabled": "Nelze provést hromadné notifikace, protože není vybrán žadný filter!"
+  },
+
+  "msg": {
+    "error": {
+      "nazev_notifikace": "Musíte zadat hodnotu"
+    }
   },
 
   "acts": {

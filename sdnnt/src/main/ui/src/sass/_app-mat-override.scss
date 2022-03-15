@@ -256,6 +256,10 @@
       }
     }
   }
+
+  &.mat-form-field-invalid {
+    @extend .app-mb-2;
+  }
 }
 
 // mat icon
@@ -271,6 +275,19 @@
 
     &:hover {
       color: $app-color-primary;
+    }
+  }
+}
+
+// mat menu
+.mat-menu-panel {
+  .mat-menu-content {
+    .mat-menu-item {
+      &[disabled] {
+        .mat-icon {
+          @include setIcon($color: $app-gray-4);
+        }
+      }
     }
   }
 }

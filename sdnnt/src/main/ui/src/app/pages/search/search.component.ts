@@ -11,6 +11,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
+import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk-notifications/dialog-bulk-notifications.component';
 
 @Component({
   selector: 'app-search',
@@ -154,6 +155,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
     });
 
+  }
+
+  openBulkNotifications() {
+    const dialogRef = this.dialog.open(DialogBulkNotificationsComponent, {
+      width: '600px',
+      panelClass: 'app-dialog-bulk-notifications'
+    });
   }
 
 }

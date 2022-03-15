@@ -69,6 +69,7 @@ import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/compone
 // Import the Canvas renderer, note that introducing the CanvasRenderer or SVGRenderer is a required step
 import { CanvasRenderer } from 'echarts/renderers';
 import 'echarts/theme/macarons.js';
+import { DialogBulkNotificationsComponent } from './components/dialog-bulk-notifications/dialog-bulk-notifications.component';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
 
@@ -139,6 +140,7 @@ const providers: any[] =[
     ShibbolethLandingPageComponent,
     DialogBulkProposalComponent,
     GraphsComponent,
+    DialogBulkNotificationsComponent,
   ],
   imports: [
     BrowserModule,

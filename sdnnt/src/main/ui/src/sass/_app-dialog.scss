@@ -57,6 +57,21 @@
   }
 }
 
+// bulk notifications dialog
+.app-dialog-bulk-notifications {
+  .mat-dialog-content {
+    ul {
+      li {
+        font-size: 14px;
+
+        span {
+          color: $app-gray-6;
+        }
+      }
+    }
+  }
+}
+
 // mat dialog scrollbar fix -> https://github.com/angular/components/issues/8798
 .mat-dialog-content--scrollbar-fix {
   &:after {

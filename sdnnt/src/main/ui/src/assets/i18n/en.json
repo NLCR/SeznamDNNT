@@ -670,7 +670,9 @@
     "zaznam_ma_navrh": "The record has a proposal",
     "prehled_zadosti": "Overview of requirement",
     "skryt_zpracovane": "Hide processed",
+    "hromadne_akce": "Bulk action",
     "hromadny_navrh": "Bulk proposal",
+    "hromadne_notifikace": "Bulk notifications",
     "oznacit_jako_zpracovane": "Mark as processed",
     "zpracovani_zadosti": "Processing of applications",
     "reset_hesla": "Password reset",
@@ -795,7 +797,21 @@
     "statistiky": "Statistics",
     "zkopirovat_cely_text": "Copy whole text",
     "kramerius_badge": "Free work in the DL",
-    "kramerius_badge_tooltip": "Free work in the Digital Library"
+    "kramerius_badge_tooltip": "Free work in the Digital Library",
+    "provest_hromadnou_notifikaci": "Make a bulk notification",
+    "nazev_notifikace": "Notification name",
+    "zadejte_nazev_notifikace": "Enter a name for the notification",
+    "hledany_vyraz": "Search term"
+  },
+
+  "tooltip": {
+    "hromadne_notifikace_disabled": "Bulk notifications cannot be performed because no filter is selected!"
+  },
+
+  "msg": {
+    "error": {
+      "nazev_notifikace": "You must enter a value"
+    }
   },
 
   "acts": {
