@@ -138,13 +138,10 @@ public class OAIRequest {
 
       if (req.getParameter("resumptionToken") != null) {
         String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
-
-        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, rt);
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss[.SSS]");
-//
-//        LocalDateTime d = LocalDateTime.parse(rt, formatter);
-//        ZonedDateTime zonedDateTime = ZonedDateTime.of(d, ZoneId.systemDefault());
-//        query.addFilterQuery(SORT_FIELD + ":{" + zonedDateTime.format(DateTimeFormatter.ISO_INSTANT) + " TO *]");
+        String[] parts = rt.split(":");
+        set = parts[1];
+        query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
+        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, parts[0]);
       } else {
         query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       }
@@ -181,7 +178,7 @@ public class OAIRequest {
 
           ret.append("<resumptionToken completeListSize=\"" + docs.getNumFound() + "\">")
                   //.append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
-                  .append(nextCursorMark)
+                  .append(nextCursorMark).append(":").append(set).append(":").append("marc21")
                   .append("</resumptionToken>");
         }
         ret.append("</" + verb + ">");
