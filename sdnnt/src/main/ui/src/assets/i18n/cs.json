@@ -801,7 +801,10 @@
     "provest_hromadnou_notifikaci": "Provést hromadnou notifikaci",
     "nazev_notifikace": "Název notifikace",
     "zadejte_nazev_notifikace": "Zadejte název notifikace",
-    "hledany_vyraz": "Hledaný výraz"
+    "hledany_vyraz": "Hledaný výraz",
+    "nastaveni_notifikaci": "Nastavení notifikací",
+    "jednotlive_notifikace": "Jednotlivé notifikace",
+    "smazat_notifikaci": "Snazat notifikaci"
   },
 
   "tooltip": {

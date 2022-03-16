@@ -801,7 +801,10 @@
     "provest_hromadnou_notifikaci": "Make a bulk notification",
     "nazev_notifikace": "Notification name",
     "zadejte_nazev_notifikace": "Enter a name for the notification",
-    "hledany_vyraz": "Search term"
+    "hledany_vyraz": "Search term",
+    "nastaveni_notifikaci": "Notification settings",
+    "jednotlive_notifikace": "Individual notifications",
+    "smazat_notifikaci": "Delete notification"
   },
 
   "tooltip": {

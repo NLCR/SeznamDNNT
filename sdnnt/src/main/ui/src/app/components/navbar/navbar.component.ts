@@ -8,6 +8,7 @@ import { DialogRegistrationComponent } from '../dialog-registration/dialog-regis
 import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
+import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
 
 @Component({
   selector: 'app-navbar',
@@ -119,4 +120,10 @@ export class NavbarComponent implements OnInit {
     this.isSearchBar =! this.isSearchBar;
   }
 
+  openNotificationsSettings() {
+    const dialogRef = this.dialog.open(DialogNotificationsSettingsComponent, {
+      width: '600px',
+      panelClass: 'app-dialog-notifications-settings'
+    });
+  }
 }

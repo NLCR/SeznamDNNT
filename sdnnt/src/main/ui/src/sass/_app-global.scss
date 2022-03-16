@@ -314,6 +314,12 @@ table {
   }
 }
 
+.app-link-icon {
+  .mat-icon {
+    @include setIcon($size: 18, $position: sub);
+  }
+}
+
 .app-pa {
   position: absolute;
   left: 0;
@@ -321,11 +327,11 @@ table {
 }
 
 .app-text-left {
-  text-align: left;
+  text-align: left !important;
 }
 
 .app-text-right {
-  text-align: right;
+  text-align: right !important;
 }
 
 .app-text-center {

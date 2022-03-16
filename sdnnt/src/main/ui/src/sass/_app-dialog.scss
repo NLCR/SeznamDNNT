@@ -72,6 +72,23 @@
   }
 }
 
+// notifications settings dialog
+.app-dialog-notifications-settings {
+  .mat-dialog-content {
+    .app-table {
+      th {
+        min-width: 130px;
+      }
+
+      td {
+        span {
+          color: $app-gray-6;
+        }
+      }
+    }
+  }
+}
+
 // mat dialog scrollbar fix -> https://github.com/angular/components/issues/8798
 .mat-dialog-content--scrollbar-fix {
   &:after {

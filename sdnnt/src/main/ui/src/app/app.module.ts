@@ -70,6 +70,7 @@ import { TitleComponent, TooltipComponent, GridComponent } from 'echarts/compone
 import { CanvasRenderer } from 'echarts/renderers';
 import 'echarts/theme/macarons.js';
 import { DialogBulkNotificationsComponent } from './components/dialog-bulk-notifications/dialog-bulk-notifications.component';
+import { DialogNotificationsSettingsComponent } from './components/dialog-notifications-settings/dialog-notifications-settings.component';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
 
@@ -141,6 +142,7 @@ const providers: any[] =[
     DialogBulkProposalComponent,
     GraphsComponent,
     DialogBulkNotificationsComponent,
+    DialogNotificationsSettingsComponent,
   ],
   imports: [
     BrowserModule,
