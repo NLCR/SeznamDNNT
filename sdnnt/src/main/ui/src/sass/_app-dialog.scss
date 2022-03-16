@@ -84,6 +84,10 @@
         span {
           color: $app-gray-6;
         }
+
+        &[colspan="2"] {
+          background-color: $app-gray-1;
+        }
       }
     }
   }

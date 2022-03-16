@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SUPER_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
+import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
 
 @Component({
   selector: 'app-sidenav-list',
@@ -25,6 +26,7 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
 
   constructor(
     dialog: MatDialog,
+    private dialogNotification: MatDialog,
     router: Router,
     service: AppService,
     public state: AppState,
@@ -39,6 +41,13 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
   // sidenav fuction
   public onToggleSidenav = () => {
     this.sidenavToggle.emit();
+  }
+
+  openNotificationsSettings() {
+    const dialogRef = this.dialogNotification.open(DialogNotificationsSettingsComponent, {
+      width: '600px',
+      panelClass: 'app-dialog-notifications-settings'
+    });
   }
 
 }
