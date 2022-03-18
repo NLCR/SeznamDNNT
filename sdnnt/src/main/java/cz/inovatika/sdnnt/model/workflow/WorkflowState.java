@@ -47,8 +47,6 @@ public class WorkflowState {
         this.firstTransition = startTransition;
         this.changingLicence = changingLicense;
         this.license = license;
-
-        //this.transitionName = transitionName;
     }
 
     public Date getDate() {

@@ -11,15 +11,15 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Reprezentuje sluzbu pro operace nad zadostmi
+ * Represents service for requets manipulations
  */
 public interface AccountService {
 
     public static final int MAXIMUM_ITEMS_IN_ZADOST = 3000;
 
     /**
-     * Najde zadost dle id
-     * @param id Identifikator zadosti
+     * Finds request by given id
+     * @param id Requet's identifier
      * @return
      * @throws SolrServerException
      * @throws IOException
@@ -27,15 +27,15 @@ public interface AccountService {
     public JSONObject getRequest(String id) throws SolrServerException, IOException;
 
     /**
-     * Hledani v zadostech
-     * @param q Dotaz
-     * @param state  Filtr pro stav zadosti open, waiting, waiting_for_automatic_process, processed
-     * @param navrhy Filtr pro  zadosti NZN, VN, VNL, VNZ
-     * @param institution Filtr pro instituci
-     * @param priority Filtr pro prioritu
-     * @param delegated Filtr pro delegovanou osobu
+     * Searching  in requests
+     * @param q Query
+     * @param state  Filter for state of request open, waiting, waiting_for_automatic_process, processed
+     * @param navrhy Filter for type of request: NZN, VN, VNL, VNZ
+     * @param institution Filter for institution
+     * @param priority Filter for priority
+     * @param delegated Filtr for delegated person
      * @param typeOfReq
-     * @param sort Sortovani dle (u uzivatele datum vytvoreni a zpracovani, u kuratoru - deadline, priority atd.. )
+     * @param sort Sorting support (u uzivatele datum vytvoreni a zpracovani, u kuratoru - deadline, priority atd.. )
      * @param rows
      * @param page
      * @return

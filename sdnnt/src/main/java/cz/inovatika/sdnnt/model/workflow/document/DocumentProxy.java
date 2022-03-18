@@ -42,13 +42,14 @@ public class DocumentProxy implements WorkflowOwner {
         Date date = new Date();
 
         List<String> dntstav = this.marcRecord.dntstav;
+        List<String> kuratorStav = this.marcRecord.kuratorstav;
 
         PublicItemState publicItemState = itm.getPublicItemState(this);
 
         if (publicItemState != null && (!dntstav.contains(publicItemState.name()) || changingLicenseState)) {
             this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(itm.getPublicItemState(this).name()));
-
             this.marcRecord.datum_stavu = new Date(date.getTime());
+            this.marcRecord.previousDntstav = dntstav;
 
             JSONObject historyObject = new JSONObject();
             historyObject.put("stav", publicItemState);
@@ -70,6 +71,7 @@ public class DocumentProxy implements WorkflowOwner {
             this.marcRecord.historie_stavu.put(historyObject);
         }
         this.marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(itm.name()));
+        if (kuratorStav != null) this.marcRecord.previousKuratorstav = kuratorStav;
         this.marcRecord.datum_krator_stavu = new Date(date.getTime());
 
         JSONObject historyObject = HistoryObjectUtils.historyObjectParent(itm.name(), license, originator, user, poznamka, MarcRecord.FORMAT.format(this.marcRecord.datum_krator_stavu));

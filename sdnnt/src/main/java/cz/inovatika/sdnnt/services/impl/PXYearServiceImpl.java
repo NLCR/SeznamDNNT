@@ -54,11 +54,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         }
 
         if (this.yearConfiguration != null && !this.yearConfiguration.trim().equals("")) {
-            //((date1_int:[1911 TO 2008] AND -date2_int:*) OR (date1_int:[1911 TO 2008] AND date2_int:[1911 TO 2008])))
-            String first = String.format("(" + YEAR_OF_PUBLICATION_1 + ":%s AND -" + YEAR_OF_PUBLICATION_2 + ":*)", this.yearConfiguration);
-            String second = String.format("(" + YEAR_OF_PUBLICATION_1 + ":%s AND " + YEAR_OF_PUBLICATION_2 + ":%s)", this.yearConfiguration,this.yearConfiguration);
-            String fq = String.format("(%s OR %s)", first, second);
-            plusFilter.add(fq);
+            plusFilter.add(yearFilter());
         }
 
         if (!this.states.isEmpty()) {
@@ -80,7 +76,6 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
 
         return foundCandidates;
     }
-
 
     @Override
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException {

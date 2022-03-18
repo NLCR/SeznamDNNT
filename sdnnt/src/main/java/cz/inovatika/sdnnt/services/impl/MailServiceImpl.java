@@ -109,7 +109,7 @@ public class MailServiceImpl implements MailService  {
             if (user != null) {
                 scopes.put("username", user.getUsername());
             }
-            String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_registration";
+            String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+" ";
             LOGGER.info("Sending email: Generated password for new created user");
             sendPeparedMail(recipient, path, Options.getInstance().getJSONObject("registration"),scopes );
         } else throw new EmailException("No recipient");

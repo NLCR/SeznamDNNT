@@ -8,9 +8,14 @@ import java.util.Date;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.FLAG_PUBLIC_IN_DL;
 
 
-// priznaky pro dokument
+/**
+ * Marc record flags
+ * @author happy
+ *
+ */
 public class MarcRecordFlags {
 
+    // The title is public in digital library
     private boolean publicInDl = false;
 
     public MarcRecordFlags() {

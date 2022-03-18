@@ -122,7 +122,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
         List<String> plusFilter = new ArrayList<>(Arrays.asList("id_pid:uuid", FMT_FIELD + ":BK"));
         if (yearConfiguration != null && !this.yearConfiguration.trim().equals("")) {
-            plusFilter.add(YEAR_OF_PUBLICATION+":" + yearConfiguration);
+            //plusFilter.add(YEAR_OF_PUBLICATION+":" + yearConfiguration);
+            plusFilter.add(yearFilter());
         }
 
         if (!this.states.isEmpty()) {
@@ -165,6 +166,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 int endIndex = (i + 1) * batchSize;
                 List<String> batch = keys.subList(startIndex, Math.min(endIndex, keys.size()));
                 if (this.typeOfRequest != null) {
+                	// used in reuqest; must not be in case of context information
                     Set<String> used = usedInRequest(solr, batch, this.typeOfRequest);
                     used.stream().forEach(mapping::remove);
                 }

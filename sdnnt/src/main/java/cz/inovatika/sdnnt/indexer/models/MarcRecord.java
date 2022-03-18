@@ -49,11 +49,13 @@ public class MarcRecord {
   public String datestamp;
   public String setSpec;
   public String leader;
-
+  public String fmt;
+  
   // hlavni, verejny stav
   public List<String> dntstav = new ArrayList<>();
+  public List<String> previousDntstav = new ArrayList<>();
   public Date datum_stavu;
-
+  
   @JsonIgnore
   public JSONArray historie_stavu = new JSONArray();
   @JsonIgnore
@@ -63,6 +65,7 @@ public class MarcRecord {
 
   // kuratorsky stav
   public List<String> kuratorstav = new ArrayList<>();
+  public List<String> previousKuratorstav = new ArrayList<>();
   public Date datum_krator_stavu;
 
 
@@ -114,7 +117,8 @@ public class MarcRecord {
   public static MarcRecord fromDoc(SolrDocument doc) throws JsonProcessingException {
     String rawJson = (String) doc.getFirstValue(RAW_FIELD);
     MarcRecord mr = fromRAWJSON(rawJson);
-    // uff
+    // uff 
+    //TODO: Chnage it 
     mr.toSolrDoc();
     MarcRecordUtilsToRefactor.syncFromDoc(doc, mr);
     return mr;
@@ -200,6 +204,10 @@ public class MarcRecord {
       if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
         JSONArray jsonArray = new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
         mr.historie_granulovaneho_stavu = jsonArray;
+      }
+      
+      if (doc.containsKey(FMT_FIELD)) {
+    	  mr.fmt = (String) doc.getFieldValue(FMT_FIELD);
       }
 
       // flags
@@ -353,6 +361,9 @@ public class MarcRecord {
         this.dntstav = sdoc.getFieldValues(DNTSTAV_FIELD) != null ? new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD)) : null;
       }
     }
+    if (previousDntstav != null && previousDntstav.isEmpty()) {
+        sdoc.setField(DNTSTAV_PREV_FIELD, previousDntstav);
+    }
 
     if (kuratorstav != null && !kuratorstav.isEmpty()) {
       sdoc.setField(KURATORSTAV_FIELD, kuratorstav);
@@ -363,6 +374,10 @@ public class MarcRecord {
       }
     }
 
+    if (previousKuratorstav != null && !previousKuratorstav.isEmpty()) {
+        sdoc.setField(KURATORSTAV_PREV_FIELD, previousKuratorstav);
+    }
+    
     if (sdoc.containsKey(MARC_264_B)) {
       String val = (String) sdoc.getFieldValue(MARC_264_B);
       sdoc.setField(NAKLADATEL_FIELD, nakladatelFormat(val));
@@ -391,10 +406,12 @@ public class MarcRecord {
       try {
         sdoc.setField("date1_int", Integer.parseInt(date1));
       } catch (NumberFormatException ex) {
+    	  // TODO:
       }
       try {
         sdoc.setField("date2_int", Integer.parseInt(date2));
       } catch (NumberFormatException ex) {
+    	  // TODO:
       }
     }
 

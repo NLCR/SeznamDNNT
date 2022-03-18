@@ -151,7 +151,7 @@ public class PXYearServiceTest {
         String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 1900]\",\"states\":[\"A\",\"PA\",\"NL\"]},\"results\":{\"state\":\"PX\",\"ctx\":true,\"request\":{\"type\":\"PXN\",\"items\":50}}}";
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
-        PXYearServiceImpl pxService = EasyMock.createMockBuilder(PXYearServiceImpl.class)
+        AbstractPXService pxService = EasyMock.createMockBuilder(PXYearServiceImpl.class)
                 .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")

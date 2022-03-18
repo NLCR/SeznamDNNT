@@ -5,7 +5,7 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 
 /**
- * Reprezentuje workflow
+ * This represents workflow
  */
 public abstract class Workflow {
 
@@ -17,7 +17,7 @@ public abstract class Workflow {
     }
 
     /**
-     * Prepnuti do dalsiho stavu
+     * Switch to the next state
      * @return
      */
     public abstract WorkflowState nextState();

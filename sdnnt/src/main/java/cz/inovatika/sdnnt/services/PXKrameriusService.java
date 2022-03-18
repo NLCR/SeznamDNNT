@@ -11,8 +11,9 @@ import java.util.List;
  * Service responsible for creating reuests or updating titles which should be public according to the state in digital library
  */
 public interface PXKrameriusService {
-    /**
-     * Check titles and returns all possible candidates
+
+	/**
+     * Check the titles and returns all possible candidates
      * @return List of candidates
      */
     public List<String> check();

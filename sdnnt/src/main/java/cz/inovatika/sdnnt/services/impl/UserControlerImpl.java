@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
@@ -24,6 +25,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,11 +34,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 
 public class UserControlerImpl implements UserControler, ApplicationUserLoginSupport {
@@ -387,6 +392,32 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
+    }
+
+    
+    
+    @Override
+    public User changeNotificationInterval(String username, NotificationInterval interval) throws UserControlerException {
+        try (SolrClient solr = buildClient()) {
+            try {
+                SolrInputDocument idoc = new SolrInputDocument();
+                idoc.setField("username", username);
+                atomicUpdate(idoc, interval.name(), "notifikace_interval");
+            } finally {
+                SolrJUtilities.quietCommit(solr, "users");
+            }
+        } catch ( IOException ex) {
+            throw new UserControlerException(ex);
+        }
+        // return stored user
+        return findUser(username);
+    }
+    
+    
+    protected void atomicUpdate(SolrInputDocument idoc, Object fValue, String fName) {
+        Map<String, Object> modifier = new HashMap<>(1);
+        modifier.put("set", fValue);
+        idoc.addField(fName, modifier);
     }
 
     SolrClient buildClient() {

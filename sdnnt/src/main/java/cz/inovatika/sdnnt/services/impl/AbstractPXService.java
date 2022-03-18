@@ -16,6 +16,9 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_1;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_2;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+// History in case of destination state
 public abstract class AbstractPXService {
 
     public static final Logger LOGGER = Logger.getLogger(AbstractPXService.class.getName());
@@ -110,5 +114,12 @@ public abstract class AbstractPXService {
 
     protected  abstract Options getOptions();
     protected abstract SolrClient buildClient();
+
+    protected String yearFilter() {
+        String first = String.format("(" + YEAR_OF_PUBLICATION_1 + ":%s AND -" + YEAR_OF_PUBLICATION_2 + ":*)", this.yearConfiguration);
+        String second = String.format("(" + YEAR_OF_PUBLICATION_1 + ":%s AND " + YEAR_OF_PUBLICATION_2 + ":%s)", this.yearConfiguration,this.yearConfiguration);
+        String fq = String.format("(%s OR %s)", first, second);
+        return fq;
+    }
 
 }

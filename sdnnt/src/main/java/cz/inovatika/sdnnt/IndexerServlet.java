@@ -1,29 +1,29 @@
 package cz.inovatika.sdnnt;
 
-import cz.inovatika.sdnnt.index.*;
+import static cz.inovatika.sdnnt.rights.Role.admin;
+import static cz.inovatika.sdnnt.rights.Role.kurator;
+import static cz.inovatika.sdnnt.rights.Role.mainKurator;
+import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.rights.RightsResolver;
-import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
-import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
-import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
-import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
-import cz.inovatika.sdnnt.utils.ServletsSupport;
-import cz.inovatika.sdnnt.utils.SimplePOST;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -32,10 +32,21 @@ import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import static cz.inovatika.sdnnt.rights.Role.*;
-import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
-
-import static javax.servlet.http.HttpServletResponse.*;
+import cz.inovatika.sdnnt.index.CatalogIterationSupport;
+import cz.inovatika.sdnnt.index.DntAlephImporter;
+import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.index.OAIHarvester;
+import cz.inovatika.sdnnt.index.XMLImporterDistri;
+import cz.inovatika.sdnnt.index.XMLImporterHeureka;
+import cz.inovatika.sdnnt.index.XMLImporterKosmas;
+import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
+import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
+import cz.inovatika.sdnnt.utils.ServletsSupport;
 
 /**
  * @author alberto
@@ -86,7 +97,6 @@ public class IndexerServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e1.toString());
             out.print(e1.toString());
         }
-
     }
 
     /**
