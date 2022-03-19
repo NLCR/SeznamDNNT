@@ -11,7 +11,7 @@ import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
-
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.EmptyIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
@@ -220,6 +220,14 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     .poznamka(req.getPoznamka());
 
                             response.getNotsaved().add(ns.reason("Solr exception: "+e.getMessage()));
+                        } catch(EmptyIdentifiers e) {
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+
+                            response.getNotsaved().add(ns.reason("Empty array of identifiers is not allowed "));
+                            
                         } catch (ConflictException e) {
                             // conflict
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
@@ -240,7 +248,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private void verifyIdentifiers(Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException {
+    private void verifyIdentifiers(Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers {
+        if (identifiers.isEmpty()) throw new EmptyIdentifiers();
         List<String> nonExistentIdentifiers = new ArrayList<>();
         List<String> invalidIdentifiers = new ArrayList<>();
 
@@ -261,6 +270,12 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         if (!invalidIdentifiers.isEmpty()) throw new InvalidIdentifiersException(invalidIdentifiers);
 
    }
+
+    public static class EmptyIdentifiers extends Exception {
+        public EmptyIdentifiers() {
+        }
+
+    }
 
     public static class NonExistentIdentifeirsException extends Exception {
         private List<String> idents;
