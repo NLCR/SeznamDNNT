@@ -37,8 +37,7 @@
         {{ 'desc.kramerius_badge' | translate }}
       </div>
     </div>
-    <div fxLayout="row">   
-      <!--   -->
+    <div fxLayout="row">
       <mat-button-toggle-group>
         <mat-button-toggle *ngIf="!hasNavhr && (state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
           <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
@@ -50,10 +49,11 @@
           <mat-icon>close</mat-icon>{{ 'desc.odstranit_z_zadosti' | translate }}
         </mat-button-toggle>
         
-        <mat-button-toggle *ngIf="!doc.hasRuleNotifications  && (state.logged && (state.user?.role==='user' || state.user?.role==='knihovna')  && doc.hasNotifications)" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
+        <mat-button-toggle *ngIf="!doc.hasRuleNotifications && (state.logged && (state.user?.role==='user' || state.user?.role==='knihovna')  && doc.hasNotifications)" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
           <mat-icon class="app-color-warning">notifications_active</mat-icon>
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!doc.hasRuleNotifications  &&  (state.logged && (state.user?.role==='user' || state.user?.role==='knihovna') &&  !doc.hasNotifications)" (click)="setFollow(true)" [matTooltip]="'desc.sledovat' | translate">
+        <!--!doc.hasRuleNotifications  &&  (state.logged && (state.user?.role==='user' || state.user?.role==='knihovna') &&  !doc.hasNotifications)-->
+        <mat-button-toggle *ngIf="(state.logged && (state.user?.role==='user' || state.user?.role==='knihovna') &&  !doc.hasNotifications)" (click)="!doc.hasRuleNotifications ? setFollow(true) : false" [matTooltip]="!doc.hasRuleNotifications ? ('desc.sledovat' | translate) : ('tooltip.sledovat_zaznam_disabled' | translate)" [disabled]="doc.hasRuleNotifications">
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
 

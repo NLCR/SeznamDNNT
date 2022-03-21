@@ -808,7 +808,8 @@
   },
 
   "tooltip": {
-    "hromadne_notifikace_disabled": "Bulk notifications cannot be performed because no filter is selected!"
+    "hromadne_notifikace_disabled": "Bulk notifications cannot be performed because no filter is selected!",
+    "sledovat_zaznam_disabled": "This record cannot be tracked because it is already included in bulk notifications!"
   },
 
   "msg": {

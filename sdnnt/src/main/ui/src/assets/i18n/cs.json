@@ -808,7 +808,8 @@
   },
 
   "tooltip": {
-    "hromadne_notifikace_disabled": "Nelze provést hromadné notifikace, protože není vybrán žadný filter!"
+    "hromadne_notifikace_disabled": "Nelze provést hromadné notifikace, protože není vybrán žadný filter!",
+    "sledovat_zaznam_disabled": "Tento záznam nelze sledovat, protože je již zahrnut v hromadných notifikacích!"
   },
 
   "msg": {
