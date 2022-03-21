@@ -28,6 +28,18 @@ export class SearchResultsUtils {
 
     }
 
+    enhanceByRulebasedNotifications(docs, notifications) {
+        docs.forEach(d => {
+            notifications?.forEach(n=> {
+            const identifier = d.identifier;
+            if (n.identifier.includes(identifier)) {
+                    d.hasRuleNotifications = true;
+                }
+            });
+        });
+
+    }
+
     // if (resp.notifications) {
     //     this.docs.forEach(doc => {
     //       const identifier = doc.identifier;

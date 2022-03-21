@@ -46,11 +46,21 @@ public class PureHTTPSolrUtils {
     }
 
 
-    public static JSONObject touchBulk(List<String> bulk, String identifierField, String index) {
+    public static JSONObject touchBulk(List<String> bulk, String identifierField, String index, boolean updateIndexTime) {
         try {
             StringBuilder builder = new StringBuilder("<add>\n");
             bulk.stream().forEach(identifier-> {
-                String document = String.format("<doc><field name=\"%s\">%s</field><field name=\"touch\" update=\"set\">true</field></doc>", identifierField, identifier);
+                String document = null;
+                if (updateIndexTime) {
+                    document = String.format("<doc><field name=\"%s\">%s</field>"
+                            + "<field name=\"touch\" update=\"set\">true</field>"
+                            + "<field name=\"indextime\" update=\"set\">NOW</field>"
+                            + "</doc>", identifierField, identifier);
+                } else {
+                    document = String.format("<doc><field name=\"%s\">%s</field>"
+                            + "<field name=\"touch\" update=\"set\">true</field>"
+                            + "</doc>", identifierField, identifier);
+                }
                 builder.append(document);
             });
 
@@ -70,6 +80,10 @@ public class PureHTTPSolrUtils {
             returnFromBulk.put("message", e.getMessage());
             return returnFromBulk;
         }
+        
+    }
+    public static JSONObject touchBulk(List<String> bulk, String identifierField, String index) {
+        return touchBulk(bulk, identifierField, index, false);
     }
 
     public static void commit(String index) {

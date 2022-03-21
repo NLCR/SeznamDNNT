@@ -57,6 +57,16 @@ public interface NotificationsService {
      */
     public List<AbstractNotification> findNotificationsByUser(String username, TYPE type) throws NotificationsException;
 
+    
+    /**
+     * Find notification by username and id
+     * @param username User name
+     * @param id Identifier
+     * @return
+     * @throws NotificationsException
+     */
+    public AbstractNotification findNotificationByUserAndId(String username, String id) throws NotificationsException;
+
     /**
      * Finds notifications by given interval
      * @param interval Notification interval

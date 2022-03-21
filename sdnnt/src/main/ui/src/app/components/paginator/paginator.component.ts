@@ -64,7 +64,6 @@ export class PaginatorComponent implements OnInit {
   }
 
   sortBy(sort: Sort) {
-
     this.state.sort[this.sortType]= sort;
     const queryParams:any = {};
     queryParams[this.sortType] = sort.field + ' ' + sort.dir;
@@ -73,7 +72,9 @@ export class PaginatorComponent implements OnInit {
 
 
   
-
+  configSorts() {
+    return this.config.sorts[this.sortType];
+  }
  
 
 }

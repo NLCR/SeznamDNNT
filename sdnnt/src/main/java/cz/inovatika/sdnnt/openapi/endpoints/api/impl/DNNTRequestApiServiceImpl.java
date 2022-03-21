@@ -167,7 +167,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                         try {
                             // verify/ maximum item and current state
-
+                           
                             JSONObject prepare = accountService.prepare(navrh);
                             Zadost zadost = Zadost.fromJSON(prepare.toString());
                             verifyIdentifiers(zadost, req.getIdentifiers());

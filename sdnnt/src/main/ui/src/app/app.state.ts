@@ -5,6 +5,7 @@ import { User } from './shared/user';
 import { Filter } from './shared/filter';
 import { Zadost } from './shared/zadost';
 import { NavigationStore } from './shared/navigationstore';
+import { NotifSettings } from './shared/notifsettings';
 
 export class AppState {
 
@@ -56,6 +57,10 @@ export class AppState {
 
   public fullCatalog: boolean;
   public withNotification: boolean;
+
+  // Notifications filter
+  public notificationSettings:NotifSettings = new NotifSettings();
+
 
   
   // Aktualni zadost kam se pridavaji navrhy; zmenit
@@ -109,6 +114,8 @@ export class AppState {
 
     this.fullCatalog = false;
     this.withNotification = false;
+    
+
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       if (p === 'q') {
@@ -171,6 +178,10 @@ export class AppState {
           }
         }); 
         
+      }
+
+      if (res.notificationsettings) {
+        this.notificationSettings = res.notificationsettings;
       }
     }
     this.loggedSubject.next(changed === this.logged);

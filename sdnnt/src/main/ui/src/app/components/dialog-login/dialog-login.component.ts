@@ -50,6 +50,7 @@ export class DialogLoginComponent implements OnInit {
         this.pwd = '';
         this.loading = false;
         this.dialogRef.close();
+
         //this.state.startTrackSession(this.bnIdle);
       }
     });
@@ -68,7 +69,6 @@ export class DialogLoginComponent implements OnInit {
       this.state.user = null;
       localStorage.removeItem('user');
       this.dialogRef.close();
-      //this.state.stopTrackSession(this.bnIdle);
     });
   }
 

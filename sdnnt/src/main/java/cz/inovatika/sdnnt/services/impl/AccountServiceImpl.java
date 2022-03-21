@@ -394,7 +394,7 @@ public class AccountServiceImpl implements AccountService {
 
             List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
             if (this.loginSupport.getUser() != null) {
-                JSONArray notifications = NotificationUtils.findNotifications(ids, this.loginSupport.getUser().getUsername(), solr);
+                JSONArray notifications = NotificationUtils.applySimpleNotifications(ids, this.loginSupport.getUser().getUsername(), solr);
                 ret.put("notifications", notifications);
             }
 

@@ -265,32 +265,15 @@ export class AppService {
     return this.post(url, { identifiers, zadost, reason }, params);
   }
 
-  // rejectNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
-  //   let url = '/account/reject_navrh';
-  //   const params: HttpParams = new HttpParams();
-  //   return this.post(url, { identifier, zadost, reason }, params);
-  // }
 
-  // approveNavrh(identifier: string, zadost: Zadost, reason: string): Observable<string> {
-  //   let url = '/account/approve_navrh';
-  //   const params: HttpParams = new HttpParams();
-  //   return this.post(url, { identifier, zadost, reason }, params);
-  // }
-
+  /** approve navrh lib */
   approveNavrhLib(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
     const params: HttpParams = new HttpParams();
     return this.post(url, { identifier, zadost, reason}, params);
   }
 
-
-  followRecord(identifier: string, follow: boolean): Observable<string> {
-    let url = '/account/follow_record';
-    const params: HttpParams = new HttpParams()
-    .set('identifier', identifier)
-    .set('follow', follow+'');
-    return this.get(url, params);
-  }
+  
 
   getZadost(id: string): Observable<any> {
     let url = 'account/get_zadost';
@@ -366,15 +349,6 @@ export class AppService {
     return this.get(url);
   }
 
-  ping(): Observable<any> {
-    let url = 'user/ping';
-    return this.get(url, new HttpParams(), false);
-  }
-
-  pong(): Observable<any> {
-    let url = 'user/pong';
-    return this.get(url, new HttpParams(), false);
-  }
 
   getUsersByPrefix(prefix: string): Observable<any> {
     let url = 'user/users_by_prefix?prefix='+prefix;
@@ -447,4 +421,46 @@ export class AppService {
     let url = '/account/import_stav';
     return this.post(url, doc);
   }
+
+
+  /** === Notications, settings, rule notification, etc.. ===  */
+  /** Save rule notification */ 
+  saveRuleNotification( notification:any): Observable<string> {
+    let url = '/notifications/save_rule_notification';
+    return this.post(url, notification);
+  }
+
+  /** Save rule notification */ 
+  getRuleNotifications(): Observable<string> {
+    let url = '/notifications/get_rule_notifications';
+    return this.get(url);
+  }
+  /** save noitification settings */ 
+  savetRuleNotificationSettings(settings:any): Observable<string> {
+    let url = '/notifications/save_notification_settings';
+    return this.post(url, settings);
+  }
+
+  /** follow record */
+  followRecord(identifier: string, follow: boolean): Observable<string> {
+    let url = '/account/follow_record';
+    const params: HttpParams = new HttpParams()
+    .set('identifier', identifier)
+    .set('follow', follow+'');
+    return this.get(url, params);
+  }
+
+
+
+  /** === Keep session; ping pong, methods ===  */
+  ping(): Observable<any> {
+    let url = 'user/ping';
+    return this.get(url, new HttpParams(), false);
+  }
+
+  pong(): Observable<any> {
+    let url = 'user/pong';
+    return this.get(url, new HttpParams(), false);
+  }
+
 }

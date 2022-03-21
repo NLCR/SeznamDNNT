@@ -1,10 +1,13 @@
 <h1 mat-dialog-title>{{ 'desc.nastaveni_notifikaci' | translate }}</h1>
 <div mat-dialog-content class="mat-dialog-content--scrollbar-fix">
+
+
   <mat-tab-group>
     <mat-tab [label]="'desc.jednotlive_notifikace' | translate">
       <div class="app-mt-4 app-mb-3">
         <label id="notifikace_interval_label" class="app-label app-mr-2">{{ 'desc.notifikace_interval' | translate }}:</label>
-        <mat-radio-group aria-labelledby="notifikace_interval_label">
+        <mat-radio-group aria-labelledby="notifikace_interval_label" [(ngModel)]="interval">
+          <mat-radio-button value="none">{{ 'desc.none' | translate }}</mat-radio-button>
           <mat-radio-button value="den">{{ 'desc.day' | translate }}</mat-radio-button>
           <mat-radio-button value="tyden">{{ 'desc.week' | translate }}</mat-radio-button>
           <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
@@ -13,79 +16,55 @@
     </mat-tab>
     <mat-tab [label]="'desc.hromadne_notifikace' | translate">
       <div class="app-mb-4">
-        <table class="app-table app-mt-4 app-mb-2" [cellPadding]="0" [cellSpacing]="0">
-          <tr>
-            <th>{{ 'desc.nazev_notifikace' | translate }}</th>
-            <td>Testovaci nazev notifikace</td>
-          </tr>
-          <tr>
-            <th>{{ 'desc.pouzite_filtry' | translate }}</th>
-            <td>
-              <ng-container *ngFor="let f of state.usedFilters; let last = last">
-                <span>{{ 'field.' + f.field | translate }}: </span>
-                <ng-container [ngSwitch]="f.field">
-                  <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-                </ng-container><ng-container *ngIf="!last">,&#160;</ng-container>
-              </ng-container>
-            </td>
-          </tr>
-          <tr>
-            <th>{{ 'desc.notifikace_interval' | translate }}</th>
-            <td>Týden</td>
-          </tr>
-          <tr>
-            <td class="app-text-right" colspan="2">
-              <a class="app-link-icon app-color-warning app-font-bold">
-                <mat-icon>clear</mat-icon> {{ 'desc.smazat_notifikaci' | translate }}
-              </a>
-            </td>
-          </tr>
-        </table>
+
+        <ng-container *ngFor="let notif of notifications">
+          <table class="app-table app-mt-4 app-mb-2" [cellPadding]="0" [cellSpacing]="0">
+            <tr>
+              <th>{{ 'desc.nazev_notifikace' | translate }}</th>
+              <td>{{notif.name}}</td>
+            </tr>
+            <tr>
+              <th>{{ 'desc.hledany_vyraz' | translate }}: </th>
+              <td>
+                <span>{{notif.query}}</span>
+              </td>
+            </tr>
+            <tr>
+              <th>{{ 'desc.pouzite_filtry' | translate }}</th>
+              <td>
+                <ng-container *ngFor="let f of notif.filters; let last = last">
+                  <span>{{ 'field.' + f.field | translate }}: </span>
+                  <ng-container [ngSwitch]="f.field">
+                    <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
+                    <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
+                  </ng-container><ng-container *ngIf="!last">,&#160;</ng-container>
+                </ng-container>
+              </td>
+            </tr>
+            <tr>
+              <th>{{ 'desc.notifikace_interval' | translate }}</th>
+              <td>{{ 'desc.'+notif.periodicity | translate }}</td>
+            </tr>
+            <tr>
+              <td class="app-text-right" colspan="2">
+                <a class="app-link-icon app-color-warning app-font-bold" (click)="deleteNotification(notif)">
+                  <mat-icon>clear</mat-icon> {{ 'desc.smazat_notifikaci' | translate }}
+                </a>
+              </td>
+            </tr>
+          </table>
+  
+        </ng-container>
+
+
       </div>
-      <div>
-        <table class="app-table app-mt-4 app-mb-2" [cellPadding]="0" [cellSpacing]="0">
-          <tr>
-            <th>{{ 'desc.nazev_notifikace' | translate }}</th>
-            <td>Testovaci nazev notifikace</td>
-          </tr>
-          <tr>
-            <th>{{ 'desc.pouzite_filtry' | translate }}</th>
-            <td>
-              <ng-container *ngFor="let f of state.usedFilters">
-                <span>{{ 'field.' + f.field | translate }}: </span>
-                <ng-container [ngSwitch]="f.field">
-                  <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
-                  <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-                </ng-container>,&#160;
-              </ng-container>
-            </td>
-          </tr>
-          <tr>
-            <th>{{ 'desc.notifikace_interval' | translate }}</th>
-            <td>Týden</td>
-          </tr>
-          <tr>
-            <td class="app-text-right" colspan="2">
-              <a class="app-link-icon app-color-warning app-font-bold">
-                <mat-icon>clear</mat-icon> {{ 'desc.smazat_notifikaci' | translate }}
-              </a>
-            </td>
-          </tr>
-        </table>
-      </div>
+
     </mat-tab>
   </mat-tab-group>
 </div>

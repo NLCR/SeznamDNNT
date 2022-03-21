@@ -23,6 +23,12 @@ export class SolrResponse {
   expanded?: any;
   zadosti?: any[];
   notifications?: any[];
+  rnotifications?: any[];
+  notificationsettings?: {
+    simple: boolean,
+    rules?: any[];
+  };
+
   actions?: any[];
   error?: any;
 }

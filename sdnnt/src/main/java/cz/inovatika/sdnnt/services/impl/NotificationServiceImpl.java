@@ -59,6 +59,24 @@ public class NotificationServiceImpl implements NotificationsService {
         }
     }
 
+    
+    @Override
+    public AbstractNotification findNotificationByUserAndId(String username, String id) throws NotificationsException {
+        try (SolrClient client = buildClient()) {
+            try {
+                List<AbstractNotification> iterateNotification = iterateNotification(client, filterUserNameAndId(username, id));
+                if (!iterateNotification.isEmpty()) {
+                    return iterateNotification.get(0);
+                } else return null;
+            } finally {
+                SolrJUtilities.quietCommit(client, "notifications");
+            }
+        } catch (IOException | SolrServerException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+            throw new NotificationsException(e);
+        }
+    }
+
     @Override
     public List<AbstractNotification> findNotificationByInterval(NotificationInterval interval, TYPE type)
             throws NotificationsException {
@@ -94,7 +112,11 @@ public class NotificationServiceImpl implements NotificationsService {
             TYPE type) throws NotificationsException {
         try (SolrClient client = buildClient()) {
             try {
-                return iterateNotification(client, filterUserIntervalAndType(username, interval, type));
+                List<AbstractNotification> iterateNotification = iterateNotification(client, filterUserIntervalAndType(username, interval, type));
+                if (type.equals(TYPE.simple)) {
+                    iterateNotification.addAll(iterateNotification(client, filterUserIntervalAndNotType(username, interval)));
+                }
+                return iterateNotification;
             } finally {
                 SolrJUtilities.quietCommit(client, "notifications");
             }
@@ -109,7 +131,11 @@ public class NotificationServiceImpl implements NotificationsService {
             throws NotificationsException {
         try (SolrClient client = buildClient()) {
             try {
-                return iterateNotification(client, filterUserNameAndType(username, type));
+                List<AbstractNotification> iterateNotification = iterateNotification(client, filterUserNameAndType(username, type));
+                if (type.equals(TYPE.simple)) {
+                    iterateNotification.addAll(iterateNotification(client, filterUserAndNotType(username)));
+                }
+                return iterateNotification;
             } finally {
                 SolrJUtilities.quietCommit(client, "notifications");
             }
@@ -133,11 +159,17 @@ public class NotificationServiceImpl implements NotificationsService {
 
         return notifications;
     }
+    private String filterUserNameAndId(String username, String id) {
+        return "user:" + username + " AND id:" + id;
+    }
 
     private String filterUserName(String username) {
         return "user:" + username;
     }
 
+    private String filterUserAndNotType(String username) {
+        return "user:" + username + " AND -type:*";
+    }
     private String filterUserNameAndType(String username, TYPE type) {
         return "user:" + username + " AND type:" + type.name();
     }
@@ -146,6 +178,9 @@ public class NotificationServiceImpl implements NotificationsService {
         return "periodicity:" + interval + " AND type:" + type.name();
     }
     
+    private String filterUserIntervalAndNotType(String username, NotificationInterval interval) {
+        return "user:" + username + " AND "+ "periodicity:" + interval + " AND -type:*";
+    }
     
     private String filterUserIntervalAndType(String username, NotificationInterval interval, TYPE type) {
         return "user:" + username + " AND "+ "periodicity:" + interval + " AND type:" + type.name();
@@ -232,18 +267,24 @@ public class NotificationServiceImpl implements NotificationsService {
                 SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
                         .addFilterQuery(fqCatalog)
                         .addFilterQuery(ruleNotification.provideSearchQueryFilters())
-                        .setFields("identifier,datum_stavu,nazev,dntstav");
+                        .setFields("identifier,datum_stavu,nazev,dntstav,license");
 
                 try {
                     iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                         Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                        Collection<Object> license = doc.getFieldValues("license");
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
                         map.put("dntstav",
                                 dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString());
+                        map.put("license",
+                                license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
                         map.put("identifier", doc.getFieldValue("identifier").toString());
-                        documents.add(map);
+
+                        if (ruleNotification.accept(map)) {
+                            documents.add(map);
+                        }
 
                         return doc;
                     });

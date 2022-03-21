@@ -16,7 +16,6 @@ public interface SolrDocumentOutput {
     public static final String GRANUARITY_KEY = "granularity";
 
 
-    //void output(String selectedInstitution, String label, Collection<Object> nazev, String identifier, String... pids);
     void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense);
 
 }

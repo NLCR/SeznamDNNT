@@ -115,8 +115,9 @@ public class NotificationServlet extends HttpServlet {
                         
                     }
                         
+                    NotificationsService service = new NotificationServiceImpl(controler, mailService);
+
                     if (inputJs.has("notifications")) {
-                        NotificationsService service = new NotificationServiceImpl(controler, mailService);
                         List<RuleNotification> aNotification = new ArrayList<>();
                         inputJs.getJSONArray("notifications").forEach(notif-> {
                             AbstractNotification aNotif = NotificationFactory.fromJSON((JSONObject)notif);
@@ -134,7 +135,31 @@ public class NotificationServlet extends HttpServlet {
                         }
                     }
                     
-                    return new JSONObject();
+                    // safra 
+                    List<AbstractNotification> simple = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.simple);
+                    List<AbstractNotification> rules = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.rule);
+                    JSONArray jsonArray = new JSONArray();
+                    if (!simple.isEmpty()) {
+                        JSONObject fobj = new JSONObject();
+                        fobj.put("name", "simple");
+                        fobj.put("id", "simple");
+                        jsonArray.put(fobj);
+                        
+                    }
+                    
+                    rules.stream().map(an-> {
+                        RuleNotification rnotif = (RuleNotification) an;
+                        JSONObject fobj = new JSONObject();
+                        fobj.put("name", rnotif.getName());
+                        fobj.put("id", rnotif.getId());
+                        return fobj;
+                    }).forEach(jsonArray::put);
+                    
+                    
+                    JSONObject ret = new JSONObject();
+                    ret.put("all", jsonArray);
+                    
+                    return ret;
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
 
@@ -187,7 +212,32 @@ public class NotificationServlet extends HttpServlet {
                         
                         NotificationsService service = new NotificationServiceImpl(controler, mailService);
                         RuleNotification saved = service.saveNotificationRule((RuleNotification) notification);
-                        return saved != null ? saved.toJSONObject() : notification.toJSONObject();
+
+                        
+                        List<AbstractNotification> simple = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.simple);
+                        List<AbstractNotification> rules = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.rule);
+                        JSONArray jsonArray = new JSONArray();
+                        if (!simple.isEmpty()) {
+                            JSONObject fobj = new JSONObject();
+                            fobj.put("name", "simple");
+                            fobj.put("id", "simple");
+                            jsonArray.put(fobj);
+                            
+                        }
+                        
+                        rules.stream().map(an-> {
+                            RuleNotification rnotif = (RuleNotification) an;
+                            JSONObject fobj = new JSONObject();
+                            fobj.put("name", rnotif.getName());
+                            fobj.put("id", rnotif.getId());
+                            return fobj;
+                        }).forEach(jsonArray::put);
+                        
+                        
+                        JSONObject ret = new JSONObject();
+                        ret.put("all", jsonArray);
+
+                        return ret;
                         
                     } else {
                         return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, "illegal.type.of.notification", "illegal.type.of.notification");

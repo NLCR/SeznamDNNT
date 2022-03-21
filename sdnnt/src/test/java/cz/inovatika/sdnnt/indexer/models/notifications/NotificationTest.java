@@ -1,27 +1,34 @@
-package cz.inovatika.sdnnt.indexer.models;
+package cz.inovatika.sdnnt.indexer.models.notifications;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NotificationTest {
 
     @Test
-    public void deserializeAndSerializeNotification() throws IOException {
+    public void deserializeAndSerializeNotification_SimpleNotification() throws IOException {
         InputStream resourceAsStream = this.getClass().getResourceAsStream("notification_knihovna_oai_aleph-nkp.cz_SKC01-000849392.json");
         Assert.assertNotNull(resourceAsStream);
         String s = IOUtils.toString(resourceAsStream, "UTF-8");
-        Notification notification = Notification.fromJSON(s);
+        SimpleNotification notification = SimpleNotification.fromJSON(s);
 
         Assert.assertTrue(notification.getId().equals("knihovna_oai:aleph-nkp.cz:SKC01-000849392"));
         Assert.assertTrue(notification.getIdentifier().equals("oai:aleph-nkp.cz:SKC01-000849392"));
         Assert.assertTrue(notification.getUser().equals("knihovna"));
         Assert.assertTrue(notification.getPeriodicity().equals("mesic"));
-        Assert.assertNotNull(notification.getIndextime());
+        //Assert.assertNotNull(notification.getIndextime());
 
         JSONObject serialized = notification.toJSONObject();
         Assert.assertTrue(serialized.getString("id").equals("knihovna_oai:aleph-nkp.cz:SKC01-000849392"));
@@ -29,6 +36,42 @@ public class NotificationTest {
         Assert.assertTrue(serialized.getString("user").equals("knihovna"));
         Assert.assertTrue(serialized.getString("periodicity").equals("mesic"));
 
-        Assert.assertTrue(serialized.has("indextime"));
+    }
+    
+
+    @Test
+    public void deserializeAndSerializeNotification_RuleNotification() throws IOException {
+        InputStream resourceAsStream = this.getClass().getResourceAsStream("notification_knihovna_rulebased.json");
+        Assert.assertNotNull(resourceAsStream);
+        String s = IOUtils.toString(resourceAsStream, "UTF-8");
+        RuleNotification notification = RuleNotification.fromJSON(s);
+
+        Assert.assertTrue(notification.getId().equals("identification"));
+        Assert.assertTrue(notification.getName().equals("Moje pojmenovani"));
+        Assert.assertTrue(notification.getQuery().equals("Query test"));
+        Assert.assertTrue(notification.getPeriodicity().equals("mesic"));
+        Assert.assertTrue(notification.getFilters() != null);
+        Assert.assertFalse(notification.getFilters().isEmpty());
+        Assert.assertTrue(notification.getFilters().containsKey("dntstav"));
+        Assert.assertTrue(notification.getFilters().containsKey("license"));
+        
+        
+        JSONObject notificationJSONObject = notification.toJSONObject();
+        Assert.assertTrue(notificationJSONObject.has("id"));
+        Assert.assertTrue(notificationJSONObject.has("name"));
+        Assert.assertTrue(notificationJSONObject.has("query"));
+        Assert.assertTrue(notificationJSONObject.has("periodicity"));
+        Assert.assertTrue(notificationJSONObject.has("filters"));
+    }
+    
+    
+    @Test
+    public void deserializeAndSerializeNotification_Factory() throws IOException {
+        InputStream resourceAsStream = this.getClass().getResourceAsStream("notification_knihovna_rulebased.json");
+        Assert.assertNotNull(resourceAsStream);
+        String s = IOUtils.toString(resourceAsStream, "UTF-8");
+        AbstractNotification an = NotificationFactory.fromJSON(s);
+        Assert.assertNotNull(an);
+        Assert.assertTrue(an.getType().equals(AbstractNotification.TYPE.rule.name()));
     }
 }

@@ -7,6 +7,9 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 
@@ -21,6 +24,9 @@ import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.ZadostTypNavrh;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.rights.Role;
+import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
@@ -31,6 +37,9 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -83,10 +92,39 @@ public class CatalogSearcher {
                 List<String> ids = SearchResultsUtils.getIdsFromResult(ret);
                 JSONArray zadosti = user != null ? findZadosti(user, ids, "NOT state:processed") : new JSONArray();
                 ret.put("zadosti", zadosti);
-
+                
                 if (user != null) {
-                    JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
+                    JSONArray notifications = NotificationUtils.applySimpleNotifications(ids, user.getUsername(), Indexer.getClient());
                     ret.put("notifications", notifications);
+
+                    JSONArray ruleNotifications = user != null ? NotificationUtils.applyRuleNotifications(user, ids) : new JSONArray();
+                    ret.put("rnotifications", ruleNotifications);
+                    
+                    /**
+                    try {
+                        JSONObject settingsObject = new JSONObject();
+                        
+                        NotificationsService service = new NotificationServiceImpl(null, null);
+                        List<AbstractNotification> simple = service.findNotificationsByUser(user.getUsername(), TYPE.simple);
+                        List<AbstractNotification> rules = service.findNotificationsByUser(user.getUsername(), TYPE.rule);
+                        settingsObject.put("simple", !simple.isEmpty());
+                        
+                        JSONArray jsonArray = new JSONArray();
+                        rules.stream().map(an-> {
+                            RuleNotification rnotif = (RuleNotification) an;
+                            JSONObject fobj = new JSONObject();
+                            fobj.put("name", rnotif.getName());
+                            fobj.put("id", rnotif.getId());
+                            return fobj;
+                        }).forEach(jsonArray::put);
+                        
+                        
+                        settingsObject.put("rules", jsonArray);
+                        ret.put("notificationsettings", settingsObject);
+                        
+                    } catch (NotificationsException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                    }**/
                 }
 
 
@@ -167,7 +205,7 @@ public class CatalogSearcher {
                 JSONArray zadosti = findZadosti(user, ids);
                 ret.put("zadosti", zadosti);
                 if (user != null) {
-                    JSONArray notifications = NotificationUtils.findNotifications(ids, user.getUsername(), Indexer.getClient());
+                    JSONArray notifications = NotificationUtils.applySimpleNotifications(ids, user.getUsername(), Indexer.getClient());
                     ret.put("notifications", notifications);
                 }
             }
@@ -189,24 +227,7 @@ public class CatalogSearcher {
         return search(resmap, new ArrayList<>(), user);
     }
 
-    public JSONObject getA(Map<String, String> req, User user) {
-        return getByStav(req, user, Arrays.asList("A"), new ArrayList<>());
-    }
-
-    public JSONObject getA(HttpServletRequest req) {
-        Map<String, String[]> parameterMap = req.getParameterMap();
-        Map<String, String> resmap = new HashMap<>();
-        parameterMap.entrySet().stream().forEach(stringEntry -> {
-            resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
-        });
-        User user = new UserControlerImpl(req).getUser();
-        return getA(resmap, user);
-    }
-
-    public JSONObject getPA(Map<String, String> req, User user) {
-        return getByStav(req, user, Arrays.asList("PA"), new ArrayList<>());
-    }
-
+   
 
     private JSONObject getByStav(Map<String, String> req, User user, List<String> stavy, List<String> notStavy) {
         JSONObject ret = new JSONObject();
@@ -246,7 +267,8 @@ public class CatalogSearcher {
         return ret;
     }
 
-
+    
+    
     private JSONArray findZadosti(User user, List<String> identifiers, String... additionalFilters) {
         try {
             if (!identifiers.isEmpty()) {
@@ -390,7 +412,7 @@ public class CatalogSearcher {
 
 
         // Vseobecne filtry podle misto vydani (xr ) a roky
-
+        // dat to mimo
         // fq=fmt:BK%20AND%20place_of_pub:"xr%20"%20AND%20date1_int:%5B1910%20TO%202007%5D&fq=marc_338a:svazek&fq=-marc_245h:*&fq=marc_338b:nc&fq=marc_3382:rdacarrier
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int fromYear = opts.getJSONObject("search").getInt("fromYear");
@@ -430,7 +452,7 @@ public class CatalogSearcher {
 
         query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
 
-
+        
         // Filtry podle role
         if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.getRole())) {
             query.addFilterQuery("dntstav:*");
@@ -440,11 +462,32 @@ public class CatalogSearcher {
             query.addFilterQuery("-dntstav:X");
         }
 
+        // notifikace
         if ("true".equals(req.get("withNotification"))) {
+            // should be in service
             query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.getUsername());
+            
         }
 
-
+        // Notification filter
+        if (user != null && req.containsKey("notificationFilter")) {
+            try {
+                String nFilter = req.get("notificationFilter");
+                if (nFilter.equals("simple")) {
+                    // should be in service
+                    query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.getUsername());
+                } else {
+                    NotificationsService notifService = new NotificationServiceImpl(null, null);
+                    AbstractNotification anotif = notifService.findNotificationByUserAndId(user.getUsername(),nFilter);
+                    if (anotif != null &&  anotif.getType().equals(TYPE.rule.name())) {
+                        query.addFilterQuery(((RuleNotification)anotif).provideSearchQueryFilters());
+                    }
+                }
+                
+            } catch (NotificationsException e) {
+                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
+        }
         return query;
     }
 

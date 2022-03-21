@@ -3,7 +3,7 @@
   <div fxLayout="row wrap">
     <mat-form-field fxFlex="100%"  appearance="outline">
       <mat-label>{{ 'desc.nazev_notifikace' | translate }}</mat-label>
-      <input matInput [placeholder]="'desc.zadejte_nazev_notifikace' | translate" [formControl]="notificationNameControl" required>
+      <input matInput  [placeholder]="'desc.zadejte_nazev_notifikace' | translate" [formControl]="notificationNameControl" required>
       <mat-error *ngIf="notificationNameControl.invalid">
         {{ 'msg.error.nazev_notifikace' | translate }}
       </mat-error>
@@ -37,7 +37,7 @@
   <mat-divider class="app-mt-4 app-mb-4"></mat-divider>
   <div>
     <label id="notifikace_interval_label" class="app-label app-mr-2">{{ 'desc.notifikace_interval' | translate }}:</label>
-    <mat-radio-group aria-labelledby="notifikace_interval_label">
+    <mat-radio-group aria-labelledby="notifikace_interval_label" [(ngModel)]="periodicity">
       <mat-radio-button value="den">{{ 'desc.day' | translate }}</mat-radio-button>
       <mat-radio-button value="tyden">{{ 'desc.week' | translate }}</mat-radio-button>
       <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>

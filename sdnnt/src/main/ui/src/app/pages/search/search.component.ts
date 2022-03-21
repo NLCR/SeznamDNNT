@@ -33,7 +33,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   searchResponse: SolrResponse;
   facets;
   numFound: number;
-  hasStateFilter: boolean;
+  
 
   constructor(
     private route: ActivatedRoute,
@@ -48,9 +48,11 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.search(val);
     }));
+    /*
     this.subs.push(this.state.paramsProcessed.subscribe(val => {
       this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'dntstav') > -1;
     }));
+    */
   }
 
   ngOnDestroy(): void {
@@ -94,17 +96,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
       if (resp.notifications) {
         utils.enhanceByNotifications(this.docs, resp.notifications);
-        /*
-        this.docs.forEach(doc => {
-          const identifier = doc.identifier;
-          resp.notifications.forEach(z => {
-            if (z.identifier.includes(identifier)) {
-              doc.hasNotifications = true;
-            }
-          });
-        });
-        */
       }
+
+      if (resp.rnotifications) {
+        utils.enhanceByRulebasedNotifications(this.docs,resp.rnotifications);
+      }
+
+     
 
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
@@ -154,6 +152,24 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.search(val);
       });
     });
+
+  }
+
+  
+
+  selectNofiticationFitler(f) {
+    const q: any = {};
+    if (f) {
+      this.state.notificationSettings.selected = f;
+      //this.notificationFilter = f;
+      q.notificationFilter =  f.id;
+    } else {
+      this.state.notificationSettings.selected = null;
+      //this.notificationFilter = null;
+      q.notificationFilter = null;
+    }
+    q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
 
   }
 

@@ -4,14 +4,14 @@ package cz.inovatika.sdnnt.utils;
 public class MarcRecordFields {
 
     public static final String HISTORIE_STAVU_FIELD = "historie_stavu";
+    public static final String HISTORIE_STAVU_FIELD_CUT = "historie_stavu_cut";
     public static final String DNTSTAV_FIELD = "dntstav";
-    public static final String DNTSTAV_PREV_FIELD = "dntstav_prev";
     public static final String DATUM_STAVU_FIELD = "datum_stavu";
 
     public static final String KURATORSTAV_FIELD = "kuratorstav";
-    public static final String KURATORSTAV_PREV_FIELD  = "kuratorstav_prev";
     public static final String DATUM_KURATOR_STAV_FIELD = "datum_kurator_stav";
     public static final String HISTORIE_KURATORSTAVU_FIELD = "historie_kurator_stavu";
+    public static final String HISTORIE_KURATORSTAVU_FIELD_CUT = "historie_kurator_stavu_cut";
     public static final String HISTORIE_GRANULOVANEHOSTAVU_FIELD = "historie_granulovaneho_stavu";
 
     public static final String LICENSE_FIELD = "license";

@@ -461,6 +461,10 @@ public class MarcRecordUtilsToRefactor {
       }).forEach(jsonArray::put);
       mr.granularity = jsonArray;
     }
+    
+    if (doc.containsKey(FMT_FIELD)) {
+    	mr.fmt = (String) doc.getFieldValue(FMT_FIELD);
+    }
   }
 
   public static void setFMT(SolrInputDocument sdoc, String type_of_resource, String item_type) {

@@ -90,17 +90,25 @@
    <field name="datum_stavu" type="date" indexed="true" stored="true" multiValued="false" />
    <!--  historie public stavu -->	
    <field name="historie_stavu" type="string" indexed="true" stored="true"  />
-
+   <field name="historie_stavu_cut" type="cut-states-licenses-history" indexed="true" stored="true" multiValued="true"  />
 
    <!-- Kurator stav --> 	
    <field name="kuratorstav" type="string" indexed="true" stored="true" multiValued="true"  />
+
    <!-- datum kurator stavu   -->
    <field name="datum_kurator_stav" type="date" indexed="true" stored="true" multiValued="false" />
+
    <!--  historie kurator stavu -->	
    <field name="historie_kurator_stavu" type="string" indexed="true" stored="true"  />
 
+   <!-- priznak; bylo ztotozneno z volnym dilem v krameriovi -->
+   <field name="historie_kurator_stavu_cut" type="cut-states-licenses-history" indexed="false" stored="true" multiValued="true"  />
+
    <!--  historie stavu rocniku -->	
    <field name="historie_granulovaneho_stavu" type="string" indexed="true" stored="true"  />
+
+   <!-- Predchozi kurator stav --> 	
+   <field name="kuratorstav_pred" type="string" indexed="true" stored="true" multiValued="true"  />
 
    <!-- License --> 
    <field name="license" type="string" indexed="true" stored="true" multiValued="true" />
@@ -142,7 +150,9 @@
    <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
    
    <!-- ukladani licenci z granularity -->
-   <field name="granularity_license_cut" type="cut-license" indexed="true" stored="false" multiValued="true" />
+   <field name="granularity_license_cut" type="cut-states-licenses-history" indexed="true" stored="false" multiValued="true" />
+   
+   
    
    <!-- Pomocne pole pro reindexaci v pripade zmeny schematu -->
    <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
@@ -229,6 +239,8 @@
 		
 	<!-- license information from granularity field -->	
 	<copyField source="granularity" dest="granularity_license_cut" />
+	<copyField source="historie_stavu" dest="historie_stavu_cut" />
+	<copyField source="historie_kurator_stavu" dest="historie_kurator_stavu_cut" />
 
 
     <!-- field type definitions. The "name" attribute is
@@ -696,15 +708,23 @@
 	</fieldType>
 
 	<!-- licence analyzer -->
-	<fieldType name="cut-license"  class="solr.TextField" positionIncrementGap="100">
+	<fieldType name="cut-states-licenses-history"  class="solr.TextField" positionIncrementGap="100">
 		<analyzer type="index">
-			<tokenizer class="solr.KeywordTokenizerFactory"/>
-			<filter class="solr.PatternCaptureGroupFilterFactory" pattern="(dnnto|dnntt)" preserve_original="false"/>
+			<charFilter class="solr.PatternReplaceCharFilterFactory"
+             pattern="([\[&quot;{},\]])" replacement=" "/>
+			
+			<tokenizer class="solr.StandardTokenizerFactory"/>
+			<filter class="solr.PatternReplaceFilterFactory" pattern='(comment|zadost|user|stav|license|date\s*)' replacement=""/>
+
+			
 		</analyzer>
 		<analyzer type="query">
 			<tokenizer class="solr.KeywordTokenizerFactory"/>
 		</analyzer>
 	</fieldType>
+
+
+
     
     <fieldType name="icu_sort_cs" class="solr.ICUCollationField"  locale="cs" strength="tertiary">
     </fieldType>

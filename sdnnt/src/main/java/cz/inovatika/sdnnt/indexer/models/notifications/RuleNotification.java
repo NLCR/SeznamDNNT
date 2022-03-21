@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -178,38 +179,73 @@ public class RuleNotification extends AbstractNotification {
         // dnt stav a licence musi byt jinak
         StringBuilder builder = new StringBuilder();
         
-        if (this.filters.containsKey(MarcRecordFields.YEAR_OF_PUBLICATION)) {
+        Map<String,String> filters = new HashMap<>(this.filters);
+        
+        List<String> fi = new ArrayList<>();
+        if (filters.containsKey(MarcRecordFields.YEAR_OF_PUBLICATION)) {
             String removed = this.filters.remove(MarcRecordFields.YEAR_OF_PUBLICATION);
-            // dntstavy - musi byt predchozi 
-            // licence - musi byt predchozi
-            
+            fi.add(MarcRecordFields.YEAR_OF_PUBLICATION + ":[" + removed.replace(",", " TO ") + "]");
         }
 
-        List<String> fi = new ArrayList<>();
-        this.filters.keySet().forEach(key-> {
+        filters.keySet().forEach(key-> {
             fi.add(key+":"+this.filters.get(key));
         });
-        
         builder.append(fi.stream().collect(Collectors.joining(" AND ")));
         return builder.toString();
     }
     
+    public boolean accept(Map<String,String> doc) {
+        if (this.filters.containsKey(MarcRecordFields.DNTSTAV_FIELD) || this.filters.containsKey(MarcRecordFields.LICENSE_FIELD)) {
+            String string = doc.get(MarcRecordFields.HISTORIE_STAVU_FIELD);
+            JSONArray jsonArray = new JSONArray(string);
+            // check previous state
+            if (jsonArray.length() >=2) {
+                JSONObject object = jsonArray.getJSONObject(jsonArray.length()-2);
+                if (this.filters.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+                   String historyStav = object.getString("stav");
+                   String dntStavField = this.filters.get(MarcRecordFields.DNTSTAV_FIELD);
+                   if (historyStav != null && dntStavField != null && !historyStav.equals(dntStavField)) {
+                       return false;
+                   }
+                }
+                if (this.filters.containsKey(MarcRecordFields.LICENSE_FIELD)) {
+                    String historyLicense = object.getString("license");
+                    String lisenceField = this.filters.get(MarcRecordFields.LICENSE_FIELD);
+                    if (historyLicense != null && lisenceField != null && !historyLicense.equals(lisenceField)) {
+                        return false;
+                    }
+                 }
+            }
+            return true;
+        } else {
+            return true;
+        }
+    }
+    
+    
     // dnstav, kuratorstav
     public String provideProcessQueryFilters() {
-        // dnt stav a licence musi byt jinak
+        
+        Map<String,String> filters = new HashMap<>(this.filters);
+        
         StringBuilder builder = new StringBuilder();
-        if (this.filters.containsKey(MarcRecordFields.YEAR_OF_PUBLICATION)) {
+        List<String> fi = new ArrayList<>();
+        if (filters.containsKey(MarcRecordFields.YEAR_OF_PUBLICATION)) {
             String removed = this.filters.remove(MarcRecordFields.YEAR_OF_PUBLICATION);
-
-            if (this.filters.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
-                String removedDntStav = this.filters.remove(MarcRecordFields.DNTSTAV_FIELD);
-                
-            }
-            
-            if (this.filters.containsKey(MarcRecordFields.LICENSE_FIELD)) {
-                String removedLicense = this.filters.remove(MarcRecordFields.DNTSTAV_FIELD);
-            }
+            fi.add(MarcRecordFields.YEAR_OF_PUBLICATION + ":[" + removed.replace(",", " TO ") + "]");
         }
+        if (filters.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+            String removedDntStav = this.filters.remove(MarcRecordFields.DNTSTAV_FIELD);
+            fi.add(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD_CUT+":"+ removedDntStav);
+        }
+        
+        if (filters.containsKey(MarcRecordFields.LICENSE_FIELD)) {
+            String removedLicense = this.filters.remove(MarcRecordFields.DNTSTAV_FIELD);
+            fi.add(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD_CUT+":"+ removedLicense);
+        }
+        filters.keySet().forEach(key-> {
+            fi.add(key+":"+this.filters.get(key));
+        });
         return builder.toString();
 }
 }

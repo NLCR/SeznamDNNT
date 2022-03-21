@@ -361,9 +361,6 @@ public class MarcRecord {
         this.dntstav = sdoc.getFieldValues(DNTSTAV_FIELD) != null ? new ArrayList(sdoc.getFieldValues(DNTSTAV_FIELD)) : null;
       }
     }
-    if (previousDntstav != null && previousDntstav.isEmpty()) {
-        sdoc.setField(DNTSTAV_PREV_FIELD, previousDntstav);
-    }
 
     if (kuratorstav != null && !kuratorstav.isEmpty()) {
       sdoc.setField(KURATORSTAV_FIELD, kuratorstav);
@@ -374,9 +371,6 @@ public class MarcRecord {
       }
     }
 
-    if (previousKuratorstav != null && !previousKuratorstav.isEmpty()) {
-        sdoc.setField(KURATORSTAV_PREV_FIELD, previousKuratorstav);
-    }
     
     if (sdoc.containsKey(MARC_264_B)) {
       String val = (String) sdoc.getFieldValue(MARC_264_B);

@@ -20,6 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.UsersIterationSupport;
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
+import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
@@ -29,10 +32,12 @@ import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
+import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserValidation;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
@@ -214,7 +219,36 @@ public class UserServlet extends HttpServlet {
                             });
                             retVal.put("zadost", jsonArray);
                         }
+
+                        // Notification settings
+                        JSONObject settingsObject = new JSONObject();
+                        NotificationsService service = new NotificationServiceImpl(controler, null);
+                        // TODO: Move to notification utils
+                        List<AbstractNotification> simple = service.findNotificationsByUser(login.getUsername(), TYPE.simple);
+                        List<AbstractNotification> rules = service.findNotificationsByUser(login.getUsername(), TYPE.rule);
+                        JSONArray jsonArray = new JSONArray();
+                        if (!simple.isEmpty()) {
+                            JSONObject fobj = new JSONObject();
+                            fobj.put("name", "simple");
+                            fobj.put("id", "simple");
+                            jsonArray.put(fobj);
+                        }
+                        
+                        rules.stream().map(an-> {
+                            RuleNotification rnotif = (RuleNotification) an;
+                            JSONObject fobj = new JSONObject();
+                            fobj.put("name", rnotif.getName());
+                            fobj.put("id", rnotif.getId());
+                            return fobj;
+                        }).forEach(jsonArray::put);
+                        
+                        
+                        settingsObject.put("all", jsonArray);
+                        retVal.put("notificationsettings", settingsObject);
+
+                        return retVal;
                     }
+                    //return retval;
                     return login.toJSONObject();
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());

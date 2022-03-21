@@ -196,15 +196,13 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         if (doc.has(MarcRecordFields.DNTSTAV_FIELD)) {
             doc.getJSONArray(MarcRecordFields.DNTSTAV_FIELD).forEach(o-> stavy.add(o.toString()));
         }
+        
+        
         // publishers
         if (doc.has(NAKLADATEL_FIELD)) {
             doc.getJSONArray(NAKLADATEL_FIELD).forEach(o-> nakladatel.add(o.toString()));
         }
 
-        // neni potreba - soucasti nakladatele
-//        if (doc.has(MARC_264_B)) {
-//            doc.getJSONArray(MARC_264_B).forEach(o-> nakladatel.add(o.toString()));
-//        }
 
         if (doc.has(HISTORIE_STAVU_FIELD)) {
             doc.getJSONArray(HISTORIE_STAVU_FIELD).forEach(o-> {

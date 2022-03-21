@@ -1,4 +1,5 @@
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { NotifSettings } from './notifsettings';
 import { UserRegisterOption } from './user-register-option';
 
 
@@ -39,9 +40,10 @@ export class User {
   nazevspolecnosti:string;
 
   registerOption: UserRegisterOption;
-
   
   thirdpartyuser:boolean = false;
 
+  // notification settings
+  notificationsettings?: NotifSettings;
 }
 
