@@ -16,8 +16,8 @@
         <mat-card *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
-             <!--  <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
-              <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox> -->
+              <!-- <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox> -->
+              <!--  <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox> -->
 
               <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' ))">
                 <mat-button-toggle [matMenuTriggerFor]="menuFilter">
@@ -37,6 +37,10 @@
                   <mat-divider *ngIf="f.name === 'simple'"></mat-divider>
                 </ng-container>
               </mat-menu>
+            </div>
+
+            <div>
+              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
             </div>
 
             <div>
