@@ -24,16 +24,25 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.json.JSONArray;
 import org.junit.*;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import static cz.inovatika.sdnnt.index.DntAlephTestUtils.alephImport;
+import static cz.inovatika.sdnnt.index.DntAlephTestUtils.dntAlephStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class NotificationServiceImplTest {
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
 
-    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplTest.class.getName());
+public class NotificationServiceImplITTest {
+
+    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplITTest.class.getName());
 
     public static SolrTestServer prepare;
 
@@ -87,6 +96,7 @@ public class NotificationServiceImplTest {
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057930.json"));
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
         service.saveNotificationRule(ruleNotification("knihovna", "notification_knihovna_rulebased.json"));
+
         //service.saveNotificationRule(ruleNotification("knihovna", "notification_knihovna_rulebased3.json"));
 
         Assert.assertTrue(service.findNotificationsByUser("test1").size() == 2);
@@ -102,7 +112,7 @@ public class NotificationServiceImplTest {
     
     
     @Test
-    public void testSendSimpleNotification() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+    public void testSendNotifications_SIMPLE_RULE() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
@@ -110,24 +120,16 @@ public class NotificationServiceImplTest {
         }
 
         MarcRecord marcRecord1 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
-        Calendar calendar1 = Calendar.getInstance();
-        calendar1.add(Calendar.DAY_OF_WEEK, -1);
-        marcRecord1.datum_stavu = calendar1.getTime();
-
         Assert.assertNotNull(marcRecord1);
 
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
-        Calendar calendar2 = Calendar.getInstance();
-        calendar2.add(Calendar.DAY_OF_WEEK, -1);
-        marcRecord2.datum_stavu = calendar2.getTime();
-
+        Assert.assertNotNull(marcRecord2);
 
         prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
         prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
         SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
-
-        // catalog prepared
+        
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
@@ -135,8 +137,26 @@ public class NotificationServiceImplTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
-        MarcRecord.fromDoc(catalog.getResults().get(0));
-        MarcRecord.fromDoc(catalog.getResults().get(1));
+        MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
+        MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
+        
+        
+        solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+        solrMarc2.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+
+        Calendar calendar1 = Calendar.getInstance();
+        //calendar1.add(Calendar.DAY_OF_WEEK, -1);
+        solrMarc1.datum_stavu = calendar1.getTime();
+
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.add(Calendar.DAY_OF_WEEK, -1);
+        solrMarc2.datum_stavu = calendar2.getTime();
+ 
+        // save and commit
+        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -166,6 +186,7 @@ public class NotificationServiceImplTest {
                 Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
                 List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
                 Assert.assertTrue(pair.getLeft().equals("test@testovic.cz"));
+                System.out.println("Document size "+ documents.size());
                 Assert.assertTrue(documents.size()  == 2);
                 return null;
             }
@@ -181,29 +202,118 @@ public class NotificationServiceImplTest {
 
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057930.json"));
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
-        
-        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
-        Assert.assertTrue(notificationsByInterval.size() == 2);
+        service.saveNotificationRule(ruleNotification("test1", "notification_knihovna_rulebased_dntstavA.json"));
 
+        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
+        Assert.assertTrue(notificationsByInterval.size() == 3);
+        
         service.processNotifications(NotificationInterval.den);
     }
 
-    private SimpleNotification simpleNotification(String user, String identifier) throws IOException {
-    	InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("cz/inovatika/sdnnt/indexer/models/notifications/"+identifier);
-    	String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
-   	
-    	AbstractNotification notification = NotificationFactory.fromJSON(jsonString);
+
+    
+    @Test
+    public void testSendNotifications_QUERY() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, FactoryConfigurationError, XMLStreamException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        
+        InputStream resourceAsStream = dntAlephStream("oai_SE_dnnt.xml");
+        Assert.assertNotNull(resourceAsStream);
+        alephImport(resourceAsStream,36);
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:DNT01-000172209\"");
+        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        long numFound = catalog.getResults().getNumFound();
+        Assert.assertTrue(numFound == 1);
+        // saved marc record
+        MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
+        
+        
+        solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.add(Calendar.DAY_OF_WEEK, -1);
+        solrMarc1.datum_stavu = calendar1.getTime();
+
+ 
+        // save and commit
+        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
+                .addMockedMethod("sendNotificationEmail")
+                .createMock();
+
+        UserControler controler = EasyMock.createMock(UserControler.class);
+
+        EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
+                .andReturn(createNotificationUsers())
+                .anyTimes();
+
+        NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
+                .withConstructor(controler, mailService)
+                .addMockedMethod("buildClient").createMock();
+
+
+
+        mailService.sendNotificationEmail(
+                EasyMock.isA(Pair.class),
+                EasyMock.isA(List.class)
+        );
+
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
+                List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
+                Assert.assertTrue(pair.getLeft().equals("test@testovic.cz"));
+                System.out.println("Document size "+ documents.size());
+                Assert.assertTrue(documents.size()  == 1);
+                return null;
+            }
+        }).times(1);
+
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+
+        EasyMock.replay(mailService, controler, service);
+
+        service.saveNotificationRule(ruleNotification("test1", "notification_knihovna_rulebased_query.json"));
+
+        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
+        Assert.assertTrue(notificationsByInterval.size() == 1);
+        
+        service.processNotifications(NotificationInterval.den);
+
+            
+    }
+
+    static SimpleNotification simpleNotification(String user, String identifier) throws IOException {
+        InputStream resourceAsStream = NotificationServiceImplITTest.class.getClassLoader()
+                .getResourceAsStream("cz/inovatika/sdnnt/indexer/models/notifications/" + identifier);
+        String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
+        AbstractNotification notification = NotificationFactory.fromJSON(jsonString);
+        notification.setUser(user);
         return (SimpleNotification) notification;
     }
 
-    private RuleNotification ruleNotification(String user, String identifier) throws IOException {
-    	InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("cz/inovatika/sdnnt/indexer/models/notifications/"+identifier);
-    	String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
-   	
-    	AbstractNotification notification = NotificationFactory.fromJSON(jsonString);
+    static RuleNotification ruleNotification(String user, String identifier) throws IOException {
+        InputStream resourceAsStream = NotificationServiceImplITTest.class.getClassLoader()
+                .getResourceAsStream("cz/inovatika/sdnnt/indexer/models/notifications/" + identifier);
+        String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
+        AbstractNotification notification = NotificationFactory.fromJSON(jsonString);
+        notification.setUser(user);
         return (RuleNotification) notification;
     }
-
 
     private MarcRecord catalogDoc(String ident ) throws IOException {
         SolrDocument document = MarcModelTestsUtils.prepareResultDocument(ident.replaceAll("\\:","_"));

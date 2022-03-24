@@ -39,9 +39,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     boolean contextInformation = false;
     private Map<String, String> mappingHosts = new HashMap<>();
     private Map<String, String> mappingApi = new HashMap<>();
-    // iteration properties
-
-
 
     public PXKrameriusServiceImpl(JSONObject iteration, JSONObject results) {
         if (iteration != null) {
@@ -113,6 +110,9 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
     @Override
     public List<String> check() {
+
+        LOGGER.info("Initializing px process");
+        
         this.initialize();
         List<String> foundCandidates = new ArrayList<>();
         Map<String, List<String>> mapping = new HashMap<>();
@@ -136,12 +136,14 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 SIGLA_FIELD,
                 MARC_911_U,
                 MARC_956_U,
+                MARC_856_U,
                 GRANULARITY_FIELD
         ), (rsp) -> {
             Object identifier = rsp.getFieldValue("identifier");
 
             Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
             Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
+            Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
 
             if (links1 != null && !links1.isEmpty()) {
                 List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
@@ -149,10 +151,16 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             } else if (links2 != null && !links2.isEmpty()) {
                 List<String> ll = links2.stream().map(Object::toString).collect(Collectors.toList());
                 mapping.put(identifier.toString(), ll);
+            } else if (links3 != null && !links3.isEmpty()) {
+                List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
+                mapping.put(identifier.toString(), ll);
+                
             }
         }, IDENTIFIER_FIELD);
 
-
+        
+        LOGGER.info("Found candidates: "+mapping.size());
+        
         try (final SolrClient solr = buildClient()) {
 
             List<String> keys = new ArrayList<>(mapping.keySet());
@@ -175,6 +183,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
+        LOGGER.info("Found candidates after used check: "+mapping.size());
+        
         Map<String, List<Pair<String, String>>> buffer = new HashMap<>();
         for (String key : mapping.keySet()) {
             List<String> links = mapping.get(key);
@@ -219,7 +229,9 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
 
                 String encodedCondition = URLEncoder.encode("PID:(" + condition + ")", "UTF-8");
-                String url = baseUrl + "api/v5.0/search?q=" + "PID:(" + encodedCondition + ")" + "&wt=json";
+                String url = baseUrl + "api/v5.0/search?q=" +  encodedCondition + "&wt=json&rows="+pairs.size();
+                
+                LOGGER.info(String.format("Testing url is %s and list of identifiers %s", url, pairs.stream().map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
 
                 try {
                     String result = simpleGET(url);
@@ -231,6 +243,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                         if (oneDoc.has("dostupnost")) {
                             String pid = oneDoc.getString("PID");
                             String dostupnost = oneDoc.getString("dostupnost");
+                            
                             if (dostupnost != null && dostupnost.equals("public")) {
 
                                 Optional<Pair<String, String>> any = pairs.stream().filter(p -> {
@@ -305,8 +318,12 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             try (final SolrClient solr = buildClient()) {
 
                 for (String identifier : identifiers) {
+                    
                     SolrInputDocument idoc = new SolrInputDocument();
                     idoc.setField(IDENTIFIER_FIELD, identifier);
+                    
+                    
+                    
                     LOGGER.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
                         LOGGER.fine(String.format("Setting curator state %s", cState.name()));
@@ -316,6 +333,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                         LOGGER.fine(String.format("Setting public state %s", pState.name()));
                         atomicUpdate(idoc, pState.name(), DNTSTAV_FIELD);
                     }
+                    
+                    // history information
                     if (contextInformation) {
                         LOGGER.fine("Setting context information ");
                         atomicUpdate(idoc, true, FLAG_PUBLIC_IN_DL);

@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.index.utils.torefactor;
 import cz.inovatika.sdnnt.index.ISBN;
 import cz.inovatika.sdnnt.index.MD5;
 import cz.inovatika.sdnnt.index.RomanNumber;
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
@@ -77,16 +78,19 @@ public class MarcRecordUtilsToRefactor {
               if (df.getSubFields().containsKey("b")) {
                 h.put("user", df.getSubFields().get("b").get(0).getValue());
               }
+                  
+              
+//              if (isANZCombination(states)) {
+//                h.put("license", "dnntt");
+//              } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null) ){
+//                h.put("license", "dnnto");
+//              }
 
-              if (isANZCombination(states)) {
-                h.put("license", "dnntt");
-              } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null) ){
-                h.put("license", "dnnto");
-              }
-
-              // System.out.println(h);
               hs.put(h);
             }
+            // doplnit licence stavu v historii 
+            
+            HistoryObjectUtils.enhanceHistoryByLicense(hs);
             sdoc.setField("historie_stavu", hs.toString());
             sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, hs.toString());
 
@@ -169,7 +173,23 @@ public class MarcRecordUtilsToRefactor {
                 if (isOnlyACombiation(stavy)) {
                   h.put(LICENSE_FIELD, License.dnnto.name());
                 } else if (isANZCombination(stavy)) {
-                  h.put(LICENSE_FIELD, License.dnnto.name());
+                  
+                  h.put(LICENSE_FIELD, License.dnntt.name());
+                  // remove nz state
+                  final JSONArray stavJSONArray = new JSONArray();
+                  final JSONArray kuratorStavJSONArray = new JSONArray();
+                  h.getJSONArray("stav").forEach(obj-> {
+                      if (!obj.toString().equals("NZ")) {
+                          stavJSONArray.put(obj);
+                      }
+                  });
+                  h.getJSONArray(KURATORSTAV_FIELD).forEach(obj-> {
+                      if (!obj.toString().equals("NZ")) {
+                          kuratorStavJSONArray.put(obj);
+                      }
+                  });
+                  h.put("stav",stavJSONArray);
+                  h.put(KURATORSTAV_FIELD,stavJSONArray);
                 }
                 //if (h.getJSONArray("stav"))
               }
@@ -189,6 +209,7 @@ public class MarcRecordUtilsToRefactor {
 
     }
 
+    
     public static boolean isANZCombination(List<String> states) {
       if (states.size() == 2 ) return states.contains("NZ") && (states.contains("A") || (states.contains("PA")));
       else return states.contains("NZ");

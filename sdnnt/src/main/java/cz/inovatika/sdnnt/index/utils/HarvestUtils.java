@@ -21,14 +21,23 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Harvesting utility class
+ * @author happy
+ */
 public class HarvestUtils {
 
     public static final Logger LOGGER = Logger.getLogger(HarvestUtils.class.getName());
 
-    private HarvestUtils() {
-    }
+    private HarvestUtils() {}
 
-    // debug files
+    /** 
+     * Creating debug files for harvest
+     * @param type type of harvest
+     * @param netStream Data stream
+     * @param url Requesting url
+     * @return
+     */
     public static File debugFile(String type, InputStream netStream, String url) {
         try {
             String harvestFiles = System.getProperty("user.home") + File.separator + ".sdnnt" + File.separator + "harvest" + File.separator + type + "_" + Thread.currentThread().getName();
@@ -67,6 +76,22 @@ public class HarvestUtils {
         }
     }
 
+    /**
+     * Throttling support. The method tries to download data stream, and if it is not possible, 
+     *  waits configured number of iterations.
+     *   
+     * Throttling situations:
+     * <ul>
+     *  <li>NotReady html page - information from Aleph </li>
+     *  <li>TimeoutException</li>
+     * </ul>
+     * @param client
+     * @param type
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws MaximumIterationExceedException
+     */
     public static File throttle(CloseableHttpClient client, String type, String url) throws IOException, MaximumIterationExceedException {
         int max_repetion = 3;
         int seconds = 5;
@@ -122,4 +147,6 @@ public class HarvestUtils {
             } else return false;
         }
     }
+    
+    
 }

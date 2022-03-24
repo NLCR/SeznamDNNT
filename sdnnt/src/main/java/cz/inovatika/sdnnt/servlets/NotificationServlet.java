@@ -129,7 +129,9 @@ public class NotificationServlet extends HttpServlet {
                         List<RuleNotification> storedRuleNotifications = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.rule).stream().map(notif-> {
                             return (RuleNotification)notif;
                         }).collect(Collectors.toList());
-                        service.deleteRuleNotifications(storedRuleNotifications);
+                        if (!storedRuleNotifications.isEmpty()) {
+                            service.deleteRuleNotifications(storedRuleNotifications);
+                        }
                         for (RuleNotification aNotif : aNotification) {
                             service.saveNotificationRule(aNotif);
                         }

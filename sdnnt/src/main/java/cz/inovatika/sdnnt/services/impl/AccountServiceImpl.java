@@ -443,6 +443,9 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    
+    
+
 
 
     public JSONObject curatorSwitchState(JSONObject zadostJSON, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException {
@@ -602,6 +605,111 @@ public class AccountServiceImpl implements AccountService {
                 new HistoryImpl(buildClient()).log(zadost.getId(), request.toString(), zadost.toJSON().toString(), zadost.getUser(), "zadost", null, false);
             }
         }
+    }
+
+    
+
+    @Override
+    public List<String> findIdentifiersUsedInRequests(String user)
+            throws AccountException, IOException, SolrServerException {
+        List<String> identifiers = new ArrayList<>();
+        try (SolrClient solr = buildClient()) {
+            
+            SolrQuery query = new SolrQuery("*")
+                    .setFields("id", "identifiers")
+                    .setRows(3000);
+
+            addFilter(query, user, null, null);
+
+            
+            SolrDocumentList zadost = solr.query(DataCollections.zadost.name(), query).getResults();
+            zadost.stream().forEach(solrDoc -> {
+                Collection<Object> identsFromZadost = solrDoc.getFieldValues("identifiers");
+                identsFromZadost.stream().map(Object::toString).forEach(foundInZadost -> {
+                    if (identifiers.contains(foundInZadost)) {
+                        identifiers.add(foundInZadost);
+                    }
+                });
+            });
+        } catch (SolrServerException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return identifiers;
+    }
+
+    private void addFilter(SolrQuery query, String user, String navrh, String requestState) {
+        if (user != null) {
+            query.addFilterQuery("user:" + user);
+        }
+        if (navrh != null) {
+            query.addFilterQuery("navrh:" + navrh);
+        }
+        if (requestState != null) {
+            query.addFilterQuery("state:" + requestState);
+        }
+        
+    }
+    
+    @Override
+    public List<String> findIdentifiersUsedInRequests(String user, String requestState)
+            throws AccountException, IOException, SolrServerException {
+        List<String> identifiers = new ArrayList<>();
+        try (SolrClient solr = buildClient()) {
+            
+            SolrQuery query = new SolrQuery("*")
+                    .setFields("id", "identifiers")
+                    .setRows(3000);
+
+            addFilter(query, user, null, requestState);
+            
+            
+            SolrDocumentList zadost = solr.query(DataCollections.zadost.name(), query).getResults();
+            zadost.stream().forEach(solrDoc -> {
+                Collection<Object> identsFromZadost = solrDoc.getFieldValues("identifiers");
+                identsFromZadost.stream().map(Object::toString).forEach(foundInZadost -> {
+                    if (identifiers.contains(foundInZadost)) {
+                        identifiers.add(foundInZadost);
+                    }
+                });
+            });
+        } catch (SolrServerException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return identifiers;
+    }
+
+    @Override
+    public List<String> findIdentifiersUsedInRequests(String user, String navrh, String requestState)
+            throws AccountException, IOException, SolrServerException {
+        List<String> identifiers = new ArrayList<>();
+        try (SolrClient solr = buildClient()) {
+            
+            SolrQuery query = new SolrQuery("*")
+                    .setFields("id", "identifiers")
+                    .setRows(3000);
+
+            addFilter(query, user, navrh, requestState);
+            
+            
+            SolrDocumentList zadost = solr.query(DataCollections.zadost.name(), query).getResults();
+            zadost.stream().forEach(solrDoc -> {
+                Collection<Object> identsFromZadost = solrDoc.getFieldValues("identifiers");
+                identsFromZadost.stream().map(Object::toString).forEach(foundInZadost -> {
+                    if (identifiers.contains(foundInZadost)) {
+                        identifiers.add(foundInZadost);
+                    }
+                });
+            });
+        } catch (SolrServerException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return identifiers;
     }
 
     @Override

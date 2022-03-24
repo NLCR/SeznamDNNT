@@ -1,10 +1,13 @@
 package cz.inovatika.sdnnt.index.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+import cz.inovatika.sdnnt.model.License;
+
 /**
- * History objects
+ * History objects utility class
  */
 public class HistoryObjectUtils {
 
@@ -34,7 +37,7 @@ public class HistoryObjectUtils {
                 // musi mit alespon jedno pole ?
                 granularityField.optJSONArray(GranularityUtils.STAV_FIELD).getString(0),
                 granularityField.optString(GranularityUtils.LICENSE_FIELD),
-        null,
+                null,
                 user,
                 poznamka,
                 historyDate
@@ -87,5 +90,28 @@ public class HistoryObjectUtils {
             eq = StringUtils.equals(firstYear,secondYear);
         }
         return eq;
+    }
+    
+    /** Raw history from aleph */
+    public static void enhanceHistoryByLicense(JSONArray historyArray) {
+        String license = null;
+        for (int i = 0,ll=historyArray.length(); i < ll; i++) {
+            JSONObject oneState = historyArray.getJSONObject(i);
+            String st = oneState.optString("stav");
+            if (st != null) {
+                if (st.equals("A") || st.equals("PA")) {
+                    if (license == null) {
+                        license = License.dnnto.name();
+                    }
+                } else if (st.equals("NZ")) {
+                    license = License.dnntt.name();
+                } else {
+                    license = null;
+                }
+                if (license != null) {
+                    oneState.put("license", license);
+                }
+            }
+        }
     }
 }

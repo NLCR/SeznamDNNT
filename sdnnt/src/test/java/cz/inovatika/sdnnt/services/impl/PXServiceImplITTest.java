@@ -28,9 +28,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class PXServiceImplTest {
+public class PXServiceImplITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(PXServiceImplTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(PXServiceImplITTest.class.getName());
 
     public static SolrTestServer prepare;
 
@@ -85,7 +85,7 @@ public class PXServiceImplTest {
         InputStream resStream = this.getClass().getResourceAsStream("pxservice_kramerius.json");
         String s = IOUtils.toString(resStream, "UTF-8");
 
-        EasyMock.expect(pxService.simpleGET("http://krameriusndk.nkp.cz/search/api/v5.0/search?q=PID:(PID%3A%28uuid%5C%3Aaf9dec90-d5bb-11e3-b110-005056827e51+OR+uuid%5C%3A113986c0-dcde-11e3-b110-005056827e51+OR+uuid%5C%3A41041210-c2d3-11e2-8b87-005056827e51%29)&wt=json"))
+        EasyMock.expect(pxService.simpleGET("http://krameriusndk.nkp.cz/search/api/v5.0/search?q=PID%3A%28uuid%5C%3Aaf9dec90-d5bb-11e3-b110-005056827e51+OR+uuid%5C%3A113986c0-dcde-11e3-b110-005056827e51+OR+uuid%5C%3A41041210-c2d3-11e2-8b87-005056827e51%29&wt=json&rows=3"))
                 .andReturn(s).anyTimes();
 
         EasyMock.replay(pxService, options);
@@ -300,7 +300,7 @@ public class PXServiceImplTest {
         EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
 
         EasyMock.expect(aService.buildClient()).andDelegateTo(
-                new AccountServiceImplTest.BuildSolrClientSupport()
+                new AccountServiceImplITTest.BuildSolrClientSupport()
         ).anyTimes();
 
 

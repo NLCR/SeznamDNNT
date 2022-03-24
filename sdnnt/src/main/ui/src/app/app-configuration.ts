@@ -81,6 +81,14 @@ import { User } from './shared/user';
         return this.config.dntSetAlpehLinks;
     }    
 
+    public get numberOfRuleBasedNotifications() {
+        return this.config.numberOfRuleBasedNotifications;
+    }    
+
+    public get numberOfItemsInRulenotification() {
+        return this.config.numberOfItemsInRulenotification;
+    }    
+
     /**
      * List the files holding section configuration in assets/configs folder
      * ['search'] will look for /assets/configs/search.json

@@ -45,6 +45,6 @@
   </div>
 </div>
 <div mat-dialog-actions>
-  <button mat-flat-button color="primary" (click)="doBulkNotification()">{{ 'desc.provest_hromadnou_notifikaci' | translate }}</button>
+  <button [disabled]="!name || name === ''" mat-flat-button color="primary"  (click)="doBulkNotification()">{{ 'desc.provest_hromadnou_notifikaci' | translate }}</button>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
 </div>

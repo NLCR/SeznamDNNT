@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 
 import static org.easymock.EasyMock.*;
 
-public class UserControlerImplTest {
+public class UserControlerImplITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplITTest.class.getName());
 
     public static SolrTestServer prepare;
 

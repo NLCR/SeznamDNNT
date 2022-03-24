@@ -29,9 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class PXYearServiceTest {
+public class PXYearServiceITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(PXServiceImplTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(PXServiceImplITTest.class.getName());
 
     public static SolrTestServer prepare;
 
@@ -170,7 +170,7 @@ public class PXYearServiceTest {
         EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
 
         EasyMock.expect(aService.buildClient()).andDelegateTo(
-                new AccountServiceImplTest.BuildSolrClientSupport()
+                new AccountServiceImplITTest.BuildSolrClientSupport()
         ).anyTimes();
 
 

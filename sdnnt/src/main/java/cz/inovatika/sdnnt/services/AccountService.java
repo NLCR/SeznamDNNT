@@ -11,10 +11,13 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Represents service for requets manipulations
+ * Represents a service for handling requests
+ * 
+ * TODO: return types
  */
 public interface AccountService {
-
+    
+    /** Maximum number of items in one requests */
     public static final int MAXIMUM_ITEMS_IN_ZADOST = 3000;
 
     /**
@@ -29,16 +32,16 @@ public interface AccountService {
     /**
      * Searching  in requests
      * @param q Query
-     * @param state  Filter for state of request open, waiting, waiting_for_automatic_process, processed
+     * @param status  Filter for request status: open, waiting, waiting_for_automatic_process, processed
      * @param navrhy Filter for type of request: NZN, VN, VNL, VNZ
      * @param institution Filter for institution
      * @param priority Filter for priority
      * @param delegated Filtr for delegated person
      * @param typeOfReq
      * @param sort Sorting support (u uzivatele datum vytvoreni a zpracovani, u kuratoru - deadline, priority atd.. )
-     * @param rows
-     * @param page
-     * @return
+     * @param rows Number items in one page
+     * @param page Page number
+     * @return Search results
      * @throws SolrServerException Chyba spojeni se solrem
      * @throws IOException IO chyba
      * @throws AccountException Genericka vyjimka pri ukladani zadosti
@@ -47,9 +50,9 @@ public interface AccountService {
 
 
     /**
-     * Uzivatel muze mit pouze jednu navrh pro kazdy typ. Dela pripravu pro tuto situaci - vraci existujici otevrenou pokud neni, vytvori a vrati
-     * @param navrh Typ navrhu/vyrazeni
-     * @return
+     * Prepare empty request
+     * @param navrh Type of request
+     * @return Return serialized request
      * @throws SolrServerException
      * @throws IOException
      * @throws AccountException
@@ -59,14 +62,14 @@ public interface AccountService {
 
 
     /**
-     * Ulozeni zadosti pro uzivatele, musi byt ve stavu open
-     * @param payload Zadost ve formatu json
-     * @param inform Informace o ulozeni zdosti
-     * @return Vraci json ulozene zadosti
-     * @throws SolrServerException Chyba spojeni se solrem
-     * @throws IOException IO chyba
-     * @throws ConflictException Konflikt, zadost byla zmenene
-     * @throws AccountException Genericka vyjimka pri ukladani zadosti
+     * Saving requests from the end of the curator
+     * @param payload Request serialized in json 
+     * @param inform Information callback
+     * @return Returns stored json
+     * @throws SolrServerException Solr exception
+     * @throws IOException IO error
+     * @throws ConflictException Saving conflict
+     * @throws AccountException Generic account exception
      * @see AccountServiceInform
      */
     public JSONObject saveRequest(String payload, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException, AccountException;
@@ -74,13 +77,12 @@ public interface AccountService {
 
 
     /**
-     * Ulozeni pro kuratory
-     * @param payload Zadost ve formatu json
-     * @param inform
-     * @return
-     * @return Vraci json ulozene zadosti
-     * @throws SolrServerException Chyba spojeni se solrem
-     * @throws IOException IO chyba
+     * Saving requests from the end of the user
+     * @param payload Requests in json
+     * @param inform 
+     * @return Stored requests
+     * @throws SolrServerException Solr exception
+     * @throws IOException IO error
      * @throws ConflictException Konflikt, zadost byla zmenene
      * @throws AccountException Genericka vyjimka pri ukladani zadosti
      * @see AccountServiceInform
@@ -88,23 +90,11 @@ public interface AccountService {
     public JSONObject saveCuratorRequest(String payload, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException,AccountException;
 
 
-    /**
-     *
-     * @param payload
-     * @param user
-     * @param frbr
-     * @param inform
-     * @return
-     * @throws SolrServerException
-     * @throws IOException
-     * @throws ConflictException
-     * @throws AccountException
-     */
     public JSONObject saveRequestWithFRBR(String payload, User user , String frbr, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException,AccountException;
 
     /**
-     * Vraci zazany
-     * @param id
+     * Returns items in request
+     * @param id Request identifiers
      * @param rows
      * @param page
      * @return
@@ -116,8 +106,8 @@ public interface AccountService {
     public JSONObject getRecords(String id, int rows, int page) throws SolrServerException, IOException, ConflictException,AccountException;
 
     /**
-     * Zavreni pozadavku z pohledu uzivatele
-     * @param payload
+     * Closing requests - from user's end
+     * @param payload Serialized request
      * @return
      * @throws ConflictException
      * @throws AccountException
@@ -125,8 +115,8 @@ public interface AccountService {
     public JSONObject userCloseRequest(String payload) throws ConflictException,AccountException;
 
     /**
-     * Zavreni pozadavku generovaneho systemem
-     * @param payload
+     * Closing requests - from scheduler's end
+     * @param payload Serialized request
      * @return
      * @throws ConflictException
      * @throws AccountException
@@ -134,8 +124,8 @@ public interface AccountService {
     public JSONObject schedulerDefinedCloseRequest(String payload) throws ConflictException,AccountException;
 
     /**
-     * Zarvreni pozdadavku z pohledu kuratora
-     * @param payload
+     * Closing requests - from curactor's end
+     * @param payload Serialized request
      * @return
      * @throws ConflictException
      * @throws AccountException
@@ -143,8 +133,8 @@ public interface AccountService {
     public JSONObject curatorCloseRequest(String payload) throws ConflictException,AccountException;
 
     /**
-     * Smaze pozadavek
-     * @param payload
+     * Delete request 
+     * @param payload  Serialized request
      * @return
      * @throws ConflictException
      * @throws AccountException
@@ -152,16 +142,99 @@ public interface AccountService {
      * @throws SolrServerException
      */
     public JSONObject deleteRequest(String payload) throws ConflictException, AccountException, IOException, SolrServerException;
-
+    
+    /**
+     * Switch state - curator's end
+     * @param zadostJson Serialized request
+     * @param documentId Document id
+     * @param reason Reason for switch
+     * @return Returns result of switch
+     * @throws ConflictException 
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public JSONObject curatorSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
+    /**
+     * Switch state - alternative state
+     * @param alternative Alternative state
+     * @param zadostJson Serialized request
+     * @param documentId Document id 
+     * @param reason Reason
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public JSONObject curatorSwitchAlternativeState(String alternative, JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
+    /**
+     * Curactor reject state 
+     * @param zadostJson Serialized request
+     * @param documentId Document id
+     * @param reason Reason for rejection
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public JSONObject curatorRejectSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
+    /**
+     * Scheduler switch states 
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public void schedulerSwitchStates() throws ConflictException, AccountException, IOException, SolrServerException;
 
     public void schedulerSwitchStates(String id) throws ConflictException, AccountException, IOException, SolrServerException;
-
+    
+    /**
+     * Explicit commit 
+     * @param indicies Indicies
+     * @throws ConflictExceptio n
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public void commit(String ... indicies) throws ConflictException, AccountException, IOException, SolrServerException;
+
+    
+    /**
+     * Finds all identifiers used in requests associated with a given user
+     * @param user User 
+     * @return 
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public List<String> findIdentifiersUsedInRequests(String user) throws  AccountException, IOException, SolrServerException; 
+    
+    /**
+     * Finds all identifiers used in requests associated with a given user and request status
+     * @param user User
+     * @param requestState Request status
+     * @return
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public List<String> findIdentifiersUsedInRequests(String user, String requestState) throws  AccountException, IOException, SolrServerException; 
+    
+    /**
+     * 
+     * @param user
+     * @param navrh
+     * @param requestState
+     * @return
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public List<String> findIdentifiersUsedInRequests(String user, String navrh, String requestState) throws  AccountException, IOException, SolrServerException; 
 }

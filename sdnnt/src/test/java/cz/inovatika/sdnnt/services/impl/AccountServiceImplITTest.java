@@ -27,9 +27,9 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class AccountServiceImplTest {
+public class AccountServiceImplITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(AccountServiceImplTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(AccountServiceImplITTest.class.getName());
 
     public static SolrTestServer prepare;
 

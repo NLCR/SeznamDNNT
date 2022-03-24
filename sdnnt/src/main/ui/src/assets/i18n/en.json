@@ -177,6 +177,8 @@
     "invalid_kontaktni_osoba_jmeno": "Špatné jméno kontaktní osoby",
     "sledovat_zaznam_success": "Record tracking was successful.",
     "sledovat_zaznam_error": "Error tracking log.",
+    "ulozeni_notifikaci_success":  "Saved settings successfully",
+    "ulozeni_notifikaci_error":  "Error saving settings",
     "odebrani_sledovaneho_zaznamu_success": "The tracked record was successfully removed.",
     "odebrani_sledovaneho_zaznamu_error": "Error removing watch record.",
     "invalid_phonenumber": "Invalid phone number",

@@ -23,9 +23,9 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.logging.Logger;
 
-public class AccountServiceWorkflowImplTest {
+public class AccountServiceWorkflowImplITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(AccountServiceWorkflowImplTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(AccountServiceWorkflowImplITTest.class.getName());
 
 
     public static SolrTestServer prepare;

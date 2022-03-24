@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
@@ -403,6 +404,9 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
                 SolrInputDocument idoc = new SolrInputDocument();
                 idoc.setField("username", username);
                 atomicUpdate(idoc, interval.name(), "notifikace_interval");
+                solr.add(DataCollections.users.name(), idoc);
+            } catch (SolrServerException e) {
+                throw new UserControlerException(e);
             } finally {
                 SolrJUtilities.quietCommit(solr, "users");
             }

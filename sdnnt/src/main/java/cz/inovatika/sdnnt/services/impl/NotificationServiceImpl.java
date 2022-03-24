@@ -13,6 +13,7 @@ import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserControler;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
@@ -242,10 +243,27 @@ public class NotificationServiceImpl implements NotificationsService {
         List<User> users = userControler.findUsersByNotificationInterval(interval.name());
         // prochazim uzivatele; beru jednoduche notifikace
         users.stream().forEach(user -> {
-            final Set<Map<String, String>> documents = new LinkedHashSet<>();
+            final List<Map<String, String>> documents = new ArrayList<>();
             try {
-                documents.addAll(processSimpleNotification(user, interval));
-                documents.addAll(processRuleBasedNotification(user, interval));
+                List<String> docIdents = new ArrayList<>();
+
+                List<Map<String,String>> simpleNotifications = processSimpleNotification(user, interval);
+                simpleNotifications.stream().forEach(doc-> {
+                    String ident = doc.get(MarcRecordFields.IDENTIFIER_FIELD);
+                    if (!docIdents.contains(ident)) {
+                        docIdents.add(ident);
+                        documents.add(doc);
+                    }
+                });
+
+                List<Map<String, String>> ruleNotifications = processRuleBasedNotification(user, interval);
+                ruleNotifications.stream().forEach(doc-> {
+                    String ident = doc.get(MarcRecordFields.IDENTIFIER_FIELD);
+                    if (!docIdents.contains(ident)) {
+                        docIdents.add(ident);
+                        documents.add(doc);
+                    }
+                });
                 if (!documents.isEmpty()) {
                     sendEmail(interval, user, new ArrayList<>(documents));
                 }
@@ -266,22 +284,30 @@ public class NotificationServiceImpl implements NotificationsService {
                 RuleNotification ruleNotification = (RuleNotification) notif;
                 SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
                         .addFilterQuery(fqCatalog)
-                        .addFilterQuery(ruleNotification.provideSearchQueryFilters())
-                        .setFields("identifier,datum_stavu,nazev,dntstav,license");
+                        .addFilterQuery(ruleNotification.provideProcessQueryFilters())
+                        .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu");
 
                 try {
                     iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                         Collection<Object> dntstav = doc.getFieldValues("dntstav");
                         Collection<Object> license = doc.getFieldValues("license");
+                        String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
+                                               
+                        
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
                         map.put("dntstav",
                                 dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString());
-                        map.put("license",
-                                license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                        if ( license != null) {
+                            map.put("license",
+                                    license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                            
+                        }
                         map.put("identifier", doc.getFieldValue("identifier").toString());
-
+                        if (historieStavu != null) {
+                            map.put("historie_stavu", historieStavu);
+                        }
                         if (ruleNotification.accept(map)) {
                             documents.add(map);
                         }
@@ -313,10 +339,18 @@ public class NotificationServiceImpl implements NotificationsService {
                 iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                     Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                    Collection<Object> license = doc.getFieldValues("license");
+
                     Map<String, String> map = new HashMap<>();
                     map.put("nazev", (String) doc.getFirstValue("nazev"));
                     map.put("dntstav",
                             dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString());
+                    if ( license != null) {
+                        map.put("license",
+                                license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                        
+                    }
+
                     map.put("identifier", doc.getFieldValue("identifier").toString());
                     documents.add(map);
 

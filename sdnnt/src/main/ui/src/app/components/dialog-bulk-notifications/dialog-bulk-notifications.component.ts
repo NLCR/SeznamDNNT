@@ -30,22 +30,25 @@ export class DialogBulkNotificationsComponent implements OnInit {
     this.notificationNameControl.valueChanges.subscribe(selValue => {
       this.name = selValue;
     });
-    
   }
 
   doBulkNotification() {
-    console.log("Periodicity "+this.periodicity);
+   let bulkNotif = {
+      "query": this.state.q,
+      "user":this.state.user.username,
+      "name":this.name,
+      "type":"rule",
+      "periodicity":this.periodicity,
+      "filters": this.filtersToJSON()
+    };
 
-    //console.log(json);
+    if (!this.state.q) {
+      delete bulkNotif.query;
+    }
+
+
     this.service.saveRuleNotification(
-      {
-        "query": this.state.q,
-        "user":this.state.user.username,
-        "name":this.name,
-        "type":"rule",
-        "periodicity":this.periodicity,
-        "filters": this.filtersToJSON()
-      }
+      bulkNotif
     ).subscribe((res: any) => {
         if (res.error) {
           this.service.showSnackBar('alert.sledovat_zaznam_error', res.error, true);

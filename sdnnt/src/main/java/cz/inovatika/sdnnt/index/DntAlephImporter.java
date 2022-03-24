@@ -34,6 +34,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
@@ -46,7 +47,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
  *
  * @author alberto
  */
-// TODO: Rewrite
 public class DntAlephImporter {
 
     public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
@@ -331,18 +331,21 @@ public class DntAlephImporter {
         return HttpClientBuilder.create().setDefaultRequestConfig(config).build();
     }
 
-    private void addToCatalog(List<MarcRecord> recs, boolean debug) throws JsonProcessingException, SolrServerException, IOException {
+    void addToCatalog(List<MarcRecord> recs, SolrClient solr, boolean debug) throws JsonProcessingException, SolrServerException, IOException {
         List<SolrInputDocument> idocs = new ArrayList<>();
 
         for (MarcRecord rec : recs) {
             idocs.add(toSolrDoc(rec, debug));
         }
         if (!idocs.isEmpty()) {
-            Indexer.getClient().add("catalog", idocs);
+            solr.add("catalog", idocs);
             idocs.clear();
         }
     }
 
+    void addToCatalog(List<MarcRecord> recs, boolean debug) throws JsonProcessingException, SolrServerException, IOException {
+        addToCatalog(recs, Indexer.getClient(),  debug);
+    }
 
 // Commented by ps ??
 //  private void mergeWithCatalog(List<MarcRecord> recs) throws JsonProcessingException, SolrServerException, IOException {
@@ -489,7 +492,7 @@ public class DntAlephImporter {
 //    // return ret;
 //  }
 
-    private String readFromXML(InputStream is) throws XMLStreamException {
+    String readFromXML(InputStream is) throws XMLStreamException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLStreamReader reader = null;

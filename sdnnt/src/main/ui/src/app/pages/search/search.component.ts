@@ -12,6 +12,7 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk-notifications/dialog-bulk-notifications.component';
+import { AppConfiguration } from 'src/app/app-configuration';
 
 @Component({
   selector: 'app-search',
@@ -40,7 +41,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private router: Router,
     private service: AppService,
     public state: AppState,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public configuration:AppConfiguration
   ) { }
 
   ngOnInit(): void {
@@ -48,6 +50,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.search(val);
     }));
+
     /*
     this.subs.push(this.state.paramsProcessed.subscribe(val => {
       this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'dntstav') > -1;
@@ -177,6 +180,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogBulkNotificationsComponent, {
       width: '600px',
       panelClass: 'app-dialog-bulk-notifications'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.route.queryParams.subscribe(val => {
+        this.search(val);
+      });
     });
   }
 

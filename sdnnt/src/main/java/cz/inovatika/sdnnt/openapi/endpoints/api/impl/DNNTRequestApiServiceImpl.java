@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.AlreadyUsedException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.EmptyIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
@@ -24,6 +26,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.store.blockcache.ReusedBufferedIndexOutput;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jvnet.hk2.annotations.Service;
@@ -170,7 +173,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                            
                             JSONObject prepare = accountService.prepare(navrh);
                             Zadost zadost = Zadost.fromJSON(prepare.toString());
-                            verifyIdentifiers(zadost, req.getIdentifiers());
+                            verifyIdentifiers(openApiLoginSupport.getUser(), accountService,zadost, req.getIdentifiers());
 
                             if (req.getIdentifiers() != null) {
                                 zadost.setIdentifiers(req.getIdentifiers());
@@ -198,6 +201,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 response.getNotsaved().add(ns.reason(e.getMessage()));
 
                             }
+                        } catch (AlreadyUsedException e) {
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+
+                            response.getNotsaved().add(ns.reason("These identifiers are already used in requests :"+e.getIdents()));
                         } catch (NonExistentIdentifeirsException e) {
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
@@ -211,7 +221,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
 
-                            response.getNotsaved().add(ns.reason("Invalid state of these documents: "+e.getPids()));
+                            response.getNotsaved().add(ns.reason("Invalid state of these documents: "+e.getIdents()));
                         } catch (SolrServerException e) {
                             // solr exception
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
@@ -248,8 +258,18 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private void verifyIdentifiers(Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers {
+    private void verifyIdentifiers(User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers, AccountException, AlreadyUsedException {
         if (identifiers.isEmpty()) throw new EmptyIdentifiers();
+
+        List<String> listByUser = new ArrayList<>();
+        //    public List<String> findIdentifiersUsedInRequests(String user, String requestState) throws  AccountException, IOException, SolrServerException; 
+        List<String> alreadyUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), "processed");
+        identifiers.stream().forEach(ident-> {
+            if (alreadyUsed.contains(ident)) {
+                listByUser.add(ident);
+            }
+        });
+        
         List<String> nonExistentIdentifiers = new ArrayList<>();
         List<String> invalidIdentifiers = new ArrayList<>();
 
@@ -268,7 +288,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
         if (!nonExistentIdentifiers.isEmpty()) throw new NonExistentIdentifeirsException(nonExistentIdentifiers);
         if (!invalidIdentifiers.isEmpty()) throw new InvalidIdentifiersException(invalidIdentifiers);
-
+        if (!alreadyUsed.isEmpty()) throw new AlreadyUsedException(alreadyUsed);
    }
 
     public static class EmptyIdentifiers extends Exception {
@@ -290,14 +310,26 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     }
 
     public static class InvalidIdentifiersException extends Exception {
-        private List<String> pids;
+        private List<String> idents;
 
-        public InvalidIdentifiersException(List<String> pids) {
-            this.pids = pids;
+        public InvalidIdentifiersException(List<String> idents) {
+            this.idents = idents;
         }
 
-        public List<String> getPids() {
-            return pids;
+        public List<String> getIdents() {
+            return idents;
+        }
+    }
+    public static class AlreadyUsedException extends Exception {
+
+        private List<String> idents;
+
+        public AlreadyUsedException(List<String> idents) {
+            this.idents = idents;
+        }
+
+        public List<String> getIdents() {
+            return idents;
         }
     }
 

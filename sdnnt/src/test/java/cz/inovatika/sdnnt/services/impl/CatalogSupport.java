@@ -23,7 +23,7 @@ public class CatalogSupport {
     public static void insertCatalog(String states, String id) {
         try {
             String path = String.format("cz/inovatika/sdnnt/services/catalog/%s/%s.json", states,id.replaceAll(":","_"));
-            InputStream stream1 = AccountServiceWorkflowImplTest.class.getClassLoader().getResourceAsStream(path);
+            InputStream stream1 = AccountServiceWorkflowImplITTest.class.getClassLoader().getResourceAsStream(path);
             Assert.assertNotNull(stream1);
             String json1 = IOUtils.toString(stream1, "UTF-8");
             MarcRecord marcRecord1 = MarcRecord.fromRAWJSON(new JSONObject(new JSONObject(json1).getString("raw")).toString());

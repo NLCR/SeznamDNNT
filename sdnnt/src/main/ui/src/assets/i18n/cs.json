@@ -177,6 +177,8 @@
     "invalid_kontaktni_osoba_jmeno": "Špatné jméno kontaktní osoby",
     "sledovat_zaznam_success": "Sledování záznamu proběhlo úspěšně.",
     "sledovat_zaznam_error": "Chyba při sledování záznamu.",
+    "ulozeni_notifikaci_success":  "Uložení notifikací proběhlo úspěšně",
+    "ulozeni_notifikaci_error":  "Nastala chyba při ukládání notifikací",
     "odebrani_sledovaneho_zaznamu_success": "Odebrání sledovaného záznamu proběhlo úspěšně.",
     "odebrani_sledovaneho_zaznamu_error": "Chyba při odebrání sledovaného záznamu.",
     "invalid_phonenumber": "Chybné telefonní číslo",

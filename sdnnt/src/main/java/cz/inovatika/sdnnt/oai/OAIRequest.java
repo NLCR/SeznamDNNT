@@ -137,15 +137,26 @@ public class OAIRequest {
       if (set != null) {
         query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       }
-
+      
+      
       if (req.getParameter("resumptionToken") != null) {
-        String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
-        String[] parts = rt.split(":");
-        set = parts[1];
-        query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
-        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, parts[0]);
+          String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
+          // Change it by PS; only checks (configurations, aio exceptions etc..)
+          if (rt.contains(":")) {
+              String[] parts = rt.split(":");
+              if (parts.length > 2) {
+                  cursorMark = parts[0];
+                  set = parts[1];
+                  JSONObject setsInConfig = Options.getInstance().getJSONObject("OAI").getJSONObject("sets");
+                  if (setsInConfig.has(set)) {
+                      query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets")
+                              .getJSONObject(set).getString("filter"));
+                  }
+              }
+          }
+          query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       } else {
-        query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+          query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       }
 
       QueryResponse qr = getClient().query(DataCollections.catalog.name(), query);

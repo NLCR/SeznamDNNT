@@ -1,0 +1,10 @@
+{
+  "id":"identification",
+  "name":"Pravidlo pro hledani",
+  "query":"cnb000394700",
+  "user":"knihovna",
+  "periodicity":"den",
+  "indextime":"2021-08-24T08:13:50.312Z",
+  "type":"rule"
+  
+}

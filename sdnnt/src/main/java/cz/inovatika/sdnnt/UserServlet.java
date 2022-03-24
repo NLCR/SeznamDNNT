@@ -299,7 +299,19 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        /* User info */
+        /* User info; regular users */
+        USER_INFO {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
+                if (!logged.isThirdPartyUser()) {
+                    JSONObject jsonObject = logged.toJSONObject();
+                    return jsonObject;
+                } else return new JSONObject();
+            }
+        },
+
+        /* User info; shibboleth users */
         SHIB_USER_INFO {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

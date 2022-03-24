@@ -7,9 +7,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Logger;
 
 public class SimpleGET {
-
+    
+    public static final Logger LOGGER = Logger.getLogger(SimpleGET.class.getName());
+    
     public static final int MAXIMUM_ITERATION = 20;
 
     public static String getFinalURL(String url, int counter) throws IOException {
@@ -27,8 +30,8 @@ public class SimpleGET {
     }
 
     public static String get(String u) throws IOException {
-
         URL url = new URL( getFinalURL(u,0) );
+        LOGGER.fine("Requesting url :"+url.toString());
         HttpURLConnection conn= (HttpURLConnection) url.openConnection();
         conn.setInstanceFollowRedirects( true);
         conn.setRequestProperty("Content-Type", "application/json");

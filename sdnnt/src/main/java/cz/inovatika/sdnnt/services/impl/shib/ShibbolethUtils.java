@@ -51,6 +51,7 @@ public class ShibbolethUtils {
             }
             LOGGER.fine("header name '"+hname+"' = "+httpServletRequest.getHeader(hname));
         }
+        LOGGER.fine("Identity provider found "+foundIdentityProvider);
         return foundIdentityProvider;
     }
 

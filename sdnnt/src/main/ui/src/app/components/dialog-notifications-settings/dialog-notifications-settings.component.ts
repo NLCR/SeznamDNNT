@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
@@ -12,13 +13,19 @@ import { AppState } from 'src/app/app.state';
 export class DialogNotificationsSettingsComponent implements OnInit {
 
   notifications;
-  interval;
+  //interval;
+
+  usedNotificationFilter;
 
   constructor(
     public dialogRef: MatDialogRef<DialogNotificationsSettingsComponent>,
     public state: AppState,
     private service: AppService,
-    private config: AppConfiguration) {
+    private config: AppConfiguration,
+    private router: Router,
+    private route: ActivatedRoute
+
+    ) {
   }
 
   ngOnInit(): void {
@@ -26,20 +33,31 @@ export class DialogNotificationsSettingsComponent implements OnInit {
       this.notifications = res.docs;
       this.notifications.forEach(notif => {
         let filters = [];
-        let parsed = JSON.parse(notif.filters);
-        let k: keyof typeof parsed;  // Type is "one" | "two" | "three"
-        for (k in parsed) {
-          const v = parsed[k];  // OK
-          filters.push({
-            "field":k,
-            "value":v
-          });          
+        if (notif.filters) {
+          let parsed = JSON.parse(notif.filters);
+          let k: keyof typeof parsed;  // Type is "one" | "two" | "three"
+          for (k in parsed) {
+            const v = parsed[k];  // OK
+            filters.push({
+              "field":k,
+              "value":v
+            });          
+          }
         }
         notif.filters = filters;
       });
+
     });
 
-    this.interval = this.state.user.notifikace_interval;
+
+    this.route.queryParams
+      .subscribe(params => {
+        this.usedNotificationFilter = params.notificationFilter;
+      }
+    );
+
+    console.log("Interval "+ this.state.user.notifikace_interval);
+    //this.interval = this.state.user.notifikace_interval;
   }
 
   deleteNotification(notification) {
@@ -72,19 +90,25 @@ export class DialogNotificationsSettingsComponent implements OnInit {
     });
 
     let request =  {
-      "notification_interval":this.interval,
+      "notification_interval":this.state.user.notifikace_interval,
       "notifications":savedNotications
     };
     let user = this.state.user;
 
     this.service.savetRuleNotificationSettings(request).subscribe((res: any) => {
       if (res.error) {
-        this.service.showSnackBar('alert.sledovat_zaznam_error', res.error, true);
+        this.service.showSnackBar('alert.ulozeni_notifikaci_error', res.error, true);
       } else {
-        this.service.showSnackBar('alert.sledovat_zaznam_success', res.error, true);
-
+        this.service.showSnackBar('alert.ulozeni_notifikaci_success', res.error, true);
         this.state.notificationSettings.all = res.all;
+        this.router.navigate([], {
+          queryParams: {
+            'notificationFilter': null
+          },
+          queryParamsHandling: 'merge'
+        });
       }
+
       this.dialogRef.close();
     });
 

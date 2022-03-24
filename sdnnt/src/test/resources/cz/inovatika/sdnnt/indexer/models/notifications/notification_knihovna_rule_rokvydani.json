@@ -1,0 +1,10 @@
+{
+  "id":"identification",
+  "name":"Moje pojmenovani",
+  "query":"Query test",
+  "user":"knihovna",
+  "periodicity":"mesic",
+  "indextime":"2021-08-24T08:13:50.312Z",
+	"type":"rule",
+  "filters":"{\"nakladatel\":\"odeon\",\"license\":\"dnntt\",\"rokvydani\":\"2006,2006\"}"
+}

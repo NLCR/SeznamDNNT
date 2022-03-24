@@ -13,6 +13,8 @@ export interface Configuration {
   simplelogin:boolean;
   maximumItemInRequest: number;
   dntSetAlpehLinks: boolean;
+  numberOfRuleBasedNotifications: number;
+  numberOfItemsInRulenotification: number;
 
   // Seznam roli
   role: string[];

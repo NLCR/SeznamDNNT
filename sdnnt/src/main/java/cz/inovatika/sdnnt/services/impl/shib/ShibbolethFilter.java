@@ -38,6 +38,8 @@ public class ShibbolethFilter implements Filter {
 
         if (session != null && session.getAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER) == null && ShibbolethUtils.isUnderShibbolethSession(hReq)) {
 
+            LOGGER.fine("Detected shibboleth session");
+            
             List<JSONObject> users = new ArrayList<>();
 
             List<String> attList = new ArrayList<>();
@@ -45,6 +47,8 @@ public class ShibbolethFilter implements Filter {
             while (headerNames.hasMoreElements()) {  attList.add(headerNames.nextElement());  }
 
             JSONObject shibboleth = Options.getInstance().getJSONObject("shibboleth");
+            LOGGER.fine("Applying configuration "+shibboleth.toString(2));
+            
             if (shibboleth.has("mappings")) {
                 JSONArray attributes = shibboleth.getJSONArray("mappings");
                 for (int i = 0; i < attributes.length(); i++) {
@@ -74,11 +78,14 @@ public class ShibbolethFilter implements Filter {
                         });
                     });
 
+                    LOGGER.fine("Try to load shibboleth user from this json :"+merged.toString());
                     User user = User.fromJSON(merged.toString());
                     if (user.getUsername() != null) {
                         user.setThirdPartyUser(true);
                         hReq.getSession(true).setAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER, user);
                         TrackSessionUtils.touchSession(hReq.getSession());
+                    } else {
+                        LOGGER.warning("No user name ");
                     }
                 }
             }
