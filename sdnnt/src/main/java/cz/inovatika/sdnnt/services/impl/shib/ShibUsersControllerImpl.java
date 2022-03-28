@@ -48,7 +48,6 @@ public class ShibUsersControllerImpl extends AbstractUserController implements U
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
-
     }
 
     @Override

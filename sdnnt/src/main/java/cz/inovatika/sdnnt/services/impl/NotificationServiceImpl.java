@@ -303,7 +303,9 @@ public class NotificationServiceImpl implements NotificationsService {
                LOGGER.log(Level.SEVERE, e.getMessage(),e);
             }
         });
-        LOGGER.info("Number of notified users :"+identsMapping.size()+".");
+
+        //identsMapping.keySet().
+        LOGGER.info("Simple notification, number of notified users :"+identsMapping.size()+".");
 
         allUsers.stream().forEach(user -> {
             try {
@@ -320,8 +322,17 @@ public class NotificationServiceImpl implements NotificationsService {
                             documents.add(doc);
                         }
                     }
-                    identsMapping.put(user.getUsername(), docIdents);
-                    docsMapping.put(user.getUsername(), documents);
+                    if (!identsMapping.containsKey(user.getUsername())) {
+                        identsMapping.put(user.getUsername(), docIdents);
+                    } else {
+                        identsMapping.get(user.getUsername()).addAll(docIdents);
+                    }
+                    
+                    if (!docsMapping.containsKey(user.getUsername())) {
+                        docsMapping.put(user.getUsername(), documents);
+                    } else {
+                        docsMapping.get(user.getUsername()).addAll(documents);
+                    }
                 } else {
                     LOGGER.warning("Missing username ! User:"+user);
                 }

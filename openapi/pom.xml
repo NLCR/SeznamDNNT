@@ -224,7 +224,7 @@
                     </goals>
                     <configuration>
                         <sources>
-                            <source>target/generated-sources/src/gen</source>
+                            <source>target/generated-sources/src/gen/java</source>
                         </sources>
                     </configuration>
                 </execution>

@@ -11,7 +11,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
+import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.UserController;
+import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.DefaultApplicationUserLoginSupport;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,9 +53,20 @@ public class ConfigServlet extends HttpServlet {
       PrintWriter out = response.getWriter();
       JSONObject js = new JSONObject(Options.getInstance().getClientConf().toString());
       
-      User user = new UserControlerImpl(request).getUser();
+      ApplicationUserLoginSupport appLoginController = new DefaultApplicationUserLoginSupport(request);
+      //UserControler userController = new UserControlerImpl(request);
+      User user = appLoginController.getUser();
       if (user != null) {
-        js.put("user", user.toJSONObject());
+          NotificationsService service = new NotificationServiceImpl( new UserControlerImpl(request), null);
+
+          try {
+              JSONObject userObject = UsersUtils.prepareUserLoggedObject(new UserControlerImpl(request), service, user);
+            js.put("user", userObject);
+
+          } catch (UserControlerException |NotificationsException   e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+        }
+          
       }
 
       out.print(js.toString());
