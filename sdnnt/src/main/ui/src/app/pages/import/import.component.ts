@@ -256,7 +256,9 @@ export class ImportComponent implements OnInit, OnDestroy {
         this.service.changeStavDirect(id.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
 
           if (res.response.docs.length > 0) {
-            id.dntstav = [result.newState];
+            id.dntstav = res.response.docs[0].dntstav;
+            id.kuratorstav = res.response.docs[0].kuratorstav;
+            id.license = res.response.docs[0].license;
             this.service.changeStavImport(doc).subscribe(res => {
               // this.getDocs(this.route.snapshot.queryParams);
             });
