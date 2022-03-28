@@ -27,7 +27,7 @@
     <mat-tab [label]="'home.' + tab | translate" *ngFor="let tab of config.homeTabs">
       <div [innerHTML]="tabContent"></div>
     </mat-tab>
-    <mat-tab *ngIf="state.user!=null && (state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin')" [label]="'desc.statistiky' | translate">
+    <mat-tab *ngIf="true || state.user!=null && (state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin')" [label]="'desc.statistiky' | translate">
       <app-graphs *ngIf="showStats"></app-graphs>   
     </mat-tab>
   </mat-tab-group>
