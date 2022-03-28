@@ -3,7 +3,7 @@
   "lang": "cs",
   "snackDuration": 2000,
   "rows": 20,
-  "simplelogin":true,
+  "simplelogin":false,
   "maximumItemInRequest":60,
   "dntSetAlpehLinks": false,
   
