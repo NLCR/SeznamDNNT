@@ -461,7 +461,7 @@ public class AccountServiceImpl implements AccountService {
 
                     // prene se a
                     WorkflowState workflowState = workflow.nextState();
-                    if (workflowState != null && workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator)) {
+                    if (workflowState != null && (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator))) {
                         workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason);
 
                         solr.add(DataCollections.catalog.name(), marcRecord.toSolrDoc());
