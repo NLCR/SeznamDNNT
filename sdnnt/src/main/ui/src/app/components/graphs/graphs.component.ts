@@ -39,6 +39,8 @@ export class GraphsComponent implements OnInit {
       },
       tooltip: {
         trigger: 'item',
+        position: [10, 25],
+        valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       series: {
         name: this.service.getTranslation("graph.title.States"),
@@ -72,6 +74,10 @@ export class GraphsComponent implements OnInit {
               return '#43a047'
             } else if (paramsExt?.data?.name1 === 'PA') {
               return '#8e24aa'
+            } else if (paramsExt?.data?.name1 === 'X') {
+              return '#757575'
+            } else if (paramsExt?.data?.name1 === 'NL') {
+              return '#039BE5'
             } else {
               return params.color
             }
@@ -80,8 +86,10 @@ export class GraphsComponent implements OnInit {
         },
       },
       legend: {
-        right: 0,
-        orient: 'vertical'
+       right: 0,
+        orient: 'vertical',
+        bottom: 0,
+        height: 30
       }
     };
 
@@ -91,6 +99,7 @@ export class GraphsComponent implements OnInit {
       },
       tooltip: {
         trigger: 'item',
+        valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       series: {
         name: this.service.getTranslation("graph.title.Licenses"),
@@ -176,6 +185,7 @@ export class GraphsComponent implements OnInit {
       },
       tooltip: {
         trigger: 'axis',
+        valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       xAxis: {
         type: 'category',
@@ -203,6 +213,7 @@ export class GraphsComponent implements OnInit {
       },
       tooltip: {
         trigger: 'axis',
+        valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       xAxis: {
         type: 'category',
