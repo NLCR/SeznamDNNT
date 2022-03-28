@@ -408,7 +408,7 @@ public class XMLImporterDistri {
         if (doc.has("dntstav")) {
           item.put("dntstav", doc.getJSONArray("dntstav").toList());
           List<Object> stavy = doc.getJSONArray("dntstav").toList();
-          if (stavy.contains("A") || stavy.contains("PA")) {
+          if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
             na_vyrazeni.add(doc.getString("identifier"));
           }
           in_sdnnt++;

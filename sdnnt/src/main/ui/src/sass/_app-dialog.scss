@@ -77,7 +77,10 @@
   .mat-dialog-content {
     .app-table {
       th {
-        min-width: 130px;
+        $app-th-width: 130px;
+        min-width: $app-th-width;
+        max-width: $app-th-width;
+        width: $app-th-width;
       }
 
       td {

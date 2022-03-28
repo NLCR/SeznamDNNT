@@ -16,4 +16,10 @@ app-sidenav-list {
       margin-right: $app-gap-icon;
     } 
   }
+
+  .mat-accordion {
+    .mat-expansion-panel-body {
+      @extend .app-pt-0, .app-pb-0;
+    }
+  }
 }

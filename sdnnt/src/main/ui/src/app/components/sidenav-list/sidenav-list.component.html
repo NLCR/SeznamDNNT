@@ -28,8 +28,20 @@
       <a mat-menu-item (click)="logout(); onSidenavClose()"><mat-icon class="material-icons-outlined">logout</mat-icon>{{ 'desc.odhlasit' | translate }}</a>
     </mat-expansion-panel>
   </mat-accordion>
-  
-  <a mat-list-item *ngIf="!state.user" (click)="showLogin(); onSidenavClose()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+
+  <a mat-list-item *ngIf="!state.user && config.simplelogin" (click)="showLogin(); onSidenavClose()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+
+  <mat-accordion *ngIf="!state.user && !config.simplelogin">
+    <mat-expansion-panel>
+      <mat-expansion-panel-header [collapsedHeight]="'48px'" [expandedHeight]="'48px'" class="app-pl-4 app-pr-4">
+        <mat-panel-title>
+          <mat-icon class="material-icons-outlined app-mr-1">login</mat-icon> {{ 'desc.prihlasit' | translate }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <a mat-menu-item (click)="showLogin()"><mat-icon class="material-icons-outlined">password</mat-icon> {{ 'desc.standardni_prihlaseni' | translate }}</a>
+      <a mat-menu-item (click)="wayfLink()"><mat-icon class="material-icons-outlined">school</mat-icon> {{ 'desc.shibboleth_prihlaseni' | translate }}</a>
+    </mat-expansion-panel>
+  </mat-accordion>
 
   <mat-divider></mat-divider>
   <a mat-list-item *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')" [title]="'desc.en' | translate">{{ 'EN' | translate }}</a>
