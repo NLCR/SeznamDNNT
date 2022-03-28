@@ -391,7 +391,7 @@ public class Indexer {
   public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
-      MarcRecord mr = MarcRecord.fromIndex(identifier);
+      MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
       JSONObject before = mr.toJSON();
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
@@ -401,6 +401,10 @@ public class Indexer {
         mr.license = licence;
       } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
         mr.license = License.dnntt.name();
+      } else {
+          // delete licenses
+          mr.license = null;
+          licence = null;
       }
 
       mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularity);

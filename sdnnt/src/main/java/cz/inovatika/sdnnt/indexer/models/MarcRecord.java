@@ -495,12 +495,13 @@ public class MarcRecord {
     this.kuratorstav = Arrays.asList(kuratorState);
     this.datum_krator_stavu = now;
 
+
     JSONObject kh = new JSONObject().put("stav", kuratorState).put("date", FORMAT.format(datum_krator_stavu)).put("user", user).put("comment", comment);
     if (license != null) {  kh.put("license", license); }
 
     this.historie_kurator_stavu.put(kh);
-
     changeLicenseIfNeeded(kuratorState, license);
+
   }
 
   private void changeLicenseIfNeeded(String nState, String license) {
