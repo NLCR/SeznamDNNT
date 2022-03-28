@@ -331,7 +331,7 @@ public class XMLImporterKosmas {
 
             if (doc.has("dntstav")) {
               List<Object> stavy = doc.getJSONArray("dntstav").toList();
-              if (stavy.contains("A") || stavy.contains("PA")) {
+              if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
                 na_vyrazeni.add(doc.getString("identifier"));
               }
             }
@@ -341,7 +341,7 @@ public class XMLImporterKosmas {
         if (!isEAN) {
           if (doc.has("dntstav")) {
             List<Object> stavy = doc.getJSONArray("dntstav").toList();
-            if (stavy.contains("A") || stavy.contains("PA")) {
+            if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
               na_vyrazeni.add(doc.getString("identifier"));
             }
           }
