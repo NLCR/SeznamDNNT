@@ -23,6 +23,8 @@ import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.*;
 import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONArray;
@@ -105,6 +107,7 @@ public class Job implements InterruptableJob {
         ALTERNATIVE_LINKS_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
                 UpdateAlternativeAlephLinksImpl impl = new UpdateAlternativeAlephLinksImpl();
                 impl.updateLinks();
             }
@@ -116,6 +119,7 @@ public class Job implements InterruptableJob {
         DATE_PX_CHECK {
             @Override
             void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
                 try {
                     JSONObject iteration = jobData.optJSONObject("iteration");
                     JSONObject results = jobData.optJSONObject("results");
@@ -170,6 +174,7 @@ public class Job implements InterruptableJob {
         KRAMERIUS_PX_CHECK {
             @Override
             void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
                 try {
                     JSONObject iteration = jobData.optJSONObject("iteration");
                     JSONObject results = jobData.optJSONObject("results");
@@ -225,6 +230,7 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 try {
+                    LOGGER.fine(name()+":configuration is "+jobData);
                     AccountServiceImpl accountService = new AccountServiceImpl(null, null);
                     accountService.schedulerSwitchStates();
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
@@ -238,8 +244,9 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 try {
+                    LOGGER.fine(name()+":configuration is "+jobData);
                     MailService mailService = new MailServiceImpl();
-                    UserControler controler = new UserControlerImpl(/* no reqest */ null);
+                    UserController controler = new UserControlerImpl(/* no reqest */ null);
                     NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
                     notificationsService.processNotifications(NotificationInterval.valueOf(jobData.getString("interval")));
                 } catch (UserControlerException | NotificationsException e) {

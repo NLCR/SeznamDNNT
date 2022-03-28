@@ -56,8 +56,6 @@ export class DialogNotificationsSettingsComponent implements OnInit {
       }
     );
 
-    console.log("Interval "+ this.state.user.notifikace_interval);
-    //this.interval = this.state.user.notifikace_interval;
   }
 
   deleteNotification(notification) {

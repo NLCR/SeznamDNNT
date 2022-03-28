@@ -1,6 +1,16 @@
 package cz.inovatika.sdnnt.services.impl.users;
 
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
+import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.services.NotificationsService;
+import cz.inovatika.sdnnt.services.UserController;
+import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmptyFieldsValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.RegularExpressionValidation;
@@ -10,6 +20,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -19,16 +30,31 @@ import java.util.function.Consumer;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 
+/**
+ * User utilities
+ * @author happy
+ *
+ */
 public class UsersUtils {
 
     private UsersUtils() {}
+    
+    /**
+     * Find one user in users index
+     * @param solr Solr client 
+     * @param q Generic query 
+     * @return Return found user
+     * @throws SolrServerException
+     * @throws IOException
+     */
+    public static User findOneUser(SolrClient solr, String q ) throws SolrServerException, IOException {
+        return findOneUser(solr,  q, DataCollections.users.name());
+    }
 
-    public static User findOneUser(SolrClient solr, String q) throws SolrServerException, IOException {
+    public static User findOneUser(SolrClient solr, String q, String collection) throws SolrServerException, IOException {
         SolrQuery query = new SolrQuery(q)
                 .setRows(1);
-
-        QueryResponse usersResult = solr.query("users", query);
-
+        QueryResponse usersResult = solr.query(collection, query);
         long numFound = usersResult.getResults().getNumFound();
         if (numFound >0 ) {
             SolrDocument document = usersResult.getResults().get(0);
@@ -38,7 +64,11 @@ public class UsersUtils {
         }
     }
 
-
+    /**
+     * Create TO object for user
+     * @param user
+     * @return
+     */
     public static User toTOObject(User user) {
         if (user != null) {
             User toObject = new User();
@@ -62,6 +92,7 @@ public class UsersUtils {
             toObject.setCislo(user.getCislo());
             toObject.setTelefon(user.getTelefon());
             toObject.setPsc(user.getPsc());
+            toObject.setThirdPartyUser(user.isThirdPartyUser());
             toObject.setNazevSpolecnosti(user.getNazevSpolecnosti());
 
             return toObject;
@@ -120,6 +151,47 @@ public class UsersUtils {
                 validationConsumer.validationError(pcsNumberValidationResult.getErrorFields(), RegularExpressionValidation.class.getName());
             }
         }
-
     }
+
+    public static JSONObject prepareUserLoggedObject(UserController controler, NotificationsService service,
+            User login) throws UserControlerException, NotificationsException {
+        JSONObject retVal = toTOObject(login).toJSONObject();
+        
+        List<Zadost> zadost = controler.getZadost(login.getUsername());
+        if (zadost != null && !zadost.isEmpty()) {
+            JSONArray jsonArray = new JSONArray();
+            zadost.stream().forEach(z -> {
+                jsonArray.put(z.toJSON());
+            });
+            retVal.put("zadost", jsonArray);
+        }
+    
+        // Notification settings
+        JSONObject settingsObject = new JSONObject();
+        // TODO: Move to notification utils
+        List<AbstractNotification> simple = service.findNotificationsByUser(login.getUsername(), TYPE.simple);
+        List<AbstractNotification> rules = service.findNotificationsByUser(login.getUsername(), TYPE.rule);
+        JSONArray jsonArray = new JSONArray();
+        if (!simple.isEmpty()) {
+            JSONObject fobj = new JSONObject();
+            fobj.put("name", "simple");
+            fobj.put("id", "simple");
+            jsonArray.put(fobj);
+        }
+        
+        rules.stream().map(an-> {
+            RuleNotification rnotif = (RuleNotification) an;
+            JSONObject fobj = new JSONObject();
+            fobj.put("name", rnotif.getName());
+            fobj.put("id", rnotif.getId());
+            return fobj;
+        }).forEach(jsonArray::put);
+        
+        
+        settingsObject.put("all", jsonArray);
+        retVal.put("notificationsettings", settingsObject);
+    
+        return retVal;
+    }
+
 }

@@ -20,11 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.UsersIterationSupport;
-import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
-import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
-import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
@@ -38,7 +34,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserValidation;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
@@ -208,48 +204,13 @@ public class UserServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 try {
                     UserControlerImpl controler = new UserControlerImpl(req);
+                    NotificationsService service = new NotificationServiceImpl(controler, null);
                     User login = controler.login();
                     if (login != null) {
-                        JSONObject retVal = login.toJSONObject();
-                        List<Zadost> zadost = controler.getZadost(login.getUsername());
-                        if (zadost != null && !zadost.isEmpty()) {
-                            JSONArray jsonArray = new JSONArray();
-                            zadost.stream().forEach(z -> {
-                                jsonArray.put(z.toJSON());
-                            });
-                            retVal.put("zadost", jsonArray);
-                        }
-
-                        // Notification settings
-                        JSONObject settingsObject = new JSONObject();
-                        NotificationsService service = new NotificationServiceImpl(controler, null);
-                        // TODO: Move to notification utils
-                        List<AbstractNotification> simple = service.findNotificationsByUser(login.getUsername(), TYPE.simple);
-                        List<AbstractNotification> rules = service.findNotificationsByUser(login.getUsername(), TYPE.rule);
-                        JSONArray jsonArray = new JSONArray();
-                        if (!simple.isEmpty()) {
-                            JSONObject fobj = new JSONObject();
-                            fobj.put("name", "simple");
-                            fobj.put("id", "simple");
-                            jsonArray.put(fobj);
-                        }
-                        
-                        rules.stream().map(an-> {
-                            RuleNotification rnotif = (RuleNotification) an;
-                            JSONObject fobj = new JSONObject();
-                            fobj.put("name", rnotif.getName());
-                            fobj.put("id", rnotif.getId());
-                            return fobj;
-                        }).forEach(jsonArray::put);
-                        
-                        
-                        settingsObject.put("all", jsonArray);
-                        retVal.put("notificationsettings", settingsObject);
-
-                        return retVal;
+                        return UsersUtils.prepareUserLoggedObject(controler, service, login);
+                    } else {
+                        return new JSONObject();
                     }
-                    //return retval;
-                    return login.toJSONObject();
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
                 }
@@ -423,7 +384,7 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-
+        // save default;registred user
         SAVE {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

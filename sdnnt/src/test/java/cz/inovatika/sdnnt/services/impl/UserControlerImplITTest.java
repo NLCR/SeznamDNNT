@@ -7,8 +7,9 @@ import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.TestServletStream;
 import org.apache.commons.lang3.tuple.Pair;
@@ -235,7 +236,7 @@ public class UserControlerImplITTest {
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
         HttpSession session = EasyMock.createMock(HttpSession.class);
 
-        UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
+        AbstractUserController userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
@@ -352,11 +353,62 @@ public class UserControlerImplITTest {
     }
 
 
-
-
-    /** Test admin password reset  */
+    /** Test change interval */
     @Test
-    public void testAdminResetPswd() throws IOException, SolrServerException, EmailException, UserControlerException {
+    public void testChangeInterval() throws IOException, SolrServerException, EmailException, UserControlerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
+        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        long numFound = response.getResults().getNumFound();
+        Assert.assertTrue(numFound == 0);
+
+        registerUsers();
+
+        HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
+        UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
+                .withConstructor(request)
+                .addMockedMethod("buildClient").createMock();
+
+        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.replay(request,  userControler);
+
+
+        User u1 = userControler.findUser("test1");
+        Assert.assertTrue(u1 != null);
+
+        User u2 = userControler.findUser("test2");
+        Assert.assertTrue(u2 != null);
+
+        userControler.changeIntervalForUser("test1", NotificationInterval.den);
+        userControler.changeIntervalForUser("test2", NotificationInterval.mesic);
+        
+        
+
+        List<User> den = userControler.findUsersByNotificationInterval(NotificationInterval.den.name());
+        Assert.assertTrue(den.size() == 1);
+
+        Assert.assertEquals(den.get(0), u1);
+
+        List<User> mesic = userControler.findUsersByNotificationInterval(NotificationInterval.mesic.name());
+        Assert.assertTrue(mesic.size() == 1);
+
+        Assert.assertEquals(mesic.get(0), u2);
+    }
+
+
+
+    /** Test admin password reset  
+     * @throws NotAuthorizedException */
+    @Test
+    public void testAdminResetPswd() throws IOException, SolrServerException, EmailException, UserControlerException, NotAuthorizedException {
 
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
@@ -378,7 +430,7 @@ public class UserControlerImplITTest {
         EasyMock.expectLastCall().times(1);
 
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
-        UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
+        AbstractUserController userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
@@ -437,7 +489,7 @@ public class UserControlerImplITTest {
             return;
         }
 
-        UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
+        AbstractUserController userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
@@ -488,7 +540,7 @@ public class UserControlerImplITTest {
         }
 
         @Override
-        SolrClient buildClient() {
+        public SolrClient buildClient() {
             return SolrTestServer.getClient();
         }
     }

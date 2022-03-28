@@ -10,7 +10,7 @@ import cz.inovatika.sdnnt.model.ZadostProcess;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
@@ -64,7 +64,7 @@ public class AccountServiceImplITTest {
         }
 
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
@@ -115,7 +115,7 @@ public class AccountServiceImplITTest {
         }
         User user = testUser();
         ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
         AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
@@ -178,7 +178,7 @@ public class AccountServiceImplITTest {
             return;
         }
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
 
         ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
@@ -237,7 +237,7 @@ public class AccountServiceImplITTest {
             return;
         }
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
@@ -293,7 +293,7 @@ public class AccountServiceImplITTest {
             return;
         }
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appLogin =  EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
@@ -339,7 +339,7 @@ public class AccountServiceImplITTest {
             return;
         }
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 
@@ -456,7 +456,7 @@ public class AccountServiceImplITTest {
 
     private AccountServiceImpl zadostProcessPrepare() throws SolrServerException, IOException {
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 

@@ -289,7 +289,7 @@ public class PXServiceImplITTest {
                 .createMock();
 
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 

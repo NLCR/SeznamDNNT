@@ -33,11 +33,12 @@ import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.impl.DefaultApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 
 @WebServlet(value = "/notifications/*")
@@ -98,6 +99,7 @@ public class NotificationServlet extends HttpServlet {
     }
 
     enum Actions {
+        
         SAVE_NOTIFICATION_SETTINGS {
 
             @Override
@@ -106,16 +108,23 @@ public class NotificationServlet extends HttpServlet {
                     JSONObject inputJs = ServletsSupport.readInputJSON(request);
                     
                     ApplicationUserLoginSupport login = new DefaultApplicationUserLoginSupport(request);
-                    UserControler controler = new UserControlerImpl(request);
-                    MailService mailService = new MailServiceImpl();
 
+                    // user controller - 
+                    UserController controller = null;
+                    if (login.getUser().isThirdPartyUser()) {
+                        controller = new ShibUsersControllerImpl();
+                    } else {
+                        controller = new UserControlerImpl(request);
+                    }
+
+                    MailService mailService = new MailServiceImpl();
+                    // check third party user
                     if (inputJs.has("notification_interval")) {
                         String notificationInterval = inputJs.getString("notification_interval");
-                        controler.changeNotificationInterval(login.getUser().getUsername(), NotificationInterval.valueOf(notificationInterval));
-                        
+                        controller.changeIntervalForUser(login.getUser().getUsername(), NotificationInterval.valueOf(notificationInterval));
                     }
                         
-                    NotificationsService service = new NotificationServiceImpl(controler, mailService);
+                    NotificationsService service = new NotificationServiceImpl(controller, mailService);
 
                     if (inputJs.has("notifications")) {
                         List<RuleNotification> aNotification = new ArrayList<>();
@@ -168,6 +177,7 @@ public class NotificationServlet extends HttpServlet {
                 }
             }
         },
+        // get notifications for settings
         GET_RULE_NOTIFICATIONS {
 
             @Override
@@ -176,7 +186,7 @@ public class NotificationServlet extends HttpServlet {
                     JSONObject jsonObject = new JSONObject();
                     
                     ApplicationUserLoginSupport login = new DefaultApplicationUserLoginSupport(req);
-                    UserControler controler = new UserControlerImpl(req);
+                    UserController controler = new UserControlerImpl(req);
                     MailService mailService = new MailServiceImpl();
 
                     NotificationsService service = new NotificationServiceImpl(controler, mailService);
@@ -208,7 +218,8 @@ public class NotificationServlet extends HttpServlet {
                     if (notification.getType() != null && notification.getType().equals(TYPE.rule.name())) {
                             
                         ApplicationUserLoginSupport login = new DefaultApplicationUserLoginSupport(req);
-                        UserControler controler = new UserControlerImpl(req);
+                        UserController controler = new UserControlerImpl(req);
+                        
                         MailService mailService = new MailServiceImpl();
                         notification.setUser(login.getUser().getUsername());
                         
@@ -261,7 +272,7 @@ public class NotificationServlet extends HttpServlet {
                 if (new RightsResolver(req, new MustBeLogged()).permit()) {
 
                     ApplicationUserLoginSupport login = new DefaultApplicationUserLoginSupport(req);
-                    UserControler controler = new UserControlerImpl(req);
+                    UserController controler = new UserControlerImpl(req);
                     MailService mailService = new MailServiceImpl();
 
                     NotificationsService service = new NotificationServiceImpl(controler, mailService);

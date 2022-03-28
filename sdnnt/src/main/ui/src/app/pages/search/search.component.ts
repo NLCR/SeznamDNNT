@@ -46,16 +46,20 @@ export class SearchComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+
     this.state.activePage = 'Search';
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.search(val);
     }));
+
 
     /*
     this.subs.push(this.state.paramsProcessed.subscribe(val => {
       this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'dntstav') > -1;
     }));
     */
+
+
   }
 
   ngOnDestroy(): void {
@@ -72,6 +76,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchResponse = null;
     this.facets = null;
     this.service.search(p as HttpParams).subscribe((resp: SolrResponse) => {
+
 
       this.searchResponse = resp;
       this.docs = resp.response.docs;
@@ -104,9 +109,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       if (resp.rnotifications) {
         utils.enhanceByRulebasedNotifications(this.docs,resp.rnotifications);
       }
-
-     
-
+ 
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
       this.loading = false;
@@ -115,7 +118,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   hromadnaZadostEnabled() {
-    return this.identifiersAndActionsMapping.size  > 0 && this.actions.length > 0;
+    let flag =  this.identifiersAndActionsMapping.size  > 0 && this.actions.length > 0;
+    return flag;
   } 
 
 

@@ -145,8 +145,8 @@ export class AppState {
         this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + " " + s.dir));
       } else if (p === 'notificationFilter') {
 
-        let selectedNotification = this.notificationSettings.all.find(n=> n.id === param); 
-        this.notificationSettings.selected = selectedNotification;
+         let selectedNotification = this.notificationSettings.all.find(n=> n.id === param); 
+         this.notificationSettings.selected = selectedNotification;
 
       } else {
         //let fFields =  this.user != null && (this.user.role === "kurator" || this.user.role === "mainKurator" || this.user.role === "admin") ?  this.config.filterFields : this.config.userFilterFields;     

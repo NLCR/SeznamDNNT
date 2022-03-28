@@ -5,7 +5,7 @@ import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -70,7 +71,6 @@ public class ShibbolethFilter implements Filter {
                     }
 
                     // merge users
-
                     JSONObject merged = new JSONObject();
                     users.stream().forEach(o-> {
                         o.keySet().forEach(k-> {
@@ -81,16 +81,31 @@ public class ShibbolethFilter implements Filter {
                     LOGGER.fine("Try to load shibboleth user from this json :"+merged.toString());
                     User user = User.fromJSON(merged.toString());
                     if (user.getUsername() != null) {
+
                         user.setThirdPartyUser(true);
+
+                        try {
+                            ShibUsersControllerImpl shibController = new ShibUsersControllerImpl();
+                            User shibUser = shibController.findUser(user.getUsername());
+                            if (shibUser != null) {
+                                user.setNotifikaceInterval(shibUser.getNotifikaceInterval());
+                            }
+                            shibController.save(user);
+
+                        } catch (UserControlerException e) {
+                            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                        }
+
                         hReq.getSession(true).setAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER, user);
                         TrackSessionUtils.touchSession(hReq.getSession());
+
+                        break;
                     } else {
                         LOGGER.warning("No user name ");
                     }
                 }
             }
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 
@@ -163,7 +178,6 @@ public class ShibbolethFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
+    public void destroy() {}
 
-    }
 }

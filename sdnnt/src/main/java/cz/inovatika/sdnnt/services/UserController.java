@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Implementation of this class is able to manage users' account
+ * Implementation of this class is able to manage regular users' account
  * @author happy
  */
-public interface UserControler {
+public interface UserController {
 
-    public static final Logger LOGGER = Logger.getLogger(UserControler.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(UserController.class.getName());
     
     /**
      * Returns all users
@@ -159,5 +159,5 @@ public interface UserControler {
      * @return
      * @throws UserControlerException Something happened ;-)
      */
-    public User changeNotificationInterval(String username, NotificationInterval interval) throws UserControlerException;
+    public User changeIntervalForUser(String username, NotificationInterval interval) throws UserControlerException;
 }

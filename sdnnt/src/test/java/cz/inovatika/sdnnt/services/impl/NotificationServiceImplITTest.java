@@ -7,8 +7,10 @@ import cz.inovatika.sdnnt.indexer.models.notifications.NotificationFactory;
 import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 import cz.inovatika.sdnnt.it.SolrTestServer;
+import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.MailService;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
@@ -73,10 +75,10 @@ public class NotificationServiceImplITTest {
             return;
         }
 
-        UserControler controler = EasyMock.createMock(UserControler.class);
+        UserController controler = EasyMock.createMock(UserController.class);
 
         EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
-                .andReturn(createNotificationUsers())
+                .andReturn(createNotificationSimpleUsers())
                 .anyTimes();
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
@@ -162,14 +164,36 @@ public class NotificationServiceImplITTest {
                 .addMockedMethod("sendNotificationEmail")
                 .createMock();
 
-        UserControler controler = EasyMock.createMock(UserControler.class);
+        UserController controler = EasyMock.createMock(UserController.class);
+        UserController shibController = EasyMock.createMock(UserController.class);
 
         EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
-                .andReturn(createNotificationUsers())
+                .andReturn(createNotificationSimpleUsers())
                 .anyTimes();
 
+        EasyMock.expect(shibController.findUsersByNotificationInterval(NotificationInterval.den.name()))
+            .andReturn(createNotificationShibUsers())
+            .anyTimes();
+
+        EasyMock.expect(controler.findUser("test1"))
+            .andReturn(testUser())
+            .anyTimes();
+
+        EasyMock.expect(controler.getAll())
+            .andReturn(createNotificationSimpleUsers())
+            .anyTimes();
+
+        EasyMock.expect(shibController.getAll())
+            .andReturn(createNotificationShibUsers())
+            .anyTimes();
+
+
+
+//        public NotificationServiceImpl(UserController userControler, UserController shibUsersController,
+//                MailService mailService) {
+
         NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
-                .withConstructor(controler, mailService)
+                .withConstructor(controler, shibController, mailService)
                 .addMockedMethod("buildClient").createMock();
 
 
@@ -198,7 +222,7 @@ public class NotificationServiceImplITTest {
         ).anyTimes();
 
 
-        EasyMock.replay(mailService, controler, service);
+        EasyMock.replay(mailService, controler, shibController, service);
 
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057930.json"));
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
@@ -214,12 +238,11 @@ public class NotificationServiceImplITTest {
     
     @Test
     public void testSendNotifications_QUERY() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, FactoryConfigurationError, XMLStreamException {
-
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
-        
+
         InputStream resourceAsStream = dntAlephStream("oai_SE_dnnt.xml");
         Assert.assertNotNull(resourceAsStream);
         alephImport(resourceAsStream,36);
@@ -234,13 +257,12 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
         
         
-        solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.add(Calendar.DAY_OF_WEEK, -1);
         solrMarc1.datum_stavu = calendar1.getTime();
 
- 
         // save and commit
         prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
         SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
@@ -249,11 +271,19 @@ public class NotificationServiceImplITTest {
                 .addMockedMethod("sendNotificationEmail")
                 .createMock();
 
-        UserControler controler = EasyMock.createMock(UserControler.class);
+        UserController controler = EasyMock.createMock(UserController.class);
 
         EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
-                .andReturn(createNotificationUsers())
+                .andReturn(new ArrayList<>())
                 .anyTimes();
+
+        EasyMock.expect(controler.findUser("test1"))
+            .andReturn(testUser())
+            .anyTimes();
+
+        EasyMock.expect(controler.getAll())
+            .andReturn(createNotificationSimpleUsers())
+            .anyTimes();
 
         NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
                 .withConstructor(controler, mailService)
@@ -293,10 +323,9 @@ public class NotificationServiceImplITTest {
         Assert.assertTrue(notificationsByInterval.size() == 1);
         
         service.processNotifications(NotificationInterval.den);
-
-            
     }
 
+    
     static SimpleNotification simpleNotification(String user, String identifier) throws IOException {
         InputStream resourceAsStream = NotificationServiceImplITTest.class.getClassLoader()
                 .getResourceAsStream("cz/inovatika/sdnnt/indexer/models/notifications/" + identifier);
@@ -321,15 +350,32 @@ public class NotificationServiceImplITTest {
         return MarcRecord.fromDoc(document);
     }
 
-    private List<User> createNotificationUsers() {
+    private List<User> createNotificationSimpleUsers() {
+        User user = testUser();
+        return new ArrayList<>(Arrays.asList(user));
+    }
+    private List<User> createNotificationShibUsers() {
+        User user = testUser();
+        return new ArrayList<>(Arrays.asList(testShibUser()));
+    }
+
+    private User testUser() {
         User user = new User();
         user.setUsername( "test1");
         user.setJmeno( "Test_1_jmeno");
         user.setPrijmeni( "Test_1_prijmeni");
         user.setEmail( "test@testovic.cz");
-        return new ArrayList<>(Arrays.asList(user));
+        return user;
     }
 
+    private User testShibUser() {
+        User user = new User();
+        user.setUsername( "shibtest1");
+        user.setJmeno( "shib_Test_1_jmeno");
+        user.setPrijmeni( "shib_Test_1_prijmeni");
+        user.setEmail( "shib_test@testovic.cz");
+        return user;
+    }
 
     protected class BuildSolrClientSupport extends NotificationServiceImpl {
 

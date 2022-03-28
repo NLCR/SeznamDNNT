@@ -10,11 +10,13 @@ import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
@@ -38,13 +40,29 @@ public class NotificationServiceImpl implements NotificationsService {
 
     static final Logger LOGGER = Logger.getLogger(NotificationServiceImpl.class.getName());
 
-    private UserControler userControler;
+    // regular users
+    private UserController userControler;
+    // shib users
+    private UserController shibUsersController;
+
     private MailService mailService;
 
-    public NotificationServiceImpl(UserControler userControler, MailService mailService) {
+    public NotificationServiceImpl(UserController userControler, MailService mailService) {
         this.userControler = userControler;
         this.mailService = mailService;
     }
+    
+    
+
+    public NotificationServiceImpl(UserController userControler, UserController shibUsersController,
+            MailService mailService) {
+        super();
+        this.userControler = userControler;
+        this.shibUsersController = shibUsersController;
+        this.mailService = mailService;
+    }
+
+
 
     @Override
     public List<AbstractNotification> findNotificationsByUser(String username) throws NotificationsException {
@@ -180,15 +198,15 @@ public class NotificationServiceImpl implements NotificationsService {
     }
     
     private String filterUserIntervalAndNotType(String username, NotificationInterval interval) {
-        return "user:" + username + " AND "+ "periodicity:" + interval + " AND -type:*";
+        return "user:\"" + username + "\" AND "+ "periodicity:" + interval + " AND -type:*";
     }
     
     private String filterUserIntervalAndType(String username, NotificationInterval interval, TYPE type) {
-        return "user:" + username + " AND "+ "periodicity:" + interval + " AND type:" + type.name();
+        return "user:\"" + username + "\" AND "+ "periodicity:" + interval + " AND type:" + type.name();
     }
 
     private String filterUserAndInterval(String username, NotificationInterval interval) {
-        return "user:" + username + " AND "+ "periodicity:" + interval;
+        return "user:\"" + username + "\" AND "+ "periodicity:" + interval;
     }
     
     @Override
@@ -238,14 +256,36 @@ public class NotificationServiceImpl implements NotificationsService {
     @Override
     public void processNotifications(NotificationInterval interval)
             throws NotificationsException, UserControlerException {
-        // notifikace ?? 
+            
+        // Notifications
+        Map<String, List<String>> identsMapping = new HashMap<>();
+        Map<String, List<Map<String, String>>> docsMapping = new HashMap<>();
+        
+
+        // notifikace pro shib users 
         // vzit vsechny uzivatele, kteri maji nastaveny interval 
-        List<User> users = userControler.findUsersByNotificationInterval(interval.name());
-        // prochazim uzivatele; beru jednoduche notifikace
-        users.stream().forEach(user -> {
-            final List<Map<String, String>> documents = new ArrayList<>();
+        List<User> simpleNotificationUsers = userControler.findUsersByNotificationInterval(interval.name());
+        List<User> allUsers = userControler.getAll();
+        
+        if (this.shibUsersController != null) {
+            List<User> shibUsers = this.shibUsersController.findUsersByNotificationInterval(interval.name());
+            if (shibUsers != null && !shibUsers.isEmpty()) {
+                simpleNotificationUsers.addAll(shibUsers);
+            }
+            
+            List<User> allShibUsers = this.shibUsersController.getAll();
+            if (allShibUsers != null && !allShibUsers.isEmpty()) {
+                allUsers.addAll(allShibUsers);
+            }
+        }
+        
+        
+
+        simpleNotificationUsers.stream().forEach(user -> {
+            LOGGER.fine("Processing simple  notifications for user "+user.getUsername());
             try {
-                List<String> docIdents = new ArrayList<>();
+                final List<String> docIdents = new ArrayList<>();
+                final List<Map<String, String>> documents = new ArrayList<>();
 
                 List<Map<String,String>> simpleNotifications = processSimpleNotification(user, interval);
                 simpleNotifications.stream().forEach(doc-> {
@@ -255,22 +295,57 @@ public class NotificationServiceImpl implements NotificationsService {
                         documents.add(doc);
                     }
                 });
-
-                List<Map<String, String>> ruleNotifications = processRuleBasedNotification(user, interval);
-                ruleNotifications.stream().forEach(doc-> {
-                    String ident = doc.get(MarcRecordFields.IDENTIFIER_FIELD);
-                    if (!docIdents.contains(ident)) {
-                        docIdents.add(ident);
-                        documents.add(doc);
-                    }
-                });
-                if (!documents.isEmpty()) {
-                    sendEmail(interval, user, new ArrayList<>(documents));
-                }
-            } catch (UserControlerException | NotificationsException | IOException e) {
+                
+                identsMapping.put(user.getUsername(), docIdents);
+                docsMapping.put(user.getUsername(), documents);
+                
+            } catch (UserControlerException | NotificationsException  e) {
                LOGGER.log(Level.SEVERE, e.getMessage(),e);
             }
         });
+        LOGGER.info("Number of notified users :"+identsMapping.size()+".");
+
+        allUsers.stream().forEach(user -> {
+            try {
+                if (user.getUsername() != null && StringUtils.isAnyString(user.getUsername())) {
+                    final List<String> docIdents = new ArrayList<>();
+                    final List<Map<String, String>> documents = new ArrayList<>();
+                    List<Map<String, String>> ruleNotifications = processRuleBasedNotification(user, interval);
+                    for (Map<String,String> doc : ruleNotifications) {
+                        String ident = doc.get(MarcRecordFields.IDENTIFIER_FIELD);
+                        boolean containsRuleBased = docIdents.contains(ident);
+                        boolean containsSimple = identsMapping.containsKey(user.getUsername()) && identsMapping.get(user.getUsername()).contains(ident);
+                        if (!containsRuleBased && !containsSimple) {
+                            docIdents.add(ident);
+                            documents.add(doc);
+                        }
+                    }
+                    identsMapping.put(user.getUsername(), docIdents);
+                    docsMapping.put(user.getUsername(), documents);
+                } else {
+                    LOGGER.warning("Missing username ! User:"+user);
+                }
+            } catch (NotificationsException | IOException e) {
+                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
+            
+        });
+        
+        docsMapping.keySet().stream().forEach(username-> {
+            try {
+                List<Map<String, String>> list = docsMapping.get(username);
+                if (!list.isEmpty()) {
+                    User user = this.userControler.findUser(username);
+                    if (user != null) {
+                        List<Map<String, String>> documents =docsMapping.get(username);
+                        sendEmail(interval, user, new ArrayList<>(documents));
+                    }
+                }
+            } catch (UserControlerException e) {
+                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            }
+        });
+        
     }
 
     protected List<Map<String, String>> processRuleBasedNotification(User user, NotificationInterval interval) throws NotificationsException, IOException {
@@ -397,7 +472,7 @@ public class NotificationServiceImpl implements NotificationsService {
                 LOGGER.throwing(this.getClass().getName(), "processNotifications", e);
             }
         } else {
-            LOGGER.info(String.format("No changed documents for user  %s and interval %s", user, interval));
+            LOGGER.info(String.format("No changed documents for user  %s and interval %s", user.getUsername(), interval));
         }
     }
 

@@ -130,12 +130,7 @@ import { User } from './shared/user';
         if (user) {
             const now = Date.now();
             const lastLogged = new Date(user.timeStamp).getTime();
-            /*
-            const isTimeOut = (now - lastLogged)/60000 > this.config.loginTimeOut;
-            if (isTimeOut) {
-                localStorage.removeItem('user');
-                return;
-            }*/
+
             return this.http.post(url, { user: user.username, pwd: user.pwd })
                 .toPromise()
                 .then((res: any) => {

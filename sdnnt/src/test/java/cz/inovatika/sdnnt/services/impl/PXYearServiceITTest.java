@@ -6,7 +6,7 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
@@ -159,7 +159,7 @@ public class PXYearServiceITTest {
                 .createMock();
 
         User user = testUser();
-        UserControler controler  = EasyMock.createMock(UserControler.class);
+        UserController controler  = EasyMock.createMock(UserController.class);
         ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
         ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
 

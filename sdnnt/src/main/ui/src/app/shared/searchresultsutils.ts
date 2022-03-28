@@ -27,7 +27,7 @@ export class SearchResultsUtils {
         });
 
     }
-
+    // rule based notfications
     enhanceByRulebasedNotifications(docs, notifications) {
         docs.forEach(d => {
             notifications?.forEach(n=> {
@@ -37,7 +37,6 @@ export class SearchResultsUtils {
                 }
             });
         });
-
     }
 
     // if (resp.notifications) {

@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class MockHTTPServletInvocationHandler implements InvocationHandler {
 
+    public static final Logger LOGGER = Logger.getLogger(MockHTTPServletInvocationHandler.class.getName());
+    
     public static class EmbeddedEnumeration  implements Enumeration<String> {
         private HttpServletRequest request;
         private Hashtable<String, String> table;
@@ -41,6 +44,7 @@ public class MockHTTPServletInvocationHandler implements InvocationHandler {
     public MockHTTPServletInvocationHandler(Hashtable<String, String> attributes, HttpServletRequest request) {
         this.attributes = attributes;
         this.request = request;
+        LOGGER.info("Servlet request headers "+attributes);
     }
 
     @Override

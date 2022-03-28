@@ -1,19 +1,18 @@
-package cz.inovatika.sdnnt.services.impl;
+package cz.inovatika.sdnnt.services.impl.users;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
-import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
+import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -24,7 +23,6 @@ import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
@@ -33,11 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -45,10 +40,9 @@ import java.util.stream.Collectors;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 
-public class UserControlerImpl implements UserControler, ApplicationUserLoginSupport {
+public class UserControlerImpl  extends AbstractUserController implements UserController, ApplicationUserLoginSupport {
 
 
-    private static int USERS_LIMIT = 10000;
 
     private HttpServletRequest request;
     private MailService mailService;
@@ -102,17 +96,10 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     @Override
     public List<User> getAll() throws UserControlerException{
-        try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery("*:*")
-                    .setRows(USERS_LIMIT);
-            QueryResponse users = solr.query("users", query);
-            List<User> collect = users.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
-            //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
-            return collect;
-        } catch (SolrServerException | IOException ex) {
-            throw new UserControlerException(ex);
-        }
+        String collection = DataCollections.users.name();
+        return getUsersImpl(collection);
     }
+
 
     @Override
     public User findUserByApiKey(String apikey) throws UserControlerException{
@@ -126,10 +113,15 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     @Override
     public List<User> findUsersByPrefix(String prefix) throws UserControlerException {
+        String collection = DataCollections.users.name();
+        return findUserByPrefixImpl(prefix, collection);
+    }
+
+    protected List<User> findUserByPrefixImpl(String prefix, String collection) throws UserControlerException {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery(String.format("fullText:%s*",  prefix))
                     .setRows(1000);
-            QueryResponse users = solr.query("users", query);
+            QueryResponse users = solr.query(collection, query);
             List<User> userList = users.getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
             List<User> collect = userList.stream().map(UsersUtils::toTOObject).collect(Collectors.toList());
             return collect;
@@ -291,19 +283,10 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     @Override
     public List<User> findUsersByNotificationInterval(String interval) throws UserControlerException {
-
-        try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery("notifikace_interval:\""+interval+"\"")
-                    .setRows(1000);
-
-            QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
-            return users;
-            //return solr.query("users", query).getBeans(User.class).stream().map(this::toTOObject).collect(Collectors.toList());
-        } catch (SolrServerException | IOException ex) {
-            throw new UserControlerException(ex);
-        }
+        String collection = DataCollections.users.name();
+        return findUsersByNotificationIntervalImpl(interval, collection);
     }
+
 
 
     @Override
@@ -322,7 +305,8 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
             throw new UserControlerException(String.format("Cannot save user %s", user.getUsername()));
         }
     }
-        @Override
+
+    @Override
     public User userSave(User user) throws UserControlerException, NotAuthorizedException {
         User found = null;
         try (SolrClient client = buildClient()) {
@@ -343,89 +327,25 @@ public class UserControlerImpl implements UserControler, ApplicationUserLoginSup
 
     public User save(User user) throws UserControlerException{
         try (SolrClient client = buildClient()) {
-            return save(user, client);
+            return save(user, client, DataCollections.users.name());
         } catch (IOException | SolrServerException ex) {
             throw new  UserControlerException(ex);
         }
     }
 
-    @Override
-    public List<Zadost> getZadost(String username) throws UserControlerException {
-        try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery("user:\"" + username + "\"")
-                    .addFilterQuery("state:open")
-                    .setFields("id", "identifiers", "typ", "user", "state", "navrh", "poznamka", "pozadavek", "datum_zadani", "datum_vyrizeni", "formular")
-                    .setRows(10);
-            //List<Zadost> zadost = solr.query("zadost", query).getBeans(Zadost.class);
-
-            List<Zadost> zadosti = new ArrayList<>();
-            SolrJUtilities.jsonDocsFromResult(solr, query, "zadost").forEach(z-> {
-                zadosti.add(Zadost.fromJSON(z.toString()));
-            });
-
-            return zadosti;
-        } catch (SolrServerException | IOException ex) {
-            throw new  UserControlerException(ex);
-        }
-    }
-
-
-    private  User save(User user, SolrClient client) throws IOException, SolrServerException {
-        try {
-            client.add("users", user.toSolrInputDocument());
-            return UsersUtils.toTOObject(user);
-        } finally {
-            SolrJUtilities.quietCommit(client, "users");
-        }
-    }
 
 
     @Override
     public List<User> findUsersByRole(Role role) throws UserControlerException {
-        try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery("role:\""+role.name()+"\"")
-                    .setRows(1000);
-
-            QueryResponse usersResponse = solr.query("users", query);
-            List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
-            return users;
-
-        } catch (SolrServerException | IOException ex) {
-            throw new UserControlerException(ex);
-        }
+        String collection = DataCollections.users.name();
+        return findUsersByRole(role, collection);
     }
 
-    
     
     @Override
-    public User changeNotificationInterval(String username, NotificationInterval interval) throws UserControlerException {
-        try (SolrClient solr = buildClient()) {
-            try {
-                SolrInputDocument idoc = new SolrInputDocument();
-                idoc.setField("username", username);
-                atomicUpdate(idoc, interval.name(), "notifikace_interval");
-                solr.add(DataCollections.users.name(), idoc);
-            } catch (SolrServerException e) {
-                throw new UserControlerException(e);
-            } finally {
-                SolrJUtilities.quietCommit(solr, "users");
-            }
-        } catch ( IOException ex) {
-            throw new UserControlerException(ex);
-        }
-        // return stored user
-        return findUser(username);
-    }
-    
-    
-    protected void atomicUpdate(SolrInputDocument idoc, Object fValue, String fName) {
-        Map<String, Object> modifier = new HashMap<>(1);
-        modifier.put("set", fValue);
-        idoc.addField(fName, modifier);
+    public User changeIntervalForUser(String username, NotificationInterval interval) throws UserControlerException {
+        return changeIntervalImpl(username, interval, DataCollections.users.name());
     }
 
-    SolrClient buildClient() {
-        return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-    }
 
 }

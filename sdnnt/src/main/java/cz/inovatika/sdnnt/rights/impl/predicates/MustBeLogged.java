@@ -1,7 +1,7 @@
 package cz.inovatika.sdnnt.rights.impl.predicates;
 
 import cz.inovatika.sdnnt.rights.Predicate;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 
 import javax.servlet.http.HttpServletRequest;
 

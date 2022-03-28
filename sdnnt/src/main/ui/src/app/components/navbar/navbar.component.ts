@@ -100,6 +100,11 @@ export class NavbarComponent implements OnInit {
     else return true;
   }
 
+  settingsMenuEnabled(): boolean {
+    if (this.state.user)  return true;
+    else return false;
+  }
+ 
   changePassEnabled(): boolean {
     if (this.state.user && this.state.user.thirdpartyuser) return false;
     else return true;

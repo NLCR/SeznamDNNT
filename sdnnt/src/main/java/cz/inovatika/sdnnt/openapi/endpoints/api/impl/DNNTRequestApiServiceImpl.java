@@ -19,9 +19,11 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
@@ -76,7 +78,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     public Response requestGet(String status, String internalStatus,String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
         if (headerString != null) {
-            UserControlerImpl userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
+            AbstractUserController userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
             OpenApiLoginSupportImpl loginSupport = new OpenApiLoginSupportImpl(headerString);
             if (loginSupport.getUser() != null) {
                 ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();

@@ -569,6 +569,9 @@
     "day": "Den",
     "week": "Týden",
     "month": "Měsíc",
+    "den": "Den",
+    "tyden": "Týden",
+    "mesic": "Měsíc",
     "change": "Změna",
     "change_password": "Změna hesla",
     "password": "Heslo",
@@ -806,7 +809,7 @@
     "hledany_vyraz": "Hledaný výraz",
     "nastaveni_notifikaci": "Nastavení notifikací",
     "jednotlive_notifikace": "Jednotlivé notifikace",
-    "smazat_notifikaci": "Snazat notifikaci"
+    "smazat_notifikaci": "Smazat notifikaci"
   },
 
   "tooltip": {

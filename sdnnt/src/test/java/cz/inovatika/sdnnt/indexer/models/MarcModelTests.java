@@ -82,7 +82,6 @@ public class MarcModelTests {
 
 
         EasyMock.expect(mockResponse.getResults()).andReturn(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_"))).anyTimes();
-        //EasyMock.expect(mockResponse.).andReturn(mockResponse).anyTimes();
 
         EasyMock.expect(mockClient.query("catalog",q)).andReturn(mockResponse).anyTimes();
         EasyMock.replay(mockClient, mockResponse);
@@ -92,7 +91,6 @@ public class MarcModelTests {
         Assert.assertNotNull(marcRecord.dntstav);
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
-
 
     }
 

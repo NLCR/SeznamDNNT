@@ -3,7 +3,7 @@ package cz.inovatika.sdnnt.rights.impl.predicates;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Predicate;
 import cz.inovatika.sdnnt.rights.Role;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;

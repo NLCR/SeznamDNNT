@@ -2,7 +2,7 @@ package cz.inovatika.sdnnt.tracking;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import org.json.JSONObject;
 
 import javax.servlet.*;

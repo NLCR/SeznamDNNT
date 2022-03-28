@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
-import cz.inovatika.sdnnt.services.UserControler;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
@@ -301,7 +301,7 @@ public class Indexer {
    *
    * @return
    */
-  public static Map<User, List<Map<String,String>>>  checkNotifications(UserControler controler,  String interval) {
+  public static Map<User, List<Map<String,String>>>  checkNotifications(UserController controler,  String interval) {
 
     try {
       List<User> usersByNotificationInterval = controler.findUsersByNotificationInterval(interval);

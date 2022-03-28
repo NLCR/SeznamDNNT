@@ -3,7 +3,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.services.impl.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
