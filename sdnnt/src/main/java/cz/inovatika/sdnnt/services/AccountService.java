@@ -225,6 +225,9 @@ public interface AccountService {
      * @throws SolrServerException
      */
     public List<String> findIdentifiersUsedInRequests(String user, String requestState) throws  AccountException, IOException, SolrServerException; 
+
+    
+    public List<String> findIdentifiersUsedInRequests(String user, List<String>requestsStates) throws  AccountException, IOException, SolrServerException; 
     
     /**
      * 

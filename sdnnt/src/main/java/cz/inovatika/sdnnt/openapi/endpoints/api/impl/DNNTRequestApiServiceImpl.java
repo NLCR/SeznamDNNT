@@ -263,14 +263,20 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     private void verifyIdentifiers(User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers, AccountException, AlreadyUsedException {
         if (identifiers.isEmpty()) throw new EmptyIdentifiers();
 
-        List<String> listByUser = new ArrayList<>();
-        //    public List<String> findIdentifiersUsedInRequests(String user, String requestState) throws  AccountException, IOException, SolrServerException; 
-        List<String> alreadyUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), "processed");
+        List<String> usedByUser = new ArrayList<>();
+        List<String> usedStates = Arrays.asList(
+                "open",
+                "waiting",
+                "waiting_for_automatic_process"
+        );
+        
+        List<String> allUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), usedStates);
         identifiers.stream().forEach(ident-> {
-            if (alreadyUsed.contains(ident)) {
-                listByUser.add(ident);
+            if (allUsed.contains(ident)) {
+                usedByUser.add(ident);
             }
         });
+        
         
         List<String> nonExistentIdentifiers = new ArrayList<>();
         List<String> invalidIdentifiers = new ArrayList<>();
@@ -290,15 +296,22 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
         if (!nonExistentIdentifiers.isEmpty()) throw new NonExistentIdentifeirsException(nonExistentIdentifiers);
         if (!invalidIdentifiers.isEmpty()) throw new InvalidIdentifiersException(invalidIdentifiers);
-        if (!alreadyUsed.isEmpty()) throw new AlreadyUsedException(alreadyUsed);
+        if (!usedByUser.isEmpty()) throw new AlreadyUsedException(usedByUser);
    }
 
+    /**
+     * Empty or null identifiers exception
+     *
+     */
     public static class EmptyIdentifiers extends Exception {
         public EmptyIdentifiers() {
         }
-
     }
-
+    
+    /**
+     * Non existent item exception
+     *
+     */
     public static class NonExistentIdentifeirsException extends Exception {
         private List<String> idents;
 
@@ -311,6 +324,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
+    /**
+     * Invalid identifier exception
+     */
     public static class InvalidIdentifiersException extends Exception {
         private List<String> idents;
 
@@ -322,6 +338,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             return idents;
         }
     }
+    
+    
     public static class AlreadyUsedException extends Exception {
 
         private List<String> idents;
