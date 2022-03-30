@@ -316,7 +316,6 @@ public class UserServlet extends HttpServlet {
                 try {
                     new UserControlerImpl(req, new MailServiceImpl()).forgotPwd(readInputJSON(req));
                     JSONObject object = new JSONObject();
-                    object.put("result", "token has been sent");
                     return object;
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
