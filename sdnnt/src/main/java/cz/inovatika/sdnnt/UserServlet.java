@@ -314,9 +314,9 @@ public class UserServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 try {
-                    String resetPwdToken = new UserControlerImpl(req, new MailServiceImpl()).forgotPwd(readInputJSON(req));
+                    new UserControlerImpl(req, new MailServiceImpl()).forgotPwd(readInputJSON(req));
                     JSONObject object = new JSONObject();
-                    object.put("token", resetPwdToken);
+                    object.put("result", "token has been sent");
                     return object;
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
@@ -327,8 +327,12 @@ public class UserServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 try {
-                    User pswd = new UserControlerImpl(req).changePwdUser(readInputJSON(req).optString("pswd"));
-                    return pswd != null ? pswd.toJSONObject() : new JSONObject();
+                    if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                        User pswd = new UserControlerImpl(req).changePwdUser(readInputJSON(req).optString("pswd"));
+                        return pswd != null ? pswd.toJSONObject() : new JSONObject();
+                    } else {
+                        throw new NotAuthorizedException("not authorized");
+                    }
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
                 } catch (NotAuthorizedException e) {

@@ -350,16 +350,20 @@ public class IndexerServlet extends HttpServlet {
         RESUME_DNTSET {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                JSONObject json = new JSONObject();
-                try {
-                    DntAlephImporter imp = new DntAlephImporter();
-                    json = imp.resume(req.getParameter("token"));
+                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    JSONObject json = new JSONObject();
+                    try {
+                        DntAlephImporter imp = new DntAlephImporter();
+                        json = imp.resume(req.getParameter("token"));
 
-                } catch (Exception ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                    json.put("error", ex.toString());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        json.put("error", ex.toString());
+                    }
+                    return json;
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "not allowed");
                 }
-                return json;
             }
         },
         // import zaznamu z kosmas - uzivatelske api

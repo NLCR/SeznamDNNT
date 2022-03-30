@@ -382,17 +382,6 @@ public class SearchServlet extends HttpServlet {
         }
       }
     },
-    XSERVER {
-      @Override
-      JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        try {
-          return  XServer.find(req.getParameter("sysno"));
-        } catch (Exception ex) {
-          LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-          return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
-        }
-      }
-    },
     GOOGLEBOOKS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
