@@ -54,6 +54,11 @@ public class IndexerITTest {
 
     @Test
     public void testChangeKuratorState() throws JsonProcessingException, FactoryConfigurationError, XMLStreamException, IOException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
         InputStream resourceAsStream = dntAlephStream("oai_SE_dnnt.xml");
         Assert.assertNotNull(resourceAsStream);
         alephImport(resourceAsStream,36);

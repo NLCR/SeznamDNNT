@@ -319,27 +319,25 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
                 for (String identifier : identifiers) {
                     
-                    SolrInputDocument idoc = new SolrInputDocument();
-                    idoc.setField(IDENTIFIER_FIELD, identifier);
-                    
-                    
+                    SolrInputDocument idoc = null;
                     
                     LOGGER.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
-                        LOGGER.fine(String.format("Setting curator state %s", cState.name()));
-                        atomicUpdate(idoc, cState.name(), KURATORSTAV_FIELD);
-                    }
-                    if (pState != null) {
-                        LOGGER.fine(String.format("Setting public state %s", pState.name()));
-                        atomicUpdate(idoc, pState.name(), DNTSTAV_FIELD);
+                        idoc = super.changeProcessState(solr, identifier, cState.name());
                     }
                     
                     // history information
                     if (contextInformation) {
                         LOGGER.fine("Setting context information ");
-                        atomicUpdate(idoc, true, FLAG_PUBLIC_IN_DL);
+                        if (idoc != null) {
+                            super.enahanceContextInformation(idoc);
+                        } else {
+                            idoc = super.changeContextInformation(solr, identifier);
+                        }
                     }
-                    solr.add(DataCollections.catalog.name(), idoc);
+                    if (idoc != null) {
+                        solr.add(DataCollections.catalog.name(), idoc);
+                    }
                 }
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
             }

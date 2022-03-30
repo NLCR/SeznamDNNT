@@ -46,7 +46,6 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         Map<String, String> reqMap = new HashMap<>();
         reqMap.put("rows", "" + LIMIT);
 
-        //List<String> plusFilter = new ArrayList<>(Arrays.asList(FMT_FIELD + ":BK"));
         List<String> plusFilter = new ArrayList<>();
 
         if (this.format != null && !this.format.trim().equals("")) {
@@ -61,6 +60,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
             String collected = states.stream().collect(Collectors.joining(" OR "));
             plusFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
         }
+        
         LOGGER.info("Current iteration filter " + plusFilter);
         support.iterate(buildClient(), reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
                 IDENTIFIER_FIELD,
@@ -91,15 +91,10 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
 
             try (final SolrClient solr = buildClient()) {
                 for (String identifier : identifiers) {
-                    SolrInputDocument idoc = new SolrInputDocument();
-                    idoc.setField(IDENTIFIER_FIELD, identifier);
                     if (cState != null) {
-                        atomicUpdate(idoc, cState.name(), KURATORSTAV_FIELD);
+                        SolrInputDocument sDoc = super.changeProcessState(solr, identifier, cState.name());
+                        solr.add(DataCollections.catalog.name(), sDoc);
                     }
-                    if (pState != null) {
-                        atomicUpdate(idoc, pState.name(), DNTSTAV_FIELD);
-                    }
-                    solr.add(DataCollections.catalog.name(), idoc);
                 }
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
             }

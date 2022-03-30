@@ -1,20 +1,31 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.indexer.models.MarcRecordFlags;
+import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.License;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
+import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_1;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_2;
@@ -105,7 +116,9 @@ public abstract class AbstractPXService {
             accountService.schedulerDefinedCloseRequest(zadost.toJSON().toString());
         }
     }
-
+    
+    
+    // todo: remove
     protected void atomicUpdate(SolrInputDocument idoc, Object fValue, String fName) {
         Map<String, Object> modifier = new HashMap<>(1);
         modifier.put("set", fValue);
@@ -121,5 +134,35 @@ public abstract class AbstractPXService {
         String fq = String.format("(%s OR %s)", first, second);
         return fq;
     }
+    
+    protected  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state) throws JsonProcessingException, SolrServerException, IOException {
+        MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
+        CuratorItemState kstav = CuratorItemState.valueOf(state);
+        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
+        if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+          mr.license = License.dnnto.name();
+        } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
+          mr.license = License.dnntt.name();
+        } else {
+            mr.license = null;
+        }
+        mr.setKuratorStav(kstav.name(), pstav.name(), null, "scheduler", "scheduler", new JSONArray());
+        return mr.toSolrDoc();
+    }
 
+    protected void enahanceContextInformation(SolrInputDocument idoc) {
+        idoc.addField(MarcRecordFields.FLAG_PUBLIC_IN_DL, true);
+    }
+
+    protected SolrInputDocument changeContextInformation(SolrClient solr, String identifier) throws JsonProcessingException, SolrServerException, IOException {
+        MarcRecord mr = MarcRecord.fromIndex(solr, identifier);
+        if (mr != null) {
+            if (mr.recordsFlags == null) {
+                mr.recordsFlags = new MarcRecordFlags(true);
+            }
+            mr.recordsFlags.setPublicInDl(true);
+            return mr.toSolrDoc();
+        } else return null;
+    }
+    
 }

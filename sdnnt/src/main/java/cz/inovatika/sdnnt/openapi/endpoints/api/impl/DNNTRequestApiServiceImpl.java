@@ -171,7 +171,6 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     for (Request req : batch) {
 
                         try {
-                            // verify/ maximum item and current state
                            
                             JSONObject prepare = accountService.prepare(navrh);
                             Zadost zadost = Zadost.fromJSON(prepare.toString());
@@ -187,10 +186,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             zadost.setPoznamka(req.getPoznamka());
 
                             try {
-
                                 JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
                                 response.getSaved().add(objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class));
-
                             } catch ( ConflictException e) {
                                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
 
@@ -276,8 +273,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 usedByUser.add(ident);
             }
         });
-        
-        
+
         List<String> nonExistentIdentifiers = new ArrayList<>();
         List<String> invalidIdentifiers = new ArrayList<>();
 
