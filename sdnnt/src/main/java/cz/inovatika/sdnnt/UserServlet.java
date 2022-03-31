@@ -380,7 +380,7 @@ public class UserServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
                     User user = new UserControlerImpl(req, new MailServiceImpl()).resetPwd(readInputJSON(req));
-                    return user.toJSONObject();
+                    return new JSONObject();
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");
                 }

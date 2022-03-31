@@ -172,9 +172,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                         try {
                            
+                            Zadost mockZadost = new Zadost("-1");
+                            mockZadost.setNavrh(navrh);
+
+                            verifyIdentifiers(openApiLoginSupport.getUser(), accountService,mockZadost, req.getIdentifiers());
+
                             JSONObject prepare = accountService.prepare(navrh);
                             Zadost zadost = Zadost.fromJSON(prepare.toString());
-                            verifyIdentifiers(openApiLoginSupport.getUser(), accountService,zadost, req.getIdentifiers());
 
                             if (req.getIdentifiers() != null) {
                                 zadost.setIdentifiers(req.getIdentifiers());
