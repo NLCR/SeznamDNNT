@@ -9,7 +9,7 @@
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div class="app-right">
-          <app-paginator [numFound]="numFound"  [showSort]="true"></app-paginator>
+          <app-paginator [numFound]="numFound"  [showSort]="true" [storeStateKey]="'search'"></app-paginator>
         </div>
       </div>
       <div class="app-results-wrapper" [ngClass]="state.logged ? 'app-role-' + state.user.role : null">
@@ -66,7 +66,7 @@
         <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
       </div>
       <div class="app-mt-4">
-        <app-paginator [numFound]="numFound" [showSort]="true"></app-paginator>
+        <app-paginator [numFound]="numFound" [showSort]="true" [storeStateKey]="'search'"></app-paginator>
       </div>
     </div>
   </div>

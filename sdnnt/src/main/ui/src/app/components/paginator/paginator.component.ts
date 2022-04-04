@@ -29,7 +29,15 @@ export class PaginatorComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageIndex = this.state.page + 1;
- 
+
+    this.state.navigationstore.paginatorChanged.subscribe(r => {
+      this.setPagParams();
+    });
+    this.setPagParams();
+
+  }
+
+  setPagParams() {
     if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
       this.rows = this.state.navigationstore.getRows(this.storeStateKey);
       this.page = this.state.navigationstore.getPage(this.storeStateKey);
@@ -59,6 +67,11 @@ export class PaginatorComponent implements OnInit {
     const params: any = {};
     params.page = this.pageIndex - 1;
     this.state.page = this.pageIndex - 1;
+
+    if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
+      this.state.navigationstore.setPage(this.storeStateKey, params.page);
+      this.state.navigationstore.setRows(this.storeStateKey, params.rows);
+    }
     // document.getElementById('scroll-wrapper').scrollTop = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }

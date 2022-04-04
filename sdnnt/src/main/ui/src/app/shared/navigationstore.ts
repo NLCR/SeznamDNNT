@@ -1,10 +1,16 @@
+import { Subject, Observable } from "rxjs";
+
 export class NavigationStore {
+
+    private paginatorSubject: Subject<boolean> = new Subject();
+    public paginatorChanged: Observable<boolean> = this.paginatorSubject.asObservable();
 
     private _navigationUIStore =new Map();
 
     constructor() {
         this.initDefault('imports');
-        this.initDefault('account');        
+        this.initDefault('account');   
+        this.initDefault('search');        
     }
 
     public contains(key:string) : boolean {
@@ -16,6 +22,7 @@ export class NavigationStore {
             this.initDefault(key);
         }
         this._navigationUIStore.get(key).rows = rows;
+        this.paginatorSubject.next()
     }
 
     public getRows(key: string): number {
@@ -29,6 +36,7 @@ export class NavigationStore {
             this.initDefault(key);
         }
         this._navigationUIStore.get(key).page = page;
+        this.paginatorSubject.next()
     }
 
     public getPage(key: string): number {
