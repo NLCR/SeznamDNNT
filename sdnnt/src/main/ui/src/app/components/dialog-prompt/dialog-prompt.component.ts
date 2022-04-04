@@ -8,7 +8,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class DialogPromptComponent implements OnInit {
 
-  result: string;
+  result: string = null;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: {caption: string, label: string}) { }
 

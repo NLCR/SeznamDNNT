@@ -139,10 +139,10 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.docs.forEach(doc => {
 
         const f = doc.identifiers.filter(id => {
-          if (this.fullCatalog) {
-            return true;
-          }
-          if (!id.dntstav) {
+          // if (this.fullCatalog) {
+          //   return true;
+          // }
+          if (!id.dntstav || id.dntstav.includes('N') || id.dntstav.includes('X')) {
             return false;
           }
           if (!this.onlyEAN) {
@@ -289,14 +289,16 @@ export class ImportComponent implements OnInit, OnDestroy {
     });
 
     approveDialogRef.afterClosed().subscribe(result => {
-      const note = result !== null ? result : '';
-
-      doc.controlled_note = note;
-      this.service.setImportControlled(doc).subscribe(res => {
-        doc.controlled = true;
-        doc.controlled_user = this.state.user.username;
-        // this.getDocs(this.route.snapshot.queryParams);
-      });
+      console.log(result)
+      if (result !== undefined) {
+        const note = result ? result : '';
+        doc.controlled_note = note;
+        this.service.setImportControlled(doc).subscribe(res => {
+          doc.controlled = true;
+          doc.controlled_user = this.state.user.username;
+          // this.getDocs(this.route.snapshot.queryParams);
+        });
+      }
 
 
     });
