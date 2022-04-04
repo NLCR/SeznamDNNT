@@ -257,7 +257,7 @@ public class MarcRecord {
       
       //Filtrujeme 956 -> granularita
       keys = keys.stream()
-              .filter(x -> !"956".equals(x))
+              .filter(x -> !"956".equals(x) && !"990".equals(x))
               .collect(Collectors.toList());
 
       for (Object key : keys) {
