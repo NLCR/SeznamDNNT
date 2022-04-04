@@ -263,13 +263,28 @@ public class MarcRecord {
           //DataField df = dataFields.get(key);
           xml.append("<marc:datafield tag=\"" + key + "\" ind1=\"" + df.ind1 + "\" ind2=\"" + df.ind2 + "\">");
           ArrayList<String> keys2 = new ArrayList<String>(df.subFields.keySet());
-          Collections.sort(keys2);
+          ArrayList<SubField> subs = new ArrayList<SubField>();
+          
           for (Object sk : keys2) {
             for (SubField sf : df.subFields.get(sk)) {
-              xml.append("<marc:subfield code=\"" + sk + "\" >")
-                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
+              subs.add(sf);
+//              xml.append("<marc:subfield code=\"" + sk + "\" >")
+//                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
             }
           }
+          Collections.sort(subs, new Comparator<SubField>(){
+              @Override
+              public int compare(
+                SubField o1, SubField o2) {
+                  return o1.index - o2.index;
+              }
+          });
+          
+          for (SubField sf : subs) {
+              xml.append("<marc:subfield code=\"" + sf.code + "\" >")
+                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
+          }
+          
           xml.append("</marc:datafield>");
         }
       }
