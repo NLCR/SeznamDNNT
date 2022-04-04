@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#echo "Assembling"
+
+# Source code provided to S2I is at ${HOME}
+if [[ "$1" == "-h" ]]; then
+	exec /usr/libexec/s2i/usage
+fi
+
+LOCAL_SOURCE_DIR=/tmp/src
+ANGULAR_LOCAL_SOURCE_DIR=/tmp/src/sdnnt/src/main/ui
+
+DEPLOY_DIR=$CATALINA_HOME/webapps/
+
+#Angular npm install
+cd $ANGULAR_LOCAL_SOURCE_DIR
+npm install
+
+#pushd $LOCAL_SOURCE_DIR &> /dev/null
+cd $LOCAL_SOURCE_DIR
+mvn clean install 
+
+#mkdir -p WEB-INF/lib
+echo "MOVING WAR TO TOMCAT DEPLOY DIR"
+
+mv /tmp/src/sdnnt/target/sdnnt-*.war /tmp/src/sdnnt/target/sdnnt.war
+mv /tmp/src/sdnnt/target/sdnnt.war $DEPLOY_DIR/sdnnt.war
+
+
+
