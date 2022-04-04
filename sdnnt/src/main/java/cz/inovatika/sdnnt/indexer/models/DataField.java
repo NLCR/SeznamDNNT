@@ -15,16 +15,18 @@ public class DataField {
   public String tag;
   public String ind1;
   public String ind2;
+  public int index;
   public Map<String, List<SubField>> subFields = new HashMap();
 
   public DataField() {
     this.tag = "error";
   }
 
-  public DataField(String tag, String ind1, String ind2) {
+  public DataField(String tag, String ind1, String ind2, int index) {
     this.tag = tag;
     this.ind1 = ind1;
     this.ind2 = ind2;
+    this.index = index;
   }
 
   public JSONObject toJSON() {
@@ -32,12 +34,20 @@ public class DataField {
     json.put("tag", getTag());
     json.put("ind1", getInd1());
     json.put("ind2", getInd2());
+    json.put("index", getIndex());
     json.put("subFields", getSubFields());
     return json;
   }
   
   public String getTag() {
     return tag;
+  }
+
+  /**
+   * @return the index
+   */
+  public int getIndex() {
+    return index;
   }
 
   /**

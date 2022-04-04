@@ -7,14 +7,23 @@ package cz.inovatika.sdnnt.indexer.models;
 public class SubField {
   public String code;
   public String value;
+  public int index;
   
   public SubField() {
     this.code = "error";
   }
   
-  public SubField(String code, String value) {
+  public SubField(String code, String value, int index) {
     this.code = code;
     this.value = value;
+    this.index = index;
+  }
+
+  /**
+   * @return the index
+   */
+  public int getIndex() {
+    return index;
   }
 
   /**

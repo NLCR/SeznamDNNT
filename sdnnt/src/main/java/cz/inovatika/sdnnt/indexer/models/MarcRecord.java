@@ -237,8 +237,6 @@ public class MarcRecord {
     return json;
   }
 
-
-
   public String toXml(boolean onlyIdentifiers) {
     StringBuilder xml = new StringBuilder();
 

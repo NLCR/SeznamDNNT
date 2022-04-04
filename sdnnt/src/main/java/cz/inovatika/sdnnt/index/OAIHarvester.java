@@ -402,6 +402,7 @@ public class OAIHarvester {
   }
 
   private MarcRecord readMarcRecord(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
+    int index = 0;
     while (reader.hasNext()) {
       int eventType = reader.next();
       switch (eventType) {
@@ -416,7 +417,7 @@ public class OAIHarvester {
             String v = reader.getElementText();
             mr.controlFields.put(tag, v);
           } else if (elementName.equals("datafield")) {
-            readDatafields(reader, mr);
+            readDatafields(reader, mr, index++);
           }
         case XMLStreamReader.END_ELEMENT:
           elementName = reader.getLocalName();
@@ -428,14 +429,14 @@ public class OAIHarvester {
     throw new XMLStreamException("Premature end of marc:record");
   }
 
-  private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr) throws XMLStreamException {
+  private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr, int index) throws XMLStreamException {
     String tag = reader.getAttributeValue(null, "tag");
     if (!mr.dataFields.containsKey(tag)) {
       mr.dataFields.put(tag, new ArrayList());
     }
     List<DataField> dfs = mr.dataFields.get(tag);
-
-    DataField df = new DataField(tag, reader.getAttributeValue(null, "ind1"), reader.getAttributeValue(null, "ind2"));
+    int subFieldIndex = 0;
+    DataField df = new DataField(tag, reader.getAttributeValue(null, "ind1"), reader.getAttributeValue(null, "ind2"), index);
     dfs.add(df);
     while (reader.hasNext()) {
       int eventType = reader.next();
@@ -451,7 +452,7 @@ public class OAIHarvester {
             }
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();
-            sfs.add(new SubField(code, val));
+            sfs.add(new SubField(code, val, subFieldIndex++));
             if (allFields || MarcRecord.tagsToIndex.contains(tag)) {
               // Pristup do solr dokumentu
               //mr.sdoc.addField("marc_" + tag + code, val);
