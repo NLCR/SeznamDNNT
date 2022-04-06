@@ -1,6 +1,10 @@
 <div class="app-container">
   <div fxLayout="row" fxLayoutGap="32px" class="app-account-wrapper">
     <div class="app-left app-fx-facets">
+      <mat-form-field class="app-w-100 app-mb-1" appearance="outline">
+        <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
+        <input type="text" matInput>
+      </mat-form-field>
       <div class="app-facets-used">
         <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length || delegatedFilter?.length || priorityFilter?.length || typeOfRequestFilter?.length">
           <h3 matSubheader fxLayout="row">

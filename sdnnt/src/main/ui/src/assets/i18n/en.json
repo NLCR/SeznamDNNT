@@ -809,7 +809,8 @@
     "hledany_vyraz": "Search term",
     "nastaveni_notifikaci": "Notification settings",
     "jednotlive_notifikace": "Individual notifications",
-    "smazat_notifikaci": "Delete notification"
+    "smazat_notifikaci": "Delete notification",
+    "vyhledavani_zadosti": "Application search"
   },
 
   "tooltip": {
