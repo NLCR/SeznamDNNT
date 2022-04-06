@@ -113,7 +113,7 @@
           <a>{{ 'desc.zaznam_z_katalogu' | translate }}</a>
         </button>
 
-        <button mat-menu-item *ngIf="(state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && this.doc.alternative_aleph_link)" (click)="goto(doc.alternative_aleph_link, $event)">
+        <button mat-menu-item *ngIf="(state.logged && (state.user?.role === 'knihovna' || state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && this.doc.alternative_aleph_link)" (click)="goto(doc.alternative_aleph_link, $event)">
           <mat-icon>link</mat-icon>
           <a>{{ 'desc.alternativni_zaznam_z_katalogu' | translate }}</a>
         </button>
