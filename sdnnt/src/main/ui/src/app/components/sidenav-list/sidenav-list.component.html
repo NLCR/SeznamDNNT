@@ -19,7 +19,7 @@
     <mat-expansion-panel>
       <mat-expansion-panel-header [collapsedHeight]="'48px'" [expandedHeight]="'48px'" class="app-pl-4 app-pr-4">
         <mat-panel-title>
-          <mat-icon class="material-icons-outlined">person</mat-icon>  {{ state.user.jmeno }} {{ state.user.prijmeni }}
+          <mat-icon class="material-icons-outlined">person</mat-icon>  {{ (state.user.jmeno || state.user.prijmeni) ? state.user.jmeno+ ' ' +state.user.prijmeni :  state.user.username }}
         </mat-panel-title>
       </mat-expansion-panel-header>
       <a mat-menu-item  *ngIf="profileEnabled()"  (click)="showUser(); onSidenavClose()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</a>
