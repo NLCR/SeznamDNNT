@@ -11,6 +11,7 @@ app-searchbar {
     color: $app-searchbar-field-color;
     border: 1px solid $app-brand-border-color;
     max-width: 850px;
+    margin: 0 auto;
 
     &:focus-within {
       box-shadow: inset 0px 0px 32px -25px rgba(0,0,0,0.70);
