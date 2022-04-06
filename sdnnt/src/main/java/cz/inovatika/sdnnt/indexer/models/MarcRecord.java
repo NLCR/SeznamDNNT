@@ -255,7 +255,7 @@ public class MarcRecord {
       
       //Filtrujeme 956 -> granularita
       keys = keys.stream()
-              .filter(x -> !"956".equals(x) && !"990".equals(x))
+              .filter(x -> !"956".equals(x) && !"990".equals(x) && !"992".equals(x))
               .collect(Collectors.toList());
 
       for (Object key : keys) {
@@ -263,13 +263,28 @@ public class MarcRecord {
           //DataField df = dataFields.get(key);
           xml.append("<marc:datafield tag=\"" + key + "\" ind1=\"" + df.ind1 + "\" ind2=\"" + df.ind2 + "\">");
           ArrayList<String> keys2 = new ArrayList<String>(df.subFields.keySet());
-          Collections.sort(keys2);
+          ArrayList<SubField> subs = new ArrayList<SubField>();
+          
           for (Object sk : keys2) {
             for (SubField sf : df.subFields.get(sk)) {
-              xml.append("<marc:subfield code=\"" + sk + "\" >")
-                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
+              subs.add(sf);
+//              xml.append("<marc:subfield code=\"" + sk + "\" >")
+//                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
             }
           }
+          Collections.sort(subs, new Comparator<SubField>(){
+              @Override
+              public int compare(
+                SubField o1, SubField o2) {
+                  return o1.index - o2.index;
+              }
+          });
+          
+          for (SubField sf : subs) {
+              xml.append("<marc:subfield code=\"" + sf.code + "\" >")
+                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
+          }
+          
           xml.append("</marc:datafield>");
         }
       }
@@ -278,6 +293,28 @@ public class MarcRecord {
       xml.append("<marc:datafield tag=\"990\" ind1=\" \" ind2=\" \">");
       for (String sk : dntstav) {
           xml.append("<marc:subfield code=\"a\" >").append(sk).append("</marc:subfield>");
+      }
+      xml.append("</marc:datafield>");
+      
+//      <marc:datafield tag="992" ind1=" " ind2=" ">
+//<marc:subfield code="s">A</marc:subfield>
+//<marc:subfield code="a">20200101</marc:subfield>
+//<marc:subfield code="b">batch</marc:subfield>
+//</marc:datafield>
+//        String stav, date, user, comment, license;
+      xml.append("<marc:datafield tag=\"992\" ind1=\" \" ind2=\" \">");
+      for (int i = 0; i < historie_stavu.length(); i++) {
+        JSONObject h = historie_stavu.getJSONObject(i);
+          xml.append("<marc:subfield code=\"s\" >").append(h.optString("stav")).append("</marc:subfield>");
+          xml.append("<marc:subfield code=\"a\" >").append(h.optString("date")).append("</marc:subfield>");
+          xml.append("<marc:subfield code=\"b\" >").append(h.optString("user")).append("</marc:subfield>");
+          if (h.has("comment")) {
+            xml.append("<marc:subfield code=\"k\" >").append(h.optString("comment")).append("</marc:subfield>");
+          }
+          if (h.has("license")) {
+            xml.append("<marc:subfield code=\"l\" >").append(h.optString("license")).append("</marc:subfield>");
+          }
+          
       }
       xml.append("</marc:datafield>");
       
