@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Rights resolver;
- * Aggregates all predicates; iterates and if any of them return false; then final result is false otherwise final result is true
+ * Rights resolver. The class aggregates implementations of predicate interfaces and tries to find 
+ * the first who says <code>false</code>. If there is no such one, it returns true.    
  */
 public class RightsResolver {
 

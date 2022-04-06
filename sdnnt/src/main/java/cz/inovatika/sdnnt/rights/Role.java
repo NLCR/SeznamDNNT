@@ -1,7 +1,7 @@
 package cz.inovatika.sdnnt.rights;
 
 /**
- * Represents roles in system
+ * Represents roles in system SDNNT
  */
 public enum Role {
     admin,

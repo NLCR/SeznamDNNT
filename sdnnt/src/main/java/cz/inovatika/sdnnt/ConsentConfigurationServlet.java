@@ -16,6 +16,19 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
 
+/**
+ * The servlet is able to serve consent configuration. 
+ * In order to overrride the default use following configuration snippet
+ * <br>
+ * <pre>
+ *  "server": {
+ *      "cookieconsent-init_cs":"/path/to/config/json_cs_file",
+ *      "cookieconsent-init_en":"/path/to/config/json_en_file"
+ *      ....
+ *  }
+ * </pre>
+ * @author happy
+ */
 public class ConsentConfigurationServlet extends HttpServlet {
 
     private static final String DEFAULT_LOCALE = "cs";

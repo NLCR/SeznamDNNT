@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 
+/**
+ * The servlet is able to serve properties file with build info (git hash and version)
+ * @author happy
+ */
 @WebServlet(value = "/info/git")
 public class InfoServlet extends HttpServlet {
 

@@ -4,7 +4,10 @@ import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.util.Date;
-
+/**
+ * Listener is able to store tracking info to the session
+ * @author happy
+ */
 @WebListener
 public class TrackSessionListener implements HttpSessionListener {
 

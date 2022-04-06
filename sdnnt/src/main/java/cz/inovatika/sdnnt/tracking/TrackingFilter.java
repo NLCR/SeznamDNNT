@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Tracking filter for setting
+ * Tracking http session filter
+ * <p>
+ * This filter is able to store information about the remaining time of the user's http session.
+ * </p>
  */
 @WebFilter("/*")
 public class TrackingFilter implements javax.servlet.Filter {

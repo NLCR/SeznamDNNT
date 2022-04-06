@@ -11,6 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The predicate will allow  the action if current user is in one of given roles
+ * @author happy
+ */
 public class UserMustBeInRole implements Predicate {
 
     private List<Role> list = new ArrayList<>();

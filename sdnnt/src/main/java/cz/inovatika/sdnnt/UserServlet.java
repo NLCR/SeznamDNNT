@@ -54,7 +54,10 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 /**
+ * Serlvet is part of internal api and is responsible for handling all user-related actions 
+ * 
  * @author alberto
+ * Note: Internal API; 
  */
 @WebServlet(name = "UserServlet", urlPatterns = {"/user/*"})
 public class UserServlet extends HttpServlet {
@@ -147,7 +150,13 @@ public class UserServlet extends HttpServlet {
 
     enum Actions {
 
-
+        /** 
+         * Allows to reindex the user base in case of schema changes
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/touch</code> 
+         * </ul>
+         * @see MustBeCalledFromLocalhost
+         */
         TOUCH {
 
             private static final int LIMIT = 1000;
@@ -198,7 +207,14 @@ public class UserServlet extends HttpServlet {
             }
 
         },
+        
 
+        /** 
+         * Basic login endpoint 
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/login</code> 
+         * </ul>
+         */
         LOGIN {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -217,6 +233,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        /** 
+         * Basic logout endpoint 
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/logout</code> 
+         * </ul>
+         */
         LOGOUT {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -229,8 +251,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        /**
-         * Redirect to IdentityProvider or wayfling
+        
+        /** 
+         * Endpoint for redirecting to IdentityProvider or wayflink 
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/shib_login_redirect</code> 
+         * </ul>
          */
         SHIB_LOGIN_REDIRECT {
             @Override
@@ -245,8 +271,11 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        /**
-         * Callback from IP
+        /**  
+         * Callback endpoint for redirect from IdentityProvider
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/shib_login_callback</code> 
+         * </ul>
          */
         SHIB_LOGIN_CALLBACK {
             @Override
@@ -260,30 +289,58 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        /* User info; regular users */
+        /**  
+         * Returns info about currect user (only regular users)
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/user_info</code> 
+         * </ul>
+         * @see MustBeLogged
+         */
         USER_INFO {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
-                if (!logged.isThirdPartyUser()) {
-                    JSONObject jsonObject = logged.toJSONObject();
-                    return jsonObject;
-                } else return new JSONObject();
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
+                    if (!logged.isThirdPartyUser()) {
+                        JSONObject jsonObject = logged.toJSONObject();
+                        return jsonObject;
+                    } else return new JSONObject();
+                } else {
+                    return new JSONObject();
+                }
             }
         },
 
-        /* User info; shibboleth users */
+
+        
+        /**  
+         * Returns info about current user (only third party users users)
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/shib_user_info</code> 
+         * </ul>
+         * @see MustBeLogged
+         */
         SHIB_USER_INFO {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
-                if (logged.isThirdPartyUser()) {
-                    JSONObject jsonObject = logged.toJSONObject();
-                    return jsonObject;
-                } else return new JSONObject();
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    User logged = (User) req.getSession(true).getAttribute(AUTHENTICATED_USER);
+                    if (logged.isThirdPartyUser()) {
+                        JSONObject jsonObject = logged.toJSONObject();
+                        return jsonObject;
+                    } else return new JSONObject();
+                } else {
+                    return new JSONObject();
+                }
             }
         },
 
+        /**
+         * Ping endpoint; tracking http session
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/ping</code> 
+         * </ul>
+         */
         PING {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -298,6 +355,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        /**
+         * Pong endpoint; tracking http session
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/pong</code> 
+         * </ul>
+         */
         PONG {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -309,7 +372,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        // posle link uzivateli ze si ma vygenerovat heslo
+        /**
+         * Endpoint for forgot password.  Responsible for sending email with pwd token.
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/forgot_pswd</code> 
+         * </ul>
+         */
         FORGOT_PWD {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -322,6 +390,14 @@ public class UserServlet extends HttpServlet {
                 }
             }
         },
+        
+        /**
+         * Change password endpoint for logged user
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/change_pswd_user</code> 
+         * </ul>
+         * @see MustBeLogged
+         */
         CHANGE_PWD_USER {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -343,6 +419,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        /**
+         * Change password for users with pwd token
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/change_pwd_token</code> 
+         * </ul>
+         */
         CHANGE_PWD_TOKEN {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -359,6 +441,12 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        /**
+         * Token validation endpoint. Check if the token is expired.
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/validate_pwd_token</code> 
+         * </ul>
+         */
         VALIDATE_PWD_TOKEN {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -373,8 +461,13 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-
-        // mail o resetovanem hesle - admin rozhrani
+        /**
+         * Administration reset password; Caller must have admin role 
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/admin_reset_pwd</code> 
+         * </ul>
+         * @see UserMustBeInRole
+         */
         ADMIN_RESET_PWD {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -387,14 +480,22 @@ public class UserServlet extends HttpServlet {
             }
         },
 
-        // save default;registred user
+        /**
+         * Saving user; 
+         * <i> Note: Caller must have an admin role to save another user </i>
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/save</code> 
+         * </ul>
+         * @see MustBeLogged, UserMustBeInRole 
+         */
         SAVE {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-
+                
                 if (new RightsResolver(req, new MustBeLogged()).permit()) {
                     User sender = new UserControlerImpl(req).getUser();
                     JSONObject savingUser = readInputJSON(req);
+                    
                     if (sender.getUsername().equals(savingUser.optString("username"))) {
                         AtomicReference<String> errorMessage = new AtomicReference<>();
                         UsersUtils.userValidation(savingUser, (errorFields, validationId) -> {
@@ -417,7 +518,6 @@ public class UserServlet extends HttpServlet {
                         // must be admin
                         if (new RightsResolver(req, new UserMustBeInRole(admin)).permit()) {
                             // must be load first and then
-
                             return new UserControlerImpl(req).adminSave(User.fromJSON(savingUser.toString())).toJSONObject();
                         } else {
                             return errorJson(response, SC_FORBIDDEN, "not allowed");
@@ -429,7 +529,13 @@ public class UserServlet extends HttpServlet {
                 }
             }
         },
-        // registrace noveho uzivatele
+        
+        /**
+         * User registration endpoint
+         * <ul>
+         *      <li> Endpoint: <code>POST /api/user/register</code> 
+         * </ul>
+         */
         REGISTER {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -443,6 +549,14 @@ public class UserServlet extends HttpServlet {
                 }
             }
         },
+            
+        /**
+         * Returns information about all users. Caller must have admin role 
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/all</code> 
+         * </ul>
+         * @see UserMustBeInRole
+         */
         ALL {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -457,11 +571,18 @@ public class UserServlet extends HttpServlet {
                 }
             }
         },
-
+        
+        /**
+         * Returns list of users filtered by role. Caller must be admin
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/users_by_role?role=xxx</code> 
+         * </ul>
+         * @see UserMustBeInRole
+         */
         USERS_BY_ROLE {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin, mainKurator)).permit()) {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
                     JSONObject retval = new JSONObject();
                     JSONArray docs = new JSONArray();
                     String role = req.getParameter("role");
@@ -474,10 +595,17 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        /**
+         * Returns list of users filtered by prefix where prefix is part of username or  name or surname or email. Caller must be admin
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/users_by_prefix?prefix=xxx</code> 
+         * </ul>
+         * @see UserMustBeInRole
+         */
         USERS_BY_PREFIX {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin, mainKurator)).permit()) {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
                     JSONObject retval = new JSONObject();
                     JSONArray docs = new JSONArray();
                     String prefix = req.getParameter("prefix");
@@ -490,8 +618,13 @@ public class UserServlet extends HttpServlet {
                 }
             }
         },
-
-
+        
+        /**
+         * Returns all configured institutions
+         * <ul>
+         *      <li> Endpoint: <code>GET /api/user/institutions</code> 
+         * </ul>
+         */
         INSTITUTIONS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
