@@ -37,12 +37,16 @@ import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 import cz.inovatika.sdnnt.utils.VersionStringCast;
+import cz.inovatika.sdnnt.utils.ZadostUtils;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import cz.inovatika.sdnnt.utils.*;
 
 import static cz.inovatika.sdnnt.utils.ServletsSupport.*;
 
@@ -168,29 +172,11 @@ public class AccountServlet extends HttpServlet {
                         AtomicInteger number = new AtomicInteger(0);
                         Map<String, String> reqMap = new HashMap<>();
                         reqMap.put("rows", "" + LIMIT);
-
-                        List<String> bulk = new ArrayList<>();
-                        support.iterate(reqMap, null, Arrays.asList(), Arrays.asList("type_of_request:*"), Arrays.asList("id"), (rsp) -> {
-                            Object identifier = rsp.getFieldValue("id");
-
-                            bulk.add(identifier.toString());
-                            if (bulk.size() >= LIMIT) {
-                                number.addAndGet(bulk.size());
-                                LOGGER.info(String.format("Bulk update %d", number.get()));
-                                JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
-                                    "<field name="+"\"type_of_request\">user</feild>"
-                                );
-                                jsonArray.put(returnFromPost);
-                                bulk.clear();
-                            }
-                        }, "id");
-                        if (!bulk.isEmpty()) {
-                            number.addAndGet(bulk.size());
-                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
-                            bulk.clear();
-                            jsonArray.put(returnFromPost);
-                        }
-
+                        // all request with null type of request are 
+                        updateTypeOfReQuestUSER(support, jsonArray, number, reqMap);
+                        
+                        updateIDPart(support, jsonArray, number, reqMap);
+                        
                         JSONObject object = new JSONObject();
                         object.put("numberOfObjects", number.get());
                         object.put("bulkResults", jsonArray);
@@ -204,6 +190,66 @@ public class AccountServlet extends HttpServlet {
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+
+
+            private void updateIDPart(final AccountIterationSupport support, JSONArray jsonArray,
+                    AtomicInteger number, Map<String, String> reqMap) {
+                List<String> bulk = new ArrayList<>();
+                support.iterate(reqMap, null, Arrays.asList(), Arrays.asList("id_parts:*"), Arrays.asList("id"), (rsp) -> {
+                    Object identifier = rsp.getFieldValue("id");
+
+                    bulk.add(identifier.toString());
+                    if (bulk.size() >= LIMIT) {
+                        number.addAndGet(bulk.size());
+                        LOGGER.info(String.format("Bulk update %d", number.get()));
+                        
+                        JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(), 
+                            (id) -> {
+                                String idParts = ZadostUtils.idParts(id);
+                                return "<field name="+"\"id_parts\" update=\"set\">"+idParts+"</field>";
+                            }
+                        );
+                        jsonArray.put(returnFromPost);
+                        bulk.clear();
+                    }
+                }, "id");
+                if (!bulk.isEmpty()) {
+                    number.addAndGet(bulk.size());
+                    JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
+                            (id) -> {
+                                String idParts = ZadostUtils.idParts(id);
+                                return "<field name="+"\"id_parts\" update=\"set\">"+idParts+"</field>";
+                            }
+                    );
+                    bulk.clear();
+                    jsonArray.put(returnFromPost);
+                }
+            }
+
+            private void updateTypeOfReQuestUSER(final AccountIterationSupport support, JSONArray jsonArray,
+                    AtomicInteger number, Map<String, String> reqMap) {
+                List<String> bulk = new ArrayList<>();
+                support.iterate(reqMap, null, Arrays.asList(), Arrays.asList("type_of_request:*"), Arrays.asList("id"), (rsp) -> {
+                    Object identifier = rsp.getFieldValue("id");
+
+                    bulk.add(identifier.toString());
+                    if (bulk.size() >= LIMIT) {
+                        number.addAndGet(bulk.size());
+                        LOGGER.info(String.format("Bulk update %d", number.get()));
+                        JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
+                            "<field name="+"\"type_of_request\" \"update\"=\"set\">user</field>"
+                        );
+                        jsonArray.put(returnFromPost);
+                        bulk.clear();
+                    }
+                }, "id");
+                if (!bulk.isEmpty()) {
+                    number.addAndGet(bulk.size());
+                    JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                    bulk.clear();
+                    jsonArray.put(returnFromPost);
                 }
             }
         },
@@ -275,12 +321,15 @@ public class AccountServlet extends HttpServlet {
                     String delegated = req.getParameter("delegated");
                     String priority = req.getParameter("priority");
                     String typeOfReq = req.getParameter("type_of_request");
-
                     String sort = req.getParameter("sort_account");
                     if (sort == null) {
                         sort = req.getParameter("user_sort_account");
                     }
-
+                    // override q 
+                    String prefix = req.getParameter("prefix");
+                    if (prefix != null && StringUtils.isAnyString(prefix)) {
+                        q = String.format("%s*", prefix);
+                    }
                     String page = req.getParameter("page");
                     String rows = req.getParameter("rows");
 

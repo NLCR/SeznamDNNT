@@ -422,3 +422,53 @@ paths:
                 type: string
         '429':
           description: Server je plně vytížen, opakujte dotaz později
+
+
+  # List vsech zmen
+  /lists/changes:
+    get:
+      tags:
+        - Umožňuje získat seznam všech změn 
+      summary: Umožňuje získat seznam všech změn
+      description: Umožňuje iterovat pomocí resumption tokenu
+      operationId: changes
+      parameters:
+        - in: query
+          name: institution
+          description: Sigla instituce. (ABA001, ABA007, atd...)
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
+          name: from
+          description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
+          schema:
+            type: string
+            format: date-time
+            example: "2021-07-27T16:31:05.169Z"
+          required: false
+        - in: query
+          name: rows
+          description: Velikost stránky
+          schema:
+            type: integer
+            example: 10
+          required: false
+        - in: query
+          name: resumptionToken
+          description: Resumption token
+          schema:
+            type: string
+            default: "*"
+          required: false
+      responses:
+        '200':
+          description: Výsledky ve formátu JSON
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/lists/ListitemResponse.yaml'
+        '400':
+          description: Špatný dotaz; Překročen maximální počet záznamů.
+

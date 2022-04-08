@@ -2,6 +2,7 @@ import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Subject } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DialogDeleteRequestComponent } from 'src/app/components/dialog-delete-request/dialog-delete-request.component';
@@ -9,6 +10,8 @@ import { DialogSendRequestComponent } from 'src/app/components/dialog-send-reque
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
+
 
 
 @Component({
@@ -31,6 +34,11 @@ export class AccountComponent implements OnInit {
     {id: "VNZ", val: "navrzeno_na_omezeni_vnz"},
     {id: "VNL", val: "navrzeno_na_omezeni_vnl"}
   ];
+
+
+  // subject for deboucning
+  private subject: Subject<string> = new Subject();
+
   
   loading: boolean;
   items: SolrDocument[];
@@ -39,22 +47,6 @@ export class AccountComponent implements OnInit {
   numFound: number;
   escalated: boolean = false;
   expired: boolean = false;
-
-  // displayedColumns = [
-  //   'id',
-  //   'datum_zadani',
-  //   'user', 
-  //   'institution', 
-  //   'state', 
-  //   'navrh',
-  //   'datum_vyrizeni',
-  //   'count', 
-  //   'pozadavek',
-  //   'poznamka',
-  //   'deadline',
-  //   'period',
-  //   'actions'
-  // ];
 
   displayedColumns =[];
 
@@ -66,6 +58,8 @@ export class AccountComponent implements OnInit {
   delegatedFilter: string;
   priorityFilter: string;
   typeOfRequestFilter: string;
+
+  prefixsearch: string;
 
   allResultInstitutions:string[] = [];
   allPriorities:string[] = [];
@@ -129,9 +123,33 @@ export class AccountComponent implements OnInit {
       this.institutionFilter = val.institution;
       this.delegatedFilter = val.delegated;
       this.typeOfRequestFilter = val.type_of_request;
+
+      this.prefixsearch = val.prefix;
+
+    });
+
+
+    this.subject.pipe(
+      debounceTime(400)
+    ).subscribe(searchTextValue => {
+
+      const q: any = {};
+      q.prefix = searchTextValue;
+
+      this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
     });
   }
 
+  //onFilterZadostKeyUp
+  //onFilterZadostKeyUp
+
+  onFilterZadostKeyUp(target) {
+    console.log("On key up");
+    this.subject.next(target.value);
+  }
+
+
+  
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);

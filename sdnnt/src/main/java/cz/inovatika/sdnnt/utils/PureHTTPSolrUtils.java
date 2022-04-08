@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,7 +19,34 @@ public class PureHTTPSolrUtils {
     public static final Logger LOGGER  = Logger.getLogger(PureHTTPSolrUtils.class.getName());
 
     private PureHTTPSolrUtils() {}
+    
+    public static JSONObject bulkField(List<String> bulk, String identifierField, String index, Function<String, String> function) {
+        try {
+            StringBuilder builder = new StringBuilder("<add>\n");
+            bulk.stream().forEach(identifier-> {
+                String applied = function.apply(identifier);
+                String document = String.format("<doc><field name=\"%s\">%s</field> %s </doc>", identifierField, identifier, applied);
+                builder.append(document);
+            });
 
+            builder.append("\n</add>");
+            String solrHosts = Options.getInstance().getString("solr.host", "http://localhost:8983/solr/");
+            Pair<Integer, String> post = SimplePOST.post(solrHosts + (solrHosts.endsWith("/") ? "" : "/") + index+"/update", builder.toString());
+
+            JSONObject returnFromBulk = new JSONObject();
+            returnFromBulk.put("statusCode", post.getLeft());
+            returnFromBulk.put("message", post.getRight());
+
+            return returnFromBulk;
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(),e);
+            JSONObject returnFromBulk = new JSONObject();
+            returnFromBulk.put("statusCode", -1);
+            returnFromBulk.put("message", e.getMessage());
+            return returnFromBulk;
+        }
+    }
+    
     public static JSONObject bulkField(List<String> bulk, String identifierField, String index, String updateField) {
         try {
             StringBuilder builder = new StringBuilder("<add>\n");

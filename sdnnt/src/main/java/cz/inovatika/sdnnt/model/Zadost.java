@@ -14,6 +14,8 @@ import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.utils.BeanUtilities;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.ZadostUtils;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -79,6 +81,7 @@ public class Zadost implements NotNullAwareObject {
 
     // id zadosti
     public static final String ID_KEY = "id";
+    public static final String ID_PARTS_KEY = "id_parts";
 
     // aktulalni stav zpracovani zadosti - polozka po polozce
     public static final String PROCESS_KEY = "process";
@@ -712,6 +715,12 @@ public class Zadost implements NotNullAwareObject {
     public SolrInputDocument toSolrInputDocument() {
         SolrInputDocument sinput = new SolrInputDocument();
         sinput.addField(ID_KEY, getId());
+        
+        String idPart = ZadostUtils.idParts(getId());
+        if (idPart != null) {
+            sinput.addField(ID_PARTS_KEY, idPart);
+        }
+        
         if (getTyp() != null) {
             sinput.addField(TYP_KEY, getTyp());
         }
@@ -804,9 +813,18 @@ public class Zadost implements NotNullAwareObject {
 
     }
 
+//    private String getIdPart() {
+//        if (this.id != null) {
+//            if (this.id.length() > 9) {
+//                return this.id.substring(this.id.length()-9);
+//            } else return this.id;
+//        } else return null;
+//    }
+
     public JSONObject toJSON() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(ID_KEY, getId());
+        
         if (getTyp() != null) {
             jsonObject.put(TYP_KEY, getTyp());
         }

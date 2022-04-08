@@ -152,6 +152,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         return object.toString();
     }
 
+    
+    
     @Override
     public Response removedDnntt(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
@@ -213,6 +215,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 
+    
+    
 
     @Override
     public Response addedDnntoCsvExport(String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
@@ -482,6 +486,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }
         }
     }
+    
+    
 
     private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String ... p) {
         Map<String, Object> document = new HashMap<>();
@@ -497,14 +503,39 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         return document;
     }
 
+    
+    
+    @Override
+    public Response changes(String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
+            ContainerRequestContext containerRequestContext) throws NotFoundException {
+        String token = resumptionToken != null ? resumptionToken : "*";
+        List<String> plusList = (institution != null) ?  new ArrayList<>(
+                Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution,  "id_pid:uuid", "license:*")) :
+                Arrays.asList("id_pid:uuid","license:*" );
+        if (dateTime != null) {
+            String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
+            plusList.add("datum_stavu:["+utc+" TO *]");
+        }
+
+        final ListitemResponse response = new ListitemResponse();
+        ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
+        response.setItems(arrayOfListitem);
+        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+                String nextCursorMark = rsp.getNextCursorMark();
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc: rsp.getResults()) {
+                    emitDocument(institution, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
+                response.setResumptiontoken(nextCursorMark);
+            });
+            return Response.ok().entity(response).build();
+        } else {
+            return Response.status(400).entity(jsonError( "Maximum number of items exceeded")).build();
+        }
+    }
+
 
 }
-
-
-
-
-
-
-
-
 

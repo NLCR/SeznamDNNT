@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Rights resolver. The class aggregates implementations of predicate interfaces and tries to find 
+ * The rights resolver. The class aggregates implementations of predicate interfaces and tries to find 
  * the first who says <code>false</code>. If there is no such one, it returns true.    
  */
 public class RightsResolver {
