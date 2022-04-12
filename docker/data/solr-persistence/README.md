@@ -1,0 +1,1 @@
+Solr persistence folder

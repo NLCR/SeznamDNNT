@@ -5,8 +5,14 @@ services:
     ports:
         - '8080:8080'
     volumes:
-        - ./config:/opt/app-root/src/.sdnnt
+        - ./data/config:/opt/app-root/src/.sdnnt
+        - ./data/logs:/usr/local/tomcat/logs
+
   sdnnt-solr:
-    image: sdnnt-solr:8.11
+    image: bitnami/solr:latest
+    volumes:
+        - ./data/solr-persistence:/bitnami
     ports:
         - '8983:8983'
+
+

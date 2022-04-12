@@ -1,0 +1,6 @@
+{	
+	"client": {},
+	"server": {
+		"solr.host":"http://sdnnt-solr:8983/solr/",
+	}
+}
