@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,10 +15,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.joda.time.LocalDate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -174,6 +181,8 @@ public class Import {
       Map<String,Object> fieldModifier1 = new HashMap<>(1);
       fieldModifier1.put("set", note);
       idoc.addField("controlled_note", fieldModifier1); 
+
+      idoc.addField("controlled_date", LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE_TIME)); 
       
       Map<String,Object> fieldModifier2 = new HashMap<>(1);
       fieldModifier2.put("set",user);
@@ -240,5 +249,24 @@ public class Import {
     }
   }
   
+  public static SolrDocument isControlled(String id) {
+    SolrDocument ret = null;
+    try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+      int days = Options.getInstance().getInt("importControlledExpireationDays", 30);
+      SolrQuery q = new SolrQuery("*")
+              .addFilterQuery("item_id:" + id)
+              .addFilterQuery("controlled_date:[NOW/DAY-" + days + "DAYS TO NOW]")
+              .addFilterQuery("controlled:true");
+      SolrDocumentList docs = solr.query("imports_documents", q).getResults();
+      if (docs.getNumFound() > 0) {
+        ret = docs.get(0);
+      }
+      solr.close();
+    } catch (Exception ex) {
+      LOGGER.log(Level.SEVERE, null, ex);
+    }
+    return ret;
+  }
+ 
   
 }

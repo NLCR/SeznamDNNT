@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import cz.inovatika.sdnnt.indexer.models.Import;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -33,6 +34,7 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
@@ -323,8 +325,10 @@ public class XMLImporterDistri {
       }
 
       SolrInputDocument idoc = new SolrInputDocument();
+      String item_id = item.get("EAN") + "_" + import_origin;
       idoc.setField("import_id", import_id);
       idoc.setField("import_date", import_date);
+      idoc.setField("item_id", item_id); 
 
       idoc.setField("id", import_id + "_" + item.get("EAN"));
       idoc.setField("ean", item.get("EAN"));
@@ -338,8 +342,16 @@ public class XMLImporterDistri {
 
       addDedup(item);
       addFrbr(item);
-      findInCatalog(item);
+      SolrDocument isControlled = Import.isControlled(item_id);
+      if (isControlled != null) {
+        //LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", isControlled);
+        idoc.setField("controlled", true);
+        idoc.setField("controlled_note", isControlled.get("controlled_note"));
+        idoc.setField("controlled_date", isControlled.get("controlled_date"));
+        idoc.setField("controlled_user", isControlled.get("controlled_user"));
+      } 
 
+      findInCatalog(item);
       if (item.containsKey("found")) {
         idoc.setField("identifiers", item.get("identifiers"));
         idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
