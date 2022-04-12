@@ -20,6 +20,7 @@
             
   "textsDir": "texts",
   "resetPwdExpirationDays": 3,
+  "importControlledExpireationDays": 30,
   "search": {
     "fromYear": 1911,
     "yearsBK": 14,
