@@ -262,8 +262,6 @@ public class XMLImporterHeureka {
       SolrDocument isControlled = Import.isControlled(item_id);
 
       if (isControlled != null) {
-      System.out.println(isControlled);
-        //LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", isControlled);
         idoc.setField("controlled", true);
         idoc.setField("controlled_note", isControlled.get("controlled_note"));
         idoc.setField("controlled_date", isControlled.get("controlled_date"));

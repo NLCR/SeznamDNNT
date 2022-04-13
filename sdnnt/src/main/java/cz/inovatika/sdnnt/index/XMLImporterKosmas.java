@@ -258,7 +258,6 @@ public class XMLImporterKosmas {
       SolrDocument isControlled = Import.isControlled(item_id);
 
       if (isControlled != null) {
-        //LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", isControlled);
         idoc.setField("controlled", true);
         idoc.setField("controlled_note", isControlled.get("controlled_note"));
         idoc.setField("controlled_date", isControlled.get("controlled_date"));
@@ -278,7 +277,6 @@ public class XMLImporterKosmas {
         getClient().add(IMPORTS_DOCUMENTS, idoc);
         indexed++;
       }
-
       
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -337,30 +335,23 @@ public class XMLImporterKosmas {
       for (Object o : docs) {
         JSONObject doc = (JSONObject) o;
 
+        if (doc.has("dntstav")) {
+          item.put("dntstav", doc.getJSONArray("dntstav").toList());
+          List<Object> stavy = doc.getJSONArray("dntstav").toList();
+          if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
+            na_vyrazeni.add(doc.getString("identifier"));
+          }
+          in_sdnnt++;
+        }
+        identifiers.add(doc.toString());
+
         if (doc.has("ean")) {
           List<Object> eans = doc.getJSONArray("ean").toList();
           if (eans.contains(item.get("EAN"))) {
             isEAN = true;
 
-            if (doc.has("dntstav")) {
-              List<Object> stavy = doc.getJSONArray("dntstav").toList();
-              if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
-                na_vyrazeni.add(doc.getString("identifier"));
-              }
-            }
-            identifiers.add(doc.toString());
           }
         }
-        if (!isEAN) {
-          if (doc.has("dntstav")) {
-            List<Object> stavy = doc.getJSONArray("dntstav").toList();
-            if (stavy.contains("A") || stavy.contains("PA") || stavy.contains("NL")) {
-              na_vyrazeni.add(doc.getString("identifier"));
-            }
-          }
-          identifiers.add(doc.toString());
-        }
-
       }
       item.put("found", true);
       item.put("hit_type", isEAN ? "ean" : "noean");
