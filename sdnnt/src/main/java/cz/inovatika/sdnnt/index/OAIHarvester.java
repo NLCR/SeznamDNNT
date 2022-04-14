@@ -60,11 +60,20 @@ public class OAIHarvester {
   long procTime = 0;
   long solrTime = 0;
 
+  private boolean debug = false;
+
   public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
     this.update = update;
     this.allFields = allFields;
+    
+    JSONObject oaiHavest = Options.getInstance().getJSONObject("OAIHavest");
+    if (oaiHavest.has("debug")) {
+        debug = oaiHavest.getBoolean("debug");
+        LOGGER.info("OAIHarvester is in debug mode !");
+    }
+    
     long start = new Date().getTime();
     Options opts = Options.getInstance();
     String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&set=%s",
@@ -193,12 +202,7 @@ public class OAIHarvester {
           }
 
 
-          try {
-            Files.delete(dFile.toPath());
-            Files.delete(dFile.getParentFile().toPath());
-          } catch (IOException e) {
-            LOGGER.warning("Exception during deleting file");
-          }
+          deletePaths(dFile);
 
         } catch (MaximumIterationExceedException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);
@@ -235,12 +239,7 @@ public class OAIHarvester {
               IOUtils.closeQuietly(dStream);
             }
 
-            try {
-              Files.delete(dFile.toPath());
-              Files.delete(dFile.getParentFile().toPath());
-            } catch (IOException e) {
-              LOGGER.warning("Exception during deleting file");
-            }
+            deletePaths(dFile);
           } catch (MaximumIterationExceedException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);
           }
@@ -273,6 +272,17 @@ public class OAIHarvester {
     }
   }
 
+    private void deletePaths(File dFile) {
+        if (!debug) {
+            try {
+                Files.delete(dFile.toPath());
+                Files.delete(dFile.getParentFile().toPath());
+              } catch (IOException e) {
+                LOGGER.warning("Exception during deleting file");
+              }
+        }
+    }
+
 
   private String readFromXML(InputStream is) throws XMLStreamException {
 
@@ -299,7 +309,7 @@ public class OAIHarvester {
    * @throws XMLStreamException
    * @throws IOException
    */
-  private String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
+  public String readDocument(XMLStreamReader reader) throws XMLStreamException, IOException {
     String resumptionToken = null;
     while (reader.hasNext()) {
       int eventType = reader.next();

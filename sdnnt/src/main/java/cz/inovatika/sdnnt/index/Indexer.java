@@ -12,6 +12,7 @@ import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.index.utils.GranularityUtils;
 import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
+import cz.inovatika.sdnnt.index.utils.SurviveFieldUtils;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
@@ -27,7 +28,6 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -73,30 +73,34 @@ public class Indexer {
   }
 
   public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user) {
+      return add(collection, recs, merge,update,user,getClient());
+  }
+  public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user, SolrClient client) {
     JSONObject ret = new JSONObject();
     try {
       if (update) {
         for (SolrInputDocument rec : recs) {
-          SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"));
+          SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"), client);
           if (docs.getNumFound() == 0) {
             LOGGER.log(Level.FINE, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
-            getClient().add("catalog", rec);
+            client.add("catalog", rec);
           } else {
             SolrInputDocument hDoc = new SolrInputDocument();
             SolrInputDocument cDoc = mergeWithHistory(
                     (String) rec.getFieldValue("raw"),
                     docs.get(0), hDoc,
                     user, update, ret);
+            SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
             if (cDoc != null) {
-              getClient().add("catalog", cDoc);
-              getClient().add("history", hDoc);
+              client.add("catalog", cDoc);
+              client.add("history", hDoc);
             }
           }
 
         }
       } else if (merge) {
         for (SolrInputDocument rec : recs) {
-          SolrDocumentList docs = find((String) rec.getFieldValue("raw"));
+          SolrDocumentList docs = find((String) rec.getFieldValue("raw"), client);
           if (docs == null) {
 
           } else if (docs.getNumFound() == 0) {
@@ -118,16 +122,7 @@ public class Indexer {
                     user, update, ret);
             
             // Nechame puvodni hodnoty "DNT" poli
-            cDoc.setField(MarcRecordFields.DNTSTAV_FIELD, doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD));
-            cDoc.setField(MarcRecordFields.KURATORSTAV_FIELD, doc.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD));
-            cDoc.setField(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD));
-            cDoc.setField(MarcRecordFields.DATUM_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_STAVU_FIELD));
-            cDoc.setField(MarcRecordFields.DATUM_KURATOR_STAV_FIELD, doc.getFieldValue(MarcRecordFields.DATUM_KURATOR_STAV_FIELD));
-            cDoc.setField(MarcRecordFields.HISTORIE_STAVU_FIELD, doc.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD));
-
-            cDoc.setField(MarcRecordFields.LICENSE_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_FIELD));
-            cDoc.setField(MarcRecordFields.LICENSE_HISTORY_FIELD, doc.getFieldValue(MarcRecordFields.LICENSE_HISTORY_FIELD));
-            cDoc.setField(MarcRecordFields.GRANULARITY_FIELD, doc.getFieldValue(MarcRecordFields.GRANULARITY_FIELD));
+            SurviveFieldUtils.surviveFields(doc, cDoc);
             
             if (cDoc != null) {
               hDocs.add(hDoc);
@@ -136,15 +131,15 @@ public class Indexer {
           }
 
           if (!cDocs.isEmpty()) {
-            getClient().add("history", hDocs);
-            getClient().add("catalog", cDocs);
+            client.add("history", hDocs);
+            client.add("catalog", cDocs);
             hDocs.clear();
             cDocs.clear();
           }
 
         }
       } else {
-        getClient().add(collection, recs);
+          client.add(collection, recs);
       }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -152,7 +147,7 @@ public class Indexer {
     return ret;
   }
 
-  // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
+// keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
   // keepDNTFields = false => zmena pouze DNT (990, 992) poli
   static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
@@ -198,50 +193,54 @@ public class Indexer {
   }
 
   public static SolrDocumentList findById(String identifier) {
-    // JSONObject ret = new JSONObject();
-    try {
-      SolrQuery query = new SolrQuery("*")
-              .addFilterQuery("identifier:\"" + identifier + "\"")
-              .setRows(1)
-              .setFields("*");
-      return getClient().query("catalog", query).getResults();
-
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
-    }
-    // return ret;
+      return findById(identifier, getClient());
   }
 
-  public static SolrDocumentList find(String source) {
-    // JSONObject ret = new JSONObject();
-    try {
+  public static SolrDocumentList findById(String identifier, SolrClient client) {
+      // JSONObject ret = new JSONObject();
+      try {
+        SolrQuery query = new SolrQuery("*")
+                .addFilterQuery("identifier:\"" + identifier + "\"")
+                .setRows(1)
+                .setFields("*");
+        return client.query("catalog", query).getResults();
 
-      MarcRecord mr = MarcRecord.fromRAWJSON(source);
-      SolrInputDocument sdoc = mr.toSolrDoc();
-      String q = "(controlfield_001:\"" + sdoc.getFieldValue("controlfield_001") + "\""
-              + " AND marc_040a:\"" + sdoc.getFieldValue("marc_040a") + "\""
-              + " AND controlfield_008:\"" + sdoc.getFieldValue("controlfield_008") + "\")"
-              + " OR marc_020a:\"" + sdoc.getFieldValue("marc_020a") + "\""
-              + " OR marc_015a:\"" + sdoc.getFieldValue("marc_015a") + "\""
-              + " OR dedup_fields:\"" + sdoc.getFieldValue("dedup_fields") + "\"";
-
-      SolrQuery query = new SolrQuery(q)
-              .setRows(20)
-              .setFields("*,score");
-      return getClient().query("catalog", query).getResults();
-//      QueryRequest qreq = new QueryRequest(query);
-//      NoOpResponseParser rParser = new NoOpResponseParser();
-//      rParser.setWriterType("json");
-//      qreq.setResponseParser(rParser);
-//      NamedList<Object> qresp = solr.request(qreq, "catalog");
-//      return new JSONObject((String) qresp.get("response"));
-
-    } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
-      return null;
+      } catch (SolrServerException | IOException ex) {
+        LOGGER.log(Level.SEVERE, null, ex);
+        return null;
+      }
     }
-    // return ret;
+  public static SolrDocumentList find(String source, SolrClient client) {
+      // JSONObject ret = new JSONObject();
+      try {
+
+        MarcRecord mr = MarcRecord.fromRAWJSON(source);
+        SolrInputDocument sdoc = mr.toSolrDoc();
+        String q = "(controlfield_001:\"" + sdoc.getFieldValue("controlfield_001") + "\""
+                + " AND marc_040a:\"" + sdoc.getFieldValue("marc_040a") + "\""
+                + " AND controlfield_008:\"" + sdoc.getFieldValue("controlfield_008") + "\")"
+                + " OR marc_020a:\"" + sdoc.getFieldValue("marc_020a") + "\""
+                + " OR marc_015a:\"" + sdoc.getFieldValue("marc_015a") + "\""
+                + " OR dedup_fields:\"" + sdoc.getFieldValue("dedup_fields") + "\"";
+
+        SolrQuery query = new SolrQuery(q)
+                .setRows(20)
+                .setFields("*,score");
+        return client.query("catalog", query).getResults();
+//        QueryRequest qreq = new QueryRequest(query);
+//        NoOpResponseParser rParser = new NoOpResponseParser();
+//        rParser.setWriterType("json");
+//        qreq.setResponseParser(rParser);
+//        NamedList<Object> qresp = solr.request(qreq, "catalog");
+//        return new JSONObject((String) qresp.get("response"));
+
+      } catch (SolrServerException | IOException ex) {
+        LOGGER.log(Level.SEVERE, null, ex);
+        return null;
+      }
+  }
+  public static SolrDocumentList find(String source) {
+      return find(source, getClient());
   }
 
   public static JSONObject approveInImport(String identifier, String newRaw, String user) {
