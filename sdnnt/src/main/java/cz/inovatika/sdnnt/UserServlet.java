@@ -243,8 +243,20 @@ public class UserServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 try {
+                    String redirectEndpoint = null;
+                    if (new UserControlerImpl(req).getUser() != null && new UserControlerImpl(req).getUser().isThirdPartyUser()) {
+                        redirectEndpoint = Options.getInstance().getString("shiblogoutlink");
+                    }
                     User logout = new UserControlerImpl(req).logout();
-                    return logout != null ? logout.toJSONObject() : new JSONObject();
+                    if (logout != null) {
+                        return logout.toJSONObject();
+                    } else {
+                       JSONObject jsonObject = new JSONObject();
+                       if (redirectEndpoint != null) {
+                           jsonObject.put("redirectEndpoint", redirectEndpoint);
+                       }
+                       return jsonObject;
+                    }
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
                 }
@@ -271,6 +283,7 @@ public class UserServlet extends HttpServlet {
             }
         },
 
+        
         /**  
          * Callback endpoint for redirect from IdentityProvider
          * <ul>
@@ -288,6 +301,19 @@ public class UserServlet extends HttpServlet {
                 return null;
             }
         },
+
+//        SHIB_LOGOUT_REDIRECT {
+//            @Override
+//            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//                String shibboleth = Options.getInstance().getString("shiblogoutlink");
+//                if (shibboleth != null) {
+//                    response.sendRedirect(shibboleth);
+//                } else {
+//                    LOGGER.warning("No link to shibboleth");
+//                }
+//                return null;
+//            }
+//        },
 
         /**  
          * Returns info about currect user (only regular users)
