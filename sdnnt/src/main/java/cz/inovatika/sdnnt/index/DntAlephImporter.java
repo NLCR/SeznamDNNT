@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.indexer.models.utils.MarcRecordUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,6 +90,8 @@ public class DntAlephImporter {
             MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);
         }
         sdoc.setField(IDENTIFIER_FIELD, rec.identifier);
+        MarcRecordUtils.derivedIdentifiers(rec.identifier, sdoc);
+        
         sdoc.setField(DATESTAMP_FIELD, rec.datestamp);
         sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
         sdoc.setField(LEADER_FIELD, rec.leader);

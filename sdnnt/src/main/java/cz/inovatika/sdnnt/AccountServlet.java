@@ -239,7 +239,7 @@ public class AccountServlet extends HttpServlet {
                         number.addAndGet(bulk.size());
                         LOGGER.info(String.format("Bulk update %d", number.get()));
                         JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
-                            "<field name="+"\"type_of_request\" \"update\"=\"set\">user</field>"
+                            "<field name="+"\"type_of_request\" update=\"set\">user</field>"
                         );
                         jsonArray.put(returnFromPost);
                         bulk.clear();
@@ -247,7 +247,9 @@ public class AccountServlet extends HttpServlet {
                 }, "id");
                 if (!bulk.isEmpty()) {
                     number.addAndGet(bulk.size());
-                    JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                    JSONObject returnFromPost = PureHTTPSolrUtils.bulkField(bulk,"id", support.getCollection(),
+                            "<field name="+"\"type_of_request\" update=\"set\">user</field>"
+                    );
                     bulk.clear();
                     jsonArray.put(returnFromPost);
                 }

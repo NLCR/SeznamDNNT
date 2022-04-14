@@ -148,6 +148,11 @@
    <field name="id_issn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ismn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
+   <!-- identifikator derivovany z oai -->
+   <field name="id_oaiident" type="string" indexed="true" stored="false" multiValued="true"  />
+   <!-- iterni sdnnt identifikator -->
+   <field name="id_sdnnt" type="string" indexed="true" stored="false" multiValued="true"  />
+
    
    <!-- ukladani licenci z granularity -->
    <field name="granularity_license_cut" type="cut-states-licenses-history" indexed="true" stored="false" multiValued="true" />

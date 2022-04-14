@@ -33,7 +33,7 @@
           {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
         </div>
       </ng-container>
-      <div *ngIf="doc.flag_public_in_dl" class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
+      <div *ngIf="doc.flag_public_in_dl && (state.logged && (state.user?.role ==='knihovna' || state.user?.role === 'kurator' || state.user?.role === 'mainKurator') )" class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
         {{ 'desc.kramerius_badge' | translate }}
       </div>
     </div>
