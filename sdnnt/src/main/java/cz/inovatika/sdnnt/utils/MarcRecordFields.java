@@ -2,7 +2,8 @@ package cz.inovatika.sdnnt.utils;
 
 /** Marc record fields */
 public class MarcRecordFields {
-
+    
+    // aplikacni pole 
     public static final String HISTORIE_STAVU_FIELD = "historie_stavu";
     public static final String HISTORIE_STAVU_FIELD_CUT = "historie_stavu_cut";
     public static final String DNTSTAV_FIELD = "dntstav";
@@ -71,6 +72,9 @@ public class MarcRecordFields {
     //rocniky
     public static final String MARC_2643 = "marc_2643";
 
+    // odkaz do SKC 
+    public static final String MARC_996_A = "marc_996a";
+    
     // priznaky; verejne v dk
     public static final String FLAG_PUBLIC_IN_DL= "flag_public_in_dl";
 
@@ -82,6 +86,10 @@ public class MarcRecordFields {
     // CCNB pole
     public static final String ID_CCNB_FIELD = "id_ccnb";
 
+    public static final String ID_OAIIDENT = "id_oaiident";
+    public static final String ID_SDNNT = "id_sdnnt";
+
+    
     public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
 
     private MarcRecordFields() {}

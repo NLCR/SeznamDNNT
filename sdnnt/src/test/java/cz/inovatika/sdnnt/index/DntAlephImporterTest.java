@@ -118,5 +118,39 @@ public class DntAlephImporterTest {
         XMLStreamReader reader = null;
     }
     
+    @Test
+    public void testReadDocument4() throws XMLStreamException {
+        InputStream resourceAsStream = DntAlephImporterTest.class.getResourceAsStream("oai.4_996.xml");
+        Assert.assertNotNull(resourceAsStream);
+        
+        Assert.assertNotNull(resourceAsStream);
+        XMLStreamReader reader = null;
+        try {
+            XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+            reader = inputFactory.createXMLStreamReader(resourceAsStream);
+            Assert.assertNotNull(reader);
+
+            DntAlephImporter importer = new DntAlephImporter();
+            importer.readDocument(reader);
+
+            System.out.println(importer.recs.size());
+            Assert.assertTrue(importer.recs.size() == 37);
+
+            List<SolrInputDocument> collected = importer.recs.stream().map(r -> {
+               return r.toSolrDoc();
+            }).collect(Collectors.toList());
+
+            collected.stream().forEach(sdoc-> {
+                //sdoc.get
+                Assert.assertTrue(sdoc.containsKey(MarcRecordFields.MARC_996_A));
+            });
+
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        } finally {
+            if (reader != null) reader.close();
+        }
+
+    }
     
 }

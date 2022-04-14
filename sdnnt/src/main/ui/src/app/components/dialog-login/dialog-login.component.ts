@@ -64,9 +64,15 @@ export class DialogLoginComponent implements OnInit {
 
   logout() {
     this.service.logout().subscribe(res => {
+      // clear state
       this.state.setLogged(res);
+
       this.state.logged = false;
       this.state.user = null;
+
+      this.state.sort['sort'] = this.config.sorts.sort[0];
+      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
+      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
       localStorage.removeItem('user');
       this.dialogRef.close();
     });

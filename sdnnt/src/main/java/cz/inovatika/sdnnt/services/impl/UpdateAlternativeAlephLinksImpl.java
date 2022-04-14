@@ -9,6 +9,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.UpdateAlternativeAlephLinks;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,6 +39,9 @@ public class UpdateAlternativeAlephLinksImpl implements UpdateAlternativeAlephLi
 
     @Override
     public void updateLinks() {
+        
+        long start = System.currentTimeMillis();
+        
         try(SolrClient client = buildClient()) {
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "" + LIMIT);
@@ -117,8 +121,10 @@ public class UpdateAlternativeAlephLinksImpl implements UpdateAlternativeAlephLi
 
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(),e);
+        } finally {
+            QuartzUtils.printDuration(LOGGER, start);
         }
-        LOGGER.info("DNT SET has been updated");
+        
     }
 
     public void update(SolrClient solr, List<String> identifiers, Map<String,String> mapping) throws  IOException,  SolrServerException {

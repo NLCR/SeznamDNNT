@@ -32,7 +32,7 @@ import cz.inovatika.sdnnt.services.impl.NotificationServiceImplITTest;
 
 public class DntAlephImporterITTest {
 
-    public static final Logger LOGGER = Logger.getLogger(NotificationServiceImplITTest.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(DntAlephImporterITTest.class.getName());
 
     public static SolrTestServer prepare;
 
@@ -145,7 +145,33 @@ public class DntAlephImporterITTest {
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
+    }
 
+    
+    /** Nove pole 996 - odkazy do SKC  */
+    @Test
+    public void testDNTAleph_Pole996() throws XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        InputStream resourceAsStream = dntAlephStream("oai.4_996.xml");
+        Assert.assertNotNull(resourceAsStream);
+        try {
+            alephImport(resourceAsStream,37);
+
+            try(SolrClient client = SolrTestServer.getClient()) {
+                SolrQuery query = new SolrQuery("*")
+                        .setRows(1000);
+                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
+                for (SolrDocument doc : docs) {
+                    MarcRecord fDoc = MarcRecord.fromDoc(doc);
+                    Assert.assertTrue(fDoc.dataFields.containsKey("996"));
+                }
+            }
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
 }

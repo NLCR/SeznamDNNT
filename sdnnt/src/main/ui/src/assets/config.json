@@ -21,7 +21,6 @@
   "filterFields": ["dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled"],
   "sorts":{
     "sort": [
-      {"field": "score", "dir": "asc"},
       {"field": "score", "dir": "desc"},
       {"field": "title_sort", "dir": "asc"},
       {"field": "title_sort", "dir": "desc"},

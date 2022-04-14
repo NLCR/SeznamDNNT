@@ -3,7 +3,7 @@
     <div class="app-left app-fx-facets">
       <mat-form-field class="app-w-100 app-mb-1" appearance="outline">
         <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
-        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)"  >
+        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)"  [ngModel]="prefixsearch" >
 
       </mat-form-field>
 

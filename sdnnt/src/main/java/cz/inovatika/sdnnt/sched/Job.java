@@ -24,6 +24,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.*;
 import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -112,7 +113,7 @@ public class Job implements InterruptableJob {
                 impl.updateLinks();
             }
         },
-
+ 
         /**
          * Kontrola oproti datumu vydani
          */
@@ -120,6 +121,7 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 LOGGER.fine(name()+":configuration is "+jobData);
+                long start = System.currentTimeMillis();
                 try {
                     JSONObject iteration = jobData.optJSONObject("iteration");
                     JSONObject results = jobData.optJSONObject("results");
@@ -134,7 +136,7 @@ public class Job implements InterruptableJob {
 
                     PXYearService service = new PXYearServiceImpl(iteration, results);
                     List<String> check = service.check();
-                    LOGGER.info("Number of found candidates "+check.size());
+                    PXYearServiceImpl.LOGGER.info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
                         int maximum = 100;
                         if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
@@ -152,7 +154,7 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
-                                LOGGER.info("Creating request for sublist "+subList);
+                                PXYearServiceImpl.LOGGER.info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
@@ -162,9 +164,10 @@ public class Job implements InterruptableJob {
                         }
                     }
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    PXYearServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }finally {
+                    QuartzUtils.printDuration(PXYearServiceImpl.LOGGER, start);
                 }
-
             }
         },
 
@@ -175,6 +178,7 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 LOGGER.fine(name()+":configuration is "+jobData);
+                long start = System.currentTimeMillis();
                 try {
                     JSONObject iteration = jobData.optJSONObject("iteration");
                     JSONObject results = jobData.optJSONObject("results");
@@ -191,7 +195,7 @@ public class Job implements InterruptableJob {
                     PXKrameriusService service = new PXKrameriusServiceImpl(iteration, results);
 
                     List<String> check = service.check();
-                    LOGGER.info("Number of found candidates "+check.size());
+                    PXYearServiceImpl.LOGGER.info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
 
                         int maximum = 100;
@@ -210,18 +214,21 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
-                                LOGGER.info("Creating request for sublist "+subList);
+                                PXYearServiceImpl.LOGGER.info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
                             if (results.has("state") || results.has("ctx")) {
-                                LOGGER.info("Updating sublist "+subList);
+                                PXYearServiceImpl.LOGGER.info("Updating sublist "+subList);
                                 service.update(subList);
                             }
                         }
                     }
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    PXYearServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    QuartzUtils.printDuration(PXYearServiceImpl.LOGGER, start);
+
                 }
             }
         },

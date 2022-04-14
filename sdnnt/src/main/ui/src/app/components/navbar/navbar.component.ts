@@ -72,9 +72,24 @@ export class NavbarComponent implements OnInit {
         VNX:null
       };
 
+
+
+      this.state.sort['sort'] = this.config.sorts.sort[0];
+      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
+      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+
       localStorage.removeItem('user');
       sessionStorage.clear();
-      this.router.navigate(['/']);
+      
+      if (res["redirectEndpoint"]) {
+        window.location.href = res["redirectEndpoint"];
+      } else {
+        this.router.navigate(['/']);
+      }
+
+
+      // hard redirect if res contains redirect link
+
     });
   }
 

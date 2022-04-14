@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.index.MD5;
 
 import java.io.IOException;
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
+import cz.inovatika.sdnnt.indexer.models.utils.MarcRecordUtils;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
@@ -105,7 +107,9 @@ public class MarcRecord {
           = Arrays.asList("015", "020", "022", "035", "040", "044", "100", "130", "240", "243",
                   "245", "246", "250", "260", "264", "338",
                   "700", "710", "711", "730",
-                  "856", "990", "991", "992", "998", "956", "911", "910");
+                  "856", "990", "991", "992", "998", "956", "911", "910",
+                  "996"
+                  );
 
   public static MarcRecord fromRAWJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -349,7 +353,9 @@ public class MarcRecord {
     if (sdoc.isEmpty()) {
       MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, this.dataFields, tagsToIndex);
     }
-    sdoc.setField(IDENTIFIER_FIELD, identifier);
+    
+    MarcRecordUtils.derivedIdentifiers(identifier, sdoc);
+    
     sdoc.setField(DATESTAMP_FIELD, datestamp);
     sdoc.setField(SET_SPEC_FIELD, setSpec);
     sdoc.setField(LEADER_FIELD, leader);
