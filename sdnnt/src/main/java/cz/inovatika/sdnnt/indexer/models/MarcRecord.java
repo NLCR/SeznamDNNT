@@ -264,7 +264,6 @@ public class MarcRecord {
 
       for (Object key : keys) {
         for (DataField df : dataFields.get(key)) {
-          //DataField df = dataFields.get(key);
           xml.append("<marc:datafield tag=\"" + key + "\" ind1=\"" + df.ind1 + "\" ind2=\"" + df.ind2 + "\">");
           ArrayList<String> keys2 = new ArrayList<String>(df.subFields.keySet());
           ArrayList<SubField> subs = new ArrayList<SubField>();
@@ -272,8 +271,6 @@ public class MarcRecord {
           for (Object sk : keys2) {
             for (SubField sf : df.subFields.get(sk)) {
               subs.add(sf);
-//              xml.append("<marc:subfield code=\"" + sk + "\" >")
-//                      .append(StringEscapeUtils.escapeXml(sf.value)).append("</marc:subfield>");
             }
           }
           Collections.sort(subs, new Comparator<SubField>(){

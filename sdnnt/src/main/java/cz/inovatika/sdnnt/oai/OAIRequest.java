@@ -37,7 +37,9 @@ import org.json.JSONObject;
  * @author alberto
  */
 public class OAIRequest {
-
+    
+   public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt";
+    
   // Muze byt indextime nebo datestamp
   static String SORT_FIELD = "indextime";
   static String CURSOR_FIELD = "identifier";
@@ -123,7 +125,7 @@ public class OAIRequest {
               .setRows(rows)
               .addSort(SORT_FIELD, SolrQuery.ORDER.asc)
               .addSort(CURSOR_FIELD, SolrQuery.ORDER.asc)
-              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
+              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
       if (req.getParameter("from") != null) {
         String from = req.getParameter("from");
         String until = "*";
@@ -172,7 +174,9 @@ public class OAIRequest {
           Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
           ret.append("<record>");
           ret.append("<header>");
-          ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
+          // Changed identifiers
+          Object id = oaiIdentifier(doc);
+          ret.append("<identifier>").append(id).append("</identifier>");
           ret.append("<datestamp>")
                   .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
                   .append("</datestamp>");
@@ -204,18 +208,37 @@ public class OAIRequest {
     }
   }
 
-  public static String getRecord(HttpServletRequest req) {
+private static Object oaiIdentifier(SolrDocument doc) {
+    Object id = doc.getFirstValue("identifier");
+      // sdnnt identifier
+      Object idSdnnt = doc.getFirstValue("id_sdnnt");
+      if (idSdnnt != null) {
+          id  = makeSDNNTIdentifier(idSdnnt);
+      }
+    return id;
+}
+
+  private static Object makeSDNNTIdentifier(Object idSdnnt) {
+      return String.format("oai:%s:%s", SDNNT_PREFIX_IDENTIFIER, idSdnnt);
+  }
+
+public static String getRecord(HttpServletRequest req) {
     Options opts = Options.getInstance();
     StringBuilder ret = new StringBuilder();
     ret.append(headerOAI())
             .append(responseDateTag())
             .append(requestTag(req));
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-
+        String id = req.getParameter("identifier");
+        if (id.contains(SDNNT_PREFIX_IDENTIFIER)) {
+            int index = id.indexOf(SDNNT_PREFIX_IDENTIFIER);
+            id = id.substring(index + (SDNNT_PREFIX_IDENTIFIER+":").length());
+        }
+        
       SolrQuery query = new SolrQuery("*")
               .setRows(1)
-              .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-              .setFields(SORT_FIELD, "identifier,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
+              .addFilterQuery("identifier:\"" + id + "\" OR id_sdnnt:\""+id+"\"")
+              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
 
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
@@ -237,7 +260,7 @@ public class OAIRequest {
 
           ret.append("<record>");
           ret.append("<header>");
-          ret.append("<identifier>").append(doc.getFirstValue("identifier")).append("</identifier>");
+          ret.append("<identifier>").append(oaiIdentifier(doc)).append("</identifier>");
           ret.append("<datestamp>")
                   // .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
                   .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))

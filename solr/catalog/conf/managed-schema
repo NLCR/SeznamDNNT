@@ -246,7 +246,9 @@
 	<copyField source="granularity" dest="granularity_license_cut" />
 	<copyField source="historie_stavu" dest="historie_stavu_cut" />
 	<copyField source="historie_kurator_stavu" dest="historie_kurator_stavu_cut" />
-
+	
+	<!-- sdnnt identifier -->
+	<copyField source="id_sdnnt" dest="id_all_identifiers" />
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"
