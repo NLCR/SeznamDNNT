@@ -48,8 +48,8 @@ public class ConsentConfigurationServlet extends HttpServlet {
             File file = new File(configured);
             if (file.exists()) {
                 String s = IOUtils.toString(new FileInputStream(file), "UTF-8");
-                JSONObject jsonObject = new JSONObject(s);
-                resp.getWriter().write(jsonObject.toString());
+                //JSONObject jsonObject = new JSONObject(s);
+                resp.getWriter().write(s.toString());
             }
         } else {
 

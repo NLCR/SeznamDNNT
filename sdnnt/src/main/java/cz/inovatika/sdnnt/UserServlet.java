@@ -608,7 +608,7 @@ public class UserServlet extends HttpServlet {
         USERS_BY_ROLE {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin,mainKurator)).permit()) {
                     JSONObject retval = new JSONObject();
                     JSONArray docs = new JSONArray();
                     String role = req.getParameter("role");

@@ -53,6 +53,13 @@ export class DialogSessionExpirationComponent implements OnInit {
       this.state.setLogged(res);
       this.state.logged = false;
       this.state.user = null;
+
+      this.state.facetsstore.reinit();
+
+      this.state.sort['sort'] = this.config.sorts.sort[0];
+      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
+      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+
       localStorage.removeItem('user');
       this.dialogRef.close();
       //this.state.stopTrackSession(this.bnIdle);

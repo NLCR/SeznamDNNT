@@ -72,7 +72,7 @@ export class NavbarComponent implements OnInit {
         VNX:null
       };
 
-
+      this.state.facetsstore.reinit();
 
       this.state.sort['sort'] = this.config.sorts.sort[0];
       this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
@@ -88,9 +88,14 @@ export class NavbarComponent implements OnInit {
       }
 
 
-      // hard redirect if res contains redirect link
-
     });
+  }
+
+  linkToAccount() {
+    const p: any = {};
+
+    
+    this.router.navigate(['/account'], { queryParams: p, queryParamsHandling: 'merge' });
   }
 
   register() {

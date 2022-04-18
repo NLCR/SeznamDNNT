@@ -39,16 +39,4 @@ export class SearchResultsUtils {
         });
     }
 
-    // if (resp.notifications) {
-    //     this.docs.forEach(doc => {
-    //       const identifier = doc.identifier;
-    //       resp.notifications.forEach(z => {
-    //         if (z.identifier.includes(identifier)) {
-    //           doc.hasNotifications = true;
-    //         }
-    //       });
-    //     });
-    //   }
-
-
 }

@@ -25,10 +25,6 @@ export class ZadostComponent implements OnInit {
   docs: SolrDocument[];
   hideProcessed: boolean;
   
-  //escalated: boolean = false;
-  //expired: boolean = true;
-  
-
   kurators: User[];
 
 
@@ -61,8 +57,41 @@ export class ZadostComponent implements OnInit {
       });
     }));
 
+  }
 
 
+  linkToAccount() {
+    const p: any = {};
+    if (this.state.user?.role === 'kurator' || this.state.user?.role === 'mainKurator') {
+      p.sort_account = this.state.sort.sort_account.field + " " + this.state.sort.sort_account.dir;
+    } else {
+      p.user_sort_account = this.state.sort.user_sort_account.field + " " + this.state.sort.user_sort_account.dir;
+    }
+
+    if (this.state.navigationstore.contains('account')) {
+      p.page = this.state.navigationstore.getPage('account')
+      p.rows= this.state.navigationstore.getRows('account');
+    }
+
+    let navrh = this.state.facetsstore.getFacet('account','newStavFilter');
+    let state = this.state.facetsstore.getFacet('account','stateFilter');
+    let institution = this.state.facetsstore.getFacet('account','institutionFilter');
+    let delegated = this.state.facetsstore.getFacet('account','delegatedFilter');
+    let type_of_request = this.state.facetsstore.getFacet('account','typeOfRequestFilter');
+    let priority = this.state.facetsstore.getFacet('account','priorityFilter');
+
+    if (navrh) p.navrh = navrh;
+    if (state) p.state = state;
+    if (institution) p.institution = institution;
+    if (delegated) p.delegated = delegated;
+    if (type_of_request) p.type_of_request = type_of_request;
+    if (priority) p.priority = priority;
+
+    if (this.state.prefixsearch['account']?.length) {
+      p.prefix = this.state.prefixsearch['account'];
+    }
+
+    this.router.navigate(['/account'], { queryParams: p, queryParamsHandling: 'merge' });
   }
 
   ngOnDestroy(): void {

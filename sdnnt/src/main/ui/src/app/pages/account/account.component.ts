@@ -52,14 +52,8 @@ export class AccountComponent implements OnInit {
 
   zadosti: Zadost[] = [];
 
-  stateFilter: string;
-  newStavFilter: string;
-  institutionFilter:string;
-  delegatedFilter: string;
-  priorityFilter: string;
-  typeOfRequestFilter: string;
 
-  prefixsearch: string;
+  
 
   allResultInstitutions:string[] = [];
   allPriorities:string[] = [];
@@ -117,14 +111,13 @@ export class AccountComponent implements OnInit {
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
-      this.newStavFilter = val.navrh;
-      this.stateFilter = val.state;
-      this.priorityFilter = val.priority;
-      this.institutionFilter = val.institution;
-      this.delegatedFilter = val.delegated;
-      this.typeOfRequestFilter = val.type_of_request;
+      
+      this.state.facetsstore.setFacet('account','newStavFilter', val.navrh);
 
-      this.prefixsearch = val.prefix;
+      
+      this.state.prefixsearch['account'] = val.prefix;
+
+     
 
     });
 
@@ -134,17 +127,17 @@ export class AccountComponent implements OnInit {
     ).subscribe(searchTextValue => {
 
       const q: any = {};
+
       q.prefix = searchTextValue;
+
+      //console.log(this.state.prefixsearch);
 
       this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
     });
   }
 
-  //onFilterZadostKeyUp
-  //onFilterZadostKeyUp
 
   onFilterZadostKeyUp(target) {
-    console.log("On key up");
     this.subject.next(target.value);
   }
 
@@ -160,6 +153,10 @@ export class AccountComponent implements OnInit {
       p.user_sort_account = this.state.sort.user_sort_account.field + " " + this.state.sort.user_sort_account.dir;
     }
 
+    if (this.state.navigationstore.contains('account')) {
+      p.page = this.state.navigationstore.getPage('account')
+      p.rows= this.state.navigationstore.getRows('account');
+    }
     
     this.items = [];
     this.searchResponse = null;
@@ -204,14 +201,12 @@ export class AccountComponent implements OnInit {
 
   setStav(navrh: string) {
     const q: any = {};
-    // added by peter
-    if (this.newStavFilter === navrh) {
-      q.navrh = null;
-    } else {
-      q.navrh = navrh;
-    }
-    
 
+    this.state.facetsstore.checkTheSameAndSet('account','newStavFilter',navrh);
+    let filter =this.state.facetsstore.getFacet('account','newStavFilter');
+
+    
+    q.navrh = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
@@ -219,27 +214,55 @@ export class AccountComponent implements OnInit {
 
   setStavZadosti(state: string) {
     const q: any = {};
-    if (this.stateFilter === state) {
-      q.state = null;
-    } else {
-      q.state = state;
-    }
-    
+
+    this.state.facetsstore.checkTheSameAndSet('account','stateFilter',state);
+    let filter =this.state.facetsstore.getFacet('account','stateFilter');
+
+    q.state = filter;
     q.page = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
+  clearTypeOfRequest() {
+    const q: any = {};
+    this.state.facetsstore.clearFacetKey('account','typeOfRequestFilter');
+    q.page = null;
+    q.type_of_request = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+
+  }
+
+  clearPriority() {
+    const q: any = {};
+    this.state.facetsstore.clearFacetKey('account','priorityFilter');
+    q.page = null;
+    q.priority = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+
+  }
+  clearDelegated() {
+    const q: any = {};
+    this.state.facetsstore.clearFacetKey('account','delegatedFilter');
+    q.page = null;
+    q.delegated = null;
+    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+
+  clearInstitution() {
+    const q: any = {};
+    this.state.facetsstore.clearFacetKey('account','institutionFilter');
+    q.page = null;
+    q.institution = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
   setInstitution(institution: string) {
     const q: any = {};
-    q.institution = institution;
-    if (this.institutionFilter === institution) {
-      q.institution = null;
-      this.institutionFilter = null;
-    } else {
-      this.institutionFilter  = institution;
-      q.institution = institution;
-    }
-    //this.allResultInstitutions = this.allResultInstitutions.filter(obj => obj !== institution);
+
+    this.state.facetsstore.checkTheSameAndSet('account','institutionFilter',institution);
+    let filter =this.state.facetsstore.getFacet('account','institutionFilter');
+
+    q.institution = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
@@ -247,28 +270,22 @@ export class AccountComponent implements OnInit {
 
   setDelegated(delegated: string) {
     const q: any = {};
-    q.delegated = delegated;
-    if (this.delegatedFilter === delegated) {
-      q.delegated = null;
-      this.delegatedFilter = null;
-    } else {
-      q.delegated = delegated;
-      this.delegatedFilter  = delegated;
-    }
+
+    this.state.facetsstore.checkTheSameAndSet('account','delegatedFilter',delegated);
+    let filter =this.state.facetsstore.getFacet('account','delegatedFilter');
+    
+    q.delegated = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
   setTypeOfRequest(typeOfReq: string) {
     const q: any = {};
-    q.type_of_request = typeOfReq;
-    if (this.typeOfRequestFilter === typeOfReq) {
-      q.type_of_request = null;
-      this.typeOfRequestFilter = null;
-    } else {
-      q.type_of_request = typeOfReq;
-      this.typeOfRequestFilter  = typeOfReq;
-    }
+
+    this.state.facetsstore.checkTheSameAndSet('account','typeOfRequestFilter',typeOfReq);
+    let filter =this.state.facetsstore.getFacet('account','typeOfRequestFilter');
+
+    q.type_of_request = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
 
@@ -276,25 +293,20 @@ export class AccountComponent implements OnInit {
 
   setPriority(priority: string) {
     const q: any = {};
-    q.priority = priority;
-    if (this.priorityFilter === priority) {
-      q.priority = null;
-      this.priorityFilter = null;
-    } else {
-      q.priority = priority;
-      this.priorityFilter  = priority;
-    }
+
+    this.state.facetsstore.checkTheSameAndSet('account','priorityFilter',priority);
+    let filter =this.state.facetsstore.getFacet('account','priorityFilter');
+
+   
+
+    q.priority = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
   removeAllFilters() {
-    this.stateFilter = null;
-    this.newStavFilter = null;
-    this.institutionFilter = null; 
-    this.priorityFilter = null;
-    this.delegatedFilter = null;
-    this.typeOfRequestFilter = null;
+
+    this.state.facetsstore.clearFacets('account');
 
     const q: any = {};
     q.navrh = null;
@@ -328,8 +340,11 @@ export class AccountComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         this.route.queryParams.subscribe(val => {
           this.search(val);
-          this.newStavFilter = val.navrh;
-          this.stateFilter = val.state;
+          
+          this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
+          this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
+
+          
         });
       });
       
@@ -409,8 +424,10 @@ export class AccountComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       this.route.queryParams.subscribe(val => {
         this.search(val);
-        this.newStavFilter = val.navrh;
-        this.stateFilter = val.state;
+
+        this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
+        this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
+      
       });
     });
 
@@ -420,8 +437,9 @@ export class AccountComponent implements OnInit {
     
     this.route.queryParams.subscribe(val => {
       this.search(val);
-      this.newStavFilter = val.navrh;
-      this.stateFilter = val.state;
+      this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
+      this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
+      
     });
 
   }

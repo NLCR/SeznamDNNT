@@ -90,10 +90,10 @@ public class Indexer {
                     (String) rec.getFieldValue("raw"),
                     docs.get(0), hDoc,
                     user, update, ret);
-            SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
             if (cDoc != null) {
-              client.add("catalog", cDoc);
-              client.add("history", hDoc);
+                SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
+                client.add("catalog", cDoc);
+                client.add("history", hDoc);
             }
           }
 

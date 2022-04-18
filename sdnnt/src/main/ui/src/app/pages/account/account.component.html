@@ -1,21 +1,27 @@
 <div class="app-container">
   <div fxLayout="row" fxLayoutGap="32px" class="app-account-wrapper">
+
     <div class="app-left app-fx-facets">
-      <mat-form-field class="app-w-100 app-mb-1" appearance="outline">
+      <mat-form-field class="app-w-100 app-mb-1" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
         <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
-        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)"  [ngModel]="prefixsearch" >
+        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)"  [ngModel]="state.prefixsearch['account']" >
 
       </mat-form-field>
 
       <div class="app-facets-used">
-        <mat-list *ngIf="stateFilter?.length || newStavFilter?.length || institutionFilter?.length || delegatedFilter?.length || priorityFilter?.length || typeOfRequestFilter?.length">
+        <mat-list *ngIf="state.facetsstore.getFacet('account','stateFilter')?.length       || 
+                        state.facetsstore.getFacet('account','newStavFilter')?.length      || 
+                        state.facetsstore.getFacet('account','institutionFilter')?.length  || 
+                        state.facetsstore.getFacet('account','delegatedFilter')?.length    || 
+                        state.facetsstore.getFacet('account','priorityFilter')?.length     || 
+                        state.facetsstore.getFacet('account','typeOfRequestFilter')?.length">
           <h3 matSubheader fxLayout="row">
             <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
             <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
           </h3>
           <div class="app-list-content-wrapper">
             <ng-container *ngFor="let filter of filterState">
-              <mat-list-item *ngIf="stateFilter === filter.id">
+              <mat-list-item *ngIf="state.facetsstore.getFacet('account','stateFilter') === filter.id">
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStavZadosti(filter.id)"><mat-icon>clear</mat-icon></a>
                 <div>
                   <span>{{ 'desc.stav_zadosti' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
@@ -23,42 +29,42 @@
               </mat-list-item>
             </ng-container>
             <ng-container *ngFor="let filter of filterType">
-              <mat-list-item *ngIf="newStavFilter === filter.id">
+              <mat-list-item *ngIf="state.facetsstore.getFacet('account','newStavFilter') === filter.id">
                 <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStav(filter.id)"><mat-icon>clear</mat-icon></a>
                 <div>
                   <span>{{ 'desc.typ_navrhu' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
                 </div>
               </mat-list-item>
             </ng-container>  
-            <ng-container *ngIf="institutionFilter">
+            <ng-container *ngIf="state.facetsstore.getFacet('account','institutionFilter')?.length">
               <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setInstitution(institutionFilter)"><mat-icon>clear</mat-icon></a>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearInstitution()"><mat-icon>clear</mat-icon></a>
                 <div>
-                  <span>{{ 'desc.institution' | translate }}:</span> {{institutionFilter }}
+                  <span>{{ 'desc.institution' | translate }}:</span> {{state.facetsstore.getFacet('account','institutionFilter') }}
                 </div>
               </mat-list-item>
             </ng-container>  
-            <ng-container *ngIf="delegatedFilter">
+            <ng-container *ngIf="state.facetsstore.getFacet('account','delegatedFilter')?.length">
               <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setDelegated(delegatedFilter)"><mat-icon>clear</mat-icon></a>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearDelegated()"><mat-icon>clear</mat-icon></a>
                 <div>
-                  <span>{{ 'desc.delegated_kurator' | translate }}:</span> {{delegatedFilter }}
+                  <span>{{ 'desc.delegated_kurator' | translate }}:</span> {{state.facetsstore.getFacet('account','delegatedFilter') }}
                 </div>
               </mat-list-item>
             </ng-container>  
-            <ng-container *ngIf="priorityFilter">
+            <ng-container *ngIf="state.facetsstore.getFacet('account','priorityFilter')?.length">
               <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setPriority(priorityFilter)"><mat-icon>clear</mat-icon></a>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearPriority()"><mat-icon>clear</mat-icon></a>
                 <div>
-                  <span>{{ 'desc.priority' | translate }}:</span> {{priorityFilter }}
+                  <span>{{ 'desc.priority' | translate }}:</span> {{state.facetsstore.getFacet('account','priorityFilter') }}
                 </div>
               </mat-list-item>
             </ng-container>
-            <ng-container *ngIf="typeOfRequestFilter">
+            <ng-container *ngIf="state.facetsstore.getFacet('account','typeOfRequestFilter')?.length">
               <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setTypeOfRequest(typeOfRequestFilter)"><mat-icon>clear</mat-icon></a>
+                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearTypeOfRequest()"><mat-icon>clear</mat-icon></a>
                 <div>
-                  <span>{{ 'desc.type_of_request' | translate }}:</span> {{ 'desc.'+typeOfRequestFilter+'_type_request' | translate }}
+                  <span>{{ 'desc.type_of_request' | translate }}:</span> {{ 'desc.'+state.facetsstore.getFacet('account','typeOfRequestFilter')+'_type_request' | translate }}
                 </div>
               </mat-list-item>
             </ng-container>  
@@ -73,16 +79,16 @@
               {{ 'desc.stav_zadosti' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div *ngIf="stateFilter !== 'open'">
+          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'open'">
             <a (click)="setStavZadosti('open')">{{ 'desc.neodeslano' | translate }}</a>
           </div>
-          <div *ngIf="stateFilter !== 'waiting'">
+          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'waiting'">
             <a (click)="setStavZadosti('waiting')">{{ 'desc.ceka_na_posouzeni' | translate }}</a>
           </div>
-          <div *ngIf="stateFilter !== 'waiting_for_automatic_process'">
+          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'waiting_for_automatic_process'">
             <a (click)="setStavZadosti('waiting_for_automatic_process')">{{ 'desc.ceka_na_automaticke_zpracovani' | translate }}</a>
           </div>
-          <div *ngIf="stateFilter !== 'processed'">
+          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'processed'">
             <a (click)="setStavZadosti('processed')">{{ 'desc.zpracovano' | translate }}</a>
           </div>
         </mat-expansion-panel>
@@ -93,16 +99,16 @@
               {{ 'desc.typ_navrhu' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div *ngIf="newStavFilter !== 'NZN'">
+          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'NZN'">
             <a (click)="setStav('NZN')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
           </div>
-          <div *ngIf="newStavFilter !== 'VN'">
+          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VN'">
             <a (click)="setStav('VN')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
           </div>
-          <div *ngIf="newStavFilter !== 'VNL'">
+          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VNL'">
             <a (click)="setStav('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</a>
           </div>
-          <div *ngIf="newStavFilter !== 'VNZ'">
+          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VNZ'">
             <a (click)="setStav('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</a>
           </div>
         </mat-expansion-panel>

@@ -127,7 +127,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>consent_init</servlet-name>
-        <url-pattern>/cookieconsent/embedded_consent_init</url-pattern>
+        <url-pattern>/cookieconsent/consent_config.js</url-pattern>
     </servlet-mapping>
 
 

@@ -1,7 +1,7 @@
 <div class="app-container">  
   <ng-container *ngIf="zadost">
     <ul class="app-breadcrumb">
-      <li><a routerLink="/account">{{ 'desc.moje_pozadavky' | translate }}</a></li>
+      <li><a (click)="linkToAccount()">{{ 'desc.moje_pozadavky' | translate }}</a></li>
       <li>{{ 'desc.prehled_zadosti' | translate }}</li>
     </ul>
     <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
@@ -47,7 +47,7 @@
           </div>
           <div>
             <mat-button-toggle-group  name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
-              <mat-button-toggle *ngIf="state.user.role === 'mainKurator' && kurators && kurators.length > 0 && zadost.state==='waiting'" value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
+              <mat-button-toggle *ngIf="state.user && state.user.role === 'mainKurator' && kurators && kurators.length > 0 && zadost.state==='waiting'" value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
                 <mat-icon *ngIf="!zadost.delegated?.length" class="material-icons-outlined">manage_accounts</mat-icon>
                 <ng-container *ngIf="zadost.delegated?.length">{{ zadost.delegated }}</ng-container>
               </mat-button-toggle>

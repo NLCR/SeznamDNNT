@@ -6,6 +6,7 @@ import { Filter } from './shared/filter';
 import { Zadost } from './shared/zadost';
 import { NavigationStore } from './shared/navigationstore';
 import { NotifSettings } from './shared/notifsettings';
+import { FacetsStore } from './shared/facetstore';
 
 export class AppState {
 
@@ -32,16 +33,21 @@ export class AppState {
   public rows: number = 20;
 
  
-  
+  // page,rows  
   public navigationstore: NavigationStore = new NavigationStore();
+  // facets
+  public facetsstore: FacetsStore = new FacetsStore();
+  // prefix search 
+  public prefixsearch :{[key: string]: string} = {};
 
+
+  // store for sort
   public sort: {[key: string]: Sort} = {};
 
+  //public prefix: {[key: string]: Sort} = {};
 
   // vyhodit ?? 
   public rokvydani:string;
-  
-
 
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
@@ -50,8 +56,6 @@ export class AppState {
 
 
   public consent: boolean = true;
-
-  
 
   public usedFilters: Filter[] = [];
 
@@ -82,24 +86,7 @@ export class AppState {
 
     let navigationKey = this.navigationstore.findKey(url);
 
-    //url.indexOf("imports")
-
-    //default
-   // posledni stav z minuleho prochazeni
-
-    // if (this.navigateUIKey) {
-    //   let cfg = this.navigationUIStore.get(this.navigateUIKey);
-    //   this.rows = cfg.rows ? cfg.rows : this.config.rows;
-    //   this.page =  cfg.page ? cfg.page :  0;
-    // } else {
-    //   this.rows = this.config.rows;
-    //   this.page = 0;
-    // }
-
-
     this.usedFilters = [];
-    //this.sort = this.config.sorts[0];
-    // this.sort = {};
 
     if (!this.sort['sort']) {
       this.sort['sort'] = this.config.sorts.sort[0];

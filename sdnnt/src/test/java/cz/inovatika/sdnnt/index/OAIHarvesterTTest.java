@@ -65,45 +65,36 @@ public class OAIHarvesterTTest {
         }
         try {
             alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
-            System.out.println("IMPORTED");
-            
-            AccountService accountService = new AccountServiceImpl();
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
 
             alephImport(skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);
-            System.out.println("IMPORTED");
 
-//            try(SolrClient client = SolrTestServer.getClient()) {
-//                
-//                SolrQuery query = oai:aleph-nkp.cz:SKC01-001579067new SolrQuery("*")
-//                        .setRows(1000);
-//                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
-//                for (SolrDocument doc : docs) {
-//                    MarcRecord fDoc = MarcRecord.fromDoc(doc);
-//                    // only this one has dnnnt granularity
-//                    JSONArray historyJSON = fDoc.historie_stavu;
-//                    if (historyJSON != null) {
-//
-//                        List<String> licenses = new ArrayList<>();
-//                        List<String> states = new ArrayList<>();
-//                        for (Object obj : historyJSON) {
-//                            JSONObject jObject = (JSONObject) obj;
-//                            states.add(jObject.getString("stav"));
-//                            licenses.add(jObject.getString("license"));
-//                        }
-//                        
-//                        if (fDoc.identifier.equals("oai:aleph-nkp.cz:DNT01-000143604") || 
-//                            fDoc.identifier.equals("oai:aleph-nkp.cz:DNT01-000143602")) {
-//                            Assert.assertTrue(licenses.equals(Arrays.asList("dnnto","dnntt","dnntt")));
-//                            Assert.assertTrue(states.equals(Arrays.asList("PA","NZ","A")));
-//                        } else {
-//                            Assert.assertTrue(licenses.equals(Arrays.asList("dnnto","dnnto")));
-//                            Assert.assertTrue(states.equals(Arrays.asList("PA","A")));
-//                            
-//                        }
-//                    }
-//                }
-//            }
+            try(SolrClient client = SolrTestServer.getClient()) {
+                
+                SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
+                        .setRows(1000);
+                SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
+                Assert.assertTrue(catalogDocs.size() == 1);
+                
+                MarcRecord fDoc = MarcRecord.fromDoc(catalogDocs.get(0));
+
+                Assert.assertNotNull(fDoc.dntstav);
+                Assert.assertTrue(fDoc.dntstav.equals(Arrays.asList("A")));
+
+                Assert.assertNotNull(fDoc.kuratorstav);
+                Assert.assertTrue(fDoc.kuratorstav.equals(Arrays.asList("A")));
+                
+                Assert.assertNotNull(fDoc.license);
+                Assert.assertTrue(fDoc.license.equals("dnnto"));
+
+                SolrQuery historyQuery = new SolrQuery("*")
+                        .setRows(1000);
+                SolrDocumentList historyDocs = client.query(DataCollections.history.name(), historyQuery).getResults();
+                Assert.assertTrue(historyDocs.size() == 5);
+                    
+                
+                
+            }
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }

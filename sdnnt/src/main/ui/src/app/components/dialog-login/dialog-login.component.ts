@@ -70,6 +70,9 @@ export class DialogLoginComponent implements OnInit {
       this.state.logged = false;
       this.state.user = null;
 
+      this.state.facetsstore.reinit();
+
+
       this.state.sort['sort'] = this.config.sorts.sort[0];
       this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
       this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
