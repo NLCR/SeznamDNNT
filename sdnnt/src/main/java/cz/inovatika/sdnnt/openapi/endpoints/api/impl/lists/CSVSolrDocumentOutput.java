@@ -22,18 +22,22 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
 
     @Override
     public void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense) {
-
+        Object object = outputDocument.get(FMT_KEY);
+        
         Collection<String> pids = (Collection<String>) outputDocument.get(PIDS_KEY);
         String masterPid = !pids.isEmpty() ? pids.iterator().next() : "";
-        if (pids != null) {
-            pids.stream().forEach(p-> {
-                try {
-                    List<String> record = csvRecord(outputDocument, fields, p);
-                    printer.printRecord(record);
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
-                }
-            });
+        // in case of serial; do not emit master pid
+        if (object != null && !object.equals("SE")) {
+            if (pids != null) {
+                pids.stream().forEach(p-> {
+                    try {
+                        List<String> record = csvRecord(outputDocument, fields, p);
+                        printer.printRecord(record);
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                    }
+                });
+            }
         }
 
         // pokud master pid ma pak jo, pokud ne, pak vynechat

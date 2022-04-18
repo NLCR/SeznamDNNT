@@ -62,15 +62,16 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
-    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", "marc_911u", MarcRecordFields.SIGLA_FIELD, "marc_911a",
+    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier",ID_SDNNT , "marc_856u", "dntstav", "historie_stavu", "marc_911u", MarcRecordFields.SIGLA_FIELD, "marc_911a",
             GRANULARITY_FIELD,
             MARC_015_A,
             MARC_020_A,
             MARC_902_A,
-            LICENSE_FIELD
+            LICENSE_FIELD,
+            FMT_FIELD
     );
 
-    public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD);
+    public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD, FMT_FIELD);
 
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
@@ -402,6 +403,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         Collection<Object> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD);
 
+        Object fmt = doc.getFieldValue(FMT_FIELD);
+        
+        
         final List<String> links = new ArrayList<>();
         if (mlinks911u != null && !mlinks911u.isEmpty()) {
             mlinks911u.stream().map(Object::toString).forEach(links::add);
@@ -449,7 +453,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     if (indexOf > -1 && indexOf< pids.size()) {
                         String pid = pids.get(indexOf);
                         if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
-                            documentOutput.output(doc(Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, pid), outputFields,requestedLicense );
+                            documentOutput.output(doc(Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid), outputFields,requestedLicense );
                             uniqe.add(pid);
                         }
                     } else {
@@ -462,13 +466,13 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                             for (int i = 0; i < pids.size(); i++) {
                                 String s = i < siglas.size() ? siglas.get(i) : "";
                                 if (!uniqe.contains( pids.get(i))) {
-                                    documentOutput.output( doc(siglas, documentLicense,  nazev, identifier, granularity, pids.get(i)), outputFields, requestedLicense);
+                                    documentOutput.output( doc(siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i)), outputFields, requestedLicense);
                                     uniqe.add(pids.get(i));
                                 }
                             }
                         } else {
                             for (int i = 0; i < pids.size(); i++) {
-                                documentOutput.output( doc(siglas, documentLicense,  nazev, identifier,granularity , pids.get(i)),outputFields, requestedLicense);
+                                documentOutput.output( doc(siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i)),outputFields, requestedLicense);
                             }
                         }
                 }
@@ -476,12 +480,16 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 if (onlyUniqPids) {
                     for (int i = 0; i < pids.size(); i++) {
                         if (!uniqe.contains( pids.get(i))) {
-                            documentOutput.output( doc(Arrays.asList("") , documentLicense,  nazev, identifier, granularity, pids.get(i)),outputFields, requestedLicense);
+                            //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
+
+                            documentOutput.output( doc(Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i)),outputFields, requestedLicense);
                             uniqe.add(pids.get(i));
                         }
                     }
                 } else {
-                    documentOutput.output(doc( Arrays.asList(""), documentLicense, nazev, identifier, granularity, pids.toArray(new String[pids.size()])),outputFields, requestedLicense);
+                    //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
+
+                    documentOutput.output(doc( Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()])),outputFields, requestedLicense);
                 }
             }
         }
@@ -489,7 +497,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     
     
 
-    private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String ... p) {
+    private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
         Map<String, Object> document = new HashMap<>();
         document.put(SolrDocumentOutput.SELECTED_INSTITUTION_KEY, instituions);
         document.put(SolrDocumentOutput.LABEL_KEY, label);
@@ -499,7 +507,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Arrays.stream(p).forEach(pids::add);
         document.put(SolrDocumentOutput.PIDS_KEY, pids);
         document.put(GRANUARITY_KEY, granularity);
-
+        document.put(FMT_KEY, fmt);
         return document;
     }
 
