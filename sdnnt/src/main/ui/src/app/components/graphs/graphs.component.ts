@@ -46,7 +46,7 @@ export class GraphsComponent implements OnInit {
         name: this.service.getTranslation("graph.title.States"),
         type: 'pie',
         radius: ['40%', '70%'],
-
+        // center: ['40%', '50%'],
         label: {
           show: false,
         },
@@ -86,10 +86,11 @@ export class GraphsComponent implements OnInit {
         },
       },
       legend: {
-       right: 0,
-        orient: 'vertical',
+        // type: 'scroll',
+        // orient: 'vertical',
+        // right: 10,
+        // top: 20,
         bottom: 0,
-        height: 30
       }
     };
 
