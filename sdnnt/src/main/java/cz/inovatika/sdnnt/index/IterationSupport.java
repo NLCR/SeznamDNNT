@@ -1,9 +1,11 @@
 package cz.inovatika.sdnnt.index;
 
+import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.User;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.CursorMarkParams;
@@ -32,9 +34,8 @@ public abstract class IterationSupport {
      * @param consumer Consumer closure
      */
     public void iterateOnePage(int rows, String cursorMark, Map<String, String> req, User user, List<String> plusFilter , List<String> minusFilter, List<String> fields, Consumer<QueryResponse> consumer) {
-        SolrClient solr = Indexer.getClient();
-
-        try {
+        //SolrClient solr = Indexer.getClient();
+        try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
             SolrQuery q = (new SolrQuery("*")).setRows(rows).setSort(SolrQuery.SortClause.asc("identifier"));
 
             plusFilter.stream().forEach(q::addFilterQuery);

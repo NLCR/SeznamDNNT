@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
+import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput;
@@ -9,11 +10,18 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.glassfish.jersey.media.multipart.ContentDisposition;
 import org.json.JSONObject;
 
@@ -68,7 +76,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             MARC_020_A,
             MARC_902_A,
             LICENSE_FIELD,
-            FMT_FIELD
+            FMT_FIELD,
+            
+            ID_ISSN,
+            ID_ISBN,
+            ID_ISMN
     );
 
     public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD, FMT_FIELD);
@@ -453,7 +465,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     if (indexOf > -1 && indexOf< pids.size()) {
                         String pid = pids.get(indexOf);
                         if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
-                            documentOutput.output(doc(Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid), outputFields,requestedLicense );
+                            Map<String,Object> d = doc(Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid);
+                            d = enIdSdnnt(d, doc);
+                            documentOutput.output(d, outputFields,requestedLicense );
                             uniqe.add(pid);
                         }
                     } else {
@@ -466,13 +480,17 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                             for (int i = 0; i < pids.size(); i++) {
                                 String s = i < siglas.size() ? siglas.get(i) : "";
                                 if (!uniqe.contains( pids.get(i))) {
-                                    documentOutput.output( doc(siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i)), outputFields, requestedLicense);
+                                    Map<String,Object> d = doc(siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i));
+                                    d = enIdSdnnt(d, doc);
+                                    documentOutput.output( d, outputFields, requestedLicense);
                                     uniqe.add(pids.get(i));
                                 }
                             }
                         } else {
                             for (int i = 0; i < pids.size(); i++) {
-                                documentOutput.output( doc(siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i)),outputFields, requestedLicense);
+                                Map<String,Object> d = doc(siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i));
+                                d = enIdSdnnt(d, doc);
+                                documentOutput.output( d,outputFields, requestedLicense);
                             }
                         }
                 }
@@ -481,15 +499,17 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     for (int i = 0; i < pids.size(); i++) {
                         if (!uniqe.contains( pids.get(i))) {
                             //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-
-                            documentOutput.output( doc(Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i)),outputFields, requestedLicense);
+                            Map<String,Object> d =  doc(Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
+                            d = enIdSdnnt(d, doc);
+                            documentOutput.output(d,outputFields, requestedLicense);
                             uniqe.add(pids.get(i));
                         }
                     }
                 } else {
                     //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-
-                    documentOutput.output(doc( Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()])),outputFields, requestedLicense);
+                    Map<String,Object> d = doc( Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
+                    d = enIdSdnnt(d, doc);
+                    documentOutput.output(d,outputFields, requestedLicense);
                 }
             }
         }
@@ -511,7 +531,26 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         return document;
     }
 
+//    public static final String ID_CCNB_FIELD = "id_ccnb";
+//    public static final String ID_OAIIDENT = "id_oaiident";
+//    public static final String ID_SDNNT = "id_sdnnt";
+//
+//    public static final String ID_ISSN="id_issn";
+//    public static final String ID_ISBN="id_isbn";
+//    public static final String ID_ISMN="id_ismn";
     
+    private Map<String, Object> enDoc(Map<String, Object> doc, String key, Object val) {
+        doc.put(key, val);
+        return doc;
+    }
+    
+    private Map<String, Object> enIdSdnnt(Map<String, Object> doc, SolrDocument sdoc) {
+        Collection<Object> fieldValues = sdoc.getFieldValues(MarcRecordFields.ID_SDNNT);
+        if (fieldValues != null && !fieldValues.isEmpty()) {
+            return enDoc(doc, SolrDocumentOutput.SDNNT_ID_KEY, fieldValues.toArray()[0]);
+        }
+        return doc;
+    }
     
     @Override
     public Response changes(String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
@@ -544,6 +583,29 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 
+    @Override
+    public Response info(String ident, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+        try {
+            int maxRowsInCaseOfIdent = 1000;
+            try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
+                final ListitemResponse response = new ListitemResponse();
+                ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
+                response.setItems(arrayOfListitem);
 
+               SolrQuery q = (new SolrQuery("*")).setRows(maxRowsInCaseOfIdent).setSort(SolrQuery.SortClause.asc("identifier"));
+                q.addFilterQuery("id_pid:uuid");
+                q.addFilterQuery("id_all_identifiers:\""+ident+"\" OR id_pid:\""+ident+"\" OR identifier:\""+ident+"\" OR id_sdnnt:\""+ident+"\"");
+                QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                for (SolrDocument resultDoc: rsp.getResults()) {
+                    emitDocument(null, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                }
+                response.setNumFound((int) rsp.getResults().getNumFound());
+                return Response.ok().entity(response).build();
+            }
+        } catch (SolrServerException | IOException e) {
+            return Response.status(500).entity(jsonError( e.getMessage() )).build();
+        }
+    }
 }
 

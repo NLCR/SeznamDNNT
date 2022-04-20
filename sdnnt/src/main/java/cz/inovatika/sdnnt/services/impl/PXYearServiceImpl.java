@@ -62,18 +62,23 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         }
         
         LOGGER.info("Current iteration filter " + plusFilter);
-        support.iterate(buildClient(), reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
-                IDENTIFIER_FIELD,
-                SIGLA_FIELD,
-                MARC_911_U,
-                MARC_956_U,
-                GRANULARITY_FIELD
-        ), (rsp) -> {
+ 
+        try (SolrClient solrClient = buildClient()){
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+                    IDENTIFIER_FIELD,
+                    SIGLA_FIELD,
+                    MARC_911_U,
+                    MARC_956_U,
+                    GRANULARITY_FIELD
+            ), (rsp) -> {
 
-            Object identifier = rsp.getFieldValue("identifier");
-            foundCandidates.add(identifier.toString());
-        }, IDENTIFIER_FIELD);
-
+                Object identifier = rsp.getFieldValue("identifier");
+                foundCandidates.add(identifier.toString());
+            }, IDENTIFIER_FIELD);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+        }
+        
         return foundCandidates;
     }
 

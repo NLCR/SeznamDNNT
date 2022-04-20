@@ -51,7 +51,10 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
 
         ListitemGranularity granularity = new ListitemGranularity();
         if (stav != null) stav.forEach(o-> granularity.addStatesItem(o.toString()));
-        if (license != null && !license.trim().equals("")) granularity.setLicense(license);
+        if (license != null && !license.trim().equals("")) {
+            granularity.setTerritoriality("CZ");
+            granularity.setLicense(license);
+        }
         if (cislo != null && !cislo.trim().equals("")) granularity.setNumber(cislo);
         if (link != null && link.contains("uuid:")) {
             int indexOf = link.indexOf("uuid:");
@@ -72,6 +75,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             List<String> siglas = outputDocument.get(SELECTED_INSTITUTION_KEY) != null ? (List<String>) outputDocument.get(SELECTED_INSTITUTION_KEY) : null ;
             String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
             String label = outputDocument.get(LABEL_KEY) != null ? outputDocument.get(LABEL_KEY).toString() : null ;
+            String idsdnnt = outputDocument.get(SDNNT_ID_KEY) != null ? outputDocument.get(SDNNT_ID_KEY).toString() : null ;
 
             Listitem item = new Listitem()
                     .pid(pid.toString())
@@ -79,7 +83,16 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                     .sigla(siglas)
                     .title(nazev)
                     .license(label);
-
+            if (label != null) {
+                      //territoriality
+                item.setTerritoriality("CZ");
+            }
+            
+            if (idsdnnt != null) {
+                item.sdnntIdentifier(idsdnnt);
+            }
+            
+            
             List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
             if (granularity != null) {
                 List<ListitemGranularity> collect = granularity.stream().map(this::granularity).collect(Collectors.toList());

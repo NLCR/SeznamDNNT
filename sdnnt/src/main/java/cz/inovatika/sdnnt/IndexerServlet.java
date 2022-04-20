@@ -44,8 +44,10 @@ import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.services.impl.PXYearServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 
 /**
@@ -147,6 +149,7 @@ public class IndexerServlet extends HttpServlet {
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                long start = System.currentTimeMillis();
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
                     CatalogIterationSupport support = new CatalogIterationSupport();
                     try {
@@ -184,6 +187,7 @@ public class IndexerServlet extends HttpServlet {
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
                         PureHTTPSolrUtils.commit(support.getCollection());
+                        QuartzUtils.printDuration(Indexer.LOGGER, start);
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");

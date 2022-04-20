@@ -142,6 +142,7 @@ public class MarcRecord {
                     HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
+                    FLAG_PUBLIC_IN_DL+" ",
                     LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+ GRANULARITY_FIELD+":[json]");
     return fromIndex(client,q);
   }

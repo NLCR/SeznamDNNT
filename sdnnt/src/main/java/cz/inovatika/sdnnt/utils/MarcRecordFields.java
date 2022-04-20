@@ -89,6 +89,10 @@ public class MarcRecordFields {
     public static final String ID_OAIIDENT = "id_oaiident";
     public static final String ID_SDNNT = "id_sdnnt";
 
+    public static final String ID_ISSN="id_issn";
+    public static final String ID_ISBN="id_isbn";
+    public static final String ID_ISMN="id_ismn";
+    
     
     public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
 

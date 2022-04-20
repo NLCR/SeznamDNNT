@@ -65,8 +65,6 @@ public class NotificationServiceImplITTest {
     }
 
 
-    
-    
     @Test
     public void testSaveNotifications() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
 
@@ -141,7 +139,6 @@ public class NotificationServiceImplITTest {
         // saved marc record
         MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
         MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
-        
         
         solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
         solrMarc2.setKuratorStav("X", "X", null, "testuser", "poznamka", null);

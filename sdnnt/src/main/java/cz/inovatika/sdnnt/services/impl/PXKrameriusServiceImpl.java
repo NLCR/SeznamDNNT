@@ -131,32 +131,40 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             plusFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
         }
         LOGGER.info("Current iteration filter " + plusFilter);
-        support.iterate(buildClient(), reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
-                IDENTIFIER_FIELD,
-                SIGLA_FIELD,
-                MARC_911_U,
-                MARC_956_U,
-                MARC_856_U,
-                GRANULARITY_FIELD
-        ), (rsp) -> {
-            Object identifier = rsp.getFieldValue("identifier");
-
-            Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
-            Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
-            Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
-
-            if (links1 != null && !links1.isEmpty()) {
-                List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
-                mapping.put(identifier.toString(), ll);
-            } else if (links2 != null && !links2.isEmpty()) {
-                List<String> ll = links2.stream().map(Object::toString).collect(Collectors.toList());
-                mapping.put(identifier.toString(), ll);
-            } else if (links3 != null && !links3.isEmpty()) {
-                List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
-                mapping.put(identifier.toString(), ll);
-                
+        try (final SolrClient solrClient = buildClient()) {
+            List<String> negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
+            if (this.contextInformation) {
+                    negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
             }
-        }, IDENTIFIER_FIELD);
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+                    IDENTIFIER_FIELD,
+                    SIGLA_FIELD,
+                    MARC_911_U,
+                    MARC_956_U,
+                    MARC_856_U,
+                    GRANULARITY_FIELD
+            ), (rsp) -> {
+                Object identifier = rsp.getFieldValue("identifier");
+
+                Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
+                Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
+                Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
+
+                if (links1 != null && !links1.isEmpty()) {
+                    List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
+                    mapping.put(identifier.toString(), ll);
+                } else if (links2 != null && !links2.isEmpty()) {
+                    List<String> ll = links2.stream().map(Object::toString).collect(Collectors.toList());
+                    mapping.put(identifier.toString(), ll);
+                } else if (links3 != null && !links3.isEmpty()) {
+                    List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
+                    mapping.put(identifier.toString(), ll);
+                    
+                }
+            }, IDENTIFIER_FIELD);
+        } catch(IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
 
         
         LOGGER.info("Found candidates: "+mapping.size());

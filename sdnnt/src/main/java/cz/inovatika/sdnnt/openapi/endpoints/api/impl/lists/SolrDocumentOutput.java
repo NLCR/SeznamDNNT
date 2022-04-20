@@ -14,6 +14,8 @@ public interface SolrDocumentOutput {
     public static final String LABEL_KEY = "label";
     public static final String NAZEV_KEY = "title";
     public static final String IDENTIFIER_KEY = "identifier";
+    public static final String SDNNT_ID_KEY = MarcRecordFields.ID_SDNNT;
+
     public static final String FMT_KEY = "fmt";
     public static final String PIDS_KEY = "pids";
     public static final String GRANUARITY_KEY = "granularity";

@@ -472,3 +472,27 @@ paths:
         '400':
           description: Špatný dotaz; Překročen maximální počet záznamů.
 
+  # List vsech zmen
+  /lists/info/{ident}:
+    get:
+      tags:
+        - Umožňuje získat informace o titulu dle identifikátorů 
+      summary: Umožňuje získat informace o titulu dle identifikátorů 
+      description: Umožňuje získat informace o titulu dle identifikátorů 
+      operationId: info
+      parameters:
+        - in: path
+          name: ident
+          schema:
+            type: string
+          required: true
+          description: Identifier
+      responses:
+        '200':
+          description: Výsledky ve formátu JSON
+          content:
+            application/json:
+              schema:
+                $ref: './schemas/lists/ListitemResponse.yaml'
+        '400':
+          description: Špatný dotaz; Překročen maximální počet záznamů.

@@ -168,6 +168,8 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
     private CatalogItem createcatalogItemFromJSON(JSONObject doc) {
         String ident = doc.getString("identifier");
+        String sdnntIdent = null;
+
         String catalog = doc.getJSONArray("marc_998a").optString(0);
 
         String fmt = doc.optString("fmt", "");
@@ -182,7 +184,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         List<String> links = new ArrayList<>();
         List<String> pids = new ArrayList<>();
         List<CatalogItemBaseGranularity> granularities = new ArrayList<>();
-
+        
 
         doc.getJSONArray(NAZEV_FIELD).forEach(o-> nazev.add(o.toString()));
         // author fields
@@ -203,6 +205,10 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
             doc.getJSONArray(NAKLADATEL_FIELD).forEach(o-> nakladatel.add(o.toString()));
         }
 
+        if (doc.has(ID_SDNNT)) {
+            JSONArray idSdnntArr = doc.getJSONArray(ID_SDNNT);
+            sdnntIdent = idSdnntArr.optString(0);
+        }
 
         if (doc.has(HISTORIE_STAVU_FIELD)) {
             doc.getJSONArray(HISTORIE_STAVU_FIELD).forEach(o-> {
@@ -315,6 +321,9 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 .fmt(fmt);
 
 
+        if (sdnntIdent != null) {
+            item.sdnntIdentifier(sdnntIdent);
+        }
         if (!nakladatel.isEmpty()) {
             item.publisher(nakladatel);
         }

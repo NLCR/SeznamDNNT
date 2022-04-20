@@ -4,18 +4,31 @@ required:
 properties:
   pid:
     type: string
+    example: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
   license:
     type: string
+    example: 'dnntt' 
+  territoriality:
+    type: string
+    example: 'CZE'
   sigla:
     type: array
     items:
       type: string
+    example: 
+        - 'BOA001'
   title:
     type: string
+    example: 'ERA 21 ekologie, realizace, architektura'
   type:
     type: string
-  catalogIdentifier:
+    example: 'BK'
+  catalog_identifier:
     type: string
+    example: 'oai:aleph-nkp.cz:SKC01-000085907'
+  sdnnt_identifier:
+    type: string
+    example: 'a36aeb793976c94a01bc9f21c8ae5010'
 
   other_identifiers:
     type: object
@@ -44,16 +57,17 @@ properties:
             type: string
         license:
           type: string
+          example: 'dnnto'
+        territoriality:
+          type: string
+          example: 'CZE'
         pid:
           type: string
+          pid: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
         number:
           type: string
+          example: '19'
         year:
           type: string
-example:
-  pid: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
-  license: "dnntt"
-  sigla: "BOA001"
-  title: "ERA 21 ekologie, realizace, architektura"
-  catalogIdentifier: "oai:aleph-nkp.cz:SKC01-000085907"
-  type: "BK"
+          example: '1993'
+          
