@@ -16,7 +16,7 @@ example:
     ccnb: "cnb000359230"
     issn: "1210-731X"
   catalog: "DNT01-000173538"
-  states": ["A","NZ"]
+  states: ["A"]
   stateshistory: ["PA","NZ","A"]
   title: [ "Diagnostický software ADT 4400. zpracovali P. Kučera ... [et al.]"]
   author: []

@@ -4,6 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -17,16 +18,19 @@ public class SimpleGET {
 
     public static String getFinalURL(String url, int counter) throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-        con.setInstanceFollowRedirects(false);
-        con.connect();
-        con.getInputStream();
+        try {
+            con.setInstanceFollowRedirects(false);
+            con.connect();
 
-        if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
-            String redirectUrl = con.getHeaderField("Location");
-            if (counter > MAXIMUM_ITERATION) return redirectUrl;
-            return getFinalURL(redirectUrl, counter++);
+            if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+                String redirectUrl = con.getHeaderField("Location");
+                if (counter > MAXIMUM_ITERATION) return redirectUrl;
+                return getFinalURL(redirectUrl, counter++);
+            }
+            return url;
+        } finally {
+            if (con != null) con.disconnect();
         }
-        return url;
     }
 
     public static String get(String u) throws IOException {
@@ -37,7 +41,10 @@ public class SimpleGET {
         conn.setRequestProperty("Content-Type", "application/json");
         int responseCode = conn.getResponseCode();
 
-        String s = IOUtils.toString(conn.getInputStream(), "UTF-8");
+        String s = "";
+        try(InputStream is = conn.getInputStream()) {
+            s = IOUtils.toString(is, "UTF-8");
+        }
         return s;
     }
 }

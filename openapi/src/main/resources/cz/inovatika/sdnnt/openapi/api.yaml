@@ -34,7 +34,7 @@ paths:
       description: |
         Umožňuje vyhledávat a prohlížet data v katalogu. Předdefinované filtry
           - Licence - licence díla (**DNNTT**, **DNNTO**)
-          - Stavy - Stav díla (**A**, **PA**, **V**, **VN**, **N**, **NZN**, **VNL**, **VNZ**)
+          - Stavy - Stav díla (**A**, **PA**, **V**, **N**, **X**)
 
       parameters:
         - in: query
