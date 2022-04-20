@@ -108,9 +108,25 @@ export class ZadostComponent implements OnInit {
       this.numFound = resp.response.numFound;
 
       const notifications = resp.notifications;
-      this.docs.map(doc => {
-        doc.isProcessed = process && process[doc.identifier];
-      });
+      // TODO: Should not be dependent on type 
+      if (this.zadost.navrh=='VNL') {
+
+        let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
+        let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
+        let allProcessed: boolean = true;
+        if (this.zadost && this.zadost.process) {
+          this.docs.forEach(doc=> {
+            let id = doc.identifier;
+            let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
+            let noworkflowkey =id+"_noworkflow";
+            doc.isProcessed = this.zadost.process[tablekey] || this.zadost.process[noworkflowkey];
+          });
+        }
+      } else {
+        this.docs.map(doc => {
+          doc.isProcessed = process && process[doc.identifier];
+        });
+      }
 
       this.docs.forEach(doc=> {
         const docId = doc.identifier;
