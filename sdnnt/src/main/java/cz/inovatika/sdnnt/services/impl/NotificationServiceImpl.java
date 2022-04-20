@@ -420,7 +420,8 @@ public class NotificationServiceImpl implements NotificationsService {
             String  fqCatalog = fCatalogFilter(interval);
             try {
                 SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
-                        .addFilterQuery(fqCatalog).addFilterQuery(fqJoin)
+                        .addFilterQuery(fqCatalog)
+                        .addFilterQuery(fqJoin)
                         .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu");
                 
                 iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
@@ -457,13 +458,13 @@ public class NotificationServiceImpl implements NotificationsService {
         String fqCatalog;
         switch (interval) {
         case den:
-            fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO NOW]";
+            fqCatalog = "datum_stavu:[NOW/DAY-1DAY TO *]";
             break;
         case tyden:
-            fqCatalog = "datum_stavu:[NOW/DAY-7DAYS TO NOW]";
+            fqCatalog = "datum_stavu:[NOW/DAY-7DAYS TO *]";
             break;
         default:
-            fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO NOW]";
+            fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO *]";
         }
         return fqCatalog;
     }
@@ -539,8 +540,6 @@ public class NotificationServiceImpl implements NotificationsService {
         } catch (IOException | SolrServerException  e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
-        //public UpdateResponse deleteById(String collection, List<String> ids, int commitWithinMs) throws SolrServerException, IOException {
-
     }
     
     

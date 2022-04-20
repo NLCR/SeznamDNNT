@@ -60,17 +60,17 @@
     "notifikace_den": {
       "type": "notifications",
       "interval": "den",
-      "cron": "0 0 0 * * ?"
+      "cron": "3 0 0 * * ?"
     },
     "notifikace_tyden": {
       "type": "notifications",
       "interval": "tyden",
-      "cron": "0 0 2 ? * MON"
+      "cron": "3 0 2 ? * MON"
     },
     "notifikace_mesic": {
       "type": "notifications",
       "interval": "mesic",
-      "cron": "0 15 22 ? * 6L"
+      "cron": "3 15 22 1 * ?"
     }
   }
 
