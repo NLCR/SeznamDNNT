@@ -19,7 +19,7 @@
               <!-- <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox> -->
               <!--  <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox> -->
 
-              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' ))">
+              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' || state.user.role == 'kurator' || state.user.role == 'mainKurator'))">
                 <mat-button-toggle [matMenuTriggerFor]="menuFilter">
                   <mat-icon class="material-icons-outlined app-mr-1">notifications</mat-icon>
                   {{ this.state.notificationSettings.selected ? (this.state.notificationSettings.selected.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : this.state.notificationSettings.selected.name) : 'desc.zobrazit_zaznamy_s_notifikaci' | translate }}
