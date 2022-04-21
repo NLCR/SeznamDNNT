@@ -54,6 +54,7 @@
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     
     <field name="import_id" type="string" indexed="true" stored="true"  />
+    <field name="item_id" type="string" indexed="true" stored="true"  />
     <field name="import_date" type="date" indexed="true" stored="true" />
     <field name="ean" type="string" indexed="true" stored="true"  />
     <field name="name" type="string" indexed="true" stored="true"  />
@@ -66,6 +67,7 @@
     <field name="controlled" type="boolean" indexed="true" stored="true" default="false" />
     <field name="controlled_user" type="string" indexed="true" stored="true"  />
     <field name="controlled_note" type="string" indexed="true" stored="true"  />
+    <field name="controlled_date" type="date" indexed="true" stored="true"  />
     <field name="dntstav" type="string" indexed="true" stored="true" multiValued="true"  />
     
     <field name="item" type="text_big" indexed="false" stored="true"  />
