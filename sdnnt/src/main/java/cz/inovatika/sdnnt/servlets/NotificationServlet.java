@@ -41,6 +41,12 @@ import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.ServletsSupport;
 
+/**
+ * Notitication mangement 
+ * 
+ * Note: Part of internal API
+ * @author happy
+ */
 @WebServlet(value = "/notifications/*")
 public class NotificationServlet extends HttpServlet {
 
@@ -99,7 +105,9 @@ public class NotificationServlet extends HttpServlet {
     }
 
     enum Actions {
-        
+        /** 
+         * Save notification settings 
+         */
         SAVE_NOTIFICATION_SETTINGS {
 
             @Override
@@ -177,7 +185,10 @@ public class NotificationServlet extends HttpServlet {
                 }
             }
         },
-        // get notifications for settings
+
+        /**
+         * Get rule notifications
+         */
         GET_RULE_NOTIFICATIONS {
 
             @Override
@@ -208,6 +219,9 @@ public class NotificationServlet extends HttpServlet {
             
         },
 
+        /**
+         * Store one rule notification
+         */
         SAVE_RULE_NOTIFICATION {
 
             @Override
@@ -262,7 +276,6 @@ public class NotificationServlet extends HttpServlet {
             }
         
         },
-        
         RULE_NOTIFICATIONS {
 
             @Override

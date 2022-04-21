@@ -257,6 +257,8 @@ public class NotificationServiceImpl implements NotificationsService {
     public void processNotifications(NotificationInterval interval)
             throws NotificationsException, UserControlerException {
             
+        long start = System.currentTimeMillis();
+        LOGGER.info(String.format("Processing notification interval '%s'", interval));
         // Notifications
         Map<String, List<String>> identsMapping = new HashMap<>();
         Map<String, List<Map<String, String>>> docsMapping = new HashMap<>();
@@ -304,8 +306,7 @@ public class NotificationServiceImpl implements NotificationsService {
             }
         });
 
-        //identsMapping.keySet().
-        LOGGER.info("Simple notification, number of notified users :"+identsMapping.size()+".");
+        LOGGER.info("Notified users : "+identsMapping.keySet()+".");
 
         allUsers.stream().forEach(user -> {
             try {
@@ -347,16 +348,21 @@ public class NotificationServiceImpl implements NotificationsService {
                 List<Map<String, String>> list = docsMapping.get(username);
                 if (!list.isEmpty()) {
                     User user = this.userControler.findUser(username);
+                    if (user  == null) {
+                        user = this.shibUsersController.findUser(username);
+                    }
                     if (user != null) {
                         List<Map<String, String>> documents =docsMapping.get(username);
                         sendEmail(interval, user, new ArrayList<>(documents));
+                    } else {
+                        LOGGER.log(Level.WARNING, String.format("Cannot find user %s", username));
                     }
                 }
             } catch (UserControlerException e) {
                 LOGGER.log(Level.SEVERE,e.getMessage(),e);
             }
         });
-        
+        LOGGER.info(String.format("FINISHED. Notification:'%s'. TotalTime: %d", interval.name() , (System.currentTimeMillis() - start)));
     }
 
     protected List<Map<String, String>> processRuleBasedNotification(User user, NotificationInterval interval) throws NotificationsException, IOException {

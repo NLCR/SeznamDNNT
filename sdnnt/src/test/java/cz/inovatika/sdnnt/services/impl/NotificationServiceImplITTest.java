@@ -172,6 +172,14 @@ public class NotificationServiceImplITTest {
             .andReturn(createNotificationShibUsers())
             .anyTimes();
 
+        EasyMock.expect(controler.findUser("shibtest1"))
+            .andReturn(null)
+            .anyTimes();
+
+        EasyMock.expect(shibController.findUser("shibtest1"))
+            .andReturn(testShibUser())
+            .anyTimes();
+
         EasyMock.expect(controler.findUser("test1"))
             .andReturn(testUser())
             .anyTimes();
@@ -289,6 +297,14 @@ public class NotificationServiceImplITTest {
             .andReturn(createNotificationShibUsers())
             .anyTimes();
 
+        EasyMock.expect(controler.findUser("shibtest1"))
+            .andReturn(null)
+            .anyTimes();
+
+        EasyMock.expect(shibController.findUser("shibtest1"))
+            .andReturn(testShibUser())
+            .anyTimes();
+
         EasyMock.expect(controler.findUser("test1"))
             .andReturn(testUser())
             .anyTimes();
@@ -319,12 +335,12 @@ public class NotificationServiceImplITTest {
             public Object answer() throws Throwable {
                 Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
                 List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
-                Assert.assertTrue(pair.getLeft().equals("test@testovic.cz"));
+                Assert.assertTrue(pair.getLeft().equals("test@testovic.cz") || pair.getLeft().equals("shib_test@testovic.cz"));
                 System.out.println("Document size "+ documents.size());
-                Assert.assertTrue(documents.size()  == 2);
+                //Assert.assertTrue(documents.size()  == 2);
                 return null;
             }
-        }).times(1);
+        }).times(2);
 
 
         EasyMock.expect(service.buildClient()).andDelegateTo(
@@ -338,8 +354,10 @@ public class NotificationServiceImplITTest {
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
         service.saveNotificationRule(ruleNotification("test1", "notification_knihovna_rulebased_dntstavA.json"));
 
+        service.saveSimpleNotification(simpleNotification("shibtest1", "notification_testshib_oai_aleph-nkp.cz_SKC01-57931.json"));
+
         List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
-        Assert.assertTrue(notificationsByInterval.size() == 3);
+        Assert.assertTrue(notificationsByInterval.size() == 4);
         
         service.processNotifications(NotificationInterval.den);
     }
