@@ -191,7 +191,7 @@ public class OAIHarvester {
             recs.clear();
           }
           if (!toDelete.isEmpty()) {
-            solr.deleteById(collection, toDelete);
+            //solr.deleteById(collection, toDelete);
             deleted += toDelete.size();
             toDelete.clear();
           }
@@ -252,9 +252,9 @@ public class OAIHarvester {
         }
 
         if (!toDelete.isEmpty()) {
-          solr.deleteById(collection, toDelete);
-          deleted += toDelete.size();
-          toDelete.clear();
+          //solr.deleteById(collection, toDelete);
+          //deleted += toDelete.size();
+          //toDelete.clear();
         }
         solrTime += new Date().getTime() - start;
       } catch (XMLStreamException | IOException exc) {
@@ -351,7 +351,7 @@ public class OAIHarvester {
               recs.add(DntAlephImporter.toSolrDoc(mr));
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
-              toDelete.add(mr.identifier);
+              //toDelete.add(mr.identifier);
             }
             // ret.append("records", mr.toJSON());
           } else {

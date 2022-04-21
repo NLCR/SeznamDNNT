@@ -187,7 +187,7 @@ public class IndexerServlet extends HttpServlet {
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
                         PureHTTPSolrUtils.commit(support.getCollection());
-                        QuartzUtils.printDuration(Indexer.LOGGER, start);
+                        QuartzUtils.printDuration(LOGGER, start);
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");

@@ -243,6 +243,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
                 try {
                     String result = simpleGET(url);
+                        
                     JSONObject object = new JSONObject(result);
                     JSONObject response = object.getJSONObject("response");
                     JSONArray jsonArray = response.getJSONArray("docs");

@@ -50,7 +50,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
  */
 public class DntAlephImporter {
 
-    public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(DntAlephImporter.class.getName());
     public static final int DEFAULT_CONNECT_TIMEOUT = 5;
     public static final String CONNECTION_TIMEOUT_KEY = "connectionTimeout";
     public static final String CONNECTION_REQUEST_TIMEOUT_KEY = "connectionRequestTimeout";

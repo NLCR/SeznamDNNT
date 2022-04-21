@@ -16,6 +16,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -25,11 +26,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.indexer.models.MarcRecordFlags;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 // OAI U
 public class OAIHarvesterTTest {
@@ -92,15 +95,44 @@ public class OAIHarvesterTTest {
                 SolrDocumentList historyDocs = client.query(DataCollections.history.name(), historyQuery).getResults();
                 Assert.assertTrue(historyDocs.size() == 5);
                     
-                
-                
             }
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
     }
+
     /** Test indexace DNT, indexace odpovidajici SKC a naslednemu update SKC */
     @Test
-    public void testIndexAndFollow() throws XMLStreamException, SolrServerException {
+    public void testLinkDK() throws XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        try {
+            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            try(SolrClient client = SolrTestServer.getClient()) {
+                MarcRecord mr = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:SKC01-001579065");
+                if (mr != null) {
+                    if (mr.recordsFlags == null) {
+                        mr.recordsFlags = new MarcRecordFlags(true);
+                    }
+                }
+                mr.recordsFlags.setPublicInDl(true);
+                
+                SolrInputDocument solrDoc = mr.toSolrDoc();
+                client.add("catalog", solrDoc);
+
+                SolrJUtilities.quietCommit(client, "catalog");
+                alephImport(skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);                
+
+                SolrJUtilities.quietCommit(client, "catalog");
+
+                MarcRecord mr2 = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:SKC01-001579065");
+                Assert.assertNotNull(mr2.recordsFlags);
+                Assert.assertTrue(mr2.recordsFlags.isPublicInDl());
+            }
+        } catch(Exception ex) {
+            Assert.fail(ex.getMessage());
+        }
     }
 }

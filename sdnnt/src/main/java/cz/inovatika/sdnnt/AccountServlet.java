@@ -34,10 +34,6 @@ import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
-import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
-import cz.inovatika.sdnnt.utils.ServletsSupport;
-import cz.inovatika.sdnnt.utils.VersionStringCast;
-import cz.inovatika.sdnnt.utils.ZadostUtils;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -166,6 +162,7 @@ public class AccountServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    long start = System.currentTimeMillis();
                     final AccountIterationSupport support = new AccountIterationSupport();
                     try {
                         JSONArray jsonArray = new JSONArray();
@@ -187,6 +184,7 @@ public class AccountServlet extends HttpServlet {
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
                         PureHTTPSolrUtils.commit(support.getCollection());
+                        QuartzUtils.printDuration(LOGGER, start);
                     }
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
@@ -264,6 +262,7 @@ public class AccountServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    long start = System.currentTimeMillis();
                     final AccountIterationSupport support = new AccountIterationSupport();
                     try {
                         JSONArray jsonArray = new JSONArray();
@@ -300,6 +299,7 @@ public class AccountServlet extends HttpServlet {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
                     } finally {
+                        QuartzUtils.printDuration(LOGGER, start);
                         PureHTTPSolrUtils.commit(support.getCollection());
                     }
                 } else {

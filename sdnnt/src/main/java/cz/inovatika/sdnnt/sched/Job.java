@@ -5,6 +5,7 @@
  */
 package cz.inovatika.sdnnt.sched;
 
+import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
 
@@ -108,9 +109,11 @@ public class Job implements InterruptableJob {
         ALTERNATIVE_LINKS_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
+                long start = System.currentTimeMillis();
                 LOGGER.fine(name()+":configuration is "+jobData);
                 UpdateAlternativeAlephLinksImpl impl = new UpdateAlternativeAlephLinksImpl();
                 impl.updateLinks();
+                QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
             }
         },
  
@@ -195,7 +198,7 @@ public class Job implements InterruptableJob {
                     PXKrameriusService service = new PXKrameriusServiceImpl(iteration, results);
 
                     List<String> check = service.check();
-                    PXYearServiceImpl.LOGGER.info("Number of found candidates "+check.size());
+                    PXKrameriusServiceImpl.LOGGER.info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
 
                         int maximum = 100;
@@ -214,20 +217,20 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
-                                PXYearServiceImpl.LOGGER.info("Creating request for sublist "+subList);
+                                PXKrameriusServiceImpl.LOGGER.info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
                             if (results.has("state") || results.has("ctx")) {
-                                PXYearServiceImpl.LOGGER.info("Updating sublist "+subList);
+                                PXKrameriusServiceImpl.LOGGER.info("Updating sublist "+subList);
                                 service.update(subList);
                             }
                         }
                     }
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    PXYearServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    PXKrameriusServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 } finally {
-                    QuartzUtils.printDuration(PXYearServiceImpl.LOGGER, start);
+                    QuartzUtils.printDuration(PXKrameriusServiceImpl.LOGGER, start);
 
                 }
             }
