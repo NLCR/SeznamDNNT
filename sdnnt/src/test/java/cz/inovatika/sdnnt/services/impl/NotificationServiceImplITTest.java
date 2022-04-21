@@ -140,8 +140,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
         MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
         
-        solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.add(Calendar.DAY_OF_WEEK, -2);
@@ -211,6 +211,9 @@ public class NotificationServiceImplITTest {
                 Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
                 List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
                 Assert.assertTrue(pair.getLeft().equals("test@testovic.cz"));
+                documents.stream().forEach(d-> {
+                    Assert.assertTrue(d.containsKey("license"));
+                });
                 System.out.println("Document size "+ documents.size());
                 Assert.assertTrue(documents.size()  == 1);
                 return null;
@@ -232,7 +235,8 @@ public class NotificationServiceImplITTest {
         Assert.assertTrue(notificationsByInterval.size() == 2);
         
         service.processNotifications(NotificationInterval.den);
-}
+    }
+    
     
     /** Posilani jednoduchych notifikaci */
     @Test
@@ -265,8 +269,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
         
         
-        solrMarc1.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("X", "X", null, "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
 
         Calendar calendar1 = Calendar.getInstance();
         //calendar1.add(Calendar.DAY_OF_WEEK, -1);
@@ -338,6 +342,9 @@ public class NotificationServiceImplITTest {
                 Assert.assertTrue(pair.getLeft().equals("test@testovic.cz") || pair.getLeft().equals("shib_test@testovic.cz"));
                 System.out.println("Document size "+ documents.size());
                 //Assert.assertTrue(documents.size()  == 2);
+                documents.stream().forEach(d-> {
+                    Assert.assertTrue(d.containsKey("license"));
+                });
                 return null;
             }
         }).times(2);
