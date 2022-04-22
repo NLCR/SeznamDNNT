@@ -10,7 +10,8 @@ export class NavigationStore {
     constructor() {
         this.initDefault('imports');
         this.initDefault('account');   
-        this.initDefault('search');        
+        this.initDefault('search');  
+        this.initDefault('zadost');      
     }
 
     public contains(key:string) : boolean {
