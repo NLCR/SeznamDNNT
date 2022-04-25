@@ -97,6 +97,10 @@
    <!-- full text -->
    <field name="fullText" type="text_lowercase" indexed="true" stored="false" multiValued="true" />
 
+   <!-- Pomocne pole pro reindexaci v pripade zmeny schematu -->
+   <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
+
+
 	<copyField source="id_parts" dest="fullText"/>
 	<copyField source="id" dest="fullText"/>
 	<copyField source="user" dest="fullText"/>
@@ -496,7 +500,7 @@
     <!-- Lowercase bez diakrity -->
     <fieldType name="text_lowercase" class="solr.TextField" positionIncrementGap="100">
       <analyzer> 
-        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <tokenizer class="solr.WhitespaceTokenizerFactory" rule="java" />
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.ASCIIFoldingFilterFactory"/>       
       </analyzer>
