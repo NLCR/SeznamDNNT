@@ -3,7 +3,7 @@ services:
   sdnnt-tomcat:
     image: sdnnt:latest
     ports:
-        - '8080:8080'
+        - '127.0.0.1:8080:8080'
     volumes:
         - ./data/config:/opt/app-root/src/.sdnnt
         - ./data/logs:/usr/local/tomcat/logs
@@ -13,6 +13,6 @@ services:
     volumes:
         - ./data/solr-persistence:/bitnami
     ports:
-        - '8983:8983'
+        - '127.0.0.1:8983:8983'
 
 
