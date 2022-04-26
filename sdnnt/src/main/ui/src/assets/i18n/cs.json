@@ -845,6 +845,11 @@
       "History by user": "Historie uživatele",
       "History by type": "Historie dle typu"
     },
+    "field": {
+      "zadost": "Žádost",
+      "catalog": "Katalog",
+      "import": "Import"
+    },
     "desc": {
       "interval": "Rozmezí",
       "select_interval": "Vyber rozmezí",

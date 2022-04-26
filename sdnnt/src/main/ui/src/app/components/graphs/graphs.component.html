@@ -27,7 +27,10 @@
           <mat-option value="1DAY">{{ 'graph.desc.day' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <div *ngIf="historyUserOpts.series" class="app-graph" echarts [options]="historyUserOpts" style="height: 350px;" ></div>
+      <div *ngIf="historyUserOpts.series" class="app-graph"  style="height: 350px;"
+        echarts #userChart [options]="historyUserOpts" 
+        (chartLegendSelectChanged)="selectUserLegent($event)" 
+        (chartInit)="onChartInit($event)"></div>
     </div>
   </div>
   <div class="app-graph-wrapper">
