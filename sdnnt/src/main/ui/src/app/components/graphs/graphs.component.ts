@@ -236,7 +236,7 @@ export class GraphsComponent implements OnInit {
       yAxis: {
         type: 'value',
       },
-      series: [{ name: title, data, type: 'bar' }],
+      series: [{ name: this.service.getTranslation('graph.title.' + title), data, type: 'bar' }],
       legend: {
         data: stats.map(e => e.name),
         bottom: 0,
