@@ -285,9 +285,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", MarcRecordFields.MARC_911_U, MarcRecordFields.SIGLA_FIELD,"marc_911a"), makeSurePids(list));
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
                 } else {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), Arrays.asList("nazev", "identifier", "marc_856u", "dntstav", "historie_stavu", MarcRecordFields.MARC_911_U, MarcRecordFields.SIGLA_FIELD,"marc_911a"),DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS,DEFAULT_OUTPUT_FIELDS);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Maximum number of items exceeded")).build();
