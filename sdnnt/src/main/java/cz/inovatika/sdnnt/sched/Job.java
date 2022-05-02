@@ -24,6 +24,7 @@ import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.*;
 import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
+import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
 
@@ -125,21 +126,23 @@ public class Job implements InterruptableJob {
             void doPerform(JSONObject jobData) {
                 LOGGER.fine(name()+":configuration is "+jobData);
                 long start = System.currentTimeMillis();
+                JSONObject iteration = jobData.optJSONObject("iteration");
+                JSONObject results = jobData.optJSONObject("results");
+
+                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                List<String> states = new ArrayList<>();
+                if (jsonArrayOfStates != null) {
+                    jsonArrayOfStates.forEach(it -> {
+                        states.add(it.toString());
+                    });
+                }
+
+                String loggerPostfix = jobData.optString("logger");
+
+                PXYearService service = new PXYearServiceImpl(loggerPostfix, iteration, results);
                 try {
-                    JSONObject iteration = jobData.optJSONObject("iteration");
-                    JSONObject results = jobData.optJSONObject("results");
-
-                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-                    List<String> states = new ArrayList<>();
-                    if (jsonArrayOfStates != null) {
-                        jsonArrayOfStates.forEach(it -> {
-                            states.add(it.toString());
-                        });
-                    }
-
-                    PXYearService service = new PXYearServiceImpl(iteration, results);
                     List<String> check = service.check();
-                    PXYearServiceImpl.LOGGER.info("Number of found candidates "+check.size());
+                    service.getLogger().info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
                         int maximum = 100;
                         if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
@@ -157,7 +160,7 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
-                                PXYearServiceImpl.LOGGER.info("Creating request for sublist "+subList);
+                                service.getLogger().info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
@@ -167,9 +170,9 @@ public class Job implements InterruptableJob {
                         }
                     }
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    PXYearServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
                 }finally {
-                    QuartzUtils.printDuration(PXYearServiceImpl.LOGGER, start);
+                    QuartzUtils.printDuration(service.getLogger(), start);
                 }
             }
         },
@@ -182,23 +185,24 @@ public class Job implements InterruptableJob {
             void doPerform(JSONObject jobData) {
                 LOGGER.fine(name()+":configuration is "+jobData);
                 long start = System.currentTimeMillis();
-                try {
-                    JSONObject iteration = jobData.optJSONObject("iteration");
-                    JSONObject results = jobData.optJSONObject("results");
+                String loggerPostfix = jobData.optString("logger");
+                JSONObject iteration = jobData.optJSONObject("iteration");
+                JSONObject results = jobData.optJSONObject("results");
 
-                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-                    List<String> states = new ArrayList<>();
-                    if (jsonArrayOfStates != null) {
-                        jsonArrayOfStates.forEach(it -> {
-                            states.add(it.toString());
-                        });
-                    }
+                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                List<String> states = new ArrayList<>();
+                if (jsonArrayOfStates != null) {
+                    jsonArrayOfStates.forEach(it -> {
+                        states.add(it.toString());
+                    });
+                }
+                HttpsTrustManager.allowAllSSL();
+                PXKrameriusService service = new PXKrameriusServiceImpl(loggerPostfix,iteration, results);
+                    try {
 
-                    HttpsTrustManager.allowAllSSL();
-                    PXKrameriusService service = new PXKrameriusServiceImpl(iteration, results);
 
                     List<String> check = service.check();
-                    PXKrameriusServiceImpl.LOGGER.info("Number of found candidates "+check.size());
+                    service.getLogger().info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
 
                         int maximum = 100;
@@ -217,20 +221,20 @@ public class Job implements InterruptableJob {
                             List<String> subList = check.subList(startIndex, endIndex);
                             // posle zadost
                             if (results.has("request")) {
-                                PXKrameriusServiceImpl.LOGGER.info("Creating request for sublist "+subList);
+                                service.getLogger().info("Creating request for sublist "+subList);
                                 service.request(subList);
                             }
                             // provede pouze update
                             if (results.has("state") || results.has("ctx")) {
-                                PXKrameriusServiceImpl.LOGGER.info("Updating sublist "+subList);
+                                service.getLogger().info("Updating sublist "+subList);
                                 service.update(subList);
                             }
                         }
                     }
                 } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    PXKrameriusServiceImpl.LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
                 } finally {
-                    QuartzUtils.printDuration(PXKrameriusServiceImpl.LOGGER, start);
+                    QuartzUtils.printDuration(service.getLogger(), start);
 
                 }
             }
@@ -257,7 +261,8 @@ public class Job implements InterruptableJob {
                     LOGGER.fine(name()+":configuration is "+jobData);
                     MailService mailService = new MailServiceImpl();
                     UserController controler = new UserControlerImpl(/* no reqest */ null);
-                    NotificationsService notificationsService = new NotificationServiceImpl(controler, mailService);
+                    ShibUsersControllerImpl shibUserController = new ShibUsersControllerImpl();
+                    NotificationsService notificationsService = new NotificationServiceImpl(controler,shibUserController, mailService);
                     notificationsService.processNotifications(NotificationInterval.valueOf(jobData.getString("interval")));
                 } catch (UserControlerException | NotificationsException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);

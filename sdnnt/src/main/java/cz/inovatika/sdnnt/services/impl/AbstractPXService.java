@@ -40,10 +40,10 @@ import java.util.logging.Logger;
 // History in case of destination state
 public abstract class AbstractPXService {
 
-    public static final Logger LOGGER = Logger.getLogger(AbstractPXService.class.getName());
+    //public static final Logger LOGGER = Logger.getLogger(AbstractPXService.class.getName());
 
 
-    public static final int CHECK_SIZE = 10;
+    public static final int CHECK_SIZE = 90;
     public static final int LIMIT = 1000;
 
     protected String typeOfRequest;
@@ -53,10 +53,12 @@ public abstract class AbstractPXService {
     protected List<String> states = new ArrayList<>();
     //
     protected String destinationState;
-
+    protected String loggerPostfix;
+    
     protected AbstractPXService() { }
 
-    public AbstractPXService(JSONObject iteration, JSONObject results) {
+    public AbstractPXService(String loggerPostfix, JSONObject iteration, JSONObject results) {
+        this.loggerPostfix = loggerPostfix;
         if (results != null) {
             requestsConfig(results);
         }

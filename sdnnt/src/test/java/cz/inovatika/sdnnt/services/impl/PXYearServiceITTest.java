@@ -64,7 +64,7 @@ public class PXYearServiceITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXYearServiceImpl pxService = EasyMock.createMockBuilder(PXYearServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .createMock();
@@ -102,7 +102,7 @@ public class PXYearServiceITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXYearServiceImpl pxService = EasyMock.createMockBuilder(PXYearServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .createMock();
@@ -218,7 +218,7 @@ public class PXYearServiceITTest {
     protected class BuildSolrClientSupport extends PXYearServiceImpl {
 
         public BuildSolrClientSupport() {
-            super(null, null);
+            super(null, null, null);
         }
 
         @Override

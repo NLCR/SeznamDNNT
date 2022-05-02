@@ -2,13 +2,16 @@ version: "2"
 services:
   sdnnt-tomcat:
     image: sdnnt:latest
+    container_name: sdnnt
     ports:
         - '127.0.0.1:8080:8080'
     volumes:
         - ./data/config:/opt/app-root/src/.sdnnt
         - ./data/logs:/usr/local/tomcat/logs
+        - ./data/scripts:/opt/app-root/src/bin
 
   sdnnt-solr:
+    container_name: solr
     image: bitnami/solr:latest
     volumes:
         - ./data/solr-persistence:/bitnami

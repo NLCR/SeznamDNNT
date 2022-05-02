@@ -95,6 +95,7 @@
     "s": "Serial",
     "i": "Musi se doplnit",
     "a": "Taky se musi",
+    "id_sdnnt": "Internal identifier",
 
     "fmt": "Document format",
     "item_type": "Document type",

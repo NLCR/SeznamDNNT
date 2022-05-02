@@ -34,10 +34,10 @@ public class SimpleGET {
     }
 
     public static String get(String u) throws IOException {
-        URL url = new URL( getFinalURL(u,0) );
+        URL url = new URL(u);
         LOGGER.fine("Requesting url :"+url.toString());
         HttpURLConnection conn= (HttpURLConnection) url.openConnection();
-        conn.setInstanceFollowRedirects( true);
+        //conn.setInstanceFollowRedirects( true);
         conn.setRequestProperty("Content-Type", "application/json");
         int responseCode = conn.getResponseCode();
 

@@ -38,7 +38,7 @@ import org.json.JSONObject;
  */
 public class OAIRequest {
     
-   public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt";
+   public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
     
   // Muze byt indextime nebo datestamp
   static String SORT_FIELD = "indextime";
@@ -219,9 +219,14 @@ private static Object oaiIdentifier(SolrDocument doc) {
 }
 
   private static Object makeSDNNTIdentifier(Object idSdnnt) {
-      return String.format("oai:%s:%s", SDNNT_PREFIX_IDENTIFIER, idSdnnt);
+      return String.format("oai:%s:%s", sdnntPrefixIdentifier(), idSdnnt);
   }
 
+  private static String sdnntPrefixIdentifier() {
+      JSONObject oaiJSON = Options.getInstance().getJSONObject("OAI");
+      return oaiJSON.optString("domain", SDNNT_PREFIX_IDENTIFIER);
+  }
+  
 public static String getRecord(HttpServletRequest req) {
     Options opts = Options.getInstance();
     StringBuilder ret = new StringBuilder();
@@ -230,9 +235,9 @@ public static String getRecord(HttpServletRequest req) {
             .append(requestTag(req));
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
         String id = req.getParameter("identifier");
-        if (id.contains(SDNNT_PREFIX_IDENTIFIER)) {
-            int index = id.indexOf(SDNNT_PREFIX_IDENTIFIER);
-            id = id.substring(index + (SDNNT_PREFIX_IDENTIFIER+":").length());
+        if (id.contains(sdnntPrefixIdentifier())) {
+            int index = id.indexOf(sdnntPrefixIdentifier());
+            id = id.substring(index + (sdnntPrefixIdentifier()+":").length());
         }
         
       SolrQuery query = new SolrQuery("*")

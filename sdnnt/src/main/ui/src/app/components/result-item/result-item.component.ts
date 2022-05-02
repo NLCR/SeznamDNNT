@@ -201,6 +201,8 @@ export class ResultItemComponent implements OnInit {
     this.config.identifiers.forEach(f => {
       if (this.doc['marc_' + f]) {
         data.items.push({ label: 'field.' + f, value: this.doc['marc_' + f] })
+      } else if (this.doc[f] ){
+        data.items.push({ label: 'field.' + f, value: this.doc[ f] })
       }
     });
 

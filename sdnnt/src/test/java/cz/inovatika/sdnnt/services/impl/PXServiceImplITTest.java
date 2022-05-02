@@ -51,6 +51,54 @@ public class PXServiceImplITTest {
     }
 
 
+    @Test
+    public void testCheck2() throws IOException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        CatalogSupport.inserAIdentifiers();
+
+        String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+        JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
+
+        String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 2020]\"},\"results\":{\"ctx\":true}}";
+        System.out.println(jonbConfig);
+        JSONObject jobJSONObject = new JSONObject(jonbConfig);
+        System.out.println(jobJSONObject.getJSONObject("iteration"));
+        System.out.println(jobJSONObject.getJSONObject("results"));
+        
+        PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .addMockedMethod("getOptions")
+                .addMockedMethod("buildClient")
+                .addMockedMethod("simpleGET")
+                .createMock();
+        
+        
+        Options options = EasyMock.createMock(Options.class);
+        EasyMock.expect(options.getJSONObject("check_kramerius")).andReturn(optionsConfigJSONObject.getJSONObject("check_kramerius")).anyTimes();
+
+        EasyMock.expect(pxService.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+        EasyMock.expect(pxService.getOptions()).andReturn(options).anyTimes();
+
+        InputStream resStream = this.getClass().getResourceAsStream("pxservice_kramerius.json");
+        String s = IOUtils.toString(resStream, "UTF-8");
+
+        EasyMock.expect(pxService.simpleGET("http://krameriusndk.nkp.cz/search/api/v5.0/search?q=PID%3A%28uuid%5C%3Aaf9dec90-d5bb-11e3-b110-005056827e51+OR+uuid%5C%3A113986c0-dcde-11e3-b110-005056827e51+OR+uuid%5C%3A41041210-c2d3-11e2-8b87-005056827e51%29&wt=json&rows=3&fl=PID+dostupnost"))
+                .andReturn(s).anyTimes();
+
+        EasyMock.replay(pxService, options);
+
+        List<String> check = pxService.check();
+        Assert.assertTrue(check.size() == 2);
+        Assert.assertTrue(check.contains("oai:aleph-nkp.cz:DNT01-000008886"));
+        Assert.assertTrue(check.contains("oai:aleph-nkp.cz:DNT01-000008874"));
+
+    }
 
     @Test
     public void testCheck() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, AccountException, ConflictException {
@@ -68,7 +116,7 @@ public class PXServiceImplITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .addMockedMethod("simpleGET")
@@ -85,7 +133,7 @@ public class PXServiceImplITTest {
         InputStream resStream = this.getClass().getResourceAsStream("pxservice_kramerius.json");
         String s = IOUtils.toString(resStream, "UTF-8");
 
-        EasyMock.expect(pxService.simpleGET("http://krameriusndk.nkp.cz/search/api/v5.0/search?q=PID%3A%28uuid%5C%3Aaf9dec90-d5bb-11e3-b110-005056827e51+OR+uuid%5C%3A113986c0-dcde-11e3-b110-005056827e51+OR+uuid%5C%3A41041210-c2d3-11e2-8b87-005056827e51%29&wt=json&rows=3"))
+        EasyMock.expect(pxService.simpleGET("http://krameriusndk.nkp.cz/search/api/v5.0/search?q=PID%3A%28uuid%5C%3Aaf9dec90-d5bb-11e3-b110-005056827e51+OR+uuid%5C%3A113986c0-dcde-11e3-b110-005056827e51+OR+uuid%5C%3A41041210-c2d3-11e2-8b87-005056827e51%29&wt=json&rows=3&fl=PID+dostupnost"))
                 .andReturn(s).anyTimes();
 
         EasyMock.replay(pxService, options);
@@ -113,7 +161,7 @@ public class PXServiceImplITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .createMock();
@@ -171,7 +219,7 @@ public class PXServiceImplITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .createMock();
@@ -226,7 +274,7 @@ public class PXServiceImplITTest {
 
         //PXKrameriusService pxService =
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .createMock();
@@ -282,7 +330,7 @@ public class PXServiceImplITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .addMockedMethod("buildAccountService")
@@ -348,7 +396,7 @@ public class PXServiceImplITTest {
     protected class BuildSolrClientSupport extends PXKrameriusServiceImpl {
 
         public BuildSolrClientSupport() {
-            super(null, null);
+            super(null, null, null);
         }
 
         @Override

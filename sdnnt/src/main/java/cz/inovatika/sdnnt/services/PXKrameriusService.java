@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Service responsible for creating reuests or updating titles which should be public according to the state in digital library
@@ -37,4 +38,6 @@ public interface PXKrameriusService {
      * @throws SolrServerException
      */
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
+
+    public Logger getLogger();
 }

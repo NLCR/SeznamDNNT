@@ -91,6 +91,8 @@
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
     "022a": "ISSN",
+    "id_sdnnt": "Interní identifikátor",
+
     "m": "Monografie",
     "s": "Serial",
     "i": "Musi se doplnit",

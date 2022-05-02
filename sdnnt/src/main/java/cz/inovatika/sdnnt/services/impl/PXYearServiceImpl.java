@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -29,7 +30,12 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
 
     private String format;
 
-    public PXYearServiceImpl(JSONObject iteration, JSONObject results) {
+    private Logger logger = Logger.getLogger(PXYearService.class.getName());
+    
+    public PXYearServiceImpl(String loggerName, JSONObject iteration, JSONObject results) {
+        if (loggerName != null) {
+            this.logger = Logger.getLogger(PXYearService.class.getName()+"."+loggerName);
+        }
         if (iteration != null) {
             super.iterationConfig(iteration);
             this.format =  iteration.optString(FMT_FIELD);
@@ -61,7 +67,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
             plusFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
         }
         
-        LOGGER.info("Current iteration filter " + plusFilter);
+        logger.info("Current iteration filter " + plusFilter);
  
         try (SolrClient solrClient = buildClient()){
             support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
@@ -76,7 +82,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
                 foundCandidates.add(identifier.toString());
             }, IDENTIFIER_FIELD);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            this.logger.log(Level.SEVERE,e.getMessage(),e);
         }
         
         return foundCandidates;
@@ -86,7 +92,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException {
 
         if (!identifiers.isEmpty()) {
-            LOGGER.info("Updating identifiers :"+identifiers);
+            this.logger.info("Updating identifiers :"+identifiers);
             CuratorItemState cState = null;
             PublicItemState pState = null;
             if (this.destinationState != null) {
@@ -104,6 +110,13 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
             }
         }
+    }
+    
+    
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
     }
 
     protected Options getOptions() {

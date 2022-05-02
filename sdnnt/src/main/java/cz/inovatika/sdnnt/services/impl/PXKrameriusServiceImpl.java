@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -33,14 +34,19 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
 public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrameriusService {
 
-    public static final Logger LOGGER = Logger.getLogger(PXKrameriusService.class.getName());
-
+    //public static final Logger LOGGER = Logger.getLogger(PXKrameriusService.class.getName());
+    
 
     boolean contextInformation = false;
     private Map<String, String> mappingHosts = new HashMap<>();
     private Map<String, String> mappingApi = new HashMap<>();
+    private AtomicInteger fetchedInfoCounter = new AtomicInteger();
+    private AtomicInteger requestedInfoCounter = new AtomicInteger();
 
-    public PXKrameriusServiceImpl(JSONObject iteration, JSONObject results) {
+    private Logger logger = Logger.getLogger(PXKrameriusService.class.getName());
+    
+    
+    public PXKrameriusServiceImpl(String loggerPostfix, JSONObject iteration, JSONObject results) {
         if (iteration != null) {
             super.iterationConfig(iteration);
         }
@@ -48,9 +54,14 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             contextInformation = results.optBoolean("ctx");
             super.requestsConfig(results);
         }
+        
+        if (loggerPostfix != null) {
+            this.logger = Logger.getLogger(PXKrameriusService.class.getName()+"."+loggerPostfix);
+        }
+        
     }
 
-    public static Set<String> usedInRequest(SolrClient solr, List<String> identifiers, String typeOfRequest) {
+    public  Set<String> usedInRequest(SolrClient solr, List<String> identifiers, String typeOfRequest) {
         try {
             Set<String> retval = new HashSet<>();
             SolrQuery query = new SolrQuery("*")
@@ -69,13 +80,12 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                         retval.add(foundInZadost);
                     }
                 });
-
             });
             return retval;
         } catch (SolrServerException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
         return new HashSet<>();
     }
@@ -88,7 +98,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
 
 
-    protected void initialize() {
+    public void initialize() {
         JSONObject checkKamerius = getOptions().getJSONObject("check_kramerius");
         if (checkKamerius != null && checkKamerius.has("urls")) {
             JSONObject urlobject = checkKamerius.getJSONObject("urls");
@@ -110,9 +120,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
     @Override
     public List<String> check() {
-
-        LOGGER.info("Initializing px process");
         
+        logger.info("Initializing px process");
         this.initialize();
         List<String> foundCandidates = new ArrayList<>();
         Map<String, List<String>> mapping = new HashMap<>();
@@ -122,7 +131,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
         List<String> plusFilter = new ArrayList<>(Arrays.asList("id_pid:uuid", FMT_FIELD + ":BK"));
         if (yearConfiguration != null && !this.yearConfiguration.trim().equals("")) {
-            //plusFilter.add(YEAR_OF_PUBLICATION+":" + yearConfiguration);
             plusFilter.add(yearFilter());
         }
 
@@ -130,7 +138,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             String collected = states.stream().collect(Collectors.joining(" OR "));
             plusFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
         }
-        LOGGER.info("Current iteration filter " + plusFilter);
+        logger.info("Current iteration filter " + plusFilter);
         try (final SolrClient solrClient = buildClient()) {
             List<String> negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
             if (this.contextInformation) {
@@ -163,11 +171,11 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 }
             }, IDENTIFIER_FIELD);
         } catch(IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
         
-        LOGGER.info("Found candidates: "+mapping.size());
+        logger.info("Found candidates: "+mapping.size());
         
         try (final SolrClient solr = buildClient()) {
 
@@ -188,10 +196,10 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
-        LOGGER.info("Found candidates after used check: "+mapping.size());
+        logger.info("Found candidates after used check: "+mapping.keySet().size());
         
         Map<String, List<Pair<String, String>>> buffer = new HashMap<>();
         for (String key : mapping.keySet()) {
@@ -212,14 +220,23 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         if (!buffer.isEmpty()) {
             clearBuffer(buffer, foundCandidates);
         }
+        logger.info(String.format("Requested info count %d, Fetched info count %d", this.requestedInfoCounter.get(), this.fetchedInfoCounter.get()));
         return foundCandidates;
     }
 
+    
     protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer, List<String> foundCadidates) {
         Integer sum = buffer.values().stream().map(List::size).reduce(0, Integer::sum);
-        if (sum > CHECK_SIZE) {
+        if (sum > bufferSize()) {
             clearBuffer(buffer, foundCadidates);
         }
+    }
+    
+    protected int bufferSize() {
+        JSONObject jsonObject = getOptions().getJSONObject("check_kramerius");
+        if (jsonObject != null) {
+            return jsonObject.optInt("buffersize", CHECK_SIZE);
+        } else return CHECK_SIZE;
     }
 
     protected void clearBuffer(Map<String, List<Pair<String, String>>> buffer, List<String> foundCadidates) {
@@ -234,12 +251,13 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 if (!baseUrl.endsWith("/")) {
                     baseUrl = baseUrl + "/";
                 }
-
+                this.requestedInfoCounter.addAndGet(pairs.size());
 
                 String encodedCondition = URLEncoder.encode("PID:(" + condition + ")", "UTF-8");
-                String url = baseUrl + "api/v5.0/search?q=" +  encodedCondition + "&wt=json&rows="+pairs.size();
+                String encodedFieldList = URLEncoder.encode("PID dostupnost","UTF-8");
+                String url = baseUrl + "api/v5.0/search?q=" +  encodedCondition + "&wt=json&rows="+pairs.size()+"&fl="+encodedFieldList;
                 
-                LOGGER.info(String.format("Testing url is %s and list of identifiers %s", url, pairs.stream().map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
+                logger.fine(String.format("Kramerius url is %s and list of identifiers are %s", url, pairs.stream().map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
 
                 try {
                     String result = simpleGET(url);
@@ -249,6 +267,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     JSONArray jsonArray = response.getJSONArray("docs");
                     for (int i = 0, ll = jsonArray.length(); i < ll; i++) {
                         JSONObject oneDoc = jsonArray.getJSONObject(i);
+                        this.fetchedInfoCounter.addAndGet(1);
+                        
                         if (oneDoc.has("dostupnost")) {
                             String pid = oneDoc.getString("PID");
                             String dostupnost = oneDoc.getString("dostupnost");
@@ -261,20 +281,19 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
                                 if (any.isPresent()) {
                                     Pair<String, String> pair = any.get();
-                                    LOGGER.info(String.format("Found public document. Identifier %s and pid %s", pair.getLeft(), pair.getRight()));
+                                    logger.info(String.format("Found public document. Identifier %s and pid %s", pair.getLeft(), pair.getRight()));
                                     foundCadidates.add(pair.getLeft());
                                 }
                             }
                         }
                     }
                 } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    logger.log(Level.SEVERE, String.format("Error while accessing %s, error: %s ", url, e.getMessage()) , e);
                 }
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
         }
-
         buffer.clear();
     }
 
@@ -282,21 +301,18 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         return SimpleGET.get(url);
     }
 
-    String baseUrl(String surl) {
+    public String baseUrl(String surl) {
         if (surl.contains("/search/")) {
             String val = surl.substring(0, surl.indexOf("/search") + "/search".length());
-            if (findByPrefix(val)) return this.mappingHosts.get(val);
-            return val;
+            String foundByPrefix = findValueByPrefix(val);
+            return foundByPrefix != null ? foundByPrefix : val;
         } else {
             List<String> prefixes = Arrays.asList("view", "uuid");
             for (String pref : prefixes) {
                 if (surl.contains(pref)) {
                     String remapping = surl.substring(0, surl.indexOf(pref));
-                    if (findByPrefix(remapping)) {
-                        return this.mappingHosts.get(remapping);
-                    } else {
-                        return remapping + "/search";
-                    }
+                    String foundByPrefix = findValueByPrefix(remapping);
+                    return foundByPrefix != null ? foundByPrefix : (remapping + (remapping.endsWith("/") ? "": "/")+"search");
                 }
 
             }
@@ -304,15 +320,16 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         }
     }
 
-    private boolean findByPrefix(String val) {
+
+    private String findValueByPrefix(String val) {
         for (String key : this.mappingHosts.keySet()) {
             if (val.startsWith(key)) {
-                return true;
+                return this.mappingHosts.get(key);
             }
         }
-        return false;
+        return null;
     }
-
+    
     @Override
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException {
         if (!identifiers.isEmpty()) {
@@ -323,21 +340,17 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 cState = CuratorItemState.valueOf(this.destinationState);
                 pState = cState.getPublicItemState(null);
             }
-
             try (final SolrClient solr = buildClient()) {
-
+                // diff documents - use to have field
                 for (String identifier : identifiers) {
-                    
                     SolrInputDocument idoc = null;
-                    
-                    LOGGER.fine(String.format("Updating identifier %s", identifier));
+                    logger.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
                         idoc = super.changeProcessState(solr, identifier, cState.name());
                     }
-                    
                     // history information
                     if (contextInformation) {
-                        LOGGER.fine("Setting context information ");
+                        logger.fine("Setting context information ");
                         if (idoc != null) {
                             super.enahanceContextInformation(idoc);
                         } else {
@@ -360,5 +373,12 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     protected SolrClient buildClient() {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
+    }
+    
+    
 
 }
