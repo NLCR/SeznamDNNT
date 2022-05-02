@@ -846,6 +846,11 @@
       "History by user": "History by user",
       "History by type": "History by type"
     },
+    "field": {
+      "zadost": "Request",
+      "catalog": "Catalog",
+      "import": "Import"
+    },
     "desc": {
       "interval": "Interval",
       "select_interval": "Select interval",

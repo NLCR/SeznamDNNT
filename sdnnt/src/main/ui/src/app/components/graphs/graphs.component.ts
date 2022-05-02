@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { EChartsOption } from 'echarts';
+import { ECharts, EChartsOption } from 'echarts';
 import { AppService } from 'src/app/app.service';
 
 @Component({
@@ -19,7 +19,8 @@ export class GraphsComponent implements OnInit {
   historyUserActivityOpts: EChartsOption = {};
 
   interval: string = '1MONTH';
-
+  userEchart: ECharts;
+  selectedUsers: {[user: string]: boolean} = {};
 
   constructor(
     private datePipe: DatePipe,
@@ -94,7 +95,7 @@ export class GraphsComponent implements OnInit {
       }
     };
 
-    this.licenseOpts =  {
+    this.licenseOpts = {
       title: {
         text: this.service.getTranslation("graph.title.Licenses")
       },
@@ -159,25 +160,26 @@ export class GraphsComponent implements OnInit {
     this.service.getStatsHistory(this.interval).subscribe(res => {
 
       const stats = res.facet_counts.facet_pivot.type;
-      this.historyStavOpts = this.setHistoryStats(stats, 'History by type');
-      this.historyUserOpts = this.setHistoryStats(res.facet_counts.facet_pivot.user, 'History by user');
+      this.historyStavOpts = this.setHistoryStats(stats, 'History by type', false);
+      this.historyUserOpts = this.setHistoryStats(res.facet_counts.facet_pivot.user, 'History by user', true);
       this.historyUserActivityOpts = this.setUserActivity(res.facet_counts.facet_fields.user.filter(e => e.name !== 'harvester'), "User activity");
     });
   }
 
-  setHistoryStats(stats, title): any {
+  setHistoryStats(stats: any, title: string, user: boolean): any {
     const series = [];
     const legend = [];
 
     stats.forEach(t => {
       if (t.value !== 'app' && t.value !== 'harvester') {
         // const s = t.ranges.indextime.counts.map(e => { return { x: new Date(e.name).getTime(), y: e.value } });
-        series.push({ 
-          data: t.ranges.indextime.counts.map(e => e.value ), 
+        const name = user ? t.value : this.service.getTranslation('graph.field.' + t.value);
+        series.push({
+          data: t.ranges.indextime.counts.map(e => e.value),
           type: 'line',
-          name: t.value 
+          name
         });
-        legend.push(t.value);
+        legend.push(name);
       }
     });
     const opts: any = {
@@ -190,7 +192,18 @@ export class GraphsComponent implements OnInit {
       },
       xAxis: {
         type: 'category',
-        data: stats[0].ranges.indextime.counts.map(e => this.datePipe.transform(new Date(e.name), 'MM.yyyy')),
+        data: stats[0].ranges.indextime.counts.map(e => {
+          if (this.interval === '1YEAR') {
+            return this.datePipe.transform(new Date(e.name), 'yyyy')
+          } else if (this.interval === '7DAYS') {
+            return this.datePipe.transform(new Date(e.name), 'ww (MM.yyyy)')
+          } else if (this.interval === '1DAY') {
+            return this.datePipe.transform(new Date(e.name), 'dd.MM.yyyy')
+          } else {
+            return this.datePipe.transform(new Date(e.name), 'MM.yyyy')
+          }
+
+        }),
       },
       yAxis: {
         type: 'value',
@@ -223,13 +236,47 @@ export class GraphsComponent implements OnInit {
       yAxis: {
         type: 'value',
       },
-      series: [{ name: title, data, type: 'bar' }],
+      series: [{ name: this.service.getTranslation('graph.title.' + title), data, type: 'bar' }],
       legend: {
         data: stats.map(e => e.name),
         bottom: 0,
       }
     };
     return opts;
+  }
+
+  onChartInit(ec: ECharts) {
+    this.userEchart = ec;
+  }
+
+  selectUserLegent(e) {
+    if (this.selectedUsers[e.name]) {
+      // select all
+      for (const legend in e.selected) {
+        this.userEchart.dispatchAction({
+          type: 'legendSelect',
+          name: legend,
+        })
+        this.selectedUsers[legend] = true;
+      }
+    } else {
+      for (const legend in e.selected) {
+        if (legend !== e.name) {
+          this.userEchart.dispatchAction({
+            type: 'legendUnSelect',
+            name: legend,
+          });
+          this.selectedUsers[legend] = false;
+        } else {
+          this.userEchart.dispatchAction({
+            type: 'legendSelect',
+            name: e.name,
+          })
+          this.selectedUsers[legend] = true;
+        }
+      }
+    }
+
   }
 
 }
