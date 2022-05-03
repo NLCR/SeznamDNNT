@@ -4,6 +4,7 @@
     "url": "http://aleph.nkp.cz/OAI"
   },
   "OAI": {
+    "domain":"sdnnt.nkp.cz",
     "rowsPerPage": 100,
     "repositoryName": "Seznam děl nedostupných na trhu",
     "adminEmail": "sdnnt@nkp.cz",

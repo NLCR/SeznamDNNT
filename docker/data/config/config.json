@@ -1,6 +1,300 @@
 {	
-	"client": {},
+	"client": {
+		"simplelogin": false,
+		"homeTabs": ["about", "news", "readers", "authors", "libraries", "api", "test"],
+		"maximumItemInRequest": 60,
+	},	
+	
+	
 	"server": {
+	
 		"solr.host":"http://sdnnt-solr:8983/solr/",
+
+		"search": {
+			"fromYear": 1911,
+			"yearsBK": 15,
+			"yearsSE": 11
+		},
+
+  		"OAI":{
+			"domain":"sdnnt.nkp.cz",
+			"rowsPerPage": 1000,
+			"repositoryName": "Seznam děl nedostupných na trhu",
+			"adminEmail": "sdnnt@nkp.cz",
+			"sets": {
+						"SDNNT-ALL": { "name": "Seznam děl nedostupných na trhu (všechny stavy)", "filter": "dntstav:*"},
+						"SDNNT-A": { "name": "Seznam děl nedostupných na trhu (zařazeno)", "filter": "dntstav:A"},
+						"SDNNT-PA": { "name": "Seznam děl nedostupných na trhu (dílo publikováno jako návrh)", "filter": "dntstav:PA"},
+						"SDNNT-N": { "name": "Seznam děl nedostupných na trhu (ne zařazeno)", "filter": "dntstav:N"},
+						"SDNNT-NL": { "name": "Seznam děl nedostupných na trhu (omezení na terminál / plánované vydání po získání licence)", "filter": "dntstav:NL"},
+						"DNNTO": { "name": "Seznam děl nedostupných na trhu (Licence pro online přístup)", "filter": "license:dnnto"},
+						"DNNTT": { "name": "Seznam děl nedostupných na trhu (Licence pro terminálový přístup)", "filter": "license:dnntt"},
+						"TEST": { "name": "Testovací set", "filter": "license:dnnto AND id_pid:uuid"},
+						"DK-DNNTO": { "name": "Seznam děl nedostupných na trhu (Licence pro online přístup) s odkazem do digitálních knihoven", "filter": "license:dnnto AND id_pid:uuid AND dntstav:A"},
+						"DK-DNNTT": { "name": "Seznam děl nedostupných na trhu (Licence pro terminálový přístup)", "filter": "license:dnntt AND id_pid:uuid AND dntstav:A"}
+			}
+		},
+	
+
+		"mail": {
+			"from.user": "sdnnt@nkp.cz",
+			"from.name": "SDNNT",
+			"smtp.host" : "10.1.2.183",
+			"smtp.auth": false,
+			"smtp.starttls.enable": false,
+			"smtp.port":25
+		},
+		"registration": {
+			"subject": "Registrace uživatele" ,
+			"content.html": true
+		},
+		"passwordreset": {
+			"subject": "Reset hesla" ,
+			"content.html": true
+		},
+		"resetlink": {
+			"subject": "Žádost o resetování hesla" ,
+			"content.html": true
+		},
+		"notificationemail": {
+			"subject": "Notifikace o změně stavu" ,
+			"content.html": true
+		},
+		"jobs": {
+			"check_stav": {
+				"type": "check_stav",
+				"cron": "0 0 1 1 FEB,AUG ? *"
+			},
+			"zadost": {
+				"type": "zadost",
+				"cron": "0 0 0 * * ?"
+			},
+			"zadost_po_minute": {
+				"type": "workflow",
+				"cron": "0 * * * * ?"
+			},
+			"automaticke_vyrazovani_dle_data": {
+				"type":"date_px_check",
+    				"cron":"0 0 21 ? * SUN *",
+     				"iteration":{
+          				"date_range":"[* TO 1910]",
+           				"states":["A","PA","NL"],
+           				"fmt":"BK"
+				},
+      				"results":{
+                			"state":"PX"
+       				}
+			},
+			"krameriove_kontextova_informace": {
+				"type":"kramerius_px_check",
+				"cron": "0 0 18 ? * THU *",
+				"iteration": {
+					"date_range": "[* TO 2020]",
+				},
+				"results": {
+					"ctx": true
+				}
+			},
+			"krameriove_kontrola_zaznamu":{
+          			"type":"kramerius_px_check",
+				"cron":"0 30 16 ? * SUN *",
+				"iteration":{
+					"states":["A","PA","NL"]
+          			},
+          			"results":{
+                  			"request":{
+                          			"items":60,
+                          			"type":"PXN"
+                  			}
+          			}
+			},				
+			"aktualizace_odkazu_do_SKC": {
+				"type": "alternative_links_update",
+				"cron": "0 30 15 ? * THU *"
+			},
+
+
+
+			"notifikace_den": {
+				"type": "notifications",
+				"interval": "den",
+				"cron": "0 0 3 * * ?"
+			},
+			"notifikace_tyden": {
+				"type": "notifications",
+				"interval": "tyden",
+				"cron": "0 4 0 ? * MON"
+			},
+			"notifikace_mesic": {
+				"type": "notifications",
+				"interval": "mesic",
+				"cron": "0 0 5 1 * ?"
+			}
+		},
+		"workflow" :{
+			"escalation" :{
+				"VNZ" : {
+					"value": 5,
+					"unit": "minute"
+				},
+				"VNL" : {
+					"value": 5,
+					"unit": "minute"
+				},
+				"NZN" : {
+					"value": 5,
+					"unit": "minute"
+				}
+			},
+			"periods": {
+				"debug": true,
+				"debug_nzn_0_5wd" : {
+					"value": 5 
+				},
+				"debug_nzn_1_12_18" : {
+					"value": 10
+				},
+				"debug_nzn_2_6m" : {
+					"value": 120
+				},
+				"debug_vn_0_28d" : {
+					"value": 6
+				},
+				"debug_vnl_0_5wd": {
+					"value": 8
+				},
+				"debug_vnl_2_18m": {
+					"value": 60
+				}
+			}
+		},
+		"institutions": [
+			{
+				"acronym":"MZK",
+				"name":"Moravská zemská knihovna"
+			},
+			{
+				"acronym":"NKP",
+				"name":"Národní knihovna Praha"
+			},		
+			{
+				"acronym":"KNAV",
+				"name":"Knihovna Akademie věd ČR"
+			},
+			{
+				"acronym":"Svaz knihkupců",
+				"name":"Svaz knihkupců"
+			},	
+			{
+				"acronym":"Koalice učebnic",
+				"name":"koalice učebnic"
+			},
+		],
+		
+		"OAIHavest": {
+			"url": "http://aleph.nkp.cz/OAI",
+			"numrepeat": 30,
+			"seconds": 30
+		},
+		
+		"check_kramerius":{
+		    "buffersize": 98,
+			"urls":{
+				"http://kramerius5.nkp.cz/":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"https://kramerius5.nkp.cz/":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"http://kramerius5.nkp.cz/uuid":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"https://kramerius5.nkp.cz/uuid":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"http://krameriusndk.nkp.cz/search":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"http://kramerius5.nkp.cz/search":{
+					"api":"https://kramerius5.nkp.cz/search"
+				},
+				"http://www.digitalniknihovna.cz/mzk/": {
+					"api":"https://kramerius.mzk.cz/search/"
+				},
+				"https://www.digitalniknihovna.cz/mzk/" :{
+					"api":"https://kramerius.mzk.cz/search/"
+				},
+				"http://www.digitalniknihovna.cz/mlp/" :{
+					"api":"https://kramerius4.mlp.cz/search/"
+				},
+				"https://digitalniknihovna.mlp.cz/":{
+					"api":"https://kramerius4.mlp.cz/search/"
+				},	
+				"https://kramerius.lib.cas.cz/" :{
+					"api":"https://kramerius.lib.cas.cz/search/"
+				},
+				"https://kramerius.techlib.cz/kramerius-web-client/" :{
+					"api":"https://kramerius.techlib.cz/search/"
+				},
+				"http://krameriusndk.mzk.cz/search" :{
+					"api":"https://kramerius.mzk.cz/search/"
+				},
+				"https://krameriusndk.mzk.cz/search" :{
+					"api":"https://kramerius.mzk.cz/search/"
+				}
+			}
+		 },
+		"shibiplink": "https://sdnnt-test.nkp.cz/sdnnt/api/user/shib_login_callback",
+		"shiblogoutlink":"https://sdnnt-test.nkp.cz/Shibboleth.sso/Logout?return=https://sdnnt-test.nkp.cz",
+		"shibboleth": {
+			"mappings": [
+				{
+					"comment": " Users from NK ČR ",
+					"match": {
+						"header":"affiliation",
+						"regexp" : ".*employee@nkp.*",	
+						"user": {
+							"username":{
+								"headervalue": "sn"
+							},
+							"institution":{
+								"stringvalue": "NKP"
+							},
+							"email": {
+								"headervalue": "mail"
+							},
+							"role": {
+								"stringvalue": "knihovna"
+							}
+						}
+					}
+			
+				},
+				{
+					"comment": " Users from MZK ",
+					"match": {
+						"header":"affiliation",
+						"regexp" : ".*mzk.*",	
+						"user": {
+							"username":{
+								"headervalue": "sn"
+							},
+							"institution":{
+								"stringvalue": "MZK"
+							},
+							"email": {
+								"headervalue": "remote_user"
+							},
+							"role": {
+								"stringvalue": "knihovna"
+							}
+						}
+					}
+			
+				}
+			]
+		}   		
+
 	}
+
 }
