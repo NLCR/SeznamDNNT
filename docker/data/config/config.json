@@ -39,7 +39,7 @@
 		"mail": {
 			"from.user": "sdnnt@nkp.cz",
 			"from.name": "SDNNT",
-			"smtp.host" : "10.1.2.183",
+			"smtp.host" : "xxx",
 			"smtp.auth": false,
 			"smtp.starttls.enable": false,
 			"smtp.port":25
