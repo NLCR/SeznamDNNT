@@ -1,0 +1,4 @@
+#!/bin/bash
+cat <<EOF
+see README.md
+EOF
