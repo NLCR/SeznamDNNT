@@ -39,11 +39,10 @@ public class Options {
   }
 
   public Options() throws IOException, JSONException {
-
     // v servletu prenastaveno
-
     File fdef = new File(InitServlet.DEFAULT_CONFIG_FILE);
 
+    //TODO: ?? reading embedded conf ? Read from classloader
     if (fdef.exists()) {
       client_conf = new JSONObject(FileUtils.readFileToString(fdef, "UTF-8"));
     } else {
@@ -57,8 +56,10 @@ public class Options {
     String sjson = FileUtils.readFileToString(fserver, "UTF-8");
     server_conf = new JSONObject(sjson);
 
+
     //Merge options defined in custom dir
     File f = new File(path);
+    LOGGER.info(String.format("Loading configuration files client(%s), server(%s), custom(%s) ", fdef.getAbsolutePath(), fserver.getAbsolutePath(), f.getAbsolutePath()));
 
     if (f.exists() && f.canRead()) {
       String json = FileUtils.readFileToString(f, "UTF-8");
@@ -70,6 +71,8 @@ public class Options {
           LOGGER.log(Level.FINE, "key {0} will be overrided", key);
           client_conf.put(key, customClientConf.get(key));
         }
+      } else {
+          LOGGER.log(Level.SEVERE, String.format("Cannot read from file %s", f.getAbsoluteFile()));
       }
 
       JSONObject customServerConf = new JSONObject(json).getJSONObject("server");
@@ -82,7 +85,7 @@ public class Options {
         }
       }
     }
-
+    LOGGER.info("Loaded configuration :"+this.toString());
   }
 
   public JSONObject getClientConf() {
@@ -121,4 +124,17 @@ public class Options {
   public JSONObject getJSONObject(String key) {
     return server_conf.optJSONObject(key);
   }
+
+    @Override
+    public String toString() {
+        JSONObject json = new JSONObject();
+        if (this.client_conf != null) {
+            json.put("client", this.client_conf);
+        }
+        if (this.server_conf != null) {
+            json.put("server", this.server_conf);
+        }
+        return json.toString(2);
+    }
+  
 }
