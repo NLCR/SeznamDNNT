@@ -304,8 +304,8 @@ public class MarcRecord {
 //<marc:subfield code="b">batch</marc:subfield>
 //</marc:datafield>
 //        String stav, date, user, comment, license;
-      xml.append("<marc:datafield tag=\"992\" ind1=\" \" ind2=\" \">");
       for (int i = 0; i < historie_stavu.length(); i++) {
+        xml.append("<marc:datafield tag=\"992\" ind1=\" \" ind2=\" \">");
         JSONObject h = historie_stavu.getJSONObject(i);
           xml.append("<marc:subfield code=\"s\" >").append(h.optString("stav")).append("</marc:subfield>");
           xml.append("<marc:subfield code=\"a\" >").append(h.optString("date")).append("</marc:subfield>");
@@ -316,9 +316,8 @@ public class MarcRecord {
           if (h.has("license")) {
             xml.append("<marc:subfield code=\"l\" >").append(h.optString("license")).append("</marc:subfield>");
           }
-          
+        xml.append("</marc:datafield>");
       }
-      xml.append("</marc:datafield>");
       
       // Granularita
       if (granularity != null) {
