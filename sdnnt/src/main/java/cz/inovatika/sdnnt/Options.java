@@ -48,10 +48,9 @@ public class Options {
     } else {
       client_conf = new JSONObject();
     }
+    
+    String path = config();
 
-    String path = InitServlet.CONFIG_DIR + File.separator + "config.json";
-
-    //Get server options
     File fserver = FileUtils.toFile(Options.class.getResource("config.json"));
     String sjson = FileUtils.readFileToString(fserver, "UTF-8");
     server_conf = new JSONObject(sjson);
@@ -86,6 +85,11 @@ public class Options {
       }
     }
     LOGGER.info("Loaded configuration :"+this.toString());
+  }
+
+  // 
+  protected String config() {
+      return System.getProperty("user.home")+File.separator+".sdnnt"+File.separator+"config.json";
   }
 
   public JSONObject getClientConf() {
