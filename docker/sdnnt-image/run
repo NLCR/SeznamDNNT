@@ -1,4 +1,4 @@
 #!/bin/bash
-
+export JAVA_OPTS="-Duser.home=/opt/app-root/src"
 exec $CATALINA_HOME/bin/catalina.sh run
 
