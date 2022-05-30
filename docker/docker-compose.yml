@@ -12,7 +12,7 @@ services:
 
   sdnnt-solr:
     container_name: solr
-    image: bitnami/solr:solr:8.11.1
+    image: bitnami/solr:8.11.1
     volumes:
         - ./data/solr-persistence:/bitnami
     ports:
