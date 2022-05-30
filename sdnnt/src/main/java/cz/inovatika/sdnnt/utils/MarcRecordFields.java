@@ -94,6 +94,9 @@ public class MarcRecordFields {
     public static final String ID_ISMN="id_ismn";
     
     
+    // sigla of digital libraries
+    public static final String DIGITAL_LIBRARIES = "digital_libraries";
+    
     public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
 
     private MarcRecordFields() {}

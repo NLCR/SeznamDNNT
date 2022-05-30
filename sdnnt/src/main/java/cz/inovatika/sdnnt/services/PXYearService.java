@@ -39,5 +39,9 @@ public interface PXYearService {
      */
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
+    /**
+     * Get logger for logging customization
+     * @return
+     */
     public Logger getLogger();
 }
