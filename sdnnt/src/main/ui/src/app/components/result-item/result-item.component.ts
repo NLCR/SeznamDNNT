@@ -18,6 +18,7 @@ import { Subject, zip } from 'rxjs';
 import { DocsUtils } from 'src/app/shared/docutils';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
+import { DialogSuccessorRecordsComponent } from '../dialog-successor-records/dialog-successor-records.component';
 
 
 @Component({
@@ -474,6 +475,13 @@ export class ResultItemComponent implements OnInit {
 
   notPublic(doc: SolrDocument) {
     return doc.dntstav == null || doc.dntstav[doc.dntstav.length - 1] !== 'X';
+  }
+
+  openSuccessorRecords() {
+    const approveDialogRef = this.dialog.open(DialogSuccessorRecordsComponent, {
+      width: '1150px',
+      panelClass: 'app-successor-records-dialog'
+    });
   }
 }
 

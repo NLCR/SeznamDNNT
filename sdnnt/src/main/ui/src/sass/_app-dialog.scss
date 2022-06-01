@@ -96,6 +96,28 @@
   }
 }
 
+.app-successor-records-dialog {
+  .app-table {
+    tbody {
+      tr {
+        td {
+          &:first-of-type {
+            width: 80%;
+
+            .app-text-cutter {
+              max-width: 800px;
+            }
+          }
+
+          &:last-of-type {
+            width: 16px;
+          }
+        }
+      }
+    }
+  }
+}
+
 // mat dialog scrollbar fix -> https://github.com/angular/components/issues/8798
 .mat-dialog-content--scrollbar-fix {
   &:after {

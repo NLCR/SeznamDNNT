@@ -1,1 +1,40 @@
-<p>dialog-successor-records works!</p>
+<h1 mat-dialog-title>{{ 'desc.naslednicke_zaznamy' | translate }}</h1>
+<mat-dialog-content>
+  <div>
+    <table [cellSpacing]="0" [cellPadding]="0" class="app-table app-mb-4">
+      <thead>
+        <tr>
+          <th>{{ 'desc.zaznam' | translate }}</th>
+          <th>Url</th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of data">
+          <td>
+            <div [class.app-text-cutter]="!item.expanded" [matTooltip]="item.expanded ? null : item.title"><strong>{{ item.title }}</strong></div>
+            <div class="app-detail app-mt-1" *ngIf="item.expanded">
+              <div><label class="app-label app-mr-1">Nakl. údaje:</label>{{ item.desc }}</div>
+              <div><label class="app-label app-mr-1">Popis (rozsah):</label>{{ item.desc }}</div>
+              <div><label class="app-label app-mr-1">Ve fondu:</label>{{ item.desc }}</div>
+            </div>
+          </td>
+          <td class="app-col-action">
+            <a [href]="item.url"><mat-icon>link</mat-icon></a>
+          </td>
+          <td class="app-col-action">
+            <a (click)="item.expanded =! item.expanded" [ngClass]="item.expanded ? 'app-rotate-up' : 'app-rotate-down'">
+              <mat-icon class="app-mr-1">expand_more</mat-icon>{{ item.expanded ? ('desc.zobrazit_mene' | translate) : ('desc.zobrazit_vice' | translate) }}
+            </a>
+          </td>
+          <td class="app-col-checkbox"><mat-checkbox></mat-checkbox></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</mat-dialog-content>
+<div mat-dialog-actions>
+  <button mat-flat-button color="primary" (click)="accept()" cdkFocusInitial>{{ 'desc.akceptovat' | translate }}</button>
+  <button mat-button mat-dialog-close >{{ 'desc.zavrit' | translate }}</button>
+</div>
