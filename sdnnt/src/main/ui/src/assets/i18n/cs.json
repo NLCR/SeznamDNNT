@@ -91,12 +91,11 @@
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
     "022a": "ISSN",
-    "id_sdnnt": "Interní identifikátor",
-
     "m": "Monografie",
     "s": "Serial",
     "i": "Musi se doplnit",
     "a": "Taky se musi",
+    "id_sdnnt": "Interní identifikátor",
 
     "fmt": "Formát dokumentu",
     "item_type": "Typ dokumentu",
@@ -812,7 +811,12 @@
     "nastaveni_notifikaci": "Nastavení notifikací",
     "jednotlive_notifikace": "Jednotlivé notifikace",
     "smazat_notifikaci": "Smazat notifikaci",
-    "vyhledavani_zadosti": "Vyhledávání žádosti"
+    "vyhledavani_zadosti": "Vyhledávání žádosti",
+    "naslednicke_zaznamy": "Následnické záznamy",
+    "zaznam": "Záznam",
+    "akceptovat": "Akceptovat",
+    "zobrazit_vice": "Zobrazit více",
+    "zobrazit_mene": "Zobrazit méně"
   },
 
   "tooltip": {
@@ -831,7 +835,8 @@
     "schvalit_zmenu_stavu":"Schvalit změnu stavu",
     "schvalit_pouze_na_terminalu":"Schválit pouze na terminálu",
     "odmitnout_zmenu":"Odmítnout změnu",
-    "dilo_publikovano":"Dílo bylo nakladatelem publikováno"
+    "dilo_publikovano":"Dílo bylo nakladatelem publikováno",
+    "zobrazit_naslednicke_zaznamy": "Zobrazit následnické záznamy"
   },
 
   "account":{

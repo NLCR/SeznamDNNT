@@ -115,6 +115,25 @@ a {
   word-break: break-all;
 }
 
+.app-rotate-up {
+  .mat-icon {
+    &:not(.app-no-rotate) {
+      transition: all 0.4s ease;
+      transform: rotateZ(180deg);
+    }
+  }
+}
+
+.app-rotate-down {
+  .mat-icon {
+    &:not(.app-no-rotate) {
+      transition: all 0.4s ease;
+      transform: rotateZ(0deg);
+    }
+  }
+}
+
+
 table {
   // import table
   &.app-table-import {

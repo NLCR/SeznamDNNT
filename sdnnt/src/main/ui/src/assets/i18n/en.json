@@ -811,7 +811,12 @@
     "nastaveni_notifikaci": "Notification settings",
     "jednotlive_notifikace": "Individual notifications",
     "smazat_notifikaci": "Delete notification",
-    "vyhledavani_zadosti": "Application search"
+    "vyhledavani_zadosti": "Application search",
+    "naslednicke_zaznamy": "Successor records",
+    "zaznam": "Record",
+    "akceptovat": "Accept",
+    "zobrazit_vice": "Show more",
+    "zobrazit_mene": "Show less"
   },
 
   "tooltip": {
@@ -830,7 +835,8 @@
     "schvalit_zmenu_stavu":"Approve state change",
     "schvalit_pouze_na_terminalu":"Approve terminal license",
     "odmitnout_zmenu":"Reject",
-    "dilo_publikovano":"Title has been published, state N"
+    "dilo_publikovano":"Title has been published, state N",
+    "zobrazit_naslednicke_zaznamy": "View successor records"
   },
 
   "account":{
