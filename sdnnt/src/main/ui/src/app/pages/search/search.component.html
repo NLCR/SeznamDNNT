@@ -17,19 +17,20 @@
         <mat-card *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
-              <!-- <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox> -->
-              <!--  <mat-checkbox [(ngModel)]="state.withNotification" (change)="setNotis()">{{ 'desc.zobrazit_zaznamy_s_notifikaci' | translate}}</mat-checkbox> -->
-
+              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
+            </div>
+            <div>
               <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' || state.user.role == 'kurator' || state.user.role == 'mainKurator'))">
                 <mat-button-toggle [matMenuTriggerFor]="menuFilter">
                   <mat-icon class="material-icons-outlined app-mr-1">notifications</mat-icon>
                   {{ this.state.notificationSettings.selected ? (this.state.notificationSettings.selected.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : this.state.notificationSettings.selected.name) : 'desc.zobrazit_zaznamy_s_notifikaci' | translate }}
+                  <mat-icon class="app-color-warning app-cursor-pointer app-ml-2" *ngIf="this.state.notificationSettings.selected" (click)="selectNofiticationFitler(null)" [matTooltip]="'desc.zrusit' | translate">clear</mat-icon>
                 </mat-button-toggle>
-                <mat-button-toggle *ngIf="this.state.notificationSettings.selected" (click)="selectNofiticationFitler(null)" [matTooltip]="'desc.zrusit' | translate">
-                  <mat-icon class="app-color-warning">clear</mat-icon>
+                <mat-button-toggle mat-stroked-button *ngIf="(state.user)" [matMenuTriggerFor]="menuMassAction">
+                  <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.hromadne_akce' | translate }}
                 </mat-button-toggle>
               </mat-button-toggle-group>
-              
+
               <mat-menu #menuFilter="matMenu">
                 <ng-container *ngFor="let f of this.state.notificationSettings.all">
                   <button mat-menu-item (click)="selectNofiticationFitler(f)">
@@ -38,25 +39,11 @@
                   <mat-divider *ngIf="f.name === 'simple'"></mat-divider>
                 </ng-container>
               </mat-menu>
-            </div>
 
-            <div>
-              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
-            </div>
-
-            <div>
-              <!-- <button mat-stroked-button *ngIf="(state.user && state.user.role == 'user' || state.user.role == 'knihovna') && hromadnaZadostEnabled()" (click)="openBulkProposal()">
-                <mat-icon class="material-icons-outlined app-mr-1">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
-              </button> -->
-              <button mat-stroked-button *ngIf="(state.user)" [matMenuTriggerFor]="menuMassAction">
-                <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.hromadne_akce' | translate }}
-              </button>
               <mat-menu #menuMassAction="matMenu">
-
                 <button mat-menu-item *ngIf="hromadnaZadostEnabled() &&  (state.user.role == 'user' || state.user.role == 'knihovna'  )  " (click)="openBulkProposal()">
                   <mat-icon class="material-icons-outlined">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
                 </button>
-
                 <span [matTooltip]="( state.notificationSettings.selected !=null  ||  numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications) ? ('tooltip.hromadne_notifikace_disabled' | translate) : null">
                   <button mat-menu-item (click)="openBulkNotifications()" [disabled]=" state.notificationSettings.selected != null || numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications">
                     <mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.hromadne_notifikace' | translate }}
