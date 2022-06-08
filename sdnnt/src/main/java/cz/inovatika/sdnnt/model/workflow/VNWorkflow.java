@@ -39,7 +39,7 @@ public class VNWorkflow extends Workflow {
 
 
     @Override
-    public WorkflowState nextAlternativeState(String alternative) {
+    public WorkflowState nextAlternativeState(String alternative, SwitchStateOptions options) {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
 

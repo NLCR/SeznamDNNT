@@ -118,8 +118,16 @@ export class AppService {
     });
   }
 
+  /** catalog serach  */
   search(params: HttpParams): Observable<any> {
     let url = 'search/catalog';
+    return this.get(url, params);
+  }
+
+  details(id:string[]): Observable<any> {
+    let url = 'search/details';
+    let ids = id.join(",");
+    const params: HttpParams = new HttpParams().set('identifiers', ids);
     return this.get(url, params);
   }
 
@@ -234,22 +242,22 @@ export class AppService {
     return this.post(url, zadost, params);
   }
 
-  approveItem(identifier: string, zadost: Zadost, reason: string, alternative: string): Observable<string> {
+  approveItem(identifier: string, zadost: Zadost, reason: string, alternative: string, options: string): Observable<string> {
     let url = '/account/approve';
     let params: HttpParams = new HttpParams();
     if (alternative != null) {
       params = params.append('alternative', alternative);
     }
-    return this.post(url, { identifier, zadost, reason }, params);
+    return this.post(url, { identifier, zadost, reason, options }, params);
   }
 
-  approveItems(identifiers: string[], zadost: Zadost, reason: string, alternative: string): Observable<string> {
+  approveItems(identifiers: string[], zadost: Zadost, reason: string, alternative: string, options: string): Observable<string> {
     let url = '/account/approve';
     let params: HttpParams = new HttpParams();
     if (alternative != null) {
       params = params.append('alternative', alternative);
     }
-    return this.post(url, { identifiers, zadost, reason }, params);
+    return this.post(url, { identifiers, zadost, reason, options}, params);
   }
 
 

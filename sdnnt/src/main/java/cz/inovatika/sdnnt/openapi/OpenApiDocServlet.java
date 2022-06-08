@@ -13,7 +13,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+/**
+ * Provides documentation for openapi endpoints
+ * @author happy
+ */
 @WebServlet(value = "/openapi/*")
 public class OpenApiDocServlet  extends HttpServlet {
 

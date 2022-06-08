@@ -62,12 +62,11 @@ public class PXServiceImplITTest {
 
         String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
         JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
-
+        System.out.println(optionsConfigJSONObject);
+        
         String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 2020]\"},\"results\":{\"ctx\":true}}";
-        System.out.println(jonbConfig);
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
-        System.out.println(jobJSONObject.getJSONObject("iteration"));
-        System.out.println(jobJSONObject.getJSONObject("results"));
+        System.out.println(jonbConfig);
         
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
                 .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))

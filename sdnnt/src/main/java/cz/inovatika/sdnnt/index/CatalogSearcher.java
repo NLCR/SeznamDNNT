@@ -47,7 +47,6 @@ import org.json.JSONObject;
 /**
  * @author alberto
  */
-// TODO: Rewrite
 public class CatalogSearcher {
 
     public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
@@ -100,31 +99,6 @@ public class CatalogSearcher {
                     JSONArray ruleNotifications = user != null ? NotificationUtils.applyRuleNotifications(user, ids) : new JSONArray();
                     ret.put("rnotifications", ruleNotifications);
                     
-                    /**
-                    try {
-                        JSONObject settingsObject = new JSONObject();
-                        
-                        NotificationsService service = new NotificationServiceImpl(null, null);
-                        List<AbstractNotification> simple = service.findNotificationsByUser(user.getUsername(), TYPE.simple);
-                        List<AbstractNotification> rules = service.findNotificationsByUser(user.getUsername(), TYPE.rule);
-                        settingsObject.put("simple", !simple.isEmpty());
-                        
-                        JSONArray jsonArray = new JSONArray();
-                        rules.stream().map(an-> {
-                            RuleNotification rnotif = (RuleNotification) an;
-                            JSONObject fobj = new JSONObject();
-                            fobj.put("name", rnotif.getName());
-                            fobj.put("id", rnotif.getId());
-                            return fobj;
-                        }).forEach(jsonArray::put);
-                        
-                        
-                        settingsObject.put("rules", jsonArray);
-                        ret.put("notificationsettings", settingsObject);
-                        
-                    } catch (NotificationsException e) {
-                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
-                    }**/
                 }
 
 
@@ -159,6 +133,7 @@ public class CatalogSearcher {
 
                             List<ZadostTypNavrh> zadostTypNavrhs = DocumentWorkflowFactory.canBePartOfZadost(curatorStates, publicStates, license != null && license.length() > 0 ? license.getString(0) : null);
                             JSONArray actions = new JSONArray();
+
                             zadostTypNavrhs.stream().map(ZadostTypNavrh::name).forEach(actions::put);
                             jsonObject.put("workflows", actions);
                         } else {
@@ -215,7 +190,54 @@ public class CatalogSearcher {
         }
         return ret;
     }
+    
+    public JSONObject details(HttpServletRequest req) {
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        Map<String, String> resmap = new HashMap<>();
+        parameterMap.entrySet().stream().forEach(stringEntry -> {
+            resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+        });
+        return details(resmap);
+    }
+    
+    public JSONObject details(Map<String, String> req) {
+        JSONObject ret = new JSONObject();
+        try {
+            SolrClient solr = Indexer.getClient();
+            Options opts = Options.getInstance();
+            int rows = opts.getClientConf().getInt("rows");
+            if (req.containsKey("rows")) {
+                rows = Integer.parseInt(req.get("rows"));
+            }
+            
+            int start = 0;
+            if (req.containsKey("page")) {
+                start = Integer.parseInt(req.get("page")) * rows;
+            }
+            
+            String identifiers = req.get("identifiers");
+            String q = "("+Arrays.stream(identifiers.split(",")).map(it-> '"'+it+'"').collect(Collectors.joining(" OR "))+")";
+            
+            SolrQuery query = new SolrQuery("identifier:"+q)
+                    .setRows(rows)
+                    .setStart(start)
+                    .setSort("identifier", SolrQuery.ORDER.asc);
+            
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+            ret = new JSONObject((String) qresp.get("response"));
 
+        } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        return ret;
+        
+    }
+    
     public JSONObject search(HttpServletRequest req) {
         Map<String, String[]> parameterMap = req.getParameterMap();
         Map<String, String> resmap = new HashMap<>();
@@ -372,7 +394,7 @@ public class CatalogSearcher {
         SolrQuery query = new SolrQuery(q)
                 .setRows(rows)
                 .setStart(start)
-                .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel")
+                .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries")
                 .setFacetMinCount(1)
                 .setParam("json.nl", "arrntv")
                 .setParam("stats", true)
@@ -458,9 +480,8 @@ public class CatalogSearcher {
             query.addFilterQuery("dntstav:*");
         }
 
-        if (user == null || "user".equals(user.getRole())) {
-            query.addFilterQuery("-dntstav:X");
-        }
+        ensureUserRoleFilter(user, query);
+        ensureKnihovnaRoleFilter(user, query);
 
         // notifikace
         if ("true".equals(req.get("withNotification"))) {
@@ -489,6 +510,20 @@ public class CatalogSearcher {
             }
         }
         return query;
+    }
+
+
+    private void ensureUserRoleFilter(User user, SolrQuery query) {
+        if (user == null || "user".equals(user.getRole())) {
+            query.addFilterQuery("-dntstav:X");
+            query.addFilterQuery("-dntstav:D");
+        }
+    }
+
+    private void ensureKnihovnaRoleFilter(User user, SolrQuery query) {
+        if (user == null || "knihovnar".equals(user.getRole())) {
+            query.addFilterQuery("-dntstav:D");
+        }
     }
 
 }

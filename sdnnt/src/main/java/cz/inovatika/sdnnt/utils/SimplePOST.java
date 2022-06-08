@@ -28,7 +28,12 @@ public class SimplePOST {
             os.write(input, 0, input.length);
         }
         int responseCode = conn.getResponseCode();
-        String s = IOUtils.toString(conn.getInputStream(), "UTF-8");
+        String s = null;
+        if (responseCode  == 200) {
+            s = IOUtils.toString(conn.getInputStream(), "UTF-8");
+        } else {
+            s = IOUtils.toString(conn.getErrorStream(), "UTF-8");
+        }
         return Pair.of(responseCode, s);
 
     }

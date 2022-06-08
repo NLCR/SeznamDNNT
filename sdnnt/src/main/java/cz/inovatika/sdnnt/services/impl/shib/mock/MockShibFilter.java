@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Proxy;
+import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ public class MockShibFilter implements javax.servlet.Filter {
     
     public static Hashtable<String,String> initFromFile(String path) throws FileNotFoundException, IOException {
         Properties properties = new Properties();
-        properties.load(new FileReader(path));
+        properties.load(new FileReader(path,Charset.forName("UTF-8")));
         
         Hashtable<String,String> tbl = new Hashtable<>();
         properties.keySet().forEach(key-> {

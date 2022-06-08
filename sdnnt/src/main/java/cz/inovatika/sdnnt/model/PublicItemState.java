@@ -21,6 +21,6 @@ import java.util.List;
 /** All posibilities of catalog item state*/
 public enum PublicItemState {
 
-    A, PA, N, X, NL;
+    A, PA, N, X, NL, D;
     /*,  NL, NZ*/;
 }

@@ -1,0 +1,113 @@
+<add>
+<doc>
+<field name="marc_015a">cnb001025184</field>
+<field name="marc_015z">cnb00102518c</field>
+
+<field name="marc_020a">80-86122-86-7</field>
+<field name="marc_020q">(Repronis ;</field>
+<field name="marc_035a">(OCoLC)50342670</field>
+<field name="marc_040a">ABA001</field>
+<field name="marc_040b">cze</field>
+<field name="marc_100a">Prnka, Tasilo,</field>
+<field name="author">Prnka, Tasilo,</field>
+<field name="marc_100d">1932-2010</field>
+<field name="marc_1004">aut</field>
+<field name="marc_1007">ola2002110337</field>
+<field name="marc_245p">Výzkum nanotechnologií a nanomateriálů v Evropě a USA /</field>
+<field name="marc_245a">Pátý rámcový program evropského výzkumu a technického rozvoje.</field>
+<field name="title">Pátý rámcový program evropského výzkumu a technického rozvoje.</field>
+<field name="marc_245c">Tasilo Prnka ; Oborová kontaktní organizace pro průmyslový výzkum a vývoj v České republice - Svaz průmyslu a dopravy, Oborová kontaktní organizace pro výzkum materiálů a technologií - Česká společnost pro nové materiály a technologie</field>
+<field name="marc_245n">5,</field>
+<field name="marc_246a">Výzkum nanotechnologií a nanomateriálů v Evropě a USA</field>
+<field name="marc_246a">5. rámcový program evropského výzkumu a technického rozvoje</field>
+<field name="marc_250a">Vyd. 1.</field>
+<field name="marc_260a">Ostrava :</field>
+<field name="marc_260b">Repronis pro Českou společnost pro nové materiály,</field>
+<field name="marc_260c">2001</field>
+<field name="marc_710a">Oborová kontaktní organizace pro průmyslový výzkum a vývoj v České republice (projekt)</field>
+<field name="marc_710a">Česká společnost pro nové materiály a technologie</field>
+<field name="marc_710a">Česká společnost pro nové materiály a technologie.</field>
+<field name="marc_7107">kn20020321414</field>
+<field name="marc_7107">kn20020321415</field>
+<field name="marc_7107">kn20020321416</field>
+<field name="marc_710b">Oborová kontaktní organizace pro výzkum materiálů a technologií v České republice</field>
+<field name="marc_998a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=000995692&amp;local_base=SKC</field>
+<field name="marc_911a">ABA001</field>
+<field name="marc_911a">BOA001</field>
+<field name="marc_911d">zdigitalizováno</field>
+<field name="marc_911d">zdigitalizováno</field>
+<field name="marc_911u">http://krameriusndk.nkp.cz/search/handle/uuid:41fde7c0-43a5-11e2-b246-005056827e52</field>
+<field name="marc_911u">http://krameriusndk.mzk.cz/search/handle/uuid:41fde7c0-43a5-11e2-b246-005056827e52</field>
+<field name="marc_910p">prezenčně</field>
+<field name="marc_910a">ABA001</field>
+<field name="marc_910a">ABA007</field>
+<field name="marc_910a">BOA001</field>
+<field name="marc_910a">ULG001</field>
+<field name="marc_910w">l</field>
+<field name="marc_910w">l</field>
+<field name="marc_910w">l</field>
+<field name="marc_910w">l</field>
+<field name="marc_910x">cpk20011025182</field>
+<field name="marc_910x">000023540</field>
+<field name="marc_910x">000571541</field>
+<field name="marc_910x">016020003265392</field>
+<field name="marc_910b">3-1080.085,5</field>
+<field name="marc_910b">N147052/V</field>
+<field name="dedup_fields">999ef4e11f960739e1a39b5339afe06e</field>
+<field name="frbr">tasilo,prnka|1932-2010/|patyramcovyprogramevropskehovyzkumuatechnickehorozvoje.|5,|vyzkumnanotechnologiiananomaterialuvevropeausa/</field>
+<field name="ean">9788086122861</field>
+<field name="identifier">oai:aleph-nkp.cz:SKC01-00099999c</field>
+<field name="datestamp">2020-11-17T12:32:02Z</field>
+<field name="setSpec">SKC</field>
+<field name="leader"> nam a22 a 4500</field>
+<field name="controlfield_001">cpk20011025182</field>
+<field name="controlfield_003">CZ PrSKC</field>
+<field name="controlfield_005">20060503082814.0</field>
+<field name="controlfield_007">tu</field>
+<field name="controlfield_008">011102s2001 xr e 000 0 cze </field>
+
+<field name="record_status">n</field>
+<field name="type_of_resource">a</field>
+<field name="item_type">m</field>
+<field name="fmt">BK</field>
+<field name="nakladatel">Repronis pro Českou společnost pro nové materiály</field>
+<field name="sigla">ABA001</field>
+<field name="sigla">ABA007</field>
+<field name="sigla">BOA001</field>
+<field name="sigla">ULG001</field>
+<field name="language">cze</field>
+
+<field name="place_of_pub">xr </field>
+<field name="type_of_date">s</field>
+<field name="date1">2001</field>
+<field name="date2"> </field>
+<field name="date1_int">2001</field>
+<field name="is_proposable">true</field>
+<field name="title_sort">Pátý rámcový program evropského výzkumu a technického rozvoje.</field>
+<field name="nazev">Pátý rámcový program evropského výzkumu a technického rozvoje. Výzkum nanotechnologií a nanomateriálů v Evropě a USA / Tasilo Prnka ; Oborová kontaktní organizace pro průmyslový výzkum a vývoj v České republice - Svaz průmyslu a dopravy, Oborová kontaktní organizace pro výzkum materiálů a technologií - Česká společnost pro nové materiály a technologie 5,</field>
+<field name="rokvydani">2001</field>
+<field name="raw">{"identifier":"oai:aleph-nkp.cz:SKC01-00099999c","datestamp":"2020-11-17T12:32:02Z","leader":" nam a22 a 4500","controlFields":{"008":"011102s2001 xr e 000 0 cze ","001":"cpk20011025182","003":"CZ PrSKC","005":"20060503082814.0","007":"tu"},"kuratorstav":[],"dntstav":[],"setSpec":"SKC","historie_granulovaneho_stavu":[],"historie_stavu":[],"dataFields":{"080":[{"ind2":" ","ind1":" ","index":5,"tag":"080","subFields":{"a":[{"code":"a","index":0,"value":"621.3.049.76"}],"2":[{"code":"2","index":1,"value":"MRF"}]}},{"ind2":" ","ind1":" ","index":6,"tag":"080","subFields":{"a":[{"code":"a","index":0,"value":"62-022.532"}],"2":[{"code":"2","index":1,"value":"MRF"}]}},{"ind2":" ","ind1":" ","index":7,"tag":"080","subFields":{"a":[{"code":"a","index":0,"value":"001.891"}],"2":[{"code":"2","index":1,"value":"MRF"}]}},{"ind2":" ","ind1":" ","index":8,"tag":"080","subFields":{"a":[{"code":"a","index":0,"value":"005.591"}],"2":[{"code":"2","index":1,"value":"MRF"}]}},{"ind2":" ","ind1":" ","index":9,"tag":"080","subFields":{"a":[{"code":"a","index":0,"value":"(036)"}],"2":[{"code":"2","index":1,"value":"MRF"}]}}],"072":[{"ind2":"7","ind1":" ","index":4,"tag":"072","subFields":{"x":[{"code":"x","index":1,"value":"Technika všeobecně"}],"a":[{"code":"a","index":0,"value":"62"}],"9":[{"code":"9","index":3,"value":"19"}],"2":[{"code":"2","index":2,"value":"Konspekt"}]}}],"040":[{"ind2":" ","ind1":" ","index":3,"tag":"040","subFields":{"a":[{"code":"a","index":0,"value":"ABA001"}],"b":[{"code":"b","index":1,"value":"cze"}]}}],"260":[{"ind2":" ","ind1":" ","index":15,"tag":"260","subFields":{"a":[{"code":"a","index":0,"value":"Ostrava :"}],"b":[{"code":"b","index":1,"value":"Repronis pro Českou společnost pro nové materiály,"}],"c":[{"code":"c","index":2,"value":"2001"}]}}],"250":[{"ind2":" ","ind1":" ","index":14,"tag":"250","subFields":{"a":[{"code":"a","index":0,"value":"Vyd. 1."}]}}],"020":[{"ind2":" ","ind1":" ","index":1,"tag":"020","subFields":{"a":[{"code":"a","index":0,"value":"80-86122-86-7"}],"q":[{"code":"q","index":1,"value":"(Repronis ;"},{"code":"q","index":2,"value":"brož.)"}]}}],"100":[{"ind2":" ","ind1":"1","index":10,"tag":"100","subFields":{"a":[{"code":"a","index":0,"value":"Prnka, Tasilo,"}],"d":[{"code":"d","index":1,"value":"1932-2010"}],"4":[{"code":"4","index":3,"value":"aut"}],"7":[{"code":"7","index":2,"value":"ola2002110337"}]}}],"650":[{"ind2":"7","ind1":"0","index":18,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanotechnologie"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"ph123164"}]}},{"ind2":"7","ind1":"0","index":19,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanoelektronika"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"ph138052"}]}},{"ind2":"7","ind1":"0","index":20,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanomateriály"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"ph138053"}]}},{"ind2":"7","ind1":"0","index":21,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"vědecký výzkum"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"ph116680"}]}},{"ind2":"7","ind1":"0","index":22,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"programy a projekty"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"ph255086"}]}},{"ind2":"9","ind1":"0","index":23,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanoelectronics"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}},{"ind2":"9","ind1":"0","index":24,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanostructure materials"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}},{"ind2":"9","ind1":"0","index":25,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"scientific research"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}},{"ind2":"9","ind1":"0","index":26,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"nanotechnology"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}},{"ind2":"9","ind1":"0","index":27,"tag":"650","subFields":{"a":[{"code":"a","index":0,"value":"programs and projects"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}}],"035":[{"ind2":" ","ind1":" ","index":2,"tag":"035","subFields":{"a":[{"code":"a","index":0,"value":"(OCoLC)50342670"}]}}],"245":[{"ind2":"0","ind1":"1","index":11,"tag":"245","subFields":{"p":[{"code":"p","index":2,"value":"Výzkum nanotechnologií a nanomateriálů v Evropě a USA /"}],"a":[{"code":"a","index":0,"value":"Pátý rámcový program evropského výzkumu a technického rozvoje."}],"c":[{"code":"c","index":3,"value":"Tasilo Prnka ; Oborová kontaktní organizace pro průmyslový výzkum a vývoj v České republice - Svaz průmyslu a dopravy, Oborová kontaktní organizace pro výzkum materiálů a technologií - Česká společnost pro nové materiály a technologie"}],"n":[{"code":"n","index":1,"value":"5,"}]}}],"300":[{"ind2":" ","ind1":" ","index":16,"tag":"300","subFields":{"a":[{"code":"a","index":0,"value":"67 s. ;"}],"c":[{"code":"c","index":1,"value":"25 cm"}]}}],"015":[{"ind2":" ","ind1":" ","index":0,"tag":"015","subFields":{"a":[{"code":"a","index":0,"value":"cnb001025182"}]}}],"246":[{"ind2":"0","ind1":"3","index":12,"tag":"246","subFields":{"a":[{"code":"a","index":0,"value":"Výzkum nanotechnologií a nanomateriálů v Evropě a USA"}]}},{"ind2":"3","ind1":"3","index":13,"tag":"246","subFields":{"a":[{"code":"a","index":0,"value":"5. rámcový program evropského výzkumu a technického rozvoje"}]}}],"655":[{"ind2":"7","ind1":" ","index":28,"tag":"655","subFields":{"a":[{"code":"a","index":0,"value":"informační publikace"}],"2":[{"code":"2","index":2,"value":"czenas"}],"7":[{"code":"7","index":1,"value":"fd132454"}]}},{"ind2":"9","ind1":" ","index":29,"tag":"655","subFields":{"a":[{"code":"a","index":0,"value":"information publications"}],"2":[{"code":"2","index":1,"value":"eczenas"}]}}],"710":[{"ind2":" ","ind1":"2","index":30,"tag":"710","subFields":{"a":[{"code":"a","index":0,"value":"Oborová kontaktní organizace pro průmyslový výzkum a vývoj v České republice (projekt)"}],"7":[{"code":"7","index":1,"value":"kn20020321414"}]}},{"ind2":" ","ind1":"2","index":31,"tag":"710","subFields":{"a":[{"code":"a","index":0,"value":"Česká společnost pro nové materiály a technologie"}],"7":[{"code":"7","index":1,"value":"kn20020321415"}]}},{"ind2":" ","ind1":"2","index":32,"tag":"710","subFields":{"a":[{"code":"a","index":0,"value":"Česká společnost pro nové materiály a technologie."}],"b":[{"code":"b","index":1,"value":"Oborová kontaktní organizace pro výzkum materiálů a technologií v České republice"}],"7":[{"code":"7","index":2,"value":"kn20020321416"}]}}],"910":[{"ind2":" ","ind1":" ","index":34,"tag":"910","subFields":{"p":[{"code":"p","index":2,"value":"prezenčně"}],"x":[{"code":"x","index":1,"value":"cpk20011025182"}],"a":[{"code":"a","index":0,"value":"ABA001"}],"w":[{"code":"w","index":3,"value":"l"}]}},{"ind2":" ","ind1":" ","index":35,"tag":"910","subFields":{"x":[{"code":"x","index":1,"value":"000023540"}],"a":[{"code":"a","index":0,"value":"ABA007"}],"w":[{"code":"w","index":2,"value":"l"}]}},{"ind2":" ","ind1":" ","index":36,"tag":"910","subFields":{"x":[{"code":"x","index":1,"value":"000571541"}],"a":[{"code":"a","index":0,"value":"BOA001"}],"b":[{"code":"b","index":2,"value":"3-1080.085,5"}],"w":[{"code":"w","index":3,"value":"l"}]}},{"ind2":" ","ind1":" ","index":37,"tag":"910","subFields":{"x":[{"code":"x","index":1,"value":"016020003265392"}],"a":[{"code":"a","index":0,"value":"ULG001"}],"b":[{"code":"b","index":2,"value":"N147052/V"}],"w":[{"code":"w","index":3,"value":"l"}]}}],"998":[{"ind2":" ","ind1":" ","index":41,"tag":"998","subFields":{"a":[{"code":"a","index":0,"value":"http://aleph.nkp.cz/F/?func=direct&amp;doc_number=000995692&amp;local_base=SKC"}]}}],"504":[{"ind2":" ","ind1":" ","index":17,"tag":"504","subFields":{"a":[{"code":"a","index":0,"value":"Obsahuje bibliografii"}]}}],"900":[{"ind2":" ","ind1":" ","index":33,"tag":"900","subFields":{"a":[{"code":"a","index":0,"value":"ABA001"}],"b":[{"code":"b","index":1,"value":"17"}]}}],"911":[{"ind2":" ","ind1":" ","index":38,"tag":"911","subFields":{"d":[{"code":"d","index":1,"value":"zdigitalizováno"}],"a":[{"code":"a","index":0,"value":"ABA001"}],"u":[{"code":"u","index":2,"value":"http://krameriusndk.nkp.cz/search/handle/uuid:41fde7c0-43a5-11e2-b246-005056827e52"}]}},{"ind2":" ","ind1":" ","index":39,"tag":"911","subFields":{"d":[{"code":"d","index":1,"value":"zdigitalizováno"}],"a":[{"code":"a","index":0,"value":"BOA001"}],"u":[{"code":"u","index":2,"value":"http://krameriusndk.mzk.cz/search/handle/uuid:41fde7c0-43a5-11e2-b246-005056827e52"}]}}],"928":[{"ind2":" ","ind1":"9","index":40,"tag":"928","subFields":{"a":[{"code":"a","index":0,"value":"Repronis"}]}}]}}</field>
+<!-- 
+<field name="id_ccnb">cnb001025182<
+</field>
+<field name="id_ean">
+<str>9788086122861</str>
+</field>
+<long name="_version_">1731373307884732416</long>
+<field name="id_isbn">
+<str>80-86122-86-7</str>
+</field>
+<field name="id_sdnnt">
+<str>eda12f99f4be6e74a83ff095e3f2c5e8</str>
+</field>
+<field name="id_oaiident">
+<str>SKC01-000995692</str>
+</field>
+<field name="id_all_identifiers">
+<str>80-86122-86-7</str>
+<str>9788086122861</str>
+<str>cnb001025182</str>
+</field>
+ -->
+</doc>
+</add>

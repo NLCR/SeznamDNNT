@@ -10,6 +10,7 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
+import cz.inovatika.sdnnt.model.workflow.document.DocumentProxyException;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.AlreadyUsedException;
@@ -285,9 +286,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             try (SolrClient solr = buildClient()) {
                 MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
                 if (marcRecord != null) {
-                    Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                    if (workflow == null) {
-                        invalidIdentifiers.add(documentId);
+                    try {
+                        Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
+                        if (workflow == null) {
+                            invalidIdentifiers.add(documentId);
+                        }
+                    } catch (DocumentProxyException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage());
                     }
                 } else {
                     nonExistentIdentifiers.add(documentId);

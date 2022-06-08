@@ -4,9 +4,15 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.common.SolrInputDocument;
 
 public class DocumentCheckProxy implements WorkflowOwner {
 
@@ -41,7 +47,7 @@ public class DocumentCheckProxy implements WorkflowOwner {
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         // class is only for checking
     }
 
@@ -69,4 +75,19 @@ public class DocumentCheckProxy implements WorkflowOwner {
     public String getLicense() {
         return this.license;
     }
+
+    @Override
+    public List<Pair<String, SolrInputDocument>> getStateToSave(SwitchStateOptions options) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public boolean hasRejectableWorkload() {
+        return false;
+    }
+
+    @Override
+    public void rejectWorkflowState(String originator, String user, String poznamka) {
+    }
+    
 }

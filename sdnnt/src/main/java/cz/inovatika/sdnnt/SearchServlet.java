@@ -85,6 +85,18 @@ public class SearchServlet extends HttpServlet {
   }
 
   enum Actions {
+    DETAILS {
+        @Override
+        JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+              if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin))
+                      .permit()) {
+                  CatalogSearcher searcher = new CatalogSearcher();
+                  return searcher.details(req);
+              } else {
+                  return errorJson(response, SC_FORBIDDEN, "not allowed");
+              }
+          }
+    },
     CATALOG {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -92,6 +104,7 @@ public class SearchServlet extends HttpServlet {
         return searcher.search(req);
       }
     },
+    
     FRBR {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

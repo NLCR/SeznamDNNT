@@ -3,10 +3,15 @@ package cz.inovatika.sdnnt.model.workflow.document;
 import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -14,9 +19,13 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Reprezentuje dokument 
+ * @author happy
+ */
 public class DocumentProxy implements WorkflowOwner {
 
-    MarcRecord marcRecord;
+    protected MarcRecord marcRecord;
 
     public DocumentProxy(MarcRecord record) {
         this.marcRecord = record;
@@ -38,7 +47,7 @@ public class DocumentProxy implements WorkflowOwner {
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         Date date = new Date();
 
         List<String> dntstav = this.marcRecord.dntstav;
@@ -122,4 +131,21 @@ public class DocumentProxy implements WorkflowOwner {
     public void setLicense(String l) {
         this.marcRecord.license = l;
     }
+
+    @Override
+    public List<Pair<String, SolrInputDocument>> getStateToSave(SwitchStateOptions options) {
+        Pair<String, SolrInputDocument> pair = Pair.of(DataCollections.catalog.name(), marcRecord.toSolrDoc());
+        return Arrays.asList(pair);
+    }
+
+    @Override
+    public boolean hasRejectableWorkload() {
+        return false;
+    }
+
+    @Override
+    public void rejectWorkflowState(String originator, String user, String poznamka) {
+    }
+    
+    
 }

@@ -302,7 +302,38 @@ public enum Period {
         public TransitionType getTransitionType() {
             return TransitionType.kurator;
         }
-    };
+    },
+    
+    
+    debug_dx_0_5wd {
+        @Override
+        public Date defineDeadline(Date inputDate) {
+            Calendar instance = Calendar.getInstance();
+            instance.setTime(inputDate);
+            instance.add(Calendar.MINUTE, periodValue(this.name(),5));
+            return instance.getTime();
+        }
+
+        @Override
+        public TransitionType getTransitionType() {
+            return TransitionType.kurator;
+        }
+    },
+    period_dx_0_5wd {
+        @Override
+        public Date defineDeadline(Date inputDate) {
+            //vyřazení ze vzdáleného přístupu (do 5 pracovních dnů – lze požádat nakladatele o prodloužení do 10 pracovních dnů) - Memorandum odst. 11
+            Calendar instance = Calendar.getInstance();
+            instance.setTime(inputDate);
+            return endOfdayAlign(addWorkingDays(instance,periodValue(this.name(),5))).getTime();
+        }
+
+        @Override
+        public TransitionType getTransitionType() {
+            return TransitionType.kurator;
+        }
+    },
+    ;
 
 
     private static Calendar dayAlign(Calendar instance) {

@@ -251,7 +251,7 @@ export class ZadostComponent implements OnInit {
   }
 
 
-  processNavrh(data: { type: string, identifier: string, komentar: string }) {
+  processNavrh(data: { type: string, identifier: string, komentar: string, options:string }) {
     if (!data.komentar && data.type != 'reject') {
       this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
       return;
@@ -264,7 +264,7 @@ export class ZadostComponent implements OnInit {
        // approve navrh 
 
       //  this.service.approveNavrh(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
-        this.service.approveItem(data.identifier, this.zadost, data.komentar, null).subscribe((res: any) => {
+        this.service.approveItem(data.identifier, this.zadost, data.komentar, null, data.options).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
           } else {
@@ -275,7 +275,7 @@ export class ZadostComponent implements OnInit {
         });
         break;
       case 'approveLib': 
-        this.service.approveItem(data.identifier, this.zadost, data.komentar, 'dnntt').subscribe((res: any) => {
+        this.service.approveItem(data.identifier, this.zadost, data.komentar, 'dnntt', data.options).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
           } else {
@@ -286,7 +286,7 @@ export class ZadostComponent implements OnInit {
         });
         break;
       case 'releasedProved': 
-        this.service.approveItem(data.identifier, this.zadost, data.komentar, 'title_released').subscribe((res: any) => {
+        this.service.approveItem(data.identifier, this.zadost, data.komentar, 'title_released', data.options).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
           } else {
@@ -329,7 +329,7 @@ export class ZadostComponent implements OnInit {
     approveDialogRef.afterClosed().subscribe(result => {
       if (result) {
         let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
-        this.service.approveItems(items, this.zadost,result, null).subscribe((res: any) => {
+        this.service.approveItems(items, this.zadost,result, null, 'all').subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
             if (res.payload) {

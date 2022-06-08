@@ -11,23 +11,13 @@ import java.util.logging.Logger;
 /**
  * Service responsible for creating reuests or updating titles which should be public according to the date of publication
  */
-public interface PXYearService {
+public interface PXYearService extends RequestService, LoggerAware {
 
     /**
      * Check titles and return all possible candidates
      * @return List of candidates
      */
     public List<String> check();
-
-    /**
-     * Creating requests
-     * @param identifiers Lists of identifier
-     * @throws AccountException
-     * @throws IOException
-     * @throws ConflictException
-     * @throws SolrServerException
-     */
-    public void request(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
     /**
      * Update titles

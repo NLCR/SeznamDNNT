@@ -70,7 +70,7 @@ public class DntAlephImporterITTest {
                         .setRows(1000);
                 SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
                 for (SolrDocument doc : docs) {
-                    MarcRecord fDoc = MarcRecord.fromDoc(doc);
+                    MarcRecord fDoc = MarcRecord.fromDocDep(doc);
                     // only this one has dnnnt granularity
                     JSONArray historyJSON = fDoc.historie_stavu;
                     if (historyJSON != null) {
@@ -121,7 +121,7 @@ public class DntAlephImporterITTest {
                         .setRows(1000);
                 SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
                 for (SolrDocument doc : docs) {
-                    MarcRecord fDoc = MarcRecord.fromDoc(doc);
+                    MarcRecord fDoc = MarcRecord.fromDocDep(doc);
                     // only this one has dnnnt granularity
                     JSONArray granularityJSON = fDoc.granularity;
                     if (granularityJSON != null) {
@@ -159,13 +159,12 @@ public class DntAlephImporterITTest {
         Assert.assertNotNull(resourceAsStream);
         try {
             alephImport(resourceAsStream,37);
-
             try(SolrClient client = SolrTestServer.getClient()) {
                 SolrQuery query = new SolrQuery("*")
                         .setRows(1000);
                 SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
                 for (SolrDocument doc : docs) {
-                    MarcRecord fDoc = MarcRecord.fromDoc(doc);
+                    MarcRecord fDoc = MarcRecord.fromDocDep(doc);
                     Assert.assertTrue(fDoc.dataFields.containsKey("996"));
                 }
             }
@@ -173,5 +172,4 @@ public class DntAlephImporterITTest {
             Assert.fail(e.getMessage());
         }
     }
-
 }

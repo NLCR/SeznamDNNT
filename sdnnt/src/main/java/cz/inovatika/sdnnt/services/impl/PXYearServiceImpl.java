@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.PXYearService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +27,11 @@ import java.util.stream.Collectors;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
+/**
+ * Sluzba, ktera umoznuje vyrazeni dila na zaklade datumu
+ * @author happy
+ *
+ */
 public class PXYearServiceImpl extends AbstractPXService implements PXYearService  {
 
     private String format;
@@ -103,7 +109,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
             try (final SolrClient solr = buildClient()) {
                 for (String identifier : identifiers) {
                     if (cState != null) {
-                        SolrInputDocument sDoc = super.changeProcessState(solr, identifier, cState.name());
+                        SolrInputDocument sDoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name());
                         solr.add(DataCollections.catalog.name(), sDoc);
                     }
                 }

@@ -101,7 +101,11 @@ public class MarcRecordFields {
     // sigla of digital libraries
     public static final String DIGITAL_LIBRARIES = "digital_libraries";
     
+    //TODO: Remove - not used now
     public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
-
+    
+    // followers
+    public static final String FOLLOWERS = "followers";
+    
     private MarcRecordFields() {}
 }

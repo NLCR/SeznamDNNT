@@ -1,0 +1,103 @@
+<add>
+
+<doc>
+    <field name="marc_015a">cnb001174586</field>
+    <field name="marc_015z">cnb001255343</field>
+    <field name="marc_020a">80-7108-231-7</field>
+    <field name="marc_020a">80-7108-239-2</field>
+    <field name="marc_020q">(váz.) :</field>
+    <field name="marc_020q">(brož.)</field>
+    <field name="marc_020c">Kč 273,00</field>
+    <field name="marc_035a">(CZ-PrSKC)cpk20031255343</field>
+    <field name="marc_040a">BOA001</field>
+    <field name="marc_040b">cze</field>
+    <field name="marc_040d">BA001</field>
+    <field name="marc_100a">Kundera, Ludvík,</field>
+    <field name="author">Kundera, Ludvík,</field>
+    <field name="marc_100d">1920-2010</field>
+    <field name="marc_1004">aut</field>
+    <field name="marc_1007">jk01070892</field>
+    <field name="marc_245a">Piju čaj /</field>
+    <field name="title">Piju čaj /</field>
+    <field name="marc_245c">Ludvík Kundera ; [k vydání připravily Jitka a Jana Uhdeovy ; ilustrace Ludmila Jandová ... et al.]</field>
+    <field name="marc_250a">Vyd. 1.</field>
+    <field name="marc_260a">Brno :</field>
+    <field name="marc_260b">Atlantis,</field>
+    <field name="marc_260c">2003</field>
+    <field name="marc_700a">Uhdeová, Jitka,</field>
+    <field name="marc_700a">Uhdeová, Jana,</field>
+    <field name="marc_700a">Jandová, Ludmila,</field>
+    <field name="marc_700d">1942-</field>
+    <field name="marc_700d">1975-</field>
+    <field name="marc_700d">1938-2008</field>
+    <field name="marc_7004">edt</field>
+    <field name="marc_7004">edt</field>
+    <field name="marc_7004">ill</field>
+    <field name="marc_7007">jo2003163178</field>
+    <field name="marc_7007">xx0021757</field>
+    <field name="marc_7007">jn19990216077</field>
+    <field name="marc_856u">http://krameriusndk.nkp.cz/search/handle/uuid:3354e8c0-d05f-11e3-b110-005056827e51</field>
+    <field name="marc_856y">Digitalizovaný dokument</field>
+    <field name="marc_990a">N</field>
+    <field name="marc_991a">Vyřazeno na žádost nakladatele</field>
+    <field name="marc_992a">20200731</field>
+    <field name="marc_992a">20210109</field>
+    <field name="marc_992a">20210126</field>
+    <field name="marc_992b">batch</field>
+    <field name="marc_992b">batch</field>
+    <field name="marc_992b">batch</field>
+    <field name="marc_992s">PA</field>
+    <field name="marc_992s">NZ</field>
+    <field name="marc_992s">N</field>
+    <field name="marc_998a">DNT01-000108858</field>
+    <field name="marc_956u">http://krameriusndk.nkp.cz/search/handle/uuid:3354e8c0-d05f-11e3-b110-005056827e51</field>
+    <field name="marc_9569">N</field>
+    <field name="datum_stavu">2021-01-25T23:00:00Z</field>
+    <field name="datum_kurator_stav">2021-01-25T23:00:00Z</field>
+    <field name="historie_stavu">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210109","license":"dnntt","user":"batch"},{"stav":"N","date":"20210126","user":"batch"}]</field>
+    <field name="historie_kurator_stavu">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210109","license":"dnntt","user":"batch"},{"stav":"N","date":"20210126","user":"batch"}]</field>
+    <field name="dntstav">N</field>
+    <field name="kuratorstav">N</field>
+    <field name="license_history">dnnto</field>
+    <field name="license_history">dnntt</field>
+    <field name="granularity">{"stav":["N"],"link":"http://krameriusndk.nkp.cz/search/handle/uuid:3354e8c0-d05f-11e3-b110-005056827e51","kuratorstav":["N"]}</field>
+    <field name="dedup_fields">f83ead8209a9b735b14be3673a82a61a</field>
+    <field name="frbr">ludvik,kundera|1920-2010/|pijucaj/</field>
+    <field name="ean">9788071082316</field>
+    <field name="ean">9788071082392</field>
+    <field name="identifier">oai:aleph-nkp.cz:DNT01-000108858</field>
+    <field name="datestamp">2021-08-01T12:08:52Z</field>
+    <field name="setSpec">DNT-ALL</field>
+    <field name="leader">     cam a22      a 4500</field>
+    <field name="controlfield_001">000108858</field>
+    <field name="controlfield_003">CZ PrDNT</field>
+    <field name="controlfield_005">20200228082202.0</field>
+    <field name="controlfield_007">tu</field>
+    <field name="controlfield_008">030807s2003    xr agh e      000 m cze  </field>
+    <field name="record_status">c</field>
+    <field name="type_of_resource">a</field>
+    <field name="item_type">m</field>
+    <field name="fmt">BK</field>
+    <field name="nakladatel">Atlantis</field>
+    <field name="sigla">BOA001</field>
+    <field name="language">cze</field>
+    <field name="place_of_pub">xr </field>
+    <field name="type_of_date">s</field>
+    <field name="date1">2003</field>
+    <field name="date2">    </field>
+    <field name="date1_int">2003</field>
+    <field name="is_proposable">true</field>
+    <field name="title_sort">Piju čaj /</field>
+    <field name="nazev">Piju čaj / Ludvík Kundera ; [k vydání připravily Jitka a Jana Uhdeovy ; ilustrace Ludmila Jandová ... et al.]</field>
+    <field name="rokvydani">2003</field>
+    <field name="raw">{"identifier":"oai:aleph-nkp.cz:DNT01-000108858","datestamp":"2021-08-01T12:08:52Z","leader":"     cam a22      a 4500","controlFields":{"008":"030807s2003    xr agh e      000 m cze  ","001":"000108858","003":"CZ PrDNT","005":"20200228082202.0","007":"tu"},"kuratorstav":[],"dntstav":[],"setSpec":"DNT-ALL","historie_stavu":[],"dataFields":{"072":[{"ind2":"7","ind1":" ","tag":"072","subFields":{"x":[{"code":"x","value":"Lingvistika. Jazyky"}],"a":[{"code":"a","value":"81"}],"9":[{"code":"9","value":"11"}],"2":[{"code":"2","value":"Konspekt"}]}},{"ind2":"7","ind1":" ","tag":"072","subFields":{"x":[{"code":"x","value":"Průmysl nápojů. Kvasný průmysl. Průmysl pochutin"}],"a":[{"code":"a","value":"663"}],"9":[{"code":"9","value":"19"}],"2":[{"code":"2","value":"Konspekt"}]}}],"490":[{"ind2":" ","ind1":"1","tag":"490","subFields":{"a":[{"code":"a","value":"Spisy L.K. ;"}],"v":[{"code":"v","value":"sv. 11"}]}}],"250":[{"ind2":" ","ind1":" ","tag":"250","subFields":{"a":[{"code":"a","value":"Vyd. 1."}]}}],"990":[{"ind2":" ","ind1":" ","tag":"990","subFields":{"a":[{"code":"a","value":"N"}]}}],"650":[{"ind2":"7","ind1":"0","tag":"650","subFields":{"a":[{"code":"a","value":"světová literatura"}],"2":[{"code":"2","value":"czenas"}],"7":[{"code":"7","value":"ph116360"}]}},{"ind2":"7","ind1":"0","tag":"650","subFields":{"a":[{"code":"a","value":"literární náměty"}],"2":[{"code":"2","value":"czenas"}],"7":[{"code":"7","value":"ph138213"}]}},{"ind2":"7","ind1":"0","tag":"650","subFields":{"a":[{"code":"a","value":"čaj"}],"2":[{"code":"2","value":"czenas"}],"7":[{"code":"7","value":"ph135501"}]}}],"991":[{"ind2":" ","ind1":" ","tag":"991","subFields":{"a":[{"code":"a","value":"Vyřazeno na žádost nakladatele"}]}}],"035":[{"ind2":" ","ind1":" ","tag":"035","subFields":{"a":[{"code":"a","value":"(CZ-PrSKC)cpk20031255343"}]}}],"992":[{"ind2":" ","ind1":" ","tag":"992","subFields":{"a":[{"code":"a","value":"20200731"}],"b":[{"code":"b","value":"batch"}],"s":[{"code":"s","value":"PA"}]}},{"ind2":" ","ind1":" ","tag":"992","subFields":{"a":[{"code":"a","value":"20210109"}],"b":[{"code":"b","value":"batch"}],"s":[{"code":"s","value":"NZ"}]}},{"ind2":" ","ind1":" ","tag":"992","subFields":{"a":[{"code":"a","value":"20210126"}],"b":[{"code":"b","value":"batch"}],"s":[{"code":"s","value":"N"}]}}],"015":[{"ind2":" ","ind1":" ","tag":"015","subFields":{"a":[{"code":"a","value":"cnb001174586"}],"z":[{"code":"z","value":"cnb001255343"}]}}],"655":[{"ind2":"7","ind1":" ","tag":"655","subFields":{"a":[{"code":"a","value":"antologie"}],"2":[{"code":"2","value":"czenas"}],"7":[{"code":"7","value":"fd131819"}]}},{"ind2":"7","ind1":" ","tag":"655","subFields":{"a":[{"code":"a","value":"populárně-naučné publikace"}],"2":[{"code":"2","value":"czenas"}],"7":[{"code":"7","value":"fd131864"}]}}],"998":[{"ind2":" ","ind1":" ","tag":"998","subFields":{"a":[{"code":"a","value":"DNT01-000108858"}]}}],"856":[{"ind2":"1","ind1":"4","tag":"856","subFields":{"u":[{"code":"u","value":"http://krameriusndk.nkp.cz/search/handle/uuid:3354e8c0-d05f-11e3-b110-005056827e51"}],"y":[{"code":"y","value":"Digitalizovaný dokument"}]}}],"956":[{"ind2":" ","ind1":"4","tag":"956","subFields":{"u":[{"code":"u","value":"http://krameriusndk.nkp.cz/search/handle/uuid:3354e8c0-d05f-11e3-b110-005056827e51"}],"9":[{"code":"9","value":"N"}]}}],"080":[{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"663.951/.954"}],"2":[{"code":"2","value":"MRF"}]}},{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"821(100)"}],"2":[{"code":"2","value":"MRF"}]}},{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"7.04:82"}],"2":[{"code":"2","value":"MRF"}]}},{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"663.95"}],"2":[{"code":"2","value":"MRF"}]}},{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"(0.062)"}],"2":[{"code":"2","value":"MRF"}]}},{"ind2":" ","ind1":" ","tag":"080","subFields":{"a":[{"code":"a","value":"(082.21)"}],"2":[{"code":"2","value":"MRF"}]}}],"040":[{"ind2":" ","ind1":" ","tag":"040","subFields":{"d":[{"code":"d","value":"ABA001"}],"a":[{"code":"a","value":"BOA001"}],"b":[{"code":"b","value":"cze"}]}}],"260":[{"ind2":" ","ind1":" ","tag":"260","subFields":{"a":[{"code":"a","value":"Brno :"}],"b":[{"code":"b","value":"Atlantis,"}],"c":[{"code":"c","value":"2003"}]}}],"020":[{"ind2":" ","ind1":" ","tag":"020","subFields":{"a":[{"code":"a","value":"80-7108-231-7"}],"q":[{"code":"q","value":"(váz.) :"}],"c":[{"code":"c","value":"Kč 273,00"}]}},{"ind2":" ","ind1":" ","tag":"020","subFields":{"a":[{"code":"a","value":"80-7108-239-2"}],"q":[{"code":"q","value":"(brož.)"}]}}],"100":[{"ind2":" ","ind1":"1","tag":"100","subFields":{"a":[{"code":"a","value":"Kundera, Ludvík,"}],"d":[{"code":"d","value":"1920-2010"}],"4":[{"code":"4","value":"aut"}],"7":[{"code":"7","value":"jk01070892"}]}}],"245":[{"ind2":"0","ind1":"1","tag":"245","subFields":{"a":[{"code":"a","value":"Piju čaj /"}],"c":[{"code":"c","value":"Ludvík Kundera ; [k vydání připravily Jitka a Jana Uhdeovy ; ilustrace Ludmila Jandová ... et al.]"}]}}],"300":[{"ind2":" ","ind1":" ","tag":"300","subFields":{"a":[{"code":"a","value":"270 s. :"}],"b":[{"code":"b","value":"il., noty, faksim. ;"}],"c":[{"code":"c","value":"17 x 18 cm"}]}}],"520":[{"ind2":" ","ind1":"2","tag":"520","subFields":{"a":[{"code":"a","value":"Půvabná kniha nás úvodem formou fiktivního rozhovoru seznamuje s Kunderovým vztahem k čaji a čajovnám. Druhá část přináší \"portréty\" čajů podle druhu, způsobu sklizně a přípravy i osobnosti konzumenta, formálně uvedené formou haiku. Ocitáme se tak už na půdě poezie, která utváří nejobsáhléjší část knihy, jak jinak - tematicky vymezenou čajem."}]}},{"ind2":" ","ind1":"2","tag":"520","subFields":{"a":[{"code":"a","value":"Vyznání lásky a obdivu k čaji, které nepostrádá cenné faktické informace o historicko-kulturních souvislostech prastarého nápoje."}]}}],"500":[{"ind2":" ","ind1":" ","tag":"500","subFields":{"a":[{"code":"a","value":"Vyšlo v rámci projektu Podpora vydávání české a překladové literatury"}]}}],"700":[{"ind2":" ","ind1":"1","tag":"700","subFields":{"a":[{"code":"a","value":"Uhdeová, Jitka,"}],"d":[{"code":"d","value":"1942-"}],"4":[{"code":"4","value":"edt"}],"7":[{"code":"7","value":"jo2003163178"}]}},{"ind2":" ","ind1":"1","tag":"700","subFields":{"a":[{"code":"a","value":"Uhdeová, Jana,"}],"d":[{"code":"d","value":"1975-"}],"4":[{"code":"4","value":"edt"}],"7":[{"code":"7","value":"xx0021757"}]}},{"ind2":" ","ind1":"1","tag":"700","subFields":{"a":[{"code":"a","value":"Jandová, Ludmila,"}],"d":[{"code":"d","value":"1938-2008"}],"4":[{"code":"4","value":"ill"}],"7":[{"code":"7","value":"jn19990216077"}]}}],"800":[{"ind2":" ","ind1":"1","tag":"800","subFields":{"d":[{"code":"d","value":"1920-"}],"t":[{"code":"t","value":"Spisy"}],"a":[{"code":"a","value":"Kundera, Ludvík,"}]}}],"910":[{"ind2":" ","ind1":"1","tag":"910","subFields":{"a":[{"code":"a","value":"OSA001"},{"code":"a","value":"ULG001"}],"x":[{"code":"x","value":"2640022346"},{"code":"x","value":"KN3148000000213764"}]}}],"504":[{"ind2":" ","ind1":" ","tag":"504","subFields":{"a":[{"code":"a","value":"Obsahuje bibliografické odkazy"}]}}]}}</field>
+
+    <field name="marc_910a">OSA001</field>
+    <field name="marc_910a">ULG001</field>
+
+    <field name="marc_910x">2640022346</field>
+    <field name="marc_910x">KN3148000000213764</field>
+
+</doc>
+
+</add>

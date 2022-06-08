@@ -140,7 +140,6 @@ public class OAIRequest {
         query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       }
       
-      
       if (req.getParameter("resumptionToken") != null) {
           String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
           // Change it by PS; only checks (configurations, aio exceptions etc..)
@@ -184,8 +183,8 @@ public class OAIRequest {
           ret.append("</header>");
 
           String raw = (String) doc.getFirstValue("raw");
-          MarcRecord mr = MarcRecord.fromDoc(doc);
-          ret.append(mr.toXml(onlyIdentifiers));
+          MarcRecord mr = MarcRecord.fromDocDep(doc);
+          ret.append(mr.toXml(onlyIdentifiers, false));
 
           ret.append("</record>");
         }
@@ -245,6 +244,7 @@ public static String getRecord(HttpServletRequest req) {
               .addFilterQuery("identifier:\"" + id + "\" OR id_sdnnt:\""+id+"\"")
               .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
 
+      /** to je blbe */
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
         query.addFilterQuery("dntstav:A");
@@ -275,9 +275,9 @@ public static String getRecord(HttpServletRequest req) {
           //String raw = (String) doc.getFirstValue("raw");
           //MarcRecord mr = MarcRecord.fromRAWJSON(raw);
           
-          MarcRecord mr = MarcRecord.fromDoc(doc);
+          MarcRecord mr = MarcRecord.fromDocDep(doc);
           
-          ret.append(mr.toXml(false));
+          ret.append(mr.toXml(false, false));
           ret.append("</record>");
         }
         ret.append("</GetRecord>");

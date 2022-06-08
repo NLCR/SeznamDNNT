@@ -104,9 +104,10 @@ public class Job implements InterruptableJob {
         }
     }
 
-    enum Actions {
+    public enum Actions {
 
-
+        
+        /** Depreceted - alternativni linky do alephu - jiz se nepouziva */
         ALTERNATIVE_LINKS_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
@@ -118,6 +119,32 @@ public class Job implements InterruptableJob {
             }
         },
  
+        DNT_SKC_PAIR {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
+                long start = System.currentTimeMillis();
+                JSONObject results = jobData.optJSONObject("results");
+                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                List<String> states = new ArrayList<>();
+                if (jsonArrayOfStates != null) {
+                    jsonArrayOfStates.forEach(it -> {
+                        states.add(it.toString());
+                    });
+                }
+                String loggerPostfix = jobData.optString("logger");
+                AbstractCheckDeleteService service = new DNTSKCPairServiceImpl(loggerPostfix, results);
+                try {
+                    service.update();
+                } catch (IOException | SolrServerException e) {
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                }finally {
+                    QuartzUtils.printDuration(service.getLogger(), start);
+                }
+            }
+        },
+        
         /**
          * Kontrola oproti datumu vydani
          */

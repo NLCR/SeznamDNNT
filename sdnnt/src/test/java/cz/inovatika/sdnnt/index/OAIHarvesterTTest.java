@@ -79,7 +79,7 @@ public class OAIHarvesterTTest {
                 SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
                 Assert.assertTrue(catalogDocs.size() == 1);
                 
-                MarcRecord fDoc = MarcRecord.fromDoc(catalogDocs.get(0));
+                MarcRecord fDoc = MarcRecord.fromDocDep(catalogDocs.get(0));
 
                 Assert.assertNotNull(fDoc.dntstav);
                 Assert.assertTrue(fDoc.dntstav.equals(Arrays.asList("A")));
@@ -134,5 +134,10 @@ public class OAIHarvesterTTest {
         } catch(Exception ex) {
             Assert.fail(ex.getMessage());
         }
+    }
+    
+    @Test
+    public void testDelete() {
+        
     }
 }

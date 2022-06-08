@@ -1,0 +1,25 @@
+{
+    "id": "1d2581b6-4414-4c1a-82b1-d0561229c87f",
+    "datum_vyrizeni": "2022-03-24T13:54:24.145Z",
+    "datum_zadani": "2022-03-24T13:52:09.634Z",
+    "user": "pokus23",
+    "identifiers": ["oai:aleph-nkp.cz:DNT01-000102092",
+        "oai:aleph-nkp.cz:DNT01-000066685",
+        "oai:aleph-nkp.cz:DNT01-000067410"
+    ],
+    "institution": "KNAV",
+    "kurator": "kurator",
+    "navrh": "VNL",
+    "pozadavek": "VNL-kolize",
+    "poznamka": "VNL-kolize",
+    "state": "waiting",
+    "process": "{\"oai:aleph-nkp.cz:DNT01-000102092_(NLX,dnntt)\":{\"date\":1648130062641,\"reason\":\"Hromadne odmitam\",\"state\":\"rejected\",\"user\":\"kurator\",\"transitionname\":\"(NLX,dnntt)\"},\"oai:aleph-nkp.cz:DNT01-000067410\":{\"date\":1648130052767,\"reason\":\"Schvaleno\",\"state\":\"approved\",\"user\":\"kurator\",\"transitionname\":\"(NL,dnntt)\"},\"oai:aleph-nkp.cz:DNT01-000102092\":{\"date\":1648130062641,\"reason\":\"Hromadne odmitam\",\"state\":\"rejected\",\"user\":\"kurator\",\"transitionname\":\"(A,dnnto)\"},\"oai:aleph-nkp.cz:DNT01-000067410_(NL,dnntt)\":{\"date\":1648130052767,\"reason\":\"Schvaleno\",\"state\":\"approved\",\"user\":\"kurator\",\"transitionname\":\"(NL,dnntt)\"},\"oai:aleph-nkp.cz:DNT01-000066685\":{\"date\":1648130052724,\"reason\":\"Schvaleno\",\"state\":\"approved\",\"user\":\"kurator\",\"transitionname\":\"(NL,dnntt)\"},\"oai:aleph-nkp.cz:DNT01-000069886_noworkflow\":{\"date\":1648130062641,\"reason\":\"Hromadne odmitam\",\"state\":\"rejected\",\"user\":\"kurator\",\"transitionname\":\"noworkflow\"},\"oai:aleph-nkp.cz:DNT01-000102092_(A,dnnto)\":{\"date\":1648130062641,\"reason\":\"Hromadne odmitam\",\"state\":\"rejected\",\"user\":\"kurator\",\"transitionname\":\"(A,dnnto)\"},\"oai:aleph-nkp.cz:DNT01-000066685_(NL,dnntt)\":{\"date\":1648130052724,\"reason\":\"Schvaleno\",\"state\":\"approved\",\"user\":\"kurator\",\"transitionname\":\"(NL,dnntt)\"}}",
+    "type_of_period": "debug_vnl_3_5wd",
+    "type_of_transition": "kurator",
+    "deadline": "2022-03-24T14:07:00.236Z",
+    "desired_item_state": "A",
+    "desired_license": "dnnto",
+    "type_of_request": "user",
+    "indextime": "2022-03-24T14:02:00.237Z",
+    "id_parts": "1229c87f"
+}

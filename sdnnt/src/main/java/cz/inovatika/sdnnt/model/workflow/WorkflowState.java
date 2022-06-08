@@ -78,7 +78,7 @@ public class WorkflowState {
         return this.firstTransition;
     }
 
-    public void switchState(String originator, String user, String poznamka) {
+    public void switchState(String originator, String user, String poznamka, SwitchStateOptions options) {
 
         boolean shouldChangeLicense = false;
         License expectingLicense = getLicense();
@@ -90,7 +90,7 @@ public class WorkflowState {
             shouldChangeLicense = true;
         }
 
-        this.workflowOwner.switchWorkflowState(getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense, this. getPeriod(),originator , user, poznamka);
+        this.workflowOwner.switchWorkflowState(options, getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
         this.workflowOwner.setPeriodBetweenStates(getPeriod());
     }
 }

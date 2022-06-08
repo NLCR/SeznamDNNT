@@ -83,8 +83,6 @@ public class UserTests {
         Assert.assertNotNull(solrInputFields.getFieldValue("adresa"));
         Assert.assertNotNull(solrInputFields.getFieldValue("apikey"));
         Assert.assertNotNull(solrInputFields.getFieldValue("notifikace_interval"));
-        //User bean = binder.getBean(User.class, document);
-
     }
 
 }

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Service responsible for creating reuests or updating titles which should be public according to the state in digital library
  */
-public interface PXKrameriusService {
+public interface PXKrameriusService extends RequestService, LoggerAware {
 
 	/**
      * Check the titles and returns all possible candidates
@@ -19,15 +19,6 @@ public interface PXKrameriusService {
      */
     public List<String> check();
 
-    /**
-     * Sends requests
-     * @param identifiers Found identifiers
-     * @throws AccountException
-     * @throws IOException
-     * @throws ConflictException
-     * @throws SolrServerException
-     */
-    public void request(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
     /**
      * Update titles
@@ -39,5 +30,4 @@ public interface PXKrameriusService {
      */
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
-    public Logger getLogger();
 }

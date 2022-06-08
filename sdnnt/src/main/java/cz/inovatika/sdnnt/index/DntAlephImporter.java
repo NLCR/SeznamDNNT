@@ -189,10 +189,10 @@ public class DntAlephImporter {
             
             if (mlinks911u != null && !mlinks911u.isEmpty()) {
                 mlinks911u.stream().map(Object::toString).forEach(links::add);
-            } else if (mlinks856u != null) {
-                mlinks856u.stream().map(Object::toString).forEach(links::add);
             } else if (mlinks956u != null) {
                 mlinks956u.stream().map(Object::toString).forEach(links::add);
+            } else if (mlinks856u != null) {
+                mlinks856u.stream().map(Object::toString).forEach(links::add);
             }
             
             digitalized.keySet().forEach(key -> {

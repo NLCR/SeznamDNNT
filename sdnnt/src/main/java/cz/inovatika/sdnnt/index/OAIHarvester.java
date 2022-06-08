@@ -7,6 +7,7 @@ import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -191,9 +192,14 @@ public class OAIHarvester {
             recs.clear();
           }
           if (!toDelete.isEmpty()) {
-            //solr.deleteById(collection, toDelete);
-            deleted += toDelete.size();
-            toDelete.clear();
+
+              String loggerPostfix = null;
+              JSONObject confObj = new JSONObject();
+              SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl(loggerPostfix, confObj, new ArrayList<>(toDelete));
+              skcDeleteServiceImpl.update();
+
+              deleted += toDelete.size();
+              toDelete.clear();
           }
           solrTime += new Date().getTime() - start;
 
@@ -351,7 +357,7 @@ public class OAIHarvester {
               recs.add(DntAlephImporter.toSolrDoc(mr));
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
-              //toDelete.add(mr.identifier);
+              toDelete.add(mr.identifier);
             }
             // ret.append("records", mr.toJSON());
           } else {

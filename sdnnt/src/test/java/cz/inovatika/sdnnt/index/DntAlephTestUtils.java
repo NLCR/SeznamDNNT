@@ -35,7 +35,7 @@ public class DntAlephTestUtils {
 
             DntAlephImporter importer = new DntAlephImporter();
             importer.readDocument(reader);
-
+            
             Assert.assertTrue(importer.recs.size() == expectedSize);
 
             // adding to catalog

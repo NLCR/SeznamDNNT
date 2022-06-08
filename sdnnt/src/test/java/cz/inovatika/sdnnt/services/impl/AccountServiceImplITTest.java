@@ -1,31 +1,33 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import cz.inovatika.sdnnt.AccountServlet;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Period;
-import cz.inovatika.sdnnt.model.Zadost;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.easymock.EasyMock;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import cz.inovatika.sdnnt.it.SolrTestServer;
+import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.ZadostProcess;
-import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.utils.ServletsSupport;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.easymock.EasyMock;
-import org.json.JSONObject;
-import org.junit.*;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class AccountServiceImplITTest {
 
@@ -102,7 +104,6 @@ public class AccountServiceImplITTest {
 
         Assert.assertNotNull(fromService.getPozadavek());
         Assert.assertNotNull(fromService.getPoznamka());
-
     }
 
 
@@ -229,6 +230,8 @@ public class AccountServiceImplITTest {
         Assert.assertTrue(process.get("identifier-abc").getUser().equals("pokusny"));
     }
 
+    
+    
     // Test send zadost
     @Test
     public void testSendZadostNZN() throws IOException, SolrServerException, ConflictException {
@@ -277,12 +280,6 @@ public class AccountServiceImplITTest {
         Assert.assertNotNull(savedZadost.getDeadline());
 
 
-        LocalDate date1 = LocalDate.now();
-        LocalDate date2 = LocalDate.ofInstant(savedZadost.getDeadline().toInstant(), ZoneId.systemDefault());
-
-        // debug configuration !
-//        int days = java.time.Period.between(date1, date2).getDays();
-//        Assert.assertTrue(days >= 5);
     }
 
 
@@ -391,11 +388,10 @@ public class AccountServiceImplITTest {
 
         service.commit("catalog","zadost","history");
 
-
         JSONObject zadostJSON = service.userCloseRequest(zadost.toJSON().toString());
         for (String identifier : CatalogSupport.N_IDENTIFIERS) {
             try {
-                zadostJSON = service.curatorSwitchState(zadostJSON, identifier, "Test reason");
+                zadostJSON = service.curatorSwitchState(zadostJSON, null, identifier, "Test reason");
                 // committing
                 service.commit("catalog","zadost","history");
             } catch (AccountException e) {
@@ -449,7 +445,6 @@ public class AccountServiceImplITTest {
         // po schvaleni, waiting for automatic process
         Zadost rejectedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
         Assert.assertNotNull(rejectedZadost.getState());
-        System.out.println(rejectedZadost.getState());
         Assert.assertEquals(rejectedZadost.getState(), "processed");
     }
 
