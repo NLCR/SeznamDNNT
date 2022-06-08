@@ -96,6 +96,7 @@
     "i": "Musi se doplnit",
     "a": "Taky se musi",
     "id_sdnnt": "Internal identifier",
+    "digital_libraries": "Digital library",
 
     "fmt": "Document format",
     "item_type": "Document type",
@@ -124,7 +125,7 @@
     "VNZ": "Call for on on-site terminal license",
     "NL": "Scheduled release of the work",
     "NLX": "On-site terminal license, internal state",
-
+    "D": "Deleted",
     "Priorita 1": "Priority 1",
     "Priorita 2": "Priority 2",
     "Priorita 3": "Priority 3"
