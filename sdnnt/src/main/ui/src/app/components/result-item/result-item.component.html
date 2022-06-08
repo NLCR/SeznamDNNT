@@ -132,6 +132,10 @@
           <mat-icon>format_list_numbered</mat-icon>
           <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
         </button>
+        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost" (click)="openSuccessorRecords()">
+          <mat-icon class="material-icons-outlined">start</mat-icon>
+          <a>{{ 'acts.zobrazit_naslednicke_zaznamy' | translate }}</a>
+        </button>
       </mat-menu>
     
     </div>
