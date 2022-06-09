@@ -144,11 +144,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         }
         logger.info("Current iteration filter " + plusFilter);
         try (final SolrClient solrClient = buildClient()) {
-            List<String> negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
-            if (this.contextInformation) {
-                    negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
-            }
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
@@ -350,7 +346,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     SolrInputDocument idoc = null;
                     logger.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
-                        idoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name());
+                        idoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name(), "scheduler/kramerius check");
                     }
                     // history information
                     if (contextInformation) {

@@ -76,7 +76,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         logger.info("Current iteration filter " + plusFilter);
  
         try (SolrClient solrClient = buildClient()){
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
@@ -109,7 +109,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
             try (final SolrClient solr = buildClient()) {
                 for (String identifier : identifiers) {
                     if (cState != null) {
-                        SolrInputDocument sDoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name());
+                        SolrInputDocument sDoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name(), "scheduler/yearscheck");
                         solr.add(DataCollections.catalog.name(), sDoc);
                     }
                 }
