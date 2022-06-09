@@ -177,8 +177,6 @@ export class ResultItemComponent implements OnInit {
     }
   }
 
-//  this.hasNavhr = !!this.doc.zadost && !this.processed;
-
 
   curatorAndPublicStateAreDifferent(): boolean {
     // neni nastaveny public stav ale ma kuratorsky stav NPA 
@@ -478,10 +476,11 @@ export class ResultItemComponent implements OnInit {
     return doc.dntstav == null || doc.dntstav[doc.dntstav.length - 1] !== 'X';
   }
 
-  openSuccessorRecords() {
+  openSuccessorRecords(flag: boolean) {
     this.service.details(this.doc.followers).subscribe((resp: SolrResponse) => {
       const data = {
-          "docs" : resp.response.docs
+        "edit": flag,
+        "docs" : resp.response.docs
        };
 
       const approveDialogRef = this.dialog.open(DialogSuccessorRecordsComponent, {

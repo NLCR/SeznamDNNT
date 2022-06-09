@@ -90,6 +90,9 @@ public class MarcRecord {
   // followers
   public List<String> followers = new ArrayList<>();
   
+  // digital librarires
+  public List<String> digitalLibraries = new ArrayList<>();
+  
   // <marc:controlfield tag="001">000000075</marc:controlfield>
   // <marc:controlfield tag="003">CZ PrDNT</marc:controlfield>
   public Map<String, String> controlFields = new HashMap();
@@ -148,7 +151,7 @@ public class MarcRecord {
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
                     FLAG_PUBLIC_IN_DL+" ",
-                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+ GRANULARITY_FIELD+":[json]");
+                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ GRANULARITY_FIELD+":[json]");
 
     return fromIndex(client,q);
   }
@@ -234,6 +237,11 @@ public class MarcRecord {
       if (doc.containsKey(FOLLOWERS)) {
           List<String> collected = doc.getFieldValues(FOLLOWERS).stream().map(Object::toString).collect(Collectors.toList());
           mr.followers = collected;
+      }
+      
+      if (doc.containsKey(DIGITAL_LIBRARIES)) {
+          List<String> collected = doc.getFieldValues(DIGITAL_LIBRARIES).stream().map(Object::toString).collect(Collectors.toList());
+          mr.digitalLibraries = collected;
       }
       
       return mr;
@@ -498,6 +506,12 @@ public class MarcRecord {
     if (this.followers != null && !this.followers.isEmpty()) {
         followers.stream().forEach(f-> {
             sdoc.addField(FOLLOWERS, f);
+        });
+    }
+    
+    if (this.digitalLibraries != null && !this.digitalLibraries.isEmpty()) {
+        digitalLibraries.stream().forEach(f-> {
+            sdoc.addField(DIGITAL_LIBRARIES, f);
         });
     }
     

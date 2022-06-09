@@ -115,7 +115,6 @@ public class DntAlephImporterITTest {
         Assert.assertNotNull(resourceAsStream);
         try {
             alephImport(resourceAsStream,36);
-
             try(SolrClient client = SolrTestServer.getClient()) {
                 SolrQuery query = new SolrQuery("*")
                         .setRows(1000);

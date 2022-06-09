@@ -45,6 +45,17 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
         }
     }
 
+    public SKCDeleteServiceImpl(String loggerPostfix, JSONObject results) {
+        super(loggerPostfix, results);
+        if (loggerPostfix != null) {
+            this.logger = Logger.getLogger(SKCDeleteServiceImpl.class.getName()+"."+loggerPostfix);
+        }
+    }
+
+    
+    public void updateDeleteInfo(List<String> deleteInfo) {
+        this.deletedInfo = deleteInfo;
+    }
     
     protected void deleteRecords(List<String> identifiers) throws IOException, SolrServerException {
         if (identifiers != null && !identifiers.isEmpty()) {
@@ -60,11 +71,11 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
         return this.logger;
     }
 
-    protected Options getOptions() {
+    public Options getOptions() {
         return Options.getInstance();
     }
 
-    protected SolrClient buildClient() {
+    public SolrClient buildClient() {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
 
@@ -77,6 +88,8 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
                String id = this.deletedInfo.get(i);
                SolrQuery query = new SolrQuery(String.format("identifier:\"%s\"", id))
                        .addFilterQuery("dntstav:*")
+                       .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":DX")
+                       .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":D")
                        .setRows(1)
                    .setStart(0);
                SolrDocumentList docs = solrClient.query(DataCollections.catalog.name(), query).getResults();

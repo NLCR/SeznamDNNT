@@ -18,6 +18,8 @@ export class DialogSuccessorRecordsComponent implements OnInit {
 
   documents = [];
 
+  edit: boolean = false;
+
   constructor(
     public dialogRef: MatDialogRef<DialogSuccessorRecordsComponent>,
     private route: ActivatedRoute,
@@ -26,6 +28,9 @@ export class DialogSuccessorRecordsComponent implements OnInit {
     private config: AppConfiguration,
     public state: AppState,
     @Inject(MAT_DIALOG_DATA) public dat:  any) {
+
+      this.edit = dat.edit;
+
       dat.docs.forEach((dd)=> {
         this.documents.push({
           expanded:false,

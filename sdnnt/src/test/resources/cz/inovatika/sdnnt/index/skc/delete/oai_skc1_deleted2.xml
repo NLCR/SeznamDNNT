@@ -125,13 +125,66 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 				</marc:record>
 			</metadata>
 		</record>
-		<record>
-			<header status="deleted">
-				<identifier>oai:aleph-nkp.cz:SKC01-001579067</identifier>
-				<datestamp>2014-12-29T22:17:02Z</datestamp>
-				<setSpec>SKC</setSpec>
-			</header>
-		</record>
+        <record>
+            <header>
+                <identifier>oai:aleph-nkp.cz:SKC01-001579067</identifier>
+                <datestamp>2014-12-29T22:17:02Z</datestamp>
+                <setSpec>SKC</setSpec>
+            </header>
+            <metadata>
+                <marc:record xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+                    <marc:leader>nam a22 a 4500</marc:leader>
+                    <marc:controlfield tag="001">000349686</marc:controlfield>
+                    <marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+                    <marc:controlfield tag="008">980103s1992 gw f ger</marc:controlfield>
+                    <marc:datafield tag="040" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="b">cze</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="080" ind1=" " ind2=" ">
+                        <marc:subfield code="a">538.3:621.3.015</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="080" ind1=" " ind2=" ">
+                        <marc:subfield code="a">621.3.015:538.3</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="100" ind1="1" ind2=" ">
+                        <marc:subfield code="a">Feurer, Klaus</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="245" ind1="1" ind2="0">
+                        <marc:subfield code="a">Erzeugung multipler elektromagnetischer Impulse mit hoher Amplitude /</marc:subfield>
+                        <marc:subfield code="c">Klaus Feurer.</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="260" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Stuttgart :</marc:subfield>
+                        <marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+                        <marc:subfield code="c">1992</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="300" ind1=" " ind2=" ">
+                        <marc:subfield code="a">104 s.</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="500" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Disertace</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="900" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="b">9</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="910" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="x">000349686</marc:subfield>
+                        <marc:subfield code="b">TK-X-0252.801</marc:subfield>
+                        <marc:subfield code="w">l</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="928" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Universität Stuttgart</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="998" ind1=" " ind2=" ">
+                        <marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579067&amp;local_base=SKC</marc:subfield>
+                    </marc:datafield>
+                </marc:record>
+            </metadata>
+        </record>
 		<record>
 			<header>
 				<identifier>oai:aleph-nkp.cz:SKC01-001579047</identifier>

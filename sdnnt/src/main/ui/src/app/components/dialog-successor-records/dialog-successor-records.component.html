@@ -7,7 +7,7 @@
           <th>{{ 'desc.zaznam' | translate }}</th>
           <th>Url</th>
           <th></th>
-          <th></th>
+          <th *ngIf="edit"></th>
         </tr>
       </thead>
       <tbody>
@@ -19,10 +19,12 @@
               <div *ngIf="nakladatelskeUdaje(item.doc)"><label class="app-label app-mr-1">Nakl. údaje:</label> {{nakladatelskeUdaje(item.doc)}} </div>
               <div *ngIf="nakladatel(item.doc)"><label class="app-label app-mr-1">Nakladatel:</label> {{nakladatel(item.doc)}} </div>
               <div *ngIf="vydani(item.doc)"><label class="app-label app-mr-1">Vydání:</label>{{vydani(item.doc)}}</div>
-              <div><label class="app-label app-mr-1">Ve fondu:</label>{{fondy(item.doc)}} </div>
               <div *ngIf="item.doc.id_issn"><label class="app-label app-mr-1">ISSN:</label>{{item.doc.id_issn}}</div>
               <div *ngIf="item.doc.id_isbn"><label class="app-label app-mr-1">ISBN:</label>{{item.doc.id_isbn}}</div>
               <div *ngIf="item.doc.id_ccnb"><label class="app-label app-mr-1">ČČNB:</label>{{item.doc.id_ccnb}}</div>
+              <div><label class="app-label app-mr-1">Identifikátor:</label> <a (click)="goto('search??q={{item.doc.identifier}}&page=0',$event)"> {{item.doc.identifier}}</a></div>
+
+              <div><label class="app-label app-mr-1">Ve fondu:</label>{{fondy(item.doc)}} </div>
             </div>
           </td>
           <td class="app-col-action">
@@ -33,13 +35,13 @@
               <mat-icon class="app-mr-1">expand_more</mat-icon>{{ item.expanded ? ('desc.zobrazit_mene' | translate) : ('desc.zobrazit_vice' | translate) }}
             </a>
           </td>
-          <td class="app-col-checkbox"><mat-checkbox [(ngModel)]="item.selected"></mat-checkbox></td>
+          <td *ngIf="edit" class="app-col-checkbox"><mat-checkbox [(ngModel)]="item.selected"></mat-checkbox></td>
         </tr>
       </tbody>
     </table>
   </div>
 </mat-dialog-content>
 <div mat-dialog-actions>
-  <button mat-flat-button mat-dialog-close color="primary" (click)="accept()" cdkFocusInitial>{{ 'desc.akceptovat' | translate }}</button>
+  <button *ngIf="edit" mat-flat-button mat-dialog-close color="primary" (click)="accept()" cdkFocusInitial>{{ 'desc.akceptovat' | translate }}</button>
   <button mat-button mat-dialog-close >{{ 'desc.zavrit' | translate }}</button>
 </div>

@@ -29,9 +29,10 @@ import cz.inovatika.sdnnt.index.OAICheckSKC;
 import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
+import cz.inovatika.sdnnt.services.SKCTypeService;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
-public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SKCDeleteService {
+public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SKCTypeService {
 
     protected Logger logger = Logger.getLogger(SKCTypeServiceImpl.class.getName());
 
@@ -99,4 +100,5 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
     protected List<String> checkDelete() throws IOException, SolrServerException {
         return new ArrayList<>();
     }
+
 }

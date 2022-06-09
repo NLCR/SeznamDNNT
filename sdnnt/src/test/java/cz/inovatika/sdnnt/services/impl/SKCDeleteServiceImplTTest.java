@@ -277,7 +277,7 @@ public class SKCDeleteServiceImplTTest {
         }
 
         @Override
-        protected SolrClient buildClient() {
+        public SolrClient buildClient() {
             return SolrTestServer.getClient();
         }
     }

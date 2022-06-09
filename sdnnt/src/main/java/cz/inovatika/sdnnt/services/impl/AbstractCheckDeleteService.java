@@ -102,17 +102,6 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
     
                     for (Pair<String, List<String>> pair : batch) {
                         MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
-                        /*
-                        List<MarcRecord> followers = pair.getRight().stream().map(id -> {
-                            try {
-                                return MarcRecord.fromIndex(solrClient, id);
-                            } catch (IOException | SolrServerException  e) {
-                                reqService.getLogger().log(Level.SEVERE,e.getMessage(),e);
-                                return null;
-                            }
-                        }).filter(mr-> Objects.nonNull(mr)).collect(Collectors.toList());
-                        */
-                        
                         origin.followers = pair.getRight();
                         // zmena stavu - nutno 
                         SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin);

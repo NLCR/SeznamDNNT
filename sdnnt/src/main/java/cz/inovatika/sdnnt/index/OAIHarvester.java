@@ -7,6 +7,7 @@ import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
 
 import java.io.File;
@@ -192,22 +193,14 @@ public class OAIHarvester {
             recs.clear();
           }
           if (!toDelete.isEmpty()) {
-
-              String loggerPostfix = null;
-              JSONObject confObj = new JSONObject();
-              SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl(loggerPostfix, confObj, new ArrayList<>(toDelete));
-              skcDeleteServiceImpl.update();
-
+              deleteRecords(new ArrayList(toDelete), buildSKCDeleteService());
               deleted += toDelete.size();
               toDelete.clear();
           }
           solrTime += new Date().getTime() - start;
-
           if (dStream != null ) {
             IOUtils.closeQuietly(dStream);
           }
-
-
           deletePaths(dFile);
 
         } catch (MaximumIterationExceedException e) {
@@ -258,9 +251,10 @@ public class OAIHarvester {
         }
 
         if (!toDelete.isEmpty()) {
-          //solr.deleteById(collection, toDelete);
-          //deleted += toDelete.size();
-          //toDelete.clear();
+            deleteRecords(new ArrayList<>(toDelete), buildSKCDeleteService());
+            //solr.deleteById(collection, toDelete);
+          deleted += toDelete.size();
+          toDelete.clear();
         }
         solrTime += new Date().getTime() - start;
       } catch (XMLStreamException | IOException exc) {
@@ -278,6 +272,19 @@ public class OAIHarvester {
     }
   }
 
+    protected void deleteRecords(List<String> delete, SKCDeleteService skcDeleteService) throws IOException, SolrServerException {
+      if (!delete.isEmpty()) {
+          skcDeleteService.updateDeleteInfo(delete);
+          skcDeleteService.update();
+      }
+    }
+
+    protected SKCDeleteServiceImpl buildSKCDeleteService() {
+        String loggerPostfix = null;
+        JSONObject confObj = new JSONObject();
+        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl(loggerPostfix, confObj);
+        return skcDeleteServiceImpl;
+    }
     private void deletePaths(File dFile) {
         if (!debug) {
             try {
@@ -349,7 +356,10 @@ public class OAIHarvester {
             if (!"deleted".equals(status)) {
               readRecordHeader(reader, mr);
             } else {
-              mr.isDeleted = true;
+                readRecordHeader(reader, mr);
+                System.out.println("DELETED record "+mr.identifier);
+                mr.isDeleted = true;
+                toDelete.add(mr.identifier);
             }
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);

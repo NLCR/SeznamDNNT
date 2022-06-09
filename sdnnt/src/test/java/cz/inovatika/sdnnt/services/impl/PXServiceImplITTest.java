@@ -271,7 +271,6 @@ public class PXServiceImplITTest {
         String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 1900]\",\"states\":[\"A\",\"PA\",\"NL\"]},\"results\":{\"state\":\"PX\",\"ctx\":true,\"request\":{\"type\":\"PXN\",\"items\":50}}}";
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
-        //PXKrameriusService pxService =
         PXKrameriusServiceImpl pxService = EasyMock.createMockBuilder(PXKrameriusServiceImpl.class)
                 .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")

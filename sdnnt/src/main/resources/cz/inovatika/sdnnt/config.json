@@ -52,6 +52,24 @@
     }
   },
 
+  "digitalized":{
+            "ABA000":{
+                "regexp":[ "https?://krameriusndk.nkp.cz.*", "https?://kramerius5.nkp.cz.*"]
+            },
+            "BOA001":{
+                "regexp":[ "https?://www.digitalniknihovna.cz/mzk.*"]
+            },
+            "HKA001":{
+                "regexp":[ "https?://kramerius.svkhk.cz.*"]
+            },
+            "ABA013":{
+                "regexp":[ "https?://kramerius.techlib.cz.*"]
+            },
+            "OSA001":{
+                "regexp":[ "https?://kramerius.svkos.*"]
+            }
+      },
+
   "jobs": {
     "zadost_po_minute": {
       "type": "workflow",
