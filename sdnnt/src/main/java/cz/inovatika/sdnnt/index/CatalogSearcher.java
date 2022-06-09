@@ -48,7 +48,9 @@ import org.json.JSONObject;
  * @author alberto
  */
 public class CatalogSearcher {
-
+    
+    public static final String ID_PREFIX = "oai:aleph-nkp.cz:";
+    
     public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
 
     public JSONObject frbr(String id) {
@@ -404,8 +406,11 @@ public class CatalogSearcher {
 
 
         query.set("defType", "edismax");
-        query.set("qf", "title^3 id_pid^4 id_all_identifiers^4 id_all_identifiers_cuts^4 fullText license");
-
+        if (q.startsWith(QueryUtils.IDENTIFIER_PREFIX) ||q.startsWith('"'+QueryUtils.IDENTIFIER_PREFIX)) {
+            query.set("qf", "identifier");
+        } else {
+            query.set("qf", "title^3 id_pid^4 id_all_identifiers^4 id_all_identifiers_cuts^4 fullText license");
+        }
 
         if (req.containsKey("sort")) {
             if (req.get("sort").startsWith("date1")) {
@@ -521,7 +526,7 @@ public class CatalogSearcher {
     }
 
     private void ensureKnihovnaRoleFilter(User user, SolrQuery query) {
-        if (user == null || "knihovnar".equals(user.getRole())) {
+        if (user != null && "knihovna".equals(user.getRole())) {
             query.addFilterQuery("-dntstav:D");
         }
     }
