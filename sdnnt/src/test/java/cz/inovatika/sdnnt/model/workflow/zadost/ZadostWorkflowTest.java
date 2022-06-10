@@ -18,13 +18,13 @@ public class ZadostWorkflowTest {
         List<String> expectedStates = new ArrayList<>(Arrays.asList("NPA","PA","A"));
         Workflow workflow = ZadostWorkflowFactory.create(zadost);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
-            state.switchState("mojeid", zadost.getUser(), zadost.getId());
+            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null);
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
             Assert.assertTrue(state.getLicense() == null || state.getLicense().name().equals("dnnto"));
         }
         Assert.assertTrue(state.isFinalSate());
         if (state.isFinalSate()) {
-            state.switchState("mojeid", zadost.getUser(), zadost.getId());
+            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null);
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
             Assert.assertTrue(state.getLicense().name().equals("dnnto"));
         }
@@ -63,7 +63,7 @@ public class ZadostWorkflowTest {
             if (map.containsKey(remove)) {
                 Assert.assertEquals(state.getLicense(), License.valueOf(map.get(remove)));
             }
-            owner.switchWorkflowState(state.getCuratorState(), state.getLicense().name(), true,  state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, state.getCuratorState(), state.getLicense().name(),  true, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
         if (state.isFinalSate()) {
@@ -84,15 +84,50 @@ public class ZadostWorkflowTest {
         VNZWorkflow workflow = new VNZWorkflow(owner);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
             Assert.fail("Cannot be here");
-            owner.switchWorkflowState(state.getCuratorState(), null, false ,  state.getPeriod(),"mojeid" , zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
         }
 
         if (state.isFinalSate()) {
             Assert.assertEquals(state.getCuratorState(), CuratorItemState.A);
             Assert.assertEquals(state.getLicense(), License.dnntt);
-            Assert.assertEquals(state.getPeriod(), Period.period_vln_0_5wd);
+            Assert.assertTrue(state.getPeriod().equals(Period.debug_vnl_0_5wd) || state.getPeriod().equals(Period.period_vln_0_5wd));
         }
-
     }
 
+    @Test
+    public void testPXWorkflow() {
+        Zadost zadost = new Zadost("mojeid");
+        WorkflowOwner owner = new ZadostProxy(zadost);
+        WorkflowState state = null;
+
+        PXWorkflow workflow = new PXWorkflow(owner);
+        while((state = workflow.nextState()) != null && !state.isFinalSate()) {
+            Assert.fail("Cannot be here");
+            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
+        }
+
+        if (state.isFinalSate()) {
+            Assert.assertEquals(state.getCuratorState(), CuratorItemState.X);
+            Assert.assertTrue(state.getLicense() == null);
+        }
+    }
+    
+    @Test
+    public void testDXWorkflow() {
+        Zadost zadost = new Zadost("mojeid");
+        WorkflowOwner owner = new ZadostProxy(zadost);
+        WorkflowState state = null;
+        // send
+        DXWorkflow workflow = new DXWorkflow(owner);
+        while((state = workflow.nextState()) != null && !state.isFinalSate()) {
+            Assert.fail("Cannot be here");
+            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
+        }
+        if (state.isFinalSate()) {
+            System.out.println(state.getCuratorState());
+            Assert.assertEquals(state.getCuratorState(), CuratorItemState.D);
+            Assert.assertTrue(state.getLicense() == null);
+        }
+    }
+    
 }

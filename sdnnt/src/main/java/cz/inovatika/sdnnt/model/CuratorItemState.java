@@ -23,12 +23,16 @@ import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
  */
 public enum CuratorItemState {
 
+    
+    
+    // Vyrazeno
     N{
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
             return PublicItemState.N;
         }
     },
+    
     // vyrazeno/nezarazeno ale ceka na zarazeni  N
     NPA {
         @Override
@@ -59,7 +63,7 @@ public enum CuratorItemState {
             return PublicItemState.NL;
         }
     },
-
+    //Omezeni na terminal - ocekavana produkce
     NLX {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
@@ -67,14 +71,14 @@ public enum CuratorItemState {
             return currentPublicState != null ? currentPublicState :  PublicItemState.A;
         }
     },
-
+    // Omezeni na terminal - ocekavana produkce
     NZ {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
             return PublicItemState.N;
         }
     },
-
+    // Pravdepodobne volne dilo
     PX {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
@@ -85,14 +89,38 @@ public enum CuratorItemState {
             }
         }
     },
+    // Volne dilo
     X {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {
             return PublicItemState.X;
         }
+    },
+    // Pravdepodobna duplicita
+    DX {
+
+        @Override
+        public PublicItemState getPublicItemState(WorkflowOwner owner) {
+            if (owner != null) {
+                return owner.getPublicState();
+            } else {
+                return null;
+            }
+        }
+        
+    },
+    
+    // Realna duplicita
+    D {
+
+        @Override
+        public PublicItemState getPublicItemState(WorkflowOwner owner) {
+            // TODO Auto-generated method stub
+            return PublicItemState.D;
+        }
+        
     };
-
-
+    
     /**
      * Curator and public state association
      * @param owner Given owner

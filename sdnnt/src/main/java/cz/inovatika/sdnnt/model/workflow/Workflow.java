@@ -29,7 +29,15 @@ public abstract class Workflow {
     public abstract boolean isClosableState();
 
 
-
+    /**
+     * Returns true if the switch is possible
+     * <p>
+     *  <ul>
+     *      <li> The owner is in the state which allows the switch </li>
+     *  </ul>
+     * </p>
+     * @return
+     */
     public abstract  boolean isSwitchPossible();
 
     /**
@@ -44,9 +52,10 @@ public abstract class Workflow {
     /**
      * Pokud ma alternativni prechod, umozni ho
      * @param alternative Nazev alternativniho prechodu
+     * @param options TODO
      * @return
      */
-    public abstract WorkflowState nextAlternativeState(String alternative);
+    public abstract WorkflowState nextAlternativeState(String alternative, SwitchStateOptions options);
 
     /**
      * Vraci true, pokud existuje alternativni prechod
@@ -56,6 +65,11 @@ public abstract class Workflow {
     public abstract  boolean isAlternativeSwitchPossible(String alternative);
 
 
+    /**
+     * Vraci true, pokud je workflow vztazeno k uzivatelske akci (zaradit, vyradit atd..) 
+     * V pripade, ze je vysledkem procesu (volne dilo v digitalni knihovne, vyrazeni, duplicita, atd..) vraci false
+     * @return
+     */
     public abstract boolean userDefinedWorkflow();
 
     /**

@@ -1,0 +1,2198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2022-04-13T07:42:59Z</responseDate>
+	<request verb="ListRecords"
+		resumptionToken="201412292217023999999999999999SKC:SKCM">http://aleph.nkp.cz/OAI</request>
+	<ListRecords>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001579065</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000349682</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980103s1994    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">548.73/.75</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Blank, Rupert</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Positronendiffusion in kubischen Kristallen /</marc:subfield>
+						<marc:subfield code="c">Rupert Blank.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Stuttgart :</marc:subfield>
+						<marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+						<marc:subfield code="c">1992</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">144 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Disertace</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000349682</marc:subfield>
+						<marc:subfield code="b">TK-X-0252.803</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Universität Stuttgart</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579065&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001579066</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000349683</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980103s1992    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">536.2.08</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Song, Youwang</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="4">
+						<marc:subfield code="a">Das transiente Heißdraht-Verfahren und seine Anwendung zur Messung der Wärmeleitfähigkeit bis nahe an den kritischen Punkt /</marc:subfield>
+						<marc:subfield code="c">Youwang Song.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Stuttgart :</marc:subfield>
+						<marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+						<marc:subfield code="c">1992</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">130 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Disertace</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000349683</marc:subfield>
+						<marc:subfield code="b">TK-X-0252.802</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Universität Stuttgart</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579066&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+        <record>
+            <header>
+                <identifier>oai:aleph-nkp.cz:SKC01-001579067</identifier>
+                <datestamp>2014-12-29T22:17:02Z</datestamp>
+                <setSpec>SKC</setSpec>
+            </header>
+            <metadata>
+                <marc:record xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+                    <marc:leader>nam a22 a 4500</marc:leader>
+                    <marc:controlfield tag="001">000349686</marc:controlfield>
+                    <marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+                    <marc:controlfield tag="008">980103s1992 gw f ger</marc:controlfield>
+                    <marc:datafield tag="040" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="b">cze</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="080" ind1=" " ind2=" ">
+                        <marc:subfield code="a">538.3:621.3.015</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="080" ind1=" " ind2=" ">
+                        <marc:subfield code="a">621.3.015:538.3</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="100" ind1="1" ind2=" ">
+                        <marc:subfield code="a">Feurer, Klaus</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="245" ind1="1" ind2="0">
+                        <marc:subfield code="a">Erzeugung multipler elektromagnetischer Impulse mit hoher Amplitude /</marc:subfield>
+                        <marc:subfield code="c">Klaus Feurer.</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="260" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Stuttgart :</marc:subfield>
+                        <marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+                        <marc:subfield code="c">1992</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="300" ind1=" " ind2=" ">
+                        <marc:subfield code="a">104 s.</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="500" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Disertace</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="900" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="b">9</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="910" ind1=" " ind2=" ">
+                        <marc:subfield code="a">BOA001</marc:subfield>
+                        <marc:subfield code="x">000349686</marc:subfield>
+                        <marc:subfield code="b">TK-X-0252.801</marc:subfield>
+                        <marc:subfield code="w">l</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="928" ind1=" " ind2=" ">
+                        <marc:subfield code="a">Universität Stuttgart</marc:subfield>
+                    </marc:datafield>
+                    <marc:datafield tag="998" ind1=" " ind2=" ">
+                        <marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579067&amp;local_base=SKC</marc:subfield>
+                    </marc:datafield>
+                </marc:record>
+            </metadata>
+        </record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001579047</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000349454</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980103s1963    xr     f            cze  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">695.6(083.74)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Sklobetonové konstrukce</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Praha :</marc:subfield>
+						<marc:subfield code="b">Ústav normování ve stavebnictví,</marc:subfield>
+						<marc:subfield code="c">1963</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">31 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000349454</marc:subfield>
+						<marc:subfield code="b">TK-0114.700</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">HKA001</marc:subfield>
+						<marc:subfield code="x">000475453</marc:subfield>
+						<marc:subfield code="b">107 194</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Ústav normování ve stavebnictví</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579047&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001579063</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000349680</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980103s1993    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">533.9:537.523:546.17</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">537.523:533.9:546.17</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">546.17:537.523:533.9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Volk, Gert</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Zeitaufgelöste Bestimmung von Plasmaparametern der stillen Entladung in Stickstoff /</marc:subfield>
+						<marc:subfield code="c">Gert Volk.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Stuttgart :</marc:subfield>
+						<marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+						<marc:subfield code="c">1992</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">101 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Disertace</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000349680</marc:subfield>
+						<marc:subfield code="b">TK-X-0252.805</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Universität Stuttgart</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579063&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001579064</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000349681</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980103s1993    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">546.681&apos;546.19:548.73/.75</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">548.73/.75:546.681&apos;546.19</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Brandt, Oliver</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Untersuchungen zur direkt-epitaktischen Nanostrukturierung von GaAs /</marc:subfield>
+						<marc:subfield code="c">Oliver Brandt.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Stuttgart :</marc:subfield>
+						<marc:subfield code="b">Universität Stuttgart,</marc:subfield>
+						<marc:subfield code="c">1991</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">98 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Disertace</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000349681</marc:subfield>
+						<marc:subfield code="b">TK-X-0252.804</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Universität Stuttgart</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001579064&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442266</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353712</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980219s1982    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie B: 1925-1933.</marc:subfield>
+						<marc:subfield code="n">Band 18,</marc:subfield>
+						<marc:subfield code="p">1. Juli bis 15. Oktober 1931</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">1. Juli bis 15. Oktober 1931</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1982</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">xlvi, 572 s</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 549-572.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353712</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442266&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442267</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353713</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980219s1983    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie B: 1925-1933.</marc:subfield>
+						<marc:subfield code="n">Band 19,</marc:subfield>
+						<marc:subfield code="p">16. Oktober 1931 bis 29. Februar 1932</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">16. Oktober 1931 bis 29. Februar 1932</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1983</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">liv, 671 s</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 645-669.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353713</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442267&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442268</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353714</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980219s1983    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie B: 1925-1933.</marc:subfield>
+						<marc:subfield code="n">Band 20,</marc:subfield>
+						<marc:subfield code="p">1. März bis 15. August 1932</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">1. März bis 15. August 1932</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1983</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">lii, 637 s</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 611-637.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353714</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442268&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442269</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353715</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980223s1971    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie C: 1933-1937.</marc:subfield>
+						<marc:subfield code="n">Band 1/1,</marc:subfield>
+						<marc:subfield code="p">30. Januar bis 15. Mai 1933</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">30. Januar bis 15. Mai 1933</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1971</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">lxxviii, 434 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353715</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442269&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442270</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353716</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980223s1971    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie C: 1933-1937.</marc:subfield>
+						<marc:subfield code="n">Band 1/2,</marc:subfield>
+						<marc:subfield code="p">16. Mai bis 14. Oktober 1933</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">16. Mai bis 14. Oktober 1933</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1971</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">S. 435-979</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 949-979.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353716</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442270&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442242</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353688</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980217s1982    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie A: 1918-1925.</marc:subfield>
+						<marc:subfield code="n">Band 1,</marc:subfield>
+						<marc:subfield code="p">9. November 1918 bis 5. Mai 1919</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">9. November 1918 bis 5. Mai 1919</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1982</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">lii, 516 s</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 491-516.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">rok 1918</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">rok 1919</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353688</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442242&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442271</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353717</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980223s1973    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie C: 1933-1937.</marc:subfield>
+						<marc:subfield code="n">Band 2/1,</marc:subfield>
+						<marc:subfield code="p">14. Oktober 1933 bis 31. Januar 1934</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">14. Oktober 1933 bis 31. Januar 1934</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1973</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">lxxvii, 432 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353717</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442271&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001442272</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000353718</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">980223s1973    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(430)</marc:subfield>
+						<marc:subfield code="2">MRF</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Akten zur deutschen auswärtigen Politik 1918-1945 :</marc:subfield>
+						<marc:subfield code="b">Serie C: 1933-1937.</marc:subfield>
+						<marc:subfield code="n">Band 2/2,</marc:subfield>
+						<marc:subfield code="p">1. Februar bis 13. Juni 1934</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="0">
+						<marc:subfield code="a">1. Februar bis 13. Juni 1934</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Göttingen :</marc:subfield>
+						<marc:subfield code="b">Vandenhoeck &amp; Ruprecht,</marc:subfield>
+						<marc:subfield code="c">1973</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">S. 433-941</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Jmenný rejstřík s. 913-941.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">30. léta</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">Německo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">dokumenty</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1=" " ind2=" ">
+						<marc:subfield code="a">zahraniční politika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABB083</marc:subfield>
+						<marc:subfield code="x">000353718</marc:subfield>
+						<marc:subfield code="b">stud.</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001442272&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001529678</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22     1  4500</marc:leader>
+					<marc:controlfield tag="001">rgk05000227</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001029s1953    bu     e            bul  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+						<marc:subfield code="c">ABA004</marc:subfield>
+						<marc:subfield code="d">ABA004</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="6">880-01</marc:subfield>
+						<marc:subfield code="a">10 godini Otečestven front :</marc:subfield>
+						<marc:subfield code="b">1942-1952</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="6">880-02</marc:subfield>
+						<marc:subfield code="a">Sofija :</marc:subfield>
+						<marc:subfield code="b">Nacionalen săvet na Otečestvenija front,</marc:subfield>
+						<marc:subfield code="c">1953</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">87 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="880" ind1="0" ind2="0">
+						<marc:subfield code="6">245-01/(N</marc:subfield>
+						<marc:subfield code="a">10 години Отечествен фронт :</marc:subfield>
+						<marc:subfield code="b">1942-1952</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="880" ind1=" " ind2=" ">
+						<marc:subfield code="6">260-02/(N</marc:subfield>
+						<marc:subfield code="a">София :</marc:subfield>
+						<marc:subfield code="b">Национален съвет на Отечествения фронт,</marc:subfield>
+						<marc:subfield code="c">1953</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="b">8</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="x">rgk05000227</marc:subfield>
+						<marc:subfield code="b">Rd 045276</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001529678&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001529679</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22     1  4500</marc:leader>
+					<marc:controlfield tag="001">rgk05000228</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001029s1954    bu     e            bul  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+						<marc:subfield code="c">ABA004</marc:subfield>
+						<marc:subfield code="d">ABA004</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="6">880-01</marc:subfield>
+						<marc:subfield code="a">Deset godini poezija :</marc:subfield>
+						<marc:subfield code="b">1944-1954 /</marc:subfield>
+						<marc:subfield code="c">Podbor i red. Mladen Isaev, Valeri Petrov</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="6">880-02</marc:subfield>
+						<marc:subfield code="a">Sofija :</marc:subfield>
+						<marc:subfield code="b">Bălgarski pisatel,</marc:subfield>
+						<marc:subfield code="c">1954</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">468 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Isaev, Mladen,</marc:subfield>
+						<marc:subfield code="d">1907-1991</marc:subfield>
+						<marc:subfield code="7">jo2007376807</marc:subfield>
+						<marc:subfield code="4">com</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="880" ind1="0" ind2="0">
+						<marc:subfield code="6">245-01/(N</marc:subfield>
+						<marc:subfield code="a">Десет години поезия :</marc:subfield>
+						<marc:subfield code="b">1944-1954 /</marc:subfield>
+						<marc:subfield code="c">Подбор и ред. Младен Исаев, Валери Петров</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="880" ind1=" " ind2=" ">
+						<marc:subfield code="6">260-02/(N</marc:subfield>
+						<marc:subfield code="a">София :</marc:subfield>
+						<marc:subfield code="b">Български писател,</marc:subfield>
+						<marc:subfield code="c">1954</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="b">10</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ABA004</marc:subfield>
+						<marc:subfield code="x">rgk05000228</marc:subfield>
+						<marc:subfield code="b">Rd 048686</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001529679&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001249848</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">2640028271</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">971001s1997    xr     |     |      cze  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="a">80-7054-074-5</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">017/019</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">659</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Tomášová, Marcela</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Seznam firemních časopisů 1997 /</marc:subfield>
+						<marc:subfield code="c">[zpracovatel Marcela Tomášová, Dana Sklenářová]</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">v Ostravě :</marc:subfield>
+						<marc:subfield code="b">Státní vědecká knihovna v Ostravě,</marc:subfield>
+						<marc:subfield code="c">1997</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">33 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="490" ind1="1" ind2=" ">
+						<marc:subfield code="a">Publikace oddělení bibliografie ;</marc:subfield>
+						<marc:subfield code="v">[vol.] I/380</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">Státní vědecká knihovna (Ostrava, Česko)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Sklenářová, Dana</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="710" ind1="2" ind2=" ">
+						<marc:subfield code="a">Státní vědecká knihovna (Ostrava, Česko)</marc:subfield>
+						<marc:subfield code="7">kn20010709332</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="830" ind1=" " ind2="0">
+						<marc:subfield code="a">Publikace oddělení bibliografie</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="x">2640028271</marc:subfield>
+						<marc:subfield code="b">H 59.541</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Časopisy firemní - Státní vědecká knihovna (Ostrava, Česko) - r. 1997 - soupisy</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001249848&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001249849</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000083423</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">970723m19949999xr     f            cze  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="a">80-210-1577-2</marc:subfield>
+						<marc:subfield code="q">(brož) :</marc:subfield>
+						<marc:subfield code="c">56.00</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">004</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">378.4(437.2)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="110" ind1="2" ind2=" ">
+						<marc:subfield code="a">Masarykova univerzita.</marc:subfield>
+						<marc:subfield code="b">Fakulta informatiky</marc:subfield>
+						<marc:subfield code="7">kn20010709274</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Seznam přednášek Fakulty informatiky ve školním roce.</marc:subfield>
+						<marc:subfield code="n">1997-1998</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="250" ind1=" " ind2=" ">
+						<marc:subfield code="a">Vyd. 1.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Brno :</marc:subfield>
+						<marc:subfield code="b">Masarykova univerzita,</marc:subfield>
+						<marc:subfield code="c">1997</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">219 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="610" ind1="2" ind2="7">
+						<marc:subfield code="a">Masarykova univerzita.</marc:subfield>
+						<marc:subfield code="b">Fakulta informatiky</marc:subfield>
+						<marc:subfield code="7">kn20010709274</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">vysokoškolské studium</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">studijní programy</marc:subfield>
+						<marc:subfield code="7">fd520458</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="x">2640027016</marc:subfield>
+						<marc:subfield code="b">G 240.067</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Informatika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Univerzity</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001249849&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001249850</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">2640022346</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">970304s1997    xr     |     |      cze  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="a">80-7054-069-9</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">015</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">017/019</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">050</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="110" ind1="2" ind2=" ">
+						<marc:subfield code="a">Státní vědecká knihovna (Ostrava, Česko)</marc:subfield>
+						<marc:subfield code="7">kn20010709332</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Seznam zahraničních periodik objednaných na rok 1997 knihovnami, podniky a jinými institucemi na území severní Moravy :</marc:subfield>
+						<marc:subfield code="b">(neobsahuje lékařské časopisy)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Ostrava :</marc:subfield>
+						<marc:subfield code="b">Státní vědecká knihovna v Ostravě,</marc:subfield>
+						<marc:subfield code="c">1997</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">110 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="490" ind1="1" ind2=" ">
+						<marc:subfield code="a">Edice I ;</marc:subfield>
+						<marc:subfield code="v">[vol.] 376</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">zahraniční periodika</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="830" ind1=" " ind2="0">
+						<marc:subfield code="a">Edice I</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="x">2640022346</marc:subfield>
+						<marc:subfield code="b">H 58.539</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">ULG001</marc:subfield>
+						<marc:subfield code="x">KN3148000000213764</marc:subfield>
+						<marc:subfield code="b">IN19815/1997</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Periodika zahraniční - Morava severní - r. 1997 - bibliografie</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001249850&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001249851</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">2640024150</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">970423s1996    xr     |     |      eng  </marc:controlfield>
+					<marc:datafield tag="015" ind1=" " ind2=" ">
+						<marc:subfield code="a">cnb000296624</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="a">80-7189-056-1</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">794</marc:subfield>
+						<marc:subfield code="2">MRF-sel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="110" ind1="2" ind2=" ">
+						<marc:subfield code="a">Moravský šach (Olomouc, Česko)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">[Sicilian def. :</marc:subfield>
+						<marc:subfield code="b">B70 I]</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Olomouc :</marc:subfield>
+						<marc:subfield code="b">Publishing House Moravian Chess,</marc:subfield>
+						<marc:subfield code="c">1996</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">60 s. :</marc:subfield>
+						<marc:subfield code="b">obr.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="490" ind1="1" ind2=" ">
+						<marc:subfield code="a">Game encyclopaedia of chess openings ;</marc:subfield>
+						<marc:subfield code="v">[vol.] 30/(38)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Název převz. z obálky.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">šachové obrany</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="830" ind1=" " ind2="0">
+						<marc:subfield code="a">Game encyclopaedia of chess openings</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OSA001</marc:subfield>
+						<marc:subfield code="b">13</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000081972</marc:subfield>
+						<marc:subfield code="b">783.609</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Šachy - partie - příručky</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001249851&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298731</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469415</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001026s1997    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="q">(Brož.)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(438)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">327(474.5)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Ryssel, Gregor,</marc:subfield>
+						<marc:subfield code="d">1967-</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Innenpolitische Demokratisierungsprozesse und grenzüberschreitende Vernetzungen der Bevölkerungen als Motor einer zukünftigen Stabilisierung und Intensivierung der polnisch-litauischen Beziehungen /</marc:subfield>
+						<marc:subfield code="c">Gregor Ryssel</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="c">1997</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">ix, 576 s., tb. příl. :</marc:subfield>
+						<marc:subfield code="b">il., tab.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="502" ind1=" " ind2=" ">
+						<marc:subfield code="a">Dissertation--Philosophische Fakultät der Rheinischen Friedrich-Wilhelms-Universität zu Bonn, 1997</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="504" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliografie na s. 543-575</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">disertace</marc:subfield>
+						<marc:subfield code="7">fd132024</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="710" ind1="2" ind2=" ">
+						<marc:subfield code="a">Rheinische Friedrich-Wilhelms-Universität.</marc:subfield>
+						<marc:subfield code="b">Philosophische Fakultät (Bonn, Německo)</marc:subfield>
+						<marc:subfield code="4">pbl</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">12</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000244683</marc:subfield>
+						<marc:subfield code="b">M2-1038.460</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469415</marc:subfield>
+						<marc:subfield code="b">799.165</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298731&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298732</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469418</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001026s1999    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="q">(Brož)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">902(4-11)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">902(4-13)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Katsougiannopoulou, Christina,</marc:subfield>
+						<marc:subfield code="d">1967-</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Studien zu ost- und südosteuropäischen Bügelfibeln /</marc:subfield>
+						<marc:subfield code="c">Christina Katsougiannopoulou</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="c">1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">112 s., 4 s. obr. příl., tb. příl. :</marc:subfield>
+						<marc:subfield code="b">il., tab.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="502" ind1=" " ind2=" ">
+						<marc:subfield code="a">Dissertation--Philosophische Fakultät der Rheinischen Friedrich-Wilhelms-Universität zu Bonn, 1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="504" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliografie na s. 84-112</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">disertace</marc:subfield>
+						<marc:subfield code="7">fd132024</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="710" ind1="2" ind2=" ">
+						<marc:subfield code="a">Rheinische Friedrich-Wilhelms-Universität.</marc:subfield>
+						<marc:subfield code="b">Philosophische Fakultät (Bonn, Německo)</marc:subfield>
+						<marc:subfield code="4">pbl</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">12</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000461211</marc:subfield>
+						<marc:subfield code="b">M2-1068.321</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469418</marc:subfield>
+						<marc:subfield code="b">799.166</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298732&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298733</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469421</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001026s1999    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="q">(Brož.)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Böhnigk, Volker,</marc:subfield>
+						<marc:subfield code="d">1961-</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Weltversionen - Welten - Traditionen /</marc:subfield>
+						<marc:subfield code="c">Volker Böhnigk</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="c">1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">129 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="502" ind1=" " ind2=" ">
+						<marc:subfield code="a">Dissertation--Philosophische Fakultät der Rheinischen Friedrich-Wilhelms-Universität zu Bonn, 1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="504" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliografie na s. 114-129</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">disertace</marc:subfield>
+						<marc:subfield code="7">fd132024</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="710" ind1="2" ind2=" ">
+						<marc:subfield code="a">Rheinische Friedrich-Wilhelms-Universität.</marc:subfield>
+						<marc:subfield code="b">Philosophische Fakultät (Bonn, Německo)</marc:subfield>
+						<marc:subfield code="4">pbl</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">12</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000461174</marc:subfield>
+						<marc:subfield code="b">M2-1068.315</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469421</marc:subfield>
+						<marc:subfield code="b">799.167</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298733&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298735</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469423</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001026s1999    gw     f            ger  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="q">(Brož.)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">17</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">929</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">García-Pazos, Manuel,</marc:subfield>
+						<marc:subfield code="d">1937-</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="4">
+						<marc:subfield code="a">Die Moralphilosophie John Stuart Mills Utilitarismus /</marc:subfield>
+						<marc:subfield code="c">Manuel García Pazos</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="c">1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">205 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="502" ind1=" " ind2=" ">
+						<marc:subfield code="a">Dissertation--Philosophische Fakultät der Rheinischen Friedrich-Wilhelms-Universität zu Bonn, 1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="504" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliografie na s. 195-205</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">disertace</marc:subfield>
+						<marc:subfield code="7">fd132024</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="710" ind1="2" ind2=" ">
+						<marc:subfield code="a">Rheinische Friedrich-Wilhelms-Universität.</marc:subfield>
+						<marc:subfield code="b">Philosophische Fakultät (Bonn, Německo)</marc:subfield>
+						<marc:subfield code="4">pbl</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">12</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469423</marc:subfield>
+						<marc:subfield code="b">799.169</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298735&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298736</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469424</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001002s1959    fi     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Tuurala, Osmo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Über den Einfluss von Natrium-Chlorid-und Wasserbelastung auf das Blutbild des Frosches (Rana temporaria L.)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Helsinki,</marc:subfield>
+						<marc:subfield code="c">1959</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">1 sv.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">10</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469424</marc:subfield>
+						<marc:subfield code="b">391.288</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298736&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001298715</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">vkol000469377</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">001122s2000    xr     f            cze  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="q">(Brož.)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">061.7(437.2)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">39(437.2)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="111" ind1="2" ind2=" ">
+						<marc:subfield code="a">Lidový rok 2000.</marc:subfield>
+						<marc:subfield code="b">Národní přehlídka vesnických folklorních souborů a skupin</marc:subfield>
+						<marc:subfield code="n">(11. :</marc:subfield>
+						<marc:subfield code="d">2000 :</marc:subfield>
+						<marc:subfield code="c">Velká Bystřice, Česko)</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Lidový rok 2000 :</marc:subfield>
+						<marc:subfield code="b">XI. národní přehlídka vesnických folklorních souborů a skupin : program : Velká Bystřice - Zámecké náměstí, 16.-17.9.2000 /</marc:subfield>
+						<marc:subfield code="c">[redakce Helena Lisická, Milan Ludvík]</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">[Velká Bystřice :</marc:subfield>
+						<marc:subfield code="b">Městský úřad],</marc:subfield>
+						<marc:subfield code="c">2000</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">Nestr. :</marc:subfield>
+						<marc:subfield code="b">il.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="611" ind1="2" ind2="4">
+						<marc:subfield code="a">Lidový rok 2000</marc:subfield>
+						<marc:subfield code="c">(Velká Bystřice, Česko)</marc:subfield>
+						<marc:subfield code="x">programy</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">folklorní soubory</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="655" ind1=" " ind2="7">
+						<marc:subfield code="a">programy</marc:subfield>
+						<marc:subfield code="7">fd133135</marc:subfield>
+						<marc:subfield code="2">czenas</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Lisická, Helena,</marc:subfield>
+						<marc:subfield code="d">1930-2009</marc:subfield>
+						<marc:subfield code="7">jk01072235</marc:subfield>
+						<marc:subfield code="4">edt</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Ludvík, Milan</marc:subfield>
+						<marc:subfield code="4">edt</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="b">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">OLA001</marc:subfield>
+						<marc:subfield code="x">vkol000469377</marc:subfield>
+						<marc:subfield code="b">799.152</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001298715&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001603116</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000644838</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">030109s1910    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="b">cze</marc:subfield>
+						<marc:subfield code="c">BOA001</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Spisar, Karel,</marc:subfield>
+						<marc:subfield code="d">1879-1932</marc:subfield>
+						<marc:subfield code="7">jk01120697</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Beiträge zur Physiologie der Cuscuta Gronovii Willd /</marc:subfield>
+						<marc:subfield code="c">Karel Spisar</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Prag :</marc:subfield>
+						<marc:subfield code="b">Akademie der Wissen,</marc:subfield>
+						<marc:subfield code="c">1910</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">46 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Separát z: Bulletin international de ľ Académie des Sciences de Boheme, 15</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="504" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliografie na s. 45-46</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">6</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000644838</marc:subfield>
+						<marc:subfield code="b">X2-0414.248</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001603116&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001603117</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000644839</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">030109s1944    xr     f            ger  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="b">cze</marc:subfield>
+						<marc:subfield code="c">BOA001</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Stifter, Adalbert,</marc:subfield>
+						<marc:subfield code="d">1805-1868</marc:subfield>
+						<marc:subfield code="7">jn19990009997</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Wirkungen eines weißen Mantels ;</marc:subfield>
+						<marc:subfield code="b">&lt;&lt;Der &gt;&gt;arme Wohltäter ; &lt;&lt;Der &gt;&gt;Pförtner im Herrenhause /</marc:subfield>
+						<marc:subfield code="c">von Adalbert Stifter ; nach den Urfassungen herausgegeben von Max Stefl</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Karlsbad :</marc:subfield>
+						<marc:subfield code="b">Adam Kraft,</marc:subfield>
+						<marc:subfield code="c">1944</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">130 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Stefl, Max</marc:subfield>
+						<marc:subfield code="4">edt</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="740" ind1="0" ind2="9">
+						<marc:subfield code="a">&lt;&lt;Der &gt;&gt;arme Wohltäter</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="740" ind1="0" ind2="9">
+						<marc:subfield code="a">&lt;&lt;Der &gt;&gt;Pförtner im Herrenhause</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">7</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000644839</marc:subfield>
+						<marc:subfield code="b">1-0214.492</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001603117&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001603118</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000644843</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">030110s1910    xr     f            cze  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="b">cze</marc:subfield>
+						<marc:subfield code="c">BOA001</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Stehlík, Jaromír</marc:subfield>
+						<marc:subfield code="4">aut</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">Uvedení do alkoholové otázky /</marc:subfield>
+						<marc:subfield code="c">napsal Jaromír Stehlík</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Praha :</marc:subfield>
+						<marc:subfield code="b">Komenský,</marc:subfield>
+						<marc:subfield code="c">[1910?]</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">15 s.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">4</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000644843</marc:subfield>
+						<marc:subfield code="b">2-0075.714</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001603118&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001391016</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000553515</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">000115s1999    xr     |            cze  </marc:controlfield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">66.0-051(437.1/.3)</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">929 Květ, Radan</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="100" ind1="1" ind2=" ">
+						<marc:subfield code="a">Květ, Radan,</marc:subfield>
+						<marc:subfield code="d">1928-</marc:subfield>
+						<marc:subfield code="7">jk01071203</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="1" ind2="0">
+						<marc:subfield code="a">O svých poznatcích /</marc:subfield>
+						<marc:subfield code="c">Radan Květ.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Brno :</marc:subfield>
+						<marc:subfield code="b">R. Květ,</marc:subfield>
+						<marc:subfield code="c">1999</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">24, 20, 23 s. ;</marc:subfield>
+						<marc:subfield code="c">30 cm</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Bibliogr</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Název z obálky</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="500" ind1=" " ind2=" ">
+						<marc:subfield code="a">Rozmnoženo</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">Květ, Radan 1928-</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">14</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000553515</marc:subfield>
+						<marc:subfield code="b">4-1083.212</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">R. Květ</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Květ</marc:subfield>
+						<marc:subfield code="b">Radan</marc:subfield>
+						<marc:subfield code="f">1928-</marc:subfield>
+						<marc:subfield code="x">vzpomínky vlastní</marc:subfield>
+						<marc:subfield code="9">PH</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001391016&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<record>
+			<header>
+				<identifier>oai:aleph-nkp.cz:SKC01-001391032</identifier>
+				<datestamp>2014-12-29T22:17:02Z</datestamp>
+				<setSpec>SKC</setSpec>
+			</header>
+			<metadata>
+				<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
+http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:controlfield tag="001">000553963</marc:controlfield>
+					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
+					<marc:controlfield tag="008">000115s2001    xxu    |            eng  </marc:controlfield>
+					<marc:datafield tag="020" ind1=" " ind2=" ">
+						<marc:subfield code="a">0-566-08384-1</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="040" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">cze</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">615.21</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="080" ind1=" " ind2=" ">
+						<marc:subfield code="a">616.839</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="245" ind1="0" ind2="0">
+						<marc:subfield code="a">Ashgate handbook of autonomic nervous system agents :</marc:subfield>
+						<marc:subfield code="b">[an international guide to 2000 drugs in current use] /</marc:subfield>
+						<marc:subfield code="c">edited by G.W.A. Milne.</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="246" ind1="3" ind2="3">
+						<marc:subfield code="a">Autonomic nervous system agents</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="260" ind1=" " ind2=" ">
+						<marc:subfield code="a">Burlington ;</marc:subfield>
+						<marc:subfield code="a">Ashgate,</marc:subfield>
+						<marc:subfield code="c">c2001</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="300" ind1=" " ind2=" ">
+						<marc:subfield code="a">xx, 478 s. ;</marc:subfield>
+						<marc:subfield code="c">24 cm</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="653" ind1="0" ind2=" ">
+						<marc:subfield code="a">autonomní nervová soustava</marc:subfield>
+						<marc:subfield code="a">léky</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="700" ind1="1" ind2=" ">
+						<marc:subfield code="a">Milne, G. W. A.</marc:subfield>
+						<marc:subfield code="q">(George William Anthony),</marc:subfield>
+						<marc:subfield code="d">1937-</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="900" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="b">13</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="910" ind1=" " ind2=" ">
+						<marc:subfield code="a">BOA001</marc:subfield>
+						<marc:subfield code="x">000553963</marc:subfield>
+						<marc:subfield code="b">2-1083.341</marc:subfield>
+						<marc:subfield code="w">l</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="928" ind1=" " ind2=" ">
+						<marc:subfield code="a">Ashgate</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Léky</marc:subfield>
+						<marc:subfield code="x">soustava nervová autonomní</marc:subfield>
+						<marc:subfield code="x">příručky</marc:subfield>
+						<marc:subfield code="9">PH</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="964" ind1=" " ind2=" ">
+						<marc:subfield code="a">Soustava nervová autonomní</marc:subfield>
+						<marc:subfield code="x">léky</marc:subfield>
+						<marc:subfield code="x">příručky</marc:subfield>
+						<marc:subfield code="9">PH</marc:subfield>
+					</marc:datafield>
+					<marc:datafield tag="998" ind1=" " ind2=" ">
+						<marc:subfield code="a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=001391032&amp;local_base=SKC</marc:subfield>
+					</marc:datafield>
+				</marc:record>
+			</metadata>
+		</record>
+		<resumptionToken>201412292217024999999999999999SKC:SKCM</resumptionToken>
+	</ListRecords>
+</OAI-PMH> 

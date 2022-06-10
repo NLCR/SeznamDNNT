@@ -154,7 +154,7 @@ public interface AccountService {
      * @throws IOException
      * @throws SolrServerException
      */
-    public JSONObject curatorSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
+    public JSONObject curatorSwitchState(JSONObject zadostJson, String switchOptions, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
     /**
      * Switch state - alternative state
@@ -168,7 +168,7 @@ public interface AccountService {
      * @throws IOException
      * @throws SolrServerException
      */
-    public JSONObject curatorSwitchAlternativeState(String alternative, JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
+    public JSONObject curatorSwitchAlternativeState(String alternative, JSONObject zadostJson,String switchOptions, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
     /**
      * Curactor reject state 
@@ -249,4 +249,12 @@ public interface AccountService {
      * @throws SolrServerException
      */
     public List<String> findIdentifiersUsedInRequests(String user, String navrh, String requestState) throws  AccountException, IOException, SolrServerException; 
+    
+    
+    
+    public List<JSONObject> findAllRequestForGivenIds(String user, String navrh, String requestState, List<String> ids) throws  AccountException, IOException, SolrServerException; 
+    
+    
+    
+    
 }

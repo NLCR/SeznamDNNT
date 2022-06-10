@@ -152,7 +152,7 @@ public class PXYearServiceITTest {
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
 
         AbstractPXService pxService = EasyMock.createMockBuilder(PXYearServiceImpl.class)
-                .withConstructor(jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
+                .withConstructor("test-logger",jobJSONObject.getJSONObject("iteration"),jobJSONObject.getJSONObject("results"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
                 .addMockedMethod("buildAccountService")

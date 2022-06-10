@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.MD5;
@@ -85,7 +86,13 @@ public class MarcRecord {
 
 
   public boolean isDeleted = false;
-
+  
+  // followers
+  public List<String> followers = new ArrayList<>();
+  
+  // digital librarires
+  public List<String> digitalLibraries = new ArrayList<>();
+  
   // <marc:controlfield tag="001">000000075</marc:controlfield>
   // <marc:controlfield tag="003">CZ PrDNT</marc:controlfield>
   public Map<String, String> controlFields = new HashMap();
@@ -118,7 +125,8 @@ public class MarcRecord {
     return mr;
   }
   
-  public static MarcRecord fromDoc(SolrDocument doc) throws JsonProcessingException {
+  // do not use it; delete 
+  public static MarcRecord fromDocDep(SolrDocument doc) throws JsonProcessingException {
     String rawJson = (String) doc.getFirstValue(RAW_FIELD);
     MarcRecord mr = fromRAWJSON(rawJson);
     // uff 
@@ -143,7 +151,8 @@ public class MarcRecord {
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
                     FLAG_PUBLIC_IN_DL+" ",
-                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+ GRANULARITY_FIELD+":[json]");
+                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ GRANULARITY_FIELD+":[json]");
+
     return fromIndex(client,q);
   }
 
@@ -154,7 +163,14 @@ public class MarcRecord {
     if (dlist.getNumFound() > 0) {
       SolrDocument doc = dlist.get(0);;
       //.get(0);
-      String json = (String) doc.getFirstValue(RAW_FIELD);
+      MarcRecord mr = fromSolrDoc(doc);
+
+      return mr;
+    } else return null;
+  }
+
+  public static MarcRecord fromSolrDoc(SolrDocument doc) throws JsonProcessingException, JsonMappingException {
+    String json = (String) doc.getFirstValue(RAW_FIELD);
       ObjectMapper objectMapper = new ObjectMapper();
       MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
 
@@ -218,9 +234,18 @@ public class MarcRecord {
       // flags
       mr.recordsFlags = MarcRecordFlags.fromSolrDoc(doc);
 
+      if (doc.containsKey(FOLLOWERS)) {
+          List<String> collected = doc.getFieldValues(FOLLOWERS).stream().map(Object::toString).collect(Collectors.toList());
+          mr.followers = collected;
+      }
+      
+      if (doc.containsKey(DIGITAL_LIBRARIES)) {
+          List<String> collected = doc.getFieldValues(DIGITAL_LIBRARIES).stream().map(Object::toString).collect(Collectors.toList());
+          mr.digitalLibraries = collected;
+      }
+      
       return mr;
-    } else return null;
-  }
+}
 
   // raw field json
   public JSONObject toJSON() {
@@ -242,9 +267,9 @@ public class MarcRecord {
     return json;
   }
 
-  public String toXml(boolean onlyIdentifiers) {
+  public String toXml(boolean onlyIdentifiers, boolean displaydeleted) {
     StringBuilder xml = new StringBuilder();
-
+    
     if (!onlyIdentifiers) {
 
       xml.append("<metadata>");
@@ -476,7 +501,20 @@ public class MarcRecord {
 
     // store flags
     if (this.recordsFlags != null) this.recordsFlags.enhanceDoc(sdoc);
-
+    
+    // followers
+    if (this.followers != null && !this.followers.isEmpty()) {
+        followers.stream().forEach(f-> {
+            sdoc.addField(FOLLOWERS, f);
+        });
+    }
+    
+    if (this.digitalLibraries != null && !this.digitalLibraries.isEmpty()) {
+        digitalLibraries.stream().forEach(f-> {
+            sdoc.addField(DIGITAL_LIBRARIES, f);
+        });
+    }
+    
     return sdoc;
   }
 
@@ -529,10 +567,8 @@ public class MarcRecord {
       this.historie_stavu.put(h);
 
     }
-
     this.kuratorstav = Arrays.asList(kuratorState);
     this.datum_krator_stavu = now;
-
 
     JSONObject kh = new JSONObject().put("stav", kuratorState).put("date", FORMAT.format(datum_krator_stavu)).put("user", user).put("comment", comment);
     if (license != null) {  kh.put("license", license); }
@@ -567,6 +603,9 @@ public class MarcRecord {
         break;
 
         case PX:
+        // keep license
+        break;
+        case DX:
         // keep license
         break;
 

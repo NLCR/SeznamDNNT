@@ -41,7 +41,7 @@ public class PXWorkflow extends Workflow {
     }
 
     @Override
-    public WorkflowState nextAlternativeState(String alternative) {
+    public WorkflowState nextAlternativeState(String alternative, SwitchStateOptions options) {
         return null;
     }
 

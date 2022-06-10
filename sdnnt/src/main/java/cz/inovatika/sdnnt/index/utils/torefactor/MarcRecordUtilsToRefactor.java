@@ -486,6 +486,10 @@ public class MarcRecordUtilsToRefactor {
     if (doc.containsKey(FMT_FIELD)) {
     	mr.fmt = (String) doc.getFieldValue(FMT_FIELD);
     }
+    
+    if (doc.containsKey(FOLLOWERS)) {
+        mr.followers = new ArrayList(doc.getFieldValues(FOLLOWERS));
+    }
   }
 
   public static void setFMT(SolrInputDocument sdoc, String type_of_resource, String item_type) {

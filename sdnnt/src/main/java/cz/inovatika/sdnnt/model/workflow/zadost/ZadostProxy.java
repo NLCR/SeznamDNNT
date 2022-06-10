@@ -1,11 +1,16 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
 import cz.inovatika.sdnnt.model.*;
+import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +23,6 @@ public class ZadostProxy implements WorkflowOwner  {
         this.zadost = zadost;
     }
 
-    // Workflow owner methods
     @Override
     public CuratorItemState getWorkflowState() {
         return  zadost.getDesiredItemState() != null ? CuratorItemState.valueOf(zadost.getDesiredItemState()) : null;
@@ -36,7 +40,7 @@ public class ZadostProxy implements WorkflowOwner  {
     }
 
     @Override
-    public void switchWorkflowState(CuratorItemState itm, String license, boolean changingLicenseState,  Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license,  boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         this.zadost.setDesiredItemState(itm.name());
         if (changingLicenseState)  this.zadost.setDesiredLicense(license);
         // zadost, nova deadline
@@ -125,6 +129,25 @@ public class ZadostProxy implements WorkflowOwner  {
             setWorkflowDate(null);
             this.zadost.setTransitionType(null);
         }
+    }
+    
+    
+
+    @Override
+    public List<Pair<String, SolrInputDocument>> getStateToSave(SwitchStateOptions options) {
+        Pair<String, SolrInputDocument> pair =Pair.of(DataCollections.zadost.name(), this.zadost.toSolrInputDocument());
+        return Arrays.asList(pair);
+    }
+
+    
+    
+    @Override
+    public boolean hasRejectableWorkload() {
+        return false;
+    }
+
+    @Override
+    public void rejectWorkflowState(String originator, String user, String poznamka) {
     }
 
     @Override

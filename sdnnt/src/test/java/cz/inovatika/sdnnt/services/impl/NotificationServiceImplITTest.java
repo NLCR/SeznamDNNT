@@ -137,8 +137,8 @@ public class NotificationServiceImplITTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
-        MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
-        MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
+        MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
+        MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
         solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
@@ -265,8 +265,8 @@ public class NotificationServiceImplITTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
-        MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
-        MarcRecord solrMarc2 = MarcRecord.fromDoc(catalog.getResults().get(1));
+        MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
+        MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         
         solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
@@ -389,7 +389,7 @@ public class NotificationServiceImplITTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
         // saved marc record
-        MarcRecord solrMarc1 = MarcRecord.fromDoc(catalog.getResults().get(0));
+        MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
         
         
         solrMarc1.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
@@ -482,7 +482,7 @@ public class NotificationServiceImplITTest {
     private MarcRecord catalogDoc(String ident ) throws IOException {
         SolrDocument document = MarcModelTestsUtils.prepareResultDocument(ident.replaceAll("\\:","_"));
         Assert.assertNotNull(document);
-        return MarcRecord.fromDoc(document);
+        return MarcRecord.fromDocDep(document);
     }
 
     private List<User> createNotificationSimpleUsers() {

@@ -21,6 +21,8 @@ import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.PublicItemState;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -71,7 +73,7 @@ public class OAIRequest {
             + "<protocolVersion>2.0</protocolVersion>"
             + "<adminEmail>" + conf.getString("adminEmail") + "</adminEmail>"
             + "<earliestDatestamp>2012-06-30T22:26:40Z</earliestDatestamp>"
-            + "<deletedRecord>transient</deletedRecord>"
+            + "<deletedRecord>persistent</deletedRecord>"
             + "<granularity>YYYY-MM-DDThh:mm:ssZ</granularity>"
             + "<description>"
             + "<oai-identifier xmlns=\"http://www.openarchives.org/OAI/2.0/oai-identifier\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai-identifier http://www.openarchives.org/OAI/2.0/oai-identifier.xsd\">"
@@ -137,9 +139,8 @@ public class OAIRequest {
 
       String set = req.getParameter("set");
       if (set != null) {
-        query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
-      }
-      
+          query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
+      } 
       
       if (req.getParameter("resumptionToken") != null) {
           String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
@@ -171,10 +172,15 @@ public class OAIRequest {
 
         for (SolrDocument doc : docs) {
 
+          MarcRecord mr = MarcRecord.fromDocDep(doc);
           Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
+          boolean deletedStatus = mr.dntstav != null && mr.dntstav.get(0).equals(PublicItemState.D.name());
           ret.append("<record>");
-          ret.append("<header>");
-          // Changed identifiers
+          if (deletedStatus) {
+              ret.append("<header status=\"deleted\">");
+          } else {
+              ret.append("<header>");
+          }
           Object id = oaiIdentifier(doc);
           ret.append("<identifier>").append(id).append("</identifier>");
           ret.append("<datestamp>")
@@ -183,10 +189,10 @@ public class OAIRequest {
           ret.append("<setSpec>").append(set).append("</setSpec>");
           ret.append("</header>");
 
-          String raw = (String) doc.getFirstValue("raw");
-          MarcRecord mr = MarcRecord.fromDoc(doc);
-          ret.append(mr.toXml(onlyIdentifiers));
-
+          // Changed identifiers
+          if (!deletedStatus) {
+              ret.append(mr.toXml(onlyIdentifiers, false));
+          }
           ret.append("</record>");
         }
         solr.close();
@@ -245,6 +251,7 @@ public static String getRecord(HttpServletRequest req) {
               .addFilterQuery("identifier:\"" + id + "\" OR id_sdnnt:\""+id+"\"")
               .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
 
+      /** to je blbe */
       String set = req.getParameter("set");
       if ("SDNNT-A".equals(set)) {
         query.addFilterQuery("dntstav:A");
@@ -263,21 +270,27 @@ public static String getRecord(HttpServletRequest req) {
 
           Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
 
+          MarcRecord mr = MarcRecord.fromDocDep(doc);
+
+          boolean deletedStatus = mr.dntstav != null && mr.dntstav.get(0).equals(PublicItemState.D.name());
           ret.append("<record>");
-          ret.append("<header>");
+          if (deletedStatus) {
+              ret.append("<header status=\"deleted\">");
+          } else {
+              ret.append("<header>");
+          }
+
           ret.append("<identifier>").append(oaiIdentifier(doc)).append("</identifier>");
           ret.append("<datestamp>")
-                  // .append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
                   .append(DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault()).format(datestamp.toInstant()))
                   .append("</datestamp>");
-          ret.append("<setSpec>").append(set).append("</setSpec>");
+          if (set != null) {
+              ret.append("<setSpec>").append(set).append("</setSpec>");
+          }
           ret.append("</header>");
-          //String raw = (String) doc.getFirstValue("raw");
-          //MarcRecord mr = MarcRecord.fromRAWJSON(raw);
-          
-          MarcRecord mr = MarcRecord.fromDoc(doc);
-          
-          ret.append(mr.toXml(false));
+          if (!deletedStatus) {
+              ret.append(mr.toXml(false, false));
+          }
           ret.append("</record>");
         }
         ret.append("</GetRecord>");

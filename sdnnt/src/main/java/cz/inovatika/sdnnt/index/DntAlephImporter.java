@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,6 +39,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -84,6 +86,7 @@ public class DntAlephImporter {
         }
         return sDoc;
     }
+    
     static SolrInputDocument toSolrDoc(MarcRecord rec) {
         SolrInputDocument sdoc = new SolrInputDocument();
         if (sdoc.isEmpty()) {
@@ -171,9 +174,43 @@ public class DntAlephImporter {
         sdoc.setField("nazev", nazev.trim());
         MarcRecordUtilsToRefactor.addRokVydani(sdoc);
 
+        
+        
+        JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
+        if (digitalized != null) { 
 
-
-
+            final List<String> siglas = new ArrayList<>();
+            
+            Collection<Object> mlinks911u = sdoc.getFieldValues("marc_911u");
+            Collection<Object> mlinks856u =  sdoc.getFieldValues("marc_856u");
+            Collection<Object> mlinks956u =  sdoc.getFieldValues("marc_956u");
+            //Object fmt = sdoc.getFieldValue(FMT_FIELD);
+            final List<String> links = new ArrayList<>();
+            
+            if (mlinks911u != null && !mlinks911u.isEmpty()) {
+                mlinks911u.stream().map(Object::toString).forEach(links::add);
+            } else if (mlinks956u != null) {
+                mlinks956u.stream().map(Object::toString).forEach(links::add);
+            } else if (mlinks856u != null) {
+                mlinks856u.stream().map(Object::toString).forEach(links::add);
+            }
+            
+            digitalized.keySet().forEach(key -> {
+                JSONArray regexps = digitalized.getJSONObject(key).getJSONArray("regexp");
+                for (Object oneRegexp : regexps) {
+                    // one regexps 
+                    if(links.stream().anyMatch(l -> {
+                            return l.matches(oneRegexp.toString());
+                        })) {
+                        siglas.add(key);
+                    }
+                }
+            });
+            
+            if (!siglas.isEmpty()) {
+                sdoc.setField(DIGITAL_LIBRARIES, siglas);
+            }
+        }
         return sdoc;
     }
 

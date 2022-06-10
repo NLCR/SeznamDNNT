@@ -10,7 +10,9 @@ import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
 /**
- * NZN Workfow
+ * Pokryva scenar navrhu na zarazeni dila, kontroluje lhuty a prepina stav
+ * <p>
+ * </p>
  */
 public class NZNWorkflow extends Workflow {
 
@@ -46,7 +48,7 @@ public class NZNWorkflow extends Workflow {
     }
 
     @Override
-    public WorkflowState nextAlternativeState(String stateHint) {
+    public WorkflowState nextAlternativeState(String stateHint, SwitchStateOptions options) {
         return null;
     }
 

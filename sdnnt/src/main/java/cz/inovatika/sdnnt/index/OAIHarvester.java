@@ -7,6 +7,8 @@ import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.services.SKCDeleteService;
+import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,6 +47,7 @@ import org.apache.solr.common.SolrInputDocument;
 public class OAIHarvester {
 
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+  
   JSONObject ret = new JSONObject();
   String collection = "catalog";
   boolean merge;
@@ -62,7 +65,19 @@ public class OAIHarvester {
 
   private boolean debug = false;
 
-  public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
+      
+  private JSONObject skcDeleteConfig;
+  public OAIHarvester(JSONObject config) {
+      super();
+      this.skcDeleteConfig = config;
+  }
+  
+  public OAIHarvester() {
+    super();
+  }
+
+
+public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
     this.update = update;
@@ -191,17 +206,14 @@ public class OAIHarvester {
             recs.clear();
           }
           if (!toDelete.isEmpty()) {
-            //solr.deleteById(collection, toDelete);
-            deleted += toDelete.size();
-            toDelete.clear();
+              deleteRecords(new ArrayList(toDelete), buildSKCDeleteService());
+              deleted += toDelete.size();
+              toDelete.clear();
           }
           solrTime += new Date().getTime() - start;
-
           if (dStream != null ) {
             IOUtils.closeQuietly(dStream);
           }
-
-
           deletePaths(dFile);
 
         } catch (MaximumIterationExceedException e) {
@@ -252,9 +264,10 @@ public class OAIHarvester {
         }
 
         if (!toDelete.isEmpty()) {
-          //solr.deleteById(collection, toDelete);
-          //deleted += toDelete.size();
-          //toDelete.clear();
+            deleteRecords(new ArrayList<>(toDelete), buildSKCDeleteService());
+            //solr.deleteById(collection, toDelete);
+          deleted += toDelete.size();
+          toDelete.clear();
         }
         solrTime += new Date().getTime() - start;
       } catch (XMLStreamException | IOException exc) {
@@ -272,6 +285,18 @@ public class OAIHarvester {
     }
   }
 
+    protected void deleteRecords(List<String> delete, SKCDeleteService skcDeleteService) throws IOException, SolrServerException {
+      if (!delete.isEmpty()) {
+          skcDeleteService.updateDeleteInfo(delete);
+          skcDeleteService.update();
+      }
+    }
+
+    protected SKCDeleteServiceImpl buildSKCDeleteService() {
+        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl("", this.skcDeleteConfig);
+        skcDeleteServiceImpl.setLogger(LOGGER);
+        return skcDeleteServiceImpl;
+    }
     private void deletePaths(File dFile) {
         if (!debug) {
             try {
@@ -343,7 +368,10 @@ public class OAIHarvester {
             if (!"deleted".equals(status)) {
               readRecordHeader(reader, mr);
             } else {
-              mr.isDeleted = true;
+                readRecordHeader(reader, mr);
+                LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
+                mr.isDeleted = true;
+                toDelete.add(mr.identifier);
             }
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);
@@ -351,7 +379,7 @@ public class OAIHarvester {
               recs.add(DntAlephImporter.toSolrDoc(mr));
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
-              //toDelete.add(mr.identifier);
+              toDelete.add(mr.identifier);
             }
             // ret.append("records", mr.toJSON());
           } else {

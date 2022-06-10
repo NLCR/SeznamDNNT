@@ -78,7 +78,7 @@ public class IndexerITTest {
         catalog = prepare.getClient().query("catalog", solrQuery);
         Assert.assertTrue(catalog.getResults().getNumFound() == 1);
         
-        MarcRecord changedMarcRercord = MarcRecord.fromDoc(catalog.getResults().get(0));
+        MarcRecord changedMarcRercord = MarcRecord.fromDocDep(catalog.getResults().get(0));
         Assert.assertTrue(changedMarcRercord.dntstav != null);
         Assert.assertTrue(changedMarcRercord.dntstav.size() == 1);
         Assert.assertTrue(changedMarcRercord.dntstav.get(0).equals("N"));

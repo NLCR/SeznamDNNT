@@ -60,9 +60,13 @@ public class MarcRecordFields {
     //isbn
     public static final String MARC_020_A = "marc_020a";
     public static final String MARC_902_A = "marc_902a";
+
+    public static final String MARC_035_A = "marc_035a";
+    
     //marc_902a
     //issn
     public static final String MARC_022_A = "marc_022a";
+
     //ccnb
     public static final String MARC_015_A = "marc_015a";
 
@@ -94,7 +98,14 @@ public class MarcRecordFields {
     public static final String ID_ISMN="id_ismn";
     
     
+    // sigla of digital libraries
+    public static final String DIGITAL_LIBRARIES = "digital_libraries";
+    
+    //TODO: Remove - not used now
     public static final String ALTERNATIVE_ALEPH_LINK = "alternative_aleph_link";
-
+    
+    // followers
+    public static final String FOLLOWERS = "followers";
+    
     private MarcRecordFields() {}
 }

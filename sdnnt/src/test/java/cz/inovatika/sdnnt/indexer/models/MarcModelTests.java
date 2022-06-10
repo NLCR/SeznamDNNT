@@ -65,14 +65,11 @@ public class MarcModelTests {
         Assert.assertTrue(marcRecord.dataFields.containsKey("504"));
 
 
-        SolrInputDocument solrInputFields = marcRecord.toSolrDoc();
-        System.out.println(solrInputFields);
-
     }
 
 
     @Test
-    public void readFromSOLRDoc() throws IOException, SolrServerException {
+    public void readFromSolrDoc() throws IOException, SolrServerException {
         SolrClient mockClient = EasyMock.createMock(SolrClient.class);
         QueryResponse mockResponse = EasyMock.createMock(QueryResponse.class);
 
@@ -96,7 +93,7 @@ public class MarcModelTests {
 
     @Test
     public void readFromSolrDoc2() throws IOException, SolrServerException {
-        MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
+        MarcRecord marcRecord = MarcRecord.fromDocDep(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
         Assert.assertNotNull(marcRecord.datum_stavu);
         Assert.assertNotNull(marcRecord.dntstav);
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
@@ -113,7 +110,7 @@ public class MarcModelTests {
 
     @Test
     public void readFromSolrDoc4() throws IOException, SolrServerException {
-        MarcRecord marcRecord = MarcRecord.fromDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000106789".replaceAll("\\:","_")).get(0));
+        MarcRecord marcRecord = MarcRecord.fromDocDep(prepareResultList("oai:aleph-nkp.cz:DNT01-000106789".replaceAll("\\:","_")).get(0));
         Assert.assertNotNull(marcRecord.datum_stavu);
         Assert.assertNotNull(marcRecord.dntstav);
         Assert.assertTrue(marcRecord.dntstav.size() == 1);

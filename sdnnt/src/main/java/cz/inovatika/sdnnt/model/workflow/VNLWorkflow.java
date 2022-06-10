@@ -51,7 +51,7 @@ public class VNLWorkflow extends Workflow {
     }
 
     @Override
-    public WorkflowState nextAlternativeState(String stateHint) {
+    public WorkflowState nextAlternativeState(String stateHint, SwitchStateOptions options) {
         if (this.getOwner().getWorkflowState().equals(NLX) && stateHint != null && TITLE_RELEASED.equals(stateHint)) {
             return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), null, true,  false, true);
         }

@@ -8,7 +8,7 @@ import java.util.Optional;
  */
 public enum ZadostTypNavrh {
 
-    VN, VNZ, VNL, NZN, PXN;
+    VN, VNZ, VNL, NZN, PXN, DXN;
 
     public static ZadostTypNavrh find(String type) {
         if (type != null) {

@@ -9,6 +9,7 @@ import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
@@ -32,10 +33,13 @@ import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
+/**
+ * Sluzba kontroluje zda je v krameriovi dilo volne ci nikoliv 
+ * Vysledkem je kontextova informace a zadost PXN
+ * @author happy
+ *
+ */
 public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrameriusService {
-
-    //public static final Logger LOGGER = Logger.getLogger(PXKrameriusService.class.getName());
-    
 
     boolean contextInformation = false;
     private Map<String, String> mappingHosts = new HashMap<>();
@@ -46,7 +50,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     private Logger logger = Logger.getLogger(PXKrameriusService.class.getName());
     
     
-    public PXKrameriusServiceImpl(String loggerPostfix, JSONObject iteration, JSONObject results) {
+    public PXKrameriusServiceImpl(String logger, JSONObject iteration, JSONObject results) {
         if (iteration != null) {
             super.iterationConfig(iteration);
         }
@@ -55,8 +59,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             super.requestsConfig(results);
         }
         
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(PXKrameriusService.class.getName()+"."+loggerPostfix);
+        if (logger != null) {
+            this.logger = Logger.getLogger(logger);
         }
         
     }
@@ -120,8 +124,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
     @Override
     public List<String> check() {
-        
         logger.info("Initializing px process");
+
         this.initialize();
         List<String> foundCandidates = new ArrayList<>();
         Map<String, List<String>> mapping = new HashMap<>();
@@ -140,11 +144,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         }
         logger.info("Current iteration filter " + plusFilter);
         try (final SolrClient solrClient = buildClient()) {
-            List<String> negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
-            if (this.contextInformation) {
-                    negativeFilter = Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX");
-            }
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
@@ -346,7 +346,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     SolrInputDocument idoc = null;
                     logger.fine(String.format("Updating identifier %s", identifier));
                     if (cState != null) {
-                        idoc = super.changeProcessState(solr, identifier, cState.name());
+                        idoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name(), "scheduler/kramerius check");
                     }
                     // history information
                     if (contextInformation) {

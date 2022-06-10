@@ -1,22 +1,21 @@
 package cz.inovatika.sdnnt.index;
 
-import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.*;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -25,13 +24,20 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.MarcRecordFlags;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
+import cz.inovatika.sdnnt.services.ResourceServiceService;
+import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImplITTest;
+import cz.inovatika.sdnnt.services.impl.PXKrameriusServiceImpl;
+import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 // OAI U
@@ -79,7 +85,7 @@ public class OAIHarvesterTTest {
                 SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
                 Assert.assertTrue(catalogDocs.size() == 1);
                 
-                MarcRecord fDoc = MarcRecord.fromDoc(catalogDocs.get(0));
+                MarcRecord fDoc = MarcRecord.fromDocDep(catalogDocs.get(0));
 
                 Assert.assertNotNull(fDoc.dntstav);
                 Assert.assertTrue(fDoc.dntstav.equals(Arrays.asList("A")));
@@ -135,4 +141,6 @@ public class OAIHarvesterTTest {
             Assert.fail(ex.getMessage());
         }
     }
+    
+    
 }

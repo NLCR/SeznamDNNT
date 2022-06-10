@@ -11,21 +11,28 @@ import java.util.stream.Collectors;
 
 public class QueryUtils {
 
+    public static final String IDENTIFIER_PREFIX = "oai:aleph-nkp.cz:";
+    
     private QueryUtils() {}
-
+    
+    
     public static String query(String inputQuery) {
-        List<String> words = new ArrayList<>();
-        Scanner scanner = new Scanner(inputQuery);
-        while(scanner.hasNext()) {
-            String word = scanner.next();
-            if (word != null && !word.trim().equals("")) {
-                if (word !=null && word.startsWith("\"")&&  word.endsWith("\"")) {
-                    words.add(word);
-                } else {
-                    words.add(ClientUtils.escapeQueryChars(word));
+        if (inputQuery != null && inputQuery.startsWith(IDENTIFIER_PREFIX)) {
+            return "\""+ inputQuery +"\"";
+        } else {
+            List<String> words = new ArrayList<>();
+            Scanner scanner = new Scanner(inputQuery);
+            while(scanner.hasNext()) {
+                String word = scanner.next();
+                if (word != null && !word.trim().equals("")) {
+                    if (word !=null && word.startsWith("\"")&&  word.endsWith("\"")) {
+                        words.add(word);
+                    } else {
+                        words.add(ClientUtils.escapeQueryChars(word));
+                    }
                 }
             }
+            return words.stream().collect(Collectors.joining(" "));
         }
-        return words.stream().collect(Collectors.joining(" "));
     }
 }

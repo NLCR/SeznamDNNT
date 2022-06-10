@@ -33,7 +33,7 @@ public class VNZWorkflow extends Workflow {
     }
 
     @Override
-    public WorkflowState nextAlternativeState(String stateHint) {
+    public WorkflowState nextAlternativeState(String stateHint, SwitchStateOptions options) {
         return null;
     }
 

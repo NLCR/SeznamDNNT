@@ -18,6 +18,8 @@ import { Subject, zip } from 'rxjs';
 import { DocsUtils } from 'src/app/shared/docutils';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
+import { DialogSuccessorRecordsComponent } from '../dialog-successor-records/dialog-successor-records.component';
+import { SolrResponse } from 'src/app/shared/solr-response';
 
 
 @Component({
@@ -31,7 +33,7 @@ export class ResultItemComponent implements OnInit {
   @Input() inZadost: boolean;
   @Input() zadost: Zadost;
   @Output() removeFromZadostEvent = new EventEmitter<string>();
-  @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string }>();
+  @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string, options:string }>();
 
 
   newState = new FormControl();
@@ -174,8 +176,6 @@ export class ResultItemComponent implements OnInit {
       this.hasNavhr = false;
     }
   }
-
-//  this.hasNavhr = !!this.doc.zadost && !this.processed;
 
 
   curatorAndPublicStateAreDifferent(): boolean {
@@ -391,7 +391,7 @@ export class ResultItemComponent implements OnInit {
 
     approveDialogRef.afterClosed().subscribe(result => {
       if (result !== null) {
-        this.processZadostEvent.emit({ type: 'approve', identifier: this.doc.identifier, komentar: result });
+        this.processZadostEvent.emit({ type: 'approve', identifier: this.doc.identifier, komentar: result , options:null});
       }
     });
 
@@ -409,7 +409,7 @@ export class ResultItemComponent implements OnInit {
 
     approvedLibDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.processZadostEvent.emit({ type: 'approveLib', identifier: this.doc.identifier, komentar: result });
+        this.processZadostEvent.emit({ type: 'approveLib', identifier: this.doc.identifier, komentar: result, options:null });
       }
     });
   }
@@ -425,7 +425,7 @@ export class ResultItemComponent implements OnInit {
 
     releasedDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.processZadostEvent.emit({ type: 'releasedProved', identifier: this.doc.identifier, komentar: result });
+        this.processZadostEvent.emit({ type: 'releasedProved', identifier: this.doc.identifier, komentar: result, options:null });
       }
     });
 
@@ -440,7 +440,7 @@ export class ResultItemComponent implements OnInit {
 
     rejectDialogRef.afterClosed().subscribe(result => {
       //if (result) {
-      this.processZadostEvent.emit({ type: 'reject', identifier: this.doc.identifier, komentar: result });
+      this.processZadostEvent.emit({ type: 'reject', identifier: this.doc.identifier, komentar: result, options:null });
       //}
     });
 
@@ -474,6 +474,39 @@ export class ResultItemComponent implements OnInit {
 
   notPublic(doc: SolrDocument) {
     return doc.dntstav == null || doc.dntstav[doc.dntstav.length - 1] !== 'X';
+  }
+
+  openSuccessorRecords(flag: boolean) {
+    let followers = this.doc.followers ? this.doc.followers : [];
+    this.service.details(followers).subscribe((resp: SolrResponse) => {
+      const data = {
+        "edit": flag,
+        "docs" : resp.response.docs
+       };
+
+      const approveDialogRef = this.dialog.open(DialogSuccessorRecordsComponent, {
+        width: '1150px',
+        data,
+        panelClass: 'app-successor-records-dialog'
+      });
+
+      approveDialogRef.afterClosed().subscribe(result => {
+        if (typeof result.options === "string") {
+          const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+            width: '700px',
+            data: { caption: 'komentar', label: 'komentar' },
+            panelClass: 'app-register-dialog'
+          });
+
+          approveDialogRef.afterClosed().subscribe(r => {
+            if (r !== null) {
+              this.processZadostEvent.emit({ type: 'approve', identifier: this.doc.identifier, komentar: r,options:result.options});
+            }
+          });
+        }
+      });
+
+    });
   }
 }
 

@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -151,8 +152,8 @@ public class AccountServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    enum Actions {
 
+    enum Actions {
 
         // vyhledava zadosti
         _UPDATE_ZADOST {
@@ -511,7 +512,8 @@ public class AccountServlet extends HttpServlet {
                         JSONObject inputJs = ServletsSupport.readInputJSON(request);
                         JSONObject zadostJSON = inputJs.getJSONObject("zadost");
                         Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
-
+                        String optionsJSON = inputJs.has("options") ? inputJs.getString("options") : null;
+                        
                         List<String> identifiers = Actions.identifiers(inputJs);
                         Map<String, AccountException> failedIdentifiers = new HashMap<>();
                         for (String identifier : identifiers) {
@@ -519,9 +521,9 @@ public class AccountServlet extends HttpServlet {
                             try {
                                 String alternativeState = request.getParameter("alternative");
                                 if (alternativeState != null) {
-                                    zadostJSON = service.curatorSwitchAlternativeState(alternativeState, zadostJSON, identifier, inputJs.getString("reason"));
+                                    zadostJSON = service.curatorSwitchAlternativeState(alternativeState, zadostJSON, optionsJSON, identifier, inputJs.getString("reason"));
                                 } else {
-                                    zadostJSON = service.curatorSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
+                                    zadostJSON = service.curatorSwitchState(zadostJSON, optionsJSON, identifier, inputJs.getString("reason"));
                                 }
                             } catch (AccountException e) {
                                 failedIdentifiers.put(identifier, e);

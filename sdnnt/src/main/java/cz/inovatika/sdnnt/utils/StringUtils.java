@@ -12,6 +12,14 @@ import java.util.Stack;
  */
 public class StringUtils {
 
+    public static boolean match(String left, String right) {
+        if (isAnyString(left) && isAnyString(right))  {
+            return left.equals(right);
+        }  else if(left ==null && right == null){
+            return true;
+        } else return false;
+    }
+    
     /**
      * Minus operator
      * @param bigger Bigger string

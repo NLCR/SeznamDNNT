@@ -25,6 +25,7 @@ public class ZadostWorkflowFactory {
                 case VNL: return new VNLWorkflow(new ZadostProxy(zadost));
                 // zadosti generovane systemem
                 case PXN: return new PXWorkflow(new ZadostProxy(zadost));
+                case DXN: return new DXWorkflow(new ZadostProxy(zadost));
                 default: new NZNWorkflow(new ZadostProxy(zadost));
             }
         }

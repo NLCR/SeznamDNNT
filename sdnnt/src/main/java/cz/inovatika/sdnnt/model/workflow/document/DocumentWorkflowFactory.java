@@ -6,9 +6,20 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.*;
+import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateProxy;
+import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.IndexService;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
+import cz.inovatika.sdnnt.services.impl.IndexServiceImpl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.solr.client.solrj.SolrServerException;
+import org.json.JSONObject;
 
 
 public class DocumentWorkflowFactory {
@@ -25,6 +36,12 @@ public class DocumentWorkflowFactory {
         return null;
     }
 
+    /**
+     * @param kuratorstav
+     * @param stav
+     * @param license
+     * @return
+     */
     public static List<ZadostTypNavrh> canBePartOfZadost(List<String> kuratorstav, List<String> stav, String license) {
         CuratorItemState curatorItemState = null;
         if (kuratorstav != null && !kuratorstav.isEmpty()) {
@@ -70,7 +87,7 @@ public class DocumentWorkflowFactory {
         return zadostTypNavrhs;
    }
 
-    public static Workflow create(MarcRecord record, Zadost zadost) {
+    public static Workflow create(MarcRecord record, Zadost zadost) throws DocumentProxyException {
         List<String> kuratorstav = record.kuratorstav;
         String license = record.license;
         String navrh = zadost.getNavrh();
@@ -97,6 +114,26 @@ public class DocumentWorkflowFactory {
                     if (pxnDocument(kuratorstav)) { return new PXWorkflow(new DocumentProxy(record));}
                     else return null;
                 }
+                case DXN : {
+                    if (dxnDocument(kuratorstav)) { 
+                        try {
+                            // musim najit nastupce - Uz mam v dokumentu; vzdy
+                            AccountService accountService = new AccountServiceImpl();
+                            List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, null, null,  record.followers);
+
+                            List<Zadost> allRequests = foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
+                            
+                            IndexService indexService = new IndexServiceImpl();
+                            List<MarcRecord> followers = indexService.findById(record.followers);
+
+                            return new DXWorkflow(new DuplicateProxy(record, followers, allRequests));
+                        } catch (AccountException | IOException | SolrServerException e) {
+                            throw new DocumentProxyException(e);
+                        } 
+                    }
+                    else return null;
+                }
+                    
                 default:  return null;
             }
         }
@@ -131,6 +168,10 @@ public class DocumentWorkflowFactory {
                 !kuratorstav.contains(CuratorItemState.PX.name());
     }
 
+    private static boolean dxnDocument(List<String> kuratorstav) {
+        return  kuratorstav.contains(CuratorItemState.DX.name());
+    }
+    
     private static boolean nznDocument(List<String> kuratorstav) {
         if (kuratorstav.isEmpty()) return true;
         else {

@@ -22,6 +22,7 @@ public class HistoryObjectUtils {
 
     private HistoryObjectUtils() {}
 
+    // v pripade granularity zapisuje i parent
     public static JSONObject historyObjectParent(String stav, String license, String originator, String user, String poznamka, String historyDate) {
         return historyObject(null, null, stav, license, originator, user, poznamka, historyDate);
     }

@@ -33,6 +33,11 @@ public class OAIServlet extends HttpServlet {
     response.setContentType("text/xml;charset=UTF-8");
     PrintWriter out = response.getWriter();
     try {
+      /**
+       * oai - default 
+       * oai - repo 
+       * zakazat vse co je mimo
+       */
       String actionNameParam = request.getParameter("verb");
       if (actionNameParam != null) {
         Actions actionToDo = Actions.valueOf(actionNameParam);

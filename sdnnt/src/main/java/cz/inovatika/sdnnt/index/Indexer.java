@@ -386,7 +386,7 @@ public class Indexer {
     }
   }
 
-
+  //TODO: Move and do Junit tests
   public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
@@ -405,7 +405,7 @@ public class Indexer {
           mr.license = null;
           licence = null;
       }
-
+      // zapis do historie
       mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularity);
 
       if (!granularity.isEmpty()) {
@@ -437,16 +437,17 @@ public class Indexer {
     return ret;
   }
 
-  // TODO: Move to service
+  //TODO: Move and do Junit tests
   public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     return changeStavDirect(getClient(), identifier, newStav, licence, poznamka, granularity, user);
   }
 
-  //
+  //TODO: Move and do Junit tests
   public static JSONObject changeStav(String identifier, String user ) {
     return changeStav(identifier, user,getClient());
   }
 
+  //TODO: Move and do Junit tests
   public static JSONObject changeStav(String identifier,  String user, SolrClient client) {
     try {
       MarcRecord mr = MarcRecord.fromIndex(identifier);

@@ -97,7 +97,20 @@ public class PeriodTests {
         // +18 months deadline
         String format = SIMPLE_DATE_FORMAT_2.format(period_vln_2_18m.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("2021-10-31 05:13:03")));
         Assert.assertEquals("2023-04-30 00:00:00",format );
+    }
+    
+    @Test
+    public void testPeriod5() throws ParseException {
+        // + 5 working days // pondeli  - pondeli dalsi tyden
+        String format = SIMPLE_DATE_FORMAT_2.format(period_vln_3_5wd.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("2022-05-30 05:13:03")));
+        Assert.assertEquals(format, "2022-06-06 23:59:00");
+
+        String format2 = SIMPLE_DATE_FORMAT_2.format(period_vln_3_5wd.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("2022-05-31 05:13:03")));
+        Assert.assertEquals(format2, "2022-06-07 23:59:00");
+
+        String format3 = SIMPLE_DATE_FORMAT_2.format(period_vln_3_5wd.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("2022-6-3 05:13:03")));
+        //System.out.println(format3);
+        Assert.assertEquals(format3, "2022-06-10 23:59:00");
 
     }
-
 }

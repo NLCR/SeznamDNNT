@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.PXYearService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +27,11 @@ import java.util.stream.Collectors;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
+/**
+ * Sluzba, ktera umoznuje vyrazeni dila na zaklade datumu
+ * @author happy
+ *
+ */
 public class PXYearServiceImpl extends AbstractPXService implements PXYearService  {
 
     private String format;
@@ -34,7 +40,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
     
     public PXYearServiceImpl(String loggerName, JSONObject iteration, JSONObject results) {
         if (loggerName != null) {
-            this.logger = Logger.getLogger(PXYearService.class.getName()+"."+loggerName);
+            this.logger = Logger.getLogger(loggerName);
         }
         if (iteration != null) {
             super.iterationConfig(iteration);
@@ -70,7 +76,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         logger.info("Current iteration filter " + plusFilter);
  
         try (SolrClient solrClient = buildClient()){
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(DNTSTAV_FIELD + ":X", DNTSTAV_FIELD + ":PX"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
@@ -103,7 +109,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
             try (final SolrClient solr = buildClient()) {
                 for (String identifier : identifiers) {
                     if (cState != null) {
-                        SolrInputDocument sDoc = super.changeProcessState(solr, identifier, cState.name());
+                        SolrInputDocument sDoc = ChangeProcessStatesUtility.changeProcessState(solr, identifier, cState.name(), "scheduler/yearscheck");
                         solr.add(DataCollections.catalog.name(), sDoc);
                     }
                 }
