@@ -477,7 +477,8 @@ export class ResultItemComponent implements OnInit {
   }
 
   openSuccessorRecords(flag: boolean) {
-    this.service.details(this.doc.followers).subscribe((resp: SolrResponse) => {
+    let followers = this.doc.followers ? this.doc.followers : [];
+    this.service.details(followers).subscribe((resp: SolrResponse) => {
       const data = {
         "edit": flag,
         "docs" : resp.response.docs

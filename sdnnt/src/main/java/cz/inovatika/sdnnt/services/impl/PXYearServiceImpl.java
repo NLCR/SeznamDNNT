@@ -40,7 +40,7 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
     
     public PXYearServiceImpl(String loggerName, JSONObject iteration, JSONObject results) {
         if (loggerName != null) {
-            this.logger = Logger.getLogger(PXYearService.class.getName()+"."+loggerName);
+            this.logger = Logger.getLogger(loggerName);
         }
         if (iteration != null) {
             super.iterationConfig(iteration);

@@ -36,7 +36,6 @@
       <div *ngIf="doc.flag_public_in_dl && (state.logged && (state.user?.role ==='knihovna' || state.user?.role === 'kurator' || state.user?.role === 'mainKurator') )" class="app-badge app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
         {{ 'desc.kramerius_badge' | translate }}
       </div>
-
     </div>
     <div fxLayout="row">
       <mat-button-toggle-group>
@@ -64,7 +63,7 @@
 
             <!-- ready for happy -->
             <mat-button-toggle (click)="openSuccessorRecords(true)" [matTooltip]="'acts.zobrazit_naslednicke_zaznamy' | translate" matTooltipPosition="above">
-              <mat-icon class="material-icons-outlined">start</mat-icon>
+              <mat-icon class="material-icons-outlined">double_arrow</mat-icon>
             </mat-button-toggle>
 
             <!-- TODO change it ; cannot be dependent on type of request-->  
@@ -133,8 +132,8 @@
           <mat-icon>format_list_numbered</mat-icon>
           <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
         </button>
-        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost && (doc.kuratorstav[doc.kuratorstav.length-1] ==='D' || doc.kuratorstav[doc.kuratorstav.length-1] ==='DX') " (click)="openSuccessorRecords(false)">
-          <mat-icon class="material-icons-outlined">start</mat-icon>
+        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost && (doc.kuratorstav && (doc.kuratorstav[doc.kuratorstav.length-1] ==='D' || doc.kuratorstav[doc.kuratorstav.length-1] ==='DX')) " (click)="openSuccessorRecords(false)">
+          <mat-icon class="material-icons-outlined">double_arrow</mat-icon>
           <a>{{ 'acts.zobrazit_naslednicke_zaznamy' | translate }}</a>
         </button>
       </mat-menu>

@@ -11,9 +11,11 @@ public enum Case {
 
     SKC_3,
 
-    
     SKC_4,
 
+    SKC_4a,
+
+    SKC_4b,
     
     DNT_1,
     

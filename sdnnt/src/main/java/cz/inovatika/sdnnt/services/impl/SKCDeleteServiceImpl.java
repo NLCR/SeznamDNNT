@@ -37,22 +37,27 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
     
     protected Logger logger = Logger.getLogger(SKCDeleteServiceImpl.class.getName());
 
-    public SKCDeleteServiceImpl(String loggerPostfix, JSONObject results, List<String> deletedInfo) {
-        super(loggerPostfix, results);
+    public SKCDeleteServiceImpl(String loggerName, JSONObject results, List<String> deletedInfo) {
+        super(loggerName, results);
         this.deletedInfo = deletedInfo;
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(SKCDeleteServiceImpl.class.getName()+"."+loggerPostfix);
+        if (loggerName != null) {
+            this.logger = Logger.getLogger(loggerName);
         }
     }
 
-    public SKCDeleteServiceImpl(String loggerPostfix, JSONObject results) {
-        super(loggerPostfix, results);
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(SKCDeleteServiceImpl.class.getName()+"."+loggerPostfix);
+    public SKCDeleteServiceImpl(String loggerName, JSONObject results) {
+        super(loggerName, results);
+        if (loggerName != null) {
+            this.logger = Logger.getLogger(loggerName);
         }
     }
 
     
+    
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
     public void updateDeleteInfo(List<String> deleteInfo) {
         this.deletedInfo = deleteInfo;
     }
@@ -86,23 +91,30 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
         try (final SolrClient solrClient = buildClient()) {
            for (int i = 0; i < this.deletedInfo.size(); i++) {
                String id = this.deletedInfo.get(i);
-               SolrQuery query = new SolrQuery(String.format("identifier:\"%s\"", id))
-                       .addFilterQuery("dntstav:*")
-                       .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":DX")
-                       .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":D")
+               SolrQuery zadostQuery = new SolrQuery(String.format("identifiers:\"%s\"", id))
+                       .addFilterQuery("navrh:DXN")
                        .setRows(1)
                    .setStart(0);
-               SolrDocumentList docs = solrClient.query(DataCollections.catalog.name(), query).getResults();
-               if (docs.getNumFound()  == 1) {
-                   SolrDocument solrDocument = docs.get(0);
-                   MarcRecord fromIndex = MarcRecord.fromSolrDoc(solrDocument);
-                   Pair<Case,List<String>> followers = DuplicateSKCUtils.findSKCFollowers(solrClient, fromIndex);
-                   if (!retvals.containsKey(followers.getKey())) {
-                       retvals.put(followers.getKey(),new ArrayList<>());
+               SolrDocumentList zadosti = solrClient.query(DataCollections.zadost.name(), zadostQuery).getResults();
+               if (zadosti.getNumFound() == 0) {
+                   SolrQuery query = new SolrQuery(String.format("identifier:\"%s\"", id))
+                           .addFilterQuery("dntstav:*")
+                           .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":DX")
+                           .addFilterQuery("NOT "+MarcRecordFields.KURATORSTAV_FIELD+":D")
+                           .setRows(1)
+                       .setStart(0);
+                   SolrDocumentList docs = solrClient.query(DataCollections.catalog.name(), query).getResults();
+                   if (docs.getNumFound()  == 1) {
+                       SolrDocument solrDocument = docs.get(0);
+                       MarcRecord fromIndex = MarcRecord.fromSolrDoc(solrDocument);
+                       Pair<Case,List<String>> followers = DuplicateSKCUtils.findSKCFollowers(solrClient, fromIndex);
+                       if (!retvals.containsKey(followers.getKey())) {
+                           retvals.put(followers.getKey(),new ArrayList<>());
+                       }
+                       retvals.get(followers.getKey()).add(Pair.of(fromIndex.identifier, followers.getRight()));
                    }
-                   retvals.get(followers.getKey()).add(Pair.of(fromIndex.identifier, followers.getRight()));
-
                }
+               
            }
         }
         return retvals;

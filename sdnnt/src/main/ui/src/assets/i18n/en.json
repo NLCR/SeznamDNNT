@@ -76,7 +76,9 @@
       "A,NZ": "On-site terminal license",
       "NZN": "Proposal for inclusion in the Draft List (internal state of administration)",
       "NLX":"On-site terminal license, internal state",
-      "PXN":"Public work suggestion"
+      "PXN":"Public work suggestion",
+      "DXN": "Deleted works suggestion",
+      "D": "Deleted work"
     }
   },
   "license": {
@@ -88,9 +90,14 @@
     "dnntt-noactive": "Assigned license dnntt"
   },
   "field": {
+
     "015a": "Number nr.bibl.",
     "020a": "ISBN",
     "022a": "ISSN",
+    "edition":"Edition",
+    "no_followers": "No followers",
+    "identifier":"Identifier",
+
     "m": "Monographs",
     "s": "Serial",
     "i": "Musi se doplnit",
@@ -126,7 +133,7 @@
     "NL": "Scheduled release of the work",
     "NLX": "On-site terminal license, internal state",
     "D": "Deleted",
-    "DX": "Probably Smazáno",
+    "DX": "Probably deleted",
 
     "Priorita 1": "Priority 1",
     "Priorita 2": "Priority 2",
@@ -462,7 +469,7 @@
   },
   "sigla": {
     "ABA000":"National Library of the Czech Republic",
-    "ABA001":"National Library of the Czech Republic - Library Collection and Services",
+    "ABA001":"National Library of the Czech Republic",
     "ABA004":"National Library of the Czech Republic - Slavonic Library",
     "ABA006":"University of Economics, Prague",
     "ABA007":"Library of the ASCR",
@@ -476,6 +483,7 @@
     "ABB019":"Institute of Sociology of the Czech Academy of Sciences",
     "ABB030":"Oriental Institute of the AS CR",
     "ABB045":"Institute of Ethnology of the AS CR",
+    "ABB060" : "The Institute for Czech Literature of the CAS",
     "ABB083":"Institute of Contemporary History, Czech Academy of Sciences",
     "ABB085":"Masaryk Institute and Archives of the AS CR",
     "ABC039":"Research Institute of Geodesy, Topography and Cartography",
@@ -485,6 +493,7 @@
     "ABD020":"Academy of Performing Arts in Prague",
     "ABD024":"Academy of Arts, Architecture and Design in Prague",
     "ABD025":"University of Chemistry and Technology, Prague",
+    "ABD027":"Charles University - Protestant theological faculty",
     "ABD065":"Charles University - Faculty of Science - Map Collection",
     "ABD103":"Charles University in Prague - Faculty of Social Sciences",
     "ABD134":"Charles University - First Faculty of Medicine",
@@ -507,12 +516,15 @@
     "BOA001":"Moravian Library in Brno",
     "BOA002":"Moravian Library in Brno - Pedagogická knihovna",
     "BOB007":"Institute of History of the Czech Academy of Sciences",
+    "BOD004":"Masarykova univerzita - Faculty of science",    
     "BOD006":"Mendel University in Brno",
     "BOD022":"Masaryk University - Faculty of Economics and Administration",
+    "BOD034":"Masaryk University - The University Campus Library",
     "BOE303":"Moravian Gallery in Brno",
     "BOE310":"Moravian museum",
     "BOE801":"Museum of Brno Region",
     "BOE950":"Library of the Benedictine Abbey Rajhrad",
+    "BOG001":"Jiří Mahen Library in Brno",
     "BRE302":"Museum in Bruntal",
     "BVE301":"Regional Museum in Mikulov",
     "CBA001":"Research Library of South Bohemia in Ceske Budejovice",
@@ -542,6 +554,7 @@
     "NAE802":"Town Museum Jaromer",
     "NJE303":"Museum of Novy Jicin Region",
     "OLA001":"Research Library in Olomouc",
+    "OLD012":"Palacký University",
     "OPD001":"Silesian university in Opava",
     "OPE301":"Library Silesian Museum",
     "OPE801":"The Hlučín Area Museum",
@@ -551,6 +564,7 @@
     "OSE306":"Gallery of Fine Arts in Ostrava",
     "OSE309":"Archives of the Town Ostrava",
     "OSG002":"Ostrava City Library",
+    "PAG001":"Regional library Pardubice",
     "PNA001":"Education and Research Library of Pilsener Region",
     "PNE303":"Museum of West Bohemia in Pilsen",
     "ROE301":"Dr. Bohuslav Horak Museum",
@@ -559,12 +573,14 @@
     "TUE301":"Museum Podkrkonosi in Trutnov",
     "TUE801":"Krkonose Museum",
     "ULG001":"The North Bohemian Research Library in Ústí nad Labem",
+    "UOG001": "Municipal Library Ústí n.Orlicí",
     "UOG505":"Municipal Library Ceska Trebova",
     "ZLE302":"Museum of Southeastern Moravia of Zlin",
     "ZLG001":"František Bartoš Regional Library in Zlin"
   },
 
   "desc": {
+    "fonds": "Fonds",
     "scheduler_type_request":"Scheduler generated requests", 
     "user_type_request":"Users' requests", 
     "institution": "Institution",
@@ -766,6 +782,7 @@
     "debug_vnl_1_10wd":"10 days",
     "debug_vnl_2_18m":"18 months",
     "debug_vnl_3_5wd":"5 working days",
+    "debug_px_0_5wd":"5 working days",
 
     "period_nzn_0_5wd":"5 working days",
     "period_nzn_1_12_18": "1.2 or 1.8",
@@ -775,6 +792,7 @@
     "period_vnl_1_10d":"10 calendar days",
     "period_vln_2_18m": "18 months",
     "period_vln_3_5wd":"5 working days", 
+    "period_px_0_5wd":"5 working days",
     
     "desiredstate" : "Feature state/license",
     "period" : "Period",

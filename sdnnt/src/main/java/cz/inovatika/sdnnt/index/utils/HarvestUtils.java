@@ -129,7 +129,7 @@ public class HarvestUtils {
 
     private static void wait(int seconds) {
         try {
-            OAIHarvester.LOGGER.log(Level.INFO, "Suspending threads for " + seconds + "seconds ");
+            LOGGER.log(Level.INFO, "Suspending threads for " + seconds + "seconds ");
             Thread.sleep(seconds * 1000);
         } catch (InterruptedException e) {
             OAIHarvester.LOGGER.log(Level.SEVERE, e.getMessage(), e);

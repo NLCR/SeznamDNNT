@@ -31,7 +31,7 @@ public class ChangeProcessStatesUtilityTests {
         Assert.assertTrue(marcRecord.historie_kurator_stavu.length() == 3);
         Assert.assertTrue(marcRecord.historie_kurator_stavu.getJSONObject(2).getString("stav").equals("N"));
         
-        ChangeProcessStatesUtility.changeProcessState("NPA", marcRecord);
+        ChangeProcessStatesUtility.changeProcessState("NPA", marcRecord,"Zmena stavu");
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("N"));
         Assert.assertTrue(marcRecord.historie_stavu.length() == 4);
@@ -48,7 +48,7 @@ public class ChangeProcessStatesUtilityTests {
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
 
-        ChangeProcessStatesUtility.changeProcessState("D", marcRecord);
+        ChangeProcessStatesUtility.changeProcessState("D", marcRecord, "Zmena stavu");
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("D"));
         Assert.assertTrue(marcRecord.kuratorstav.size() == 1);
@@ -68,7 +68,7 @@ public class ChangeProcessStatesUtilityTests {
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
 
-        ChangeProcessStatesUtility.changeProcessState("DX", marcRecord);
+        ChangeProcessStatesUtility.changeProcessState("DX", marcRecord, "Zmena stavu");
         Assert.assertTrue(marcRecord.dntstav.size() == 1);
         Assert.assertTrue(marcRecord.dntstav.get(0).equals("PA"));
         Assert.assertTrue(marcRecord.kuratorstav.size() == 1);

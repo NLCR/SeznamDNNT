@@ -79,7 +79,17 @@ export class DialogSuccessorRecordsComponent implements OnInit {
     }
     return fondy.join(', ');
   }
-  
+
+  digitallibraries(doc:SolrDocument) {
+    let fondy = [];
+    if (doc.digital_libraries) {
+      doc.digital_libraries.forEach(i=> {
+        let t = `${i} (${this.service.getTranslation('sigla.'+i)})`; 
+        fondy.push(t);
+      });
+      return fondy.join(', ');
+    }
+  }
 
   accept() {
     let selected = [];

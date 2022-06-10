@@ -8,6 +8,7 @@ package cz.inovatika.sdnnt.sched;
 import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.OAIHarvester;
 
 import java.io.File;
 import java.io.IOException;
@@ -118,7 +119,46 @@ public class Job implements InterruptableJob {
                 QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
             }
         },
- 
+        
+        /** SKC Update */
+        SKC_UPDATE {
+            @Override
+            void doPerform(JSONObject jobData) {
+                JSONObject json = new JSONObject();
+                JSONObject results = jobData.optJSONObject("results");
+                OAIHarvester oai = new OAIHarvester(results);
+                String set = "SKC";
+                String core = "catalog";
+                boolean merge = true;
+                json.put("indexed", oai.update(set, core,
+                        merge,
+                        true,
+                        false));
+            }
+        },
+        
+        /** Type check */
+        SKC_TYPE_CHECK {
+            
+            @Override
+            void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
+                long start = System.currentTimeMillis();
+                JSONObject results = jobData.optJSONObject("results");
+                String loggerPostfix = jobData.optString("logger");
+                AbstractCheckDeleteService service = new SKCTypeServiceImpl(loggerPostfix, results);
+                try {
+                    service.update();
+                } catch (IOException | SolrServerException e) {
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                }finally {
+                    QuartzUtils.printDuration(service.getLogger(), start);
+                }
+
+            }
+        },
+        
+        /** Parovani SCK */
         DNT_SKC_PAIR {
 
             @Override
@@ -126,13 +166,6 @@ public class Job implements InterruptableJob {
                 LOGGER.fine(name()+":configuration is "+jobData);
                 long start = System.currentTimeMillis();
                 JSONObject results = jobData.optJSONObject("results");
-                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-                List<String> states = new ArrayList<>();
-                if (jsonArrayOfStates != null) {
-                    jsonArrayOfStates.forEach(it -> {
-                        states.add(it.toString());
-                    });
-                }
                 String loggerPostfix = jobData.optString("logger");
                 AbstractCheckDeleteService service = new DNTSKCPairServiceImpl(loggerPostfix, results);
                 try {

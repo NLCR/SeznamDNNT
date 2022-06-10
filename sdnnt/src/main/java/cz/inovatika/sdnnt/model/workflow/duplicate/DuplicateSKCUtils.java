@@ -67,7 +67,7 @@ public class DuplicateSKCUtils {
             List<String> moreidents = retvals.stream().map(Triple::getLeft).collect(Collectors.toList());
             return Pair.of(Case.SKC_3, moreidents);
         } else  {
-            return Pair.of(Case.SKC_4, new ArrayList<>());
+            return Pair.of(Case.SKC_4b, new ArrayList<>());
         }
     }
 

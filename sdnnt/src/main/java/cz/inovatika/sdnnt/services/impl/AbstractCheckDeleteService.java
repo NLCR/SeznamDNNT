@@ -41,7 +41,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
     public static final String TYPE_OF_REQ = "DXN";
     protected JSONObject results;
     
-    public AbstractCheckDeleteService(String loggerPostfix,JSONObject results) {
+    public AbstractCheckDeleteService(String logger,JSONObject results) {
         this.typeOfRequest = TYPE_OF_REQ;
         this.results = results;
         //if (results != null) {
@@ -68,7 +68,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
         state {
             @Override
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
-                    List<Pair<String, List<String>>> batch) throws SolrServerException, IOException {
+                    List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
                     for (Pair<String, List<String>> pair : batch) {
                         
                         
@@ -85,7 +85,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                         
                         DuplicateUtils.moveProperties(origin, followers, null);
                         origin.followers = pair.getRight();
-                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin);
+                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin, "scheduler/"+cs);
                         solrClient.add(DataCollections.catalog.name(), document);
                         for (MarcRecord smr : followers) {
                             solrClient.add(DataCollections.catalog.name(), smr.toSolrDoc());
@@ -96,7 +96,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
         request{
 
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
-                    List<Pair<String, List<String>>> batch) throws SolrServerException, IOException {
+                    List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
                 
                 try {
     
@@ -104,7 +104,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                         MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
                         origin.followers = pair.getRight();
                         // zmena stavu - nutno 
-                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin);
+                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
                         solrClient.add(DataCollections.catalog.name(), document);
                     }
                     List<String> identifiers = batch.stream().map(Pair::getKey).collect(Collectors.toList());
@@ -118,7 +118,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
 
         };
         
-        protected  abstract void update(SolrClient solrClient, AbstractCheckDeleteService reqService, List<Pair<String, List<String>>> batch) throws SolrServerException, IOException;
+        protected  abstract void update(SolrClient solrClient, AbstractCheckDeleteService reqService, List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException;
     }
 
     // ty ktere se resi au
@@ -141,25 +141,31 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                 getLogger().log(Level.INFO, String.format("Updating records, Case %s and number of records %d", cs.name(), updates.size()));
                 switch (cs) {
                     case DNT_1:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) : Process.state, getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) : Process.state, getLogger(),cs);
                         break;
                     case DNT_2:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     case SKC_1:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.state,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.state,getLogger(),cs);
                         break;
                     case SKC_2a:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     case SKC_2b:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     case SKC_3:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     case SKC_4:
-                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger());
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
+                        break;
+                    case SKC_4a:
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.state,getLogger(),cs);
+                        break;
+                    case SKC_4b:
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     default:
                         break;
@@ -185,7 +191,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
         }
     }
 
-    protected void updateRecords(List<Pair<String, List<String>>> toUpdateRecords, Process process, Logger logger) throws IOException, SolrServerException {
+    protected void updateRecords(List<Pair<String, List<String>>> toUpdateRecords, Process process, Logger logger, Case cs) throws IOException, SolrServerException {
         long startUpdating = System.currentTimeMillis();
         //AtomicInteger counter = new AtomicInteger();
         int counter = 0;
@@ -202,7 +208,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                     List<Pair<String,List<String>>> subList = toUpdateRecords.subList(fromIndex, toIndex);
                     try {
                         logger.info("Sublist size "+subList.size()+ " from index "+fromIndex +" to index "+toIndex );
-                        process.update(sClient, this, subList);
+                        process.update(sClient, this, subList,cs);
                         counter = counter+ subList.size();
                         long took = System.currentTimeMillis() - startUpdating;
                         debugMesage(counter, took,getLogger());

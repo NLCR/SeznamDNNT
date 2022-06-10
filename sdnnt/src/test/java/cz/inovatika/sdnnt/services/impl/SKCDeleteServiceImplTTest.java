@@ -165,6 +165,8 @@ public class SKCDeleteServiceImplTTest {
             Assert.assertTrue(skcdoc.dntstav.get(0).equals("A"));
         }
     }
+
+    
     
 
     /** Test update state */
@@ -227,7 +229,6 @@ public class SKCDeleteServiceImplTTest {
     
         
         try (SolrClient client = SolrTestServer.getClient()) {
-            
             SolrQuery query = new SolrQuery("identifier:\"oai:aleph-nkp.cz:DNT01-000102092\"")
                     .setRows(2)
                     .setStart(0);

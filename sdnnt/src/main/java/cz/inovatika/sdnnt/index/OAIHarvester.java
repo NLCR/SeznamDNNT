@@ -47,6 +47,7 @@ import org.apache.solr.common.SolrInputDocument;
 public class OAIHarvester {
 
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
+  
   JSONObject ret = new JSONObject();
   String collection = "catalog";
   boolean merge;
@@ -64,7 +65,19 @@ public class OAIHarvester {
 
   private boolean debug = false;
 
-  public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
+      
+  private JSONObject skcDeleteConfig;
+  public OAIHarvester(JSONObject config) {
+      super();
+      this.skcDeleteConfig = config;
+  }
+  
+  public OAIHarvester() {
+    super();
+  }
+
+
+public JSONObject full(String set, String core, boolean merge, boolean update, boolean allFields) {
     collection = core;
     this.merge = merge;
     this.update = update;
@@ -280,9 +293,8 @@ public class OAIHarvester {
     }
 
     protected SKCDeleteServiceImpl buildSKCDeleteService() {
-        String loggerPostfix = null;
-        JSONObject confObj = new JSONObject();
-        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl(loggerPostfix, confObj);
+        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl("", this.skcDeleteConfig);
+        skcDeleteServiceImpl.setLogger(LOGGER);
         return skcDeleteServiceImpl;
     }
     private void deletePaths(File dFile) {
@@ -357,7 +369,7 @@ public class OAIHarvester {
               readRecordHeader(reader, mr);
             } else {
                 readRecordHeader(reader, mr);
-                System.out.println("DELETED record "+mr.identifier);
+                LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
                 mr.isDeleted = true;
                 toDelete.add(mr.identifier);
             }

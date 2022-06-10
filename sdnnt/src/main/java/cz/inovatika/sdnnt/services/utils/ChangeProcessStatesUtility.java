@@ -19,7 +19,7 @@ public class ChangeProcessStatesUtility {
 
     private ChangeProcessStatesUtility() {}
     
-    public static SolrInputDocument changeProcessState(String state, MarcRecord mr) {
+    public static SolrInputDocument changeProcessState(String state, MarcRecord mr, String message) {
         CuratorItemState kstav = CuratorItemState.valueOf(state);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
         if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
@@ -29,13 +29,13 @@ public class ChangeProcessStatesUtility {
         } else {
             mr.license = null;
         }
-        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", "scheduler", new JSONArray());
+        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
         return mr.toSolrDoc();
     }
 
-    public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state) throws JsonProcessingException, SolrServerException, IOException {
+    public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state, String message) throws JsonProcessingException, SolrServerException, IOException {
         MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
-        return changeProcessState(state, mr);
+        return changeProcessState(state, mr, message);
     }
 
 }

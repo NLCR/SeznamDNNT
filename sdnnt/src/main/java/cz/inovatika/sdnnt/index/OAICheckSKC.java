@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,10 +43,20 @@ public class OAICheckSKC {
     public static final String CONNECTION_REQUEST_TIMEOUT_KEY = "connectionRequestTimeout";
     public static final String SOCKET_TIMEOUT_KEY = "socketTimeout";
     public static final String START_URL ="https://aleph.nkp.cz/OAI?verb=ListIdentifiers&metadataPrefix=marc21&set=SKC-DNNT";
-
     
-    public Pair<List<String>, List<String>> iterate() throws IOException, MaximumIterationExceedException, XMLStreamException, ParserConfigurationException, SAXException {
-        List<String> records = new ArrayList<>();
+    private Logger logger = LOGGER;
+    
+    
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
+
+    public Pair<Set<String>, List<String>> iterate() throws IOException, MaximumIterationExceedException, XMLStreamException, ParserConfigurationException, SAXException {
+        Set<String> records = new HashSet<>();
         List<String> deleted = new ArrayList<>();
         
         int recCounter = 0;
@@ -57,20 +69,17 @@ public class OAICheckSKC {
                 File dFile = HarvestUtils.throttle(client, "skc_dnt", url);
                 InputStream dStream = new FileInputStream(dFile);
                 OAIXMLHeadersReader xmlReader = new OAIXMLHeadersReader(dStream);
-
                 resumptionToken = xmlReader.readFromXML();
                 records.addAll(xmlReader.getRecords());
                 records.addAll(xmlReader.getToDelete());
-                
-                if (indexCount > 6) {
-                    break;
-                }
-                
                 indexCount++;
+                if (indexCount % 100 == 0) {
+                    logger.info(String.format("Iteration %d,  Number of records %d", indexCount, records.size()));
+                }
                 deletePaths(dFile);
             }
         }
-        
+        logger.info(String.format("Iteration finished. Records: %d", records.size()));
         return Pair.of(records, deleted);
     }
     

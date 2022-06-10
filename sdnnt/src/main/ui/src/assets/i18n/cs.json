@@ -76,7 +76,9 @@
       "A,NZ": "Licence pro terminál na místě samém",
       "NZN": "Návrh k zařazení",
       "NLX":"Omezeno na terminál, interní stav",
-      "PXN":"Návrhy na veřejné dílo"
+      "PXN":"Návrhy na veřejné dílo",
+      "DXN": "Návrhy na smazaná díla",
+      "D": "Smazané dílo"
     }
   },
   "license": {
@@ -91,11 +93,16 @@
     "015a": "Číslo nár.bibl.",
     "020a": "ISBN",
     "022a": "ISSN",
+    "id_sdnnt": "Interní identifikátor",
+    "digital_libraries": "Digitální knihovna",
+    "editon":"Vydání",
+    "no_followers": "Nejsou žádné naslednické záznamy",
+    "identifier":"Identifikátor",
+
     "m": "Monografie",
     "s": "Serial",
     "i": "Musi se doplnit",
     "a": "Taky se musi",
-    "id_sdnnt": "Interní identifikátor",
 
     "fmt": "Formát dokumentu",
     "item_type": "Typ dokumentu",
@@ -124,6 +131,8 @@
     "VNZ": "Výzva k licenci pro terminál na místě samém",
     "NL": "Plánované vydání díla",
     "NLX": "Omezeno na terminál",
+    "D": "Smazáno",
+    "DX": "Pravděpodobně Smazáno",
 
     "Priorita 1": "Priorita 1",
     "Priorita 2": "Priorita 2",
@@ -459,7 +468,7 @@
   },
   "sigla": {
     "ABA000":"Národní knihovna České republiky",
-    "ABA001":"Národní knihovna České republiky - Knihovní fondy a služby",
+    "ABA001":"Národní knihovna České republiky",
     "ABA004":"Národní knihovna České republiky - Slovanská knihovna",
     "ABA006":"Vysoká škola ekonomická v Praze",
     "ABA007":"Knihovna AV ČR",
@@ -473,6 +482,7 @@
     "ABB019":"Sociologický ústav AV ČR",
     "ABB030":"Orientální ústav AV ČR",
     "ABB045":"Etnologický ústav AV ČR",
+    "ABB060" : "Ústav pro českou literaturu AV ČR, v. v. i. - Knihovna",
     "ABB083":"Ústav pro soudobé dějiny AV ČR",
     "ABB085":"Masarykův ústav a Archiv AV ČR",
     "ABC039":"Výzkumný ústav geodetický, topografický a kartografický, v.v.i.",
@@ -482,6 +492,7 @@
     "ABD020":"Akademie múzických umění v Praze",
     "ABD024":"Vysoká škola uměleckoprůmyslová v Praze",
     "ABD025":"Vysoká škola chemicko-technologická v Praze",
+    "ABD027": "Univerzita Karlova - Evangelická teologická fakulta - knihovna",
     "ABD065":"Univerzita Karlova - Přírodovědecká fakulta - Mapová sbírka",
     "ABD103":"Univerzita Karlova v Praze - Fakulta sociálních věd",
     "ABD134":"Univerzita Karlova v Praze - 1. lékařská fakulta",
@@ -504,12 +515,15 @@
     "BOA001":"Moravská zemská knihovna v Brně",
     "BOA002":"Moravská zemská knihovna - Pedagogická knihovna",
     "BOB007":"Historický ústav AV ČR",
+    "BOD004": "Masarykova univerzita - Přírodovědecká fakulta - Ústřední knihovna",    
     "BOD006":"Mendelova univerzita v Brně",
     "BOD022":"Masarykova univerzita - Ekonomicko-správní fakulta",
+    "BOD034": "Masarykova univerzita - Knihovna univerzitního kampusu",
     "BOE303":"Moravská galerie v Brně",
     "BOE310":"Moravské zemské muzeum",
     "BOE801":"Muzeum Brněnska",
     "BOE950":"Benediktinské opatství Rajhrad",
+    "BOG001": "Knihovna Jiřího Mahena v Brně",
     "BRE302":"Muzeum v Bruntále",
     "BVE301":"Regionální muzeum v Mikulově",
     "CBA001":"Jihočeská vědecká knihovna v Českých Budějovicích",
@@ -539,6 +553,7 @@
     "NAE802":"Městské muzeum v Jaroměři",
     "NJE303":"Muzeum Novojičínska",
     "OLA001":"Vědecká knihovna v Olomouci",
+    "OLD012": "Univerzita Palackého v Olomouci - Knihovna UP",
     "OPD001":"Slezská univerzita v Opavě",
     "OPE301":"Knihovna Slezského zemského muzea",
     "OPE801":"Muzeum Hlučínska",
@@ -548,6 +563,7 @@
     "OSE306":"Galerie výtvarného umění v Ostravě",
     "OSE309":"Archiv města Ostravy",
     "OSG002":"Knihovna města Ostravy",
+    "PAG001": "Krajská knihovna v Pardubicích",
     "PNA001":"Studijní a vědecká knihovna Plzeňského kraje",
     "PNE303":"Západočeské muzeum v Plzni",
     "ROE301":"Muzeum Dr. Bohuslava Horáka v Rokycanech",
@@ -556,12 +572,14 @@
     "TUE301":"Muzeum Podkrkonoší v Trutnově",
     "TUE801":"Krkonošské muzeum",
     "ULG001":"Severočeská vědecká knihovna v Ústí nad Labem",
+    "UOG001": "Městská knihovna Ústí n.Orlicí",
     "UOG505":"Městská knihovna Česká Třebová",
     "ZLE302":"Muzeum jihovýchodní Moravy ve Zlíně",
     "ZLG001":"Krajská knihovna Františka Bartoše ve Zlíně"
   },
 
   "desc": {
+    "fonds": "Ve fondu",
     "scheduler_type_request":"Systémem generované žádosti", 
     "user_type_request":"Uživatelské žádosti", 
     "institution": "Instituce",
@@ -763,6 +781,8 @@
     "debug_vnl_1_10wd":"10 kalendářních dnů",
     "debug_vnl_2_18m":"18 měsíců",
     "debug_vnl_3_5wd":"5 pracovních dnů",
+    
+    "debug_px_0_5wd":"5 pracovních dnů",
 
     "period_nzn_0_5wd":"5 pracovních dnů",
     "period_nzn_1_12_18": "1.2 nebo 1.8",
@@ -772,6 +792,7 @@
     "period_vnl_1_10d":"10 kalendářních dnů",
     "period_vln_2_18m": "18 měsíců",
     "period_vln_3_5wd":"5 pracovních dnů",    
+    "period_px_0_5wd":"5 pracovních dnů",
 
     "desiredstate" : "Budoucí stav/licence",
     "period" : "Lhůta",

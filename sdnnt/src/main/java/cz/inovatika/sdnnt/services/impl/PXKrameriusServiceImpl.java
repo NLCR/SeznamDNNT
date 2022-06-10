@@ -50,7 +50,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     private Logger logger = Logger.getLogger(PXKrameriusService.class.getName());
     
     
-    public PXKrameriusServiceImpl(String loggerPostfix, JSONObject iteration, JSONObject results) {
+    public PXKrameriusServiceImpl(String logger, JSONObject iteration, JSONObject results) {
         if (iteration != null) {
             super.iterationConfig(iteration);
         }
@@ -59,8 +59,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             super.requestsConfig(results);
         }
         
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(PXKrameriusService.class.getName()+"."+loggerPostfix);
+        if (logger != null) {
+            this.logger = Logger.getLogger(logger);
         }
         
     }

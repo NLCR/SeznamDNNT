@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,10 +37,10 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
 
     protected Logger logger = Logger.getLogger(SKCTypeServiceImpl.class.getName());
 
-    public SKCTypeServiceImpl(String loggerPostfix, JSONObject results) {
-        super(loggerPostfix, results);
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(SKCTypeServiceImpl.class.getName()+"."+loggerPostfix);
+    public SKCTypeServiceImpl(String loggerName, JSONObject results) {
+        super(loggerName, results);
+        if (loggerName != null) {
+            this.logger = Logger.getLogger(loggerName);
         }
     }
     
@@ -48,15 +49,18 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
         Map<Case, List<Pair<String, List<String>>>> retvals = new HashMap<>();
         try {
             OAICheckSKC check = buildCheckOAISKC();
-            Pair<List<String>,List<String>> ids = check.iterate();
-            retvals.put(Case.SKC_4, new ArrayList<>());
+            Pair<Set<String>,List<String>> ids = check.iterate();
+
+            retvals.put(Case.SKC_4a, new ArrayList<>());
+            // deleted ids
             ids.getValue().stream().forEach(deleted-> {
-                retvals.get(Case.SKC_4).add(Pair.of(deleted, new ArrayList<>()));
+                retvals.get(Case.SKC_4a).add(Pair.of(deleted, new ArrayList<>()));
             });
-            List<String> active = ids.getLeft();
+
+            Set<String> active = ids.getLeft();
             CatalogIterationSupport support = new CatalogIterationSupport();
             Map<String, String> reqMap = new HashMap<>();
-            reqMap.put("rows", "1000" );
+            reqMap.put("rows", "10000");
 
             try (final SolrClient solrClient = buildClient()) {
                 List<String> plusFilter = Arrays.asList(DNTSTAV_FIELD + ":*");
@@ -64,7 +68,7 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
                 support.iterate(solrClient, reqMap, null, plusFilter, minusFilter, Arrays.asList(MarcRecordFields.IDENTIFIER_FIELD), (rsp) -> {
                     Object identifier = rsp.getFieldValue("identifier");
                     if (!active.contains(identifier.toString())) {
-                        retvals.get(Case.SKC_4).add(Pair.of(identifier.toString(), new ArrayList<>()));
+                        retvals.get(Case.SKC_4a).add(Pair.of(identifier.toString(), new ArrayList<>()));
                     }
                 }, IDENTIFIER_FIELD);
             } catch(IOException e) {
@@ -77,7 +81,7 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
         }
     }
 
-    private OAICheckSKC buildCheckOAISKC() {
+    protected OAICheckSKC buildCheckOAISKC() {
         return new OAICheckSKC();
     }
 

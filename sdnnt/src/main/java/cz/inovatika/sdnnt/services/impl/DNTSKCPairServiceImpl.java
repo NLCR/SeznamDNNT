@@ -30,10 +30,10 @@ public class DNTSKCPairServiceImpl extends AbstractCheckDeleteService implements
     
     protected Logger logger = Logger.getLogger(DNTSKCPairServiceImpl.class.getName());
     
-    public DNTSKCPairServiceImpl(String loggerPostfix, JSONObject results) {
-        super(loggerPostfix, results);
-        if (loggerPostfix != null) {
-            this.logger = Logger.getLogger(DNTSKCPairServiceImpl.class.getName()+"."+loggerPostfix);
+    public DNTSKCPairServiceImpl(String loggerName, JSONObject results) {
+        super(loggerName, results);
+        if (loggerName != null) {
+            this.logger = Logger.getLogger(loggerName);
         }
     }
 
