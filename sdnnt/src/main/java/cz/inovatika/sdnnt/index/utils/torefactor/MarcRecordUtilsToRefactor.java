@@ -494,9 +494,11 @@ public class MarcRecordUtilsToRefactor {
 
   public static void setFMT(SolrInputDocument sdoc, String type_of_resource, String item_type) {
     // https://knowledge.exlibrisgroup.com/Primo/Product_Documentation/Primo/Technical_Guide/020Working_with_Normalization_Rules/100Validate_UNIMARC_FMT
+    // https://knowledge.exlibrisgroup.com/Aleph/Knowledge_Articles/Logic_for_assigning_FMT%3B_where_it_is_set
     // Zmena POZOR. Podle url ai by mel byt BK, ale v alephu vidim SE
     String fmt = "BK";
     switch (type_of_resource) {
+      case "t":
       case "a":
         if ("s".equals(item_type) || "i".equals(item_type)) {
           fmt = "SE";
