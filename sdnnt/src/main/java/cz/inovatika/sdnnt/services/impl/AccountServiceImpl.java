@@ -420,7 +420,7 @@ public class AccountServiceImpl implements AccountService {
                 MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
                 Workflow workflow = DocumentWorkflowFactory.create(marcRecord,zadost);
                 
-                if (workflow.getOwner().hasRejectableWorkload()) {
+                if (workflow != null && workflow.getOwner() != null &&workflow.getOwner().hasRejectableWorkload()) {
                     
                     workflow.getOwner().rejectWorkflowState(zadost.getId(), username, reason);
                     List<Pair<String,SolrInputDocument>> save = workflow.getOwner().getStateToSave(null);
