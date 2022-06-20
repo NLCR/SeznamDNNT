@@ -36,8 +36,8 @@ public class DntAlephTestUtils {
             DntAlephImporter importer = new DntAlephImporter();
             importer.readDocument(reader);
             
+            //System.out.println(importer.recs.size());
             Assert.assertTrue(importer.recs.size() == expectedSize);
-
             // adding to catalog
             importer.addToCatalog(importer.recs, SolrTestServer.getClient(), false);
             SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");

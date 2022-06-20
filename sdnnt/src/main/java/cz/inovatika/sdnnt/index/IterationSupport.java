@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public abstract class IterationSupport {
 
 
-    public static final Logger LOGGER = Logger.getLogger(CatalogIterationSupport.class.getName());
+    public static final Logger LOGGER = Logger.getLogger(IterationSupport.class.getName());
 
     /**
      * One page iteration

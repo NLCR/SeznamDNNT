@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 
@@ -106,18 +107,23 @@ public class MarcRecordUtilsToRefactor {
               }
             }
             if (!states.isEmpty()) {
-              if (isANZCombination(states)) {
-                sdoc.setField("license", "dnntt");
-
-                sdoc.setField("dntstav", aOrPa(states));
-                sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
-
-              } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
-                sdoc.setField("license", "dnnto");
-
-                sdoc.setField("dntstav", aOrPa(states));
-                sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
-
+                if (isANZCombination(states)) {
+                    sdoc.setField("license", "dnntt");
+                    sdoc.setField("dntstav", aOrPa(states));
+                    sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
+                } else if (isOnlyACombiation(states) && (!sdoc.containsKey("license") || sdoc.getFieldValue("license") == null)) {
+                    sdoc.setField("license", "dnnto");
+                    sdoc.setField("dntstav", aOrPa(states));
+                    sdoc.setField(KURATORSTAV_FIELD, aOrPa(states));
+                } else if (isPXCombination(states)) {
+                  List<DataField> list = dataFields.get("992");
+                  List<String> collectedstates = collectHistoryStates(list);
+                  String lastState = !collectedstates.isEmpty()  ? collectedstates.remove(collectedstates.size() - 1) : "PX";
+                  if (lastState.equals("PX") && !collectedstates.isEmpty()) {
+                      lastState  = collectedstates.remove(collectedstates.size() -1);
+                  }
+                  sdoc.setField("dntstav", Arrays.asList(lastState));
+                  sdoc.setField(KURATORSTAV_FIELD, Arrays.asList("PX"));
               } else {
                 states.forEach(oneState -> {
                   sdoc.addField("dntstav", oneState);
@@ -209,6 +215,24 @@ public class MarcRecordUtilsToRefactor {
 
     }
 
+    private static List<String> collectHistoryStates(List<DataField> list) {
+        List<String> collectedstates = list.stream().map(df-> {
+              boolean flag = df.getSubFields().containsKey("s");
+              if (flag) {
+                  List<String> vals = df.getSubFields().get("s").stream().map(SubField::getValue).collect(Collectors.toList());
+                  return vals;
+              } else {
+                  return new ArrayList<String>();
+              }
+          }).flatMap(x-> x.stream()).collect(Collectors.toList());
+        return collectedstates;
+    }
+    
+    
+    public static boolean isPXCombination(List<String> states) {
+        if (states.contains("PX")) return true;
+        else return false;
+    }
     
     public static boolean isANZCombination(List<String> states) {
       if (states.size() == 2 ) return states.contains("NZ") && (states.contains("A") || (states.contains("PA")));

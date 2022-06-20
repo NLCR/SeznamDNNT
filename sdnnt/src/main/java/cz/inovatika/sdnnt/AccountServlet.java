@@ -512,7 +512,7 @@ public class AccountServlet extends HttpServlet {
                         JSONObject inputJs = ServletsSupport.readInputJSON(request);
                         JSONObject zadostJSON = inputJs.getJSONObject("zadost");
                         Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
-                        String optionsJSON = inputJs.has("options") ? inputJs.getString("options") : null;
+                        String optionsJSON = inputJs.has("options") && !inputJs.isNull("options") ? inputJs.getString("options") : null;
                         
                         List<String> identifiers = Actions.identifiers(inputJs);
                         Map<String, AccountException> failedIdentifiers = new HashMap<>();

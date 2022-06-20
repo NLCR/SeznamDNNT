@@ -62,7 +62,7 @@
           <ng-container *ngIf="(state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && zadost.state === 'waiting'">
 
             <!-- ready for happy -->
-            <mat-button-toggle (click)="openSuccessorRecords(true)" [matTooltip]="'acts.zobrazit_naslednicke_zaznamy' | translate" matTooltipPosition="above">
+            <mat-button-toggle (click)="openSuccessorRecords(true)" *ngIf="zadost.navrh === 'DXN'"  [matTooltip]="'acts.zobrazit_naslednicke_zaznamy' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">double_arrow</mat-icon>
             </mat-button-toggle>
 

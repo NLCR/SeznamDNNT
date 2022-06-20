@@ -171,4 +171,40 @@ public class DntAlephImporterITTest {
             Assert.fail(e.getMessage());
         }
     }
+    
+    /** Nove podporovany stav PX -*/
+    @Test
+    public void testDNTAleph_StavPX() throws XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        InputStream resourceAsStream = dntAlephStream("oai_PX.xml");
+        Assert.assertNotNull(resourceAsStream);
+        try {
+            alephImport(resourceAsStream,41);
+            try(SolrClient client = SolrTestServer.getClient()) {
+                SolrQuery query = new SolrQuery("*")
+                        .setRows(1000);
+                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
+                
+                List<String> ll = Arrays.asList(
+                        "oai:aleph-nkp.cz:DNT01-000110651",
+                        "oai:aleph-nkp.cz:DNT01-000012906",
+                        "oai:aleph-nkp.cz:DNT01-000012931"
+                );
+                for (SolrDocument doc : docs) {
+                    MarcRecord fDoc = MarcRecord.fromDocDep(doc);
+                    Assert.assertFalse(fDoc.dntstav.contains("PX"));
+                    
+                    if (ll.contains(fDoc.identifier)) {
+                        Assert.assertTrue(fDoc.kuratorstav.contains("PX"));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+    
 }
