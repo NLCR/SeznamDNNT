@@ -171,6 +171,9 @@ public class DuplicateUtils {
                     
                     SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_"+marcFieldPair.getKey()+marcFieldPair.getValue(), builder.toString())).setRows(100);
                     idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
+                    idQuery.addFilterQuery("NOT dntstav:D");
+                    idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    
                     try {
                         LOGGER.info("Query: "+idQuery);
                         SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
@@ -231,6 +234,9 @@ public class DuplicateUtils {
                                
                                SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
                                idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
+                               idQuery.addFilterQuery("NOT dntstav:D");
+                               idQuery.addFilterQuery("NOT kuratorstav:DX");
+
                                LOGGER.info("Query: "+idQuery);
                                SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
                                for (SolrDocument sDocument : results) {

@@ -208,6 +208,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
               if (testfile != null) {
                   File fFile = new File(testfile);
                   if (fFile.exists() && fFile.canRead()) {
+                      LOGGER.log(Level.INFO, "\t Replaced by {0}...", fFile.getAbsolutePath());
                       return fFile;
                   } else return null;
               } else {
