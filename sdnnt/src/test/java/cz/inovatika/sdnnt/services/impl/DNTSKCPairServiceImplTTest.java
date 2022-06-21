@@ -122,6 +122,7 @@ public class DNTSKCPairServiceImplTTest {
             Assert.assertTrue(follower.license.equals("dnnto"));
         }
     }
+
     
     @Test
     public void testUpdateRequest() throws IOException, SolrServerException {

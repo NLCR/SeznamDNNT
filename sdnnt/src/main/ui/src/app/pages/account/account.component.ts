@@ -356,7 +356,7 @@ export class AccountComponent implements OnInit {
       let count: number = 0;
       let stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : "_");
       let licenseKey = (zadost.desired_license ?  zadost.desired_license : "_");
-      zadost.identifiers.forEach(id => {
+      zadost.identifiers?.forEach(id => {
         let tablekey = id +"_("+stateKey+","+licenseKey+")";
         if ( !zadost.process[tablekey]) {
           count  += 1;

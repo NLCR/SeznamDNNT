@@ -50,14 +50,12 @@ public class DuplicateUtils {
         String id = origin.identifier;
         List<String> followersIds = followers.stream().map(m-> m.identifier).collect(Collectors.toList());
         zadosti.stream().forEach(zadost-> {
-           if (zadost.getState() != null && !zadost.getState().equals("processed")) {
-              
-               Map<String,ZadostProcess> process = zadost.getProcess();
+            if (zadost.getState() != null && !zadost.getState().equals("processed")) {
+               Map<String,ZadostProcess> process = zadost.getProcess() != null ? zadost.getProcess() : new HashMap<>();
                Map<String, ZadostProcess> changedProcess = new HashMap<>();
                
                // vymenit vse v zadosti
                if (zadost.getIdentifiers().contains(id)) {
-
                    // obsahuje 
                    List<String> changed = new ArrayList<>();
                    for (String zid : zadost.getIdentifiers()) {
@@ -81,6 +79,13 @@ public class DuplicateUtils {
                    }
                    zadost.setIdentifiers(changed);
                    zadost.setProcess(changedProcess);
+                   
+                   // uzavrit, pokud neni zadny identifikator
+                   if (zadost.getIdentifiers() != null && zadost.getIdentifiers().isEmpty()) {
+                       if (!zadost.getState().equals("open")) {
+                           zadost.setState("processed");
+                       }
+                   }
                }
            }
        });

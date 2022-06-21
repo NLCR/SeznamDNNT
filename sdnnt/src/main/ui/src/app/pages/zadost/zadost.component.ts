@@ -211,7 +211,7 @@ export class ZadostComponent implements OnInit {
     let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
     let allProcessed: boolean = true;
     if (this.zadost && this.zadost.process) {
-      this.zadost.identifiers.forEach(id => {
+      this.zadost.identifiers?.forEach(id => {
         let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
         let noworkflowkey =id+"_noworkflow";
         if (!this.zadost.process[tablekey] && !this.zadost.process[noworkflowkey]) {
@@ -226,7 +226,7 @@ export class ZadostComponent implements OnInit {
   }
 
   removeDoc(identifier: string) {
-    this.zadost.identifiers = this.zadost.identifiers.filter(id => id !== identifier);
+    this.zadost.identifiers = this.zadost.identifiers?.filter(id => id !== identifier);
     this.service.saveZadost(this.zadost).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.odstraneni_zadosti_error', res.error, true);

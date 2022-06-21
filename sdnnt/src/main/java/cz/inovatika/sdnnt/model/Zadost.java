@@ -195,6 +195,8 @@ public class Zadost implements NotNullAwareObject {
                 List<Object> identifiers = new ArrayList<>();
                 jsonobj.getJSONArray(IDENTIFIERS_KEY).forEach(identifiers::add);
                 zadost.setIdentifiers(identifiers.stream().map(Objects::toString).collect(Collectors.toList()));
+            } else {
+                zadost.setIdentifiers(new ArrayList<>());
             }
 
             if (jsonobj.has(PROCESS_KEY)) {

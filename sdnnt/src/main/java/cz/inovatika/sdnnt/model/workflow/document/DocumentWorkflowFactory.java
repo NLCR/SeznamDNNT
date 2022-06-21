@@ -15,6 +15,7 @@ import cz.inovatika.sdnnt.services.impl.IndexServiceImpl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,13 +120,14 @@ public class DocumentWorkflowFactory {
                         try {
                             // musim najit nastupce - Uz mam v dokumentu; vzdy
                             AccountService accountService = new AccountServiceImpl();
-                            List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, null, null,  record.followers);
-
+                            // pokud ma nejake nasledovniky
+                            List<String> navrhy = Arrays.asList("NZN","VN","VNL","VNZ","PXN");
+                            List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, navrhy, null,  Arrays.asList(record.identifier));
                             List<Zadost> allRequests = foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
                             
                             IndexService indexService = new IndexServiceImpl();
                             List<MarcRecord> followers = indexService.findById(record.followers);
-
+                            // vsechny pozadavky
                             return new DXWorkflow(new DuplicateProxy(record, followers, allRequests));
                         } catch (AccountException | IOException | SolrServerException e) {
                             throw new DocumentProxyException(e);

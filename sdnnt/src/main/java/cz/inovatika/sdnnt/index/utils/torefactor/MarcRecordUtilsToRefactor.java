@@ -32,6 +32,23 @@ public class MarcRecordUtilsToRefactor {
 
     public static final Logger LOGGER = Logger.getLogger(MarcRecordUtilsToRefactor.class.getName());
 
+    
+    public static void fillSolrDocWST(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {
+        for (String tag : tagsToIndex) {
+          if (dataFields.containsKey(tag)) {
+            for (DataField df : dataFields.get(tag)) {
+              for (String code : df.getSubFields().keySet()) {
+                sdoc.addField("marc_" + tag + code, df.getSubFields().get(code).get(0).getValue());
+              }
+            }
+          }
+        }
+        addDedup(sdoc, dataFields);
+        addFRBR(sdoc, dataFields);
+        addEAN(sdoc, dataFields);
+      }
+    
+    
     public static void fillSolrDoc(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {
       for (String tag : tagsToIndex) {
         if (dataFields.containsKey(tag)) {

@@ -68,8 +68,8 @@ public class OAIHarvesterTTest {
     /** Test pro indexaci OAI zaznamu a naslednemu udpatu */
     @Test
     public void testOAIIndexAndUpdate() throws XMLStreamException, SolrServerException {
-        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
             return;
         }
         try {
@@ -100,12 +100,55 @@ public class OAIHarvesterTTest {
                         .setRows(1000);
                 SolrDocumentList historyDocs = client.query(DataCollections.history.name(), historyQuery).getResults();
                 Assert.assertTrue(historyDocs.size() == 5);
-                    
             }
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }
     }
+    
+
+    /** Zmena formatu a mista publikace */
+    @Test
+    public void testOAIIndexAndUpdate_FormatAndPlace() throws XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        try {
+            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579047", "N", null,"poznamka", new JSONArray(), "test");
+
+            alephImport(skcAlephStream("skc/update/oai_skc1_changed_format.xml"),31, true, true);
+            
+            
+            try(SolrClient client = SolrTestServer.getClient()) {
+                
+                SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
+                        .setRows(1000);
+                SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
+                Assert.assertTrue(catalogDocs.size() == 1);
+                
+                MarcRecord changedFormatDoc = MarcRecord.fromDocDep(catalogDocs.get(0));
+                Assert.assertTrue("VM".equals(changedFormatDoc.fmt));
+
+                catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579047\"")
+                        .setRows(1000);
+                catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
+                Assert.assertTrue(catalogDocs.size() == 1);
+                MarcRecord changedPlace = MarcRecord.fromDocDep(catalogDocs.get(0));
+                //System.out.println("control field "+changedPlace.controlFields.get("008"));
+                SolrInputDocument solrDoc = changedPlace.toSolrDoc();
+                Assert.assertTrue(solrDoc.containsKey("place_of_pub"));
+                Assert.assertTrue(solrDoc.getFieldValue("place_of_pub").toString().trim().equals("gr"));
+            }
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+        
+    }
+    
 
     /** Test indexace DNT, indexace odpovidajici SKC a naslednemu update SKC */
     @Test

@@ -7,7 +7,9 @@ import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE
 import cz.inovatika.sdnnt.indexer.models.notifications.NotificationFactory;
 import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserController;
@@ -52,8 +54,6 @@ public class NotificationServiceImpl implements NotificationsService {
         this.mailService = mailService;
     }
     
-    
-
     public NotificationServiceImpl(UserController userControler, UserController shibUsersController,
             MailService mailService) {
         super();
@@ -385,12 +385,14 @@ public class NotificationServiceImpl implements NotificationsService {
                         Collection<Object> dntstav = doc.getFieldValues("dntstav");
                         Collection<Object> license = doc.getFieldValues("license");
                         String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
-                                               
+
+                        String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
                         
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
-                        map.put("dntstav",
-                                dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString());
+                        
+                        map.put("dntstav", dntStavStr);
+
                         if ( license != null) {
                             map.put("license",
                                     license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
@@ -401,9 +403,15 @@ public class NotificationServiceImpl implements NotificationsService {
                             map.put("historie_stavu", historieStavu);
                         }
                         if (ruleNotification.accept(map)) {
-                            documents.add(map);
+                            if (dntStavStr.equals(PublicItemState.D.name())) {
+                                if (user != null && user.getRole() != null && Arrays.asList(Role.mainKurator.name(), Role.kurator.name(), Role.admin.name()).contains(user.getRole())) {
+                                    documents.add(map);
+                                }
+                            } else {
+                                documents.add(map);
+                            }
                         }
-
+                        
                         return doc;
                     });
                 } catch (SolrServerException | IOException ex) {
@@ -435,10 +443,12 @@ public class NotificationServiceImpl implements NotificationsService {
                     Collection<Object> dntstav = doc.getFieldValues("dntstav");
                     Collection<Object> license = doc.getFieldValues("license");
 
+                    String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
+                    
+                    
                     Map<String, String> map = new HashMap<>();
                     map.put("nazev", (String) doc.getFirstValue("nazev"));
-                    map.put("dntstav",
-                            dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString());
+                    map.put("dntstav",dntStavStr);
                     if ( license != null) {
                         map.put("license",
                                 license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
@@ -446,8 +456,15 @@ public class NotificationServiceImpl implements NotificationsService {
                     }
 
                     map.put("identifier", doc.getFieldValue("identifier").toString());
-                    documents.add(map);
 
+                    if (dntStavStr.equals(PublicItemState.D.name())) {
+                        if (user != null && user.getRole() != null && Arrays.asList(Role.mainKurator.name(), Role.kurator.name(), Role.admin.name()).contains(user.getRole())) {
+                            documents.add(map);
+                        }
+                    } else {
+                        documents.add(map);
+                    }
+                    
                     return doc;
                 });
                 LOGGER.log(Level.INFO, "checkNotifications finished");

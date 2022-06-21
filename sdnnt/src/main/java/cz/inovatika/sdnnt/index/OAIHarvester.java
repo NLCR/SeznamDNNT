@@ -9,6 +9,7 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
+import cz.inovatika.sdnnt.services.impl.SKCUpdateSupportServiceImpl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,6 +88,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
     if (oaiHavest.has("debug")) {
         debug = oaiHavest.getBoolean("debug");
         LOGGER.info("OAIHarvester is in debug mode !");
+        
     }
     
     long start = new Date().getTime();
@@ -126,7 +128,8 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
   }
 
   public JSONObject update(String set, String core, boolean merge, boolean update, boolean allFields) {
-    collection = core;
+
+      collection = core;
     this.merge = merge;
     this.update = update;
     this.allFields = allFields;
@@ -185,6 +188,12 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
 
   private void getRecords(String type, String url) {
     LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
+
+    final JSONObject harvestConf = Options.getInstance().getJSONObject("OAIHavest");
+    JSONObject conf =  harvestConf.has("results") ? harvestConf.getJSONObject("results") : new JSONObject();
+    
+    SKCUpdateSupportServiceImpl skcUpdateSupportServiceImpl = new SKCUpdateSupportServiceImpl(LOGGER.getName(), conf, new ArrayList<>());
+    
     Options opts = Options.getInstance();
     String resumptionToken = null;
     CloseableHttpClient client = null;
@@ -193,7 +202,19 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         long start = new Date().getTime();
         client = HttpClients.createDefault();
         try {
-          File dFile = HarvestUtils.throttle(client, type, url);
+          
+          File dFile = HarvestUtils.throttle(client, type, url, ()-> {
+              String testfile = harvestConf.optString("testfile", null);
+              if (testfile != null) {
+                  File fFile = new File(testfile);
+                  if (fFile.exists() && fFile.canRead()) {
+                      return fFile;
+                  } else return null;
+              } else {
+                  return null;
+              }
+          });
+          
           InputStream dStream = new FileInputStream(dFile);
           reqTime += new Date().getTime() - start;
           start = new Date().getTime();
@@ -201,7 +222,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           procTime += new Date().getTime() - start;
           start = new Date().getTime();
           if (!recs.isEmpty()) {
-            Indexer.add(collection, recs, merge, update, "harvester");
+            Indexer.add(collection, recs, merge, update, "harvester",skcUpdateSupportServiceImpl);
             indexed += recs.size();
             recs.clear();
           }
@@ -236,7 +257,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
             procTime += new Date().getTime() - start;
             start = new Date().getTime();
             if (recs.size() > batchSize) {
-              Indexer.add(collection, recs, merge, update, "harvester");
+              Indexer.add(collection, recs, merge, update, "harvester", skcUpdateSupportServiceImpl);
               indexed += recs.size();
               solrTime += new Date().getTime() - start;
               LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
@@ -258,7 +279,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         }
         start = new Date().getTime();
         if (!recs.isEmpty()) {
-          Indexer.add(collection, recs, merge, update, "harvester");
+          Indexer.add(collection, recs, merge, update, "harvester", skcUpdateSupportServiceImpl);
           indexed += recs.size();
           recs.clear();
         }
@@ -277,10 +298,17 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
       // ??
       solr.commit(collection);
       solr.close();
+      
+      // update support service
+      if (skcUpdateSupportServiceImpl != null) {
+          skcUpdateSupportServiceImpl.update();
+      }
     } catch (SolrServerException | IOException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
       ret.put("error", ex);
     } finally {
+        
+        
         HTTPClientsUtils.quiteClose(client);
     }
   }

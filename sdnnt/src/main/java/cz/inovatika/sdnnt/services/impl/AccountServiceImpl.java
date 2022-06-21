@@ -670,7 +670,7 @@ public class AccountServiceImpl implements AccountService {
                     .setFields("id", "identifiers")
                     .setRows(3000);
 
-            addFilter(query, user, null, null);
+            addFilter(query, user, new ArrayList<>(), null);
 
             
             SolrDocumentList zadost = solr.query(DataCollections.zadost.name(), query).getResults();
@@ -702,6 +702,23 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
+    private void addFilter(SolrQuery query, String user, List<String> navrhy, String requestState) {
+        if (user != null) {
+            query.addFilterQuery("user:" + user);
+        }
+        
+        if (navrhy != null && !navrhy.isEmpty()) {
+            String strNavrhy = navrhy.stream().map(it-> {
+               return "navrh:" + it; 
+            }).collect(Collectors.joining(" OR "));
+            query.addFilterQuery(strNavrhy);
+        }
+        if (requestState != null) {
+            query.addFilterQuery("state:" + requestState);
+        }
+    }
+
+    
     private void addFilter(SolrQuery query, List<String> users, String navrh, List<String> requestStates) {
         if (users != null) {
             String collected = users.stream().collect(Collectors.joining("OR  "));
@@ -727,7 +744,7 @@ public class AccountServiceImpl implements AccountService {
                     .setFields("id", "identifiers")
                     .setRows(3000);
 
-            addFilter(query, user, null, requestState);
+            addFilter(query, user, new ArrayList<>(), requestState);
             
             
             SolrDocumentList zadost = solr.query(DataCollections.zadost.name(), query).getResults();
@@ -826,7 +843,7 @@ public class AccountServiceImpl implements AccountService {
     
 
     @Override
-    public List<JSONObject> findAllRequestForGivenIds(String user, String navrh, String requestState, List<String> ids)
+    public List<JSONObject> findAllRequestForGivenIds(String user, List<String> navrhy, String requestState, List<String> ids)
             throws AccountException, IOException, SolrServerException {
         List<JSONObject> retvals = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
@@ -838,7 +855,7 @@ public class AccountServiceImpl implements AccountService {
                 }).collect(Collectors.joining(" OR "))+")";
                 query.addFilterQuery("identifiers:"+q);
                 
-                addFilter(query, user, navrh, requestState);
+                addFilter(query, user, navrhy, requestState);
 
                 QueryRequest qreq = new QueryRequest(query);
                 NoOpResponseParser rParser = new NoOpResponseParser();

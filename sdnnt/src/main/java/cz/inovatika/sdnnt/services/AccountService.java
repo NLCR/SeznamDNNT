@@ -252,7 +252,7 @@ public interface AccountService {
     
     
     
-    public List<JSONObject> findAllRequestForGivenIds(String user, String navrh, String requestState, List<String> ids) throws  AccountException, IOException, SolrServerException; 
+    public List<JSONObject> findAllRequestForGivenIds(String user, List<String> navrhy, String requestState, List<String> ids) throws  AccountException, IOException, SolrServerException; 
     
     
     

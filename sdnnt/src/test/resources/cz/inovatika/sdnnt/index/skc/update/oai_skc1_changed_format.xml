@@ -21,7 +21,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 					<marc:leader>     nam a22      a 4500</marc:leader>
 					<marc:controlfield tag="001">000349682</marc:controlfield>
 					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
-					<marc:controlfield tag="008">980103s1992    gw     f            ger  </marc:controlfield>
+					<marc:controlfield tag="008">980103s1994    gw     f            ger  </marc:controlfield>
 					<marc:datafield tag="040" ind1=" " ind2=" ">
 						<marc:subfield code="a">BOA001</marc:subfield>
 						<marc:subfield code="b">cze</marc:subfield>
@@ -136,7 +136,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 					xsi:schemaLocation="http://www.loc.gov/MARC21/slim
 http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
-					<marc:leader>     nam a22      a 4500</marc:leader>
+					<marc:leader>     nrr a22      a 4500</marc:leader>
 					<marc:controlfield tag="001">000349686</marc:controlfield>
 					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
 					<marc:controlfield tag="008">980103s1992    gw     f            ger  </marc:controlfield>
@@ -151,7 +151,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 						<marc:subfield code="a">621.3.015:538.3</marc:subfield>
 					</marc:datafield>
 					<marc:datafield tag="100" ind1="1" ind2=" ">
-						<marc:subfield code="a">Feurer, Klaus</marc:subfield>
+						<marc:subfield code="a">Feurer, Klaus- zmena v klausovi</marc:subfield>
 					</marc:datafield>
 					<marc:datafield tag="245" ind1="1" ind2="0">
 						<marc:subfield code="a">Erzeugung multipler elektromagnetischer Impulse mit hoher Amplitude /</marc:subfield>
@@ -201,7 +201,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 					<marc:leader>     nam a22      a 4500</marc:leader>
 					<marc:controlfield tag="001">000349454</marc:controlfield>
 					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
-					<marc:controlfield tag="008">980103s1963    xr     f            cze  </marc:controlfield>
+					<marc:controlfield tag="008">980103s1963    gr     f            cze  </marc:controlfield>
 					<marc:datafield tag="040" ind1=" " ind2=" ">
 						<marc:subfield code="a">BOA001</marc:subfield>
 						<marc:subfield code="b">cze</marc:subfield>
@@ -259,7 +259,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 					<marc:leader>     nam a22      a 4500</marc:leader>
 					<marc:controlfield tag="001">000349680</marc:controlfield>
 					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
-					<marc:controlfield tag="008">980103s1992    gw     f            ger  </marc:controlfield>
+					<marc:controlfield tag="008">980103s1993    gw     f            ger  </marc:controlfield>
 					<marc:datafield tag="040" ind1=" " ind2=" ">
 						<marc:subfield code="a">BOA001</marc:subfield>
 						<marc:subfield code="b">cze</marc:subfield>
@@ -324,7 +324,7 @@ http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
 					<marc:leader>     nam a22      a 4500</marc:leader>
 					<marc:controlfield tag="001">000349681</marc:controlfield>
 					<marc:controlfield tag="003">CZ PrSKC</marc:controlfield>
-					<marc:controlfield tag="008">980103s1991    gw     f            ger  </marc:controlfield>
+					<marc:controlfield tag="008">980103s1993    gw     f            ger  </marc:controlfield>
 					<marc:datafield tag="040" ind1=" " ind2=" ">
 						<marc:subfield code="a">BOA001</marc:subfield>
 						<marc:subfield code="b">cze</marc:subfield>

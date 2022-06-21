@@ -27,6 +27,7 @@ import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateUtils;
 import cz.inovatika.sdnnt.services.LoggerAware;
@@ -69,27 +70,42 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
             @Override
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
                     List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
-                    for (Pair<String, List<String>> pair : batch) {
-                        
-                        
-                        // pokud 
-                        MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
-                        List<MarcRecord> followers = pair.getRight().stream().map(id -> {
-                            try {
-                                return MarcRecord.fromIndex(solrClient, id);
-                            } catch (IOException | SolrServerException  e) {
-                                reqService.getLogger().log(Level.SEVERE,e.getMessage(),e);
-                                return null;
+                    try {
+                        for (Pair<String, List<String>> pair : batch) {
+                            
+                            
+                            // pokud 
+                            MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
+                            List<MarcRecord> followers = pair.getRight().stream().map(id -> {
+                                try {
+                                    return MarcRecord.fromIndex(solrClient, id);
+                                } catch (IOException | SolrServerException  e) {
+                                    reqService.getLogger().log(Level.SEVERE,e.getMessage(),e);
+                                    return null;
+                                }
+                            }).filter(mr-> Objects.nonNull(mr)).collect(Collectors.toList());
+
+                            
+                            // pri zmene stavu se taky musi menit v zadostech
+                            AccountServiceImpl accountService = reqService.buildAccountService();
+                            //DuplicateUtils.changeRequests(origin, followers, null);
+
+                            List<String> navrhy = Arrays.asList("NZN","VN","VNL","VNL","PXN");
+                            List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, navrhy, null,  Arrays.asList(origin.identifier));
+                            List<Zadost> allRequests = foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
+                            
+                            DuplicateUtils.changeRequests(origin, followers, allRequests);
+                            DuplicateUtils.moveProperties(origin, followers, null);
+                            
+                            origin.followers = pair.getRight();
+                            SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin, "scheduler/"+cs);
+                            solrClient.add(DataCollections.catalog.name(), document);
+                            for (MarcRecord smr : followers) {
+                                solrClient.add(DataCollections.catalog.name(), smr.toSolrDoc());
                             }
-                        }).filter(mr-> Objects.nonNull(mr)).collect(Collectors.toList());
-                        
-                        DuplicateUtils.moveProperties(origin, followers, null);
-                        origin.followers = pair.getRight();
-                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin, "scheduler/"+cs);
-                        solrClient.add(DataCollections.catalog.name(), document);
-                        for (MarcRecord smr : followers) {
-                            solrClient.add(DataCollections.catalog.name(), smr.toSolrDoc());
                         }
+                    } catch (AccountException e) {
+                        throw new IOException(e);
                     }
             }   
         },
@@ -144,6 +160,9 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                         updateRecords(updates, confProc != null ? Process.valueOf(confProc) : Process.state, getLogger(),cs);
                         break;
                     case DNT_2:
+                        updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
+                        break;
+                    case DNT_3:
                         updateRecords(updates, confProc != null ? Process.valueOf(confProc) :Process.request,getLogger(),cs);
                         break;
                     case SKC_1:

@@ -38,6 +38,7 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImplITTest.BuildSolrClientSupport;
 
 public class SKCTypeServiceTTest {
     
@@ -149,6 +150,7 @@ public class SKCTypeServiceTTest {
                     new BuildSolrClientSupport()
             ).anyTimes();
             EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
+
             
 
             ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
@@ -158,6 +160,12 @@ public class SKCTypeServiceTTest {
                     .withConstructor(appSupport, bservice)
                     .addMockedMethod("buildClient").createMock();
             
+
+            EasyMock.expect(aService.buildClient()).andDelegateTo(
+                    new AccountServiceImplITTest.BuildSolrClientSupport()
+                ).anyTimes();
+
+            EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
 
             EasyMock.replay(skcDeleteService,appSupport,bservice,aService,oaiCheck);
             skcDeleteService.update();

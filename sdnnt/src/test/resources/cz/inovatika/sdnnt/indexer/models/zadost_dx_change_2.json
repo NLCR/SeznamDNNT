@@ -3,7 +3,9 @@
     "datum_vyrizeni": "2022-03-24T13:54:24.145Z",
     "datum_zadani": "2022-03-24T13:52:09.634Z",
     "user": "pokus23",
-    "identifiers": ["oai:aleph-nkp.cz:DNT01-000102092"
+    "identifiers": ["oai:aleph-nkp.cz:DNT01-000102092",
+        "oai:aleph-nkp.cz:DNT01-000066685",
+        "oai:aleph-nkp.cz:DNT01-000067410"
     ],
     "institution": "KNAV",
     "kurator": "kurator",

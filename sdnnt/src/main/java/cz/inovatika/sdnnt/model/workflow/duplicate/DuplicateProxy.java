@@ -30,11 +30,14 @@ public class DuplicateProxy extends DocumentProxy {
     
     private List<MarcRecord> allFollowers;
     private List<MarcRecord> affectedFollowers;
+    private List<Zadost> reqs;
+    
     
     public DuplicateProxy(MarcRecord origin, List<MarcRecord> followers, List<Zadost> reqs) {
         super(origin);
         this.allFollowers = followers;
         this.affectedFollowers = new ArrayList<>();
+        this.reqs = reqs;
     }
     
 
@@ -58,9 +61,10 @@ public class DuplicateProxy extends DocumentProxy {
                 });
             }
         }
-        
+        DuplicateUtils.changeRequests(this.marcRecord, this.affectedFollowers, reqs);
         DuplicateUtils.moveProperties(this.marcRecord, this.affectedFollowers, (mr) -> {
             if (mr.kuratorstav!= null && mr.kuratorstav.size() > 0) {
+                // pokud je dx, musi se pri zmene stavu vratit stav z historie
                 if (mr.kuratorstav.get(0).equals(CuratorItemState.DX.name())) {
                     List<String> previous = mr.kuratorstav;
                     mr.kuratorstav = mr.dntstav;
@@ -77,15 +81,6 @@ public class DuplicateProxy extends DocumentProxy {
     }
     
 
-    private boolean affectedRequest(Zadost zadost) {
-        for (MarcRecord marcRecord : affectedFollowers) {
-            if (zadost.getIdentifiers() != null && zadost.getIdentifiers().contains(marcRecord.identifier)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
 
     @Override
     public List<Pair<String, SolrInputDocument>> getStateToSave(SwitchStateOptions options) {
@@ -96,11 +91,9 @@ public class DuplicateProxy extends DocumentProxy {
         this.affectedFollowers.stream().forEach(f-> {
             retlist.add(Pair.of(DataCollections.catalog.name(), f.toSolrDoc()));
         });
-        /* Nepotrebuju ukladat
-         this.affectedRequests.stream().forEach(r-> {
+         this.reqs.stream().forEach(r-> {
             retlist.add(Pair.of(DataCollections.zadost.name(), r.toSolrInputDocument()));
         });
-        */
         return retlist;
     }
 

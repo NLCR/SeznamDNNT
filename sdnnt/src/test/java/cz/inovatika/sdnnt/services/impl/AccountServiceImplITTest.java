@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -446,6 +447,64 @@ public class AccountServiceImplITTest {
         Zadost rejectedZadost = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
         Assert.assertNotNull(rejectedZadost.getState());
         Assert.assertEquals(rejectedZadost.getState(), "processed");
+    }
+
+    
+
+    // Find all 
+    @Test
+    public void testSaveZadostFindAll() throws IOException, SolrServerException, ConflictException, AccountException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        User user = testUser();
+        UserController controler  = EasyMock.createMock(UserController.class);
+        ApplicationUserLoginSupport appLogin = EasyMock.createMock(ApplicationUserLoginSupport.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
+            //public AccountServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
+
+        AccountServiceImpl service = EasyMock.createMockBuilder(AccountServiceImpl.class)
+                .withConstructor( appLogin, bservice)
+                .addMockedMethod("buildClient").createMock();
+
+        EasyMock.expect(appLogin.getUser()).andReturn(user).anyTimes();
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+            new BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.replay(controler, service ,bservice, appLogin);
+
+
+        Zadost zadost = new Zadost("pokusny11234");
+        zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930","oai:aleph-nkp.cz:DNT01-000057932", "oai:aleph-nkp.cz:DNT01-000057934"));
+        zadost.setState("open");
+        zadost.setInstitution("NKP");
+        zadost.setUser("pokusny");
+        zadost.setNavrh("DXN");
+        zadost.setTypeOfPeriod(Period.period_nzn_1_12_18.name());
+        zadost.setPozadavek("Pozadavek ABC");
+        zadost.setPoznamka("Poznamka ABC");
+
+        service.saveRequest(zadost.toJSON().toString(), null);
+        
+        List<JSONObject> findAllRequestForGivenIds = service.findAllRequestForGivenIds(null, null, null, Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930","oai:aleph-nkp.cz:DNT01-000057932"));
+        System.out.println(findAllRequestForGivenIds);
+        Assert.assertNotNull(findAllRequestForGivenIds.size() > 0);
+        
+        
+        
+//        Zadost fromService = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
+//
+//        Assert.assertTrue(fromService.getUser().equals("pokusny"));
+//        Assert.assertTrue(fromService.getInstitution().equals("NKP"));
+//        Assert.assertTrue(fromService.getNavrh().equals("NZN"));
+//
+//        Assert.assertNotNull(fromService.getPozadavek());
+//        Assert.assertNotNull(fromService.getPoznamka());
     }
 
 

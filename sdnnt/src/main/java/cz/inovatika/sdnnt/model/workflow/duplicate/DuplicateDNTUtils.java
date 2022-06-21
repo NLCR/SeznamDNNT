@@ -55,13 +55,13 @@ public class DuplicateDNTUtils {
                     Pair<Case,List<String>> pair = Pair.of(req ? Case.DNT_2 : Case.DNT_1, Arrays.asList(identifier));
                     return pair;
                 } else {
-                    return Pair.of(Case.DNT_3, null);
+                    return Pair.of(Case.DNT_3, new ArrayList<>());
                 }
             } else {
-                return Pair.of(Case.DNT_3, null);
+                return Pair.of(Case.DNT_3, new ArrayList<>());
             }
         } else {
-            return Pair.of(Case.DNT_3, null);
+            return Pair.of(Case.DNT_3, new ArrayList<>());
         }
     }
     

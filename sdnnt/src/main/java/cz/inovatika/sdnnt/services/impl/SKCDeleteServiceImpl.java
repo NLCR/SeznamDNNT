@@ -114,7 +114,6 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
                        retvals.get(followers.getKey()).add(Pair.of(fromIndex.identifier, followers.getRight()));
                    }
                }
-               
            }
         }
         return retvals;

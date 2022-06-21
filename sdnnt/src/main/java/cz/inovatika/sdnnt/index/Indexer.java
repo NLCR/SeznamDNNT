@@ -13,6 +13,7 @@ import com.flipkart.zjsonpatch.JsonPatch;
 import cz.inovatika.sdnnt.index.utils.GranularityUtils;
 import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.index.utils.SurviveFieldUtils;
+import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
@@ -28,6 +29,8 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
+import cz.inovatika.sdnnt.services.impl.SKCUpdateSupportServiceImpl;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -72,10 +75,19 @@ public class Indexer {
     }
   }
 
+  
   public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user) {
       return add(collection, recs, merge,update,user,getClient());
   }
+  public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user, SKCUpdateSupportServiceImpl updatesupportService) {
+      return add(collection, recs, merge,update,user,getClient(), updatesupportService);
+  }
+
   public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user, SolrClient client) {
+      return add(collection, recs, merge,update,user,client, null);
+  }
+  
+  public static JSONObject add(String collection, List<SolrInputDocument> recs, boolean merge, boolean update, String user, SolrClient client, SKCUpdateSupportServiceImpl updatesupportService) {
     JSONObject ret = new JSONObject();
     try {
       if (update) {
@@ -85,6 +97,8 @@ public class Indexer {
             LOGGER.log(Level.FINE, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
             client.add("catalog", rec);
           } else {
+              
+            // zadost 
             SolrInputDocument hDoc = new SolrInputDocument();
             SolrInputDocument cDoc = mergeWithHistory(
                     (String) rec.getFieldValue("raw"),
@@ -95,8 +109,24 @@ public class Indexer {
                 client.add("catalog", cDoc);
                 client.add("history", hDoc);
             }
+            
+            if (updatesupportService != null && cDoc != null) {
+                Object identifier = cDoc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
+                if (cDoc.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+                    
+                    // check format and place
+                    Object fieldValue = cDoc.getFieldValue(MarcRecordFields.FMT_FIELD);
+                    if (fieldValue == null || !Arrays.asList("BK","SE").contains(fieldValue.toString().trim().toUpperCase())) {
+                        updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
+                    }
+                    
+                    Object placeOfPub = cDoc.getFieldValue("place_of_pub");
+                    if (placeOfPub == null || !placeOfPub.toString().trim().toLowerCase().equals("xr")) {
+                        updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
+                    }
+                }
+            }
           }
-
         }
       } else if (merge) {
         for (SolrInputDocument rec : recs) {
@@ -147,7 +177,7 @@ public class Indexer {
     return ret;
   }
 
-// keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
+  // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
   // keepDNTFields = false => zmena pouze DNT (990, 992) poli
   static SolrInputDocument mergeWithHistory(String jsTarget,
           SolrDocument docCat, SolrInputDocument historyDoc,
@@ -178,7 +208,7 @@ public class Indexer {
 
         // Create record in catalog
         MarcRecord mr = MarcRecord.fromRAWJSON(JsonPatch.apply(fwPatch, source).toString());
-        // mr.fillSolrDoc();
+
         return mr.toSolrDoc();
       } else {
         LOGGER.log(Level.FINE, "No changes detected in {0}", target.at("/identifier").asText());

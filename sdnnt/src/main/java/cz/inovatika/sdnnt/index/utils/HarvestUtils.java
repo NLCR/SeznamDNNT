@@ -18,6 +18,8 @@ import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -75,7 +77,12 @@ public class HarvestUtils {
             throw new RuntimeException(e);
         }
     }
+    public static File throttle(CloseableHttpClient client, String type, String url) throws IOException, MaximumIterationExceedException {
+        return throttle(client, type, url, null);
+    }
 
+    
+    
     /**
      * Throttling support. The method tries to download data stream, and if it is not possible, 
      *  waits configured number of iterations.
@@ -92,7 +99,7 @@ public class HarvestUtils {
      * @throws IOException
      * @throws MaximumIterationExceedException
      */
-    public static File throttle(CloseableHttpClient client, String type, String url) throws IOException, MaximumIterationExceedException {
+    public static File throttle(CloseableHttpClient client, String type, String url, Supplier<File> suplier) throws IOException, MaximumIterationExceedException {
         int max_repetion = 3;
         int seconds = 5;
 
@@ -103,30 +110,40 @@ public class HarvestUtils {
         if (harvest.has("seconds")) {
             seconds = harvest.getInt("seconds");
         }
-        for (int i = 0; i < max_repetion; i++) {
-            LOGGER.log(Level.FINE, "Throttling url: "+url+" iteration:"+i);
-            HttpGet httpGet = new HttpGet(url);
-            try (CloseableHttpResponse response1 = client.execute(httpGet)) {
-                final HttpEntity entity = response1.getEntity();
-                if (entity != null) {
-                    File dFile = null;
-                    try (InputStream netStream = entity.getContent()) {
-                        dFile = debugFile(type, netStream, url);
-                        if (checkNotHTML(dFile)) {
-                            return dFile;
-                        } else {
-                            wait(seconds);
+        File tFile = suplier != null ? suplier.get() : null;
+        if (tFile != null) {
+            return tFile;
+        } else {
+            for (int i = 0; i < max_repetion; i++) {
+                LOGGER.log(Level.FINE, "Throttling url: "+url+" iteration:"+i);
+                HttpGet httpGet = new HttpGet(url);
+                try (CloseableHttpResponse response1 = client.execute(httpGet)) {
+                    final HttpEntity entity = response1.getEntity();
+                    if (entity != null) {
+                        File dFile = null;
+                        try (InputStream netStream = entity.getContent()) {
+                            dFile = debugFile(type, netStream, url);
+                            if (checkNotHTML(dFile)) {
+                                return dFile;
+                            } else {
+                                wait(seconds);
+                            }
                         }
                     }
+                } catch (ConnectTimeoutException | ConnectException | SocketTimeoutException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getMessage(),ex);
+                    wait(seconds);
                 }
-            } catch (ConnectTimeoutException | ConnectException | SocketTimeoutException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(),ex);
-                wait(seconds);
             }
+            throw new MaximumIterationExceedException("Maximum number of waiting exceeed");
+            
         }
-        throw new MaximumIterationExceedException("Maximum number of waiting exceeed");
+        
     }
 
+    
+    
+    
     private static void wait(int seconds) {
         try {
             LOGGER.log(Level.INFO, "Suspending threads for " + seconds + "seconds ");

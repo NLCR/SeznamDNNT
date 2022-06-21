@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.duplicate;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,21 @@ public class DuplicateUtilsTest {
         
         Assert.assertTrue(sKC.isPresent());
     }
+
+    
+    @Test
+    public void testZadost_emptyIdentifiers_Processed() throws JsonMappingException, JsonProcessingException, IOException {
+        MarcRecord marcRecord = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000102092".replaceAll("\\:","_")).get(0));
+        InputStream zadostStream = MarcModelTests.class.getResourceAsStream("zadost_dx_change.json");
+        String string = IOUtils.toString(zadostStream, "UTF-8");
+        Zadost zadost = Zadost.fromJSON(string);
+        Assert.assertTrue(zadost.getState() != null && zadost.getState().equals("waiting"));
+        DuplicateUtils.changeRequests(marcRecord, new ArrayList<>(), Arrays.asList(zadost));
+        Assert.assertTrue(zadost.getIdentifiers().isEmpty());
+        Assert.assertTrue(zadost.getState().equals("processed"));
+    }
+
+
     
     public static SolrDocumentList prepareResultList(String ident) throws IOException {
         SolrDocumentList documentList = new SolrDocumentList();
