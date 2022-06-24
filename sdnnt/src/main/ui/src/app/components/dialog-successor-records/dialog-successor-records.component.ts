@@ -35,7 +35,8 @@ export class DialogSuccessorRecordsComponent implements OnInit {
         this.documents.push({
           expanded:false,
           doc:dd,
-          selected: true
+          selected: true,
+          marcview: this.filterView(dd.raw)
         });
       });      
     }
@@ -90,6 +91,28 @@ export class DialogSuccessorRecordsComponent implements OnInit {
       return fondy.join(', ');
     }
   }
+
+  filterView(strDoc) {
+    let retval = {};
+    let parsed = JSON.parse(strDoc);
+    /*
+    Object.keys(parsed).forEach(key => {
+      if (forbiddenKeys.indexOf(key) < 0) {
+        retval[key] = parsed[key];
+      }
+    });
+    */
+    retval["identifier"] = parsed.identifier;
+    retval["datestamp"] = parsed.datestamp;
+    retval["leader"] = parsed.leader;
+    retval["controlFields"] = parsed.controlFields;
+    retval["dataFields"] = parsed.dataFields;
+    return retval;
+  }
+  /*
+  raw(doc) {
+    return JSON.parse(doc.raw);
+  }*/
 
   accept() {
     let selected = [];

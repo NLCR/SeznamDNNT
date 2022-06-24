@@ -77,7 +77,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             MARC_902_A,
             LICENSE_FIELD,
             FMT_FIELD,
-            
+            DIGITAL_LIBRARIES,
             ID_ISSN,
             ID_ISBN,
             ID_ISMN
@@ -90,11 +90,12 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
 
     @Override
-    public Response addedDnnto(String instituion, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnnto(String dl, String instituion, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = (instituion != null) ?  new ArrayList<>(
                 Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+instituion, "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid")) :
                 new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
+        digitalLibrariesFilter(dl, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -128,11 +129,12 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
     @Override
-    public Response addedDnntt(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnntt(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = (institution != null) ?
                 new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnntt.name()+" OR "+"granularity_license_cut:"+License.dnntt.name(), "id_pid:uuid")):
                 new ArrayList<>(Arrays.asList("license:"+License.dnntt.name() +" OR "+"granularity_license_cut:"+License.dnntt.name(),"id_pid:uuid" ));
+        digitalLibrariesFilter(dl, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -168,11 +170,12 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     
     
     @Override
-    public Response removedDnntt(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnntt(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = (institution != null) ?
                 new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnntt.name(), "id_pid:uuid")) :
                 new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name(), "id_pid:uuid"));
+        digitalLibrariesFilter(dl, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -197,12 +200,19 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 
+    private void digitalLibrariesFilter(String dl, List<String> plusList) {
+        if (dl != null) {
+            plusList.add("digital_libraries:"+dl);
+        }
+    }
+
     @Override
-    public Response removedDnnto(String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnnto(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = (institution != null) ?
                 new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnnto.name(), "id_pid:uuid")) :
                 new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name(), "id_pid:uuid"));
+        digitalLibrariesFilter(dl, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -229,11 +239,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
     
+
     
 
     @Override
-    public Response addedDnntoCsvExport(String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
-
+    public Response addedDnntoCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -242,6 +252,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 List<String> plusList = (institution != null) ?  new ArrayList<>(
                         Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid")) :
                         new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
+                digitalLibrariesFilter(dl, plusList);
 
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
@@ -274,7 +285,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response addedDnnttCsvExport(String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnnttCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -284,6 +295,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
+                digitalLibrariesFilter(dl, plusList);
                 if (list != null && !list.isEmpty()) {
                     return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
                 } else {
@@ -301,7 +313,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response removedDnntoCsvExport(String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnntoCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -311,6 +323,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
+                digitalLibrariesFilter(dl, plusList);
                 if (list != null && !list.isEmpty()) {
                     return fullCSV(institution,License.dnnto.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
                 } else {
@@ -329,7 +342,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response removedDnnttCsvExport(String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnnttCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -339,6 +352,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
+                digitalLibrariesFilter(dl, plusList);
                 if (list != null && !list.isEmpty()) {
                     return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
                 } else {
@@ -406,6 +420,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Collection<Object> nazev = doc.getFieldValues("nazev");
         String identifier = (String) doc.getFieldValue("identifier");
 
+        //Collection<Object> mdigitallibraries = doc.getFieldValues("digital_libraries");
+
         // prvni je master
         Collection<Object> granularityField = doc.getFieldValues("granularity");
 
@@ -416,6 +432,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Collection<Object> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD);
 
         Object fmt = doc.getFieldValue(FMT_FIELD);
+        
+        List<String> mdigitallibraries = doc.getFieldValues("digital_libraries") != null ? doc.getFieldValues("digital_libraries").stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
+        
         
         
         final List<String> links = new ArrayList<>();
@@ -438,7 +457,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             if (granularity != null && !granularity.isEmpty()) {
                 // ma granularitu, link se bere pouze prvni, ostatni jsou v granularite
                 krameriusLinks = krameriusLinks.isEmpty() ? new ArrayList<>() : krameriusLinks.subList(0,1);
-
             }
 
             // Z linku posbirane pidy pokud obsahuji subsgring uuid
@@ -446,7 +464,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 int i = it.indexOf("uuid:");
                 return it.substring(i);
             }).collect(Collectors.toList());
-
 
             if (minstitutions !=null && !minstitutions.isEmpty()) {
 
@@ -465,7 +482,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     if (indexOf > -1 && indexOf< pids.size()) {
                         String pid = pids.get(indexOf);
                         if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
-                            Map<String,Object> d = doc(Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid);
+                            Map<String,Object> d = doc( mdigitallibraries,  Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid);
                             d = enIdSdnnt(d, doc);
                             documentOutput.output(d, outputFields,requestedLicense );
                             uniqe.add(pid);
@@ -480,7 +497,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                             for (int i = 0; i < pids.size(); i++) {
                                 String s = i < siglas.size() ? siglas.get(i) : "";
                                 if (!uniqe.contains( pids.get(i))) {
-                                    Map<String,Object> d = doc(siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i));
+                                    Map<String,Object> d = doc(mdigitallibraries, siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i));
                                     d = enIdSdnnt(d, doc);
                                     documentOutput.output( d, outputFields, requestedLicense);
                                     uniqe.add(pids.get(i));
@@ -488,7 +505,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                             }
                         } else {
                             for (int i = 0; i < pids.size(); i++) {
-                                Map<String,Object> d = doc(siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i));
+                                Map<String,Object> d = doc(mdigitallibraries, siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i));
                                 d = enIdSdnnt(d, doc);
                                 documentOutput.output( d,outputFields, requestedLicense);
                             }
@@ -499,7 +516,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     for (int i = 0; i < pids.size(); i++) {
                         if (!uniqe.contains( pids.get(i))) {
                             //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-                            Map<String,Object> d =  doc(Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
+                            Map<String,Object> d =  doc(mdigitallibraries,Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
                             d = enIdSdnnt(d, doc);
                             documentOutput.output(d,outputFields, requestedLicense);
                             uniqe.add(pids.get(i));
@@ -507,7 +524,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     }
                 } else {
                     //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-                    Map<String,Object> d = doc( Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
+                    Map<String,Object> d = doc(mdigitallibraries, Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
                     d = enIdSdnnt(d, doc);
                     documentOutput.output(d,outputFields, requestedLicense);
                 }
@@ -517,12 +534,14 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     
     
 
-    private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
+    private Map<String, Object> doc(List<String> digitalLibs, List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
         Map<String, Object> document = new HashMap<>();
         document.put(SolrDocumentOutput.SELECTED_INSTITUTION_KEY, instituions);
+        document.put(SolrDocumentOutput.SELECTED_DL_KEY, digitalLibs);
         document.put(SolrDocumentOutput.LABEL_KEY, label);
         document.put(SolrDocumentOutput.NAZEV_KEY, nazev.stream().map(Object::toString).collect(Collectors.joining(" ")));
         document.put(SolrDocumentOutput.IDENTIFIER_KEY, identifier);
+
         List<String> pids = new ArrayList<>();
         Arrays.stream(p).forEach(pids::add);
         document.put(SolrDocumentOutput.PIDS_KEY, pids);
@@ -553,7 +572,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
     
     @Override
-    public Response changes(String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
+    public Response changes(String dl, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
             ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = (institution != null) ?  new ArrayList<>(
@@ -607,5 +626,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             return Response.status(500).entity(jsonError( e.getMessage() )).build();
         }
     }
+
+    
 }
 

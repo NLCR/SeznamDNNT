@@ -11,6 +11,12 @@ properties:
   territoriality:
     type: string
     example: 'CZE'
+  digital_libraries:
+    type: array
+    items:
+      type: string
+    example: 
+        - 'BOA001'
   sigla:
     type: array
     items:

@@ -288,7 +288,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 if (marcRecord != null) {
                     try {
                         Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                        if (workflow == null) {
+                        if (workflow == null || (workflow.nextState() != null && !workflow.nextState().isFirstTransition())) {
                             invalidIdentifiers.add(documentId);
                         }
                     } catch (DocumentProxyException e) {

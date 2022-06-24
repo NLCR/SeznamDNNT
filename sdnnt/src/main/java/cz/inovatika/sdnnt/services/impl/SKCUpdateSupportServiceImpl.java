@@ -67,11 +67,13 @@ public class SKCUpdateSupportServiceImpl extends AbstractCheckDeleteService impl
                retvals.get(Case.SKC_4b).add(Pair.of(id, new ArrayList<>()));
            }
         }
+        getLogger().info(String.format("Check update %s", retvals.toString()));
         return retvals;
     }
 
     @Override
     protected List<String> checkDelete() throws IOException, SolrServerException {
+        getLogger().info(String.format("Check delete %s", new ArrayList<String>().toString()));
         return new ArrayList<>();
     }
 }

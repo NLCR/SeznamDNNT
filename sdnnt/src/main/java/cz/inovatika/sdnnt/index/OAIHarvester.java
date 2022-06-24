@@ -208,6 +208,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
               if (testfile != null) {
                   File fFile = new File(testfile);
                   if (fFile.exists() && fFile.canRead()) {
+                      LOGGER.log(Level.INFO, "\t Replaced by {0}...", fFile.getAbsolutePath());
                       return fFile;
                   } else return null;
               } else {
@@ -227,7 +228,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
             recs.clear();
           }
           if (!toDelete.isEmpty()) {
-              deleteRecords(new ArrayList(toDelete), buildSKCDeleteService());
+              deleteRecords(new ArrayList(toDelete), buildSKCDeleteService(conf));
               deleted += toDelete.size();
               toDelete.clear();
           }
@@ -285,17 +286,19 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         }
 
         if (!toDelete.isEmpty()) {
-            deleteRecords(new ArrayList<>(toDelete), buildSKCDeleteService());
-            //solr.deleteById(collection, toDelete);
+          deleteRecords(new ArrayList<>(toDelete), buildSKCDeleteService(conf));
           deleted += toDelete.size();
           toDelete.clear();
         }
+
         solrTime += new Date().getTime() - start;
       } catch (XMLStreamException | IOException exc) {
-        LOGGER.log(Level.SEVERE, null, exc);
+        LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         ret.put("error", exc);
       }
+      
       // ??
+      LOGGER.info("Commit collection");
       solr.commit(collection);
       solr.close();
       
@@ -304,24 +307,24 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           skcUpdateSupportServiceImpl.update();
       }
     } catch (SolrServerException | IOException ex) {
-      LOGGER.log(Level.SEVERE, null, ex);
+      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
       ret.put("error", ex);
     } finally {
-        
-        
+
         HTTPClientsUtils.quiteClose(client);
-    }
+    } 
   }
 
     protected void deleteRecords(List<String> delete, SKCDeleteService skcDeleteService) throws IOException, SolrServerException {
       if (!delete.isEmpty()) {
+          LOGGER.info(String.format("Starting process for deleting records ", delete.toString()));
           skcDeleteService.updateDeleteInfo(delete);
           skcDeleteService.update();
       }
     }
 
-    protected SKCDeleteServiceImpl buildSKCDeleteService() {
-        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl("", this.skcDeleteConfig);
+    protected SKCDeleteServiceImpl buildSKCDeleteService(JSONObject conf) {
+        SKCDeleteServiceImpl skcDeleteServiceImpl = new SKCDeleteServiceImpl("", conf);
         skcDeleteServiceImpl.setLogger(LOGGER);
         return skcDeleteServiceImpl;
     }
