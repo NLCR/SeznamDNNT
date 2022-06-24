@@ -156,7 +156,7 @@ const providers: any[] =[
     AppRoutingModule,
     AppMaterialModule,
     FlexLayoutModule,
-    NgxJsonViewerModule,
+    /*NgxJsonViewerModule,*/
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
