@@ -83,6 +83,8 @@ public class DuplicateUtils {
                    // uzavrit, pokud neni zadny identifikator
                    if (zadost.getIdentifiers() != null && zadost.getIdentifiers().isEmpty()) {
                        if (!zadost.getState().equals("open")) {
+                           String poznamka = zadost.getPoznamka();
+                           zadost.setPoznamka("Zruseno systemem - duplicita. ("+poznamka+")");
                            zadost.setState("processed");
                        }
                    }
@@ -217,35 +219,72 @@ public class DuplicateUtils {
                 if (cFSubfields != null) {
                     cFSubfields.stream().forEach(left-> {
                         String code = cartesianRight.getValue();
-
+                        
                         cartesianRightFields.stream().forEach(r-> {
-                           List<SubField> list = r.getSubFields().get(code);
+                           List<SubField> list = r.getSubFields().get(code);// != null ?  r.getSubFields().get(code) : new ArrayList<SubField>();
                            
-                           StringBuilder builder = new StringBuilder("marc_").append(cartesianLeft.getKey()+cartesianLeft.getValue()).append(":\"").append(left.getValue()).append("\"").append(" AND ");
-                           
-                           builder.append("marc_").append(cartesianRight.getKey()).append(cartesianRight.getValue()).append(":(");
-                           for (int i = 0; i < list.size(); i++) {
-                               SubField right = list.get(i);
-                               if (i>0) builder.append(" OR ");
-                               builder.append('"').append(right.getValue()).append('"');
-                           }
-                           builder.append(")");
-                           try {
+                           if (list != null) {
+                               StringBuilder builder = new StringBuilder("marc_").append(cartesianLeft.getKey()+cartesianLeft.getValue()).append(":\"").append(left.getValue()).append("\"").append(" AND ");
                                
-                               SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
-                               idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
-                               idQuery.addFilterQuery("NOT dntstav:D");
-                               idQuery.addFilterQuery("NOT kuratorstav:DX");
-
-                               LOGGER.info("Query: "+idQuery);
-                               SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
-                               for (SolrDocument sDocument : results) {
-                                   Triple<String, String, String> triple = triple(sDocument);
-                                   retList.add(triple);
+                               builder.append("marc_").append(cartesianRight.getKey()).append(cartesianRight.getValue()).append(":(");
+                               for (int i = 0; i < list.size(); i++) {
+                                   SubField right = list.get(i);
+                                   if (i>0) builder.append(" OR ");
+                                   builder.append('"').append(right.getValue()).append('"');
                                }
-                           } catch (SolrServerException | IOException e) {
-                               LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                               builder.append(")");
+                               try {
+                                   String ccnb = null;
+                                   
+                                   if (origin.dataFields.containsKey("015")) {
+                                       List<DataField> subFields = origin.dataFields.get("015");
+                                       if (subFields != null) {
+                                           for (DataField mField : subFields) {
+                                               List<SubField> subfield = mField.subFields.get("a");
+                                               if (subfield != null && !subfield.isEmpty()) {
+                                                   ccnb = subfield.get(0).getValue();
+                                               }
+                                           }
+                                       }
+                                   }
+                                   
+                                   
+                                   SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
+                                   idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
+                                   idQuery.addFilterQuery("NOT dntstav:D");
+                                   idQuery.addFilterQuery("NOT kuratorstav:DX");
+                                   if (ccnb == null) {
+                                       idQuery.addFilterQuery("NOT marc_015a:*");
+                                   } else {
+                                       idQuery.addFilterQuery("NOT marc_015a:\""+ccnb+"\"");
+                                   }
+                                   
+//                                   String ccnb = null;
+//                                   if (origin.dataFields.containsKey("015")) {
+//                                       List<DataField> dfs = origin.dataFields.get("015");
+//                                       for(DataField df: dfs) {
+//                                           if (df.subFields.containsKey("a")) {
+//                                               List<SubField> vals = df.subFields.get("a");
+//                                               if (!vals.isEmpty()) {
+//                                                   ccnb = vals.get(0).getValue();
+//                                               }
+//                                           }
+//                                       }
+//                                   }
+                                   
+                                   
+                                   LOGGER.info("Query: "+idQuery);
+                                   SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+                                   for (SolrDocument sDocument : results) {
+                                       Triple<String, String, String> triple = triple(sDocument);
+                                       retList.add(triple);
+                                   }
+                               } catch (SolrServerException | IOException e) {
+                                   LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                               }
+                               
                            }
+                           
                         });
                     });
                 }

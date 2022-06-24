@@ -39,8 +39,15 @@ paths:
       operationId: addedDnntt
       parameters:
         - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
           name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
+          description: Sigla instituce, ktera ma dilo ve fondu
           schema:
             type: string
             example: ABA001
@@ -84,6 +91,13 @@ paths:
       description: Export dat, licence **DNNTT**
       operationId: addedDnnttCsvExport
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
         - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
@@ -135,6 +149,13 @@ paths:
       operationId: addedDnnto
       parameters:
         - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
@@ -183,6 +204,13 @@ paths:
       description: Export dat, licence **DNNTO**
       operationId: addedDnntoCsvExport
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
         - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
@@ -234,6 +262,13 @@ paths:
       operationId: removedDnntt
       parameters:
         - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
@@ -281,6 +316,13 @@ paths:
       description: Export dat, zrušená licence **DNNTT**
       operationId: removedDnnttCsvExport
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
         - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
@@ -334,6 +376,13 @@ paths:
       operationId: removedDnnto
       parameters:
         - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
@@ -381,6 +430,13 @@ paths:
       description: Export dat, zrušená licence **DNNTO**
       operationId: removedDnntoCsvExport
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
         - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
@@ -433,6 +489,13 @@ paths:
       description: Umožňuje iterovat pomocí resumption tokenu
       operationId: changes
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan
+          schema:
+            type: string
+            example: ABA001
+          required: false
         - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)

@@ -150,7 +150,9 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
     
     public void update() throws IOException, SolrServerException {
         try {
+            //getLogger().log(Level.INFO, "Updating");
             Map<Case,List<Pair<String,List<String>>>> cases = checkUpdate();
+            getLogger().log(Level.INFO, String.format("Cases %s", cases.keySet().toString()));
             for (Case cs : cases.keySet()) {
                 String confProc = getProcess(cs);
                 List<Pair<String, List<String>>> updates = cases.get(cs);
@@ -193,6 +195,8 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
             
             //updateRecords(checkUpdate());
             deleteRecords(checkDelete());
+        } catch(Exception e) {
+            getLogger().log(Level.SEVERE,e.getMessage(),e);
         } finally {
             try (SolrClient solrClient = buildClient()) {
                 SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());

@@ -168,7 +168,7 @@ public class MarcRecordUtilsToRefactor {
             }
           } else {
             if (sdoc.containsKey(IDENTIFIER_FIELD)) {
-              LOGGER.warning(String.format("No state for record %s", sdoc.getFieldValue(IDENTIFIER_FIELD).toString()));
+              LOGGER.fine(String.format("No state for record %s", sdoc.getFieldValue(IDENTIFIER_FIELD).toString()));
             }
           }
 

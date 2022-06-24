@@ -10,6 +10,7 @@ public interface SolrDocumentOutput {
 
     public static final String PID_KEY = "pid";
     public static final String SELECTED_INSTITUTION_KEY = "institution";
+    public static final String SELECTED_DL_KEY = "dl";
 
     public static final String LABEL_KEY = "label";
     public static final String NAZEV_KEY = "title";

@@ -76,7 +76,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
             String label = outputDocument.get(LABEL_KEY) != null ? outputDocument.get(LABEL_KEY).toString() : null ;
             String idsdnnt = outputDocument.get(SDNNT_ID_KEY) != null ? outputDocument.get(SDNNT_ID_KEY).toString() : null ;
-
+            
             Listitem item = new Listitem()
                     .pid(pid.toString())
                     .catalogIdentifier(identifier)

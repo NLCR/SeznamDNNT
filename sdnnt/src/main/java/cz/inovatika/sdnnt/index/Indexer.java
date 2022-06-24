@@ -94,9 +94,10 @@ public class Indexer {
         for (SolrInputDocument rec : recs) {
           SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"), client);
           if (docs.getNumFound() == 0) {
-            LOGGER.log(Level.FINE, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
+            LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
             client.add("catalog", rec);
           } else {
+              LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
               
             // zadost 
             SolrInputDocument hDoc = new SolrInputDocument();
@@ -117,11 +118,13 @@ public class Indexer {
                     // check format and place
                     Object fieldValue = cDoc.getFieldValue(MarcRecordFields.FMT_FIELD);
                     if (fieldValue == null || !Arrays.asList("BK","SE").contains(fieldValue.toString().trim().toUpperCase())) {
+                        LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not BK or SE !");
                         updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
                     }
                     
                     Object placeOfPub = cDoc.getFieldValue("place_of_pub");
                     if (placeOfPub == null || !placeOfPub.toString().trim().toLowerCase().equals("xr")) {
+                        LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not xr !");
                         updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
                     }
                 }

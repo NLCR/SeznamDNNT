@@ -23,6 +23,7 @@
         <tr *ngFor="let item of documents">
           <td>
             <div [class.app-text-cutter]="!item.expanded" [matTooltip]="item.expanded ? null : title(item.doc)"><strong>{{title(item.doc)}}</strong></div>
+          
             <div class="app-detail app-mt-1" *ngIf="item.expanded">
 
               <div *ngIf="hlavnizahlavi(item.doc)"><label class="app-label app-mr-1">Hlavní záhlaví:</label> {{hlavnizahlavi(item.doc)}} </div>
@@ -37,7 +38,14 @@
               <div *ngIf="item.digital_libraries"><label class="app-label app-mr-1">Digitalizováno:</label>{{digitallibraries(item.doc)}} </div>
 
             </div>
+            <!--
+            <div class="app-detail app-mt-1" *ngIf="item.expanded" style="width:600px">
+              <ngx-json-viewer [json]="item.marcview"  [expanded]="false"></ngx-json-viewer>
+            </div>
+            -->
           </td>
+
+
           <td class="app-col-action">
             <a (click)="goto(item.doc.marc_998a[0], $event)"><mat-icon>link</mat-icon></a>
           </td>
