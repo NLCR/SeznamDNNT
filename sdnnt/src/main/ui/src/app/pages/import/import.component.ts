@@ -142,7 +142,10 @@ export class ImportComponent implements OnInit, OnDestroy {
           // if (this.fullCatalog) {
           //   return true;
           // }
-          if (!id.dntstav || id.dntstav.includes('N') || id.dntstav.includes('X')) {
+          if (id.changedInImport) {
+            return true;
+          }
+          if (!id.dntstav || id.dntstav.includes('N') || id.dntstav.includes('X') || id.dntstav.includes('D')) {
             return false;
           }
           if (!this.onlyEAN) {
@@ -259,6 +262,7 @@ export class ImportComponent implements OnInit, OnDestroy {
             id.dntstav = res.response.docs[0].dntstav;
             id.kuratorstav = res.response.docs[0].kuratorstav;
             id.license = res.response.docs[0].license;
+            id.changedInImport = true;
             this.service.changeStavImport(doc).subscribe(res => {
               // this.getDocs(this.route.snapshot.queryParams);
             });
