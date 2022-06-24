@@ -332,7 +332,7 @@ public class XMLImporterHeureka {
               .setRows(100)
               .setParam("q.op", "AND")
               // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
-              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a");
 //      SolrDocumentList docs = getClient().query("catalog", query).getResults();
 //      for (SolrDocument doc : docs) {
 //      }

@@ -175,8 +175,8 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
   alephLink(id: string) {
-    return 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
-    // return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
+    // return 'https://aleph.nkp.cz/F/?func=direct&local_base=DNT&doc_number=' + id.substr(id.lastIndexOf('-') + 1);
+    return 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id;
   }
 
   sanitize(url: string) {
@@ -184,8 +184,8 @@ export class ImportComponent implements OnInit, OnDestroy {
   }
 
 
-  gotoAleph(id) {
-    window.open(this.alephLink(id.identifier), "_blank", 'noreferrer');
+  gotoAleph(url) {
+    window.open(url, "_blank", 'noreferrer');
     return;
   }
 

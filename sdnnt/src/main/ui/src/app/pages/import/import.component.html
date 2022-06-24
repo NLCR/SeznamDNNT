@@ -106,9 +106,9 @@
                               <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
                             </a>
                             <mat-menu #menuMore="matMenu">
-                              <button mat-menu-item *ngIf="id.identifier"  (click)="gotoAleph(id)">
+                              <button mat-menu-item *ngIf="id.marc_998a && id.marc_998a[0].startsWith('http')"  (click)="gotoAleph(id.marc_998a[0])">
                                 <mat-icon>link</mat-icon>
-                                <a [href]="alephLink(id.identifier)" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+                                <a [href]="id.marc_998a[0]" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
                               </button>
                               <button mat-menu-item (click)="showIdentifiers(id)">
                                 <mat-icon>fingerprint</mat-icon>

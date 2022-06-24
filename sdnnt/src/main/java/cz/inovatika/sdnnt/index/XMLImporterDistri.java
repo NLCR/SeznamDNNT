@@ -399,7 +399,7 @@ public class XMLImporterDistri {
               .setRows(100)
               .setParam("q.op", "AND")
               // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
-              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json]");
+              .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a");
 
       QueryRequest qreq = new QueryRequest(query);
       NoOpResponseParser rParser = new NoOpResponseParser();
