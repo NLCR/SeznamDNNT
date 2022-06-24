@@ -145,7 +145,7 @@ export class ImportComponent implements OnInit, OnDestroy {
           if (id.changedInImport) {
             return true;
           }
-          if (!id.dntstav || id.dntstav.includes('N') || id.dntstav.includes('X') || id.dntstav.includes('D')) {
+          if (!id.dntstav || id.dntstav.includes('N') || id.dntstav.includes('X') ||  id.dntstav.includes('D')) {
             return false;
           }
           if (!this.onlyEAN) {
