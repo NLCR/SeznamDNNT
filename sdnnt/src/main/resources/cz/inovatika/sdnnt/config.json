@@ -54,20 +54,136 @@
 
   "digitalized":{
             "ABA000":{
-                "regexp":[ "https?://krameriusndk.nkp.cz.*", "https?://kramerius5.nkp.cz.*"]
+                "regexp":[ "https?://.*.nkp.cz.*", "https?://kramerius5.nkp.cz.*"],
+                "acronym":"NKP"
             },
             "BOA001":{
-                "regexp":[ "https?://www.digitalniknihovna.cz/mzk.*"]
+                "regexp":[ "https?://www.digitalniknihovna.cz/mzk.*", "https?://.*mzk.cz.*"],
+                "acronym":"MZK"
+            },
+            "ABD134":{
+                "regexp":[ "https?://kramerius.lf1.cuni.cz/search.*"],
+                "acronym":"CUNI_LF1"
             },
             "HKA001":{
-                "regexp":[ "https?://kramerius.svkhk.cz.*"]
+                "regexp":[ "https?://.*.svkhk.cz.*"],
+                "acronym":"SVKHK"
             },
             "ABA013":{
-                "regexp":[ "https?://kramerius.techlib.cz.*"]
+                "regexp":[ "https?://.*.techlib.cz.*"],
+                "acronym":"NTK"
+            },
+            "ABE323" : {
+                "regexp":[ "https?://.*jewishmuseum.cz.*"],
+                "acronym":"SKVOS"
             },
             "OSA001":{
-                "regexp":[ "https?://kramerius.svkos.*"]
+                "regexp":[ "https?://.*.svkos.*"],
+                "acronym":"SKVOS"
+            },
+            "ABA007":{
+                "regexp":[ "https?://kramerius.lib.cas.cz.*", "http://www.digitalniknihovna.cz/knav.*"],
+                "acronym":"KNAV"
+            },
+            "ABG001":{
+                "regexp":[ "https?://digitalniknihovna.mlp.cz.*"],
+                "acronym":"MLP"
+            },
+            "KLG001": {
+                "regexp":[ "https?://kramerius.svkkl.cz.*"],
+                "acronym":"SVKKL"
+            },
+            "ABA006": {
+                "regexp":[ "https?://kramerius.vse.cz.*"],
+                "acronym":"VSE"
+            },
+            "ABA008" :{
+                "regexp":[ "https?://.*.medvik.cz.*"],
+                "acronym":"VSE"
+            },
+            "ABA009" :{
+                "regexp":[ "https?://.*.uzei.cz.*"],
+                "acronym":"UZEI"
+            },
+            "OLA001": {
+                "regexp":[ "https?://kramerius.kr-olomoucky.cz.*", "https?://www.digitalniknihovna.cz/vkol.*"],
+                "acronym":"VKOL"
+            }, 
+            "ULG001": {
+                "regexp":[ "https?://kramerius.svkul.cz.*", "https?://www.digitalniknihovna.cz/svkul.*"],
+                "acronym":"SVKUL"
+            },
+            "CKA501": {
+                "regexp":[ "https?://kramerius.cbvk.cz.*"],
+                "acronym":"CBVK"
+            },
+            "ABD024": {
+                "regexp":[ "https?://www.digitalniknihovna.cz/vsup.*", "https?://kramerius.vsup.cz.*?"],
+                "acronym":"VSUP"
+            },
+            "OPG504": {
+                "regexp":[ "https?://camea2.svkos.cz.*"],
+                "acronym":"SVKOS"
+            },
+            "ABA012": {
+                "regexp":[ "https?://kramerius.npmk.cz.*"],
+                "acronym":"NPMK"
+            },
+            "ABD103": {
+                "regexp":[ "https?://kramerius.fsv.cuni.cz.*"],
+                "acronym":"FSVUK"
+            },
+            "ZLG001": {
+                "regexp":[ "https?://kramerius.kfbz.cz.*", "https?://www.digitalniknihovna.cz/kfbz/.*"],
+                "acronym":"KFBZ"
+            },
+
+            "PAG001": {
+                "regexp":[ "https?://kramerius.knihovna-pardubice.cz.*"],
+                "acronym":"KKP"
+            },
+            "ABA010": {
+                "regexp":[ "https?://kramerius.nm.cz.*"],
+                "acronym":"NM"
+            },
+            "ABC013": {
+                "regexp":[ "https?://kramerius.cuni.cz.*"],
+                "acronym":"CUNI"
+            },
+            "KVG001": {
+                "regexp":[ "https?://.*kr-karlovarsky.cz.*"],
+                "acronym":"KKKV"
+            },
+            "HBG001": {
+                "regexp":[ "https?://.*.kkvysociny.cz.*"],
+                "acronym":"KKVHB"
+            },
+            "ABC135": {
+                "regexp":[ "https?://library.nfa.cz.*"],
+                "acronym":"NFA"
+            },
+            "ABE310": {
+                "regexp":[ "https?://.*.upm.cz.*"],
+                "acronym":"UPM"
+            },
+            "PNA001": {
+                "regexp":[ "https?://.*.svkpl.cz.*", "https?://.*.svkpk.cz.*"],
+                "acronym":"SVKPK"
+            },
+            "LIA001": {
+                "regexp":[ "https?://.*.kvkli.cz.*"],
+                "acronym":"KVKLI"
+            },
+            
+            "LMDA":{
+                "regexp":[ "https?://.*.silvarium.cz.*"],
+                "acronym":"KVKLI"
+            },
+            "DSMO": {
+                "regexp":[ "https?://.*.army.cz.*"],
+                "acronym":"DSMO"
             }
+            
       },
 
   "jobs": {

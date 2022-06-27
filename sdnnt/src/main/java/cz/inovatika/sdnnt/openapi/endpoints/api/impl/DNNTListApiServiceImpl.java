@@ -9,9 +9,12 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
+import cz.inovatika.sdnnt.utils.LinksUtilities;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
+
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
@@ -50,6 +53,28 @@ import static cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOu
 // zmenit
 public class DNNTListApiServiceImpl extends ListsApiService {
 
+    public static final List<String> CATALOG_FIELDS = Arrays.asList(
+            "nazev", 
+            "identifier",
+            ID_SDNNT , 
+            "marc_856u", 
+            "dntstav", 
+            "historie_stavu", 
+            "marc_911u", 
+            MarcRecordFields.SIGLA_FIELD, 
+            "marc_911a",
+            GRANULARITY_FIELD,
+            MARC_015_A,
+            MARC_020_A,
+            MARC_902_A,
+            LICENSE_FIELD,
+            FMT_FIELD,
+            DIGITAL_LIBRARIES,
+            ID_ISSN,
+            ID_ISBN,
+            ID_ISMN
+    );
+
     // number of concurrent clients in case of exporting long csv file
     public static int DEFAULT_CONCURRENT_CLIENTS = 3;
     public static int MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST = 8000;
@@ -67,35 +92,42 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
     protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
-
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
-    public static final List<String> CATALOG_FIELDS = Arrays.asList("nazev", "identifier",ID_SDNNT , "marc_856u", "dntstav", "historie_stavu", "marc_911u", MarcRecordFields.SIGLA_FIELD, "marc_911a",
-            GRANULARITY_FIELD,
-            MARC_015_A,
-            MARC_020_A,
-            MARC_902_A,
-            LICENSE_FIELD,
-            FMT_FIELD,
-            DIGITAL_LIBRARIES,
-            ID_ISSN,
-            ID_ISBN,
-            ID_ISMN
-    );
-
     public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD, FMT_FIELD);
-
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
 
-    CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
 
+    protected CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
+    protected Map<String,String> dlMap = null;
+    
+    public DNNTListApiServiceImpl() {
+        Map<String, String> map = new HashMap<String,String>();
+        JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
+        if (digitalized != null) { 
+            Set<String> keySet = digitalized.keySet();
+            for (String key : keySet) {
+                JSONObject json = digitalized.getJSONObject(key);
+                if (json.has("acronym")) {
+                    map.put(json.getString("acronym"), key);
+                }
+            }
+        }
+        this.dlMap = map;
+
+    }
+    
     @Override
-    public Response addedDnnto(String dl, String instituion, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnnto(String dl, String format, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (instituion != null) ?  new ArrayList<>(
-                Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+instituion, "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid")) :
-                new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
-        digitalLibrariesFilter(dl, plusList);
+        List<String> plusList = new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
+        institutionFilterPlusList(institution, plusList);
+        digitalLibrariesFilterPlusList(dl, plusList);
+        formatFilterPlusList(format, plusList);
+
+        ArrayList<String> minusList = new ArrayList<String>();
+        removeDMinusList(minusList);
+        
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -105,11 +137,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
                 String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(instituion, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument(license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -129,12 +161,17 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
     @Override
-    public Response addedDnntt(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnntt(String dl, String format, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?
-                new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnntt.name()+" OR "+"granularity_license_cut:"+License.dnntt.name(), "id_pid:uuid")):
+        List<String> plusList = 
                 new ArrayList<>(Arrays.asList("license:"+License.dnntt.name() +" OR "+"granularity_license_cut:"+License.dnntt.name(),"id_pid:uuid" ));
-        digitalLibrariesFilter(dl, plusList);
+        institutionFilterPlusList(institution, plusList);
+        digitalLibrariesFilterPlusList(dl, plusList);
+        formatFilterPlusList(format, plusList);
+
+        List<String> minusList = new ArrayList<>();
+        removeDMinusList(minusList);
+        
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -145,11 +182,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         response.setItems(arrayOfListitem);
 
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
                 String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(institution,license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name());
+                    emitDocument(license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name());
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -170,26 +207,34 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     
     
     @Override
-    public Response removedDnntt(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnntt(String dl, String format, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?
-                new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnntt.name(), "id_pid:uuid")) :
-                new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name(), "id_pid:uuid"));
-        digitalLibrariesFilter(dl, plusList);
+        //historie_stavu_cut
+        List<String> plusList = 
+                new ArrayList<>(Arrays.asList("historie_stavu_cut:"+License.dnntt.name(), "id_pid:uuid"));
+        List<String> minusList = new ArrayList<>(
+                Arrays.asList(MarcRecordFields.LICENSE_FIELD+":"+License.dnntt.name())
+        );
+        institutionFilterPlusList(institution, plusList);
+        digitalLibrariesFilterPlusList(dl, plusList);
+        formatFilterPlusList(format, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
+        
+        removeDMinusList(minusList);
+        
         final ListitemResponse response = new ListitemResponse();
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
 
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String, String>(), null, plusList, new ArrayList<String>(), CATALOG_FIELDS, (rsp) -> {
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String, String>(), null, plusList, minusList, CATALOG_FIELDS, (rsp) -> {
                 String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc : rsp.getResults()) {
-                    emitDocument(institution, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null);
+                    emitDocument(license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -200,34 +245,61 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 
-    private void digitalLibrariesFilter(String dl, List<String> plusList) {
+    private void institutionFilterPlusList(String dl, List<String> plusList) {
         if (dl != null) {
+            plusList.add(SIGLA_FIELD+":"+dl);
+        }
+    }
+
+    private void digitalLibrariesFilterPlusList(String dl, List<String> plusList) {
+        if (dl != null) {
+            if (dlMap.containsKey(dl)) {
+                dl = this.dlMap.get(dl);
+            }
             plusList.add("digital_libraries:"+dl);
         }
     }
 
+
+    private void formatFilterPlusList(String fmt, List<String> plusList) {
+        if (fmt != null) {
+            plusList.add(MarcRecordFields.FMT_FIELD+":"+fmt);
+        }
+    }
+
+    private void removeDMinusList(List<String> minusList) {
+        minusList.add(MarcRecordFields.DNTSTAV_FIELD+":D");
+    }
+    //new ArrayList<>(Arrays.asList(MarcRecordFields.DNTSTAV_FIELD+":D"));
+
+    
     @Override
-    public Response removedDnnto(String dl, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnnto(String dl, String format, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = (institution != null) ?
-                new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnnto.name(), "id_pid:uuid")) :
-                new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name(), "id_pid:uuid"));
-        digitalLibrariesFilter(dl, plusList);
+        List<String> plusList = 
+                new ArrayList<>(Arrays.asList("historie_stavu_cut:"+License.dnnto.name(), "id_pid:uuid"));
+        List<String> minusList = new ArrayList<>(
+                Arrays.asList(MarcRecordFields.LICENSE_FIELD+":"+License.dnnto.name())
+        );
+        digitalLibrariesFilterPlusList(dl, plusList);
+        formatFilterPlusList(format, plusList);
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
         }
-
+        
+        removeDMinusList(minusList);
+        
         final ListitemResponse response = new ListitemResponse();
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
 
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
                 String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(institution, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null);
+                    emitDocument( license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -243,26 +315,30 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     
 
     @Override
-    public Response addedDnntoCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-
-                List<String> plusList = (institution != null) ?  new ArrayList<>(
-                        Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid")) :
+                List<String> plusList = 
                         new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
-                digitalLibrariesFilter(dl, plusList);
+                institutionFilterPlusList(institution, plusList);
+                digitalLibrariesFilterPlusList(dl, plusList);
+                formatFilterPlusList(format, plusList);
 
+                ArrayList<String> minusList = new ArrayList<>();
+                removeDMinusList(minusList);
+                
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
 
+                
                 if (list == null || list.isEmpty()) {
-                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,new ArrayList<>(), CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
                 } else {
-                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list));
                 }
             } else {
                 return Response.status(429).entity(jsonError("Maximum number of items exceeded")).build();
@@ -285,21 +361,27 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response addedDnnttCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
+                List<String> plusList =  new ArrayList<>(Arrays.asList("license:"+License.dnntt.name()));
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
-                digitalLibrariesFilter(dl, plusList);
+                institutionFilterPlusList(institution, plusList);
+                digitalLibrariesFilterPlusList(dl, plusList);
+                formatFilterPlusList(format, plusList);
+                
+                ArrayList<String> minusList = new ArrayList<>();
+                removeDMinusList(minusList);
+
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list));
                 } else {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS,DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS,DEFAULT_OUTPUT_FIELDS);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Maximum number of items exceeded")).build();
@@ -313,21 +395,31 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response removedDnntoCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnnto.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnnto.name()));
+                //historie_stavu_cut
+                List<String> plusList = 
+                        new ArrayList<>(Arrays.asList("historie_stavu_cut:"+License.dnnto.name(), "id_pid:uuid"));
+                List<String> minusList = new ArrayList<>(
+                        Arrays.asList(MarcRecordFields.LICENSE_FIELD+":"+License.dnnto.name())
+                );
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
-                digitalLibrariesFilter(dl, plusList);
+                institutionFilterPlusList(institution, plusList);
+                digitalLibrariesFilterPlusList(dl, plusList);
+                formatFilterPlusList(format, plusList);
+                
+                removeDMinusList(minusList);
+
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnnto.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnnto.name(), uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list));
                 } else {
-                    return fullCSV(institution,License.dnnto.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnnto.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
                 }
 
             } else {
@@ -342,21 +434,34 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response removedDnnttCsvExport(String dl, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response removedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
             if (acquired) {
-                List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
+                //List<String> plusList = (institution != null) ?   new ArrayList<>(Arrays.asList(MarcRecordFields.DIGITAL_LIBRARIES+":"+institution, "license_history:"+License.dnntt.name())):  new ArrayList<>(Arrays.asList("license_history:"+License.dnntt.name()));
+
+                List<String> plusList = 
+                        new ArrayList<>(Arrays.asList("historie_stavu_cut:"+License.dnntt.name(), "id_pid:uuid"));
+                List<String> minusList = new ArrayList<>(
+                        Arrays.asList(MarcRecordFields.LICENSE_FIELD+":"+License.dnntt.name())
+                );
+
+                
                 if (dateTime != null) {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
-                digitalLibrariesFilter(dl, plusList);
+                institutionFilterPlusList(institution, plusList);
+                digitalLibrariesFilterPlusList(dl, plusList);
+                formatFilterPlusList(format, plusList);
+                
+                removeDMinusList(minusList);
+                
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list));
                 } else {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, new ArrayList<>(), CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Too many requests; Please wait and repeat request again")).build();
@@ -387,7 +492,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 SolrDocumentOutput documentOutput = new CSVSolrDocumentOutput(printer);
                 // select only this fields
                 this.catalogIterationSupport.iterate(map, null, plusList, minusList,fetchingFields, (doc)->{
-                    emitDocument(selectedInstitution, label, onlyUniqPids, uniqe, doc, documentOutput, outputFields, label);
+                    emitDocument( label, onlyUniqPids, uniqe, doc, documentOutput, outputFields, label);
                 }, "identifier");
             }
 
@@ -416,35 +521,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
      * @param doc Outputting doc
      * @param documentOutput DocumentOutput implementation
      */
-    private void emitDocument(String selectedInstitution, String documentLicense, Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense) {
+    private void emitDocument(/*String selectedInstitution,*/ String documentLicense, Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense) {
         Collection<Object> nazev = doc.getFieldValues("nazev");
         String identifier = (String) doc.getFieldValue("identifier");
 
         //Collection<Object> mdigitallibraries = doc.getFieldValues("digital_libraries");
+        Object fmt = doc.getFieldValue(FMT_FIELD);
 
         // prvni je master
         Collection<Object> granularityField = doc.getFieldValues("granularity");
 
-        Collection<Object> mlinks911u = doc.getFieldValues("marc_911u");
-        Collection<Object> mlinks856u =  doc.getFieldValues("marc_856u");
-        Collection<Object> mlinks956u =  doc.getFieldValues("marc_956u");
 
-        Collection<Object> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD);
-
-        Object fmt = doc.getFieldValue(FMT_FIELD);
-        
+        List<String> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD) != null ? doc.getFieldValues(SIGLA_FIELD).stream().map(Object::toString).collect(Collectors.toList())  : new ArrayList<>();
         List<String> mdigitallibraries = doc.getFieldValues("digital_libraries") != null ? doc.getFieldValues("digital_libraries").stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
         
-        
-        
-        final List<String> links = new ArrayList<>();
-        if (mlinks911u != null && !mlinks911u.isEmpty()) {
-            mlinks911u.stream().map(Object::toString).forEach(links::add);
-        } else if (mlinks856u != null) {
-            mlinks856u.stream().map(Object::toString).forEach(links::add);
-        } else if (mlinks956u != null) {
-            mlinks956u.stream().map(Object::toString).forEach(links::add);
-        }
+        final List<String> links = LinksUtilities.linksFromDocument(doc);
 
         if (!links.isEmpty()) {
             List<String> granularity = granularityField != null ? granularityField.stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
@@ -465,74 +556,24 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 return it.substring(i);
             }).collect(Collectors.toList());
 
-            if (minstitutions !=null && !minstitutions.isEmpty()) {
-
-                List<String> institutions = new ArrayList(minstitutions);
-                // indexy do puvodni pole linku
-                List<Integer> indicies = krameriusLinks.stream().map(it-> links.indexOf(it)).collect(Collectors.toList());
-                // Sigly knihoven podle linku
-                List<String> siglas = indicies.stream().map(index -> {
-                    return (index >=0 && index < institutions.size()) ? institutions.get(index) : "";
-                }).collect(Collectors.toList());
-
-
-                // pokud neni vybrano, pro vsechny, pokud je vybrano, pouze pro tu jednu
-                if (selectedInstitution != null && siglas.contains(selectedInstitution)) {
-                    int indexOf = siglas.indexOf(selectedInstitution);
-                    if (indexOf > -1 && indexOf< pids.size()) {
-                        String pid = pids.get(indexOf);
-                        if ((onlyUniqPids && !uniqe.contains(pid)) || !onlyUniqPids) {
-                            Map<String,Object> d = doc( mdigitallibraries,  Arrays.asList(selectedInstitution), documentLicense, nazev, identifier, granularity, fmt.toString(), pid);
-                            d = enIdSdnnt(d, doc);
-                            documentOutput.output(d, outputFields,requestedLicense );
-                            uniqe.add(pid);
-                        }
-                    } else {
-                        LOGGER.log(Level.WARNING, String.format("Cannot find institution '%s' in record '%s'",selectedInstitution, identifier));
+            if (onlyUniqPids) {
+                for (int i = 0; i < pids.size(); i++) {
+                    if (!uniqe.contains( pids.get(i))) {
+                        //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
+                        Map<String,Object> d =  doc(mdigitallibraries,minstitutions , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
+                        d = enIdSdnnt(d, doc);
+                        documentOutput.output(d,outputFields, requestedLicense);
+                        uniqe.add(pids.get(i));
                     }
-
-                } else if (selectedInstitution == null ) {
-                        // nevybrana instituce, bere vsechny
-                        if (onlyUniqPids) {
-                            for (int i = 0; i < pids.size(); i++) {
-                                String s = i < siglas.size() ? siglas.get(i) : "";
-                                if (!uniqe.contains( pids.get(i))) {
-                                    Map<String,Object> d = doc(mdigitallibraries, siglas, documentLicense,  nazev, identifier, granularity, fmt.toString(), pids.get(i));
-                                    d = enIdSdnnt(d, doc);
-                                    documentOutput.output( d, outputFields, requestedLicense);
-                                    uniqe.add(pids.get(i));
-                                }
-                            }
-                        } else {
-                            for (int i = 0; i < pids.size(); i++) {
-                                Map<String,Object> d = doc(mdigitallibraries, siglas, documentLicense,  nazev, identifier,granularity,fmt.toString() , pids.get(i));
-                                d = enIdSdnnt(d, doc);
-                                documentOutput.output( d,outputFields, requestedLicense);
-                            }
-                        }
                 }
             } else {
-                if (onlyUniqPids) {
-                    for (int i = 0; i < pids.size(); i++) {
-                        if (!uniqe.contains( pids.get(i))) {
-                            //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-                            Map<String,Object> d =  doc(mdigitallibraries,Arrays.asList("") , documentLicense,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
-                            d = enIdSdnnt(d, doc);
-                            documentOutput.output(d,outputFields, requestedLicense);
-                            uniqe.add(pids.get(i));
-                        }
-                    }
-                } else {
-                    //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
-                    Map<String,Object> d = doc(mdigitallibraries, Arrays.asList(""), documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
-                    d = enIdSdnnt(d, doc);
-                    documentOutput.output(d,outputFields, requestedLicense);
-                }
+                //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
+                Map<String,Object> d = doc(mdigitallibraries, minstitutions, documentLicense, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
+                d = enIdSdnnt(d, doc);
+                documentOutput.output(d,outputFields, requestedLicense);
             }
         }
     }
-    
-    
 
     private Map<String, Object> doc(List<String> digitalLibs, List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
         Map<String, Object> document = new HashMap<>();
@@ -549,14 +590,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         document.put(FMT_KEY, fmt);
         return document;
     }
-
-//    public static final String ID_CCNB_FIELD = "id_ccnb";
-//    public static final String ID_OAIIDENT = "id_oaiident";
-//    public static final String ID_SDNNT = "id_sdnnt";
-//
-//    public static final String ID_ISSN="id_issn";
-//    public static final String ID_ISBN="id_isbn";
-//    public static final String ID_ISMN="id_ismn";
     
     private Map<String, Object> enDoc(Map<String, Object> doc, String key, Object val) {
         doc.put(key, val);
@@ -572,12 +605,14 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
     
     @Override
-    public Response changes(String dl, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
+    public Response changes(String dl, String format, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
             ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
+
         List<String> plusList = (institution != null) ?  new ArrayList<>(
-                new ArrayList<>(Arrays.asList(MarcRecordFields.SIGLA_FIELD+":"+institution,  "id_pid:uuid", "license:*"))) :
+                new ArrayList<>(Arrays.asList(MarcRecordFields.DIGITAL_LIBRARIES+":"+institution,  "id_pid:uuid", "license:*"))) :
                 new ArrayList<>(Arrays.asList("id_pid:uuid","license:*" ));
+        
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
             plusList.add("datum_stavu:["+utc+" TO *]");
@@ -589,9 +624,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
             this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
                 String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(institution, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument( license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -612,12 +647,13 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 response.setItems(arrayOfListitem);
 
                SolrQuery q = (new SolrQuery("*")).setRows(maxRowsInCaseOfIdent).setSort(SolrQuery.SortClause.asc("identifier"));
+                q.addFilterQuery("NOT dntstav:D");
                 q.addFilterQuery("id_pid:uuid");
                 q.addFilterQuery("id_all_identifiers:\""+ident+"\" OR id_pid:\""+ident+"\" OR identifier:\""+ident+"\" OR id_sdnnt:\""+ident+"\"");
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem);
+                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(null, license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument( license(resultDoc), false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 return Response.ok().entity(response).build();

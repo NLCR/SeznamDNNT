@@ -26,6 +26,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import cz.inovatika.sdnnt.utils.LinksUtilities;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.io.IOUtils;
@@ -39,7 +40,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -179,7 +179,7 @@ public class DntAlephImporter {
         JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
         if (digitalized != null) { 
 
-            final List<String> siglas = new ArrayList<>();
+            //final List<String> siglas = new ArrayList<>();
             
             Collection<Object> mlinks911u = sdoc.getFieldValues("marc_911u");
             Collection<Object> mlinks856u =  sdoc.getFieldValues("marc_856u");
@@ -194,19 +194,7 @@ public class DntAlephImporter {
             } else if (mlinks856u != null) {
                 mlinks856u.stream().map(Object::toString).forEach(links::add);
             }
-            
-            digitalized.keySet().forEach(key -> {
-                JSONArray regexps = digitalized.getJSONObject(key).getJSONArray("regexp");
-                for (Object oneRegexp : regexps) {
-                    // one regexps 
-                    if(links.stream().anyMatch(l -> {
-                            return l.matches(oneRegexp.toString());
-                        })) {
-                        siglas.add(key);
-                    }
-                }
-            });
-            
+            List<String> siglas = LinksUtilities.digitalizedKeys(digitalized,  links);
             if (!siglas.isEmpty()) {
                 sdoc.setField(DIGITAL_LIBRARIES, siglas);
             }

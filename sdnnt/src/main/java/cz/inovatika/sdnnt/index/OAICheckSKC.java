@@ -71,11 +71,12 @@ public class OAICheckSKC {
                 OAIXMLHeadersReader xmlReader = new OAIXMLHeadersReader(dStream);
                 resumptionToken = xmlReader.readFromXML();
                 records.addAll(xmlReader.getRecords());
-                records.addAll(xmlReader.getToDelete());
+                deleted.addAll(xmlReader.getToDelete());
                 indexCount++;
                 if (indexCount % 100 == 0) {
                     logger.info(String.format("Iteration %d,  Number of records %d", indexCount, records.size()));
                 }
+                
                 deletePaths(dFile);
             }
         }

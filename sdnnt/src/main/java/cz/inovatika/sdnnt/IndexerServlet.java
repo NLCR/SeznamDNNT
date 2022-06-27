@@ -44,7 +44,6 @@ import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
-import cz.inovatika.sdnnt.services.impl.PXYearServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
@@ -143,6 +142,8 @@ public class IndexerServlet extends HttpServlet {
 
     enum Actions {
 
+        
+        
         TOUCH {
 
             private static final int LIMIT = 1000;
@@ -171,6 +172,7 @@ public class IndexerServlet extends HttpServlet {
                                 bulk.clear();
                             }
                         }, "identifier");
+                        
                         if (!bulk.isEmpty()) {
                             number.addAndGet(bulk.size());
                             JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk, "identifier", support.getCollection());

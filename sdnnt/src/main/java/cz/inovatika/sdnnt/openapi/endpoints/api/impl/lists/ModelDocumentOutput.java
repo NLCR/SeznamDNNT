@@ -15,9 +15,11 @@ import java.util.stream.Collectors;
 public class ModelDocumentOutput  implements  SolrDocumentOutput{
 
     private ArrayOfListitem arrayOfListitem;
-
-    public ModelDocumentOutput(ArrayOfListitem arrayOfListitem) {
+    private Map<String,String> digitalLibrariesConfiguration;
+    
+    public ModelDocumentOutput(ArrayOfListitem arrayOfListitem, Map<String,String> conf) {
         this.arrayOfListitem = arrayOfListitem;
+        this.digitalLibrariesConfiguration = conf;
     }
 
 //    @Override
@@ -76,16 +78,38 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
             String label = outputDocument.get(LABEL_KEY) != null ? outputDocument.get(LABEL_KEY).toString() : null ;
             String idsdnnt = outputDocument.get(SDNNT_ID_KEY) != null ? outputDocument.get(SDNNT_ID_KEY).toString() : null ;
+
+            String fmt = outputDocument.get(FMT_KEY) != null ? outputDocument.get(FMT_KEY).toString() : null ;
+
+            List<String> digitalLibrary = outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) != null ? (List<String>)outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) : null;
+            
             
             Listitem item = new Listitem()
                     .pid(pid.toString())
                     .catalogIdentifier(identifier)
-                    .sigla(siglas)
                     .title(nazev)
                     .license(label);
             if (label != null) {
                       //territoriality
                 item.setTerritoriality("CZ");
+                item.setLicense(label);
+            }
+            
+            if (siglas != null && !siglas.isEmpty()) {
+                item.sigla(siglas);
+            }
+            
+            if (digitalLibrary != null && !digitalLibrary.isEmpty()) {
+                for (String dl : digitalLibrary) {  
+                    if (this.digitalLibrariesConfiguration != null && this.digitalLibrariesConfiguration.containsKey(dl)) {
+                        dl = this.digitalLibrariesConfiguration.get(dl);
+                    }
+                    item.addDigitalLibrariesItem(dl);  
+                }
+            }
+            
+            if (fmt != null) {
+                item.type(fmt);
             }
             
             if (idsdnnt != null) {

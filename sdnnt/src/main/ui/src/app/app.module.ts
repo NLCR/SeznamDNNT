@@ -72,7 +72,7 @@ import 'echarts/theme/macarons.js';
 import { DialogBulkNotificationsComponent } from './components/dialog-bulk-notifications/dialog-bulk-notifications.component';
 import { DialogNotificationsSettingsComponent } from './components/dialog-notifications-settings/dialog-notifications-settings.component';
 import { DialogSuccessorRecordsComponent } from './components/dialog-successor-records/dialog-successor-records.component';
-import { NgxJsonViewerModule } from 'ngx-json-viewer';
+//import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
 

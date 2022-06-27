@@ -227,11 +227,14 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
             indexed += recs.size();
             recs.clear();
           }
+
+          /*
           if (!toDelete.isEmpty()) {
               deleteRecords(new ArrayList(toDelete), buildSKCDeleteService(conf));
               deleted += toDelete.size();
               toDelete.clear();
-          }
+          }*/
+          
           solrTime += new Date().getTime() - start;
           if (dStream != null ) {
             IOUtils.closeQuietly(dStream);
@@ -241,7 +244,6 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         } catch (MaximumIterationExceedException e) {
           LOGGER.log(Level.SEVERE, e.getMessage(),e);
         }
-
 
         while (resumptionToken != null) {
           url = "http://aleph.nkp.cz/OAI?verb=ListRecords&resumptionToken=" + resumptionToken;

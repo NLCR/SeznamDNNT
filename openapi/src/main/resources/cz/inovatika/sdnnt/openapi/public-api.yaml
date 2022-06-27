@@ -46,6 +46,14 @@ paths:
             example: ABA001
           required: false
         - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce, ktera ma dilo ve fondu
           schema:
@@ -99,8 +107,16 @@ paths:
             example: ABA001
           required: false
         - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
+          required: false
+        - in: query
           name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
+          description: Sigla instituce, ktera ma dilo ve fondu
           schema:
             type: string
             example: ABA001
@@ -156,8 +172,16 @@ paths:
             example: ABA001
           required: false
         - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
+          required: false
+        - in: query
           name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
+          description: Sigla instituce, ktera ma dilo ve fondu
           schema:
             type: string
             example: ABA001
@@ -210,6 +234,14 @@ paths:
           schema:
             type: string
             example: ABA001
+          required: false
+        - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
           required: false
         - in: query
           name: institution
@@ -269,6 +301,14 @@ paths:
             example: ABA001
           required: false
         - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
@@ -322,6 +362,14 @@ paths:
           schema:
             type: string
             example: ABA001
+          required: false
+        - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
           required: false
         - in: query
           name: institution
@@ -383,6 +431,14 @@ paths:
             example: ABA001
           required: false
         - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
+          required: false
+        - in: query
           name: institution
           description: Sigla instituce. (ABA001, ABA007, atd...)
           schema:
@@ -436,6 +492,14 @@ paths:
           schema:
             type: string
             example: ABA001
+          required: false
+        - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
           required: false
         - in: query
           name: institution
@@ -495,6 +559,14 @@ paths:
           schema:
             type: string
             example: ABA001
+          required: false
+        - in: query
+          name: format
+          description: Format 
+          schema:
+            enum: ["BK","SE"]
+            type: string
+            example: BK
           required: false
         - in: query
           name: institution

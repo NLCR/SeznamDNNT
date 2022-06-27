@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.duplicate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -209,7 +210,6 @@ public class DuplicateUtils {
     //
     public static List<Triple<String,String,String>> findByCartesianProduct(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
         List<Triple<String,String,String>> retList = new ArrayList<>();
-
         List<DataField> cartesianLeftFields = origin.dataFields.get(cartesianLeft.getKey());
         List<DataField> cartesianRightFields = origin.dataFields.get(cartesianRight.getKey());
 
@@ -234,57 +234,26 @@ public class DuplicateUtils {
                                }
                                builder.append(")");
                                try {
-                                   String ccnb = null;
-                                   
-                                   if (origin.dataFields.containsKey("015")) {
-                                       List<DataField> subFields = origin.dataFields.get("015");
-                                       if (subFields != null) {
-                                           for (DataField mField : subFields) {
-                                               List<SubField> subfield = mField.subFields.get("a");
-                                               if (subfield != null && !subfield.isEmpty()) {
-                                                   ccnb = subfield.get(0).getValue();
-                                               }
-                                           }
-                                       }
-                                   }
-                                   
                                    
                                    SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
                                    idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
                                    idQuery.addFilterQuery("NOT dntstav:D");
                                    idQuery.addFilterQuery("NOT kuratorstav:DX");
-                                   if (ccnb == null) {
-                                       idQuery.addFilterQuery("NOT marc_015a:*");
-                                   } else {
-                                       idQuery.addFilterQuery("NOT marc_015a:\""+ccnb+"\"");
-                                   }
-                                   
-//                                   String ccnb = null;
-//                                   if (origin.dataFields.containsKey("015")) {
-//                                       List<DataField> dfs = origin.dataFields.get("015");
-//                                       for(DataField df: dfs) {
-//                                           if (df.subFields.containsKey("a")) {
-//                                               List<SubField> vals = df.subFields.get("a");
-//                                               if (!vals.isEmpty()) {
-//                                                   ccnb = vals.get(0).getValue();
-//                                               }
-//                                           }
-//                                       }
-//                                   }
-                                   
                                    
                                    LOGGER.info("Query: "+idQuery);
                                    SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
                                    for (SolrDocument sDocument : results) {
+
+                                       Collection<Object> aFields = sDocument.getFieldValues("910a");
+                                       Collection<Object> xFields = sDocument.getFieldValues("910x");
+                                       
                                        Triple<String, String, String> triple = triple(sDocument);
                                        retList.add(triple);
                                    }
                                } catch (SolrServerException | IOException e) {
                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
                                }
-                               
                            }
-                           
                         });
                     });
                 }

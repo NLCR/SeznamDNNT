@@ -23,6 +23,13 @@ properties:
       type: string
     example: 
         - 'BOA001'
+  digital_libraries:
+    type: array
+    items:
+      type: string
+    example: 
+        - 'MZK'
+        - 'NKP'
   title:
     type: string
     example: 'ERA 21 ekologie, realizace, architektura'

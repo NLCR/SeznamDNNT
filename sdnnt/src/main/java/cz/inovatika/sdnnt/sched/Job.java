@@ -119,6 +119,18 @@ public class Job implements InterruptableJob {
                 QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
             }
         },
+
+        /** Depreceted - alternativni linky do alephu - jiz se nepouziva */
+        DL_UPDATE {
+            @Override
+            void doPerform(JSONObject jobData) {
+                long start = System.currentTimeMillis();
+                LOGGER.fine(name()+":configuration is "+jobData);
+                UpdateAlternativeAlephLinksImpl impl = new UpdateAlternativeAlephLinksImpl();
+                impl.updateLinks();
+                QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
+            }
+        },
         
         /** SKC Update */
         SKC_UPDATE {
