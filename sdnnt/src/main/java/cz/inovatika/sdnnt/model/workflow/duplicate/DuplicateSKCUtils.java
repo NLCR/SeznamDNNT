@@ -41,7 +41,7 @@ public class DuplicateSKCUtils {
         retvals.stream().forEach(m-> { identifiers.add(m.getLeft()); });
         if (retvals.isEmpty()) {
             // find by 015 z - canceled ccnb
-            List<Triple<String,String,String>> zccnnb = DuplicateUtils.findByMarcField(solrClient, origin, Pair.of("015", "z"));
+            List<Triple<String,String,String>> zccnnb = DuplicateUtils.findCanceledCCNB(solrClient, origin);
             zccnnb.forEach(zccnb-> {
                 if (!identifiers.contains(zccnb.getLeft())) {
                     retvals.add(zccnb); identifiers.add(zccnb.getLeft());
@@ -50,11 +50,13 @@ public class DuplicateSKCUtils {
         }
         // if there is no ccnb live or canceled ccnb
         if (retvals.isEmpty()) {
+
             // nesmi byt SKC_1
-            List<Triple<String,String,String>> cartesian = DuplicateUtils.findByCartesianProduct(solrClient, origin, Pair.of("910","a"), Pair.of("910","x"));
+            List<Triple<String,String,String>> cartesian = DuplicateUtils.findBy910ax(solrClient, origin, Pair.of("910","a"), Pair.of("910","x"));
             cartesian.forEach(c-> {
                 if (!identifiers.contains(c.getLeft())) {
-                    cartesianRetVals.add(c); identifiers.add(c.getLeft());
+                    cartesianRetVals.add(c); 
+                    identifiers.add(c.getLeft());
                 }
             });
             
@@ -79,6 +81,7 @@ public class DuplicateSKCUtils {
             } else  {
                 return Pair.of(Case.SKC_4b, new ArrayList<>());
             }
+
         // rozhodnuto na zaklade parovani
         } else if (!cartesianRetVals.isEmpty()) {
             
@@ -104,8 +107,9 @@ public class DuplicateSKCUtils {
 
 
  
-    private static boolean matchLicenseAndState(MarcRecord origin, String dntstav, String license) {
-        boolean matchState = StringUtils.match(origin.dntstav != null && origin.dntstav.size() > 0 ? origin.dntstav.get(0) : null , dntstav);
+    static boolean matchLicenseAndState(MarcRecord origin, String dntstav, String license) {
+        String originStav = origin.dntstav != null && origin.dntstav.size() > 0 ? origin.dntstav.get(0) : null;
+        boolean matchState = StringUtils.match(originStav , dntstav);
         boolean matchLicense = StringUtils.match(origin.license, license);
         return matchState && matchLicense;
     }

@@ -90,7 +90,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                             AccountServiceImpl accountService = reqService.buildAccountService();
                             //DuplicateUtils.changeRequests(origin, followers, null);
 
-                            List<String> navrhy = Arrays.asList("NZN","VN","VNL","VNL","PXN");
+                            List<String> navrhy = Arrays.asList("NZN","VN","VNL","VNZ","PXN");
                             List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, navrhy, null,  Arrays.asList(origin.identifier));
                             List<Zadost> allRequests = foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
                             

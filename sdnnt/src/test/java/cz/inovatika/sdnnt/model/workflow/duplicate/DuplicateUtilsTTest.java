@@ -2,6 +2,8 @@ package cz.inovatika.sdnnt.model.workflow.duplicate;
 
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.alephImport;
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.dntAlephStream;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +39,7 @@ import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.utils.SimplePOST;
 import cz.inovatika.sdnnt.utils.XMLUtils;
 
@@ -157,8 +160,10 @@ public class DuplicateUtilsTTest {
             LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
             return;
         }
+        
         InputStream skc = DuplicateUtilsTTest.class.getResourceAsStream("solrskc.xml");
         InputStream skcActiveccnb = DuplicateUtilsTTest.class.getResourceAsStream("solrskc-canceled-ccnb.xml");
+        
         try {
 
             String solrHosts = SolrTestServer.TEST_URL;
@@ -196,6 +201,7 @@ public class DuplicateUtilsTTest {
     /**
      * Test 910a
      */
+    // DELETE
     @Test
     public void testFindDuplicateSKC_910() throws XMLStreamException, SolrServerException, ParserConfigurationException, SAXException, IOException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
@@ -230,6 +236,47 @@ public class DuplicateUtilsTTest {
                 Assert.assertTrue(findSKCFollowers.getValue().get(0).equals("oai:aleph-nkp.cz:SKC01-00099910a"));
                 System.out.println(findSKCFollowers.getKey());
                 //Assert.assertTrue(findSKCFollowers.getKey().equals(Case.SKC_2a));
+
+            }
+        } catch (IOException e) {
+              Assert.fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFindDuplicateSKC_910_2() throws XMLStreamException, SolrServerException, ParserConfigurationException, SAXException, IOException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        InputStream skc = DuplicateUtilsTTest.class.getResourceAsStream("solrskc_910_2_orig_2.xml");
+        InputStream follower = DuplicateUtilsTTest.class.getResourceAsStream("solrskc-910_2_follower.xml");
+
+        alephImport(follower,29, true, true);
+        String string = IOUtils.toString(skc, "UTF-8").trim();
+        try {
+
+            String solrHosts = SolrTestServer.TEST_URL;
+            solrHosts = solrHosts + (solrHosts.endsWith("/") ? "" : "/") + DataCollections.catalog.name()+"/update";
+            SimplePOST.post(solrHosts,string);
+
+            SimplePOST.post(solrHosts,"<commit/>");
+            
+            try(SolrClient client = SolrTestServer.getClient()) {
+                SolrQuery query = new SolrQuery("*").setRows(1000);
+                SolrDocumentList docs = client.query(DataCollections.catalog.name(), query).getResults();
+                Assert.assertTrue(docs.getNumFound() == 30);
+
+                SolrQuery id = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-008768253\"").setRows(1);
+                docs = client.query(DataCollections.catalog.name(), id).getResults();
+                
+                MarcRecord fromDoc = MarcRecord.fromDocDep(docs.get(0));
+                Assert.assertNotNull(fromDoc);
+                Assert.assertTrue(fromDoc.identifier.equals("oai:aleph-nkp.cz:SKC01-008768253"));
+                
+                Pair<Case,List<String>> findSKCFollowers = DuplicateSKCUtils.findSKCFollowers(client, fromDoc);
+                Assert.assertTrue(findSKCFollowers.getValue().size() == 1);
+                Assert.assertTrue(findSKCFollowers.getValue().get(0).equals("oai:aleph-nkp.cz:SKC01-000890002"));
 
             }
         } catch (IOException e) {

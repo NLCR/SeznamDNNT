@@ -93,7 +93,15 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(zadost.getState().equals("processed"));
     }
 
-
+    
+    @Test
+    public void test() throws JsonMappingException, JsonProcessingException, IOException {
+        MarcRecord marcRecord = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000102092".replaceAll("\\:","_")).get(0));
+        marcRecord.setLicense("dnnto");
+        Assert.assertFalse(DuplicateSKCUtils.matchLicenseAndState(marcRecord, null, null));
+        Assert.assertTrue(DuplicateSKCUtils.matchLicenseAndState(marcRecord, "A", "dnnto"));
+        
+    }
     
     public static SolrDocumentList prepareResultList(String ident) throws IOException {
         SolrDocumentList documentList = new SolrDocumentList();
@@ -102,5 +110,6 @@ public class DuplicateUtilsTest {
         return documentList;
     }
 
+    
     
 }

@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -158,7 +161,6 @@ public class DuplicateUtils {
 
     public static List<Triple<String, String, String>> findByMarcField(SolrClient solrClient, MarcRecord origin, Pair<String,String> marcFieldPair) throws SolrServerException, IOException {
         List<Triple<String, String, String>> retList = new ArrayList<>();
-        
         List<DataField> marcField = origin.dataFields.get(marcFieldPair.getKey());
         if (marcField != null && !marcField.isEmpty()) {
             marcField.stream().forEach(mField -> {
@@ -176,7 +178,44 @@ public class DuplicateUtils {
                     idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
                     idQuery.addFilterQuery("NOT dntstav:D");
                     idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    idQuery.addFilterQuery("fmt:SE OR fmt:BK");
+
+                    try {
+                        LOGGER.info("Query: "+idQuery);
+                        SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+                        for (SolrDocument sDocument : results) {
+                            Triple<String, String, String> triple = triple(sDocument);
+                            retList.add(triple);
+                        }
+                    } catch (SolrServerException | IOException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                    }
+                }
+            });
+        }
+        return retList;
+    }
+
+    public static List<Triple<String, String, String>> findCanceledCCNB(SolrClient solrClient, MarcRecord origin) throws SolrServerException, IOException {
+        List<Triple<String, String, String>> retList = new ArrayList<>();
+        List<DataField> marcField = origin.dataFields.get("015");
+        if (marcField != null && !marcField.isEmpty()) {
+            marcField.stream().forEach(mField -> {
+                List<SubField> subfield = mField.subFields.get("a");
+                if (subfield != null) {
+                    // safra.. dat to jinam
+                    StringBuilder builder = new StringBuilder("(");
+                    for (int i = 0,ll=subfield.size(); i < ll; i++) {
+                        if (i> 0) { builder.append(" OR "); }
+                        builder.append('"').append(subfield.get(i).getValue()).append('"');
+                    }
+                    builder.append(")");
                     
+                    SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_015z", builder.toString())).setRows(100);
+                    idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
+                    idQuery.addFilterQuery("NOT dntstav:D");
+                    idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    idQuery.addFilterQuery("fmt:SE OR fmt:BK");
                     try {
                         LOGGER.info("Query: "+idQuery);
                         SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
@@ -208,11 +247,23 @@ public class DuplicateUtils {
     }
 
     //
-    public static List<Triple<String,String,String>> findByCartesianProduct(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
+    public static List<Triple<String,String,String>> findBy910ax(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
+        Set<String> identifiers = new HashSet<>();
         List<Triple<String,String,String>> retList = new ArrayList<>();
+
+        List<String> combinations = new ArrayList<>();
+        List<DataField> originDFields = origin.dataFields.get("910");
+        for (DataField oDField : originDFields) {
+            if (oDField.getSubFields().containsKey("a") && oDField.getSubFields().containsKey("x")) {
+                List<SubField> aList = oDField.getSubFields().get("a");
+                List<SubField> xList = oDField.getSubFields().get("x");
+                combinations.add(aList.get(0).getValue()+xList.get(0).getValue());
+            }
+        }
+        
         List<DataField> cartesianLeftFields = origin.dataFields.get(cartesianLeft.getKey());
         List<DataField> cartesianRightFields = origin.dataFields.get(cartesianRight.getKey());
-
+        
         if (cartesianLeftFields != null && !cartesianLeftFields.isEmpty() && cartesianRightFields != null && !cartesianRightFields.isEmpty()) {
             cartesianLeftFields.stream().forEach(cF-> {
                 List<SubField> cFSubfields =cF.subFields.get(cartesianLeft.getValue());
@@ -221,8 +272,7 @@ public class DuplicateUtils {
                         String code = cartesianRight.getValue();
                         
                         cartesianRightFields.stream().forEach(r-> {
-                           List<SubField> list = r.getSubFields().get(code);// != null ?  r.getSubFields().get(code) : new ArrayList<SubField>();
-                           
+                           List<SubField> list = r.getSubFields().get(code);
                            if (list != null) {
                                StringBuilder builder = new StringBuilder("marc_").append(cartesianLeft.getKey()+cartesianLeft.getValue()).append(":\"").append(left.getValue()).append("\"").append(" AND ");
                                
@@ -238,18 +288,39 @@ public class DuplicateUtils {
                                    SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
                                    idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
                                    idQuery.addFilterQuery("NOT dntstav:D");
-                                   idQuery.addFilterQuery("NOT kuratorstav:DX");
+                                   idQuery.addFilterQuery("NOT kuratorstav:DX").setRows(1000);
+                                   idQuery.addFilterQuery("fmt:SE OR fmt:BK");
                                    
                                    LOGGER.info("Query: "+idQuery);
+                                   
                                    SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+                                   //System.out.println(numFound);
+                                   
                                    for (SolrDocument sDocument : results) {
+                                       List<String> fCombinations = new ArrayList<>();
+                                       Collection<Object> aFields = sDocument.getFieldValues("marc_910a");
+                                       Collection<Object> xFields = sDocument.getFieldValues("marc_910x");
+                                       if (aFields != null && xFields != null) {
+                                           List<String> aFieldsStr = aFields.stream().map(Object::toString).collect(Collectors.toList());
+                                           List<String> xFieldsStr = xFields.stream().map(Object::toString).collect(Collectors.toList());
+                                           for (int i = 0; i < Math.min(aFieldsStr.size(),xFields.size()); i++) {
+                                               fCombinations.add(aFieldsStr.get(i)+xFieldsStr.get(i));
+                                           }
+                                       }
 
-                                       Collection<Object> aFields = sDocument.getFieldValues("910a");
-                                       Collection<Object> xFields = sDocument.getFieldValues("910x");
-                                       
-                                       Triple<String, String, String> triple = triple(sDocument);
-                                       retList.add(triple);
-                                   }
+                                       for(int i=0,ll=combinations.size();i<ll;i++) {
+                                           String combination = combinations.get(i);
+                                           if (fCombinations.contains(combination)) {
+                                               Triple<String, String, String> triple = triple(sDocument);
+                                               if (!identifiers.contains(triple.getLeft())) {
+                                                   retList.add(triple);
+                                                   identifiers.add(triple.getLeft());
+                                               }
+                                               break;
+                                           }
+                                       }
+                                    }
+                                   
                                } catch (SolrServerException | IOException e) {
                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
                                }

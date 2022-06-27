@@ -1,0 +1,76 @@
+<add><doc>
+    <field name="marc_020a">80-7066-062-7</field>
+    <field name="marc_040a">BOA001</field>
+    <field name="marc_040b">cze</field>
+    <field name="marc_100a">Lamserová-Dlabačová, Jana,</field>
+    <field name="author">Lamserová-Dlabačová, Jana,</field>
+    <field name="marc_100d">1938-</field>
+    <field name="marc_1004">aut</field>
+    <field name="marc_1007">xx0035870</field>
+    <field name="marc_245a">Didaktika výtvarné výchovy IV :</field>
+    <field name="title">Didaktika výtvarné výchovy IV :</field>
+    <field name="marc_245b">výtvarný projev dospívající mládeže /</field>
+    <field name="marc_245c">Jana Lamserová</field>
+    <field name="marc_250a">1. vyd.</field>
+    <field name="marc_260a">Praha :</field>
+    <field name="marc_260b">SPN,</field>
+    <field name="marc_260c">1990</field>
+    <field name="marc_710a">Univerzita Karlova.</field>
+    <field name="marc_710b">Pedagogická fakulta (Praha, Česko)</field>
+    <field name="marc_7107">kn20010710353</field>
+    <field name="marc_998a">http://aleph.nkp.cz/F/?func=direct&amp;doc_number=008768253&amp;local_base=SKC</field>
+    <field name="marc_911d">zdigitalizováno</field>
+    <field name="marc_911a">BOA001</field>
+    <field name="marc_911u">http://www.digitalniknihovna.cz/mzk/uuid/uuid:b1745180-9fc9-11e3-a744-005056827e52</field>
+    <field name="marc_910x">000084868</field>
+    <field name="marc_910a">BOA001</field>
+    <field name="marc_910b">PK-N-0028.617</field>
+    <field name="marc_910w">l</field>
+    <field name="dedup_fields">11fa32793b1cff6c1b5c2e7b935d2b48</field>
+    <field name="frbr">jana,lamserova-dlabacova|1938-/|didaktikavytvarnevychovyiv:</field>
+    <field name="ean">9788070660621</field>
+    <field name="identifier">oai:aleph-nkp.cz:SKC01-008768253</field>
+    <field name="datestamp">2022-06-10T11:21:49Z</field>
+    <field name="setSpec">SKC</field>
+    <field name="leader">     nam a22     2a 4500</field>
+    <field name="raw">{"identifier":"oai:aleph-nkp.cz:SKC01-008768253","datestamp":"2022-06-10T11:21:49Z","leader":"     nam a22     2a 4500","controlFields":{"008":"960707s1990    xr     f      ||| | cze d","001":"000084868","003":"CZ PrSKC","005":"20080229095402.0","007":"ta"},"granularity":[{"stav":["A"],"license":"dnntt","link":"http://www.digitalniknihovna.cz/mzk/uuid/uuid:b1745180-9fc9-11e3-a744-005056827e52","kuratorstav":["A"]}],"kuratorstav":["A"],"dntstav":["A"],"setSpec":"SKC","historie_granulovaneho_stavu":[],"historie_stavu":[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"A","date":"20210201","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210603","license":"dnntt","user":"batch"}],"dataFields":{"040":[{"ind2":" ","ind1":" ","index":1,"tag":"040","subFields":{"a":[{"code":"a","index":0,"value":"BOA001"}],"b":[{"code":"b","index":1,"value":"cze"}]}}],"260":[{"ind2":" ","ind1":" ","index":5,"tag":"260","subFields":{"a":[{"code":"a","index":0,"value":"Praha :"}],"b":[{"code":"b","index":1,"value":"SPN,"}],"c":[{"code":"c","index":2,"value":"1990"}]}}],"250":[{"ind2":" ","ind1":" ","index":4,"tag":"250","subFields":{"a":[{"code":"a","index":0,"value":"1. vyd."}]}}],"020":[{"ind2":" ","ind1":" ","index":0,"tag":"020","subFields":{"a":[{"code":"a","index":0,"value":"80-7066-062-7"}]}}],"550":[{"ind2":" ","ind1":" ","index":8,"tag":"550","subFields":{"a":[{"code":"a","index":0,"value":"Vydavatel: Univerzita Karlova v Praze, Pedagogická fakulta"}]}}],"100":[{"ind2":" ","ind1":"1","index":2,"tag":"100","subFields":{"a":[{"code":"a","index":0,"value":"Lamserová-Dlabačová, Jana,"}],"d":[{"code":"d","index":1,"value":"1938-"}],"4":[{"code":"4","index":3,"value":"aut"}],"7":[{"code":"7","index":2,"value":"xx0035870"}]}}],"245":[{"ind2":"0","ind1":"1","index":3,"tag":"245","subFields":{"a":[{"code":"a","index":0,"value":"Didaktika výtvarné výchovy IV :"}],"b":[{"code":"b","index":1,"value":"výtvarný projev dospívající mládeže /"}],"c":[{"code":"c","index":2,"value":"Jana Lamserová"}]}}],"300":[{"ind2":" ","ind1":" ","index":6,"tag":"300","subFields":{"a":[{"code":"a","index":0,"value":"85 s."}]}}],"710":[{"ind2":" ","ind1":"2","index":9,"tag":"710","subFields":{"a":[{"code":"a","index":0,"value":"Univerzita Karlova."}],"b":[{"code":"b","index":1,"value":"Pedagogická fakulta (Praha, Česko)"}],"7":[{"code":"7","index":2,"value":"kn20010710353"}]}}],"910":[{"ind2":" ","ind1":" ","index":11,"tag":"910","subFields":{"x":[{"code":"x","index":1,"value":"000084868"}],"a":[{"code":"a","index":0,"value":"BOA001"}],"b":[{"code":"b","index":2,"value":"PK-N-0028.617"},{"code":"b","index":3,"value":"4-0975.153"}],"w":[{"code":"w","index":4,"value":"l"}]}}],"998":[{"ind2":" ","ind1":" ","index":13,"tag":"998","subFields":{"a":[{"code":"a","index":0,"value":"http://aleph.nkp.cz/F/?func=direct&amp;doc_number=008768253&amp;local_base=SKC"}]}}],"504":[{"ind2":" ","ind1":" ","index":7,"tag":"504","subFields":{"a":[{"code":"a","index":0,"value":"Obsahuje bibliografii"}]}}],"900":[{"ind2":" ","ind1":" ","index":10,"tag":"900","subFields":{"a":[{"code":"a","index":0,"value":"BOA001"}],"b":[{"code":"b","index":1,"value":"11"}]}}],"911":[{"ind2":" ","ind1":" ","index":12,"tag":"911","subFields":{"d":[{"code":"d","index":1,"value":"zdigitalizováno"}],"a":[{"code":"a","index":0,"value":"BOA001"}],"u":[{"code":"u","index":2,"value":"http://www.digitalniknihovna.cz/mzk/uuid/uuid:b1745180-9fc9-11e3-a744-005056827e52"}]}}]}}</field>
+    <field name="historie_stavu">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"A","date":"20210201","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210603","license":"dnntt","user":"batch"}]</field>
+    <field name="historie_stavu_cut">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"A","date":"20210201","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210603","license":"dnntt","user":"batch"}]</field>
+    <field name="historie_kurator_stavu">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"A","date":"20210201","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210603","license":"dnntt","user":"batch"}]</field>
+    <field name="historie_kurator_stavu_cut">[{"stav":"PA","date":"20200731","license":"dnnto","user":"batch"},{"stav":"A","date":"20210201","license":"dnnto","user":"batch"},{"stav":"NZ","date":"20210603","license":"dnntt","user":"batch"}]</field>
+    <field name="historie_granulovaneho_stavu">[]</field>
+    <field name="license">dnntt</field>
+    <field name="datum_stavu">2021-06-02T22:00:00Z</field>
+    <field name="granularity">{"stav":["A"],"license":"dnntt","link":"http://www.digitalniknihovna.cz/mzk/uuid/uuid:b1745180-9fc9-11e3-a744-005056827e52","kuratorstav":["A"]}</field>
+    <field name="controlfield_008">960707s1990    xr     f      ||| | cze d</field>
+    <field name="controlfield_001">000084868</field>
+    <field name="controlfield_003">CZ PrSKC</field>
+    <field name="controlfield_005">20080229095402.0</field>
+    <field name="controlfield_007">ta</field>
+    <field name="record_status">n</field>
+    <field name="type_of_resource">a</field>
+    <field name="item_type">m</field>
+    <field name="fmt">BK</field>
+    <field name="dntstav">A</field>
+    <field name="kuratorstav">A</field>
+    <field name="nakladatel">SPN</field>
+    <field name="sigla">BOA001</field>
+    <field name="language">cze</field>
+    <field name="place_of_pub">xr </field>
+    <field name="type_of_date">s</field>
+    <field name="date1">1990</field>
+    <field name="date2">    </field>
+    <field name="date1_int">1990</field>
+    <field name="is_proposable">true</field>
+    <field name="title_sort">Didaktika výtvarné výchovy IV :</field>
+    <field name="nazev">Didaktika výtvarné výchovy IV : výtvarný projev dospívající mládeže / Jana Lamserová</field>
+    <field name="rokvydani">1990</field>
+    <field name="digital_libraries">BOA001</field>
+    <field name="indextime">2022-06-15T13:30:20.041Z</field>
+    <field name="id_ean">9788070660621</field>
+    <field name="id_sdnnt">1371d17ad920f528346f7b89af3b455f</field>
+    <field name="id_isbn">80-7066-062-7</field>
+    <field name="id_oaiident">SKC01-008768253
+    </field>
+   </doc>
+</add>
