@@ -9,11 +9,14 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
 
@@ -60,11 +63,19 @@ public class SKCUpdateSupportServiceImpl extends AbstractCheckDeleteService impl
         Map<Case, List<Pair<String, List<String>>>> retvals = new HashMap<>();
         try (final SolrClient solrClient = buildClient()) {
            for (int i = 0; i < this.deletedInfo.size(); i++) {
-               String id = this.deletedInfo.get(i);
-               if (!retvals.containsKey(Case.SKC_4b)) {
-                   retvals.put(Case.SKC_4b, new ArrayList<>());
+               if (!retvals.containsKey(Case.SKC_4a)) {
+                   retvals.put(Case.SKC_4a, new ArrayList<>());
                }
-               retvals.get(Case.SKC_4b).add(Pair.of(id, new ArrayList<>()));
+               String id = this.deletedInfo.get(i);
+               SolrQuery idQuery = new SolrQuery(String.format("identifier:\"%s\"", id));
+               idQuery = idQuery.addFilterQuery("(NOT dntstav:D OR NOT kuratorstav:DX)").setRows(100);
+               SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+               if (results.getNumFound() == 1) {
+                   retvals.get(Case.SKC_4a).add(Pair.of(id, new ArrayList<>()));
+               } else {
+                   getLogger().info(String.format("Title %s has already state D or DX", id));
+               }
+               
            }
         }
         getLogger().info(String.format("Check update %s", retvals.toString()));

@@ -121,7 +121,6 @@ public class MarcRecord {
   public static MarcRecord fromRAWJSON(String json) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
-
     return mr;
   }
   
@@ -514,6 +513,7 @@ public class MarcRecord {
             sdoc.addField(DIGITAL_LIBRARIES, f);
         });
     }
+    
     
     return sdoc;
   }

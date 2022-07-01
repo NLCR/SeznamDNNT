@@ -43,6 +43,8 @@ import cz.inovatika.sdnnt.utils.StringUtils;
  */
 public class DuplicateUtils {
     
+    public static final boolean DEBUG = System.getProperty("duplicate.test") != null;
+    
     
     private DuplicateUtils() {}
 
@@ -176,8 +178,12 @@ public class DuplicateUtils {
                     
                     SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_"+marcFieldPair.getKey()+marcFieldPair.getValue(), builder.toString())).setRows(100);
                     idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
-                    idQuery.addFilterQuery("NOT dntstav:D");
-                    idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    if (!DEBUG) {
+                        idQuery.addFilterQuery("NOT dntstav:D");
+                        idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    } else {
+                        idQuery.addFilterQuery("NOT setSpec:\"DNT-ALL\"");
+                    }
                     idQuery.addFilterQuery("fmt:SE OR fmt:BK");
 
                     try {
@@ -196,7 +202,48 @@ public class DuplicateUtils {
         return retList;
     }
 
-    public static List<Triple<String, String, String>> findCanceledCCNB(SolrClient solrClient, MarcRecord origin) throws SolrServerException, IOException {
+    public static List<Triple<String, String, String>> findCanceledActiveCCNB(SolrClient solrClient, MarcRecord origin) throws SolrServerException, IOException {
+        List<Triple<String, String, String>> retList = new ArrayList<>();
+        List<DataField> marcField = origin.dataFields.get("015");
+        if (marcField != null && !marcField.isEmpty()) {
+            marcField.stream().forEach(mField -> {
+                List<SubField> subfield = mField.subFields.get("z");
+                if (subfield != null) {
+                    // safra.. dat to jinam
+                    StringBuilder builder = new StringBuilder("(");
+                    for (int i = 0,ll=subfield.size(); i < ll; i++) {
+                        if (i> 0) { builder.append(" OR "); }
+                        builder.append('"').append(subfield.get(i).getValue()).append('"');
+                    }
+                    builder.append(")");
+                    
+                    SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_015a", builder.toString())).setRows(1000);
+                    idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
+                    if (!DEBUG) {
+                        idQuery.addFilterQuery("NOT dntstav:D");
+                        idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    } else {
+                        idQuery.addFilterQuery("NOT setSpec:\"DNT-ALL\"");
+                    }
+                    idQuery.addFilterQuery("fmt:SE OR fmt:BK");
+                    try {
+                        LOGGER.info("Query: "+idQuery);
+                        SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+                        for (SolrDocument sDocument : results) {
+                            Triple<String, String, String> triple = triple(sDocument);
+                            retList.add(triple);
+                        }
+                    } catch (SolrServerException | IOException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                    }
+                }
+            });
+        }
+        return retList;
+        
+    }
+    
+    public static List<Triple<String, String, String>> findActiveCanceledCCNB(SolrClient solrClient, MarcRecord origin) throws SolrServerException, IOException {
         List<Triple<String, String, String>> retList = new ArrayList<>();
         List<DataField> marcField = origin.dataFields.get("015");
         if (marcField != null && !marcField.isEmpty()) {
@@ -211,10 +258,15 @@ public class DuplicateUtils {
                     }
                     builder.append(")");
                     
-                    SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_015z", builder.toString())).setRows(100);
+                    SolrQuery idQuery = new SolrQuery(String.format("%s:%s", "marc_015z", builder.toString())).setRows(1000);
                     idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
-                    idQuery.addFilterQuery("NOT dntstav:D");
-                    idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    if (!DEBUG) {
+                        idQuery.addFilterQuery("NOT dntstav:D");
+                        idQuery.addFilterQuery("NOT kuratorstav:DX");
+                    } else {
+                        //setSpec:"DNT-ALL"
+                        idQuery.addFilterQuery("NOT setSpec:\"DNT-ALL\"");
+                    }
                     idQuery.addFilterQuery("fmt:SE OR fmt:BK");
                     try {
                         LOGGER.info("Query: "+idQuery);
@@ -237,7 +289,7 @@ public class DuplicateUtils {
         String license = null;
         String dntstav = null;
         if (sDocument.containsKey(MarcRecordFields.LICENSE_FIELD)) {
-            license = sDocument.getFieldValue(MarcRecordFields.LICENSE_FIELD).toString();
+            license = sDocument.getFirstValue(MarcRecordFields.LICENSE_FIELD).toString();
         }
         if (sDocument.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
             dntstav = sDocument.getFirstValue(MarcRecordFields.DNTSTAV_FIELD).toString();
@@ -250,7 +302,8 @@ public class DuplicateUtils {
     public static List<Triple<String,String,String>> findBy910ax(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
         Set<String> identifiers = new HashSet<>();
         List<Triple<String,String,String>> retList = new ArrayList<>();
-
+        
+        // to je dobre 
         List<String> combinations = new ArrayList<>();
         List<DataField> originDFields = origin.dataFields.get("910");
         for (DataField oDField : originDFields) {
@@ -287,30 +340,42 @@ public class DuplicateUtils {
                                    
                                    SolrQuery idQuery = new SolrQuery(builder.toString()).setRows(100);
                                    idQuery.addFilterQuery("NOT identifier:\""+origin.identifier+"\"");
-                                   idQuery.addFilterQuery("NOT dntstav:D");
-                                   idQuery.addFilterQuery("NOT kuratorstav:DX").setRows(1000);
-                                   idQuery.addFilterQuery("fmt:SE OR fmt:BK");
-                                   
+                                   if (!DEBUG) {
+                                       idQuery.addFilterQuery("NOT dntstav:D");
+                                       idQuery.addFilterQuery("NOT kuratorstav:DX");
+                                   } else {
+                                       idQuery.addFilterQuery("NOT setSpec:\"DNT-ALL\"");
+                                   }
+                                   idQuery.addFilterQuery("fmt:SE OR fmt:BK").setRows(1000);;
                                    LOGGER.info("Query: "+idQuery);
-                                   
                                    SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
-                                   //System.out.println(numFound);
                                    
                                    for (SolrDocument sDocument : results) {
                                        List<String> fCombinations = new ArrayList<>();
-                                       Collection<Object> aFields = sDocument.getFieldValues("marc_910a");
-                                       Collection<Object> xFields = sDocument.getFieldValues("marc_910x");
-                                       if (aFields != null && xFields != null) {
-                                           List<String> aFieldsStr = aFields.stream().map(Object::toString).collect(Collectors.toList());
-                                           List<String> xFieldsStr = xFields.stream().map(Object::toString).collect(Collectors.toList());
-                                           for (int i = 0; i < Math.min(aFieldsStr.size(),xFields.size()); i++) {
-                                               fCombinations.add(aFieldsStr.get(i)+xFieldsStr.get(i));
+                                           
+                                       String fValue = sDocument.getFieldValue("raw").toString();
+                                       JSONObject rawJSON = new JSONObject(fValue);
+                                       
+                                       JSONObject dataFields = rawJSON.getJSONObject("dataFields");
+                                       if (dataFields.has("910")) {
+                                           JSONArray array910 = dataFields.getJSONArray("910");
+                                           for (int i = 0; i < array910.length(); i++) {
+                                               JSONObject item910 = array910.getJSONObject(i);
+                                               if (item910.has("subFields")) {
+                                                   JSONObject subFields = item910.getJSONObject("subFields");
+                                                   if (subFields.has("a") && subFields.has("x")) {
+                                                       String aVal = subFields.getJSONArray("a").getJSONObject(0).getString("value");
+                                                       String xVal = subFields.getJSONArray("x").getJSONObject(0).getString("value");
+                                                       fCombinations.add(aVal+xVal);
+                                                   }
+                                               }
                                            }
                                        }
-
+                                       
                                        for(int i=0,ll=combinations.size();i<ll;i++) {
                                            String combination = combinations.get(i);
                                            if (fCombinations.contains(combination)) {
+                                               LOGGER.info("Matched compination "+combination);
                                                Triple<String, String, String> triple = triple(sDocument);
                                                if (!identifiers.contains(triple.getLeft())) {
                                                    retList.add(triple);

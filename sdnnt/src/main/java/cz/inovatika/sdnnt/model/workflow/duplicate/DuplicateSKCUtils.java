@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,17 +41,36 @@ public class DuplicateSKCUtils {
         List<Triple<String,String,String>> retvals = DuplicateUtils.findByMarcField(solrClient, origin, Pair.of("015", "a"));
         retvals.stream().forEach(m-> { identifiers.add(m.getLeft()); });
         if (retvals.isEmpty()) {
-            // find by 015 z - canceled ccnb
-            List<Triple<String,String,String>> zccnnb = DuplicateUtils.findCanceledCCNB(solrClient, origin);
-            zccnnb.forEach(zccnb-> {
+ 
+            // aktivni - zrusene 
+            List<Triple<String,String,String>> azccnnb = DuplicateUtils.findActiveCanceledCCNB(solrClient, origin);
+            azccnnb.forEach(zccnb-> {
                 if (!identifiers.contains(zccnb.getLeft())) {
                     retvals.add(zccnb); identifiers.add(zccnb.getLeft());
                 }
             });
+            // aktivni - zrusene 
+            List<Triple<String,String,String>> zaccnnb = DuplicateUtils.findCanceledActiveCCNB(solrClient, origin);
+            zaccnnb.forEach(azccnb-> {
+                if (!identifiers.contains(azccnb.getLeft())) {
+                    retvals.add(azccnb); identifiers.add(azccnb.getLeft());
+                }
+            });
+            
+            
+            // zrusene - zrusene
+            List<Triple<String,String,String>> zzccnb = DuplicateUtils.findByMarcField(solrClient, origin, Pair.of("015", "z"));
+            zzccnb.forEach(zcb-> {
+                if (!identifiers.contains(zcb.getLeft())) {
+                    retvals.add(zcb); identifiers.add(zcb.getLeft());
+                }
+            });
+            
         }
-        // if there is no ccnb live or canceled ccnb
-        if (retvals.isEmpty()) {
-
+        
+        
+        //TODO: kontrola, zda neexistuje ccnnb
+        if (retvals.isEmpty() && !origin.dataFields.containsKey("015")) {
             // nesmi byt SKC_1
             List<Triple<String,String,String>> cartesian = DuplicateUtils.findBy910ax(solrClient, origin, Pair.of("910","a"), Pair.of("910","x"));
             cartesian.forEach(c-> {
@@ -59,7 +79,6 @@ public class DuplicateSKCUtils {
                     identifiers.add(c.getLeft());
                 }
             });
-            
         }
         if (!retvals.isEmpty()) {
             if (retvals.size() == 1) {
@@ -79,7 +98,11 @@ public class DuplicateSKCUtils {
                 List<String> moreidents = retvals.stream().map(Triple::getLeft).collect(Collectors.toList());
                 return Pair.of(Case.SKC_3, moreidents);
             } else  {
-                return Pair.of(Case.SKC_4b, new ArrayList<>());
+                if (checkIfRecordIsValid(origin)) {
+                    return Pair.of(Case.SKC_4b, new ArrayList<>());
+                } else {
+                    return Pair.of(Case.SKC_4a, new ArrayList<>());
+                }
             }
 
         // rozhodnuto na zaklade parovani
@@ -88,10 +111,14 @@ public class DuplicateSKCUtils {
             String dntstav = cartesianRetVals.get(0).getMiddle();
             String license = cartesianRetVals.get(0).getRight();
             if (cartesianRetVals.size() == 1) {
-                if (matchLicenseAndState(origin, dntstav, license)) {
-                    return Pair.of(Case.SKC_2a, Arrays.asList(cartesianRetVals.get(0).getLeft()));
+                if (dntstav == null && license == null) {
+                    return Pair.of(Case.SKC_1, Arrays.asList(cartesianRetVals.get(0).getLeft()));
                 } else {
-                    return Pair.of(Case.SKC_2b, Arrays.asList(cartesianRetVals.get(0).getLeft()));
+                    if (matchLicenseAndState(origin, dntstav, license)) {
+                        return Pair.of(Case.SKC_2a, Arrays.asList(cartesianRetVals.get(0).getLeft()));
+                    } else {
+                        return Pair.of(Case.SKC_2b, Arrays.asList(cartesianRetVals.get(0).getLeft()));
+                    }
                 }
             } else if (cartesianRetVals.size() > 1){
                 List<String> moreidents = cartesianRetVals.stream().map(Triple::getLeft).collect(Collectors.toList());
@@ -100,13 +127,28 @@ public class DuplicateSKCUtils {
                 return Pair.of(Case.SKC_4b, new ArrayList<>());
             }
         } else {
-            return Pair.of(Case.SKC_4b, new ArrayList<>());
+            if (checkIfRecordIsValid(origin)) {
+                return Pair.of(Case.SKC_4b, new ArrayList<>());
+            } else {
+                return Pair.of(Case.SKC_4a, new ArrayList<>());
+            }
         }
         
     }
 
+    public static final Logger LOGGER = Logger.getLogger(DuplicateSKCUtils.class.getName());
+    
+    private static boolean checkIfRecordIsValid(MarcRecord origin) {
+      if (origin.fmt != null && Arrays.asList("BK", "SE").contains(origin.fmt.trim().toUpperCase())) {
+          Object fieldValue = origin.toSolrDoc().getFieldValue("place_of_pub");
+          if (fieldValue != null && fieldValue.toString().trim().toLowerCase().equals("xr")) {
+              LOGGER.log(Level.INFO, String.format("Valid record %s. Format %s, place_of_pub %s", origin.identifier, origin.fmt, fieldValue.toString()));
+              return true;
+          }
+      }
+      return false;
+    }
 
- 
     static boolean matchLicenseAndState(MarcRecord origin, String dntstav, String license) {
         String originStav = origin.dntstav != null && origin.dntstav.size() > 0 ? origin.dntstav.get(0) : null;
         boolean matchState = StringUtils.match(originStav , dntstav);

@@ -7,9 +7,11 @@ import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.services.impl.SKCDeleteServiceImpl;
 import cz.inovatika.sdnnt.services.impl.SKCUpdateSupportServiceImpl;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -228,13 +230,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
             recs.clear();
           }
 
-          /*
-          if (!toDelete.isEmpty()) {
-              deleteRecords(new ArrayList(toDelete), buildSKCDeleteService(conf));
-              deleted += toDelete.size();
-              toDelete.clear();
-          }*/
-          
+         
           solrTime += new Date().getTime() - start;
           if (dStream != null ) {
             IOUtils.closeQuietly(dStream);
@@ -287,8 +283,13 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           recs.clear();
         }
 
+        // ??
+        LOGGER.info("Commit collection");
+        solr.commit(collection);
+        SolrJUtilities.quietCommit(Indexer.getClient(), DataCollections.catalog.name());
+        
         if (!toDelete.isEmpty()) {
-          deleteRecords(new ArrayList<>(toDelete), buildSKCDeleteService(conf));
+          deleteRecords(Indexer.getClient(),  new ArrayList<>(toDelete), buildSKCDeleteService(conf));
           deleted += toDelete.size();
           toDelete.clear();
         }
@@ -299,9 +300,6 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         ret.put("error", exc);
       }
       
-      // ??
-      LOGGER.info("Commit collection");
-      solr.commit(collection);
       solr.close();
       
       // update support service
@@ -312,13 +310,14 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
       LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
       ret.put("error", ex);
     } finally {
-
         HTTPClientsUtils.quiteClose(client);
     } 
   }
 
-    protected void deleteRecords(List<String> delete, SKCDeleteService skcDeleteService) throws IOException, SolrServerException {
+    protected void deleteRecords(SolrClient client, List<String> delete, SKCDeleteService skcDeleteService) throws IOException, SolrServerException {
       if (!delete.isEmpty()) {
+          // commiting
+          SolrJUtilities.quietCommit(client, DataCollections.catalog.name());
           LOGGER.info(String.format("Starting process for deleting records ", delete.toString()));
           skcDeleteService.updateDeleteInfo(delete);
           skcDeleteService.update();

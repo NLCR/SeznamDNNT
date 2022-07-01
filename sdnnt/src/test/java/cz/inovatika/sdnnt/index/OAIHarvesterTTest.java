@@ -73,10 +73,10 @@ public class OAIHarvesterTTest {
             return;
         }
         try {
-            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(prepare.getClient(),skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
 
-            alephImport(skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);
+            alephImport(prepare.getClient(),skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);
 
             try(SolrClient client = SolrTestServer.getClient()) {
                 
@@ -115,12 +115,12 @@ public class OAIHarvesterTTest {
             return;
         }
         try {
-            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
 
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579047", "N", null,"poznamka", new JSONArray(), "test");
 
-            alephImport(skcAlephStream("skc/update/oai_skc1_changed_format.xml"),31, true, true);
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1_changed_format.xml"),31, true, true);
             
             
             try(SolrClient client = SolrTestServer.getClient()) {
@@ -158,7 +158,7 @@ public class OAIHarvesterTTest {
             return;
         }
         try {
-            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             try(SolrClient client = SolrTestServer.getClient()) {
                 MarcRecord mr = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:SKC01-001579065");
                 if (mr != null) {
@@ -172,7 +172,7 @@ public class OAIHarvesterTTest {
                 client.add("catalog", solrDoc);
 
                 SolrJUtilities.quietCommit(client, "catalog");
-                alephImport(skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);                
+                alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);                
 
                 SolrJUtilities.quietCommit(client, "catalog");
 

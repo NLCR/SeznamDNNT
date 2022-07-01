@@ -252,7 +252,7 @@ public class DuplicateUtilsTTest {
         InputStream skc = DuplicateUtilsTTest.class.getResourceAsStream("solrskc_910_2_orig_2.xml");
         InputStream follower = DuplicateUtilsTTest.class.getResourceAsStream("solrskc-910_2_follower.xml");
 
-        alephImport(follower,29, true, true);
+        alephImport(prepare.getClient(), follower,29, true, true);
         String string = IOUtils.toString(skc, "UTF-8").trim();
         try {
 

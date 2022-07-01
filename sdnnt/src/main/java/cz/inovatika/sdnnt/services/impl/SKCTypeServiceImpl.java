@@ -26,7 +26,7 @@ import org.xml.sax.SAXException;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.OAICheckSKC;
+import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
@@ -48,42 +48,82 @@ public class SKCTypeServiceImpl extends AbstractCheckDeleteService implements SK
     protected Map<Case, List<Pair<String, List<String>>>> checkUpdate() throws IOException, SolrServerException {
         Map<Case, List<Pair<String, List<String>>>> retvals = new HashMap<>();
         try {
-            OAICheckSKC check = buildCheckOAISKC();
-            Pair<Set<String>,List<String>> ids = check.iterate();
-
-            retvals.put(Case.SKC_4a, new ArrayList<>());
-            // deleted ids
-            ids.getValue().stream().forEach(deleted-> {
-                retvals.get(Case.SKC_4a).add(Pair.of(deleted, new ArrayList<>()));
-            });
-
-            Set<String> active = ids.getLeft();
             CatalogIterationSupport support = new CatalogIterationSupport();
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "10000");
-
             try (final SolrClient solrClient = buildClient()) {
-                List<String> plusFilter = Arrays.asList(DNTSTAV_FIELD + ":*");
-                List<String> minusFilter = Arrays.asList(KURATORSTAV_FIELD + ":D", KURATORSTAV_FIELD + ":DX");
-                support.iterate(solrClient, reqMap, null, plusFilter, minusFilter, Arrays.asList(MarcRecordFields.IDENTIFIER_FIELD), (rsp) -> {
-                    Object identifier = rsp.getFieldValue("identifier");
-                    if (!active.contains(identifier.toString())) {
-                        retvals.get(Case.SKC_4a).add(Pair.of(identifier.toString(), new ArrayList<>()));
-                    }
-                }, IDENTIFIER_FIELD);
+                placeOfPub(retvals, support, reqMap, solrClient);
+                format(retvals, support, reqMap, solrClient);
             } catch(IOException e) {
-                getLogger().log(Level.SEVERE, e.getMessage(), e);
+                getLogger().log(Level.SEVERE,e.getMessage(),e);
             }
-            return retvals;
-
-        } catch (IOException | MaximumIterationExceedException | XMLStreamException | ParserConfigurationException | SAXException  e) {
-            throw new IOException(e);
+        } catch (Exception  e) {
+            getLogger().log(Level.SEVERE,e.getMessage(),e);
         }
+        return retvals;
+    }
+    
+    
+    private void format(Map<Case, List<Pair<String, List<String>>>> retvals, CatalogIterationSupport support,
+            Map<String, String> reqMap, final SolrClient solrClient) {
+    
+        List<String> plusFilter = Arrays.asList(
+                DNTSTAV_FIELD + ":*",
+                "NOT fmt:BK AND NOT fmt:SE"
+        );
+        
+        List<String> minusFilter = Arrays.asList(
+                KURATORSTAV_FIELD + ":D", 
+                KURATORSTAV_FIELD + ":DX"
+        );
+        
+        support.iterate(solrClient, reqMap, null, plusFilter, minusFilter, 
+                Arrays.asList(
+                        MarcRecordFields.IDENTIFIER_FIELD,
+                        MarcRecordFields.FMT_FIELD, 
+                        "place_of_pub",
+                        KURATORSTAV_FIELD
+                        ), (rsp) -> {
+
+            Object identifier = rsp.getFieldValue("identifier");
+            if (!retvals.containsKey(Case.SKC_4a)) {
+                retvals.put(Case.SKC_4a, new ArrayList<>());
+            }
+            retvals.get(Case.SKC_4a).add(Pair.of(identifier.toString(), new ArrayList<>()));
+        }, IDENTIFIER_FIELD);
     }
 
-    protected OAICheckSKC buildCheckOAISKC() {
-        return new OAICheckSKC();
+    private void placeOfPub(Map<Case, List<Pair<String, List<String>>>> retvals, CatalogIterationSupport support,
+        Map<String, String> reqMap, final SolrClient solrClient) {
+        List<String> plusFilter = Arrays.asList(
+                DNTSTAV_FIELD + ":*"
+        );
+        
+        List<String> minusFilter = Arrays.asList(
+                KURATORSTAV_FIELD + ":D", 
+                KURATORSTAV_FIELD + ":DX",
+                "place_of_pub:\"xr \""
+        );
+        support.iterate(solrClient, reqMap, null, plusFilter, minusFilter, 
+                Arrays.asList(
+                        MarcRecordFields.IDENTIFIER_FIELD,
+                        MarcRecordFields.FMT_FIELD, 
+                        "place_of_pub",
+                        KURATORSTAV_FIELD
+                        ), (rsp) -> {
+
+            Object identifier = rsp.getFieldValue("identifier");
+            if (!retvals.containsKey(Case.SKC_4a)) {
+                retvals.put(Case.SKC_4a, new ArrayList<>());
+            }
+            retvals.get(Case.SKC_4a).add(Pair.of(identifier.toString(), new ArrayList<>()));
+        }, IDENTIFIER_FIELD);
     }
+
+
+//    protected OAICheckSKC buildCheckOAISKC() {
+//        return new OAICheckSKC();
+//    }
 
     @Override
     public Logger getLogger() {

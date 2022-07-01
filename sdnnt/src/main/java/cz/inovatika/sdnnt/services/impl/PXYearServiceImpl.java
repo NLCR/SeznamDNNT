@@ -15,6 +15,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
@@ -76,22 +77,44 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         logger.info("Current iteration filter " + plusFilter);
  
         try (SolrClient solrClient = buildClient()){
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), 
+                    
+                    Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
                     MARC_956_U,
-                    GRANULARITY_FIELD
+                    GRANULARITY_FIELD,
+                    "date1",
+                    "date2",
+                    YEAR_OF_PUBLICATION_1, 
+                    YEAR_OF_PUBLICATION_2
             ), (rsp) -> {
-
                 Object identifier = rsp.getFieldValue("identifier");
-                foundCandidates.add(identifier.toString());
+                if (checkYP1(rsp)) {
+                    getLogger().info(String.format("Ommitting identifier %s ", identifier));
+                } else {
+                    foundCandidates.add(identifier.toString());
+                }
             }, IDENTIFIER_FIELD);
         } catch (Exception e) {
             this.logger.log(Level.SEVERE,e.getMessage(),e);
         }
         
         return foundCandidates;
+    }
+
+    //issue 174
+    public static boolean checkYP1(SolrDocument rsp) {
+      if (rsp.containsKey(YEAR_OF_PUBLICATION_1)) {
+      Integer firstValue = (Integer) rsp.getFirstValue(YEAR_OF_PUBLICATION_1);
+      if (firstValue != null && firstValue <= 1910) {
+          if (rsp.containsKey("date2") && rsp.getFirstValue("date2").toString().endsWith("uu")) {
+                  return true;
+              }
+          }
+      }
+      return false;
     }
 
     @Override

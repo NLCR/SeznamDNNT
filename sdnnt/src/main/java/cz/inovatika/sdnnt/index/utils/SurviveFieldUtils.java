@@ -27,6 +27,8 @@ public class SurviveFieldUtils {
         MarcRecordUtils.derivedIdentifiers(doc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD).toString(), cDoc);
     }
 
+    
+    
     private static void ensureAndSetField(SolrDocument doc, SolrInputDocument cDoc, String field) {
         if (doc.containsKey(field)) {
             cDoc.setField(field, doc.getFieldValue(field));

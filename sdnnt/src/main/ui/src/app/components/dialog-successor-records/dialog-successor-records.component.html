@@ -37,7 +37,37 @@
               <div><label class="app-label app-mr-1">Ve fondu:</label>{{fondy(item.doc)}} </div>
               <div *ngIf="item.digital_libraries"><label class="app-label app-mr-1">Digitalizováno:</label>{{digitallibraries(item.doc)}} </div>
 
+              <br/>
+              <strong>SDNNT</strong>
+              <br/>
+              <div [class]="'app-badge ' + item.doc.dntstav[item.doc.dntstav.length-1]" *ngIf="item.doc.dntstav" [matTooltip]="'state.tooltip.' + item.doc.dntstav[item.doc.dntstav.length-1] | translate">
+                {{ item.doc.dntstav[item.doc.dntstav.length-1] }}   
+              </div>
+
+              <div *ngIf="item.doc.license" [class]="'app-badge app-icon-in ' + item.doc.license" class="app-ml-1" [matTooltip]="item.doc.license === 'dnnto' ? ('license.' + item.doc.license | translate) : ('license.' + item.doc.license | translate)">
+                <mat-icon class="material-icons-outlined">{{ item.doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                {{ 'license.' + item.doc.license + '-badge' | translate }}
+              </div>
+        
+              <br/>
+
+              <strong>MARC</strong>
+              <div><label class="app-label app-mr-1">LDR:</label>{{ item.marcview.leader}} </div>
+              <div *ngFor="let ctrl of item.marcview.controlFields | keyvalue">
+                <label class="app-label app-mr-1">{{ ctrl.key }}:</label>   <code>{{ctrl.value}}</code>                
+              </div>
+
+              <div *ngFor="let df of item.marcview.dataFields">
+                <label class="app-label app-mr-1">{{ df.key }}:</label>   <code>{{df.value}}</code>                
+
+                <!--
+                <label class="app-label app-mr-1">{{ ctrl.key }}:</label>   <code>{{ctrl.value}}</code>                
+                -->
+              </div>
+ 
             </div>
+
+
             <!--
             <div class="app-detail app-mt-1" *ngIf="item.expanded" style="width:600px">
               <ngx-json-viewer [json]="item.marcview"  [expanded]="false"></ngx-json-viewer>

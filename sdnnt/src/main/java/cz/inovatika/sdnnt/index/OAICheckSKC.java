@@ -65,7 +65,7 @@ public class OAICheckSKC {
         try(CloseableHttpClient client = buildOAIClient()) {
             String resumptionToken = firstCheck(client);
             while(resumptionToken != null) {
-                String url = "http://aleph.nkp.cz/OAI?verb=ListIdentifiers&resumptionToken=" + resumptionToken;
+                String url = "https://aleph.nkp.cz/OAI?verb=ListIdentifiers&resumptionToken=" + resumptionToken;
                 File dFile = HarvestUtils.throttle(client, "skc_dnt", url);
                 InputStream dStream = new FileInputStream(dFile);
                 OAIXMLHeadersReader xmlReader = new OAIXMLHeadersReader(dStream);

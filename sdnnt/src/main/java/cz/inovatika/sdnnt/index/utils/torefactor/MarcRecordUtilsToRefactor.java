@@ -34,15 +34,7 @@ public class MarcRecordUtilsToRefactor {
 
     
     public static void fillSolrDocWST(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {
-        for (String tag : tagsToIndex) {
-          if (dataFields.containsKey(tag)) {
-            for (DataField df : dataFields.get(tag)) {
-              for (String code : df.getSubFields().keySet()) {
-                sdoc.addField("marc_" + tag + code, df.getSubFields().get(code).get(0).getValue());
-              }
-            }
-          }
-        }
+        marcFields(sdoc, dataFields, tagsToIndex);
         addDedup(sdoc, dataFields);
         addFRBR(sdoc, dataFields);
         addEAN(sdoc, dataFields);
@@ -50,19 +42,31 @@ public class MarcRecordUtilsToRefactor {
     
     
     public static void fillSolrDoc(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields , List<String> tagsToIndex  ) {
-      for (String tag : tagsToIndex) {
-        if (dataFields.containsKey(tag)) {
-          for (DataField df : dataFields.get(tag)) {
-            for (String code : df.getSubFields().keySet()) {
-              sdoc.addField("marc_" + tag + code, df.getSubFields().get(code).get(0).getValue());
-            }
-          }
-        }
-      }
+      marcFields(sdoc, dataFields, tagsToIndex);
       addStavFromMarc(sdoc, dataFields);
       addDedup(sdoc, dataFields);
       addFRBR(sdoc, dataFields);
       addEAN(sdoc, dataFields);
+    }
+
+
+    public static void marcFields(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields,
+            List<String> tagsToIndex) {
+        for (String tag : tagsToIndex) {
+            if (dataFields.containsKey(tag)) {
+              for (DataField df : dataFields.get(tag)) {
+                  if (df.getSubFields() != null) {
+                      for (String code : df.getSubFields().keySet()) {
+                          if (df.getSubFields().get(code) != null && 
+                                  df.getSubFields().get(code).get(0) != null && 
+                                  df.getSubFields().get(code).get(0).getValue() != null) {
+                              sdoc.addField("marc_" + tag + code, df.getSubFields().get(code).get(0).getValue());
+                          }
+                      }
+                  }
+              }
+            }
+          }
     }
 
     public static void addStavFromMarc(SolrInputDocument sdoc, Map<String, List<DataField>> dataFields) {

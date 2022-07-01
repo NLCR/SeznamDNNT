@@ -98,8 +98,7 @@ public class Indexer {
             client.add("catalog", rec);
           } else {
               LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
-              
-            // zadost 
+            String rawJSON =   (String) rec.getFieldValue("raw");
             SolrInputDocument hDoc = new SolrInputDocument();
             SolrInputDocument cDoc = mergeWithHistory(
                     (String) rec.getFieldValue("raw"),
@@ -109,7 +108,11 @@ public class Indexer {
                 SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
                 client.add("catalog", cDoc);
                 client.add("history", hDoc);
+
+                MarcRecord origJSON = MarcRecord.fromRAWJSON(rawJSON);
+                MarcRecordUtilsToRefactor.marcFields(cDoc, origJSON.dataFields, MarcRecord.tagsToIndex);
             }
+
             
             if (updatesupportService != null && cDoc != null) {
                 Object identifier = cDoc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);

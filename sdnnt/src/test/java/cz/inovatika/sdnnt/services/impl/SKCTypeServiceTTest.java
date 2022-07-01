@@ -2,11 +2,18 @@ package cz.inovatika.sdnnt.services.impl;
 
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,16 +36,18 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.Indexer;
-import cz.inovatika.sdnnt.index.OAICheckSKC;
 import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImplITTest.BuildSolrClientSupport;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class SKCTypeServiceTTest {
     
@@ -73,7 +82,7 @@ public class SKCTypeServiceTTest {
             return;
         }
         try {
-            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
             
@@ -85,10 +94,10 @@ public class SKCTypeServiceTTest {
                     .addMockedMethod("buildCheckOAISKC")
                     .createMock();
             
-            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
-            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579067")), new ArrayList<>()));
+//            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
+//            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579067")), new ArrayList<>()));
 
-            EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
+            //EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
             
             Options options = EasyMock.createMock(Options.class);
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
@@ -105,7 +114,7 @@ public class SKCTypeServiceTTest {
                     .addMockedMethod("buildClient").createMock();
             
 
-            EasyMock.replay(skcDeleteService,appSupport,bservice,aService,oaiCheck);
+            EasyMock.replay(skcDeleteService,appSupport,bservice,aService /*,oaiCheck*/);
             skcDeleteService.update();
             
             try(SolrClient client = SolrTestServer.getClient()) {
@@ -127,7 +136,7 @@ public class SKCTypeServiceTTest {
             return;
         }
         try {
-            alephImport(skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
             
@@ -139,11 +148,11 @@ public class SKCTypeServiceTTest {
                     .addMockedMethod("buildCheckOAISKC")
                     .createMock();
             
-            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
-            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579069")), new ArrayList<>()));
+//            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
+//            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579069")), new ArrayList<>()));
 
             
-            EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
+//            EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
             
             Options options = EasyMock.createMock(Options.class);
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
@@ -167,7 +176,7 @@ public class SKCTypeServiceTTest {
 
             EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
 
-            EasyMock.replay(skcDeleteService,appSupport,bservice,aService,oaiCheck);
+            EasyMock.replay(skcDeleteService,appSupport,bservice,aService);
             skcDeleteService.update();
             
             try(SolrClient client = SolrTestServer.getClient()) {
@@ -180,6 +189,8 @@ public class SKCTypeServiceTTest {
             Assert.fail(e.getMessage());
         }
     }
+    
+    
 
     protected User testUser() {
         User user = new User();

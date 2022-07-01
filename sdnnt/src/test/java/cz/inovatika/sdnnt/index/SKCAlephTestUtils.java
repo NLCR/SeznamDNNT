@@ -8,6 +8,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.Assert;
 
@@ -23,11 +24,11 @@ public class SKCAlephTestUtils {
         return OAIHarvesterTTest.class.getResourceAsStream(name);
     }
 
-    public static void alephImport(InputStream resourceAsStream, int expectedSize, boolean merge, boolean update) throws FactoryConfigurationError,
+    public static void alephImport(SolrClient client,  InputStream resourceAsStream, int expectedSize, boolean merge, boolean update) throws FactoryConfigurationError,
         XMLStreamException, IOException, JsonProcessingException, SolrServerException {
-        alephImport(resourceAsStream, expectedSize, merge, update, null);
+        alephImport(client, resourceAsStream, expectedSize, merge, update, null);
     }
-    public static void alephImport(InputStream resourceAsStream, int expectedSize, boolean merge, boolean update, SKCDeleteService service ) throws FactoryConfigurationError,
+    public static void alephImport(SolrClient client, InputStream resourceAsStream, int expectedSize, boolean merge, boolean update, SKCDeleteService service ) throws FactoryConfigurationError,
             XMLStreamException, IOException, JsonProcessingException, SolrServerException {
         XMLStreamReader reader = null;
         try {
@@ -42,7 +43,7 @@ public class SKCAlephTestUtils {
             Indexer.add( "catalog", importer.recs, merge, update, "harvester",SolrTestServer.getClient());
             
             if (service != null) {
-                importer.deleteRecords(importer.toDelete,service);
+                importer.deleteRecords(client, importer.toDelete,service);
             }
             
             SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");

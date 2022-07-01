@@ -214,6 +214,7 @@ public class Job implements InterruptableJob {
                 PXYearService service = new PXYearServiceImpl(loggerPostfix, iteration, results);
                 try {
                     List<String> check = service.check();
+                    
                     service.getLogger().info("Number of found candidates "+check.size());
                     if (!check.isEmpty()) {
                         int maximum = 100;
