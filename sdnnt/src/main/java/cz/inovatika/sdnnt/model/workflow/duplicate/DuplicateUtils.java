@@ -303,14 +303,15 @@ public class DuplicateUtils {
         Set<String> identifiers = new HashSet<>();
         List<Triple<String,String,String>> retList = new ArrayList<>();
         
-        // to je dobre 
         List<String> combinations = new ArrayList<>();
         List<DataField> originDFields = origin.dataFields.get("910");
         for (DataField oDField : originDFields) {
             if (oDField.getSubFields().containsKey("a") && oDField.getSubFields().containsKey("x")) {
                 List<SubField> aList = oDField.getSubFields().get("a");
                 List<SubField> xList = oDField.getSubFields().get("x");
-                combinations.add(aList.get(0).getValue()+xList.get(0).getValue());
+                for (SubField xSubField : xList) {
+                    combinations.add(aList.get(0).getValue()+xSubField.getValue());
+                }
             }
         }
         
@@ -365,8 +366,11 @@ public class DuplicateUtils {
                                                    JSONObject subFields = item910.getJSONObject("subFields");
                                                    if (subFields.has("a") && subFields.has("x")) {
                                                        String aVal = subFields.getJSONArray("a").getJSONObject(0).getString("value");
-                                                       String xVal = subFields.getJSONArray("x").getJSONObject(0).getString("value");
-                                                       fCombinations.add(aVal+xVal);
+                                                       JSONArray xJSONArray = subFields.getJSONArray("x");
+                                                       for (int j = 0; j < xJSONArray.length(); j++) {
+                                                           JSONObject xObject = xJSONArray.getJSONObject(j);
+                                                           fCombinations.add(aVal+xObject.getString("value"));
+                                                       }
                                                    }
                                                }
                                            }

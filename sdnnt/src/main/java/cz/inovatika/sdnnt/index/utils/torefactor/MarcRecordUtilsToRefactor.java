@@ -57,10 +57,17 @@ public class MarcRecordUtilsToRefactor {
               for (DataField df : dataFields.get(tag)) {
                   if (df.getSubFields() != null) {
                       for (String code : df.getSubFields().keySet()) {
+                          
+                          List<SubField> list = df.getSubFields().get(code);
+                          
                           if (df.getSubFields().get(code) != null && 
                                   df.getSubFields().get(code).get(0) != null && 
                                   df.getSubFields().get(code).get(0).getValue() != null) {
-                              sdoc.addField("marc_" + tag + code, df.getSubFields().get(code).get(0).getValue());
+
+                              List<SubField> list2 = df.getSubFields().get(code);
+                              for (SubField sField : list2) {
+                                  sdoc.addField("marc_" + tag + code, sField.getValue());
+                              }
                           }
                       }
                   }

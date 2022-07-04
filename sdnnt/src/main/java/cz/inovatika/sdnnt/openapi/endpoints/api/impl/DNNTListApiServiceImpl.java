@@ -120,7 +120,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     @Override
     public Response addedDnnto(String dl, String format, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
-        List<String> plusList = new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
+        List<String> plusList = new ArrayList<>(Arrays.asList("license:"+ License.dnnto.name()+" OR "+
+        "(granularity_license_cut:"+License.dnnto.name()+" AND fmt:SE)", "id_pid:uuid"));
         institutionFilterPlusList(institution, plusList);
         digitalLibrariesFilterPlusList(dl, plusList);
         formatFilterPlusList(format, plusList);
@@ -164,7 +165,8 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     public Response addedDnntt(String dl, String format, String institution, OffsetDateTime dateTime,  Integer rows, String resumptionToken, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
         List<String> plusList = 
-                new ArrayList<>(Arrays.asList("license:"+License.dnntt.name() +" OR "+"granularity_license_cut:"+License.dnntt.name(),"id_pid:uuid" ));
+                new ArrayList<>(Arrays.asList("license:"+License.dnntt.name() +" OR "+
+        "(granularity_license_cut:"+License.dnntt.name()+" AND fmt:SE)","id_pid:uuid" ));
         institutionFilterPlusList(institution, plusList);
         digitalLibrariesFilterPlusList(dl, plusList);
         formatFilterPlusList(format, plusList);
@@ -609,9 +611,16 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             ContainerRequestContext containerRequestContext) throws NotFoundException {
         String token = resumptionToken != null ? resumptionToken : "*";
 
-        List<String> plusList = (institution != null) ?  new ArrayList<>(
-                new ArrayList<>(Arrays.asList(MarcRecordFields.DIGITAL_LIBRARIES+":"+institution,  "id_pid:uuid", "license:*"))) :
-                new ArrayList<>(Arrays.asList("id_pid:uuid","license:*" ));
+        List<String> minusList = new ArrayList<>();
+
+        List<String> plusList = new ArrayList<>(Arrays.asList("id_pid:uuid", "dntstav:*"));
+        
+        institutionFilterPlusList(institution, plusList);
+        digitalLibrariesFilterPlusList(dl, plusList);
+        formatFilterPlusList(format, plusList);
+
+        removeDMinusList(minusList);
+
         
         if (dateTime != null) {
             String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
