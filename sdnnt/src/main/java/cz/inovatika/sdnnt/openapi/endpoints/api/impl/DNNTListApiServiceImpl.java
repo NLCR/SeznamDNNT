@@ -631,7 +631,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
         response.setItems(arrayOfListitem);
         if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, new ArrayList<String>(),CATALOG_FIELDS, (rsp)->{
+            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {

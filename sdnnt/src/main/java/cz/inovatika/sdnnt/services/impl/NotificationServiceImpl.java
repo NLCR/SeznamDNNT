@@ -7,6 +7,7 @@ import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE
 import cz.inovatika.sdnnt.indexer.models.notifications.NotificationFactory;
 import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
+import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Role;
@@ -383,14 +384,15 @@ public class NotificationServiceImpl implements NotificationsService {
                     iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                         Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                        Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
                         Collection<Object> license = doc.getFieldValues("license");
                         String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
 
                         String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
+                        String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : kuratorstav.toString();
                         
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
-                        
                         map.put("dntstav", dntStavStr);
 
                         if ( license != null) {
@@ -403,10 +405,8 @@ public class NotificationServiceImpl implements NotificationsService {
                             map.put("historie_stavu", historieStavu);
                         }
                         if (ruleNotification.accept(map)) {
-                            if (dntStavStr.equals(PublicItemState.D.name())) {
-                                if (user != null && user.getRole() != null && Arrays.asList(Role.mainKurator.name(), Role.kurator.name(), Role.admin.name()).contains(user.getRole())) {
-                                    documents.add(map);
-                                }
+                            if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())) {
+                                // ommiting
                             } else {
                                 documents.add(map);
                             }
@@ -441,9 +441,11 @@ public class NotificationServiceImpl implements NotificationsService {
                 iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                     Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                    Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
                     Collection<Object> license = doc.getFieldValues("license");
 
                     String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
+                    String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : kuratorstav.toString();
                     
                     
                     Map<String, String> map = new HashMap<>();
@@ -457,14 +459,12 @@ public class NotificationServiceImpl implements NotificationsService {
 
                     map.put("identifier", doc.getFieldValue("identifier").toString());
 
-                    if (dntStavStr.equals(PublicItemState.D.name())) {
-                        if (user != null && user.getRole() != null && Arrays.asList(Role.mainKurator.name(), Role.kurator.name(), Role.admin.name()).contains(user.getRole())) {
-                            documents.add(map);
-                        }
+                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())) {
+                        // ommiting
                     } else {
                         documents.add(map);
                     }
-                    
+
                     return doc;
                 });
                 LOGGER.log(Level.INFO, "checkNotifications finished");

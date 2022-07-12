@@ -66,8 +66,6 @@ public class AccountServiceImpl implements AccountService {
     public AccountServiceImpl() {}
 
     
-    
-    
     @Override
     public JSONObject search(String q, String state, List<String> navrhy, String institution, String priority, String delegated, String typeOfReq, String sort, int rows, int page) throws SolrServerException, IOException {
 
