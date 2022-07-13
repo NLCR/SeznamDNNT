@@ -226,6 +226,9 @@ public class XMLImporterKosmas {
       long id = total;
       if (item.containsKey("EAN")) {
         id = Long.parseLong(item.get("EAN"));
+      } else {
+        LOGGER.log(Level.INFO, "{0} nema EAN, vynechame", item.get("NAME"));
+        return;
       }
       if (first_id == null) {
         first_id = id+"";
@@ -233,7 +236,7 @@ public class XMLImporterKosmas {
       last_id = id+"";
       if (from_id > id) {
         return;
-      }
+      } 
 
       SolrInputDocument idoc = new SolrInputDocument();
       String item_id = item.get("EAN") + "_" + import_origin;
@@ -243,6 +246,7 @@ public class XMLImporterKosmas {
       if (item.containsKey("EAN")) {
         idoc.setField("item_id", item_id); 
       }
+      item.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + item.get("EAN"));
 
       idoc.setField("item", new JSONObject(item).toString());
 
@@ -256,7 +260,6 @@ public class XMLImporterKosmas {
       }
       
       SolrDocument isControlled = Import.isControlled(item_id);
-
       if (isControlled != null) {
         idoc.setField("controlled", true);
         idoc.setField("controlled_note", isControlled.get("controlled_note"));
