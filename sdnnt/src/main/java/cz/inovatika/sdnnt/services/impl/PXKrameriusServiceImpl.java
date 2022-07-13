@@ -95,12 +95,21 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
     private static String pid(String surl) {
         if (surl.contains("uuid:")) {
-            return surl.substring(surl.indexOf("uuid:"));
+            String pid = surl.substring(surl.indexOf("uuid:"));
+            char[] charArray = pid.toCharArray();
+            boolean checkWS = false;
+            for (int i = 0; i < charArray.length; i++) {
+                if (Character.isWhitespace(charArray[i])) {
+                    checkWS = true;
+                }
+            }
+            return checkWS ? null : pid;
         } else return null;
     }
 
+    
 
-
+    
     public void initialize() {
         JSONObject checkKamerius = getOptions().getJSONObject("check_kramerius");
         if (checkKamerius != null && checkKamerius.has("urls")) {
@@ -207,13 +216,14 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             // master title; TODO: granularity check
             String master = links.get(0);
             String pid = pid(master);
-
-            String baseUrl = baseUrl(master);
-            if (!buffer.containsKey(baseUrl)) {
-                buffer.put(baseUrl, new ArrayList<>());
+            if (pid != null) {
+                String baseUrl = baseUrl(master);
+                if (!buffer.containsKey(baseUrl)) {
+                    buffer.put(baseUrl, new ArrayList<>());
+                }
+                buffer.get(baseUrl).add(Pair.of(key, pid));
+                checkBuffer(buffer, foundCandidates);
             }
-            buffer.get(baseUrl).add(Pair.of(key, pid));
-            checkBuffer(buffer, foundCandidates);
         }
 
         if (!buffer.isEmpty()) {

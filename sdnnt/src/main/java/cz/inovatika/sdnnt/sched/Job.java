@@ -120,6 +120,27 @@ public class Job implements InterruptableJob {
             }
         },
 
+        /** SKC4  update candidates */
+        SKC_4 {
+            
+            @Override
+            void doPerform(JSONObject jobData) {
+                LOGGER.fine(name()+":configuration is "+jobData);
+                long start = System.currentTimeMillis();
+                JSONObject results = jobData.optJSONObject("results");
+                String loggerPostfix = jobData.optString("logger");
+                SKCJoinServiceImpl service = new SKCJoinServiceImpl(loggerPostfix, results);
+                try {
+                    service.updateFollowers();
+                } catch (IOException  e) {
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                }finally {
+                    QuartzUtils.printDuration(service.getLogger(), start);
+                }
+            }
+        },
+        
+
         /** Depreceted - alternativni linky do alephu - jiz se nepouziva */
         DL_UPDATE {
             @Override
