@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import java.io.File;
 import java.io.FileInputStream;
@@ -235,24 +236,28 @@ public class XMLImporterHeureka {
         return;
       }
 
-      SolrInputDocument idoc = new SolrInputDocument();
-      String item_id = item.get("ITEM_ID") + "_" + import_origin;
-      idoc.setField("import_id", import_id);
-      idoc.setField("import_date", import_date);
-      idoc.setField("id", import_id + "_" + item_id);
-      idoc.setField("item_id", item_id); 
-
+      String ean;
       if (item.containsKey("ISBN")) {
         ISBNValidator isbn = ISBNValidator.getInstance();
-        String ean = item.get("ISBN");
+        ean = item.get("ISBN");
         ean = isbn.validate(ean);
         if (ean != null) {
           item.put("EAN", ean);
         } else {
           item.put("EAN", item.get("ISBN"));
         }
+      } else {
+        LOGGER.log(Level.INFO, "{0} nema EAN, vynechame", item.get("NAME"));
+        return;
       }
 
+      SolrInputDocument idoc = new SolrInputDocument();
+      String item_id = ean + "_" + import_origin;
+      idoc.setField("import_id", import_id);
+      idoc.setField("import_date", import_date);
+      idoc.setField("id", import_id + "_" + item_id);
+      idoc.setField("item_id", item_id); 
+      
       idoc.setField("item", new JSONObject(item).toString());
 
       addDedup(item);

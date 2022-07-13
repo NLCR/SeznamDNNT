@@ -65,7 +65,7 @@ public class XMLImporterDistri {
   int indexed;
   int total;
   int skipped;
-  List<String> elements = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION");
+  List<String> elements = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION","AVAILABILITY");
 
   public JSONObject doImport(String path, String from_id, boolean resume) {
     JSONObject ret = new JSONObject();
@@ -309,6 +309,10 @@ public class XMLImporterDistri {
         LOGGER.log(Level.INFO, "{0} nema EAN, vynechame", item.get("NAME"));
         return;
       }
+      if (item.containsKey("AVAILABILITY") && "0".equals(item.get("AVAILABILITY"))) {
+        LOGGER.log(Level.INFO, "{0} neni dostupny (AVAILABILITY=0), vynechame", item.get("NAME"));
+        return;
+      }
       if (first_id == null) {
         first_id = item.get("EAN");
       }
@@ -349,7 +353,7 @@ public class XMLImporterDistri {
         idoc.setField("controlled_note", isControlled.get("controlled_note"));
         idoc.setField("controlled_date", isControlled.get("controlled_date"));
         idoc.setField("controlled_user", isControlled.get("controlled_user"));
-      } 
+      }
 
       findInCatalog(item);
       if (item.containsKey("found")) {
