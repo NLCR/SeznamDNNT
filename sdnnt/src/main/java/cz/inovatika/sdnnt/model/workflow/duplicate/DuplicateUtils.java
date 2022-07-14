@@ -305,6 +305,7 @@ public class DuplicateUtils {
         
         List<String> combinations = new ArrayList<>();
         List<DataField> originDFields = origin.dataFields.get("910");
+        if (originDFields == null) return new ArrayList<>();
         for (DataField oDField : originDFields) {
             if (oDField.getSubFields().containsKey("a") && oDField.getSubFields().containsKey("x")) {
                 List<SubField> aList = oDField.getSubFields().get("a");

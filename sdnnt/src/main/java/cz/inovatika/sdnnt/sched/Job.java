@@ -120,7 +120,7 @@ public class Job implements InterruptableJob {
             }
         },
 
-        /** SKC4  update candidates */
+        /** SKC4  update followers */
         SKC_4 {
             
             @Override
