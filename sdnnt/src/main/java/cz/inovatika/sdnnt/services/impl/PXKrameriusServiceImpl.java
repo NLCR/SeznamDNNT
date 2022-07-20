@@ -44,6 +44,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     boolean contextInformation = false;
     private Map<String, String> mappingHosts = new HashMap<>();
     private Map<String, String> mappingApi = new HashMap<>();
+    private Map<String, Boolean> skipHosts = new HashMap<>();
+
     private AtomicInteger fetchedInfoCounter = new AtomicInteger();
     private AtomicInteger requestedInfoCounter = new AtomicInteger();
 
@@ -125,6 +127,12 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                         this.mappingApi.put(key, version);
                     }
                 }
+                
+                if (jObject.has("skip")) {
+                    this.skipHosts.put(key, true);
+                    this.skipHosts.put(api, true);
+                }
+
             }
         }
     }
@@ -175,7 +183,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 } else if (links3 != null && !links3.isEmpty()) {
                     List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
                     mapping.put(identifier.toString(), ll);
-                    
                 }
             }, IDENTIFIER_FIELD);
         } catch(IOException e) {
@@ -252,6 +259,12 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null) continue;
+                
+                if (this.skipHosts.containsKey(baseUrl)) {
+                    getLogger().warning("Skipping url "+baseUrl+"'");
+                    continue;
+                }
+
                 List<Pair<String, String>> pairs = buffer.get(baseUrl);
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");

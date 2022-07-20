@@ -21,6 +21,7 @@ public interface SolrDocumentOutput {
     public static final String PIDS_KEY = "pids";
     public static final String GRANUARITY_KEY = "granularity";
 
+    public static final String DNTSTAV_KEY  = MarcRecordFields.DNTSTAV_FIELD;
 
     void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense);
 

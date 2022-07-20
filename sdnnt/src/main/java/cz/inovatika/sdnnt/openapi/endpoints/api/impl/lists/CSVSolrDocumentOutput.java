@@ -4,6 +4,8 @@ import org.apache.commons.csv.CSVPrinter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -22,10 +24,13 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
 
     @Override
     public void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense) {
+        String label = (String) outputDocument.get(LABEL_KEY);
         Object object = outputDocument.get(FMT_KEY);
         
         Collection<String> pids = (Collection<String>) outputDocument.get(PIDS_KEY);
         String masterPid = !pids.isEmpty() ? pids.iterator().next() : "";
+
+        
         // in case of serial; do not emit master pid
         if (object != null && !object.equals("SE")) {
             if (pids != null) {
@@ -49,17 +54,18 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
             String cislo = jsonObject.optString("cislo");
             String link = jsonObject.optString("link");
             String rocnik = jsonObject.optString("rocnik");
+
             // TODO:
             if (link != null)  {
-                if (link.contains("uuid:")){
-                    String pid = link.substring(link.indexOf("uuid:"));
-                    try {
-                        if (!pid.equals(masterPid)) {
+                String pid = PIDSupport.pidNormalization(PIDSupport.pidFromLink(link));
+                if (!pid.equals(masterPid)) {
+                    if (license != null && license.equals(label)) {
+                        try {
                             List<String> record = csvRecord(outputDocument, fields, pid);
                             printer.printRecord(record);
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE,e.getMessage(),e);
                         }
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
                     }
                 }
             }

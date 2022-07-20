@@ -42,7 +42,7 @@ public class MarcRecordFields {
     // links
     public static final String MARC_911_U = "marc_911u";
     public static final String MARC_956_U = "marc_956u";
-    public static final String MARC_856_U = "marc_956u";
+    public static final String MARC_856_U = "marc_856u";
 
     public static final String NAZEV_FIELD = "nazev";
     public static final String AUTHOR_FIELD = "author";

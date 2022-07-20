@@ -33,7 +33,7 @@ public enum CuratorItemState {
         }
     },
     
-    // vyrazeno/nezarazeno ale ceka na zarazeni  N
+    // vyrazeno/nezarazeno ale ceka na zarazeni  A
     NPA {
         @Override
         public PublicItemState getPublicItemState(WorkflowOwner owner) {

@@ -78,16 +78,16 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
             String label = outputDocument.get(LABEL_KEY) != null ? outputDocument.get(LABEL_KEY).toString() : null ;
             String idsdnnt = outputDocument.get(SDNNT_ID_KEY) != null ? outputDocument.get(SDNNT_ID_KEY).toString() : null ;
-
             String fmt = outputDocument.get(FMT_KEY) != null ? outputDocument.get(FMT_KEY).toString() : null ;
-
-            List<String> digitalLibrary = outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) != null ? (List<String>)outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) : null;
+            String stav = outputDocument.get(DNTSTAV_KEY) != null  ? outputDocument.get(DNTSTAV_KEY).toString() : null;
             
+            List<String> digitalLibrary = outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) != null ? (List<String>)outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) : null;
             
             Listitem item = new Listitem()
                     .pid(pid.toString())
                     .catalogIdentifier(identifier)
                     .title(nazev)
+                    .state(stav)
                     .license(label);
             if (label != null) {
                       //territoriality

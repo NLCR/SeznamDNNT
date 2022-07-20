@@ -231,7 +231,20 @@ export class ResultItemComponent implements OnInit {
 
   public showGranularity() {
 
-    const data = { title: this.doc.nazev, items: this.doc.granularity };
+    let itms =  this.doc.granularity.sort((a,b) => {
+      if (a.rocnik && b.rocnik) {
+        return (a.rocnik > b.rocnik ? 1 : -1); 
+      } else if (a.rocnik && !b.rocnik) {
+        return 1;
+      } else return -1;
+    }
+    );
+
+    const data = { title: this.doc.nazev, 
+      //items: this.doc.granularity 
+      items: itms 
+    
+    };
 
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',

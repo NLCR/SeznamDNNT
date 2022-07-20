@@ -86,7 +86,9 @@ public abstract class IterationSupport {
                 q.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
 
                 QueryResponse rsp = solr.query(getCollection(),q);
-
+                
+                LOGGER.info("Plus filter "+plusFilter +", minus filter "+minusFilter+", number of results:"+rsp.getResults().getNumFound());
+                
                 String nextCursorMark = rsp.getNextCursorMark();
                 for (SolrDocument resultDoc: rsp.getResults()) {
                     consumer.accept(resultDoc);

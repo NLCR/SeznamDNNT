@@ -62,12 +62,12 @@ public enum Period {
     period_nzn_1_12_18 {
         @Override
         public Date defineDeadline(Date inputDate) {
-            // nema smysl to delat konfiguratovatlne
+            // nema smysl to delat konfiguratovatlne ?
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(inputDate);
 
-            List<Integer> februaryWallMonth = Arrays.asList(9,10,11,12,1);
-            List<Integer> augustWallMonth = Arrays.asList(2,3,4,5,6,7,8);
+            List<Integer> februaryWallMonth = Arrays.asList(8,9,10,11,12,1);
+            List<Integer> augustWallMonth = Arrays.asList(2,3,4,5,6,7);
 
             int month = calendar.get(Calendar.MONTH)+1;
 

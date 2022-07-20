@@ -129,6 +129,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
                 String frbr = null;
                 if (doc.has("frbr")) {
+                    /* Disabled frbr
                     frbr = doc.getString("frbr");
                     item.frbr(frbr);
                     JSONObject frbrObjects = catalogSearcher.frbr(frbr);
@@ -143,7 +144,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                             });
                             item.associatedItems(items);
                         }
-                    }
+                    }*/
                 }
 
                 ArrayOfAssociatedRequests associatedWithItem = new ArrayOfAssociatedRequests();

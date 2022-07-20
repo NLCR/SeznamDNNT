@@ -170,6 +170,7 @@ public class Job implements InterruptableJob {
             }
         },
         
+        
         /** Type check */
         SKC_TYPE_CHECK {
             
@@ -333,7 +334,44 @@ public class Job implements InterruptableJob {
                 }
             }
         },
+        
+        /** Refresh granularit */
+        REFRESH_GRANULARITIES {
+            
+            @Override
+            void doPerform(JSONObject jobData) {
+                long start = System.currentTimeMillis();
+                String logger = jobData.optString("logger");
+                GranularityServiceImpl service = new GranularityServiceImpl(logger);
+                try {
+                    service.initialize();
+                    service.refershGranularity();
+                } catch (IOException e) {
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    QuartzUtils.printDuration(service.getLogger(), start);
+                }
+            }
+        },
 
+        /** Nastaveni stavu u granularit */
+        SETSTATES_GRANULARITIES {
+            
+            @Override
+            void doPerform(JSONObject jobData) {
+                long start = System.currentTimeMillis();
+                String logger = jobData.optString("logger");
+                GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(logger);
+                try {
+                    service.setStates(new ArrayList<>());
+                } catch (IOException e) {
+                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    QuartzUtils.printDuration(service.getLogger(), start);
+                }
+            }
+        },
+        
         WORKFLOW {
             @Override
             void doPerform(JSONObject jobData) {

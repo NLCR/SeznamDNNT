@@ -91,13 +91,8 @@ public class SKCTypeServiceTTest {
                     .addMockedMethod("getOptions")
                     .addMockedMethod("buildClient")
                     .addMockedMethod("buildAccountService")
-                    .addMockedMethod("buildCheckOAISKC")
                     .createMock();
             
-//            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
-//            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579067")), new ArrayList<>()));
-
-            //EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
             
             Options options = EasyMock.createMock(Options.class);
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
@@ -113,7 +108,13 @@ public class SKCTypeServiceTTest {
                     .withConstructor(appSupport, bservice)
                     .addMockedMethod("buildClient").createMock();
             
+            EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
 
+            EasyMock.expect(aService.buildClient()).andDelegateTo(
+                    new AccountServiceImplITTest.BuildSolrClientSupport()
+            ).anyTimes();
+
+            
             EasyMock.replay(skcDeleteService,appSupport,bservice,aService /*,oaiCheck*/);
             skcDeleteService.update();
             
@@ -145,14 +146,9 @@ public class SKCTypeServiceTTest {
                     .addMockedMethod("getOptions")
                     .addMockedMethod("buildClient")
                     .addMockedMethod("buildAccountService")
-                    .addMockedMethod("buildCheckOAISKC")
+                    //.addMockedMethod("buildCheckOAISKC")
                     .createMock();
             
-//            OAICheckSKC oaiCheck = EasyMock.createMock(OAICheckSKC.class);
-//            EasyMock.expect(oaiCheck.iterate()).andReturn(Pair.of(new HashSet<String>(Arrays.asList("oai:aleph-nkp.cz:SKC01-001579069")), new ArrayList<>()));
-
-            
-//            EasyMock.expect(skcDeleteService.buildCheckOAISKC()).andReturn(oaiCheck).anyTimes();
             
             Options options = EasyMock.createMock(Options.class);
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
@@ -214,5 +210,6 @@ public class SKCTypeServiceTTest {
     
     }
 
+    
     
 }

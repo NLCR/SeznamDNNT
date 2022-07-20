@@ -32,6 +32,9 @@ public class PeriodTests {
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-07-02")));
         Assert.assertEquals("1993-08-01 00:00:00", format);
 
+        format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-07-31")));
+        Assert.assertEquals("1993-08-01 00:00:00", format);
+
         //1.2
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-01-02")));
         Assert.assertEquals("2020-02-01 00:00:00", format);
@@ -44,6 +47,13 @@ public class PeriodTests {
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-01-31")));
         Assert.assertEquals("2020-02-01 00:00:00", format);
+
+        format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-08-02")));
+        Assert.assertEquals("2021-02-01 00:00:00", format);
+
+        format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-08-01")));
+        Assert.assertEquals("2021-02-01 00:00:00", format);
+
     }
 
     @Test
@@ -63,7 +73,8 @@ public class PeriodTests {
     public void testPeriod_2() throws ParseException {
         // +1 month deadline
         String format = SIMPLE_DATE_FORMAT_2.format(period_vn_0_28d.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("1993-03-02 03:03:03")));
-        Assert.assertEquals("1993-04-02 00:00:00", format);
+        System.out.println(format);
+        Assert.assertEquals("1993-03-30 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_vn_0_28d.defineDeadline(SIMPLE_DATE_FORMAT_2.parse("1995-01-31 03:03:03")));
         Assert.assertEquals("1995-02-28 00:00:00", format);
