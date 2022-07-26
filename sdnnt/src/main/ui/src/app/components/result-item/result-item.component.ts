@@ -114,10 +114,16 @@ export class ResultItemComponent implements OnInit {
 
     this.hasGranularity = this.doc.granularity && this.doc.granularity.length > 1;
     this.dkLinks = [];
-    const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
+    
+    // Podle https://github.com/NLCR/SeznamDNNT/issues/444 "měly být jen odkazy z 911"
+    // const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
+    const tags = ['marc_911u'];
     tags.forEach(t => {
       if (this.doc[t]) {
-        this.doc[t].forEach(l => {
+        this.doc[t].forEach((lorig: string) => {
+          const l = lorig
+            .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
+            .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/');
           if (!this.dkLinks.includes(l)) {
             this.dkLinks.push(l);
           }
