@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
 
     public static final Logger LOGGER = Logger.getLogger(CSVSolrDocumentOutput.class.getName());
 
+    public AtomicInteger counter = new AtomicInteger();
+    
     private CSVPrinter printer;
 
     public CSVSolrDocumentOutput(CSVPrinter csvPrinter) {
@@ -23,32 +26,20 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
     }
 
     @Override
-    public void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense) {
-        String label = (String) outputDocument.get(LABEL_KEY);
+    public void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent) {
+
+        Set<String> emmitedGranularityPIDS = new HashSet<>();
+        Set<String> allGranularityPIDS = new HashSet<>();
+        
+        //String label = (String) outputDocument.get(LABEL_KEY);
         Object object = outputDocument.get(FMT_KEY);
         
         Collection<String> pids = (Collection<String>) outputDocument.get(PIDS_KEY);
         String masterPid = !pids.isEmpty() ? pids.iterator().next() : "";
 
-        
-        // in case of serial; do not emit master pid
-        if (object != null && !object.equals("SE")) {
-            if (pids != null) {
-                pids.stream().forEach(p-> {
-                    try {
-                        List<String> record = csvRecord(outputDocument, fields, p);
-                        printer.printRecord(record);
-                    } catch (IOException e) {
-                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
-                    }
-                });
-            }
-        }
 
-        // pokud master pid ma pak jo, pokud ne, pak vynechat
         List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
         granularity.stream().map(it-> new JSONObject(it)).forEach(jsonObject -> {
-
             JSONArray stav = jsonObject.optJSONArray("stav");
             String license = jsonObject.optString("license");
             String cislo = jsonObject.optString("cislo");
@@ -59,18 +50,36 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
             if (link != null)  {
                 String pid = PIDSupport.pidNormalization(PIDSupport.pidFromLink(link));
                 if (!pid.equals(masterPid)) {
-                    if (license != null && license.equals(label)) {
+                    if (license != null && license.equals(endpointLicense)) {
                         try {
                             List<String> record = csvRecord(outputDocument, fields, pid);
                             printer.printRecord(record);
+                            emmitedGranularityPIDS.add(pid);
+                            //LOGGER.info(String.format(" CSV %s counter %d",record.toString() ,counter.incrementAndGet()));
                         } catch (IOException e) {
                             LOGGER.log(Level.SEVERE,e.getMessage(),e);
                         }
                     }
+                    allGranularityPIDS.add(pid);
                 }
             }
         });
-
+        
+        // podminka pro vynechani parentu 
+        boolean skip = doNotEmitParent && allGranularityPIDS.size() > 0;
+        if (object != null && (!skip)) {
+            if (pids != null) {
+                pids.stream().forEach(p-> {
+                    try {
+                        List<String> record = csvRecord(outputDocument, fields, p);
+                        printer.printRecord(record);
+                        //LOGGER.info(String.format(" CSV %s counter %d",record.toString() ,counter.incrementAndGet()));
+                    } catch (IOException e) {
+                        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                    }
+                });
+            }
+        }
     }
 
     private List<String> csvRecord(Map<String, Object> outputDocument, List<String> fields, String p) {

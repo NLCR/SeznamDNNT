@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,7 +32,9 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.LBHttpSolrClient.Rsp;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.search.function.EqualFunction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -223,7 +226,6 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                             String controlField = (String) rsp.getFirstValue("controlfield_008");
                             String fmt = (String) rsp.getFirstValue(MarcRecordFields.FMT_FIELD);
                             String license = (String) rsp.getFirstValue(MarcRecordFields.LICENSE_FIELD);
-                            
 
                             if (nState.equals(PublicItemState.N.name())) {
                                 Set<String> keySet = secondterationNotResolved.keySet();
@@ -236,6 +238,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
                                         gItemJSON.put("stav", stavArr);
                                         gItemJSON.put("kuratorstav", stavArr);
+                                        
                                     }
                                 }
                                 changedGranularity.set(true);
@@ -275,7 +278,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                             char regularity = controlField.charAt(19);
                                             if (regularity == 'r') {
                                                 boolean regularSE = false;
-                                                String pattern = Options.getInstance().getString("granularity.se.00819", "b,c,d,e,f,j,q,t,s,w,z");
+                                                String pattern = Options.getInstance().getString("granularity.se.00819", "b,c,d,e,f,j,q,t,s,m,w,z");
                                                 char periodicity = controlField.charAt(18);
                                                 String[] split = pattern.split(",");
                                                 for (String confPattern : split) {
@@ -353,152 +356,4 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
     
 
-    public static void main(String[] args) throws IOException {
-        GranularitySetStateServiceImpl impl = new GranularitySetStateServiceImpl("test");
-        impl.setStates(Arrays.asList("identifier:\"oai:aleph-nkp.cz:SKC01-003253563\""));
-    }
-
-    
-    
-    private static void testMethod() throws IOException {
-        class BuilderClient { 
-            SolrClient buildClient() {
-                return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-            }
-        }
-        
-        try (final SolrClient solrClient = new BuilderClient().buildClient()) {
-            Map<String, String> reqMap = new HashMap<>();
-            reqMap.put("rows", "10000");
-
-            CatalogIterationSupport support = new CatalogIterationSupport();
-            List<String> plusFilter = Arrays.asList(
-                    MarcRecordFields.GRANULARITY_FIELD + ":*",
-                    MarcRecordFields.FMT_FIELD+":SE",
-                    MarcRecordFields.LICENSE_FIELD+":dnntt"
-                    
-                    //MarcRecordFields.SET_SPEC_FIELD+":SKC"
-            );
-
-            AtomicInteger counter = new AtomicInteger();
-            
-            List<String> minusFilter = Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":D");
-            support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
-                    Arrays.asList(IDENTIFIER_FIELD, SIGLA_FIELD, 
-                            MARC_911_U, MARC_956_U, MARC_856_U, 
-                            GRANULARITY_FIELD,
-                            MarcRecordFields.DNTSTAV_FIELD,
-                            MarcRecordFields.LICENSE_FIELD,
-                            MarcRecordFields.FMT_FIELD,
-                            "controlfield_008"
-
-                    ), (rsp) -> {
-                        //System.out.println("Nic");
-
-                        counter.incrementAndGet();
-                        
-                        AtomicBoolean changedGranularity = new AtomicBoolean();
-                        final Object materLicense = rsp.getFirstValue(MarcRecordFields.LICENSE_FIELD);
-                        final Object masterIdentifier = rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD);
-                        
-                        
-                        Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
-                        Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
-                        Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
-
-                      String firstValue = (String) rsp.getFirstValue("controlfield_008");
-                      Object controlField = rsp.getFirstValue("controlfield_008");
-                      //System.out.println("Identifier:"+rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD));
-
-                      char frequency = controlField.toString().charAt(18);
-                      char regularity = controlField.toString().charAt(19);
-                      System.out.println("Frequency "+frequency);
-                      System.out.println("Regularity "+regularity);
-                      System.out.println("Identifikator == "+masterIdentifier );
-                      
-                      if (regularity == 'r') {
-                          //if (frequency == 'a' ) {
-                      } else {
-                          
-                      }
-                      
-//                      Collection<Object> fValues = rsp.getFieldValues(MarcRecordFields.GRANULARITY_FIELD);
-//                      for(Object granularity: fValues) {
-//                          JSONObject granJSON = new JSONObject(granularity.toString());
-//                          if (granJSON.has("rocnik")) {
-//                              int rocnik = ZahorikUtils.rocnik(granJSON);
-//                              
-//                              /*
-//                              if (granJSON.has("license")) {
-//                                  String license = granJSON.getString("license");
-//                                  if (license.equals("dnnto")) {
-//                                    System.out.println("Identifikator == "+masterIdentifier +" and locense "+license+" rocnik "+rocnik);
-//                                  }
-//                              }*/
-//                              
-//                              if (granJSON.has("stav")) {
-//                                  String stav = granJSON.getJSONArray("stav").getString(0);
-//                                  if (rocnik >= 2012 && !stav.equals("N") && !stav.equals("X")) {
-//                                      System.out.println("Identifikator == "+masterIdentifier +" and stav "+stav);
-//                                  }
-//                              }
-//                          }
-//                      }
-//                      
-                      
-//
-//                      String json = (String) rsp.getFirstValue("raw");
-//                      JSONObject jsonObject = new JSONObject(json);
-//                      if (jsonObject.has("310")) {
-//                          JSONObject aJSON = null;
-//                          JSONArray jsonArray = jsonObject.getJSONArray("310");
-//                          for(int i=0;i<jsonArray.length();i++) {
-//                              JSONObject itemOfObject = jsonArray.getJSONObject(i);
-//                              
-//                          }
-//                      }
-//                      
-//                      if (controlField != null) {
-//                          String periodictity = firstValue.substring(18,19);
-//                          System.out.println("Control field:"+controlField);
-//                          System.out.println("Periodicity:"+periodictity);
-//                      } else {
-//                          System.out.println("No control field - identifier :"+rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD));
-//                      }
-//                      
-//                      System.out.println("FMT field "+rsp.getFirstValue(MarcRecordFields.FMT_FIELD));
-//                      System.out.println(" -------------------->>");
-
-                        
-//                        for (int i = 0; i < granularity.size(); i++) {
-//                            JSONObject iIterationObj = granularityJSONS.get(i);
-//                            
-//                            if (iIterationObj.has("rocnik") && iIterationObj.has("license")) {
-//                                String license = iIterationObj.optString("license");
-//                                if (license != null && license.equals("dnntt")) {
-//                                    if (materLicense != null && materLicense.equals("dnnto")) {
-//                                        String firstValue = (String) rsp.getFirstValue("controlfield_008");
-//                                        String periodictity = firstValue.substring(18,19);
-//                                        System.out.println("Identifier:"+rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD));
-//                                        System.out.println("Periodicity:"+periodictity);
-//                                        
-//                                        System.out.println("Rocnik :"+iIterationObj.getString("rocnik") + " Licence "+iIterationObj.optString("license") +" Master licence :"+materLicense);
-//                                        System.out.println("Control field "+rsp.getFirstValue("controlfield_008"));
-//                                        System.out.println("FMT field "+rsp.getFirstValue(MarcRecordFields.FMT_FIELD));
-//                                        System.out.println(" ------------------ ");
-//                                    }
-//                                }
-//                            }
-//                            
-//                            String iLink = iIterationObj.optString("link");
-//                            String iPid = PIDSupport.pidNormalization(PIDSupport.pidFromLink(iLink));
-//                        }
-                        if (changedGranularity.get()) {
-                            
-                            //System.out.println(granularityJSONS.size());
-                            //System.out.println("'"+granularityJSONS.toString()+"'");
-                        }
-                }, IDENTIFIER_FIELD);
-        }
-    }
 }

@@ -99,7 +99,7 @@ public class ZahorikUtils {
             int rocnik = rocnik(gItem);
             if (license != null && license.equals(License.dnntt.name())) {
                 // hranice je pevna - smlouva s Diliii
-                if (rocnik < 2007) {
+                if (rocnik <= 2007) {
     
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();
@@ -108,7 +108,7 @@ public class ZahorikUtils {
                     gItem.put("kuratorstav", stavArr);
                                  
                     
-                } else if (rocnik >= 2007) {
+                } else if (rocnik > 2007) {
     
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(PublicItemState.N.name());
@@ -135,7 +135,7 @@ public class ZahorikUtils {
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
                 // hranice je klouzava                  
-                } else if (rocnik > t2001 && rocnik <= t2012) {
+                } else if (rocnik > t2001 && rocnik < t2012) {
 
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();

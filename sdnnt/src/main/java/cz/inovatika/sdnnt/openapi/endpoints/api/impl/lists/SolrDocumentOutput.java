@@ -22,7 +22,17 @@ public interface SolrDocumentOutput {
     public static final String GRANUARITY_KEY = "granularity";
 
     public static final String DNTSTAV_KEY  = MarcRecordFields.DNTSTAV_FIELD;
+    
+    // SKC properties
+    //public static final String RAW_KEY = MarcRecordFields.RAW_FIELD;
+    public static final String CONTROL_FIELD_001_KEY = "controlfield_001";
+    public static final String CONTROL_FIELD_003_KEY = "controlfield_003";
+    public static final String CONTROL_FIELD_005_KEY = "controlfield_005";
+    public static final String CONTROL_FIELD_007_KEY = "controlfield_007";
+    public static final String CONTROL_FIELD_008_KEY = "controlfield_008";
 
-    void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense);
+    public static final String RAW_KEY = MarcRecordFields.RAW_FIELD;
+
+    void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent);
 
 }

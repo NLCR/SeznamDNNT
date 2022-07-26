@@ -171,8 +171,8 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 Object identifier = rsp.getFieldValue("identifier");
 
                 Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
-                Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
-                Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
+                Collection<Object> links2 = rsp.getFieldValues(MARC_856_U);
+                Collection<Object> links3 = rsp.getFieldValues(MARC_956_U);
 
                 if (links1 != null && !links1.isEmpty()) {
                     List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());

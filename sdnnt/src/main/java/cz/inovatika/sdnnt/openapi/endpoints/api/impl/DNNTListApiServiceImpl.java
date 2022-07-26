@@ -73,7 +73,14 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             DIGITAL_LIBRARIES,
             ID_ISSN,
             ID_ISBN,
-            ID_ISMN
+            ID_ISMN,
+            
+            "controlfield_001",
+            "controlfield_003",
+            "controlfield_005",
+            "controlfield_008"
+            
+            //MarcRecordFields.RAW_FIELD
     );
 
     // number of concurrent clients in case of exporting long csv file
@@ -147,7 +154,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -196,7 +203,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name());
+                    emitDocument(false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name(), false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -247,7 +254,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc : rsp.getResults()) {
-                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null);
+                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -315,7 +322,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null);
+                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -329,7 +336,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response addedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq, Boolean donotemitparent,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -338,7 +345,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                         new ArrayList<>(Arrays.asList( "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
                 
                 aStav(plusList);
-                
                 institutionFilterPlusList(institution, plusList);
                 digitalLibrariesFilterPlusList(dl, plusList);
                 formatFilterPlusList(format, plusList);
@@ -350,12 +356,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                     String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
                     plusList.add("datum_stavu:["+utc+" TO *]");
                 }
-
                 
                 if (list == null || list.isEmpty()) {
-                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS, donotemitparent);
                 } else {
-                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnnto.name(),uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list), donotemitparent);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Maximum number of items exceeded")).build();
@@ -382,7 +387,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     @Override
-    public Response addedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response addedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq, Boolean donotemitparent,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
             acquired = SEMAPHORE.tryAcquire();
@@ -406,9 +411,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 removeDMinusList(minusList);
 
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list), donotemitparent);
                 } else {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS,DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS,DEFAULT_OUTPUT_FIELDS, donotemitparent);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Maximum number of items exceeded")).build();
@@ -444,9 +449,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 removeDMinusList(minusList);
 
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnnto.name(), uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnnto.name(), uniq,plusList,minusList, CATALOG_FIELDS, makeSurePids(list),false);
                 } else {
-                    return fullCSV(institution,License.dnnto.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnnto.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS, false);
                 }
 
             } else {
@@ -485,9 +490,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 removeDMinusList(minusList);
                 
                 if (list != null && !list.isEmpty()) {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list));
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list),false);
                 } else {
-                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS);
+                    return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS, false);
                 }
             } else {
                 return Response.status(429).entity(jsonError("Too many requests; Please wait and repeat request again")).build();
@@ -501,7 +506,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     // TODO: Prodisktuovat instituce, marc911a,u, marc956u, marc856u a vazby na digitalni instance krameria
-    private Response fullCSV( String selectedInstitution, String label, Boolean onlyUniqPids, List<String> plusList, List<String> minusList, List<String> fetchingFields, List<String> outputFields) {
+    private Response fullCSV( String selectedInstitution, String label, Boolean onlyUniqPids, List<String> plusList, List<String> minusList, List<String> fetchingFields, List<String> outputFields, Boolean doNotEmitParent) {
         try {
             Set<String> uniqe = new HashSet<>();
             File csvFile = File.createTempFile("temp","csv");
@@ -515,7 +520,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 SolrDocumentOutput documentOutput = new CSVSolrDocumentOutput(printer);
                 // select only this fields
                 this.catalogIterationSupport.iterate(map, null, plusList, minusList,fetchingFields, (doc)->{
-                    emitDocument( onlyUniqPids, uniqe, doc, documentOutput, outputFields, label);
+                    emitDocument( onlyUniqPids, uniqe, doc, documentOutput, outputFields, label, doNotEmitParent);
                 }, "identifier");
             }
 
@@ -544,9 +549,10 @@ public class DNNTListApiServiceImpl extends ListsApiService {
      * @param doc Outputting doc
      * @param documentOutput DocumentOutput implementation
      */
-    private void emitDocument(/*String selectedInstitution, String documentLicense,*/ Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense) {
+    private void emitDocument(/*String selectedInstitution, String documentLicense,*/ Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense, Boolean doNotEmit) {
         Collection<Object> nazev = doc.getFieldValues("nazev");
         String identifier = (String) doc.getFieldValue("identifier");
+        
         
         String stav  = (String) doc.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
         String documentLicense = license(doc);
@@ -561,8 +567,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         List<String> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD) != null ? doc.getFieldValues(SIGLA_FIELD).stream().map(Object::toString).collect(Collectors.toList())  : new ArrayList<>();
         List<String> mdigitallibraries = doc.getFieldValues("digital_libraries") != null ? doc.getFieldValues("digital_libraries").stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
-        
-        final List<String> links = LinksUtilities.linksFromDocument(doc);
+
+
+        // 911u a 856u 
+        final List<String> links = LinksUtilities.krameriusLinksFromDocument(doc);
+         
 
         if (!links.isEmpty()) {
             List<String> granularity = granularityField != null ? granularityField.stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
@@ -576,36 +585,51 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 // ma granularitu, link se bere pouze prvni, ostatni jsou v granularite
                 krameriusLinks = krameriusLinks.isEmpty() ? new ArrayList<>() : krameriusLinks.subList(0,1);
             }
-
             
-            // pokud bude 
             // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?  Zahorik ?  - musi se odfiltorvat !!! 
             List<String> pids = krameriusLinks.stream().map(PIDSupport::pidFromLink).map(PIDSupport::pidNormalization).collect(Collectors.toList());
 
             if (onlyUniqPids) {
                 for (int i = 0; i < pids.size(); i++) {
                     if (!uniqe.contains( pids.get(i))) {
-                        //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
                         Map<String,Object> d =  doc(mdigitallibraries,minstitutions,  documentLicense, stav ,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
                         d = enIdSdnnt(d, doc);
-                        documentOutput.output(d,outputFields, requestedLicense);
+                        d = enMarcFields(d, doc);
+                        documentOutput.output(d,outputFields, requestedLicense, doNotEmit);
                         uniqe.add(pids.get(i));
                     }
                 }
             } else {
-                //private Map<String, Object> doc(List<String> instituions, String label, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
                 Map<String,Object> d = doc(mdigitallibraries, minstitutions,  documentLicense,stav, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
                 d = enIdSdnnt(d, doc);
-                documentOutput.output(d,outputFields, requestedLicense);
+                d = enMarcFields(d, doc);
+                documentOutput.output(d,outputFields, requestedLicense, doNotEmit);
             }
         }
     }
     
     
     
+    private Map<String, Object> enMarcFields(Map<String, Object> document, SolrDocument doc) {
+        String cField01 =  (String) doc.getFirstValue("controlfield_001");
+        String cField03 = (String) doc.getFirstValue("controlfield_003");
+        String cField05 = (String) doc.getFirstValue("controlfield_005");
+        String cField08 = (String) doc.getFirstValue("controlfield_008");
 
-    private Map<String, Object> doc(List<String> digitalLibs, List<String> instituions, String label, String stav, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, 
-            String ... p) {
+        String raw = (String) doc.getFirstValue(MarcRecordFields.RAW_FIELD);
+
+        document.put(SolrDocumentOutput.CONTROL_FIELD_001_KEY, cField01);
+        document.put(SolrDocumentOutput.CONTROL_FIELD_003_KEY, cField03);
+        document.put(SolrDocumentOutput.CONTROL_FIELD_005_KEY, cField05);
+        document.put(SolrDocumentOutput.CONTROL_FIELD_008_KEY, cField08);
+        if (raw != null) {
+            document.put(SolrDocumentOutput.RAW_KEY, raw);
+        }
+
+        return document;
+    }
+
+    private Map<String, Object> doc(List<String> digitalLibs, List<String> instituions, String label, String stav, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
         
         Map<String, Object> document = new HashMap<>();
         document.put(SolrDocumentOutput.SELECTED_INSTITUTION_KEY, instituions);
@@ -667,7 +691,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -694,7 +718,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name());
+                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 return Response.ok().entity(response).build();

@@ -137,6 +137,13 @@ paths:
             default: false
           required: false
         - in: query
+          name: notincludeparent
+          description: Nezahrnovat parent pokud je přítomna granularita, dnnt-contains. Issue #853
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
           name: fields
           description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
           schema:
@@ -261,6 +268,13 @@ paths:
         - in: query
           name: removeduplicatesuuid
           description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          schema:
+            type: boolean
+            default: false
+          required: false
+        - in: query
+          name: notincludeparent
+          description: Nezahrnovat parent pokud je přítomna granularita, dnnt-contains. Issue #853
           schema:
             type: boolean
             default: false

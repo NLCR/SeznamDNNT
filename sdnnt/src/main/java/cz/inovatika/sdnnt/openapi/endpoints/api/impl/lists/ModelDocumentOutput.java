@@ -3,13 +3,18 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfListitem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Listitem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemGranularity;
+import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemSkc;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModelDocumentOutput  implements  SolrDocumentOutput{
@@ -22,7 +27,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         this.digitalLibrariesConfiguration = conf;
     }
 
-//    @Override
+//    @Overrideraw
 //    public void output(String selectedInstitution, String label, Collection<Object> nazev, String identifier, String... pids) {
 //        for (int i = 0; i < pids.length; i++) {
 //            Listitem item = new Listitem()
@@ -70,9 +75,10 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
     }
 
     @Override
-    public void output(Map<String, Object> outputDocument, List<String> ordering, String endpointLicense) {
+    public void output(Map<String, Object> outputDocument, List<String> ordering, String endpointLicense, boolean doNotEmitParent) {
         Collection pids = (Collection) outputDocument.get(PIDS_KEY);
-        pids.forEach(pid-> {
+        Set<String> setPids = new HashSet<>(pids);
+        setPids.forEach(pid-> {
             String identifier = outputDocument.get(IDENTIFIER_KEY) != null ? outputDocument.get(IDENTIFIER_KEY).toString() : null ;
             List<String> siglas = outputDocument.get(SELECTED_INSTITUTION_KEY) != null ? (List<String>) outputDocument.get(SELECTED_INSTITUTION_KEY) : null ;
             String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
@@ -116,6 +122,55 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                 item.sdnntIdentifier(idsdnnt);
             }
             
+            if (outputDocument.containsKey(SolrDocumentOutput.CONTROL_FIELD_001_KEY)) {
+                if (item.getSkc() == null) {
+                    item.skc(new ListitemSkc());
+                }
+                item.getSkc().controlfield001((String)outputDocument.get(SolrDocumentOutput.CONTROL_FIELD_001_KEY));
+            }
+
+            if (outputDocument.containsKey(SolrDocumentOutput.CONTROL_FIELD_003_KEY)) {
+                if (item.getSkc() == null) {
+                    item.skc(new ListitemSkc());
+                }
+                item.getSkc().controlfield003((String)outputDocument.get(SolrDocumentOutput.CONTROL_FIELD_003_KEY));
+            }
+
+            if (outputDocument.containsKey(SolrDocumentOutput.CONTROL_FIELD_005_KEY)) {
+                if (item.getSkc() == null) {
+                    item.skc(new ListitemSkc());
+                }
+                item.getSkc().controlfield005((String)outputDocument.get(SolrDocumentOutput.CONTROL_FIELD_005_KEY));
+            }
+
+            if (outputDocument.containsKey(SolrDocumentOutput.CONTROL_FIELD_008_KEY)) {
+                if (item.getSkc() == null) {
+                    item.skc(new ListitemSkc());
+                }
+                item.getSkc().controlfield008((String)outputDocument.get(SolrDocumentOutput.CONTROL_FIELD_008_KEY));
+            }
+
+            /*
+            if (outputDocument.containsKey(SolrDocumentOutput.RAW_KEY)) {
+                if (item.getSkc() == null) {
+                    item.skc(new ListitemSkc());
+                }
+                String raw = (String) outputDocument.get(SolrDocumentOutput.RAW_KEY);
+                JSONObject rawJSON = new JSONObject(raw);
+                
+                Map<String, List<String>> tagCodeMapping = new HashMap<>();
+                tagsCode(rawJSON, tagCodeMapping, "310", "a");
+                tagsCode(rawJSON, tagCodeMapping, "310", "b");
+                
+                
+                if(tagCodeMapping.containsKey("310_a")) {
+                    ListitemSkcMarc310 m310 = new ListitemSkcMarc310();
+                    tagCodeMapping.get("310_a").stream().forEach(m310::addAItem);
+                    item.getSkc().setMarc310(m310);
+                }
+            }
+            */
+            
             
             List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
             if (granularity != null) {
@@ -134,4 +189,34 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             }
         });
     }
+
+    protected void tagsCode(JSONObject rawJSON, Map<String, List<String>> tagCodeMapping, String tag, String code) {
+        if (rawJSON.has("dataFields")) {
+            JSONObject dataFields = rawJSON.getJSONObject("dataFields");
+            if (dataFields.has(tag) ) {
+                JSONArray tagArr = dataFields.getJSONArray(tag);
+                for (int i = 0; i <  tagArr.length(); i++) {
+                    
+                    JSONObject tagItem = tagArr.getJSONObject(i);
+                    if (tagItem.has("subFields")) {
+                        JSONObject subFields = tagItem.getJSONObject("subFields");
+                        if (subFields.has(code)) {
+                            JSONArray aCode = subFields.getJSONArray(code);
+                            for (int j = 0; j < aCode.length(); j++) {
+                                String value = aCode.getJSONObject(j).optString("value");
+                                if (value != null) {
+                                   String format = String.format("%s_%s", tag, code);
+                                   if (!tagCodeMapping.containsKey(format)) {
+                                       tagCodeMapping.put(format, new ArrayList<>());
+                                   }
+                                   tagCodeMapping.get(format).add(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }

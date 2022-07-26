@@ -1,17 +1,22 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class PIDSupport {
+    
+    private static Pattern PATTERN = Pattern.compile("((uuid):([A-Za-z0-9\\-]+))");
     
     private PIDSupport() {}
 
     public static String pidNormalization(String pid) {
         // orezu od prvniho bileho znaku - SKC a prapodivne postfixy v url 
         if (pid != null) {
-            char[] charArray = pid.toCharArray();
-            for (int i = 0; i < charArray.length; i++) {
-                if (Character.isWhitespace(charArray[i])) {
-                    return pid.substring(0, i);
-                }
+            
+            Matcher matcher = PATTERN.matcher(pid);
+            if (matcher.find()) {
+                return matcher.group(0);
+                
             }
         }
         return pid;
@@ -24,4 +29,5 @@ public class PIDSupport {
         }
         return link;
     }
+    
 }

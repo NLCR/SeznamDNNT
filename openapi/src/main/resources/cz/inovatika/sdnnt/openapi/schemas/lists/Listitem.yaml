@@ -45,7 +45,6 @@ properties:
   sdnnt_identifier:
     type: string
     example: 'a36aeb793976c94a01bc9f21c8ae5010'
-
   other_identifiers:
     type: object
     properties:
@@ -86,6 +85,18 @@ properties:
         year:
           type: string
           example: '1993'
-  raw: 
-    type: string
-        
+  skc: 
+    type: object
+    properties:
+        controlfield_001: 
+            type: string
+        controlfield_003: 
+            type: string
+        controlfield_005: 
+            type: string
+        controlfield_007: 
+            type: string
+        controlfield_008: 
+            type: string
+            
+
