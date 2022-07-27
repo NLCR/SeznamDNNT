@@ -10,7 +10,7 @@
   "numberOfItemsInRulenotification": 11000,
   "numberOfRuleBasedNotifications": 10,
   
-  "logo": "assets/img/logo-sdnnt.svg",
+  "logo": "assets/img/logo-dnnt-v3.svg",
   "homeTabs": ["about", "news", "readers", "authors",  "libraries", "api"],
   "role": ["admin", "kurator", "mainKurator", "knihovna", "user"],
   "dntStates": {
