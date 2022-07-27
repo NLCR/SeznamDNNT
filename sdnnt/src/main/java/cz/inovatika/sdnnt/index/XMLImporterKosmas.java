@@ -7,6 +7,7 @@ package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
+import static cz.inovatika.sdnnt.index.XMLImporterDistri.LOGGER;
 import cz.inovatika.sdnnt.indexer.models.Import;
 import java.io.File;
 import java.io.FileInputStream;
@@ -224,12 +225,22 @@ public class XMLImporterKosmas {
     try {
       total++;
       long id = total;
-      if (item.containsKey("EAN")) {
-        id = Long.parseLong(item.get("EAN"));
-      } else {
+      
+      if (!item.containsKey("EAN")) {
         LOGGER.log(Level.INFO, "{0} nema EAN, vynechame", item.get("NAME"));
         return;
       }
+      String ean = item.get("EAN");
+      // https://github.com/NLCR/SeznamDNNT/issues/443
+      if (!(ean.startsWith("977") || ean.startsWith("978") || ean.startsWith("979"))) {
+        LOGGER.log(Level.INFO, "EAN {0} nezacina s 977 nebo 978 nebo 979, vynechame", ean);
+        return;
+      }
+      
+      if (item.containsKey("EAN")) {
+        id = Long.parseLong(item.get("EAN"));
+      }
+      
       if (first_id == null) {
         first_id = id+"";
       }
@@ -239,13 +250,11 @@ public class XMLImporterKosmas {
       } 
 
       SolrInputDocument idoc = new SolrInputDocument();
-      String item_id = item.get("EAN") + "_" + import_origin;
+      String item_id = ean + "_" + import_origin;
       idoc.setField("import_id", import_id);
       idoc.setField("import_date", import_date);
       idoc.setField("id", import_id + "_" + id);
-      if (item.containsKey("EAN")) {
-        idoc.setField("item_id", item_id); 
-      }
+      idoc.setField("item_id", item_id); 
       item.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + item.get("EAN"));
 
       idoc.setField("item", new JSONObject(item).toString());
