@@ -123,7 +123,8 @@ export class ResultItemComponent implements OnInit {
         this.doc[t].forEach((lorig: string) => {
           const l = lorig
             .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
-            .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/');
+            .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
+            .split(' ')[0];
           if (!this.dkLinks.includes(l)) {
             this.dkLinks.push(l);
           }
@@ -139,7 +140,7 @@ export class ResultItemComponent implements OnInit {
 
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
-        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
+        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
       }
 
     } else if (this.doc.marc_911u) {
@@ -148,7 +149,7 @@ export class ResultItemComponent implements OnInit {
 
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
-        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/') + '/thumb';
+        this.imgSrc = link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
       }
 
     } else if (this.doc.marc_856u) {
