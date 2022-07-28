@@ -46,6 +46,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 import cz.inovatika.sdnnt.services.GranularityService;
 import cz.inovatika.sdnnt.services.GranularitySetStateService;
+import cz.inovatika.sdnnt.services.impl.utils.MarcUtils;
 import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -274,19 +275,29 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                         if (license != null && license.equals(License.dnntt.name())) {
                                             ZahorikUtils.SE_1_DNNTT(nState, license, items);
                                         } else if (license != null && license.equals(License.dnnto.name())){
-
+                                            
+                                            boolean regularityFlag = false;
                                             char regularity = controlField.charAt(19);
-                                            if (regularity == 'r') {
+                                            String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r,x");
+                                            String[] rsplit = regularityPattern.split(",");
+                                            for (String confPattern : rsplit) {
+                                                if (confPattern.length() > 0 &&  confPattern.charAt(0) == regularity) {
+                                                    regularityFlag = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (regularityFlag) {
                                                 boolean regularSE = false;
-                                                String pattern = Options.getInstance().getString("granularity.se.00819", "b,c,d,e,f,j,q,t,s,m,w,z");
+                                                String frequencyPattern = Options.getInstance().getString("granularity.se.00819", "b,c,d,e,f,j,q,t,s,m,w,z");
                                                 char periodicity = controlField.charAt(18);
-                                                String[] split = pattern.split(",");
-                                                for (String confPattern : split) {
+                                                String[] psplit = frequencyPattern.split(",");
+                                                for (String confPattern : psplit) {
                                                     if (confPattern.length() > 0 &&  confPattern.charAt(0) == periodicity) {
                                                         regularSE = true;
                                                         break;
                                                     }
                                                 }
+                                                
                                                 if (regularSE) {
                                                     ZahorikUtils.SE_2_DNNTO(nState, license, items);
                                                 } else {
@@ -353,7 +364,5 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
             return null;
         }
     }
-
-    
 
 }

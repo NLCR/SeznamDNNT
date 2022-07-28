@@ -1,7 +1,9 @@
 package cz.inovatika.sdnnt.services.impl.zahorikutils;
 
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.apache.solr.security.AuditEvent.Level;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,9 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 
 public class ZahorikUtils {
+    
+    
+    static java.util.logging.Logger LOGGER = Logger.getLogger(ZahorikUtils.class.getName());
     
     private ZahorikUtils() {}
 
@@ -43,20 +48,29 @@ public class ZahorikUtils {
                     }
 
                     if (split.length > 1) {
-                        rok = Integer.parseInt(split[1].trim());
+                        rok = parsingYear(split[1].trim());
                     } else if (split.length == 1){
-                        rok = Integer.parseInt(split[0]);
+                        rok = parsingYear(split[0]);
                     } else {
-                        rok = Integer.parseInt(rocnik);
+                        rok = parsingYear( rocnik);
                     }
                 } else {
-                    rok = Integer.parseInt(gItem.getString("rocnik").trim());
+                    rok = parsingYear(gItem.getString("rocnik").trim());
                 }
             } catch (NumberFormatException | JSONException  e) {
                 e.printStackTrace();
             }
         }
         return rok;
+    }
+
+    private static int parsingYear( String rocnik) {
+        try {
+            return Integer.parseInt(rocnik);
+        } catch (Exception e) {
+            LOGGER.warning(String.format("Input date parsing problem '%s'", rocnik));
+            return -1;
+        }
     }
 
     public static void BK_DNNTO(String nState, String license, List<JSONObject> items) {

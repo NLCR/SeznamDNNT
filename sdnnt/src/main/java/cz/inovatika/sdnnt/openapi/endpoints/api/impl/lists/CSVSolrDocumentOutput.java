@@ -31,7 +31,6 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
         Set<String> emmitedGranularityPIDS = new HashSet<>();
         Set<String> allGranularityPIDS = new HashSet<>();
         
-        //String label = (String) outputDocument.get(LABEL_KEY);
         Object object = outputDocument.get(FMT_KEY);
         
         Collection<String> pids = (Collection<String>) outputDocument.get(PIDS_KEY);
@@ -40,27 +39,31 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
 
         List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
         granularity.stream().map(it-> new JSONObject(it)).forEach(jsonObject -> {
+            // pokud je vyrazeno nebo x - nepropagovat 
             JSONArray stav = jsonObject.optJSONArray("stav");
             String license = jsonObject.optString("license");
             String cislo = jsonObject.optString("cislo");
             String link = jsonObject.optString("link");
             String rocnik = jsonObject.optString("rocnik");
+            String fetched = jsonObject.optString("fetched");
 
-            // TODO:
-            if (link != null)  {
-                String pid = PIDSupport.pidNormalization(PIDSupport.pidFromLink(link));
-                if (!pid.equals(masterPid)) {
-                    if (license != null && license.equals(endpointLicense)) {
-                        try {
-                            List<String> record = csvRecord(outputDocument, fields, pid);
-                            printer.printRecord(record);
-                            emmitedGranularityPIDS.add(pid);
-                            //LOGGER.info(String.format(" CSV %s counter %d",record.toString() ,counter.incrementAndGet()));
-                        } catch (IOException e) {
-                            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+            if (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched")) {
+                if (link != null)  {
+                    String pid = PIDSupport.pidNormalization(PIDSupport.pidFromLink(link));
+                    if (!pid.equals(masterPid)) {
+                        // nesmi byt stav x - kdyby nahodou byla prirazena licence 
+                        if (license != null && license.equals(endpointLicense)) {
+                            try {
+                                List<String> record = csvRecord(outputDocument, fields, pid);
+                                printer.printRecord(record);
+                                emmitedGranularityPIDS.add(pid);
+                                //LOGGER.info(String.format(" CSV %s counter %d",record.toString() ,counter.incrementAndGet()));
+                            } catch (IOException e) {
+                                LOGGER.log(Level.SEVERE,e.getMessage(),e);
+                            }
                         }
+                        allGranularityPIDS.add(pid);
                     }
-                    allGranularityPIDS.add(pid);
                 }
             }
         });

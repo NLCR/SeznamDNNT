@@ -691,7 +691,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
+                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -718,7 +718,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
+                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 return Response.ok().entity(response).build();

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,23 +56,30 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         String cislo = jsonObject.optString("cislo");
         String link = jsonObject.optString("link");
         String rocnik = jsonObject.optString("rocnik");
+        String fetched  = jsonObject.optString("fetched");
+        
+        if (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched")) {
 
-        ListitemGranularity granularity = new ListitemGranularity();
-        if (stav != null) stav.forEach(o-> granularity.addStatesItem(o.toString()));
-        if (license != null && !license.trim().equals("")) {
-            granularity.setTerritoriality("CZ");
-            granularity.setLicense(license);
+            ListitemGranularity granularity = new ListitemGranularity();
+            if (stav != null) stav.forEach(o-> granularity.addStatesItem(o.toString()));
+            if (license != null && !license.trim().equals("")) {
+                granularity.setTerritoriality("CZ");
+                granularity.setLicense(license);
+            }
+            if (cislo != null && !cislo.trim().equals("")) granularity.setNumber(cislo);
+            if (link != null && link.contains("uuid:")) {
+                int indexOf = link.indexOf("uuid:");
+                String pid = link.substring(indexOf);
+                granularity.pid(pid);
+            }
+            if (rocnik != null) {
+                granularity.number(rocnik);
+            }
+            return granularity;
+        } else {
+            return null;
         }
-        if (cislo != null && !cislo.trim().equals("")) granularity.setNumber(cislo);
-        if (link != null && link.contains("uuid:")) {
-            int indexOf = link.indexOf("uuid:");
-            String pid = link.substring(indexOf);
-            granularity.pid(pid);
-        }
-        if (rocnik != null) {
-            granularity.number(rocnik);
-        }
-        return granularity;
+        
     }
 
     @Override
@@ -174,8 +182,14 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             
             List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
             if (granularity != null) {
-                List<ListitemGranularity> collect = granularity.stream().map(this::granularity).collect(Collectors.toList());
-                // filter master pid
+                List<ListitemGranularity> collect = new ArrayList<>();
+                for (String grItemString : granularity) {
+                    ListitemGranularity gritem = granularity(grItemString);
+                    if (gritem != null) {
+                        collect.add(gritem);
+                    }
+                }
+ 
                 collect = collect.stream().filter(g -> {
                         if (g.getPid()!= null) {
                             return !g.getPid().equals(pid);

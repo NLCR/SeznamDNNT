@@ -104,7 +104,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -176,7 +176,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -240,7 +240,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -312,7 +312,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -375,7 +375,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -442,7 +442,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -505,7 +505,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format
@@ -572,7 +572,7 @@ paths:
           description: Instituce kde je titul digitalizovan
           schema:
             type: string
-            example: ABA001
+            example: NKP
           required: false
         - in: query
           name: format

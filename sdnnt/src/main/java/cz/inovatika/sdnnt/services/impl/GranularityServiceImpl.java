@@ -186,7 +186,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         Object identifier = rsp.getFieldValue("identifier");
 
                         Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
-                        Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
+                        //Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
                         Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
 
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
@@ -205,11 +205,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                         if (links1 != null && !links1.isEmpty()) {
                             List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
-                            List<String> filtered = ll.stream().filter(it -> !granularityLinks.contains(it))
-                                    .collect(Collectors.toList());
-                            mapping.put(identifier.toString(), filtered);
-                        } else if (links2 != null && !links2.isEmpty()) {
-                            List<String> ll = links2.stream().map(Object::toString).collect(Collectors.toList());
                             List<String> filtered = ll.stream().filter(it -> !granularityLinks.contains(it))
                                     .collect(Collectors.toList());
                             mapping.put(identifier.toString(), filtered);

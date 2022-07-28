@@ -1,6 +1,9 @@
 package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import cz.inovatika.sdnnt.TestChangeProcessState;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.io.IOUtils;
@@ -18,6 +21,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
@@ -25,6 +29,19 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
 
 public class MarcModelTests {
 
+    @Test
+    public void deserializeFromRAW2JSON() throws IOException {
+        InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream("oai_aleph-nkp.cz_DNT01-000157317_RAW.json");
+        String jsonString = IOUtils.toString(resourceAsStream, "UTF-8");
+        MarcRecord marcRecord = MarcRecord.fromRAWJSON(jsonString);
+        marcRecord.dntstav = new ArrayList<>(Arrays.asList("PA"));
+        System.out.println(marcRecord.license);
+        System.out.println(marcRecord.dntstav);
+        ChangeProcessStatesUtility.changeProcessState("A", marcRecord, "message");
+        System.out.println(marcRecord.dntstav);
+        System.out.println(marcRecord.license);
+    }
+    
     @Test
     public void deserializeFromRAWJSON() throws IOException, SolrServerException {
         InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream("oai_aleph-nkp.cz_DNT01-000157317_RAW.json");
