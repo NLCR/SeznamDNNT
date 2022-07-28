@@ -117,14 +117,21 @@ export class ResultItemComponent implements OnInit {
     
     // Podle https://github.com/NLCR/SeznamDNNT/issues/444 "měly být jen odkazy z 911"
     // const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
+
     const tags = ['marc_911u'];
     tags.forEach(t => {
       if (this.doc[t]) {
         this.doc[t].forEach((lorig: string) => {
-          const l = lorig
+          // TODO: Config !! 
+          let l = lorig
+            .replace('//kramerius5.nkp.cz/uuid/', '//ndk.cz/uuid/')
+            .replace('//kramerius5.nkp.cz/search/handle/', '//ndk.cz/uuid/')
             .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
             .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
             .split(' ')[0];
+
+          l = this.normalizeLink(l);  
+            
           if (!this.dkLinks.includes(l)) {
             this.dkLinks.push(l);
           }
@@ -135,44 +142,72 @@ export class ResultItemComponent implements OnInit {
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
     if (this.doc.marc_956u) {
-      // Je to kramerius
       const link: string = this.doc.marc_956u[0];
-
-      // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
+      /*
       if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
+        //TODO: Support K7 !!
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
-      }
+      }*/
+      this.imgSrc = this.thumb(link);
 
     } else if (this.doc.marc_911u) {
-      // Je to kramerius
       const link: string = this.doc.marc_911u[0];
-
+      /*
       // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
       if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
-      }
+      }*/
 
+      this.imgSrc = this.thumb(link);
     } else if (this.doc.marc_856u) {
 
-      if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
-        // google books
-        const link: string = this.doc.marc_856u[0];
-        const id = link.substring(link.indexOf('vid=') + 4, link.indexOf('&'));
-        this.service.findGoogleBook(id).subscribe((res: any) => {
-          if (res[id]) {
-            this.imgSrc = res[id].thumbnail_url;
-          }
-          // this.imgSrc = res.items[0].volumeInfo.imageLinks.smallThumbnail;
-        });
-      } else {
-        // this.imgSrc = this.doc.marc_856u;
-      }
+      const link: string = this.doc.marc_856u[0];
 
+      const regex = /(uuid:[A-Za-z0-9\-]+)/g;
+      const found = link.match(regex);
+  
+      if (found && found.length > 0 ) {
+        this.imgSrc = this.thumb(link);
+      } else {
+        if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
+          // google books
+          const link: string = this.doc.marc_856u[0];
+          const id = link.substring(link.indexOf('vid=') + 4, link.indexOf('&'));
+          this.service.findGoogleBook(id).subscribe((res: any) => {
+            if (res[id]) {
+              this.imgSrc = res[id].thumbnail_url;
+            }
+          });
+        } else {
+          // this.imgSrc = this.doc.marc_856u;
+        }
+      }
     }
 
   
   }
 
+
+  normalizeLink(l:string) {
+    const regex = /(uuid:[A-Za-z0-9\-]+)/g;
+    const found = l.match(regex);
+    if (found && found.length > 0) {
+      const t = l.indexOf(found[0])
+      l = l.substring(0,t+found[0].length)
+    }    
+    return l;
+  }
+
+  thumb(link:string) {
+    link = this.normalizeLink(link);
+    // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
+    if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
+      //TODO: Support K7 !!
+      return  link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
+    } else if (link.indexOf('/uuid/') > -1 && link.indexOf('uuid:') > -1) {
+      return  link.replace('/uuid/', '/search/api/v5.0/item/').split(' ')[0] + '/thumb';
+    }
+  }
 
   setHasNavrhFlag() {
     //this.doc.dntstav?
