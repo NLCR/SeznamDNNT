@@ -2,10 +2,8 @@ package cz.inovatika.sdnnt.indexer.models;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import cz.inovatika.sdnnt.TestChangeProcessState;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
