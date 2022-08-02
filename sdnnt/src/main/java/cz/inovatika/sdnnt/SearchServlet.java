@@ -286,7 +286,7 @@ public class SearchServlet extends HttpServlet {
                     .setRows(0)
                     .addFilterQuery("import_id:" + req.getParameter("id"))
                     .addFilterQuery("controlled:false")
-                    .addFilterQuery("dntstav:*")
+                    .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
                     .setFields("*,identifiers:[json],catalog:[json],item:[json]");
             
             QueryRequest qreq = new QueryRequest(query);
