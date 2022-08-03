@@ -76,7 +76,6 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
                     try {
                         List<String> record = csvRecord(outputDocument, fields, p);
                         printer.printRecord(record);
-                        //LOGGER.info(String.format(" CSV %s counter %d",record.toString() ,counter.incrementAndGet()));
                     } catch (IOException e) {
                         LOGGER.log(Level.SEVERE,e.getMessage(),e);
                     }

@@ -174,7 +174,7 @@ public class OAIRequest {
 
           MarcRecord mr = MarcRecord.fromDocDep(doc);
           Date datestamp = (Date) doc.getFirstValue(SORT_FIELD);
-          boolean deletedStatus = mr.dntstav != null && mr.dntstav.get(0).equals(PublicItemState.D.name());
+          boolean deletedStatus = mr.dntstav != null && mr.dntstav.size() > 0 && mr.dntstav.get(0).equals(PublicItemState.D.name());
           ret.append("<record>");
           if (deletedStatus) {
               ret.append("<header status=\"deleted\">");

@@ -113,7 +113,6 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
 
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
                     List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
-                
                 try {
     
                     for (Pair<String, List<String>> pair : batch) {

@@ -18,7 +18,9 @@ public class ZahorikUtils {
     static java.util.logging.Logger LOGGER = Logger.getLogger(ZahorikUtils.class.getName());
     
     private ZahorikUtils() {}
-
+    
+    
+    // move to years utils
     public static int rocnik(JSONObject gItem) {
         int rok = -1;
         if (gItem.has("rocnik")) {
@@ -64,7 +66,7 @@ public class ZahorikUtils {
         return rok;
     }
 
-    private static int parsingYear( String rocnik) {
+    private static int parsingYear(String rocnik) {
         try {
             return Integer.parseInt(rocnik);
         } catch (Exception e) {

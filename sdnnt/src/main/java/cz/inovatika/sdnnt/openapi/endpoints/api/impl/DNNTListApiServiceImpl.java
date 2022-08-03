@@ -156,7 +156,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 for (SolrDocument resultDoc: rsp.getResults()) {
                     emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
                 }
-                response.setNumFound((int) rsp.getResults().getNumFound());
+                //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
             });
             return Response.ok().entity(response).build();
@@ -205,7 +205,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 for (SolrDocument resultDoc: rsp.getResults()) {
                     emitDocument(false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name(), false);
                 }
-                response.setNumFound((int) rsp.getResults().getNumFound());
+                //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
             });
             return Response.ok().entity(response).build();
@@ -256,7 +256,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 for (SolrDocument resultDoc : rsp.getResults()) {
                     emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null, false);
                 }
-                response.setNumFound((int) rsp.getResults().getNumFound());
+                //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
             });
             return Response.ok().entity(response).build();

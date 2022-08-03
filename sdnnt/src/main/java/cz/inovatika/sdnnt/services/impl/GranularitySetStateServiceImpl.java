@@ -278,7 +278,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                             
                                             boolean regularityFlag = false;
                                             char regularity = controlField.charAt(19);
-                                            String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r,x");
+                                            String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
                                             String[] rsplit = regularityPattern.split(",");
                                             for (String confPattern : rsplit) {
                                                 if (confPattern.length() > 0 &&  confPattern.charAt(0) == regularity) {
@@ -363,6 +363,13 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
         } else {
             return null;
         }
+    }
+
+
+    public static void main(String[] args) throws IOException {
+        String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
+        String[] rsplit = regularityPattern.split(",");
+        System.out.println(rsplit.length);
     }
 
 }

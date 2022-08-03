@@ -87,7 +87,6 @@ public class SKCDeleteServiceImpl extends AbstractCheckDeleteService implements 
     
     @Override
     protected Map<Case, List<Pair<String, List<String>>>> checkUpdate() throws IOException, SolrServerException {
-        //getLogger().info("Check update");
         Map<Case, List<Pair<String, List<String>>>> retvals = new HashMap<>();
         try (final SolrClient solrClient = buildClient()) {
            for (int i = 0; i < this.deletedInfo.size(); i++) {

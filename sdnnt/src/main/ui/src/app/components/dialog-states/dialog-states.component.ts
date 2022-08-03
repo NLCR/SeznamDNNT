@@ -123,7 +123,7 @@ export class DialogStatesComponent implements OnInit {
   }
 
   shouldShowGranularity(): boolean {
-    return (this.fmt != null && this.fmt === "SE");
+    return (this.fmt != null);
   }
 
   changeState(evt: any) {

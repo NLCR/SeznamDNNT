@@ -29,16 +29,17 @@ public class ChangeProcessStatesUtility {
         CuratorItemState kstav = CuratorItemState.valueOf(state);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
         if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
-          mr.license = License.dnnto.name();
+            if (mr.license == null) {
+                mr.license = License.dnnto.name();
+            }
         } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
-          mr.license = License.dnntt.name();
+            if (mr.license == null) {
+                mr.license = License.dnntt.name();
+            }
         } else {
             mr.license = null;
         }
-        
-        // granularity change
         granularityChange(mr, previous, kstav); 
-        
         mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
         return mr.toSolrDoc();
     }

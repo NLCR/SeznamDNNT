@@ -40,7 +40,8 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů. 
+                         
           schema:
             type: string
             example: ABA001
@@ -55,7 +56,7 @@ paths:
           required: false
         - in: query
           name: institution
-          description: Sigla instituce, ktera ma dilo ve fondu
+          description: Sigla instituce, která ma dílo ve fondu
           schema:
             type: string
             example: ABA001
@@ -101,7 +102,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů
           schema:
             type: string
             example: NKP
@@ -138,7 +139,7 @@ paths:
           required: false
         - in: query
           name: notincludeparent
-          description: Nezahrnovat parent pokud je přítomna granularita, dnnt-contains. Issue #853
+          description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
           schema:
             type: boolean
             default: false
@@ -173,7 +174,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
             example: NKP
@@ -237,7 +238,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
             example: NKP
@@ -274,7 +275,7 @@ paths:
           required: false
         - in: query
           name: notincludeparent
-          description: Nezahrnovat parent pokud je přítomna granularita, dnnt-contains. Issue #853
+          description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
           schema:
             type: boolean
             default: false
@@ -309,7 +310,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
           schema:
             type: string
             example: NKP
@@ -372,7 +373,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
             example: NKP
@@ -439,7 +440,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan. Možno využít zkratky a sigly uvedené v registru krameriů.
           schema:
             type: string
             example: NKP
@@ -502,7 +503,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
             example: NKP
@@ -569,7 +570,7 @@ paths:
       parameters:
         - in: query
           name: digital_library
-          description: Instituce kde je titul digitalizovan
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
           schema:
             type: string
             example: NKP

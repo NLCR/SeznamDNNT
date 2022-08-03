@@ -55,6 +55,9 @@ import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.GranularityService;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
+import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
+import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
+import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -167,6 +170,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         
         Map<String, List<String>> mapping = new HashMap<>();
 
+        Map<String, List<String>> rules911r = new HashMap<>(); 
+        
         try (final SolrClient solrClient = buildClient()) {
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "10000");
@@ -179,17 +184,17 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
             AtomicInteger count = new AtomicInteger();
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
-                    Arrays.asList(IDENTIFIER_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U, GRANULARITY_FIELD
+                    Arrays.asList(IDENTIFIER_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U, GRANULARITY_FIELD, "marc_911r"
 
                     ), (rsp) -> {
 
                         Object identifier = rsp.getFieldValue("identifier");
-
+                        
+                        
                         Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
-                        //Collection<Object> links2 = rsp.getFieldValues(MARC_956_U);
                         Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
-
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
+
                         List<String> granularityLinks = new ArrayList<>();
                         if (granularity != null) {
                             granularity.stream().forEach(it -> {
@@ -204,10 +209,18 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         }
 
                         if (links1 != null && !links1.isEmpty()) {
+                            
+                            Collection<Object> yearsColl = rsp.getFieldValues("marc_911r");
+                            if (yearsColl != null) {
+                                List<String> years = yearsColl.stream().map(Objects::toString).collect(Collectors.toList());
+                                rules911r.put(identifier.toString(), years);
+                            }
+                            
                             List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
                             List<String> filtered = ll.stream().filter(it -> !granularityLinks.contains(it))
                                     .collect(Collectors.toList());
                             mapping.put(identifier.toString(), filtered);
+                        
                         } else if (links3 != null && !links3.isEmpty()) {
                             List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
                             List<String> filtered = ll.stream().filter(it -> !granularityLinks.contains(it))
@@ -227,24 +240,25 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             if ((counter % 10000) == 0) {
                 getLogger().fine("Counter: "+counter);
             }
-
+            // identifikator - url 
             List<String> links = mapping.get(key);
             for (String link : links) {
                 String pid = pid(link);
                 if (pid != null) {
                     String baseUrl = baseUrl(link);
+                    
                     if (!buffer.containsKey(baseUrl)) {
                         buffer.put(baseUrl, new ArrayList<>());
                     }
                     getLogger().info("baseurl " + baseUrl + " pair " + Pair.of(key, pid));
                     buffer.get(baseUrl).add(Pair.of(key, pid));
-                    checkBuffer(buffer);
+                    checkBuffer(buffer, rules911r);
                 }
             }
         }
 
         if (!buffer.isEmpty()) {
-            checkBuffer(buffer);
+            checkBuffer(buffer, rules911r);
         }
         
         try (final SolrClient solrClient = buildClient()) {
@@ -254,10 +268,10 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         
     }
 
-    protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer) {
+    protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer, Map<String, List<String>> filterGranularityRules) {
         Integer sum = buffer.values().stream().map(List::size).reduce(0, Integer::sum);
         if (sum > CHECK_SIZE) {
-            clearBuffer(buffer);
+            clearBuffer(buffer, filterGranularityRules);
         }
     }
 
@@ -290,7 +304,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         return null;
     }
 
-    protected void clearBuffer(Map<String, List<Pair<String, String>>> buffer) {
+    protected void clearBuffer(Map<String, List<Pair<String, String>>> buffer, Map<String, List<String>> filterGranularityRules) {
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null)
@@ -303,9 +317,12 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 
                 List<Pair<String, String>> pairs = buffer.get(baseUrl);
 
-                Map<String, String> pidsMapping = new HashMap<>();
+                Map<String, List<String>> pidsMapping = new HashMap<>();
                 pairs.stream().forEach(p -> {
-                    pidsMapping.put(p.getRight(), p.getLeft());
+                    if (!pidsMapping.containsKey(p.getRight())) {
+                        pidsMapping.put(p.getRight(), new ArrayList<>());
+                    }
+                    pidsMapping.get(p.getRight()).add(p.getLeft());
                 });
 
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
@@ -331,9 +348,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     int numFound = responseObject.optInt("numFound", 0);
                     if (numFound > 0) {
 
-                        if (numFound > MAX_FETCHED_DOCS) {
-                            // System.out.println("MAximalni ");
-                        }
                         Map<String, List<Map<String, String>>> solrResonseGranularity = new HashMap<>();
 
                         JSONArray docs = responseObject.optJSONArray("docs");
@@ -358,26 +372,36 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             solrResonseGranularity.get(rootPid).add(map);
                         }
 
-                        // System.out.println("Checking "+results.keySet());
-                        // pidsMapping.get(buffer)
                         try (final SolrClient solrClient = buildClient()) {
                             Set keySet = solrResonseGranularity.keySet();
                             for (Object key : keySet) {
-                                String identifier = pidsMapping.get(key.toString());
-                                List<Map<String, String>> digitalized = solrResonseGranularity.get(key.toString());
-                                SolrQuery q = (new SolrQuery("identifier:\"" + identifier + "\"")
-                                        .setFields(MarcRecordFields.GRANULARITY_FIELD)).setRows(1);
-                                QueryResponse response = solrClient.query(DataCollections.catalog.name(), q);
-                                SolrDocumentList solrResults = response.getResults();
-                                if (solrResults.getNumFound() > 0) {
-                                    SolrDocument sDoc = solrResults.get(0);
-                                    if (sDoc.containsKey(MarcRecordFields.GRANULARITY_FIELD)) {
-                                        List<String> solrGran = (List<String>) sDoc
-                                                .getFieldValue(MarcRecordFields.GRANULARITY_FIELD);
-                                        compare(solrClient, identifier, baseUrl, solrGran, digitalized);
-                                    } else {
-                                        add(solrClient, identifier, baseUrl, digitalized);
+                                // identifiers not identifier
+                                List<String> identifiers = pidsMapping.get(key.toString());
+                                for (String identifier : identifiers) {
+                                    // pokud jsou pravidla, pak filtruj granularitu 
+                                    List<Map<String, String>> digitalized = solrResonseGranularity.get(key.toString());
+                                    if (filterGranularityRules.containsKey(identifier)) {
+
+                                        List<String> rules = filterGranularityRules.get(identifier);
+                                        if (rules != null && rules.size() > 0) {
+                                            digitalized = filterGranularity(rules, digitalized);
+                                        }
                                     }
+                                    SolrQuery q = (new SolrQuery("identifier:\"" + identifier + "\"")
+                                            .setFields(MarcRecordFields.GRANULARITY_FIELD)).setRows(1);
+                                    QueryResponse response = solrClient.query(DataCollections.catalog.name(), q);
+                                    SolrDocumentList solrResults = response.getResults();
+                                    if (solrResults.getNumFound() > 0) {
+                                        SolrDocument sDoc = solrResults.get(0);
+                                        if (sDoc.containsKey(MarcRecordFields.GRANULARITY_FIELD)) {
+                                            List<String> solrGran = (List<String>) sDoc
+                                                    .getFieldValue(MarcRecordFields.GRANULARITY_FIELD);
+                                            compare(solrClient, identifier, baseUrl, solrGran, digitalized);
+                                        } else {
+                                            add(solrClient, identifier, baseUrl, digitalized);
+                                        }
+                                    }
+                                    
                                 }
                             }
                         }
@@ -391,6 +415,24 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
         buffer.clear();
+    }
+
+    private List<Map<String, String>> filterGranularity(List<String> rules, List<Map<String,String>> digitalized) {
+        Set<Map<String,String>> set = new LinkedHashSet<>();
+
+        List<Pair<Integer, Integer>> pairs = rules.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
+        for (Map<String, String> map : digitalized) {
+            if (map.containsKey("datum_str")) {
+                String date = map.get("datum_str");
+                Integer date2 = SolrYearsUtils.solrDate(date);
+                for (Pair<Integer, Integer> p : pairs) {
+                    if ( date2 >= p.getLeft() && date2 <= p.getRight()) {
+                        set.add(map);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(set);
     }
 
     private void add(SolrClient solr, String identifier, String baseUrl, List<Map<String, String>> list)

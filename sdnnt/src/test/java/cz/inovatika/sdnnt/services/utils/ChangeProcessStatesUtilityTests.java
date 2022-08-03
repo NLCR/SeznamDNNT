@@ -40,6 +40,22 @@ public class ChangeProcessStatesUtilityTests {
         Assert.assertTrue(marcRecord.historie_kurator_stavu.getJSONObject(3).getString("stav").equals("NPA"));
         
     }
+
+    @Test
+    public void testChangeStateNPA_DX() throws IOException {
+        MarcRecord marcRecord = MarcRecord.fromDocDep(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));
+        marcRecord.license = "dnntt";
+
+        Assert.assertNotNull(marcRecord.datum_stavu);
+        Assert.assertNotNull(marcRecord.dntstav);
+        Assert.assertTrue(marcRecord.dntstav.size() == 1);
+
+        
+        ChangeProcessStatesUtility.changeProcessState("DX", marcRecord,"Zmena stavu");
+        Assert.assertTrue(marcRecord.license != null && marcRecord.license.equals("dnntt"));
+        
+    }
+
     @Test
     public void testChangeStateD() throws IOException {
         MarcRecord marcRecord = MarcRecord.fromDocDep(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_")).get(0));

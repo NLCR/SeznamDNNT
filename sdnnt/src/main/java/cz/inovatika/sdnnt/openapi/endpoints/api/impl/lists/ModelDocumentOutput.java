@@ -189,7 +189,6 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                         collect.add(gritem);
                     }
                 }
- 
                 collect = collect.stream().filter(g -> {
                         if (g.getPid()!= null) {
                             return !g.getPid().equals(pid);
