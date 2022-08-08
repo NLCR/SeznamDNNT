@@ -122,21 +122,41 @@ public class OAIHarvestDeleteServiceTTest {
             return;
         }
         try {
+            
+            String config = "  {     \"OAIHavest\": {\r\n"
+                    + "            \"url\": \"http://aleph.nkp.cz/OAI\",\r\n"
+                    + "            \"numrepeat\": 15,\r\n"
+                    + "            \"seconds\" : 10,\r\n"
+                    + "            \"debug\":true,\r\n"
+                    + "            \"testfile\":\"/c:/Users/happy/.sdnnt/test.oai\",\r\n"
+                    + "            \"results\":{\r\n"
+                    + "                    \"SKC_1\": \"request\",\r\n"
+                    + "                    \"SKC_2\": \"request\",\r\n"
+                    + "                    \"SKC_3\": \"request\",\r\n"
+                    + "                    \"SKC_4a\": \"request\",\r\n"
+                    + "                    \"SKC_4b\": \"request\"\r\n"
+                    + "            }\r\n"
+                    + "        }}";
+                    
+            
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
-                    .withConstructor("test-logger",new JSONObject())
+                    .withConstructor("test-logger",new JSONObject(config).getJSONObject("OAIHavest").getJSONObject("results"))
                     .addMockedMethod("getOptions")
                     .addMockedMethod("buildClient")
                     .addMockedMethod("buildAccountService")
                     .createMock();
 
             Options options = EasyMock.createMock(Options.class);
+            
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
                     new BuildSolrClientSupport()
             ).anyTimes();
             EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
 
+            EasyMock.expect(options.getJSONObject("OAIHavest")).andReturn(new JSONObject(config).getJSONObject("OAIHavest")).anyTimes();
+            
 
             User user = testUser();
             UserController controler  = EasyMock.createMock(UserController.class);
