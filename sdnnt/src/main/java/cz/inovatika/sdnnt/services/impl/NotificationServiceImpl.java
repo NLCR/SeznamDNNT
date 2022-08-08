@@ -378,7 +378,7 @@ public class NotificationServiceImpl implements NotificationsService {
                 SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
                         .addFilterQuery(fqCatalog)
                         .addFilterQuery(ruleNotification.provideProcessQueryFilters())
-                        .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu");
+                        .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu, kuratorstav");
 
                 try {
                     iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
@@ -436,7 +436,7 @@ public class NotificationServiceImpl implements NotificationsService {
                 SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
                         .addFilterQuery(fqCatalog)
                         .addFilterQuery(fqJoin)
-                        .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu");
+                        .setFields("identifier,datum_stavu,nazev,dntstav,license,historie_stavu, kuratorstav");
                 
                 iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 

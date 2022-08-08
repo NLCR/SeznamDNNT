@@ -186,10 +186,9 @@ public class DuplicateUtilsTTest {
                 Assert.assertTrue(fromDoc.identifier.equals("oai:aleph-nkp.cz:SKC01-000995692"));
                 
                 Pair<Case,List<String>> findSKCFollowers = DuplicateSKCUtils.findSKCFollowers(client, fromDoc);
-                System.out.println(findSKCFollowers);
                 Assert.assertTrue(findSKCFollowers.getValue().size() == 1);
                 Assert.assertTrue(findSKCFollowers.getValue().get(0).equals("oai:aleph-nkp.cz:SKC01-00099999c"));
-                Assert.assertTrue(findSKCFollowers.getKey().equals(Case.SKC_2a));
+                Assert.assertTrue(findSKCFollowers.getKey().equals(Case.SKC_1));
 
             }
         } catch (IOException e) {
@@ -232,10 +231,10 @@ public class DuplicateUtilsTTest {
                 Assert.assertTrue(fromDoc.identifier.equals("oai:aleph-nkp.cz:SKC01-000995692"));
                 
                 Pair<Case,List<String>> findSKCFollowers = DuplicateSKCUtils.findSKCFollowers(client, fromDoc);
-                Assert.assertTrue(findSKCFollowers.getValue().size() == 1);
-                Assert.assertTrue(findSKCFollowers.getValue().get(0).equals("oai:aleph-nkp.cz:SKC01-00099910a"));
-                System.out.println(findSKCFollowers.getKey());
-                //Assert.assertTrue(findSKCFollowers.getKey().equals(Case.SKC_2a));
+                // if there is CCNB - do not find 910a 910x
+
+                Assert.assertTrue(findSKCFollowers.getValue().size() == 0);
+                //Assert.assertTrue(findSKCFollowers.getValue().get(0).equals("oai:aleph-nkp.cz:SKC01-00099910a"));
 
             }
         } catch (IOException e) {
