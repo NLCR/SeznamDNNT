@@ -62,7 +62,7 @@
     "tooltip": {
       "undefined": "Nezařazeno - dílo je nezařazeno na Seznamu, je volně dostupné k návrhu na zařazení",
       "NNN": "Není na seznamu",
-      "NPA": "Dílo bude publikováno jako Návrh k zařazení do seznamu, datum přepnutí 1.2 nebo 1.8",
+      "NPA": "Dílo bude publikováno jako Návrh k zařazení do seznamu, datum přepnutí 1.3 nebo 1.9",
       "PA": "Dílo publikováno jako Návrh k zařazení do seznamu, běží mu 6 měsíců do přeřazení k stavu A",
       "A": "Zařazeno - dílo je zařazeno na Seznamu a má přiřazené licence k použití. V případě digitální verze je dostupný prolink na dílo do digitální knihovny (DK) typu Kramerius",
       "VN": "Výzva k vyřazení",
@@ -882,7 +882,7 @@
     "zaznamu": "záznamů",
 
     "debug_nzn_0_5wd":"5 pracovních dnů",
-    "debug_nzn_1_12_18":"1.2 nebo 1.8",
+    "debug_nzn_1_12_18":"1.3 nebo 1.9",
     "debug_nzn_2_6m":"6 měsíců",
     "debug_vn_0_28d":"28 dnů",
     "debug_vnl_0_5wd":"5 pracovních dnů",
@@ -892,7 +892,7 @@
     "debug_px_0_5wd":"5 pracovních dnů",
 
     "period_nzn_0_5wd":"5 pracovních dnů",
-    "period_nzn_1_12_18": "1.2 nebo 1.8",
+    "period_nzn_1_12_18": "1.3 nebo 1.9",
     "period_nzn_2_6m": "6 měsíců",  
     "period_vn_0_28d": "28 dnů",  
     "period_vln_0_5wd": "5 pracovních dnů",  
