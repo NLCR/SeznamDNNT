@@ -59,7 +59,7 @@ paths:
           name: fmt
           schema:
             type: string
-            enum: ["BK","SE", "MP","MU"]
+            enum: ["BK","SE"]
           required: false
 
 
