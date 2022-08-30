@@ -260,6 +260,14 @@ export class AppService {
     return this.post(url, { identifiers, zadost, reason, options}, params);
   }
 
+  approveItemsBatch(identifiers: string[], zadost: Zadost, reason: string, alternative: string, options: string): Observable<string> {
+    let url = '/account/approve_batch';
+    let params: HttpParams = new HttpParams();
+    if (alternative != null) {
+      params = params.append('alternative', alternative);
+    }
+    return this.post(url, { identifiers, zadost, reason, options}, params);
+  }
 
   rejectItem(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/reject';
@@ -274,6 +282,16 @@ export class AppService {
   }
 
 
+
+  rejectItemsBatch(identifiers: string[], zadost: Zadost, reason: string): Observable<string> {
+    let url = '/account/reject_batch';
+    const params: HttpParams = new HttpParams();
+    return this.post(url, { identifiers, zadost, reason }, params);
+  }
+
+
+
+
   /** approve navrh lib */
   approveNavrhLib(identifier: string, zadost: Zadost, reason: string): Observable<string> {
     let url = '/account/approve_navrh_lib';
@@ -281,6 +299,7 @@ export class AppService {
     return this.post(url, { identifier, zadost, reason}, params);
   }
 
+  
   
 
   getZadost(id: string): Observable<any> {
@@ -304,6 +323,12 @@ export class AppService {
     let url = 'account/get_zadost_records';
     return this.get(url, params);
   }
+
+  getZadostInvalidRecords(params: HttpParams): Observable<any> {
+    let url = 'account/get_zadost_invalid_records';
+    return this.get(url, params);
+  }
+
 
   getText(id: string): Observable<string> {
     let url = '/texts/read';

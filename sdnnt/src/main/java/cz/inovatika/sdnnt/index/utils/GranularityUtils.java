@@ -19,6 +19,11 @@ public class GranularityUtils {
 
     private GranularityUtils() {}
 
+    /**
+     * Returns true if given objects are equal
+     * @param first First item
+     * @param second Second item
+     */
     public static boolean eqGranularityObject(JSONObject first, JSONObject second) {
         JSONArray fStav = first.optJSONArray(STAV_FIELD);
         JSONArray fKuratorStav = first.optJSONArray(KURATORSTAV_FIELD);
@@ -54,4 +59,14 @@ public class GranularityUtils {
         }
         return false;
     }
+
+    
+    /**
+     * Returns true if given object represents object item 
+     * @param jsonObject
+     */
+    public static boolean isGranularityItem(JSONObject jsonObject) {
+        return (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched"));
+    }
+    
 }

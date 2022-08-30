@@ -104,6 +104,9 @@ public interface AccountService {
      * @throws AccountException
      */
     public JSONObject getRecords(String id, int rows, int page) throws SolrServerException, IOException, ConflictException,AccountException;
+    
+    // return invalid records in request
+    public JSONObject getInvalidRecords(String id) throws SolrServerException, IOException, ConflictException,AccountException;
 
     /**
      * Closing requests - from user's end
@@ -142,6 +145,23 @@ public interface AccountService {
      * @throws SolrServerException
      */
     public JSONObject deleteRequest(String payload) throws ConflictException, AccountException, IOException, SolrServerException;
+
+    
+    /**
+     * Switch state - curator's end -  
+     * @param zadostJSON
+     * @param sopts
+     * @param documentIds
+     * @param reason
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
+    public JSONObject curatorSwitchStateBatch(JSONObject zadostJSON, String sopts, List<String> documentIds, String reason, AccountServiceBatchInform inform) throws ConflictException, AccountException, IOException, SolrServerException;
+
+    
     
     /**
      * Switch state - curator's end
@@ -156,6 +176,8 @@ public interface AccountService {
      */
     public JSONObject curatorSwitchState(JSONObject zadostJson, String switchOptions, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
+    
+    
     /**
      * Switch state - alternative state
      * @param alternative Alternative state
@@ -183,6 +205,10 @@ public interface AccountService {
      */
     public JSONObject curatorRejectSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
 
+
+    public JSONObject curatorRejectStateBatch(JSONObject zadostJSON, List<String> documentIds, String reason, AccountServiceBatchInform inform) throws ConflictException, AccountException, IOException, SolrServerException;
+
+    
     /**
      * Scheduler switch states 
      * @throws ConflictException

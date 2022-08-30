@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
@@ -15,6 +16,7 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.api.*;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.AlreadyUsedException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.EmptyIdentifiers;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.MaximumNumberOfIdentifiersExceeded;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
 
 import cz.inovatika.sdnnt.services.AccountService;
@@ -29,6 +31,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.store.blockcache.ReusedBufferedIndexOutput;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -205,6 +208,12 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 response.getNotsaved().add(ns.reason(e.getMessage()));
 
                             }
+                        }catch (MaximumNumberOfIdentifiersExceeded e) {
+                            FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                            ns.identifiers(req.getIdentifiers())
+                                    .pozadavek(req.getPozadavek())
+                                    .poznamka(req.getPoznamka());
+                            response.getNotsaved().add(ns.reason("Maximum number of items exceeded. Number of items:"+e.getNumberOfIdentifiers()+". Maximum: "+e.getMaximum()));
                         } catch (AlreadyUsedException e) {
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
@@ -225,7 +234,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
 
-                            response.getNotsaved().add(ns.reason("Invalid state of these documents: "+e.getIdents()));
+                            response.getNotsaved().add(ns.reason("Failed validation / document state or place of publication or format. Identifiers: "+e.getIdents()));
                         } catch (SolrServerException e) {
                             // solr exception
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
@@ -262,9 +271,20 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private void verifyIdentifiers(User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers, AccountException, AlreadyUsedException {
+    private void verifyIdentifiers(User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws NonExistentIdentifeirsException, InvalidIdentifiersException, IOException, SolrServerException, EmptyIdentifiers, AccountException, AlreadyUsedException, MaximumNumberOfIdentifiersExceeded {
         if (identifiers.isEmpty()) throw new EmptyIdentifiers();
 
+        JSONObject apiObject = Options.getInstance().getJSONObject("api");
+        if (apiObject != null) {
+            int maximum = apiObject.optInt("maximumItemInRequest",-1);
+            if (maximum > -1 ) {
+                if (identifiers.size() > maximum) {
+                    throw new MaximumNumberOfIdentifiersExceeded(identifiers.size(), maximum);   
+                }
+            }
+        }
+            
+        
         List<String> usedByUser = new ArrayList<>();
         List<String> usedStates = Arrays.asList(
                 "open",
@@ -290,6 +310,24 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                         Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
                         if (workflow == null || (workflow.nextState() != null && !workflow.nextState().isFirstTransition())) {
                             invalidIdentifiers.add(documentId);
+                        }
+
+                        SolrDocument solrDoc = solr.getById(DataCollections.catalog.name(), documentId);
+                        String placeOfPub = (String) solrDoc.getFieldValue("place_of_pub");
+                        if (placeOfPub != null) {
+                            if (!placeOfPub.trim().toLowerCase().equals("xr")) {
+                                if (!invalidIdentifiers.contains(documentId)) {
+                                    invalidIdentifiers.add(documentId);
+                                }
+                            }
+                        }
+                        String format = (String) solrDoc.getFieldValue("fmt");
+                        if (format != null) {
+                            if (!format.trim().toUpperCase().equals("BK") && !format.trim().toUpperCase().equals("SE")) {
+                                if (!invalidIdentifiers.contains(documentId)) {
+                                    invalidIdentifiers.add(documentId);
+                                }
+                            }
                         }
                     } catch (DocumentProxyException e) {
                         LOGGER.log(Level.SEVERE,e.getMessage());
@@ -329,6 +367,25 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
+    public static class MaximumNumberOfIdentifiersExceeded extends Exception {
+        private int numberOfIdentifiers = -1;
+        private int maximum = -1;
+        
+        public MaximumNumberOfIdentifiersExceeded(int numberOfIdentifiers, int maximum) {
+            super();
+            this.numberOfIdentifiers = numberOfIdentifiers;
+            this.maximum = maximum;
+        }
+
+        public int getMaximum() {
+            return maximum;
+        }
+
+        public int getNumberOfIdentifiers() {
+            return numberOfIdentifiers;
+        }
+    }
+    
     /**
      * Invalid identifier exception
      */

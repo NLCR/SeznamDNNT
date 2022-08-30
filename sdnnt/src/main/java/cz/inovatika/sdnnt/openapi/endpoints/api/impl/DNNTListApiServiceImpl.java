@@ -571,10 +571,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         // 911u a 856u 
         final List<String> links = LinksUtilities.krameriusLinksFromDocument(doc);
-         
 
         if (!links.isEmpty()) {
+            
             List<String> granularity = granularityField != null ? granularityField.stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
+
             /**
              * Pokud je pritomno pole 911a a 911u, pak je mapovani pid - instituce - Pokud ne, pak se neda rict komu patri - zadna instituce
              */
@@ -582,13 +583,13 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
             // pokud ma granularitu, musi
             if (granularity != null && !granularity.isEmpty()) {
+                // pokud ma vyplneny rocnik, pak ne 
                 // ma granularitu, link se bere pouze prvni, ostatni jsou v granularite
                 krameriusLinks = krameriusLinks.isEmpty() ? new ArrayList<>() : krameriusLinks.subList(0,1);
             }
             
-            // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?  Zahorik ?  - musi se odfiltorvat !!! 
+            // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?   musi se odfiltorvat !!! 
             List<String> pids = krameriusLinks.stream().map(PIDSupport::pidFromLink).map(PIDSupport::pidNormalization).collect(Collectors.toList());
-
             if (onlyUniqPids) {
                 for (int i = 0; i < pids.size(); i++) {
                     if (!uniqe.contains( pids.get(i))) {

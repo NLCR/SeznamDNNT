@@ -399,6 +399,35 @@ public class AccountServlet extends HttpServlet {
             }
         },
 
+        GET_ZADOST_INVALID_RECORDS {
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+
+                if (new RightsResolver(req, new MustBeLogged()).permit()) {
+                    Options opts = Options.getInstance();
+                    int rows = opts.getClientConf().getInt("rows");
+                    if (req.getParameter("rows") != null) {
+                        rows = Integer.parseInt(req.getParameter("rows"));
+                    }
+                    int start = 0;
+                    if (req.getParameter("page") != null) {
+                        start = Integer.parseInt(req.getParameter("page")) * rows;
+                    }
+                    try {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        AccountService service = new AccountServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return service.getInvalidRecords(req.getParameter("id"));
+                    } catch (SolrServerException | IOException ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },        
+        
         // ulozeni zadosti
         SEND_ZADOST {
             @Override
@@ -499,7 +528,59 @@ public class AccountServlet extends HttpServlet {
                 }
             }
         },
+        
+        /** Batch approve */
+        APPROVE_BATCH {
 
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    try {
+                        UserControlerImpl userControler = new UserControlerImpl(request);
+                        AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+
+                        JSONObject inputJs = ServletsSupport.readInputJSON(request);
+                        JSONObject zadostJSON = inputJs.getJSONObject("zadost");
+                        Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+                        String optionsJSON = inputJs.has("options") && !inputJs.isNull("options") ? inputJs.getString("options") : null;
+                        
+                        List<String> identifiers = Actions.identifiers(inputJs);
+                        Map<String, AccountException> failedIdentifiers = new HashMap<>();
+                     
+                        zadostJSON = service.curatorSwitchStateBatch(zadostJSON, optionsJSON, identifiers, inputJs.getString("reason"), (f)-> {
+                            f.keySet().forEach(k-> {
+                               failedIdentifiers.put(k, f.get(k)); 
+                            });
+                        });
+                        
+                        service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(), DataCollections.history.name());
+
+                        JSONObject payload = VersionStringCast.cast(service.getRequest(zadost.getId()));
+                        if (!failedIdentifiers.isEmpty()) {
+                            // TODO: Multiple exceptions
+                            List<AccountException> exceptionList = failedIdentifiers.values().stream().collect(Collectors.toList());
+                            if (!exceptionList.isEmpty()) {
+                                //AccountException ex = exceptionList.get(0);
+                                return errorJson(response,SC_BAD_REQUEST, "account.noworkflowstates","account.noworkflowstates", payload);
+                            } else {
+                                return errorJson(response,SC_BAD_REQUEST, "account.noworkflowstates","account.noworkflowstates", payload);
+                            }
+                        } else {
+                            return payload;
+                        }
+                    } catch (ConflictException e) {
+                        return errorJson(response, SC_CONFLICT, e.getKey(), e.getMessage());
+                    } catch (AccountException e) {
+                        return errorJson(response, SC_BAD_REQUEST, e.getKey(), e.getMessage());
+                    } catch (JSONException | SolrServerException e) {
+                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+            
+        },
 
         APPROVE {
             @Override
@@ -529,6 +610,7 @@ public class AccountServlet extends HttpServlet {
                                 failedIdentifiers.put(identifier, e);
                             }
                         }
+                        // tady je commit
                         service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(), DataCollections.history.name());
                         JSONObject payload = VersionStringCast.cast(service.getRequest(zadost.getId()));
                         if (!failedIdentifiers.isEmpty()) {
@@ -556,6 +638,28 @@ public class AccountServlet extends HttpServlet {
             }
         },
 
+        
+        REJECT_BATCH {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(request, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    UserControlerImpl userControler = new UserControlerImpl(request);
+                    AccountService service = new AccountServiceImpl(userControler, new ResourceBundleServiceImpl(request));
+                    JSONObject inputJs = ServletsSupport.readInputJSON(request);
+                    JSONObject zadostJSON = inputJs.getJSONObject("zadost");
+                    Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+                    List<String> identifiers = Actions.identifiers(inputJs);
+                    JSONObject retObject = null;
+                    zadostJSON = service.curatorRejectStateBatch(zadostJSON, identifiers, inputJs.getString("reason"), (а)->{});
+                    service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(),DataCollections.history.name());
+                    return VersionStringCast.cast(service.getRequest(zadost.getId()));
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+            
+        },
+        
         REJECT {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -570,7 +674,6 @@ public class AccountServlet extends HttpServlet {
                     for (String identifier : identifiers) {
                         zadostJSON = service.curatorRejectSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
                     }
-
                     service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(),DataCollections.history.name());
                     return VersionStringCast.cast(service.getRequest(zadost.getId()));
                 } else {

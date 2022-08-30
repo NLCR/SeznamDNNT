@@ -1,5 +1,7 @@
 package cz.inovatika.sdnnt.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
@@ -10,6 +12,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -67,7 +70,40 @@ public class HistoryImpl implements History {
         } finally {
             if (commit) SolrJUtilities.quietCommit(solr, "history");
         }
+    }
 
+    public SolrInputDocument logDocument(String identifier,  String user, String type, String workflowId, boolean commit) {
+        try {
+            // zakazat historii pro batch operace ??
+            /*
+            ObjectMapper mapper = new ObjectMapper();
+            String oldChanged = changeObject(new JSONObject(oldRaw)).toString();
+            String newChanged = changeObject( new JSONObject(newRaw)).toString();
+
+            JsonNode source = mapper.readTree(changeObject( new JSONObject(oldRaw)).toString());
+            JsonNode target = mapper.readTree(changeObject( new JSONObject(newRaw)).toString());
+            JSONObject changes = new JSONObject();
+
+            JsonNode fwPatch = JsonDiff.asJson(source, target);
+            JsonNode bwPatch = JsonDiff.asJson(target, source);
+            changes.put("forward_patch", new JSONArray(fwPatch.toString()));
+            changes.put("backward_patch", new JSONArray(bwPatch.toString()));
+            */
+            
+            // Insert in history
+            SolrInputDocument idoc = new SolrInputDocument();
+            idoc.setField("identifier", identifier);
+            idoc.setField("user", user);
+            idoc.setField("type", type);
+            if (workflowId != null) {
+                idoc.setField("workflowid", workflowId);
+            }
+            //idoc.setField("changes", changes.toString());
+            return idoc;
+        } catch (Exception  ex) {
+            Logger.getLogger(Indexer.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     private JSONObject changeObject(JSONObject oldObject) {

@@ -17,6 +17,7 @@ import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.ZadostUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -306,7 +307,7 @@ public class Zadost implements NotNullAwareObject {
         zadost.kurator = username;
         zadost.datum_vyrizeni = new Date(); // ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_INSTANT);
         //zadost.state = "processed";
-        return save(client, zadost);
+        return save(client, zadost, true);
     }
 
     public static JSONObject markAsProcessed(String js, String username, String requestProcessedState) {
@@ -342,11 +343,47 @@ public class Zadost implements NotNullAwareObject {
 
             // history must be updated after success
             new HistoryImpl(client).log(zadost.id, js, zadost.toJSON().toString(), username, "zadost", transition, false);
-            return save(client, zadost);
+            return save(client, zadost,false);
         } catch (JSONException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return new JSONObject().put("error", ex);
         }
+    }
+    
+    // batch variant - TODO: rewrite 
+    public static void approveBatch(String identifier, Zadost zadost, String komentar, String username, String approvestate, String transition, List<Pair<String, SolrInputDocument>> outputDocs) {
+
+        ZadostProcess zprocess = new ZadostProcess();
+        zprocess.setState(approvestate != null ? approvestate : "approved");
+        zprocess.setUser(username);
+        zprocess.setReason(komentar);
+        zprocess.setDate(new Date());
+        zprocess.setTransitionName(transition);
+        zadost.addProcess(identifier, zprocess);
+
+
+        SolrInputDocument historydoc = new HistoryImpl(null).logDocument(identifier,  username, "zadost", transition, false);
+        outputDocs.add(Pair.of(DataCollections.history.name(), historydoc));
+    }
+    
+    public static void rejectBatch(String identifier,Zadost zadost,  String reason, String username, String transition,List<Pair<String, SolrInputDocument>> outputDocs) {
+        //Zadost zadost = Zadost.fromJSON(js);
+        if (zadost.process == null) {
+            zadost.process = new HashMap<>();
+        }
+        String oldProcess = new JSONObject().put("process", zadost.process).toString();
+        ZadostProcess zprocess = new ZadostProcess();
+        zprocess.setState("rejected");
+        zprocess.setUser(username);
+        zprocess.setReason(reason);
+        zprocess.setDate(new Date());
+        zprocess.setTransitionName(transition);
+        //zadost.process.put(identifier, zprocess);
+        zadost.addProcess(identifier, zprocess);
+
+        SolrInputDocument historydoc = new HistoryImpl(null).logDocument(identifier,  username, "zadost", transition, false);
+        outputDocs.add(Pair.of(DataCollections.history.name(), historydoc));
+
     }
 
     public static JSONObject reject(SolrClient solr, String identifier, String js, String reason, String username, String transition) {
@@ -367,7 +404,7 @@ public class Zadost implements NotNullAwareObject {
             zadost.addProcess(identifier, zprocess);
 
             new HistoryImpl(solr).log(zadost.id, js, zadost.toJSON().toString(), username, "zadost", transition);
-            return save(solr, zadost);
+            return save(solr, zadost, false);
         } catch (JSONException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return new JSONObject().put("error", ex);
@@ -376,14 +413,16 @@ public class Zadost implements NotNullAwareObject {
 
     public static JSONObject save(Zadost zadost) {
         try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
-            return save(solr, zadost);
+            return save(solr, zadost, true);
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return new JSONObject().put("error", ex);
         }
     }
 
-    public static JSONObject save(SolrClient client, Zadost zadost) {
+
+    
+    public static JSONObject save(SolrClient client, Zadost zadost, boolean commit) {
         try {
             SolrInputDocument idoc = zadost.toSolrInputDocument();
 
@@ -394,8 +433,8 @@ public class Zadost implements NotNullAwareObject {
                 updateRequest.setParam(VERSION_KEY, "" + zadost.getVersion());
             }
             client.add("zadost", idoc);
-            client.commit("zadost");
-            client.close();
+            if (commit) client.commit("zadost");
+            //client.close();
             return zadost.toJSON();
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);

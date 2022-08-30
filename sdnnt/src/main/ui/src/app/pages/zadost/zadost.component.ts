@@ -25,6 +25,8 @@ export class ZadostComponent implements OnInit {
   docs: SolrDocument[];
   hideProcessed: boolean;
   
+  invalidrecs:string[];
+
   kurators: User[];
 
 
@@ -135,6 +137,14 @@ export class ZadostComponent implements OnInit {
           doc.hasNotifications = true;
         }
       });
+  
+      this.service.getZadostInvalidRecords(p as HttpParams).subscribe((res:any)=> {
+        if (res.error) {
+        } else {
+          this.invalidrecs =  res["missing"];
+        }
+      });
+  
 
     });
   }
@@ -207,6 +217,7 @@ export class ZadostComponent implements OnInit {
   
 
   allProcessed(): boolean {
+    
     let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
     let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
     let allProcessed: boolean = true;
@@ -215,7 +226,13 @@ export class ZadostComponent implements OnInit {
         let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
         let noworkflowkey =id+"_noworkflow";
         if (!this.zadost.process[tablekey] && !this.zadost.process[noworkflowkey]) {
-          allProcessed = false;
+          if (this.invalidrecs) {
+            if (!this.invalidrecs.includes(id)) {
+              allProcessed = false;
+            }
+          } else {
+            allProcessed = false;
+          }
         }
 
       });
@@ -329,6 +346,22 @@ export class ZadostComponent implements OnInit {
     approveDialogRef.afterClosed().subscribe(result => {
       if (result) {
         let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
+        
+        this.service.approveItemsBatch(items, this.zadost,result, null, 'all').subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+            if (res.payload) {
+              this.zadost = res.payload;
+              this.getDocs(this.route.snapshot.queryParams);
+            }
+          } else {
+            this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs(this.route.snapshot.queryParams);
+          }
+        });
+
+        /*
         this.service.approveItems(items, this.zadost,result, null, 'all').subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
@@ -342,6 +375,7 @@ export class ZadostComponent implements OnInit {
             this.getDocs(this.route.snapshot.queryParams);
           }
         });
+        */
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
       }
@@ -360,6 +394,17 @@ export class ZadostComponent implements OnInit {
     rejectDialogRef.afterClosed().subscribe(result => {
       if (result) {
         let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
+        this.service.rejectItemsBatch(items, this.zadost,result).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.zamitnuti_navrhu_success', '', false);
+            this.zadost = res;
+            this.getDocs(this.route.snapshot.queryParams);
+          }
+        });
+
+        /*
         this.service.rejectItems(items, this.zadost,result).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
@@ -369,6 +414,7 @@ export class ZadostComponent implements OnInit {
             this.getDocs(this.route.snapshot.queryParams);
           }
         });
+        */
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.oduvodneni_chybi', true);
       }
