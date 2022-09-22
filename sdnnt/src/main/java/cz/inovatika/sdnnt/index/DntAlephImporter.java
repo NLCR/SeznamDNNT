@@ -179,7 +179,6 @@ public class DntAlephImporter {
         JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
         if (digitalized != null) { 
 
-            //final List<String> siglas = new ArrayList<>();
             
             Collection<Object> mlinks911u = sdoc.getFieldValues("marc_911u");
             Collection<Object> mlinks856u =  sdoc.getFieldValues("marc_856u");

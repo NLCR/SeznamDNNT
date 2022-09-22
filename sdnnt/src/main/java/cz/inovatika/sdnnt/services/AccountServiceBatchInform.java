@@ -5,6 +5,11 @@ import java.util.Map;
 
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 
+/**
+ * Functional inerface represents information about failing batch
+ * @author happy
+ *
+ */
 @FunctionalInterface
 public interface AccountServiceBatchInform {
     

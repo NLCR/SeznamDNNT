@@ -1120,7 +1120,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    SolrClient buildClient() {
+    public SolrClient buildClient() {
         return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
     }
     

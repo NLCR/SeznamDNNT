@@ -14,6 +14,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -48,7 +50,7 @@ public class DocumentProxy implements WorkflowOwner {
 
     @Override
     public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
-        Date date = new Date();
+        Date date = currentDate();
 
         List<String> dntstav = this.marcRecord.dntstav;
         List<String> kuratorStav = this.marcRecord.kuratorstav;
@@ -100,10 +102,16 @@ public class DocumentProxy implements WorkflowOwner {
         if (period.getTransitionType().equals(TransitionType.kurator)) {
             return true;
         } else {
-            //Date deadlineDate = period.defineDeadline(getWorkflowDate());
             Date deadlineDate = period.defineDeadline(date);
-            return new Date().after(deadlineDate);
+            boolean after = currentDate().after(deadlineDate);
+            long diff = currentDate().getTime() - deadlineDate.getTime();
+            boolean lessThanSecondDiff = Math.abs(diff) < 1000;
+            return (after || lessThanSecondDiff);
         }
+    }
+
+    private Date currentDate() {
+        return new Date();
     }
 
     @Override

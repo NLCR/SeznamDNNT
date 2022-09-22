@@ -548,7 +548,7 @@ public class AccountServiceImplITTest {
 
     public static class BuildSolrClientSupport extends AccountServiceImpl {
         @Override
-        SolrClient buildClient() {
+        public SolrClient buildClient() {
             return SolrTestServer.getClient();
         }
     }

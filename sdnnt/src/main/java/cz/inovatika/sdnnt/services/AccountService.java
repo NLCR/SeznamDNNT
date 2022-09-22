@@ -62,7 +62,7 @@ public interface AccountService {
 
 
     /**
-     * Saving requests from the end of the curator
+     * Save request 
      * @param payload Request serialized in json 
      * @param inform Information callback
      * @return Returns stored json
@@ -89,7 +89,9 @@ public interface AccountService {
      */
     public JSONObject saveCuratorRequest(String payload, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException,AccountException;
 
-
+    /**
+     * TODO: Remove, not supported
+     */
     public JSONObject saveRequestWithFRBR(String payload, User user , String frbr, AccountServiceInform inform) throws SolrServerException, IOException, ConflictException,AccountException;
 
     /**
@@ -105,7 +107,16 @@ public interface AccountService {
      */
     public JSONObject getRecords(String id, int rows, int page) throws SolrServerException, IOException, ConflictException,AccountException;
     
-    // return invalid records in request
+
+    /**
+     * Return invalid records in request
+     * @param id
+     * @return
+     * @throws SolrServerException
+     * @throws IOException
+     * @throws ConflictException
+     * @throws AccountException
+     */
     public JSONObject getInvalidRecords(String id) throws SolrServerException, IOException, ConflictException,AccountException;
 
     /**
@@ -204,8 +215,20 @@ public interface AccountService {
      * @throws SolrServerException
      */
     public JSONObject curatorRejectSwitchState(JSONObject zadostJson, String documentId, String reason) throws ConflictException, AccountException, IOException, SolrServerException;
-
-
+    
+    
+    /**
+     * Curator reject request
+     * @param zadostJSON
+     * @param documentIds
+     * @param reason
+     * @param inform
+     * @return
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public JSONObject curatorRejectStateBatch(JSONObject zadostJSON, List<String> documentIds, String reason, AccountServiceBatchInform inform) throws ConflictException, AccountException, IOException, SolrServerException;
 
     
@@ -218,6 +241,14 @@ public interface AccountService {
      */
     public void schedulerSwitchStates() throws ConflictException, AccountException, IOException, SolrServerException;
 
+    /**
+     * Sche
+     * @param id
+     * @throws ConflictException
+     * @throws AccountException
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public void schedulerSwitchStates(String id) throws ConflictException, AccountException, IOException, SolrServerException;
     
     /**
@@ -279,8 +310,5 @@ public interface AccountService {
     
     
     public List<JSONObject> findAllRequestForGivenIds(String user, List<String> navrhy, String requestState, List<String> ids) throws  AccountException, IOException, SolrServerException; 
-    
-    
-    
     
 }
