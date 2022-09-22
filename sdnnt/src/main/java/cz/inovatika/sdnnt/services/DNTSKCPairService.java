@@ -6,10 +6,15 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 
 /**
- * Mapovani zaznamu dnt a skc zaznamu
+ * Mapping SKC DNT records
  * @author happy
  */
 public interface DNTSKCPairService extends LoggerAware {
-
+    
+    /**
+     * Main mapping procedure
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public void update() throws IOException, SolrServerException;
 }

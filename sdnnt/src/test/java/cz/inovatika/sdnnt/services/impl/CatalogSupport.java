@@ -15,6 +15,7 @@ import java.util.List;
 
 public class CatalogSupport {
 
+    public static final List<String> A_IDENTIFIERS_SKC = Arrays.asList("oai:aleph-nkp.cz:DNT01-000008874", "oai:aleph-nkp.cz:DNT01-000008884", "oai:aleph-nkp.cz:DNT01-000008886", "oai:aleph-nkp.cz:SKC01-000688007");
     public static final List<String> A_IDENTIFIERS = Arrays.asList("oai:aleph-nkp.cz:DNT01-000008874", "oai:aleph-nkp.cz:DNT01-000008884", "oai:aleph-nkp.cz:DNT01-000008886");
     public static final List<String> N_IDENTIFIERS = Arrays.asList("oai:aleph-nkp.cz:DNT01-000157742", "oai:aleph-nkp.cz:DNT01-000157765");
 
@@ -45,6 +46,11 @@ public class CatalogSupport {
     }
     public static void inserAIdentifiers() {
         A_IDENTIFIERS.stream().forEach(it-> {
+            insertCatalog("a", it);
+        });
+    }
+    public static void inserAIdentifiersSKC() {
+        A_IDENTIFIERS_SKC.stream().forEach(it-> {
             insertCatalog("a", it);
         });
     }

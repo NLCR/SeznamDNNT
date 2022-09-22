@@ -221,15 +221,17 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             List<String> links = mapping.get(key);
 
             // master title; TODO: granularity check
-            String master = links.get(0);
-            String pid = pid(master);
-            if (pid != null) {
-                String baseUrl = baseUrl(master);
-                if (!buffer.containsKey(baseUrl)) {
-                    buffer.put(baseUrl, new ArrayList<>());
+            for (String link : links) {
+                String pid = pid(link);
+                if (pid != null) {
+                    String baseUrl = baseUrl(link);
+                    if (!buffer.containsKey(baseUrl)) {
+                        buffer.put(baseUrl, new ArrayList<>());
+                    }
+                    buffer.get(baseUrl).add(Pair.of(key, pid));
+                    checkBuffer(buffer, foundCandidates);
                 }
-                buffer.get(baseUrl).add(Pair.of(key, pid));
-                checkBuffer(buffer, foundCandidates);
+                
             }
         }
 
@@ -274,7 +276,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     baseUrl = baseUrl + "/";
                 }
                 this.requestedInfoCounter.addAndGet(pairs.size());
-
+                //TODO: Support kramerius 7 - licenses 
                 String encodedCondition = URLEncoder.encode("PID:(" + condition + ")", "UTF-8");
                 String encodedFieldList = URLEncoder.encode("PID dostupnost","UTF-8");
                 String url = baseUrl + "api/v5.0/search?q=" +  encodedCondition + "&wt=json&rows="+pairs.size()+"&fl="+encodedFieldList;
@@ -283,7 +285,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
 
                 try {
                     String result = simpleGET(url);
-                        
                     JSONObject object = new JSONObject(result);
                     JSONObject response = object.getJSONObject("response");
                     JSONArray jsonArray = response.getJSONArray("docs");
@@ -304,7 +305,9 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                                 if (any.isPresent()) {
                                     Pair<String, String> pair = any.get();
                                     logger.info(String.format("Found public document. Identifier %s and pid %s", pair.getLeft(), pair.getRight()));
-                                    foundCadidates.add(pair.getLeft());
+                                    if (!foundCadidates.contains(pair.getLeft())) {
+                                        foundCadidates.add(pair.getLeft());
+                                    }
                                 }
                             }
                         }

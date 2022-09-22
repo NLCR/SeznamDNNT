@@ -75,18 +75,34 @@ public class SKCDeleteServiceImplTTest {
         String jonbConfig="{\"results\":{\"SKC_1\":\"state\"}}";
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
         
-        SKCDeleteServiceImpl skcServie = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
+        
+        ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
+        ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
+        AccountServiceImpl aService = EasyMock.createMockBuilder(AccountServiceImpl.class)
+                .withConstructor(appSupport, bservice)
+                .addMockedMethod("buildClient").createMock();
+
+        
+        SKCDeleteServiceImpl skcService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                 .withConstructor("test-logger",jobJSONObject.getJSONObject("results"),Arrays.asList("oai:aleph-nkp.cz:SKC01-000995692"))
                 .addMockedMethod("getOptions")
                 .addMockedMethod("buildClient")
+                .addMockedMethod("buildAccountService")
                 .createMock();
         
-        EasyMock.expect(skcServie.buildClient()).andDelegateTo(
+        EasyMock.expect(skcService.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
         
-        EasyMock.replay(skcServie);
-        skcServie.update();
+        EasyMock.expect(aService.buildClient()).andDelegateTo(
+                new AccountServiceImplITTest.BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.expect(skcService.buildAccountService()).andReturn(aService).anyTimes();
+        
+        EasyMock.replay(skcService, appSupport, bservice, aService);
+        skcService.update();
     
         
         try (SolrClient client = SolrTestServer.getClient()) {

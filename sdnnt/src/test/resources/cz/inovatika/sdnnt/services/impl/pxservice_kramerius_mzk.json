@@ -1,0 +1,1 @@
+{"response":{"docs":[{"dostupnost":"private","PID":"uuid:5498b7a0-d469-11e9-84ef-005056827e51"}],"numFound":1,"start":0},"responseHeader":{"QTime":11,"params":{"q":"PID:(uuid\\:5498b7a0-d469-11e9-84ef-005056827e51)","fl":"PID dostupnost","rows":"1","wt":["json","json"]},"status":0}}
