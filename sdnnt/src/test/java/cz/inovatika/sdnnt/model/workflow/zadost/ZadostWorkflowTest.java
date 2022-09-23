@@ -9,6 +9,7 @@ import java.util.*;
 
 public class ZadostWorkflowTest {
 
+    
     @Test
     public void testNZNWorkflow() {
         Zadost zadost = new Zadost("mojeid");

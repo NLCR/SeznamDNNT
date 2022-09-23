@@ -46,6 +46,7 @@ public interface WorkflowOwner {
      */
     public Date getWorkflowDate();
 
+    
     /**
      * Returns public state
      * @return
@@ -55,9 +56,13 @@ public interface WorkflowOwner {
     /**
      * Returns date of change of public state
      * @return
+     * TODO: Change it 
      */
     public Date getPublicStateDate();
 
+    
+    
+    
     public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
 
     // vraci priznak, zda jsou splneny podminky pro zmenu stavu

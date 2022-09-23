@@ -27,16 +27,6 @@ public class DocumentWorkflowFactory {
 
     private DocumentWorkflowFactory() {}
 
-
-    public static Workflow create(MarcRecord record) {
-        List<String> kuratorstav = record.kuratorstav;
-        if (kuratorstav != null && !kuratorstav.isEmpty()) {
-            if (nznDocument(kuratorstav)) return new NZNWorkflow(new DocumentProxy(record));
-            if (vnlDocument(kuratorstav)) return new VNLWorkflow(new DocumentProxy(record));
-        }
-        return null;
-    }
-
     /**
      * @param kuratorstav
      * @param stav
@@ -96,23 +86,23 @@ public class DocumentWorkflowFactory {
 
             switch (ZadostTypNavrh.find(navrh)) {
                 case NZN: {
-                    if (nznDocument(kuratorstav)) { return new NZNWorkflow(new DocumentProxy(record)); }
+                    if (nznDocument(kuratorstav)) { return new NZNWorkflow(new DocumentProxy(record, zadost)); }
                     else return null;
                 }
                 case VNL: {
-                    if (vnlDocument(kuratorstav)) { return new VNLWorkflow(new DocumentProxy(record));}
+                    if (vnlDocument(kuratorstav)) { return new VNLWorkflow(new DocumentProxy(record, zadost));}
                     else return null;
                 }
                 case VNZ: {
-                    if (vnzDocument(kuratorstav, license)) { return new VNZWorkflow(new DocumentProxy(record));}
+                    if (vnzDocument(kuratorstav, license)) { return new VNZWorkflow(new DocumentProxy(record, zadost));}
                     else return null;
                 }
                 case VN: {
-                    if (vnDocument(kuratorstav)) { return new VNWorkflow(new DocumentProxy(record));}
+                    if (vnDocument(kuratorstav)) { return new VNWorkflow(new DocumentProxy(record, zadost));}
                     else return null;
                 }
                 case PXN: {
-                    if (pxnDocument(kuratorstav)) { return new PXWorkflow(new DocumentProxy(record));}
+                    if (pxnDocument(kuratorstav)) { return new PXWorkflow(new DocumentProxy(record, zadost));}
                     else return null;
                 }
                 case DXN : {
@@ -128,7 +118,7 @@ public class DocumentWorkflowFactory {
                             IndexService indexService = new IndexServiceImpl();
                             List<MarcRecord> followers = indexService.findById(record.followers);
                             // vsechny pozadavky
-                            return new DXWorkflow(new DuplicateProxy(record, followers, allRequests));
+                            return new DXWorkflow(new DuplicateProxy(record,zadost, followers, allRequests));
                         } catch (AccountException | IOException | SolrServerException e) {
                             throw new DocumentProxyException(e);
                         } 

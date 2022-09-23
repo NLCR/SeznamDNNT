@@ -33,8 +33,8 @@ public class DuplicateProxy extends DocumentProxy {
     private List<Zadost> reqs;
     
     
-    public DuplicateProxy(MarcRecord origin, List<MarcRecord> followers, List<Zadost> reqs) {
-        super(origin);
+    public DuplicateProxy(MarcRecord origin,Zadost zadostOrigin, List<MarcRecord> followers, List<Zadost> reqs) {
+        super(origin,zadostOrigin);
         this.allFollowers = followers;
         this.affectedFollowers = new ArrayList<>();
         this.reqs = reqs;

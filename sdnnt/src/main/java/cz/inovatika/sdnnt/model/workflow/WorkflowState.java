@@ -24,7 +24,7 @@ public class WorkflowState {
     private Period period;
 
     /** Calculated date between transition */
-    private Date date;
+    //private Date date;
 
     /** License associated with the state*/
     private License license;
@@ -38,10 +38,10 @@ public class WorkflowState {
     /** Flag - true if this workflow state is first state - first transition */
     private boolean firstTransition;
 
-    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, Date date, Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
+    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, /*Date date,*/ Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
         this.workflowOwner = workflowOwner;
         this.curatorState = cstate;
-        this.date = date;
+        //this.date = date;
         this.period = period;
         this.finalSate = finalSate;
         this.firstTransition = startTransition;
@@ -49,9 +49,9 @@ public class WorkflowState {
         this.license = license;
     }
 
-    public Date getDate() {
-        return date;
-    }
+//    public Date getDate() {
+//        return date;
+//    }
 
     public CuratorItemState getCuratorState() {
         return curatorState;

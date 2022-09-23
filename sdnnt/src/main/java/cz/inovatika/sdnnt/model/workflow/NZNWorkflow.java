@@ -9,6 +9,8 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
+import java.util.Date;
+
 /**
  * Pokryva scenar navrhu na zarazeni dila, kontroluje lhuty a prepina stav
  * <p>
@@ -26,19 +28,19 @@ public class NZNWorkflow extends Workflow {
         PublicItemState pState = owner.getPublicState();
         Period period = getPeriod(currentState);
         if (currentState == null) {
-            return new WorkflowState(owner, NPA,null, owner.getWorkflowDate(), period,true,  true, false);
+            return new WorkflowState(owner, NPA,null, /*owner.getWorkflowDate(),*/ period,true,  true, false);
         } else {
             switch(currentState) {
                 case N:
-                    return new WorkflowState(owner,NPA, null, owner.getWorkflowDate(), period, false,true, false);
+                    return new WorkflowState(owner,NPA, null, /*owner.getWorkflowDate(),*/ period, false,true, false);
                 case NPA:
-                    return new WorkflowState(owner, PA, License.dnnto, owner.getWorkflowDate() ,period, true ,false,  false);
+                    return new WorkflowState(owner, PA, License.dnnto, /*owner.getWorkflowDate(),*/period, true ,false,  false);
                 case PA:
-                    return new WorkflowState(owner, A, License.dnnto, owner.getWorkflowDate(), period, false,false,  true);
+                    return new WorkflowState(owner, A,  owner.getLicense() != null ? License.valueOf(owner.getLicense()) : License.dnnto, /*owner.getWorkflowDate(),*/ period, false,false,  true);
                 case NL:
                 case NLX:
                     if (pState != null && pState.equals(PublicItemState.PA)) {
-                        return new WorkflowState(owner, A, License.valueOf(owner.getLicense()), owner.getWorkflowDate(), period, false,false,  true);
+                        return new WorkflowState(owner, A, License.valueOf(owner.getLicense()), /*owner.getWorkflowDate(),*/ period, false,false,  true);
                     } else return null;
                 default:
                     return null;
@@ -60,9 +62,14 @@ public class NZNWorkflow extends Workflow {
     @Override
     public boolean isSwitchPossible() {
         if (this.getOwner().getPublicState() != null && this.owner.getPublicState().equals(PublicItemState.PA)) {
-            return getOwner().isSwitchToNextStatePossible(getOwner().getPublicStateDate(), getPeriod(getOwner().getWorkflowState()));
+            // je tam datum prepnuti, prepinaji se vsichni
+//            Date dDate = getOwner().getDeadlineDate();
+//            return getOwner().isSwitchToNextStatePossible(dDate, getPeriod(getOwner().getWorkflowState()));
+            return true;
         } else if (this.owner.getWorkflowState() != null && !this.getOwner().getWorkflowState().equals(A)) {
-            return getOwner().isSwitchToNextStatePossible(getOwner().getWorkflowDate(), getPeriod(getOwner().getWorkflowState()));
+//            Date dDate = getOwner().getDeadlineDate();
+//            return getOwner().isSwitchToNextStatePossible(dDate, getPeriod(getOwner().getWorkflowState()));
+            return true;
         } else if (this.owner.getWorkflowState() == null) {
             return true;
         } else return false;

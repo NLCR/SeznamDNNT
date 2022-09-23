@@ -27,7 +27,7 @@ public class ChangeProcessStatesUtility {
         List<String> previous = mr.dntstav;
 
         CuratorItemState kstav = CuratorItemState.valueOf(state);
-        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
+        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
         if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {
             if (mr.license == null) {
                 mr.license = License.dnnto.name();

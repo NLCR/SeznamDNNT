@@ -20,7 +20,7 @@ public class DXWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         if (currentState == null || (currentState == DX) ) {
-            return new WorkflowState(this.owner, D, null,owner.getWorkflowDate(), period, false,true, true);
+            return new WorkflowState(this.owner, D, null,/*owner.getWorkflowDate(),*/ period, false,true, true);
         }
         return null;
     }

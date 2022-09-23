@@ -6,6 +6,7 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.TransitionType;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
@@ -22,15 +23,17 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Reprezentuje dokument 
- * @author happy
+ * Represents document proxy  
  */
 public class DocumentProxy implements WorkflowOwner {
 
     protected MarcRecord marcRecord;
-
-    public DocumentProxy(MarcRecord record) {
+    
+    protected Zadost zadost;
+    
+    public DocumentProxy(MarcRecord record, Zadost zadost) {
         this.marcRecord = record;
+        this.zadost = zadost;
     }
 
     @Override
@@ -47,6 +50,11 @@ public class DocumentProxy implements WorkflowOwner {
     public Date getPublicStateDate() {
         return this.marcRecord.datum_krator_stavu;
     }
+
+    
+    
+    
+
 
     @Override
     public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
@@ -102,6 +110,11 @@ public class DocumentProxy implements WorkflowOwner {
         if (period.getTransitionType().equals(TransitionType.kurator)) {
             return true;
         } else {
+            // predchozi deadline; pokud je za deadline zadosti
+            // z podaneho datumu vypocita novy deadline; musi se pocitat deadline 
+            // z predchoziho datumu prepnuti - dokument je v poradku ale muze se menit ->  
+            // tedy zadost -> Zadost musi but 
+            
             Date deadlineDate = period.defineDeadline(date);
             boolean after = currentDate().after(deadlineDate);
             long diff = currentDate().getTime() - deadlineDate.getTime();
@@ -116,6 +129,7 @@ public class DocumentProxy implements WorkflowOwner {
 
     @Override
     public Date getWorkflowDate() {
+        // change to zadost stav 
         return this.marcRecord.datum_krator_stavu;
     }
 

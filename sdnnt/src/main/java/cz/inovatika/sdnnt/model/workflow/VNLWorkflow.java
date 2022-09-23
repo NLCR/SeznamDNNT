@@ -6,6 +6,7 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 
 import java.util.Arrays;
+import java.util.Date;
 
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
@@ -26,12 +27,12 @@ public class VNLWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() == null || owner.getLicense().equals(License.dnnto.name()))){
-            return new WorkflowState(this.owner, NL, License.dnntt,owner.getWorkflowDate(), period, true,true,  false);
+            return new WorkflowState(this.owner, NL, License.dnntt, /*owner.getWorkflowDate(),*/ period, true,true,  false);
         } else if (owner.getWorkflowState()== NL) {
-            return new WorkflowState(this.owner, NLX, License.dnntt, owner.getWorkflowDate(), period, false, false,false);
+            return new WorkflowState(this.owner, NLX, License.dnntt, /*owner.getWorkflowDate(), */period, false, false,false);
         } else if (owner.getWorkflowState()== NLX) {
             //this.getOwner().getWorkflowState()
-            return new WorkflowState(this.owner, A, License.dnnto, owner.getWorkflowDate(), period, true,false,  true);
+            return new WorkflowState(this.owner, A, License.dnnto, /*owner.getWorkflowDate(),*/ period, true,false,  true);
         }
         return null;
     }
@@ -40,9 +41,14 @@ public class VNLWorkflow extends Workflow {
     public boolean isSwitchPossible() {
         if (this.owner.getWorkflowState() != null) {
             if (this.getOwner().getWorkflowState().equals(NL)) {
-                return this.getOwner().isSwitchToNextStatePossible(getOwner().getWorkflowDate(), getPeriod(NL) );
+//                Date deadlineDate = getOwner().getDeadlineDate();
+//                return this.getOwner().isSwitchToNextStatePossible(deadlineDate, getPeriod(NL) );
+                return true;
+
             } else if (this.getOwner().getWorkflowState().equals(NLX)) {
-                return this.getOwner().isSwitchToNextStatePossible(getOwner().getWorkflowDate(), getPeriod(NLX) );
+//                Date deadlineDate = getOwner().getDeadlineDate();
+//                return this.getOwner().isSwitchToNextStatePossible(deadlineDate, getPeriod(NLX) );
+                return true;
             } else {
                 CuratorItemState cstate = this.getOwner().getWorkflowState();
                 return Arrays.asList(A, PA, PX, X).contains(cstate);
@@ -53,7 +59,7 @@ public class VNLWorkflow extends Workflow {
     @Override
     public WorkflowState nextAlternativeState(String stateHint, SwitchStateOptions options) {
         if (this.getOwner().getWorkflowState().equals(NLX) && stateHint != null && TITLE_RELEASED.equals(stateHint)) {
-            return new WorkflowState(this.owner, A, License.dnntt, owner.getWorkflowDate(), null, true,  false, true);
+            return new WorkflowState(this.owner, A, License.dnntt, /*owner.getWorkflowDate(),*/ null, true,  false, true);
         }
         return null;
 

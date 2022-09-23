@@ -431,7 +431,7 @@ public class Indexer {
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
-      PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr));
+      PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
       if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
         mr.license = licence;
       } else if (pstav != null && pstav.equals(PublicItemState.NL)) {

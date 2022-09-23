@@ -36,6 +36,8 @@ public class DocumentCheckProxy implements WorkflowOwner {
         return null;
     }
 
+
+
     @Override
     public PublicItemState getPublicState() {
         return this.publicItemState;

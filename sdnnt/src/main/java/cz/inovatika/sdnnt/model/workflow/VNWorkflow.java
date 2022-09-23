@@ -26,7 +26,7 @@ public class VNWorkflow extends Workflow {
         Period period = getPeriod(currentState);
 
         if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
-            return new WorkflowState(this.owner, N,null,owner.getWorkflowDate(), period, true,true,  true);
+            return new WorkflowState(this.owner, N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
         }
         return null;
     }
@@ -44,7 +44,7 @@ public class VNWorkflow extends Workflow {
         Period period = getPeriod(currentState);
 
         if (alternative != null && License.dnntt.name().equals(alternative)) {
-            return new WorkflowState(this.owner, owner.getWorkflowState(),License.dnntt,owner.getWorkflowDate(), period, true,true,  true);
+            return new WorkflowState(this.owner, owner.getWorkflowState(),License.dnntt,/*owner.getWorkflowDate(),*/ period, true,true,  true);
 
         }
         return null;
