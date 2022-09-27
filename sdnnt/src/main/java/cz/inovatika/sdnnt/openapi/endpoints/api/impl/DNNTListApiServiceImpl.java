@@ -572,7 +572,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         List<String> mdigitallibraries = doc.getFieldValues("digital_libraries") != null ? doc.getFieldValues("digital_libraries").stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
 
         // 911u a 856u 
-        final List<String> links = LinksUtilities.krameriusLinksFromDocument(doc);
+        final List<String> links = LinksUtilities.krameriusMergedLinksFromDocument(doc);
         if (!links.isEmpty()) {
             
             /**
@@ -585,20 +585,10 @@ public class DNNTListApiServiceImpl extends ListsApiService {
              */
             // Vraci vsechny linky do krameriu -> filtruje jine
             List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
-            // pokud ma granularitu, musi
-            if (granularity != null && !granularity.isEmpty()) {
-                // pokud ma vyplneny rocnik, pak ne 
-                // ma granularitu, link se bere pouze prvni, ostatni jsou v granularite
-                krameriusLinks = krameriusLinks.isEmpty() ? new ArrayList<>() : krameriusLinks.subList(0,1);
-            }
-            
+
             // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?   musi se odfiltorvat !!! 
             List<String> pids = krameriusLinks.stream().map(PIDSupport::pidFromLink).map(PIDSupport::pidNormalization).collect(Collectors.toList());
-            
-            // pidy z granularity musi eliminovat pidy z hlavniho zaznamu 
             if (granularity != null && !granularity.isEmpty()) {
-                // odstranit pidy, ktere jsou v granularite 
-                // ale pouze ty, ktere maji rocniky a cisla GRRR 
                 for (String str : granularity) {
                     JSONObject jsonStr = new JSONObject(str);
                     if (GranularityUtils.isGranularityItem(jsonStr)) {
