@@ -1,8 +1,10 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 
 import cz.inovatika.sdnnt.Options;
+
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.Indexer;
+import cz.inovatika.sdnnt.index.utils.GranularityUtils;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ListsApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.CSVSolrDocumentOutput;
@@ -48,6 +50,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
+
+import static cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport.*;
 
 import static cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput.*;
 
@@ -561,21 +565,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         //Collection<Object> mdigitallibraries = doc.getFieldValues("digital_libraries");
         Object fmt = doc.getFieldValue(FMT_FIELD);
 
-        // prvni je master
         Collection<Object> granularityField = doc.getFieldValues("granularity");
 
 
         List<String> minstitutions = doc.getFieldValues(MarcRecordFields.SIGLA_FIELD) != null ? doc.getFieldValues(SIGLA_FIELD).stream().map(Object::toString).collect(Collectors.toList())  : new ArrayList<>();
         List<String> mdigitallibraries = doc.getFieldValues("digital_libraries") != null ? doc.getFieldValues("digital_libraries").stream().map(Object::toString).collect(Collectors.toList()) : new ArrayList<>();
 
-
         // 911u a 856u 
         final List<String> links = LinksUtilities.krameriusLinksFromDocument(doc);
-
         if (!links.isEmpty()) {
             
+            /**
+             * pidy z granularity / 
+             */
+            
             List<String> granularity = granularityField != null ? granularityField.stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
-
             /**
              * Pokud je pritomno pole 911a a 911u, pak je mapovani pid - instituce - Pokud ne, pak se neda rict komu patri - zadna instituce
              */
@@ -590,6 +594,21 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             
             // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?   musi se odfiltorvat !!! 
             List<String> pids = krameriusLinks.stream().map(PIDSupport::pidFromLink).map(PIDSupport::pidNormalization).collect(Collectors.toList());
+            
+            // pidy z granularity musi eliminovat pidy z hlavniho zaznamu 
+            if (granularity != null && !granularity.isEmpty()) {
+                // odstranit pidy, ktere jsou v granularite 
+                // ale pouze ty, ktere maji rocniky a cisla GRRR 
+                for (String str : granularity) {
+                    JSONObject jsonStr = new JSONObject(str);
+                    if (GranularityUtils.isGranularityItem(jsonStr)) {
+                        String link = jsonStr.getString("link");
+                        String pidFromGranularity =  pidNormalization(pidFromLink(link));
+                        pids.remove(pidFromGranularity);
+                    }
+                }
+            }
+            
             if (onlyUniqPids) {
                 for (int i = 0; i < pids.size(); i++) {
                     if (!uniqe.contains( pids.get(i))) {
@@ -642,6 +661,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         List<String> pids = new ArrayList<>();
         Arrays.stream(p).forEach(pids::add);
+
         document.put(SolrDocumentOutput.PIDS_KEY, pids);
         document.put(GRANUARITY_KEY, granularity);
         document.put(FMT_KEY, fmt);

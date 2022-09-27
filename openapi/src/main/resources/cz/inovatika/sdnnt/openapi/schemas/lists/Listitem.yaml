@@ -5,6 +5,11 @@ properties:
   pid:
     type: string
     example: 'uuid:e0b83e80-74e5-11e2-86a5-005056827e52'
+  all_catalog_pids:
+    type: array
+    items:
+      type: string
+    example: ['uuid:e0b83e80-74e5-11e2-86a5-005056827e52']
   state:
     type: string
     example: 'N'

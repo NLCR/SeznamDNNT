@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
@@ -55,6 +56,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     public static final String API_KEY_HEADER = "X-API-KEY";
 
     private static final int LIMIT = 10000;
+
+    CatalogSearcher catalogSearcher = new CatalogSearcher();
 
 
     @Override
@@ -283,8 +286,18 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                 }
             }
         }
-            
-        
+
+        // Issue 430
+        if (!identifiers.isEmpty()) {
+            List<String> procIdentifiers = new ArrayList<>(identifiers);
+            while(!procIdentifiers.isEmpty()) {
+                Object removed = procIdentifiers.remove(0);
+                if (procIdentifiers.contains(removed)) {
+                    throw new AlreadyUsedException(Arrays.asList(removed.toString()));
+                }
+            }
+        }
+
         List<String> usedByUser = new ArrayList<>();
         List<String> usedStates = Arrays.asList(
                 "open",
@@ -334,6 +347,24 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                     }
                 } else {
                     nonExistentIdentifiers.add(documentId);
+                }
+            }
+        }
+        
+        // validace na dohledatelnost #461
+        for (String documentId :  identifiers) {
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("q", documentId);
+            JSONObject search = catalogSearcher.search(parameters, invalidIdentifiers, user);
+            if (search.has("response")) {
+                JSONObject response = search.getJSONObject("response");
+                if (response.has("numFound")) {
+                    if (response.has("numFound")) {
+                        int numFound = response.getInt("numFound");
+                        if (numFound == 0) {
+                            nonExistentIdentifiers.add(documentId);
+                        }
+                    }
                 }
             }
         }
