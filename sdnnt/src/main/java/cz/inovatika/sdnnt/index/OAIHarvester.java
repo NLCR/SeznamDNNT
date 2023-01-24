@@ -408,7 +408,12 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);
             if (!mr.isDeleted) {
-              recs.add(DntAlephImporter.toSolrDoc(mr));
+                SolrInputDocument solrDoc = DntAlephImporter.toSolrDoc(mr);
+                if (solrDoc != null) {
+                    recs.add(DntAlephImporter.toSolrDoc(mr));
+                } else {
+                    LOGGER.log(Level.INFO, "Record {0} is ignored; missing important metadata (leader)", mr.identifier);
+                }
             } else {
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
               toDelete.add(mr.identifier);

@@ -1053,7 +1053,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<String> findIdentifiersUsedInRequests(String user, List<String> requestsStates)
             throws AccountException, IOException, SolrServerException {
+        
         List<String> identifiers = new ArrayList<>();
+
         try (SolrClient solr = buildClient()) {
             
             SolrQuery query = new SolrQuery("*")
@@ -1078,6 +1080,7 @@ public class AccountServiceImpl implements AccountService {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+        
         return identifiers;
     }
 

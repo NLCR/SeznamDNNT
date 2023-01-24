@@ -12,6 +12,8 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.ModelDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists.SolrDocumentOutput;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 import cz.inovatika.sdnnt.openapi.endpoints.model.*;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.utils.LinksUtilities;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.model.DataCollections;
@@ -111,21 +113,20 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
 
     protected CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
-    protected Map<String,String> dlMap = null;
+    protected CheckKrameriusConfiguration kramConf;
+    protected Map<String,String> dlMap = new HashMap<>();
     
     public DNNTListApiServiceImpl() {
-        Map<String, String> map = new HashMap<String,String>();
-        JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
-        if (digitalized != null) { 
-            Set<String> keySet = digitalized.keySet();
-            for (String key : keySet) {
-                JSONObject json = digitalized.getJSONObject(key);
-                if (json.has("acronym")) {
-                    map.put(json.getString("acronym"), key);
-                }
-            }
+        
+        JSONObject conf = Options.getInstance().getJSONObject("check_kramerius");
+        this.kramConf = CheckKrameriusConfiguration.initConfiguration(conf);
+        
+        List<InstanceConfiguration> instances = this.kramConf.getInstances();
+        for (InstanceConfiguration instance : instances) {
+            String acronym = instance.getAcronym();
+            String sigla = instance.getSigla() != null ? instance.getSigla() : acronym.toUpperCase();
+            dlMap.put(acronym, sigla);
         }
-        this.dlMap = map;
     }
     
     @Override
@@ -713,18 +714,35 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 
+    
     @Override
-    public Response info(String ident, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
+    public Response info(String ident,  String digitalLibrary, SecurityContext securityContext,ContainerRequestContext crc) throws NotFoundException {
+        // do some magic!
         try {
             int maxRowsInCaseOfIdent = 1000;
             try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
                 final ListitemResponse response = new ListitemResponse();
                 ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
                 response.setItems(arrayOfListitem);
-
-               SolrQuery q = (new SolrQuery("*")).setRows(maxRowsInCaseOfIdent).setSort(SolrQuery.SortClause.asc("identifier"));
+                
+                SolrQuery q = (new SolrQuery("*")).setRows(maxRowsInCaseOfIdent).setSort(SolrQuery.SortClause.asc("identifier"));
                 q.addFilterQuery("NOT dntstav:D");
+                q.addFilterQuery("dntstav:*");
                 q.addFilterQuery("id_pid:uuid");
+                
+                String dgFilterValue = null;
+                if (digitalLibrary != null) {
+                    if (this.dlMap.containsKey(digitalLibrary.toLowerCase())) {
+                        dgFilterValue = this.dlMap.get(digitalLibrary.toLowerCase());
+                    } else {
+                        dgFilterValue = digitalLibrary;
+                    }
+                }
+                
+                if (dgFilterValue != null) {
+                    q.addFilterQuery("digital_libraries:"+dgFilterValue);
+                }
+                
                 q.addFilterQuery("id_all_identifiers:\""+ident+"\" OR id_pid:\""+ident+"\" OR identifier:\""+ident+"\" OR id_sdnnt:\""+ident+"\"");
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));

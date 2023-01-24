@@ -112,13 +112,13 @@ export class ResultItemComponent implements OnInit {
 
     this.setHasNavrhFlag();
 
-    this.hasGranularity = this.doc.granularity && this.doc.granularity.length > 1;
+    this.hasGranularity = this.doc.granularity && this.doc.granularity.length >= 1;
     this.dkLinks = [];
     
     // Podle https://github.com/NLCR/SeznamDNNT/issues/444 "měly být jen odkazy z 911"
     // const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
 
-    const tags = ['marc_911u'];
+    const tags = ['marc_911u','marc_856u'];
     tags.forEach(t => {
       if (this.doc[t]) {
         this.doc[t].forEach((lorig: string) => {
@@ -130,11 +130,12 @@ export class ResultItemComponent implements OnInit {
             .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
             .split(' ')[0];
 
-          l = this.normalizeLink(l);  
-            
-          if (!this.dkLinks.includes(l)) {
-            this.dkLinks.push(l);
-          }
+            if (l.indexOf('uuid') > -1) {
+              l = this.normalizeLink(l);  
+              if (!this.dkLinks.includes(l)) {
+                this.dkLinks.push(l);
+              }
+            }
         });
       }
     });

@@ -29,25 +29,6 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         this.digitalLibrariesConfiguration = conf;
     }
 
-//    @Overrideraw
-//    public void output(String selectedInstitution, String label, Collection<Object> nazev, String identifier, String... pids) {
-//        for (int i = 0; i < pids.length; i++) {
-//            Listitem item = new Listitem()
-//                    .pid(pids[i])
-//                    .catalogIdentifier(identifier)
-//                    .sigla(selectedInstitution)
-//                    .title(nazev.toString())
-//                    .license(label);
-//
-//            this.arrayOfListitem.add(item);
-//        }
-//
-//    }
-
-    // "{\"stav\":[\"A\"],\"license\":\"dnnto\",\"cislo\":\"25\",\"link\":\"http://krameriusndk.nkp.cz/search/handle/uuid:305637b0-f3f3-11e9-8d0f-005056825209\",\"kuratorstav\":[\"A\"],\"rocnik\":\"1976\"}",
-    //          "{\"stav\":[\"A\"],\"license\":\"dnnto\",\"cislo\":\"26\",\"link\":\"http://krameriusndk.nkp.cz/search/handle/uuid:2f1e5a20-f3d6-11e9-9f6f-5ef3fc9bb22f\",\"kuratorstav\":[\"A\"],\"rocnik\":\"1977\"}",
-    //          "{\"stav\":[\"A\"],\"license\":\"dnnto\",\"cislo\":\"27\",\"link\":\"http://krameriusndk.nkp.cz/search/handle/uuid:1e591200-f004-11e9-a329-005056827e51\",\"kuratorstav\":[\"A\"],\"rocnik\":\"1978\"}",
-    //
 
     protected ListitemGranularity granularity(String strJson) {
 

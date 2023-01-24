@@ -49,6 +49,7 @@ import cz.inovatika.sdnnt.services.GranularitySetStateService;
 import cz.inovatika.sdnnt.services.impl.utils.MarcUtils;
 import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public class GranularitySetStateServiceImpl extends AbstractGranularityService implements GranularitySetStateService{
@@ -125,11 +126,11 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                         
                         AtomicBoolean changedGranularity = new AtomicBoolean();
                         
-                        final Object masterIdentifier = rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD);
                                 
                         
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
                         List<JSONObject> granularityJSONS = granularity.stream().map(JSONObject::new).collect(Collectors.toList());
+                        final Object masterIdentifier = rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD);
 
                         // associated the same 
                         Map<String, List<Pair<String, String>>> resolved = new HashMap<>();
@@ -245,7 +246,6 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
                             } else {
-
                                 // kniha; 
                                 if (fmt != null && fmt.equals("BK")) {
                                     Set<String> keySet = secondterationNotResolved.keySet();
@@ -367,9 +367,18 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
 
     public static void main(String[] args) throws IOException {
-        String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
-        String[] rsplit = regularityPattern.split(",");
-        System.out.println(rsplit.length);
+        //String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
+        //String[] rsplit = regularityPattern.split(",");
+        //System.out.println(rsplit.length);
+
+        GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(null);
+        try {
+            service.setStates(new ArrayList<>());
+        } catch (IOException e) {
+            service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+        }
+
     }
 
 }

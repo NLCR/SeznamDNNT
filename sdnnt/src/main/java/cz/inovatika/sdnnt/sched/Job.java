@@ -291,10 +291,11 @@ public class Job implements InterruptableJob {
                         states.add(it.toString());
                     });
                 }
+
                 HttpsTrustManager.allowAllSSL();
+                
                 PXKrameriusService service = new PXKrameriusServiceImpl(loggerPostfix,iteration, results);
                     try {
-
 
                     List<String> check = service.check();
                     service.getLogger().info("Number of found candidates "+check.size());

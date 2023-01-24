@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -298,8 +299,54 @@ public class DuplicateUtils {
         return triple;
     }
 
-    //
-    public static List<Triple<String,String,String>> findBy910ax(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
+    
+    public static List<String> findBy910ax(SolrClient solrClient, String marc910a, String marc910x) throws SolrServerException, IOException {
+        
+        String combination = marc910a +marc910x;
+        
+        Set<String> identifiers = new LinkedHashSet<>();
+        SolrQuery idQuery = new SolrQuery("*").setRows(100);
+        idQuery = idQuery.addFilterQuery(String.format("marc_910a:%s AND marc_910x:%s",marc910a, marc910x));
+        idQuery = idQuery.addFilterQuery("fmt:SE OR fmt:BK").setRows(1000);
+        LOGGER.info("Query: "+idQuery);
+        SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
+        
+        for (SolrDocument sDocument : results) {
+            List<String> fCombinations = new ArrayList<>();
+                
+            String fValue = sDocument.getFieldValue("raw").toString();
+            JSONObject rawJSON = new JSONObject(fValue);
+            
+            JSONObject dataFields = rawJSON.getJSONObject("dataFields");
+            if (dataFields.has("910")) {
+                JSONArray array910 = dataFields.getJSONArray("910");
+                for (int i = 0; i < array910.length(); i++) {
+                    JSONObject item910 = array910.getJSONObject(i);
+                    if (item910.has("subFields")) {
+                        JSONObject subFields = item910.getJSONObject("subFields");
+                        if (subFields.has("a") && subFields.has("x")) {
+                            String aVal = subFields.getJSONArray("a").getJSONObject(0).getString("value");
+                            JSONArray xJSONArray = subFields.getJSONArray("x");
+                            for (int j = 0; j < xJSONArray.length(); j++) {
+                                JSONObject xObject = xJSONArray.getJSONObject(j);
+                                fCombinations.add(aVal+xObject.getString("value"));
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (fCombinations.contains(combination)) {
+                Object fieldValue = sDocument.getFieldValue("identifier");
+                identifiers.add(fieldValue.toString());
+            }
+        }
+        
+        List<String> retvals = new ArrayList<>(identifiers);
+        return retvals;
+    }    
+    
+    public static List<Triple<String,String,String>> findFollowersBy910ax(SolrClient solrClient, MarcRecord origin, Pair<String,String> cartesianLeft, Pair<String,String> cartesianRight) throws SolrServerException, IOException {
         Set<String> identifiers = new HashSet<>();
         List<Triple<String,String,String>> retList = new ArrayList<>();
         
@@ -353,8 +400,8 @@ public class DuplicateUtils {
                                    SolrDocumentList results = solrClient.query(DataCollections.catalog.name(), idQuery).getResults();
                                    
                                    for (SolrDocument sDocument : results) {
+
                                        List<String> fCombinations = new ArrayList<>();
-                                           
                                        String fValue = sDocument.getFieldValue("raw").toString();
                                        JSONObject rawJSON = new JSONObject(fValue);
                                        

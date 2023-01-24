@@ -9,6 +9,7 @@ import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
 import cz.inovatika.sdnnt.indexer.models.utils.MarcRecordUtils;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -75,6 +76,7 @@ public class DntAlephImporter {
 
     static SolrInputDocument toSolrDoc(MarcRecord rec, boolean debug) {
         SolrInputDocument sDoc = toSolrDoc(rec);
+        if (sDoc == null) return null;
         if (debug) {
             Object identifier = sDoc.containsKey(IDENTIFIER_FIELD) ? sDoc.getFieldValue(IDENTIFIER_FIELD) : "";
             Object dntstav = sDoc.containsKey(DNTSTAV_FIELD) ? sDoc.getFieldValue(DNTSTAV_FIELD) : "";
@@ -99,7 +101,12 @@ public class DntAlephImporter {
         sdoc.setField(SET_SPEC_FIELD, rec.setSpec);
         sdoc.setField(LEADER_FIELD, rec.leader);
         sdoc.setField(RAW_FIELD, rec.toJSON().toString());
-
+        
+        if (rec.leader == null) {
+            LOGGER.log(Level.WARNING,"No leader; returning null");
+            return null;
+        }
+        
         // Control fields
         for (String cf : rec.controlFields.keySet()) {
             sdoc.addField("controlfield_" + cf, rec.controlFields.get(cf));
@@ -175,6 +182,9 @@ public class DntAlephImporter {
         MarcRecordUtilsToRefactor.addRokVydani(sdoc);
 
         
+        JSONObject kramInstances = Options.getInstance().getJSONObject("check_kramerius");
+        CheckKrameriusConfiguration kramConf = CheckKrameriusConfiguration.initConfiguration(Options.getInstance().getJSONObject("check_kramerius"));
+        
         
         JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
         if (digitalized != null) { 
@@ -193,7 +203,8 @@ public class DntAlephImporter {
             } else if (mlinks856u != null) {
                 mlinks856u.stream().map(Object::toString).forEach(links::add);
             }
-            List<String> siglas = LinksUtilities.digitalizedKeys(digitalized,  links);
+            
+            List<String> siglas = LinksUtilities.digitalizedKeys(kramConf,  links);
             if (!siglas.isEmpty()) {
                 sdoc.setField(DIGITAL_LIBRARIES, siglas);
             }
@@ -362,7 +373,11 @@ public class DntAlephImporter {
         List<SolrInputDocument> idocs = new ArrayList<>();
 
         for (MarcRecord rec : recs) {
-            idocs.add(toSolrDoc(rec, debug));
+            SolrInputDocument solrDoc = toSolrDoc(rec, debug);
+            if (solrDoc != null) {
+                idocs.add(toSolrDoc(rec, debug));
+                
+            }
         }
         if (!idocs.isEmpty()) {
             solr.add("catalog", idocs);

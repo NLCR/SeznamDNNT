@@ -631,6 +631,13 @@ paths:
       description: Umožňuje získat informace o titulu dle identifikátorů 
       operationId: info
       parameters:
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
+          schema:
+            type: string
+            example: NKP
+          required: false
         - in: path
           name: ident
           schema:

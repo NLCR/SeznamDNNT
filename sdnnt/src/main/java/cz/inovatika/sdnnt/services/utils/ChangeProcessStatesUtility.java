@@ -39,22 +39,58 @@ public class ChangeProcessStatesUtility {
         } else {
             mr.license = null;
         }
+        
         granularityChange(mr, previous, kstav); 
         mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
         return mr.toSolrDoc();
     }
 
+    public static void clearGranularityItem(JSONObject gItem,CuratorItemState expectedPrev,String key, List<String> removeKeys) {
+        if (gItem.has(key)) {
+            boolean shoudRemove = false;
+            Object object = gItem.get(key);
+            if (object instanceof JSONArray) {
+                JSONArray stavArray = (JSONArray) object;
+                if (stavArray.length() > 0 && stavArray.getString(0).equals(expectedPrev.name())) {
+                    stavArray.remove(0);
+                    shoudRemove = true;
+                }
+            } else if (object instanceof String) {
+                String stv = (String) object;
+                if(stv.equals(expectedPrev.name())) {
+                    shoudRemove = true;
+                }
+            }
+            if (shoudRemove) {
+                gItem.remove(key);
+                for (String kk : removeKeys) {  gItem.remove(kk);  }
+            }
+        }
+    }
     
-    private static void granularityChange(MarcRecord mr, List<String> previous, CuratorItemState current) {
-
+    
+    //TODO: Do it more general
+    public static void granularityChange(MarcRecord mr, List<String> previous, CuratorItemState current) {
+        
         if (previous != null && previous.size() > 0 && previous.get(0).equals(CuratorItemState.PA.name()) && current.equals(CuratorItemState.A)) {
             JSONArray granularity = mr.granularity;
             if (granularity != null) {
                 for (int i = 0; i < granularity.length(); i++) {
-
                     JSONObject gItem = granularity.getJSONObject(i);
                     granularityItem(gItem, current, CuratorItemState.PA, "stav", new ArrayList<>());
                     granularityItem(gItem, current, CuratorItemState.PA, "kuratorstav", new ArrayList<>());
+                }
+            }
+        }
+
+        if (previous != null && previous.size() > 0 && previous.get(0).equals(CuratorItemState.N.name()) && (current.equals(CuratorItemState.A) || (current.equals(CuratorItemState.PA)))) {
+            JSONArray granularity = mr.granularity;
+            if (granularity != null) {
+                for (int i = 0; i < granularity.length(); i++) {
+                    JSONObject gItem = granularity.getJSONObject(i);
+                    clearGranularityItem(gItem, CuratorItemState.N, "kuratorstav", Arrays.asList("license"));
+                    clearGranularityItem(gItem, CuratorItemState.N, "stav", Arrays.asList("license"));
+                    
                 }
             }
         }
@@ -74,8 +110,11 @@ public class ChangeProcessStatesUtility {
                 }
             }
         }
+        
     }
 
+    
+    
     private static void granularityItem(JSONObject gItem, CuratorItemState current, CuratorItemState expectedPrev,String key, List<String> removeKeys) {
         if (gItem.has(key)) {
             boolean updated = false;
@@ -100,6 +139,7 @@ public class ChangeProcessStatesUtility {
             }
         }
     }
+    
 
     public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state, String message) throws JsonProcessingException, SolrServerException, IOException {
         MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);

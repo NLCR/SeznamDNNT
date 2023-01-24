@@ -72,7 +72,7 @@ public class DuplicateSKCUtils {
         //TODO: kontrola, zda neexistuje ccnnb
         if (retvals.isEmpty() && !origin.dataFields.containsKey("015")) {
             // nesmi byt SKC_1
-            List<Triple<String,String,String>> cartesian = DuplicateUtils.findBy910ax(solrClient, origin, Pair.of("910","a"), Pair.of("910","x"));
+            List<Triple<String,String,String>> cartesian = DuplicateUtils.findFollowersBy910ax(solrClient, origin, Pair.of("910","a"), Pair.of("910","x"));
             cartesian.forEach(c-> {
                 if (!identifiers.contains(c.getLeft())) {
                     cartesianRetVals.add(c); 

@@ -13,6 +13,8 @@ allOf:
         type: string
       reason:
         type: string
+      details:
+        $ref: './ArrayOfDetails.yaml'
 example:
   user: 'admin'
   identifiers: ['oai:aleph-nkp.cz:SKC01-002839929']

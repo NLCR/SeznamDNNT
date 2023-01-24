@@ -21,6 +21,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -30,6 +31,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.services.UpdateDigitalLibraries;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.utils.LinksUtilities;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
@@ -38,20 +40,19 @@ import cz.inovatika.sdnnt.utils.SolrJUtilities;
 public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
 
     public static final Logger LOGGER = Logger.getLogger(UpdateAlternativeAlephLinksImpl.class.getName());
-    public static final int LIMIT = 1000;
-    public static final int BATCH_SIZE = 100;
+    public static final int LIMIT = 30000;
+    public static final int BATCH_SIZE = 1000;
     public static final int CHECK_SIZE = 50;
 
-    public UpdateDigitalLibrariesImpl() {
-        
-    }
+    public UpdateDigitalLibrariesImpl() {}
     
     
     @Override
     public void updateDL() {
         long start = System.currentTimeMillis();
         Options options = getOptions();
-        JSONObject digitalized = options.getJSONObject("digitalized");
+        CheckKrameriusConfiguration checkKram = CheckKrameriusConfiguration.initConfiguration(options.getJSONObject("check_kramerius"));
+
         final Map<String, List<String>> idLibs = new HashMap<>();
         
         try(SolrClient client = buildClient()) {
@@ -69,7 +70,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
 
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
                 List<String> links = LinksUtilities.linksFromDocument(rsp);
-                List<String> digitalizedKeys = LinksUtilities.digitalizedKeys(digitalized, links);
+                List<String> digitalizedKeys = LinksUtilities.digitalizedKeys(checkKram, links);
                 if (!digitalizedKeys.isEmpty()) {
                     idLibs.put(identifier.toString(), digitalizedKeys);
                 }
@@ -84,6 +85,9 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
                 List<String> subList = idList.subList(startList, endList);
                 this.update(client, subList, idLibs);
             }
+
+            SolrJUtilities.quietCommit(client, DataCollections.catalog.name());
+
         } catch (IOException | SolrServerException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(),e);
         } finally {
@@ -93,16 +97,19 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
     
     public void update(SolrClient solr, List<String> identifiers, Map<String,List<String>> mapping) throws  IOException,  SolrServerException {
         if (!identifiers.isEmpty()) {
+            UpdateRequest uReq = new UpdateRequest();
             for (String identifier : identifiers) {
                 if (mapping.containsKey(identifier)) {
                     SolrInputDocument idoc = new SolrInputDocument();
                     idoc.setField(IDENTIFIER_FIELD, identifier);
                     atomicUpdate(idoc, mapping.get(identifier), MarcRecordFields.DIGITAL_LIBRARIES);
-                    solr.add(DataCollections.catalog.name(), idoc);
+                    uReq.add(idoc);
                 }
             }
+            if (!uReq.getDocuments().isEmpty()) {
+                uReq.process(solr, DataCollections.catalog.name());
+            }
             LOGGER.info("Updating identifier "+identifiers);
-            SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
         }
     }
 
@@ -121,11 +128,10 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
 
-    /*
     public static void main(String[] args) {
         UpdateDigitalLibraries lib = new UpdateDigitalLibrariesImpl();
         lib.updateDL();
-    }*/
+    }
     
     
 }

@@ -30,6 +30,7 @@ import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.services.impl.SKCUpdateSupportServiceImpl;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
@@ -423,10 +424,12 @@ public class Indexer {
   }
 
   //TODO: Move and do Junit tests
-  public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
+  public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularityChange, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
       MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
+      List<String> previous = mr.kuratorstav;
+      
       JSONObject before = mr.toJSON();
       // sync to solr doc
       SolrInputDocument sdoc = mr.toSolrDoc();
@@ -442,13 +445,14 @@ public class Indexer {
           licence = null;
       }
       // zapis do historie
-      mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularity);
+      mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularityChange);
 
-      if (!granularity.isEmpty()) {
+      // musi se menit i v ramci granularity
+      if (!granularityChange.isEmpty()) {
         JSONArray granularityFromIndex = mr.granularity;
-        int commonIndex = Math.min(granularityFromIndex.length(), granularity.length());
+        int commonIndex = Math.min(granularityFromIndex.length(), granularityChange.length());
         for (int i = 0; i < commonIndex; i++) {
-          JSONObject fromParam = granularity.getJSONObject(i);
+          JSONObject fromParam = granularityChange.getJSONObject(i);
           JSONObject fromIndex = granularityFromIndex.getJSONObject(i);
           if (!GranularityUtils.eqGranularityObject(fromParam, fromIndex)) {
             String formatted = MarcRecord.FORMAT.format(new Date());
@@ -456,15 +460,20 @@ public class Indexer {
           }
         }
         // pridano
-        if (granularity.length() > commonIndex) {
-          for (int i = commonIndex; i < granularity.length(); i++) {
+        if (granularityChange.length() > commonIndex) {
+          for (int i = commonIndex; i < granularityChange.length(); i++) {
             String formatted = MarcRecord.FORMAT.format(new Date());
-            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(granularity.getJSONObject(i), user, poznamka, formatted));
+            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(granularityChange.getJSONObject(i), user, poznamka, formatted));
           }
         }
-
-        mr.setGranularity(granularity, poznamka, user);
+        
+        // zmenit stavy granularity
+        mr.setGranularity(granularityChange, poznamka, user);
       }
+
+      ChangeProcessStatesUtility.granularityChange(mr, previous, kstav);
+      
+      
       solrClient.add("catalog", mr.toSolrDoc());
       new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user, DataCollections.catalog.name(), null);
     } finally {
@@ -473,6 +482,7 @@ public class Indexer {
     return ret;
   }
 
+  
   //TODO: Move and do Junit tests
   public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka, JSONArray granularity, String user) throws IOException, SolrServerException {
     return changeStavDirect(getClient(), identifier, newStav, licence, poznamka, granularity, user);

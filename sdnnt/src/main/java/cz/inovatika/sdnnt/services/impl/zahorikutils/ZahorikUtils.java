@@ -171,6 +171,7 @@ public class ZahorikUtils {
             }
         }
     }
+
     // prava periodika
     // control field 008 pozice 18( a 19(r) 
     public static void SE_2_DNNTO(String nState, String license, List<JSONObject> items) {

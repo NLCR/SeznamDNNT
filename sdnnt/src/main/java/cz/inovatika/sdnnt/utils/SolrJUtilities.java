@@ -5,6 +5,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +13,8 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,4 +56,18 @@ public class SolrJUtilities {
 
         return jsonArray;
     }
+    
+    
+    public static void atomicAdd(SolrInputDocument idoc, Object fValue, String fName) {
+        Map<String, Object> modifier = new HashMap<>(1);
+        modifier.put("add", fValue);
+        idoc.addField(fName, modifier);
+    }
+
+    public static void atomicSet(SolrInputDocument idoc, Object fValue, String fName) {
+        Map<String, Object> modifier = new HashMap<>(1);
+        modifier.put("set", fValue);
+        idoc.addField(fName, modifier);
+    }
+
 }

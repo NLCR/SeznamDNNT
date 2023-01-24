@@ -7,6 +7,7 @@ import org.json.JSONObject;
 /**
  * Handling granularity
  * @author happy
+ * @TODO move to GranularityField
  */
 public class GranularityUtils {
 

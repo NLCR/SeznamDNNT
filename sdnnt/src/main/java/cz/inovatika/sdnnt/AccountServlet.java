@@ -331,8 +331,15 @@ public class AccountServlet extends HttpServlet {
                     // override q 
                     String prefix = req.getParameter("prefix");
                     if (prefix != null && StringUtils.isAnyString(prefix)) {
+                        // oai identifier; exact match
+                        boolean exactMatch = prefix.startsWith("oai:aleph-nkp.cz");
                         prefix = prefix.replaceAll("\\:", "\\\\:");
-                        q = String.format("%s*", prefix);
+                        if (!exactMatch) {
+                            q = String.format("%s*", prefix);
+                        } else {
+                            q = String.format("%s", prefix);
+                        }
+                        
                     }
                     String page = req.getParameter("page");
                     String rows = req.getParameter("rows");

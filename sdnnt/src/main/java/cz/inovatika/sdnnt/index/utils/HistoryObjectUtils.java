@@ -36,7 +36,7 @@ public class HistoryObjectUtils {
                 granularityField.optString(GranularityUtils.NUMBER_FIELD),
                 granularityField.optString(GranularityUtils.YEAR_FIELD),
                 // musi mit alespon jedno pole ?
-                granularityField.optJSONArray(GranularityUtils.STAV_FIELD).getString(0),
+                granularityField.has(GranularityUtils.STAV_FIELD) ?  granularityField.optJSONArray(GranularityUtils.STAV_FIELD).getString(0) : null,
                 granularityField.optString(GranularityUtils.LICENSE_FIELD),
                 null,
                 user,

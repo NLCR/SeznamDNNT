@@ -17,12 +17,12 @@ public class SKCYearsUtils {
             if (val.contains("-")) {
                 String[] rangeValue = val.split("-");
                 if (rangeValue.length > 1) {
-                    int left = normalizeValue(Integer.parseInt(rangeValue[0]));
-                    int right = normalizeRightValue(left,Integer.parseInt(rangeValue[1]));
+                    int left = normalizeValue(Integer.parseInt(rangeValue[0].trim()));
+                    int right = normalizeRightValue(left,Integer.parseInt(rangeValue[1].trim()));
                     retval.add(Pair.of(left, right));
                 } else {
                     if (rangeValue.length == 1) {
-                        int v = normalizeValue(Integer.parseInt(rangeValue[0]));
+                        int v = normalizeValue(Integer.parseInt(rangeValue[0].trim()));
                         retval.add(Pair.of(v, 9999));
                     } else {
                         int v = normalizeValue(Integer.parseInt(val));

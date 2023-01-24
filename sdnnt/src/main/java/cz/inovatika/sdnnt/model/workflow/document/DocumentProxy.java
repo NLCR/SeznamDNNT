@@ -10,6 +10,7 @@ import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrInputDocument;
@@ -102,6 +103,11 @@ public class DocumentProxy implements WorkflowOwner {
             }
             if (marcRecord.license != null) this.marcRecord.licenseHistory.add(marcRecord.license);
             this.marcRecord.license = license;
+        }
+        
+        // automaticky switch - PA,A,N
+        if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
+            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm);
         }
     }
 

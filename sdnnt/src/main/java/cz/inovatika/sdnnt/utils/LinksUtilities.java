@@ -11,6 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 
 public class LinksUtilities {
     
@@ -35,8 +37,47 @@ public class LinksUtilities {
     }
     
     
+    public static List<String>krameriusMergedLinksFromDocument(SolrDocument doc) {
+
+        Collection<Object> mlinks911u = doc.getFieldValues("marc_911u");
+        Collection<Object> mlinks856u =  doc.getFieldValues("marc_856u");
+        
+        List<String> result = new ArrayList<>();
+        if (mlinks911u != null) {
+
+            List<String> uuidLinks = mlinks911u.stream().map(ol-> {
+                String l = ol.toString();
+                int indexof = l.indexOf("uuid:");
+                if (indexof >= 0) {
+                    return l.substring(indexof);
+                } else return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            if (!uuidLinks.isEmpty()) {
+                mlinks911u.stream().map(Object::toString).forEach(result::add);
+            }
+        } 
+        if (mlinks856u != null) {
+
+            List<String> uuidLinks = mlinks856u.stream().map(ol-> {
+                String l = ol.toString();
+                int indexof = l.indexOf("uuid:");
+                if (indexof >= 0) {
+                    return l.substring(indexof);
+                } else return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            
+            if (!uuidLinks.isEmpty()) {
+                mlinks856u.stream().map(Object::toString).forEach(it -> {
+                    if (!result.contains(it)) { result.add(it); }
+                });
+            }
+        }
+        
+        return result;
+    }
     
-    public static List<String> krameriusLinksFromDocument(SolrDocument doc) {
+    public static List<String> krameriusExclusiveLinksFromDocument(SolrDocument doc) {
 
         Collection<Object> mlinks911u = doc.getFieldValues("marc_911u");
         Collection<Object> mlinks856u =  doc.getFieldValues("marc_856u");
@@ -74,20 +115,23 @@ public class LinksUtilities {
         return result;
     }
 
-    public static List<String> digitalizedKeys(JSONObject digitalized,  final List<String> links) {
-        List<String> siglas = new ArrayList<>();
-        digitalized.keySet().forEach(key -> {
-            JSONArray regexps = digitalized.getJSONObject(key).getJSONArray("regexp");
-            for (Object oneRegexp : regexps) {
-                // one regexps 
-                if(links.stream().anyMatch(l -> {
-                        return l.matches(oneRegexp.toString());
-                    })) {
-                    siglas.add(key);
+    
+    public static List<String> digitalizedKeys(CheckKrameriusConfiguration conf,  final List<String> links) {
+        List<String> digitalLibraries = links.stream().map(l-> {
+            InstanceConfiguration matched = conf.match(l);
+            if (matched != null) {
+                String desc = matched.getSigla();
+                if (!StringUtils.isAnyString(desc)) {
+                    desc = matched.getAcronym();
+                    if (desc != null) desc = desc.toUpperCase();
                 }
+                return desc;
             }
-        });
-        return siglas;
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        return digitalLibraries;
     }
+    
+    
     
 }
