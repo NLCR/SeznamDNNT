@@ -16,6 +16,7 @@
           <th>{{ 'desc.odkaz' | translate }}</th>
           <th>{{ 'desc.stav' | translate }}</th>
           <th>{{ 'desc.licence' | translate }}</th>
+          <th>{{ 'desc.kramerius_license' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +28,9 @@
             <td> <a  [href]="item.link" target="_blank" >{{item.link }}</a>   </td>
             <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
             <td>{{item.license}}</td>
+
+            <td style="font-style: italic;">{{ item && item.kram_licenses ?  item.kram_licenses.join(',') : ''}}</td>
+
           </tr>
         </ng-container>
       </tbody>

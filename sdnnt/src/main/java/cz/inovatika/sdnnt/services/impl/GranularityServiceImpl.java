@@ -53,6 +53,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.GranularityService;
@@ -90,6 +91,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     public GranularityServiceImpl(String logger) {
         if (logger != null) {
             this.logger = Logger.getLogger(logger);
+        } else {
+            this.logger= LOGGER;
         }
     }
 
@@ -231,9 +234,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             
                             mapping.put(identifier.toString(), filtered);
                         }
-                        
-                        
-                        
                     }, IDENTIFIER_FIELD);
         }
         
@@ -310,8 +310,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             
             SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
         }
-        //logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers);
-        logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers.size());
+        logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers);
+        //logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers.size());
         
     }
 
@@ -357,7 +357,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String encodedCondition = URLEncoder.encode(
                         "root_pid:(" + condition + ") AND fedora.model:(monographunit OR periodicalvolume)", "UTF-8");
-                String encodedFieldList = URLEncoder.encode("PID fedora.model root_pid details datum_str dostupnost details", "UTF-8");
+                String encodedFieldList = URLEncoder.encode("PID fedora.model root_pid details datum_str dostupnost details dnnt-labels", "UTF-8");
                 String url = baseUrl + "api/v5.0/search?q=" + encodedCondition + "&wt=json&rows=" + MAX_FETCHED_DOCS
                         + "&fl=" + encodedFieldList;
 
@@ -398,14 +398,30 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             gf.setPid(doc.optString("PID"));
                             gf.setRootPid(doc.optString("root_pid"));
                             gf.setDostupnost(doc.optString("dostupnost"));
+                            
+                            if (doc.has("dnnt-labels")) {
+                                if (gf.getDostupnost() != null && !"public".equals(gf.getDostupnost())) {
+                                    JSONArray dnntLabels = doc.getJSONArray("dnnt-labels");
+                                    List<String> kramLicenses = new ArrayList<>();
+                                    for (int j = 0; j < dnntLabels.length(); j++) {
+                                        String klicense = dnntLabels.getString(j);
+                                        if (!kramLicenses.contains(klicense)) {
+                                            kramLicenses.add(klicense);
+                                        }
+                                    }
+                                    if (!kramLicenses.isEmpty()) {
+                                        gf.setKramLicenses(kramLicenses);
+                                    }
+                                }
+
+                            }                            
+
                             // Zahorikovo reseni, mnohokrat reseno po mailech 
                             // Pokud je public, automaticky dostava priznak X - 
                             /*
-                            if (dostupnost != null && dostupnost.equals("public")) {
-                                JSONArray stav = new JSONArray();
-                                stav.put("X");
-                                object.put("kuratorstav", stav);
-                                object.put("stav", stav);
+                            if (gf.getDostupnost()  != null && gf.getDostupnost() .equals("public")) {
+                                gf.setStav(PublicItemState.X.name());
+                                gf.setKuratorStav(PublicItemState.X.name());
                             }*/
                             
 
@@ -469,42 +485,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         }
 
                         
-                        /*
-                        try (final SolrClient solrClient = buildClient()) {
-                            Set keySet = solrResonseGranularity.keySet();
-                            for (Object key : keySet) {
-                                // identifiers not identifier
-                                List<String> identifiers = pidsMapping.get(key.toString());
-                                for (String identifier : identifiers) {
-                                    // pokud jsou pravidla, pak filtruj granularitu 
-                                    List<Map<String, String>> digitalized = solrResonseGranularity.get(key.toString());
-                                    if (filterGranularityRules.containsKey(identifier)) {
-
-                                        List<String> rules = filterGranularityRules.get(identifier);
-                                        if (rules != null && rules.size() > 0) {
-                                            digitalized = filterGranularity(rules, digitalized);
-                                        }
-                                    }
-                                    SolrQuery q = (new SolrQuery("identifier:\"" + identifier + "\"")
-                                            .setFields(MarcRecordFields.GRANULARITY_FIELD)).setRows(1);
-                                    QueryResponse response = solrClient.query(DataCollections.catalog.name(), q);
-                                    SolrDocumentList solrResults = response.getResults();
-                                    if (solrResults.getNumFound() > 0) {
-                                        SolrDocument sDoc = solrResults.get(0);
-                                        if (sDoc.containsKey(MarcRecordFields.GRANULARITY_FIELD)) {
-                                            List<String> solrGran = (List<String>) sDoc
-                                                    .getFieldValue(MarcRecordFields.GRANULARITY_FIELD);
-
-                                            compare(solrClient, identifier, baseUrl, solrGran, digitalized);
-                                        } else {
-                                            add(solrClient, identifier, baseUrl, digitalized);
-                                        }
-                                    }
-                                    
-                                }
-                            }
-                        }
-                        */
                     }
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, String.format("Error while accessing %s, error: %s ", url, e.getMessage()),

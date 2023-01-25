@@ -177,7 +177,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -241,7 +241,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -313,7 +313,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -376,7 +376,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -443,7 +443,7 @@ paths:
           description: Instituce kde je titul digitalizovan. Možno využít zkratky a sigly uvedené v registru krameriů.
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -506,7 +506,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -573,7 +573,7 @@ paths:
           description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
           schema:
             type: string
-            example: NKP
+            example: nkp
           required: false
         - in: query
           name: format
@@ -631,19 +631,19 @@ paths:
       description: Umožňuje získat informace o titulu dle identifikátorů 
       operationId: info
       parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
-          schema:
-            type: string
-            example: NKP
-          required: false
         - in: path
           name: ident
           schema:
             type: string
           required: true
           description: Identifier
+        - in: query
+          name: digital_library
+          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
+          schema:
+            type: string
+            example: nkp
+          required: false
       responses:
         '200':
           description: Výsledky ve formátu JSON

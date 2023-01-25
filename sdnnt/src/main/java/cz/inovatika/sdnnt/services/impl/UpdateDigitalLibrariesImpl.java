@@ -44,7 +44,15 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
     public static final int BATCH_SIZE = 1000;
     public static final int CHECK_SIZE = 50;
 
-    public UpdateDigitalLibrariesImpl() {}
+    public Logger logger;
+    
+    public UpdateDigitalLibrariesImpl(String loggerName) {
+        if (logger != null) {
+            this.logger = Logger.getLogger(loggerName);
+        } else {
+            this.logger = LOGGER;
+        }
+    }
     
     
     @Override
@@ -61,7 +69,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
             CatalogIterationSupport support = new CatalogIterationSupport();
             
             List<String> plusFilter = new ArrayList<>(Arrays.asList("id_pid:uuid"));
-            LOGGER.info("Current iteration filter " + plusFilter);
+            logger.info("Current iteration filter " + plusFilter);
             support.iterate(client, reqMap, null, plusFilter, new ArrayList<>(), Arrays.asList(
                     IDENTIFIER_FIELD,
                     ID_CCNB_FIELD,
@@ -89,7 +97,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
             SolrJUtilities.quietCommit(client, DataCollections.catalog.name());
 
         } catch (IOException | SolrServerException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(),e);
+            logger.log(Level.SEVERE, e.getMessage(),e);
         } finally {
             QuartzUtils.printDuration(LOGGER, start);
         }
@@ -109,7 +117,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
             if (!uReq.getDocuments().isEmpty()) {
                 uReq.process(solr, DataCollections.catalog.name());
             }
-            LOGGER.info("Updating identifier "+identifiers);
+            logger.info("Updating identifier "+identifiers);
         }
     }
 
@@ -128,10 +136,5 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
 
-    public static void main(String[] args) {
-        UpdateDigitalLibraries lib = new UpdateDigitalLibrariesImpl();
-        lib.updateDL();
-    }
-    
     
 }

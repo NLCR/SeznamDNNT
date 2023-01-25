@@ -141,14 +141,15 @@ public class Job implements InterruptableJob {
         },
         
 
-        /** Depreceted - alternativni linky do alephu - jiz se nepouziva */
+        /** Update digital libraries */
         DL_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
                 long start = System.currentTimeMillis();
                 LOGGER.fine(name()+":configuration is "+jobData);
-                UpdateAlternativeAlephLinksImpl impl = new UpdateAlternativeAlephLinksImpl();
-                impl.updateLinks();
+                String loggerName = jobData.optString("logger");
+                UpdateDigitalLibrariesImpl digitalLibraries = new UpdateDigitalLibrariesImpl(loggerName);
+                digitalLibraries.updateDL();
                 QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
             }
         },

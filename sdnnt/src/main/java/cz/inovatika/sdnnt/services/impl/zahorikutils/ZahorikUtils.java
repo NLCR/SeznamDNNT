@@ -21,7 +21,7 @@ public class ZahorikUtils {
     
     
     // move to years utils
-    public static int rocnik(JSONObject gItem) {
+    public static int rocnik(JSONObject gItem, Logger logger) {
         int rok = -1;
         if (gItem.has("rocnik")) {
             try {
@@ -50,14 +50,14 @@ public class ZahorikUtils {
                     }
 
                     if (split.length > 1) {
-                        rok = parsingYear(split[1].trim());
+                        rok = parsingYear(split[1].trim(), logger);
                     } else if (split.length == 1){
-                        rok = parsingYear(split[0]);
+                        rok = parsingYear(split[0], logger);
                     } else {
-                        rok = parsingYear( rocnik);
+                        rok = parsingYear( rocnik, logger);
                     }
                 } else {
-                    rok = parsingYear(gItem.getString("rocnik").trim());
+                    rok = parsingYear(gItem.getString("rocnik").trim(), logger);
                 }
             } catch (NumberFormatException | JSONException  e) {
                 e.printStackTrace();
@@ -66,7 +66,7 @@ public class ZahorikUtils {
         return rok;
     }
 
-    private static int parsingYear(String rocnik) {
+    private static int parsingYear(String rocnik, Logger logger) {
         try {
             return Integer.parseInt(rocnik);
         } catch (Exception e) {
@@ -75,14 +75,16 @@ public class ZahorikUtils {
         }
     }
 
-    public static void BK_DNNTO(String nState, String license, List<JSONObject> items) {
+    
+    public static void BK_DNNTO(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
-            int rocnik = rocnik(gItem);
+            int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
-                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2001);
-                //int t2011 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2011);
+                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+                
+                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2002);
                 // hranice je klouzaval 
-                if (rocnik <= t2001) {
+                if (rocnik > publicLicense &&  rocnik <= t2001) {
                     gItem.put("license", License.dnnto.name());
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(nState);
@@ -110,12 +112,15 @@ public class ZahorikUtils {
         }
     }
 
-    public static void BK_DNNTT(String nState, String license, List<JSONObject> items) {
+    public static void BK_DNNTT(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
-            int rocnik = rocnik(gItem);
+            int rocnik = rocnik(gItem, logger);
+
+            int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+
             if (license != null && license.equals(License.dnntt.name())) {
                 // hranice je pevna - smlouva s Diliii
-                if (rocnik <= 2007) {
+                if (rocnik > publicLicense && rocnik <= 2007) {
     
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();
@@ -136,14 +141,17 @@ public class ZahorikUtils {
         }
     }
     // neprava periodika  
-    public static void SE_1_DNNTO(String nState, String license, List<JSONObject> items) {
+    public static void SE_1_DNNTO(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
-            int rocnik = rocnik(gItem);
+            int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
-                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2001);
-                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2012);
+                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+
+                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2002);
+                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2013);
+
                 // hranice je klouzaval, více než dvacet let 
-                if (rocnik <= t2001) {
+                if (rocnik > publicLicense &&   rocnik <= t2001) {
 
                     gItem.put("license", License.dnnto.name());
                     JSONArray stavArr = new JSONArray();
@@ -174,13 +182,16 @@ public class ZahorikUtils {
 
     // prava periodika
     // control field 008 pozice 18( a 19(r) 
-    public static void SE_2_DNNTO(String nState, String license, List<JSONObject> items) {
+    public static void SE_2_DNNTO(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
-            int rocnik = rocnik(gItem);
+            int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
-                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2012);
+
+                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+
+                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2013);
                 // hranice je klouzaval, více než dvacet let 
-                if (rocnik < t2012) {
+                if (rocnik > publicLicense &&  rocnik < t2012) {
 
                     gItem.put("license", License.dnnto.name());
                     JSONArray stavArr = new JSONArray();
@@ -203,13 +214,14 @@ public class ZahorikUtils {
     }
     
     // stopro pouze typ 1
-    public static void SE_1_DNNTT(String nState, String license, List<JSONObject> items) {
+    public static void SE_1_DNNTT(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
-            int rocnik = rocnik(gItem);
-            int t2012 = Options.getInstance().getInt("granularity.bk.dnntt_dnntt", 2012);
+            int rocnik = rocnik(gItem, logger);
+            int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+            int t2012 = Options.getInstance().getInt("granularity.bk.dnntt_dnntt", 2013);
             if (license != null && license.equals(License.dnntt.name())) {
                 // rok je klouzavy 
-                if (rocnik < t2012) {
+                if (rocnik > publicLicense && rocnik < t2012) {
 
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();
