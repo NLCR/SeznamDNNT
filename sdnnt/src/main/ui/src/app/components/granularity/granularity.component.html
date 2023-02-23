@@ -30,7 +30,9 @@
             <td>{{item.license}}</td>
 
             <td style="font-style: italic;">{{ item && item.kram_licenses ?  item.kram_licenses.join(',') : ''}}</td>
-
+            <!--
+            <td style="font-style: italic;">{{ item && item.kram_licenses  ? (typeof item.kram_licenses)  : '' }}</td>
+            -->
           </tr>
         </ng-container>
       </tbody>

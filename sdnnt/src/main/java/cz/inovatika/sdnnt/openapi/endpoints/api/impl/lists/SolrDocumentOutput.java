@@ -33,6 +33,7 @@ public interface SolrDocumentOutput {
 
     public static final String RAW_KEY = MarcRecordFields.RAW_FIELD;
 
+    // vystupni metoda
     void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent);
 
 }

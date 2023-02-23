@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.json.JSONObject;
 import org.junit.Test;
 
-import cz.inovatika.sdnnt.services.kraminstances.granularities.Granularity;
-import cz.inovatika.sdnnt.services.kraminstances.granularities.GranularityField;
+import cz.inovatika.sdnnt.services.impl.granularities.Granularity;
+import cz.inovatika.sdnnt.services.impl.granularities.GranularityField;
 
 public class GranularityTest {
     

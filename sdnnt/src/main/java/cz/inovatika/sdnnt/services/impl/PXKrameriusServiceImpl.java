@@ -132,7 +132,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     this.skipHosts.put(key, true);
                     this.skipHosts.put(api, true);
                 }
-
             }
         }
     }

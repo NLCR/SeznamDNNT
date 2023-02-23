@@ -1,7 +1,5 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ALTERNATIVE_ALEPH_LINK;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
@@ -9,6 +7,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_856_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_911_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_956_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.SIGLA_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -58,14 +57,15 @@ import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.GranularityService;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
+import cz.inovatika.sdnnt.services.impl.granularities.Granularity;
+import cz.inovatika.sdnnt.services.impl.granularities.GranularityField;
+import cz.inovatika.sdnnt.services.impl.granularities.GranularityField.TypeOfRec;
+import cz.inovatika.sdnnt.services.impl.rules.Marc911Rule;
 import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
 import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
 import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
-import cz.inovatika.sdnnt.services.kraminstances.granularities.Granularity;
-import cz.inovatika.sdnnt.services.kraminstances.granularities.GranularityField;
-import cz.inovatika.sdnnt.services.kraminstances.granularities.GranularityField.TypeOfRec;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -83,7 +83,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     private Logger logger = Logger.getLogger(GranularityService.class.getName());
 
 
-    private Map<String, Granularity> granularities = new HashMap<>();
+    private Map<String, Granularity> granularities = new HashMap<>(50000);
 
     private Set<String> changedIdentifiers = new LinkedHashSet<>();
     public CheckKrameriusConfiguration checkConf = null;
@@ -146,34 +146,39 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     public void refershGranularity() throws IOException {
         // processing map; not every 
         Map<String, List<String>> mapping = new HashMap<>();
-        Map<String, List<String>> rules911r = new HashMap<>(); 
+        
+        //Map<String, List<String>> rules911r = new HashMap<>(); 
         
         try (final SolrClient solrClient = buildClient()) {
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "10000");
 
             CatalogIterationSupport support = new CatalogIterationSupport();
-            List<String> plusFilter = Arrays.asList("id_pid:uuid", KURATORSTAV_FIELD + ":*");
+            List<String> plusFilter = Arrays.asList("(id_pid:uuid OR granularity:*)", KURATORSTAV_FIELD + ":*");
 
             List<String> minusFilter = Arrays.asList( KURATORSTAV_FIELD + ":D",
                     KURATORSTAV_FIELD + ":DX");
 
             AtomicInteger count = new AtomicInteger();
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
-                    Arrays.asList(IDENTIFIER_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U, GRANULARITY_FIELD, "marc_911r"
+                    Arrays.asList(IDENTIFIER_FIELD, DNTSTAV_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U, GRANULARITY_FIELD, "marc_911r"
 
                     ), (rsp) -> {
                         
                         
                         Object identifier = rsp.getFieldValue("identifier");
                         
+                        List dntstav = (List) rsp.getFieldValue(DNTSTAV_FIELD);
                         Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
                         Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
+                        
+                        
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
+                        
                         
                         List<String> granularityLinks = new ArrayList<>();
                         if (granularity != null) {
-                            Granularity granObject = new Granularity(identifier.toString());
+                            Granularity granObject = new Granularity(identifier.toString(), dntstav != null ? PublicItemState.valueOf(dntstav.get(0).toString()) : null );
                             granularity.stream().forEach(it -> {
                                 JSONObject jObj = new JSONObject(it);
                                 GranularityField gf = GranularityField.initFromSDNNTSolrJson(jObj, this.checkConf);
@@ -188,22 +193,28 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             });
                             getLogger().info("Getting granularity for :"+identifier.toString() +" and size is "+this.granularities.size());
                             this.granularities.put(identifier.toString(), granObject);
+                        } else {
+                            if (links1 != null  || links3 != null) {
+                                Granularity granObject = new Granularity(identifier.toString(), dntstav != null ? PublicItemState.valueOf(dntstav.get(0).toString()) : null );
+                                this.granularities.put(identifier.toString(), granObject);
+                            }
                         }
 
                         if (links1 != null && !links1.isEmpty()) {
-                            
                             Collection<Object> yearsColl = rsp.getFieldValues("marc_911r");
                             if (yearsColl != null) {
-
                                 List<String> years = yearsColl.stream().map(Objects::toString).collect(Collectors.toList());
-                                rules911r.put(identifier.toString(), years);
-
-                                if (this.granularities.containsKey(identifier.toString())) {
-                                    years.stream().forEach(l-> {
-                                        this.granularities.get(identifier.toString()).addTitleRule(l);
-                                    });
+                                List<String> lls = links1.stream().map(Objects::toString).collect(Collectors.toList());
+                                for (int i = 0; i < Math.min(years.size(), links1.size()); i++) {
+                                    String url = lls.get(i);
+                                    InstanceConfiguration instance = this.checkConf.match(url);
+                                    if (instance != null) {
+                                        Marc911Rule rule = new Marc911Rule(years.get(i), url, instance.getAcronym());
+                                        if (this.granularities.containsKey(identifier.toString())) {
+                                            this.granularities.get(identifier.toString()).addTitleRule(rule);
+                                        }
+                                    }
                                 }
-                                
                             }
                             
                             List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
@@ -216,11 +227,12 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                     this.granularities.get(identifier.toString()).addTitleUrl(l);
                                 });
                             }
-                            
-                            
                             mapping.put(identifier.toString(), filtered);
                         
-                        } else if (links3 != null && !links3.isEmpty()) {
+                        } 
+                        
+                        if (links3 != null && !links3.isEmpty()) {
+
                             List<String> ll = links3.stream().map(Object::toString).collect(Collectors.toList());
                             List<String> filtered = ll.stream().filter(it -> !granularityLinks.contains(it))
                                     .collect(Collectors.toList());
@@ -231,9 +243,38 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 });
                             }
                             
-                            
-                            mapping.put(identifier.toString(), filtered);
+                            if (mapping.containsKey(identifier.toString())) {
+                                mapping.get(identifier.toString()).addAll(filtered);
+                            } else {
+                                mapping.put(identifier.toString(), filtered);
+                            }
                         }
+                        
+                        
+                        // k3 links but granularity ?? 
+                        /*
+                        Optional<String> findUuidLinks3 = links3 != null ?  links3.stream().map(Object::toString).filter(it-> {
+                           return it.contains("uuid:");
+                        }).findAny() : Optional.empty();
+
+                        Optional<String> findUuidLinks1 = links1 != null ?  links1.stream().map(Object::toString).filter(it-> {
+                            return it.contains("uuid:");
+                         }).findAny() : Optional.empty();
+                        
+                        if (findUuidLinks3.isEmpty() && findUuidLinks1.isEmpty() && !granularity.isEmpty()) {
+                            // smazat stavy ?? // smazat licence 
+                            String jsonString = granularity.get(0);
+                            JSONObject jsonObject = new JSONObject(jsonString);
+                            String link = jsonObject.getString("link");
+                            
+                            if (mapping.containsKey(identifier.toString())) {
+                                mapping.get(identifier.toString()).add(link);
+                            } else {
+                                mapping.put(identifier.toString(), new ArrayList<>(Arrays.asList(link)));
+                            }
+                        }
+                        */
+
                     }, IDENTIFIER_FIELD);
         }
         
@@ -262,7 +303,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         }
                         getLogger().info("baseurl " + baseUrl + " pair " + Pair.of(key, pid));
                         buffer.get(baseUrl).add(Pair.of(key, pid));
-                        checkBuffer(buffer, rules911r);
+                        checkBuffer(buffer);
                     } else {
                         getLogger().fine("Skipping instance '"+configuration+"'");
                     }
@@ -271,7 +312,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         }
 
         if (!buffer.isEmpty()) {
-            checkBuffer(buffer, rules911r);
+            checkBuffer(buffer);
         }
         
         
@@ -279,6 +320,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         this.granularities.keySet().forEach(key-> {
             this.changedIdentifiers.add(key);
             Granularity granularity = this.granularities.get(key);
+            //granularity
+            granularity.validation(this.checkConf);
+
             granularity.merge(this.checkConf);
             changes.add(granularity.toSolrDocument());
         });
@@ -311,18 +355,16 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
         }
         logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers);
-        //logger.info("Refreshing finished. Updated identifiers "+this.changedIdentifiers.size());
-        
     }
 
-    protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer, Map<String, List<String>> filterGranularityRules) {
+    protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer) {
         Integer sum = buffer.values().stream().map(List::size).reduce(0, Integer::sum);
         if (sum > CHECK_SIZE) {
-            clearBuffer(buffer, filterGranularityRules);
+            clearBuffer(buffer);
         }
     }
 
-    protected void clearBuffer(Map<String, List<Pair<String, String>>> buffer, Map<String, List<String>> filterGranularityRules) {
+    protected void clearBuffer(Map<String, List<Pair<String, String>>> buffer) {
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null) {
@@ -357,7 +399,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String encodedCondition = URLEncoder.encode(
                         "root_pid:(" + condition + ") AND fedora.model:(monographunit OR periodicalvolume)", "UTF-8");
-                String encodedFieldList = URLEncoder.encode("PID fedora.model root_pid details datum_str dostupnost details dnnt-labels", "UTF-8");
+                String encodedFieldList = URLEncoder.encode("PID fedora.model root_pid details datum_str dostupnost details dnnt-labels pid_path", "UTF-8");
                 String url = baseUrl + "api/v5.0/search?q=" + encodedCondition + "&wt=json&rows=" + MAX_FETCHED_DOCS
                         + "&fl=" + encodedFieldList;
 
@@ -380,17 +422,18 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 solrResonseGranularity.put(rootPid, new ArrayList<>());
                             }
                             
-                            List<Pair<Integer, Integer>> ranges = new ArrayList<>();
+//                            List<Pair<Integer, Integer>> ranges = new ArrayList<>();
                             List<String> identifiers = pidsMapping.get(rootPid);
-                            if (filterGranularityRules != null) {
-                                identifiers.stream().forEach(id-> {
-                                    if (filterGranularityRules.containsKey(id)) {
-                                        List<String> marc911r = filterGranularityRules.get(id);
-                                        List<Pair<Integer, Integer>> orange = marc911r.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
-                                        ranges.addAll(orange);
-                                    }
-                                });
-                            }
+//                            if (filterGranularityRules != null) {
+//                                // filter granularity rules
+//                                identifiers.stream().forEach(id-> {
+//                                    if (filterGranularityRules.containsKey(id)) {
+//                                        List<String> marc911r = filterGranularityRules.get(id);
+//                                        List<Pair<Integer, Integer>> orange = marc911r.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
+//                                        ranges.addAll(orange);
+//                                    }
+//                                });
+//                            }
                             
                             GranularityField gf = new GranularityField();
                             gf.setModel(doc.optString("fedora.model"));
@@ -416,13 +459,16 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                             }                            
 
-                            // Zahorikovo reseni, mnohokrat reseno po mailech 
-                            // Pokud je public, automaticky dostava priznak X - 
-                            /*
-                            if (gf.getDostupnost()  != null && gf.getDostupnost() .equals("public")) {
-                                gf.setStav(PublicItemState.X.name());
-                                gf.setKuratorStav(PublicItemState.X.name());
-                            }*/
+                            if (doc.has("pid_path")) {
+                                JSONArray pidPathJsonArray = doc.getJSONArray("pid_path");
+                                List<String> pidPathList = new ArrayList<>();
+                                for (int j = 0; j < pidPathJsonArray.length(); j++) {
+                                    pidPathList.add(pidPathJsonArray.getString(j));
+                                }
+                                gf.setPidPaths(pidPathList);
+                            }
+                            
+                            
                             
 
                             
@@ -435,6 +481,20 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             gf.setLink( link);
 
                             gf.setTypeOfRec(TypeOfRec.KRAM_SOLR);
+                            
+                            // Zahorikovo reseni, mnohokrat reseno po mailech 
+                            // Pokud je public, automaticky dostava priznak X - 
+                            // alespon podporeno konfiguracne, pouze vybrane knihovny mohou prinest priznak true
+                            if (gf.getDostupnost()  != null && gf.getDostupnost() .equals("public")) {
+                                if (gf.getAcronym() != null) {
+                                    boolean flag = Options.getInstance().boolKey("granularity.x_state."+gf.getAcronym(), false);
+                                    if (flag) {
+                                        gf.setStav(PublicItemState.X.name());
+                                        gf.setKuratorStav(PublicItemState.X.name());
+                                    }
+                                }
+                            }
+
                             
                             if (gf.getModel() != null && gf.getModel().equals("periodicalvolume")) {
                                 JSONArray detailsJSONArray = doc.getJSONArray("details");
@@ -473,11 +533,10 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 if (!granularities.containsKey(ident)) {
                                     granularities.put(ident, new Granularity(ident));
                                 }
+                                
                                 Granularity granularity = this.granularities.get(ident);
-                                boolean acceptField = true;
-                                if (ranges != null && !ranges.isEmpty()) {
-                                    acceptField = gf.accept(ranges);
-                                }
+                                boolean acceptField = granularity.acceptByRule(gf);
+                               
                                 if (acceptField) {
                                     granularity.addGranularityField(gf);
                                 }
@@ -497,89 +556,89 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         buffer.clear();
     }
 
-    private List<Map<String, String>> filterGranularity(List<String> rules, List<Map<String,String>> digitalized) {
-        Set<Map<String,String>> set = new LinkedHashSet<>();
+//    private List<Map<String, String>> filterGranularity(List<String> rules, List<Map<String,String>> digitalized) {
+//        Set<Map<String,String>> set = new LinkedHashSet<>();
+//
+//        List<Pair<Integer, Integer>> pairs = rules.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
+//        for (Map<String, String> map : digitalized) {
+//            if (map.containsKey("datum_str")) {
+//                String date = map.get("datum_str");
+//                Integer date2 = SolrYearsUtils.solrDate(date);
+//                for (Pair<Integer, Integer> p : pairs) {
+//                    if ( date2 >= p.getLeft() && date2 <= p.getRight()) {
+//                        set.add(map);
+//                    }
+//                }
+//            }
+//        }
+//        return new ArrayList<>(set);
+//    }
 
-        List<Pair<Integer, Integer>> pairs = rules.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
-        for (Map<String, String> map : digitalized) {
-            if (map.containsKey("datum_str")) {
-                String date = map.get("datum_str");
-                Integer date2 = SolrYearsUtils.solrDate(date);
-                for (Pair<Integer, Integer> p : pairs) {
-                    if ( date2 >= p.getLeft() && date2 <= p.getRight()) {
-                        set.add(map);
-                    }
-                }
-            }
-        }
-        return new ArrayList<>(set);
-    }
-
-    private void add(SolrClient solr, String identifier, String baseUrl, List<Map<String, String>> list)
-            throws SolrServerException, Exception {
-
-        getLogger().fine("Adding granularity for identifier " + identifier);
-        
-        if (!list.isEmpty()) {
-            String rootPid = list.get(0).get("root_pid");
-
-            JSONObject object = new JSONObject();
-            object.put("link", renderLink(baseUrl, rootPid));
-
-            SolrInputDocument idoc = new SolrInputDocument();
-            idoc.setField(IDENTIFIER_FIELD, identifier);
-            atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
-            solr.add(DataCollections.catalog.name(), idoc);
-        }
-        
-        List<String> pidsFromKram = list.stream().map(p -> {
-            return p.get("pid");
-        }).collect(Collectors.toList());
-
-        for (int i = 0; i < pidsFromKram.size(); i++) {
-            JSONObject object = new JSONObject();
-            
-            String renderingPID = pidsFromKram.get(i);
-            String link = renderLink(baseUrl, renderingPID);
-            object.put("link", link);
-
-            Map<String, String> oDoc = list.get(i);
-            if (oDoc.containsKey("datum_str")) {
-                object.put("rocnik", oDoc.get("datum_str"));
-            }
-            if (oDoc.containsKey("details")) {
-                // oDoc.
-                String details = oDoc.get("details");
-                String[] splitted = details.split("##");
-                if (splitted.length > 1) {
-                    object.put("cislo", splitted[1]);
-                }
-            }
-
-            if (oDoc.containsKey("dostupnost")) {
-                String dostupnost = oDoc.get("dostupnost");
-                object.put("policy", oDoc.get("dostupnost"));
-                
-                if (dostupnost != null && dostupnost.equals("public")) {
-                    JSONArray stav = new JSONArray();
-                    stav.put("X");
-                    object.put("kuratorstav", stav);
-                    object.put("stav", stav);
-                }
-                
-            }
-
-            object.put("fetched", SIMPLE_DATE_FORMAT.format(new Date()));
-
-            SolrInputDocument idoc = new SolrInputDocument();
-            idoc.setField(IDENTIFIER_FIELD, identifier);
-            atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
-            solr.add(DataCollections.catalog.name(), idoc);
-
-            this.changedIdentifiers.add(identifier);
-            getLogger().fine(String.format("Adding granularity for %s", identifier));
-        }
-    }
+//    private void add(SolrClient solr, String identifier, String baseUrl, List<Map<String, String>> list)
+//            throws SolrServerException, Exception {
+//
+//        getLogger().fine("Adding granularity for identifier " + identifier);
+//        
+//        if (!list.isEmpty()) {
+//            String rootPid = list.get(0).get("root_pid");
+//
+//            JSONObject object = new JSONObject();
+//            object.put("link", renderLink(baseUrl, rootPid));
+//
+//            SolrInputDocument idoc = new SolrInputDocument();
+//            idoc.setField(IDENTIFIER_FIELD, identifier);
+//            atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
+//            solr.add(DataCollections.catalog.name(), idoc);
+//        }
+//        
+//        List<String> pidsFromKram = list.stream().map(p -> {
+//            return p.get("pid");
+//        }).collect(Collectors.toList());
+//
+//        for (int i = 0; i < pidsFromKram.size(); i++) {
+//            JSONObject object = new JSONObject();
+//            
+//            String renderingPID = pidsFromKram.get(i);
+//            String link = renderLink(baseUrl, renderingPID);
+//            object.put("link", link);
+//
+//            Map<String, String> oDoc = list.get(i);
+//            if (oDoc.containsKey("datum_str")) {
+//                object.put("rocnik", oDoc.get("datum_str"));
+//            }
+//            if (oDoc.containsKey("details")) {
+//                // oDoc.
+//                String details = oDoc.get("details");
+//                String[] splitted = details.split("##");
+//                if (splitted.length > 1) {
+//                    object.put("cislo", splitted[1]);
+//                }
+//            }
+//
+//            if (oDoc.containsKey("dostupnost")) {
+//                String dostupnost = oDoc.get("dostupnost");
+//                object.put("policy", oDoc.get("dostupnost"));
+//                
+//                if (dostupnost != null && dostupnost.equals("public")) {
+//                    JSONArray stav = new JSONArray();
+//                    stav.put("X");
+//                    object.put("kuratorstav", stav);
+//                    object.put("stav", stav);
+//                }
+//                
+//            }
+//
+//            object.put("fetched", SIMPLE_DATE_FORMAT.format(new Date()));
+//
+//            SolrInputDocument idoc = new SolrInputDocument();
+//            idoc.setField(IDENTIFIER_FIELD, identifier);
+//            atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
+//            solr.add(DataCollections.catalog.name(), idoc);
+//
+//            this.changedIdentifiers.add(identifier);
+//            getLogger().fine(String.format("Adding granularity for %s", identifier));
+//        }
+//    }
 
     private String renderLink(String baseUrl, String pid) {
         InstanceConfiguration configuration = this.checkConf.match(baseUrl);

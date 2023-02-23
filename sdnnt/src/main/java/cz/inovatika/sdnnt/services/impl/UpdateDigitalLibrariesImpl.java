@@ -42,7 +42,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
     public static final Logger LOGGER = Logger.getLogger(UpdateAlternativeAlephLinksImpl.class.getName());
     public static final int LIMIT = 30000;
     public static final int BATCH_SIZE = 1000;
-    public static final int CHECK_SIZE = 50;
+    //public static final int CHECK_SIZE = 50;
 
     public Logger logger;
     
@@ -77,7 +77,7 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
             ), (rsp) -> {
 
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
-                List<String> links = LinksUtilities.linksFromDocument(rsp);
+                List<String> links = LinksUtilities.krameriusMergedLinksFromDocument(rsp);
                 List<String> digitalizedKeys = LinksUtilities.digitalizedKeys(checkKram, links);
                 if (!digitalizedKeys.isEmpty()) {
                     idLibs.put(identifier.toString(), digitalizedKeys);
@@ -88,8 +88,8 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
             
             int numberOfBatches = idLibs.keySet().size() / BATCH_SIZE + (idLibs.size() % BATCH_SIZE == 0 ? 0 :1);
             for (int i = 0; i < numberOfBatches; i++) {
-                int startList = i*CHECK_SIZE;
-                int endList = Math.min(startList + CHECK_SIZE,idLibs.keySet().size());
+                int startList = i*BATCH_SIZE;
+                int endList = Math.min(startList + BATCH_SIZE,idLibs.keySet().size());
                 List<String> subList = idList.subList(startList, endList);
                 this.update(client, subList, idLibs);
             }
@@ -136,5 +136,11 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
 
+    public static void main(String[] args) {
+        UpdateDigitalLibrariesImpl digitalLibraries = new UpdateDigitalLibrariesImpl("test");
+        digitalLibraries.updateDL();
+
+    }
+    
     
 }

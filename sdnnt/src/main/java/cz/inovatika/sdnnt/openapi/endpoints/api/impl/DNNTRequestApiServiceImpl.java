@@ -229,7 +229,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 identifiers.removeAll(invalidPlaceIdentifiers);
                                 
                                 invalidStateIdentifiers = ie.getInvalidStateIdentifiers();
-                                identifiers.removeAll(invalidStateIdentifiers);
+                                List<String> invalidStatePids = invalidStateIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList());
+                                identifiers.removeAll(invalidStatePids);
                                 
                                 alreadyUsedIdentifiers = ie.getAlreadyUsedIdents();
                                 identifiers.removeAll(alreadyUsedIdentifiers);
@@ -468,6 +469,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         // validace na dohledatelnost #461
         for (String documentId :  identifiers) {
             Map<String, String> parameters = new HashMap<>();
+            parameters.put("fullCatalog", "true");
             parameters.put("q", documentId);
             JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
             if (search.has("response")) {

@@ -2,7 +2,13 @@ package cz.inovatika.sdnnt;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
@@ -128,7 +134,74 @@ public class Options {
   public JSONObject getJSONObject(String key) {
     return server_conf.optJSONObject(key);
   }
+  
+  public JSONObject jsonObjKey(String key) {
+      AtomicReference<JSONObject> reference = new AtomicReference<>();
+      process(key, (c)-> {
+          if (c instanceof JSONObject) {
+              reference.set((JSONObject)c);
+          }
+      });
+      return reference.get();
+  }
+  
+  public boolean boolKey(String key, boolean defaultVal) {
+      AtomicReference<Boolean> reference = new AtomicReference<>();
+      process(key, (c)-> {
+          if (c instanceof Boolean) {
+              reference.set((Boolean)c);
+          }
+      });
+      return reference.get() != null ? reference.get() : defaultVal;
+  }
+  
+  public int intKey(String key, int defaultVal) {
+      AtomicReference<Integer> reference = new AtomicReference<>();
+      process(key, (c)-> {
+          if (c instanceof Integer) {
+              reference.set((Integer)c);
+          }
+      });
+      return reference.get() != null ? reference.get() : defaultVal;
+  }
+  
+  
+  public String stringKey(String key, String defaultVal) {
+      AtomicReference<String> reference = new AtomicReference<>();
+      process(key, (c)-> {
+          if (c instanceof String) {
+              reference.set((String)c);
+          }
+      });
+      return reference.get() != null ? reference.get() : defaultVal;
+  }
+  
+  
+  
+  private void process(String keys, Consumer consumer) {
+      String[] split = keys.split("\\.");
+      List<String> stack = new ArrayList(Arrays.asList(split));
+      JSONObject topOpject = null;
+      while(!stack.isEmpty()) {
+          String pop = stack.remove(0);
+          if(stack.isEmpty()) {
+              if (topOpject != null &&  topOpject.has(pop)) {
+                  consumer.accept(topOpject.opt(pop));
+              } else {
+                  consumer.accept(null);
+              }
+          } else {
+              if (topOpject == null) {topOpject =  server_conf.optJSONObject(pop);}
+              else {
+                  topOpject = topOpject.optJSONObject(pop);
+              }
+          }
+      }
+  }
 
+  
+  
+  
     @Override
     public String toString() {
         JSONObject json = new JSONObject();

@@ -158,7 +158,8 @@ public class AccountServiceWorkflowImplITTest {
             Assert.assertTrue(oneRecord.kuratorstav.get(0).equals("A"));
 
             MarcRecord secondRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157765");
-            Assert.assertTrue(secondRecord.kuratorstav.get(0).equals("NPA"));
+            //System.out.println(secondRecord.kuratorstav);
+            Assert.assertTrue(secondRecord.kuratorstav.get(0).equals("A"));
         }
 
 

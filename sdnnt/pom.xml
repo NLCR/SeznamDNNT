@@ -4,7 +4,7 @@
 
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt</artifactId>
-  <version>1.0.7.2</version>
+  <version>1.0.7.3</version>
   <packaging>war</packaging>
 
   <name>sdnnt</name>

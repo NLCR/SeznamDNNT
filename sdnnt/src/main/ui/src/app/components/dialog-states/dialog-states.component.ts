@@ -45,9 +45,17 @@ export class DialogStatesComponent implements OnInit {
     this.newLicense = this.data.license ? this.data.license[0] : null  ;
     this.granularity = this.data.granularity ? this.data.granularity : [];
     this.fmt = this.data.fmt ? this.data.fmt : null;
+    // why ?? 
     this.granularity = this.granularity.map(function(itm) {
-      return DialogStatesComponent.flat(itm);
+
+      // stavy, licence, kram_licence, pid_path
+      let kramlics = itm.kram_licence ? itm.kram_licenses.join(',') : itm.kram_licence;
+      let retval=  DialogStatesComponent.flat(itm);
+      retval.kram_licenses = kramlics;
+      return retval;
+
     });
+
   }
 
   /** TODO: Do it on the server side */
@@ -96,6 +104,20 @@ export class DialogStatesComponent implements OnInit {
     if (obj.kuratorstav &&  !Array.isArray(obj.kuratorstav)) {
       obj.kuratorstav   = [obj.kuratorstav];    
     }
+
+    if (obj.kuratorstav &&  !Array.isArray(obj.kuratorstav)) {
+      obj.kuratorstav   = [obj.kuratorstav];    
+    }
+
+
+    if (obj.pidpaths &&  !Array.isArray(obj.pidpaths)) {
+      obj.pidpaths   = [obj.pidpaths];    
+    }
+
+    if (obj.kram_licenses &&  !Array.isArray(obj.kram_licenses)) {
+      obj.kram_licenses   = obj.kram_licenses.split(',');    
+    }
+
     return obj;
   }
   /**  */

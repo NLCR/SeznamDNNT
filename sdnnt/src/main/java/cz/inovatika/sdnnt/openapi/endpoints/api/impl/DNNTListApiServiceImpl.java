@@ -546,7 +546,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     }
 
     /**
-     * Print document to document output
+     * Vyblije dokument do csv nebo do modelu 
      * @param selectedInstitution Selected institution
      * @param documentLicense Generating documentLicense
      * @param onlyUniqPids Flag says that pid should be unique in export
@@ -581,8 +581,11 @@ public class DNNTListApiServiceImpl extends ListsApiService {
              */
             
             List<String> granularity = granularityField != null ? granularityField.stream().map(Object::toString).collect(Collectors.toList()): new ArrayList<>();
+            
             /**
              * Pokud je pritomno pole 911a a 911u, pak je mapovani pid - instituce - Pokud ne, pak se neda rict komu patri - zadna instituce
+             * uz prebito granularitou
+             * kazda polozka ma acronym 
              */
             // Vraci vsechny linky do krameriu -> filtruje jine
             List<String> krameriusLinks = links.stream().map(String::toLowerCase).filter(it -> it.contains("uuid:")).collect(Collectors.toList());
@@ -590,6 +593,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             // Bordel v datech ?? Obsahuji spatne prefixy a postfixy ?   musi se odfiltorvat !!! 
             List<String> pids = krameriusLinks.stream().map(PIDSupport::pidFromLink).map(PIDSupport::pidNormalization).collect(Collectors.toList());
             if (granularity != null && !granularity.isEmpty()) {
+                
                 for (String str : granularity) {
                     JSONObject jsonStr = new JSONObject(str);
                     if (GranularityUtils.isGranularityItem(jsonStr)) {
@@ -639,6 +643,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         return document;
     }
+
 
     private Map<String, Object> doc(List<String> digitalLibs, List<String> instituions, String label, String stav, Collection<Object> nazev, String identifier,List<String> granularity, String fmt, String ... p) {
         

@@ -30,7 +30,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
     }
 
 
-    protected ListitemGranularity granularity(String strJson) {
+    protected ListitemGranularity granularity(String strJson, String parentPid) {
 
         JSONObject jsonObject = new JSONObject(strJson);
         JSONArray stav = jsonObject.optJSONArray("stav");
@@ -39,15 +39,29 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         String link = jsonObject.optString("link");
         String rocnik = jsonObject.optString("rocnik");
         String fetched  = jsonObject.optString("fetched");
-        
-        if (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched")) {
 
+        boolean pidpaths = true;
+        
+        JSONArray pidPathsJSON = jsonObject.optJSONArray("pidpaths");
+        if (pidPathsJSON != null) {
+            pidpaths = false;
+            for (int i = 0; i < pidPathsJSON.length(); i++) {
+                String path = pidPathsJSON.getString(i);
+                if (path.contains(parentPid)) { pidpaths = true; }
+            }
+        }
+        
+
+        if (pidpaths && (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched"))) {
+
+            
             ListitemGranularity granularity = new ListitemGranularity();
             if (stav != null) stav.forEach(o-> granularity.addStatesItem(o.toString()));
             if (license != null && !license.trim().equals("")) {
                 granularity.setTerritoriality("CZ");
                 granularity.setLicense(license);
             }
+
             if (cislo != null && !cislo.trim().equals("")) granularity.setNumber(cislo);
             if (link != null && link.contains("uuid:")) {
                 int indexOf = link.indexOf("uuid:");
@@ -57,6 +71,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             if (rocnik != null) {
                 granularity.number(rocnik);
             }
+            
             return granularity;
         } else {
             return null;
@@ -78,6 +93,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
     }
 
     private void pidOutput(Map<String, Object> outputDocument, String endpointLicense, String pid ) {
+
         String identifier = outputDocument.get(IDENTIFIER_KEY) != null ? outputDocument.get(IDENTIFIER_KEY).toString() : null ;
         List<String> siglas = outputDocument.get(SELECTED_INSTITUTION_KEY) != null ? (List<String>) outputDocument.get(SELECTED_INSTITUTION_KEY) : null ;
         String nazev = outputDocument.get(NAZEV_KEY) != null ? outputDocument.get(NAZEV_KEY).toString() : null ;
@@ -86,6 +102,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         String fmt = outputDocument.get(FMT_KEY) != null ? outputDocument.get(FMT_KEY).toString() : null ;
         String stav = outputDocument.get(DNTSTAV_KEY) != null  ? outputDocument.get(DNTSTAV_KEY).toString() : null;
         
+        // ?? 
         List<String> digitalLibrary = outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) != null ? (List<String>)outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) : null;
         
         Listitem item = new Listitem()
@@ -114,9 +131,13 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                 if (this.digitalLibrariesConfiguration != null && this.digitalLibrariesConfiguration.containsKey(dl)) {
                     dl = this.digitalLibrariesConfiguration.get(dl);
                 }
-                item.addDigitalLibrariesItem(dl);  
+                List<String> dls = item.getDigitalLibraries();
+                if (dls != null && !dls.contains(dl)) {
+                    item.addDigitalLibrariesItem(dl);  
+                }
             }
         }
+        
         
         if (fmt != null) {
             item.type(fmt);
@@ -180,7 +201,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         if (granularity != null) {
             List<ListitemGranularity> collect = new ArrayList<>();
             for (String grItemString : granularity) {
-                ListitemGranularity gritem = granularity(grItemString);
+                ListitemGranularity gritem = granularity(grItemString, pid);
                 if (gritem != null) {
                     collect.add(gritem);
                 }

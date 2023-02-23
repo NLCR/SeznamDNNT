@@ -245,6 +245,22 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                 }
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
+                            } if (nState.equals(PublicItemState.N.name())) {
+                                Set<String> keySet = secondterationNotResolved.keySet();
+                                for(String key: keySet) {
+                                    List<JSONObject> list = secondterationNotResolved.get(key);
+                                    for (int i = 0; i < list.size(); i++) {
+                                        JSONObject gItemJSON = list.get(i);
+                                        JSONArray stavArr = new JSONArray();
+                                        stavArr.put(PublicItemState.X.name());
+
+                                        gItemJSON.put("stav", stavArr);
+                                        gItemJSON.put("kuratorstav", stavArr);
+                                        
+                                    }
+                                }
+                                changedGranularity.set(true);
+                                changedIdentifiers.add(masterIdentifier.toString());
                             } else {
                                 // kniha; 
                                 if (fmt != null && fmt.equals("BK")) {
@@ -253,9 +269,9 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                         List<JSONObject> items = secondterationNotResolved.get(key);
                                         if (nState.equals(PublicItemState.A.name()) || nState.equals(PublicItemState.PA.name())) {
                                             if (license != null && license.equals(License.dnnto.name())) {
-                                                ZahorikUtils.BK_DNNTO(nState, license, items);
+                                                ZahorikUtils.BK_DNNTO(nState, license, items, getLogger());
                                             } else if (license != null && license.equals(License.dnntt.name())) {
-                                                ZahorikUtils.BK_DNNTT(nState, license, items);
+                                                ZahorikUtils.BK_DNNTT(nState, license, items, getLogger());
                                             }
                                         } else {
                                             for (JSONObject gItem : items) {
@@ -267,18 +283,20 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                         }
                                     }
                                     changedIdentifiers.add(masterIdentifier.toString());
+                                    // serialy 
                                 } else if (fmt != null && fmt.equals("SE")) {
                                     Set<String> keySet = secondterationNotResolved.keySet();
                                     for(String key: keySet) {
                                         // pokud je dnntt, netreba zjistovat 
                                         List<JSONObject> items = secondterationNotResolved.get(key);
                                         if (license != null && license.equals(License.dnntt.name())) {
-                                            ZahorikUtils.SE_1_DNNTT(nState, license, items);
+                                            ZahorikUtils.SE_1_DNNTT(nState, license, items, getLogger());
                                         } else if (license != null && license.equals(License.dnnto.name())){
-                                            
+                                            // rozhodnuti zda to jsou neprava periodika 
                                             boolean regularityFlag = false;
                                             char regularity = controlField.charAt(19);
-                                            String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
+                                            
+                                            String regularityPattern = Options.getInstance().stringKey("granularity.se.00819", "r");
                                             String[] rsplit = regularityPattern.split(",");
                                             for (String confPattern : rsplit) {
                                                 if (confPattern.length() > 0 &&  confPattern.charAt(0) == regularity) {
@@ -288,7 +306,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                             }
                                             if (regularityFlag) {
                                                 boolean regularSE = false;
-                                                String frequencyPattern = Options.getInstance().getString("granularity.se.00819", "b,c,d,e,f,j,q,t,s,m,w,z");
+                                                String frequencyPattern = Options.getInstance().stringKey("granularity.se.00818", "b,c,d,e,f,j,q,t,s,m,w,z");
                                                 char periodicity = controlField.charAt(18);
                                                 String[] psplit = frequencyPattern.split(",");
                                                 for (String confPattern : psplit) {
@@ -297,14 +315,13 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                                         break;
                                                     }
                                                 }
-                                                
                                                 if (regularSE) {
-                                                    ZahorikUtils.SE_2_DNNTO(nState, license, items);
+                                                    ZahorikUtils.SE_2_DNNTO(nState, license, items, getLogger());
                                                 } else {
-                                                    ZahorikUtils.SE_1_DNNTO(nState, license, items);
+                                                    ZahorikUtils.SE_1_DNNTO(nState, license, items, getLogger());
                                                 }
                                             } else {
-                                                ZahorikUtils.SE_1_DNNTO(nState, license, items);
+                                                ZahorikUtils.SE_1_DNNTO(nState, license, items, getLogger());
                                             }
                                         } else {
                                             getLogger().warning("No license");
@@ -336,9 +353,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
         try (final SolrClient solrClient = buildClient()) {
             SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
         }
-        logger.info("Changed states finished. Updated identifiers "+this.changedIdentifiers);
-
-        
+        logger.info("Changed states finished. Updated identifiers ("+this.changedIdentifiers.size()+") "+this.changedIdentifiers);
     }
 
     private Pair<String, String> same(List<Pair<String, String>> resolvedList) {
@@ -365,20 +380,11 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
         }
     }
 
-
+    
     public static void main(String[] args) throws IOException {
-        //String regularityPattern = Options.getInstance().getString("granularity.se.00818", "r");
-        //String[] rsplit = regularityPattern.split(",");
-        //System.out.println(rsplit.length);
-
         GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(null);
-        try {
-            service.setStates(new ArrayList<>());
-        } catch (IOException e) {
-            service.getLogger().log(Level.SEVERE, e.getMessage(), e);
-        } finally {
-        }
-
+        service.setStates(new ArrayList<>());
     }
+
 
 }

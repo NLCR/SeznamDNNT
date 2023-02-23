@@ -1,7 +1,13 @@
 package cz.inovatika.sdnnt.services.impl.zahorikutils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.apache.solr.security.AuditEvent.Level;
 import org.json.JSONArray;
@@ -19,6 +25,28 @@ public class ZahorikUtils {
     
     private ZahorikUtils() {}
     
+    private static List<String> parseYears(String years) {
+        // parsuje skupinu cislic, konci 
+        List<String> yearsList = new ArrayList<>();
+        StringBuilder builder = new StringBuilder();
+        char[] charArray = years.toCharArray();
+        for (int i = 0; i < charArray.length; i++) {
+            if (Character.isDigit(charArray[i])) { builder.append(charArray[i]); }
+            else {
+                if (builder.length() > 0) {
+                    yearsList.add(builder.toString());
+                    builder = new StringBuilder();
+                }
+            }
+            
+        }
+        
+        if (builder.length() > 0) {
+            yearsList.add(builder.toString());
+        }
+        return yearsList;
+    }
+    
     
     // move to years utils
     public static int rocnik(JSONObject gItem, Logger logger) {
@@ -26,39 +54,14 @@ public class ZahorikUtils {
         if (gItem.has("rocnik")) {
             try {
                 String rocnik = gItem.getString("rocnik");
-
-                if (rocnik != null && rocnik.trim().startsWith("[")) {
-                    int index = rocnik.indexOf("[");
-                    rocnik = rocnik.substring(index+1);
-                }
-                
-                if (rocnik != null && rocnik.trim().endsWith("]")) {
-                    int index = rocnik.indexOf("]");
-                    rocnik = rocnik.substring(0, index);
-                }
-                
-                
-                if (rocnik.contains("-") || rocnik.contains("_") || rocnik.contains("..") ) {
-                    // expecting range pattern yyyy - yyyyy 
-                    String[] split = new String[0];
-                    if (rocnik.contains("-")) {
-                        split = rocnik.split("-");
-                    } else if (rocnik.contains("_")){
-                        split = rocnik.split("_");
-                    } else {
-                        split = rocnik.split("..");
-                    }
-
-                    if (split.length > 1) {
-                        rok = parsingYear(split[1].trim(), logger);
-                    } else if (split.length == 1){
-                        rok = parsingYear(split[0], logger);
-                    } else {
-                        rok = parsingYear( rocnik, logger);
-                    }
+                List<Integer> collected = parseYears(rocnik).stream().map(Integer::valueOf).collect(Collectors.toList());
+                Optional<Integer> minimum = collected.stream().min(Integer::compareTo);
+                if (minimum.isPresent()) {
+                    return minimum.get();
                 } else {
-                    rok = parsingYear(gItem.getString("rocnik").trim(), logger);
+                    System.out.println("error");
                 }
+                
             } catch (NumberFormatException | JSONException  e) {
                 e.printStackTrace();
             }
@@ -66,6 +69,7 @@ public class ZahorikUtils {
         return rok;
     }
 
+    /*
     private static int parsingYear(String rocnik, Logger logger) {
         try {
             return Integer.parseInt(rocnik);
@@ -73,16 +77,16 @@ public class ZahorikUtils {
             LOGGER.warning(String.format("Input date parsing problem '%s'", rocnik));
             return -1;
         }
-    }
+    }*/
 
     
     public static void BK_DNNTO(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
-                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+                int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
                 
-                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2002);
+                int t2001 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2002);
                 // hranice je klouzaval 
                 if (rocnik > publicLicense &&  rocnik <= t2001) {
                     gItem.put("license", License.dnnto.name());
@@ -111,12 +115,16 @@ public class ZahorikUtils {
             }
         }
     }
+    
+    
+    
+    
 
     public static void BK_DNNTT(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
 
-            int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+            int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
 
             if (license != null && license.equals(License.dnntt.name())) {
                 // hranice je pevna - smlouva s Diliii
@@ -145,10 +153,10 @@ public class ZahorikUtils {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
-                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+                int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
 
-                int t2001 = Options.getInstance().getInt("granularity.bk.dnnto_dnnto", 2002);
-                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2013);
+                int t2001 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2002);
+                int t2012 = Options.getInstance().intKey("granularity.bk.dnnto_dnntt", 2013);
 
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&   rocnik <= t2001) {
@@ -187,9 +195,9 @@ public class ZahorikUtils {
             int rocnik = rocnik(gItem, logger);
             if (license != null && license.equals(License.dnnto.name())) {
 
-                int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
+                int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
 
-                int t2012 = Options.getInstance().getInt("granularity.bk.dnnto_dnntt", 2013);
+                int t2012 = Options.getInstance().intKey("granularity.bk.dnnto_dnntt", 2013);
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&  rocnik < t2012) {
 
@@ -217,8 +225,8 @@ public class ZahorikUtils {
     public static void SE_1_DNNTT(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
-            int publicLicense = Options.getInstance().getInt("granularity.public_license", 1912);
-            int t2012 = Options.getInstance().getInt("granularity.bk.dnntt_dnntt", 2013);
+            int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
+            int t2012 = Options.getInstance().intKey("granularity.bk.dnntt_dnntt", 2013);
             if (license != null && license.equals(License.dnntt.name())) {
                 // rok je klouzavy 
                 if (rocnik > publicLicense && rocnik < t2012) {
@@ -240,6 +248,13 @@ public class ZahorikUtils {
             }
         }
         
+    }
+    
+    
+    public static void main(String[] args) {
+        Integer[] array = new Integer[] {2007,2008};
+        Optional<Integer> minimum = Arrays.asList(array).stream().max(Integer::compareTo);
+        System.out.println(minimum);
     }
     
 }

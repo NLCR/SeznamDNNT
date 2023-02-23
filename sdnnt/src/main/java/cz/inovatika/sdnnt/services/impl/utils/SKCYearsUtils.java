@@ -66,10 +66,4 @@ public class SKCYearsUtils {
         return val;
     }
     
-    public static void main(String[] args) {
-        String input = "2001-";
-        List<Pair<Integer,Integer>> skcRange = skcRange(input);
-
-        
-    }
 }
