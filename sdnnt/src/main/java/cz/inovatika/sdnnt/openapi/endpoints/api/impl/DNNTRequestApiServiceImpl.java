@@ -241,42 +241,48 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                             JSONObject prepare = accountService.prepare(navrh);
                             Zadost zadost = Zadost.fromJSON(prepare.toString());
+                            
+                            if (identifiers != null && !identifiers.isEmpty()) {
+                                zadost.setPozadavek(req.getPozadavek());
+                                zadost.setPoznamka(req.getPoznamka());
+                                
 
-                            if (identifiers != null) {
-                                zadost.setIdentifiers(identifiers);
+                                try {
+                                    JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
+                                    SuccessRequestSaved readValue = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                                    
+                                    ArrayOfDetails details = details(alreadyUsedIdentifiers,  notExistentIdentifiers, invalidFormatIdentifiers, invalidPlaceIdentifiers, invalidStateIdentifiers, openApiLoginSupport.getUser());
+                                    if (!details.isEmpty()) {
+                                        readValue.setDetails(details);
+                                    }
+                                    
+                                    if (readValue.getIdentifiers() == null || readValue.getIdentifiers().isEmpty()) {
+                                        throw new BadRequestEmptyIdentifiersException();
+                                    }
+                                    
+
+                                    response.getSaved().add(readValue);
+                                } catch ( ConflictException e) {
+                                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+
+                                    FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                                    ns.identifiers(req.getIdentifiers())
+                                            .pozadavek(req.getPozadavek())
+                                            .poznamka(req.getPoznamka());
+
+                                    response.getNotsaved().add(ns.reason(e.getMessage()));
+
+                                }
                             } else {
-                                zadost.setIdentifiers(new ArrayList<>());
-                            }
-
-                            zadost.setPozadavek(req.getPozadavek());
-                            zadost.setPoznamka(req.getPoznamka());
-
-                            try {
-                                JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
-                                SuccessRequestSaved readValue = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
                                 
-                                ArrayOfDetails details = details(alreadyUsedIdentifiers,  notExistentIdentifiers, invalidFormatIdentifiers, invalidPlaceIdentifiers, invalidStateIdentifiers, openApiLoginSupport.getUser());
-                                if (!details.isEmpty()) {
-                                    readValue.setDetails(details);
-                                }
-                                
-                                if (readValue.getIdentifiers() == null || readValue.getIdentifiers().isEmpty()) {
-                                    throw new BadRequestEmptyIdentifiersException();
-                                }
-                                
-
-                                response.getSaved().add(readValue);
-                            } catch ( ConflictException e) {
-                                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-
                                 FailedRequestNotSaved ns = new FailedRequestNotSaved();
                                 ns.identifiers(req.getIdentifiers())
                                         .pozadavek(req.getPozadavek())
                                         .poznamka(req.getPoznamka());
-
-                                response.getNotsaved().add(ns.reason(e.getMessage()));
-
+                                response.getNotsaved().add(ns.reason("Nothing to save"));
                             }
+
+                            
                         }catch (BadRequestMaximumNumberOfIdentifiersExceeded e) {
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
@@ -469,6 +475,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         // validace na dohledatelnost #461
         for (String documentId :  identifiers) {
             Map<String, String> parameters = new HashMap<>();
+            // proverit ?? 
             parameters.put("fullCatalog", "true");
             parameters.put("q", documentId);
             JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
