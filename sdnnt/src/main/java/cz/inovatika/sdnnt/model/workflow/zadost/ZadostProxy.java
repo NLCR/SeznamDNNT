@@ -75,6 +75,15 @@ public class ZadostProxy implements WorkflowOwner  {
             });
         }
     }
+    
+    
+
+    @Override
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
+            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
+            String originator, String user, String poznamka) {
+        throw new UnsupportedOperationException("Unsupported for 'Zadost'");
+    }
 
     @Override
     public boolean isSwitchToNextStatePossible(Date date, Period period) {

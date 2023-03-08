@@ -8,8 +8,8 @@ import cz.inovatika.sdnnt.model.License;
  * This represents workflow
  */
 public abstract class Workflow {
-
-    // workflow owner; zadost nebo dokument
+    
+    // zadost nebo document
     protected WorkflowOwner owner;
 
     public Workflow(WorkflowOwner owner) {
@@ -17,7 +17,7 @@ public abstract class Workflow {
     }
 
     /**
-     * Switch to the next state
+     * Prepnuti do dalsiho stavu
      * @return
      */
     public abstract WorkflowState nextState();
@@ -30,16 +30,21 @@ public abstract class Workflow {
 
 
     /**
-     * Returns true if the switch is possible
-     * <p>
-     *  <ul>
-     *      <li> The owner is in the state which allows the switch </li>
-     *  </ul>
-     * </p>
+     * Vraci true, pokud je mozne se prepnout do dalsiho stavu <br/>
+     * Ridi se pouze vlastnikem workflow, moznymi prechody
      * @return
      */
     public abstract  boolean isSwitchPossible();
 
+
+    /**
+     * Vraci true, pokud existuje prechod do pozadovaneho stavu
+     * @param Cilovy stav prepnuti
+     * @return
+     */
+    public abstract  boolean isSwitchPossible(CuratorItemState desiredState);
+
+    
     /**
      * Vlastnik workflow, muze byt bud zadost nebo dokument
      * @return
@@ -64,7 +69,16 @@ public abstract class Workflow {
      */
     public abstract  boolean isAlternativeSwitchPossible(String alternative);
 
+    /**
+     * Vraci true, pokud existuje alternativni prechod s cilovym stavem
+     * @param alternative
+     * @param desiredState
+     * @return
+     */
+    public abstract  boolean isAlternativeSwitchPossible(String alternative,CuratorItemState desiredState);
 
+    
+    
     /**
      * Vraci true, pokud je workflow vztazeno k uzivatelske akci (zaradit, vyradit atd..) 
      * V pripade, ze je vysledkem procesu (volne dilo v digitalni knihovne, vyrazeni, duplicita, atd..) vraci false

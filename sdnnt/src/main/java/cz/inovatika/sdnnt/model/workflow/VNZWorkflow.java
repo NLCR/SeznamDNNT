@@ -68,6 +68,21 @@ public class VNZWorkflow extends Workflow {
             }
         }
     }
+    
+    
+
+    @Override
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
+        if ((owner.getWorkflowState() != null) &&  (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
     @Override
     public boolean userDefinedWorkflow() {

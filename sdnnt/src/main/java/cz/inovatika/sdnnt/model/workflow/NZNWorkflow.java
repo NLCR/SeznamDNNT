@@ -13,8 +13,6 @@ import java.util.Date;
 
 /**
  * Pokryva scenar navrhu na zarazeni dila, kontroluje lhuty a prepina stav
- * <p>
- * </p>
  */
 public class NZNWorkflow extends Workflow {
 
@@ -26,7 +24,7 @@ public class NZNWorkflow extends Workflow {
     public WorkflowState nextState() {
         CuratorItemState currentState = owner.getWorkflowState();
         PublicItemState pState = owner.getPublicState();
-        Period period = getPeriod(currentState);
+        Period period = getPeriod(currentState, pState);
         if (currentState == null) {
             return new WorkflowState(owner, NPA,null, /*owner.getWorkflowDate(),*/ period,true,  true, false);
         } else {
@@ -42,6 +40,27 @@ public class NZNWorkflow extends Workflow {
                     if (pState != null && pState.equals(PublicItemState.PA)) {
                         return new WorkflowState(owner, A, License.valueOf(owner.getLicense()), /*owner.getWorkflowDate(),*/ period, false,false,  true);
                     } else return null;
+                    
+
+                // dilo je predmetem zadosti o volna dila 
+                case PX:
+                case DX:
+                    if (pState != null) {
+                        // pravdepodobne volne dilo v zadosti...  N, bez stavu, 
+                        switch(pState) {
+                            case N:
+                                return new WorkflowState(owner,NPA, null, /*owner.getWorkflowDate(),*/ period, false,true, false);
+                            case PA:
+                                return new WorkflowState(owner, currentState, PublicItemState.A,  owner.getLicense() != null ? License.valueOf(owner.getLicense()) : License.dnnto, /*owner.getWorkflowDate(),*/ period, false,false,  true);
+                            case NL:
+                                return new WorkflowState(owner, currentState, PublicItemState.A, License.valueOf(owner.getLicense()), /*owner.getWorkflowDate(),*/ period, false,false,  true);
+                            default:
+                                break;
+                        }
+
+                    } else {
+                        return new WorkflowState(owner,NPA, null, /*owner.getWorkflowDate(),*/ period, false,true, false);
+                    }
                 default:
                     return null;
 
@@ -58,24 +77,72 @@ public class NZNWorkflow extends Workflow {
     public boolean isAlternativeSwitchPossible(String alternative) {
         return false;
     }
+    
 
     @Override
-    public boolean isSwitchPossible() {
-        if (this.getOwner().getPublicState() != null && this.owner.getPublicState().equals(PublicItemState.PA)) {
-            // je tam datum prepnuti, prepinaji se vsichni
-//            Date dDate = getOwner().getDeadlineDate();
-//            return getOwner().isSwitchToNextStatePossible(dDate, getPeriod(getOwner().getWorkflowState()));
-            return true;
-        } else if (this.owner.getWorkflowState() != null && !this.getOwner().getWorkflowState().equals(A)) {
-//            Date dDate = getOwner().getDeadlineDate();
-//            return getOwner().isSwitchToNextStatePossible(dDate, getPeriod(getOwner().getWorkflowState()));
-            return true;
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
+        
+        //|| this.owner.getWorkflowState().equals(PX))
+        
+        
+        // NPA -> PA
+        if (this.getOwner().getWorkflowState() != null && this.owner.getWorkflowState().equals(NPA)) {
+            if (desiredState != null) {
+                return desiredState.equals(PA);
+            } else return true;
+
+        // PA -> A
+        } else if (this.getOwner().getWorkflowState() != null && this.owner.getWorkflowState().equals(PA)) {
+            
+            if (desiredState != null) {
+                return desiredState.equals(A);
+            } else return true;
+            
+        } else if (this.getOwner().getWorkflowState() != null && (this.owner.getWorkflowState().equals(PX) || this.owner.getWorkflowState().equals(DX))) {
+
+            PublicItemState publicState = this.owner.getPublicState();
+            if (publicState != null) {
+                switch(publicState) {
+                    case N: 
+                        if (desiredState != null) {
+                            return desiredState.equals(PA);
+                        } else return true;
+                    case PA: 
+                        if (desiredState != null) {
+                            return desiredState.equals(A);
+                        } else return true;
+                    default:
+                        return false;
+                }
+            }
+            
+            return false;
+
+        // N state  || null
+        } else if (this.owner.getWorkflowState() != null && this.getOwner().getWorkflowState().equals(N)) {
+        
+            if (desiredState != null) {
+                return desiredState.equals(PA);
+            } else return true;
+ 
         } else if (this.owner.getWorkflowState() == null) {
             return true;
         } else return false;
+
     }
 
-    private Period getPeriod(CuratorItemState state) {
+    @Override
+    public boolean isSwitchPossible() {
+        return isSwitchPossible(null);
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    private Period getPeriod(CuratorItemState state, PublicItemState publicItemState) {
         boolean debug = false;
         if (Options.getInstance().getJSONObject("workflow").has("periods") && Options.getInstance().getJSONObject("workflow").getJSONObject("periods").has("debug")) {
             debug = Options.getInstance().getJSONObject("workflow").getJSONObject("periods").getBoolean("debug");
@@ -86,6 +153,15 @@ public class NZNWorkflow extends Workflow {
                 case N: return debug? debug_nzn_0_5wd : period_nzn_0_5wd;
                 case NPA: return debug ? debug_nzn_1_12_18 : period_nzn_1_12_18;
                 case PA: return debug ? debug_nzn_2_6m : period_nzn_2_6m;
+                case PX:
+                case DX:
+                    if (publicItemState != null) {
+                        switch(publicItemState) {
+                            case N: return debug? debug_nzn_0_5wd : period_nzn_0_5wd;
+                            case PA: return debug ? debug_nzn_2_6m : period_nzn_2_6m;
+                            default: return null;
+                        }
+                    } else return null;
                 default: return null;
             }
         }

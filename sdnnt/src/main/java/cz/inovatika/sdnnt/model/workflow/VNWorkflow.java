@@ -37,6 +37,19 @@ public class VNWorkflow extends Workflow {
         return (cstate == null || !cstate.equals(N));
     }
 
+    
+
+
+    @Override
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
+        CuratorItemState cstate = this.getOwner().getWorkflowState();
+        return (cstate == null || !cstate.equals(N));
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        return License.dnntt.name().equals(alternative);
+    }
 
     @Override
     public WorkflowState nextAlternativeState(String alternative, SwitchStateOptions options) {

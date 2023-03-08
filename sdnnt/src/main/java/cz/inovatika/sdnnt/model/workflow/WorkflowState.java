@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.model.workflow;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.PublicItemState;
 
 import java.util.Date;
 import java.util.logging.Logger;
@@ -16,6 +17,10 @@ public class WorkflowState {
 
     /** Curator state */
     private CuratorItemState curatorState;
+    
+    // verejny stav v pripade, ze neni zrejmy z kuratorskeho stavu DX, PX
+    private PublicItemState expectingPublicState;
+    
 
     /** workflow owner - Dokument, Zadost */
     private WorkflowOwner workflowOwner;
@@ -38,10 +43,10 @@ public class WorkflowState {
     /** Flag - true if this workflow state is first state - first transition */
     private boolean firstTransition;
 
+    
     public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, License license, /*Date date,*/ Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
         this.workflowOwner = workflowOwner;
         this.curatorState = cstate;
-        //this.date = date;
         this.period = period;
         this.finalSate = finalSate;
         this.firstTransition = startTransition;
@@ -49,6 +54,17 @@ public class WorkflowState {
         this.license = license;
     }
 
+    public WorkflowState(WorkflowOwner workflowOwner, CuratorItemState cstate, PublicItemState expPublicItemState, License license, /*Date date,*/ Period period, boolean changingLicense, boolean startTransition, boolean finalSate/*, String transitionName*/) {
+        this.workflowOwner = workflowOwner;
+        this.curatorState = cstate;
+        this.period = period;
+        this.finalSate = finalSate;
+        this.firstTransition = startTransition;
+        this.changingLicence = changingLicense;
+        this.license = license;
+        this.expectingPublicState = expPublicItemState;
+    }
+    
 //    public Date getDate() {
 //        return date;
 //    }
@@ -89,8 +105,12 @@ public class WorkflowState {
         } else if (expectingLicense != null && this.workflowOwner.getLicense() != null &&  !expectingLicense.name().equals(this.workflowOwner.getLicense())) {
             shouldChangeLicense = true;
         }
-
-        this.workflowOwner.switchWorkflowState(options, getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
+        // pokud workflow ocekava public state, prepinani NZN pro kuratorske stavy PX a DX
+        if (this.expectingPublicState != null) {
+            this.workflowOwner.switchWorkflowState(options, getCuratorState(),expectingPublicState, getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
+        } else {
+            this.workflowOwner.switchWorkflowState(options, getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
+        }
         this.workflowOwner.setPeriodBetweenStates(getPeriod());
     }
 }

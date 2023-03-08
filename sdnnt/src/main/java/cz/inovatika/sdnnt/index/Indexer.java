@@ -435,7 +435,7 @@ public class Indexer {
       SolrInputDocument sdoc = mr.toSolrDoc();
       CuratorItemState kstav = CuratorItemState.valueOf(newStav);
       PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
-      if (pstav != null && pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA)) {
+      if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {
         mr.license = licence;
       } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
         mr.license = License.dnntt.name();
@@ -444,8 +444,9 @@ public class Indexer {
           mr.license = null;
           licence = null;
       }
+
       // zapis do historie
-      mr.setKuratorStav(kstav.name(), pstav.name(), licence, user, poznamka, granularityChange);
+      mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, granularityChange);
 
       // musi se menit i v ramci granularity
       if (!granularityChange.isEmpty()) {

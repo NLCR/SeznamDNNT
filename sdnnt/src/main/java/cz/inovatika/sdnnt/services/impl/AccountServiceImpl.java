@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.services.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.TransitionType;
@@ -844,6 +845,8 @@ public class AccountServiceImpl implements AccountService {
         if ( request != null) {
             
             Zadost zadost = Zadost.fromJSON(request.toString());
+            
+            String desiredItemState = zadost.getDesiredItemState();
             List<SolrDocument> docsFromResult = new ArrayList<>();
             try (SolrClient solr = buildClient()) {
 
@@ -861,23 +864,20 @@ public class AccountServiceImpl implements AccountService {
             LOGGER.info(String.format("Switching states for request %s", id));
 
             if (docsFromResult != null) {
-                docsFromResult.stream().forEach(j-> {
+                for (int i = 0; i < docsFromResult.size(); i++) {
+                    SolrDocument sDoc = docsFromResult.get(i);
                     try {
-                        MarcRecord marcRecord = MarcRecord.fromSolrDoc(j);
+                        MarcRecord marcRecord = MarcRecord.fromSolrDoc(sDoc);
                         if (marcRecord != null) {
                             try {
+                                CuratorItemState desiredState = CuratorItemState.valueOf(zadost.getDesiredItemState());
                                 Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
                                 if(workflow != null) {
-                                    boolean switchPossible = workflow.isSwitchPossible();
+                                    boolean switchPossible = workflow.isSwitchPossible(desiredState);
                                     if (switchPossible) {
                                         WorkflowState workflowState = workflow.nextState();
-
-                                        // stav musi existovat a musi byt typu scheduler
                                         if (workflowState != null && workflowState.getPeriod() !=null && workflowState.getPeriod().getTransitionType().equals(TransitionType.scheduler)) {
-
-                                            //marcRecord.toSolrDoc();
                                             String oldRaw = marcRecord.toJSON().toString();
-                                            // prepnuti stavu
                                             workflowState.switchState(id, zadost.getUser(), "", null);
                                             try {
                                                 try (SolrClient docClient = buildClient()) {
@@ -894,20 +894,25 @@ public class AccountServiceImpl implements AccountService {
                                     } else {
                                         LOGGER.info(String.format("\tnot accept, request(%s, %s) =   doc(%s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ));
                                     }
+                                } else {
+                                    LOGGER.info(String.format("\tno workflow, request(%s, %s) =   doc(%s)", zadost.getNavrh(), zadost.getId(), marcRecord.identifier ));
+                                    
                                 }
                             } catch (DocumentProxyException e) {
                                 LOGGER.log(Level.SEVERE,e.getMessage());
                                 throw new RuntimeException(e);
                             }
                         } else {
-                            
+                            LOGGER.info(String.format("\tcannot load record, request(%s, %s) =   doc(j)", zadost.getNavrh(), zadost.getId()));
                         }
                     } catch (JsonProcessingException e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(),e);
                     }
-                });
+                    
+                }
             }
 
+            
             // close whole request
             Workflow wfl = ZadostWorkflowFactory.create(zadost);
             if (wfl.isSwitchPossible()) {

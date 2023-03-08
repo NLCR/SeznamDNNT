@@ -39,12 +39,20 @@ public class DocumentProxy implements WorkflowOwner {
 
     @Override
     public CuratorItemState getWorkflowState() {
-        return !this.marcRecord.kuratorstav.isEmpty() ? CuratorItemState.valueOf(this.marcRecord.kuratorstav.get(0)) : null;
+        if (this.marcRecord.kuratorstav != null) {
+            return !this.marcRecord.kuratorstav.isEmpty() ? CuratorItemState.valueOf(this.marcRecord.kuratorstav.get(0)) : null;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public PublicItemState getPublicState() {
-        return !this.marcRecord.dntstav.isEmpty() ? PublicItemState.valueOf(this.marcRecord.dntstav.get(0)) : null;
+        if (this.marcRecord.dntstav != null) {
+            return !this.marcRecord.dntstav.isEmpty() ? PublicItemState.valueOf(this.marcRecord.dntstav.get(0)) : null;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -56,6 +64,61 @@ public class DocumentProxy implements WorkflowOwner {
     
     
 
+    //TODO: move to one method 
+    @Override
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
+            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
+            String originator, String user, String poznamka) {
+        Date date = currentDate();
+
+        List<String> dntstav = this.marcRecord.dntstav;
+        List<String> kuratorStav = this.marcRecord.kuratorstav;
+
+        if (expectingPublicState != null && (!dntstav.contains(expectingPublicState.name()) || changingLicenseState)) {
+            this.marcRecord.dntstav = new ArrayList<>(Arrays.asList(expectingPublicState.name()));
+            this.marcRecord.datum_stavu = new Date(date.getTime());
+            this.marcRecord.previousDntstav = dntstav;
+
+            JSONObject historyObject = new JSONObject();
+            historyObject.put("stav", expectingPublicState);
+            historyObject.put("date", MarcRecord.FORMAT.format(this.marcRecord.datum_stavu));
+            if (user != null) {
+                historyObject.put("user", user);
+            }
+            if (poznamka != null) {
+                historyObject.put("comment", poznamka);
+            }
+            if (license != null) {
+                historyObject.put("license", license);
+            }
+
+            if (originator != null) {
+                historyObject.put("zadost", originator);
+            }
+
+            this.marcRecord.historie_stavu.put(historyObject);
+        }
+        this.marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(itm.name()));
+        if (kuratorStav != null) this.marcRecord.previousKuratorstav = kuratorStav;
+        this.marcRecord.datum_krator_stavu = new Date(date.getTime());
+
+        JSONObject historyObject = HistoryObjectUtils.historyObjectParent(itm.name(), license, originator, user, poznamka, MarcRecord.FORMAT.format(this.marcRecord.datum_krator_stavu));
+        this.marcRecord.historie_kurator_stavu.put(historyObject);
+
+        if (changingLicenseState) {
+            if (this.marcRecord.licenseHistory == null) {
+                this.marcRecord.licenseHistory = new ArrayList<>();
+            }
+            if (marcRecord.license != null) this.marcRecord.licenseHistory.add(marcRecord.license);
+            this.marcRecord.license = license;
+        }
+        
+        // automaticky switch - PA,A,N
+        if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
+            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm);
+        }
+        
+    }
 
     @Override
     public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {

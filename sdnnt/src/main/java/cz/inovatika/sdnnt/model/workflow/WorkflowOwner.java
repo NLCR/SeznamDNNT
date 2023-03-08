@@ -65,7 +65,8 @@ public interface WorkflowOwner {
     
     public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
 
-    // vraci priznak, zda jsou splneny podminky pro zmenu stavu
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
+
     public boolean isSwitchToNextStatePossible(Date date, Period period);
 
     /**

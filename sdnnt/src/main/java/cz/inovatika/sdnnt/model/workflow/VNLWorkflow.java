@@ -37,17 +37,34 @@ public class VNLWorkflow extends Workflow {
         return null;
     }
 
+    
+    
+    @Override
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
+        if (this.owner.getWorkflowState() != null) {
+            if (this.getOwner().getWorkflowState().equals(NL)) {
+                return true;
+            } else if (this.getOwner().getWorkflowState().equals(NLX)) {
+                return true;
+            } else {
+                CuratorItemState cstate = this.getOwner().getWorkflowState();
+                return Arrays.asList(A, PA, PX, X).contains(cstate);
+            }
+        } else return false;
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     @Override
     public boolean isSwitchPossible() {
         if (this.owner.getWorkflowState() != null) {
             if (this.getOwner().getWorkflowState().equals(NL)) {
-//                Date deadlineDate = getOwner().getDeadlineDate();
-//                return this.getOwner().isSwitchToNextStatePossible(deadlineDate, getPeriod(NL) );
                 return true;
-
             } else if (this.getOwner().getWorkflowState().equals(NLX)) {
-//                Date deadlineDate = getOwner().getDeadlineDate();
-//                return this.getOwner().isSwitchToNextStatePossible(deadlineDate, getPeriod(NLX) );
                 return true;
             } else {
                 CuratorItemState cstate = this.getOwner().getWorkflowState();

@@ -47,7 +47,7 @@ public class DocumentWorkflowFactory {
         DocumentCheckProxy checkProxy = new DocumentCheckProxy(curatorItemState, publicItemState, license);
 
         List<ZadostTypNavrh> zadostTypNavrhs = new ArrayList<>();
-        if(nznDocument(kuratorstav)) {
+        if(nznDocument(kuratorstav, stav)) {
             NZNWorkflow nznWorkflow = new NZNWorkflow(checkProxy);
             WorkflowState workflowState = nznWorkflow.nextState();
             if (workflowState != null && workflowState.isFirstTransition()) {
@@ -79,6 +79,7 @@ public class DocumentWorkflowFactory {
    }
 
     public static Workflow create(MarcRecord record, Zadost zadost) throws DocumentProxyException {
+        List<String> publicstav = record.dntstav;
         List<String> kuratorstav = record.kuratorstav;
         String license = record.license;
         String navrh = zadost.getNavrh();
@@ -86,7 +87,7 @@ public class DocumentWorkflowFactory {
 
             switch (ZadostTypNavrh.find(navrh)) {
                 case NZN: {
-                    if (nznDocument(kuratorstav)) { return new NZNWorkflow(new DocumentProxy(record, zadost)); }
+                    if (nznDocument(kuratorstav,publicstav)) { return new NZNWorkflow(new DocumentProxy(record, zadost)); }
                     else return null;
                 }
                 case VNL: {
@@ -164,14 +165,20 @@ public class DocumentWorkflowFactory {
         return  kuratorstav.contains(CuratorItemState.DX.name());
     }
     
-    private static boolean nznDocument(List<String> kuratorstav) {
+    private static boolean nznDocument(List<String> kuratorstav, List<String> publicstav) {
         if (kuratorstav.isEmpty()) return true;
         else {
+            // kurator stav PX, DX
             if (kuratorstav.contains(CuratorItemState.N.name()) ||
                 kuratorstav.contains(CuratorItemState.NPA.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name())) {
                 return true;
             }
+            
+            if (publicstav != null) {
+                return publicstav.contains(PublicItemState.N.name()) || publicstav.contains(PublicItemState.PA.name());
+            }
+            
             return false;
 
         }

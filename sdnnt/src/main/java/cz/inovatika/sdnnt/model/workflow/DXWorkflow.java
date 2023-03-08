@@ -51,6 +51,21 @@ public class DXWorkflow extends Workflow {
         return false;
     }
     
+    
+    
+    @Override
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
+        if (desiredState != null && desiredState.equals(D)) {
+            return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
     private Period getPeriod(CuratorItemState state) {
         boolean debug = false;
         if (Options.getInstance().getJSONObject("workflow").has("periods") && Options.getInstance().getJSONObject("workflow").getJSONObject("periods").has("debug")) {

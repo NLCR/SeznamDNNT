@@ -36,8 +36,25 @@ public class PXWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
+        return isSwitchPossible(null);
+    }
+
+    
+    
+    @Override
+    public boolean isSwitchPossible(CuratorItemState desiredState) {
         CuratorItemState cstate = this.getOwner().getWorkflowState();
-        return (cstate == null  || (cstate != X && cstate != PX));
+        if ((cstate == null  || (cstate != X && cstate != PX))) {
+            if (desiredState != null) {
+                return desiredState.equals(X);
+            } else return true;
+        } else return false;
+    }
+
+    @Override
+    public boolean isAlternativeSwitchPossible(String alternative, CuratorItemState desiredState) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     @Override

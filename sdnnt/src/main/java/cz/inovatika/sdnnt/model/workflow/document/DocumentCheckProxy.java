@@ -53,6 +53,14 @@ public class DocumentCheckProxy implements WorkflowOwner {
         // class is only for checking
     }
 
+    
+    @Override
+    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
+            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
+            String originator, String user, String poznamka) {
+        
+    }
+
     @Override
     public boolean isSwitchToNextStatePossible(Date date, Period period) {
         return false;
