@@ -77,7 +77,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     private static final int LIMIT = 10000;
 
     CatalogSearcher catalogSearcher = new CatalogSearcher();
-
+    //AccountService accountService = new AccountServiceImpl();
+    
 
     @Override
     public Response requestBatchVnl(BatchRequest batchRequest, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
@@ -205,7 +206,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             Zadost mockZadost = new Zadost("-1");
                             mockZadost.setNavrh(navrh);
 
-                            // remap identifiers
+                            // remap idenpreptifiers
                             req.setIdentifiers(req.getIdentifiers().stream().map(it-> {
                                 try {
                                     return findId(it, solr);
@@ -239,10 +240,14 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 identifiers.removeAll(notExistentIdentifiers);
                             }
 
-                            JSONObject prepare = accountService.prepare(navrh);
-                            Zadost zadost = Zadost.fromJSON(prepare.toString());
                             
                             if (identifiers != null && !identifiers.isEmpty()) {
+
+                                JSONObject prepare = accountService.prepare(navrh);
+                                Zadost zadost = Zadost.fromJSON(prepare.toString());
+
+                                zadost.setIdentifiers(identifiers);
+
                                 zadost.setPozadavek(req.getPozadavek());
                                 zadost.setPoznamka(req.getPoznamka());
                                 
@@ -257,6 +262,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     }
                                     
                                     if (readValue.getIdentifiers() == null || readValue.getIdentifiers().isEmpty()) {
+                                        
                                         throw new BadRequestEmptyIdentifiersException();
                                     }
                                     
@@ -274,12 +280,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                                 }
                             } else {
-                                
-                                FailedRequestNotSaved ns = new FailedRequestNotSaved();
-                                ns.identifiers(req.getIdentifiers())
-                                        .pozadavek(req.getPozadavek())
-                                        .poznamka(req.getPoznamka());
-                                response.getNotsaved().add(ns.reason("Nothing to save"));
+                                throw new BadRequestEmptyIdentifiersException();
                             }
 
                             
@@ -332,8 +333,15 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private ArrayOfDetails details(List<String> alreadyUsedIdentifiers, List<String> notExistentIdentifiers, List<String> invalidFormatIdentifiers,
-            List<String> invalidPlaceIdentifiers, List<Pair<String,String>> invalidStateIdentifiers, User user) {
+    private ArrayOfDetails details(
+            List<String> alreadyUsedIdentifiers, 
+            List<String> notExistentIdentifiers, 
+            List<String> invalidFormatIdentifiers,
+            List<String> invalidPlaceIdentifiers, 
+            List<Pair<String,String>> invalidStateIdentifiers, User user) {
+
+        List<String> alreadyRendered = new ArrayList<>();
+        
         ArrayOfDetails details = new ArrayOfDetails();
         
         notExistentIdentifiers.stream().forEach(ni-> {
@@ -342,35 +350,48 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             detail.state(StateEnum.REJECTED);
             detail.setReason("Identifier doesnt exists");
             details.add(detail);
+            
+            alreadyRendered.add(ni);
         });
         
         
         invalidFormatIdentifiers.stream().forEach(iI -> {
-            Detail detail = new Detail();
-            detail.setIdentifier(iI);
-            detail.state(StateEnum.REJECTED);
-            detail.setReason("Invalid format (!BK AND !SE)");
-            details.add(detail);
             
+            if (!alreadyRendered.contains(iI)) {
+                Detail detail = new Detail();
+                detail.setIdentifier(iI);
+                detail.state(StateEnum.REJECTED);
+                detail.setReason("Invalid format (!BK AND !SE)");
+                details.add(detail);
+                
+                alreadyRendered.add(iI);
+            }
         });
         
         
         invalidPlaceIdentifiers.stream().forEach(iP-> {
-            Detail detail = new Detail();
-            detail.setIdentifier(iP);
-            detail.state(StateEnum.REJECTED);
-            detail.setReason("Invalid place of publication (!xr)");
-            details.add(detail);
-            
+            if (!alreadyRendered.contains(iP)) {
+                Detail detail = new Detail();
+                detail.setIdentifier(iP);
+                detail.state(StateEnum.REJECTED);
+                detail.setReason("Invalid place of publication (!xr)");
+                details.add(detail);
+
+                alreadyRendered.add(iP);
+            }
         });
         invalidStateIdentifiers.stream().forEach(iS-> {
 
-            Detail detail = new Detail();
-            detail.setIdentifier(iS.getLeft());
-            detail.state(StateEnum.REJECTED);
-            
-            detail.setReason("Invalid state '"+iS.getRight()+"'");
-            details.add(detail);
+            if (!alreadyRendered.contains(iS.getKey())) {
+                Detail detail = new Detail();
+                detail.setIdentifier(iS.getLeft());
+                detail.state(StateEnum.REJECTED);
+                
+                detail.setReason("Invalid state '"+iS.getRight()+"'");
+                details.add(detail);
+
+                alreadyRendered.add(iS.getKey());
+}            
             
         });
         
@@ -419,13 +440,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         List<String> invalidFormatIdentifiers = new ArrayList<>();
         List<String> invalidPlaceIdentifiers = new ArrayList<>();
         List<Pair<String,String>> invalidStateIdentifiers = new ArrayList<>();
-        List<String> allUsed = new ArrayList<>();
+        //List<String> allUsed = new ArrayList<>();
         
         Set<String> invalidIdentifiers = new HashSet<>();
         
 
         // validace na jiz pouzite v zadostech
-        accountService.findIdentifiersUsedInRequests(user.getUsername(), usedStates);
+        List<String> allUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), usedStates);
         identifiers.stream().forEach(ident-> {
             if (allUsed.contains(ident)) {
                 usedByUser.add(ident);

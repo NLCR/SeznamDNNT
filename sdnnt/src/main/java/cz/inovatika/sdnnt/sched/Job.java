@@ -336,6 +336,32 @@ public class Job implements InterruptableJob {
                 }
             }
         },
+
+        
+        
+        /** Refresh and set granularity */
+        GRANULARITY {
+            @Override
+            void doPerform(JSONObject jobData) {
+                long start = System.currentTimeMillis();
+                String logger = jobData.optString("logger");
+
+                GranularityServiceImpl gservice = new GranularityServiceImpl(logger);
+                GranularitySetStateServiceImpl sservice = new GranularitySetStateServiceImpl(logger);
+
+                try {
+                    gservice.initialize();
+                    gservice.refershGranularity();
+                    sservice.setStates(new ArrayList<>());
+                } catch (IOException e) {
+                    gservice.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    QuartzUtils.printDuration(gservice.getLogger(), start);
+                }
+                
+            }
+            
+        },
         
         /** Refresh granularit */
         REFRESH_GRANULARITIES {

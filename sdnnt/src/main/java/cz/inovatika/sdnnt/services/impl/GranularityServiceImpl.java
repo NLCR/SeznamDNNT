@@ -482,6 +482,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                             gf.setTypeOfRec(TypeOfRec.KRAM_SOLR);
                             
+
                             // Zahorikovo reseni, mnohokrat reseno po mailech 
                             // Pokud je public, automaticky dostava priznak X - 
                             // alespon podporeno konfiguracne, pouze vybrane knihovny mohou prinest priznak true

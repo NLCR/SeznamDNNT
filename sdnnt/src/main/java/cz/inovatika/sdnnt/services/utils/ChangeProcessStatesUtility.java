@@ -94,7 +94,19 @@ public class ChangeProcessStatesUtility {
                 }
             }
         }
-        
+
+        if (previous != null && previous.size() > 0 && previous.get(0).equals(CuratorItemState.X.name()) && (current.equals(CuratorItemState.A) || (current.equals(CuratorItemState.PA)))) {
+            JSONArray granularity = mr.granularity;
+            if (granularity != null) {
+                for (int i = 0; i < granularity.length(); i++) {
+                    JSONObject gItem = granularity.getJSONObject(i);
+                    clearGranularityItem(gItem, CuratorItemState.X, "kuratorstav", Arrays.asList("license"));
+                    clearGranularityItem(gItem, CuratorItemState.X, "stav", Arrays.asList("license"));
+                    
+                }
+            }
+        }
+
         if (current != null && current.equals(CuratorItemState.N)) {
             JSONArray granularity = mr.granularity;
             if (granularity != null) {
@@ -103,14 +115,43 @@ public class ChangeProcessStatesUtility {
                     granularityItem(gItem, current, CuratorItemState.A, "stav", Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.PA, "stav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.NL, "stav",Arrays.asList("license"));
+                    granularityItem(gItem, current, CuratorItemState.X, "stav",Arrays.asList("license"));
 
                     granularityItem(gItem, current, CuratorItemState.A, "kuratorstav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.PA, "kuratorstav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.NL, "kuratorstav",Arrays.asList("license"));
+                    granularityItem(gItem, current, CuratorItemState.X, "kuratorstav",Arrays.asList("license"));
                 }
             }
         }
         
+        if (current != null && current.equals(CuratorItemState.NL)) {
+            JSONArray granularity = mr.granularity;
+            if (granularity != null) {
+                for (int i = 0; i < granularity.length(); i++) {
+                    JSONObject gItem = granularity.getJSONObject(i);
+                    if (gItem.has("license")) {
+                        gItem.put("license", License.dnntt.name());
+                    }
+                }
+            }
+        }
+        
+        if (current != null && current.equals(CuratorItemState.X)) {
+            JSONArray granularity = mr.granularity;
+            if (granularity != null) {
+                for (int i = 0; i < granularity.length(); i++) {
+                    
+                    JSONObject gItem = granularity.getJSONObject(i);
+                    JSONArray xArray = new JSONArray();
+                    xArray.put("X");
+                    gItem.put("stav", xArray);
+                    gItem.put("kuratorstav", xArray);
+                    gItem.remove("license");
+                    
+                }
+            }
+        }
     }
 
     

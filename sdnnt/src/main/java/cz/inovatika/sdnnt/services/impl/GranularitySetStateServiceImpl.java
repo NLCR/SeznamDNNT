@@ -245,14 +245,15 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                 }
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
-                            } if (nState.equals(PublicItemState.N.name())) {
+                            } 
+                            if (nState.equals(PublicItemState.N.name())) {
                                 Set<String> keySet = secondterationNotResolved.keySet();
                                 for(String key: keySet) {
                                     List<JSONObject> list = secondterationNotResolved.get(key);
                                     for (int i = 0; i < list.size(); i++) {
                                         JSONObject gItemJSON = list.get(i);
                                         JSONArray stavArr = new JSONArray();
-                                        stavArr.put(PublicItemState.X.name());
+                                        stavArr.put(PublicItemState.N.name());
 
                                         gItemJSON.put("stav", stavArr);
                                         gItemJSON.put("kuratorstav", stavArr);
