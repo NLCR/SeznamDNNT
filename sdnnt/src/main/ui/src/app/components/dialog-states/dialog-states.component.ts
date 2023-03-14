@@ -48,8 +48,11 @@ export class DialogStatesComponent implements OnInit {
     // why ?? 
     this.granularity = this.granularity.map(function(itm) {
 
-      // stavy, licence, kram_licence, pid_path
-      let kramlics = itm.kram_licence ? itm.kram_licenses.join(',') : itm.kram_licence;
+      let kramlics;
+      if (itm.kram_licenses) {
+        kramlics = itm.kram_licenses.join(',');
+      }
+
       let retval=  DialogStatesComponent.flat(itm);
       retval.kram_licenses = kramlics;
       return retval;

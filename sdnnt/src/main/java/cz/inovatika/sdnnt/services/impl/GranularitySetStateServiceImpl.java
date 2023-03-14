@@ -126,17 +126,42 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                         
                         AtomicBoolean changedGranularity = new AtomicBoolean();
                         
-                                
-                        
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
                         List<JSONObject> granularityJSONS = granularity.stream().map(JSONObject::new).collect(Collectors.toList());
                         final Object masterIdentifier = rsp.getFirstValue(MarcRecordFields.IDENTIFIER_FIELD);
-
-                        // associated the same 
+                        
+                        // vycisti granularitu
+                        for (int i = 0; i < granularity.size(); i++) {
+                            JSONObject iIterationObj = granularityJSONS.get(i);
+                            if (iIterationObj.has("stav")) {
+                                Object jStav = iIterationObj.get("stav");
+                                String stav =  null;
+                                if (jStav instanceof JSONArray) {
+                                    JSONArray jStavArray  = (JSONArray) jStav;
+                                    if (jStavArray.length() > 0) {
+                                        stav = jStavArray.getString(0);
+                                    } else {
+                                        stav = null;
+                                    }
+                                } else  if(jStav instanceof String) {
+                                    stav = (String) jStav;
+                                }
+                                
+                                if (stav != null && !stav.toUpperCase().equals(PublicItemState.X.name())) {
+                                    iIterationObj.remove("stav");
+                                    iIterationObj.remove("kuratorstav");
+                                    iIterationObj.remove("license");
+                                } 
+                            }
+                        } 
+                        
+                        
+                        
+                        // associate the same 
                         Map<String, List<Pair<String, String>>> resolved = new HashMap<>();
                         for (int i = 0; i < granularity.size(); i++) {
                             JSONObject iIterationObj = granularityJSONS.get(i);
-                            
+
                             String pid = null;
                             String stav = null;
                             String license = null;
@@ -263,6 +288,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
                             } else {
+                                
                                 // kniha; 
                                 if (fmt != null && fmt.equals("BK")) {
                                     Set<String> keySet = secondterationNotResolved.keySet();
@@ -284,7 +310,8 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                         }
                                     }
                                     changedIdentifiers.add(masterIdentifier.toString());
-                                    // serialy 
+                                
+                                // serialy 
                                 } else if (fmt != null && fmt.equals("SE")) {
                                     Set<String> keySet = secondterationNotResolved.keySet();
                                     for(String key: keySet) {
