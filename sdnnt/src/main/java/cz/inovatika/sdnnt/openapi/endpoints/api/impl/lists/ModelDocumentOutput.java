@@ -5,6 +5,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.Listitem;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemGranularity;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ListitemSkc;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,7 +31,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
     }
 
 
-    protected ListitemGranularity granularity(String strJson, String parentPid) {
+    protected ListitemGranularity granularity(Pair<String,String> digitalLibraryFilter, String strJson, String parentPid) {
 
         JSONObject jsonObject = new JSONObject(strJson);
         JSONArray stav = jsonObject.optJSONArray("stav");
@@ -51,8 +52,11 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             }
         }
         
-
-        if (pidpaths && (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched"))) {
+        String acronym = jsonObject.optString("acronym");
+        boolean shouldProcess = digitalLibraryFilter != null ? digitalLibraryFilter.getLeft().equals(acronym) : true; 
+        
+        
+        if (pidpaths && (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched")) && shouldProcess) {
 
             
             ListitemGranularity granularity = new ListitemGranularity();
@@ -80,19 +84,19 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
     }
 
     @Override
-    public void output(Map<String, Object> outputDocument, List<String> ordering, String endpointLicense, boolean doNotEmitParent) {
+    public void output(Pair<String,String> digitalLibraryFilter, Map<String, Object> outputDocument, List<String> ordering, String endpointLicense, boolean doNotEmitParent) {
         Collection pids = (Collection) outputDocument.get(PIDS_KEY);
         Set<String> setPids = new LinkedHashSet(pids);
         if (!setPids.isEmpty()) {
             setPids.forEach(pid-> {
-                pidOutput(outputDocument, endpointLicense, pid);
+                pidOutput(digitalLibraryFilter, outputDocument, endpointLicense, pid);
             });
         } else {
-            pidOutput(outputDocument, endpointLicense, null);
+            pidOutput(digitalLibraryFilter, outputDocument, endpointLicense, null);
         }
     }
 
-    private void pidOutput(Map<String, Object> outputDocument, String endpointLicense, String pid ) {
+    private void pidOutput(Pair<String,String> digitalLibraryFilter, Map<String, Object> outputDocument, String endpointLicense, String pid ) {
 
         String identifier = outputDocument.get(IDENTIFIER_KEY) != null ? outputDocument.get(IDENTIFIER_KEY).toString() : null ;
         List<String> siglas = outputDocument.get(SELECTED_INSTITUTION_KEY) != null ? (List<String>) outputDocument.get(SELECTED_INSTITUTION_KEY) : null ;
@@ -201,7 +205,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         if (granularity != null) {
             List<ListitemGranularity> collect = new ArrayList<>();
             for (String grItemString : granularity) {
-                ListitemGranularity gritem = granularity(grItemString, pid);
+                ListitemGranularity gritem = granularity(digitalLibraryFilter,  grItemString, pid);
                 if (gritem != null) {
                     collect.add(gritem);
                 }

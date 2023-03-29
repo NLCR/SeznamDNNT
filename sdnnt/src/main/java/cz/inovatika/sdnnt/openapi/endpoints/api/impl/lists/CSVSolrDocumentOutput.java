@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists;
 
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,7 +27,7 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
     }
 
     @Override
-    public void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent) {
+    public void output(Pair<String,String> digitalLibraryFilter, Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent) {
 
         Set<String> emmitedGranularityPIDS = new HashSet<>();
         Set<String> allGranularityPIDS = new HashSet<>();

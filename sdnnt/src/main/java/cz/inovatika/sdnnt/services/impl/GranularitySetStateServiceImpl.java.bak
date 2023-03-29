@@ -95,8 +95,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
             CatalogIterationSupport support = new CatalogIterationSupport();
             List<String> plusFilter = new ArrayList<>(Arrays.asList(
-                MarcRecordFields.GRANULARITY_FIELD + ":*",
-                "setSpec:SKC"
+                MarcRecordFields.GRANULARITY_FIELD + ":*"
             ));
             
             
@@ -167,20 +166,13 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
                         
                         // XStates 
+                        //"dostupnost":"public"
                         for (int i = 0; i < granularity.size(); i++) {
-                            
                             JSONObject iIterationObj = granularityJSONS.get(i);
                             String pid = iIterationObj.optString("pid");
                             List<JSONObject> list = xstates.get(pid);
                             if (list != null) {
-
-                                Set<String> set = list.stream().filter(obj->{
-                                    //"acronym":"nkp"
-                                    if (obj.has("acronym")) {
-                                        boolean flag = Options.getInstance().boolKey("granularity.x_state."+obj.optString("acronym"), false);
-                                        return flag;
-                                    } else return false;
-                                }).map(obj-> {
+                                Set<String> set = list.stream().map(obj-> {
                                     if (obj.has("dostupnost")) {
                                         String dostupnost = obj.optString("dostupnost");
                                         return dostupnost;
@@ -194,10 +186,8 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                     jsonArray.put("X");
                                     iIterationObj.put("stav", jsonArray);
                                     iIterationObj.put("kuratorstav", jsonArray);
-                                    changedGranularity.set(true);
                                 }
                             }
-                            
                         } 
                         
                         // associate the same 

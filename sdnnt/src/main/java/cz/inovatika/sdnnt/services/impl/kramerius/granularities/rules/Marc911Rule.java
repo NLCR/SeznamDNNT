@@ -1,11 +1,15 @@
-package cz.inovatika.sdnnt.services.impl.rules;
+package cz.inovatika.sdnnt.services.impl.kramerius.granularities.rules;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.services.impl.granularities.GranularityField;
+
+import cz.inovatika.sdnnt.services.impl.kramerius.LinkitemField;
 import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
 import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
 
@@ -43,9 +47,27 @@ public class Marc911Rule {
     public String getPid() {
         String u = this.url.trim();
         int indexOf = u.indexOf("uuid:");
-        return u.substring(indexOf);
+        if (indexOf > -1) {
+            return u.substring(indexOf);
+        } else {
+            return null;
+        }
     }
     
+    
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        obj.put("range",this.range);
+        obj.put("url", this.url);
+        obj.put("dlAcronym", this.dlAcronym);
+        return obj;
+    }
+    
+    @Override
+    public String toString() {
+        return "Marc911Rule [range=" + range + ", url=" + url + ", dlAcronym=" + dlAcronym + "]";
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(dlAcronym, range, url);
@@ -65,19 +87,25 @@ public class Marc911Rule {
                 && Objects.equals(url, other.url);
     }
 
-    public boolean acceptField(GranularityField f) {
-        List<Pair<Integer, Integer>> rules = SKCYearsUtils.skcRange(this.range);
-        String date = f.getDate();
-        if (date != null) {
-            Integer date2 = SolrYearsUtils.solrDate(date);
-            for (Pair<Integer, Integer> p : rules) {
-                if (date2 >= p.getLeft() && date2 <= p.getRight()) {
-                    return true;
+    public boolean acceptField(LinkitemField f, Logger logger) {
+        try {
+            List<Pair<Integer, Integer>> rules = SKCYearsUtils.skcRange(this.range);
+
+            String date = f.getDate();
+            if (date != null) {
+                Integer date2 = SolrYearsUtils.solrDate(date);
+                for (Pair<Integer, Integer> p : rules) {
+                    if (date2 >= p.getLeft() && date2 <= p.getRight()) {
+                        return true;
+                    }
                 }
-            }
-            return false;
-        } else
+                return false;
+            } else
+                return true;
+        } catch(Exception ex) {
+            logger.log(Level.SEVERE,  ex.getMessage(),ex);
             return true;
+        }
     }    
     
     

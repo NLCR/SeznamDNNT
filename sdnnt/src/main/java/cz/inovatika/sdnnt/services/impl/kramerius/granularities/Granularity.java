@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.services.impl.granularities;
+package cz.inovatika.sdnnt.services.impl.kramerius.granularities;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
@@ -19,13 +19,15 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.services.impl.granularities.GranularityField.TypeOfRec;
-import cz.inovatika.sdnnt.services.impl.rules.Marc911Rule;
+import cz.inovatika.sdnnt.services.impl.kramerius.LinkitemField;
+import cz.inovatika.sdnnt.services.impl.kramerius.granularities.GranularityField.TypeOfRec;
+import cz.inovatika.sdnnt.services.impl.kramerius.granularities.rules.Marc911Rule;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
@@ -36,17 +38,14 @@ public class Granularity {
     
     public static final Logger LOGGER = Logger.getLogger(Granularity.class.getName());
     
-    // urls 
-    private List<String> urls = new ArrayList<>();
-    // rules
-    //private List<String> rules = new ArrayList<>();
-    private List<Marc911Rule> rules = new ArrayList<>();
+    //private List<String> urls = new ArrayList<>();
+
     
-    // skc identifier
     private String identifier;
     private PublicItemState state;
 
     private List<GranularityField> gfields = new ArrayList<>();
+    private List<Marc911Rule> rules = new ArrayList<>();
     
     // runtime dirty flag
     private boolean dirty = false;
@@ -68,19 +67,40 @@ public class Granularity {
         this.gfields.add(gf);
     }
     
-    public void removeGranularityField(GranularityField gf) {
+    public void removeGranularityField(LinkitemField gf) {
         this.gfields.remove(gf);
     }
     
     public List<GranularityField> getGranularityFields() {
-        return this.gfields;
+        return  new ArrayList<>(this.gfields);
     }
     
     public String getIdentifier() {
         return identifier;
     }
     
-    public GranularityField findByAcronyms(String acronym) {
+    public LinkitemField findByRootPidAndAcronym(String pid, String acronym) {
+        AtomicReference<GranularityField> found = new AtomicReference<>();
+        this.gfields.stream().forEach(gf-> {
+            if (gf.getAcronym() != null && gf.getAcronym().equals(acronym) && gf.getRootPid() != null && gf.getRootPid().equals(pid)) {
+                found.set(gf);
+            }
+        });
+        return found.get();
+    }
+
+    public GranularityField findByRootPid(String pid) {
+        AtomicReference<GranularityField> found = new AtomicReference<>();
+        this.gfields.stream().forEach(gf-> {
+            if (gf.getRootPid() != null && gf.getRootPid().equals(pid)) {
+                found.set(gf);
+            }
+        });
+        return found.get();
+    }
+
+    
+    public LinkitemField findByAcronyms(String acronym) {
         AtomicReference<GranularityField> found = new AtomicReference<>();
         this.gfields.stream().forEach(gf-> {
             if (gf.getAcronym() != null && gf.getAcronym().equals(acronym)) {
@@ -90,7 +110,7 @@ public class Granularity {
         return found.get();
     }
 
-    public GranularityField findByBaseUrl(String baseUrl) {
+    public LinkitemField findByBaseUrl(String baseUrl) {
         AtomicReference<GranularityField> found = new AtomicReference<>();
         this.gfields.stream().forEach(gf-> {
             if (gf.getBaseUrl() != null && gf.getBaseUrl().equals(baseUrl)) {
@@ -101,20 +121,7 @@ public class Granularity {
         
     }
     
-    public void addTitleUrl(String url) {
-        this.urls.add(url);
-    }
-    
-    public void removeTitleUrl(String url) {
-        this.urls.remove(url);
-    }
-    
-    public List<String> getTitleUrls() {
-        return new ArrayList<String>(this.urls);
-    }
 
-    
-    
     
     public void addTitleRule(Marc911Rule rule) {
         this.rules.add(rule);
@@ -129,12 +136,12 @@ public class Granularity {
         return rules;
     }
     
-    public boolean acceptByRule(GranularityField f) {
+    public boolean acceptByRule(GranularityField f, Logger logger) {
         String acronym = f.getAcronym();
         String rootPid = f.getRootPid();
         for (Marc911Rule rule : this.rules) {
             if (acronym != null &&  acronym.equals(rule.getDlAcronym()) && rootPid != null && rootPid.equals(rule.getPid())) {
-                return rule.acceptField(f);
+                return rule.acceptField(f, logger);
             }
         }
         return true;
@@ -219,6 +226,8 @@ public class Granularity {
             
             solrField.setCislo(kramField.getCislo());
             solrField.setDate(kramField.getDate());
+            
+            solrField.setKramLicenses(kramField.getKramLicenses());
 
             solrField.setPidPaths(kramField.getPidPaths());
 
@@ -269,12 +278,40 @@ public class Granularity {
         return null;
     }
     
-    public SolrInputDocument toSolrDocument() {
+    public JSONObject toJSON() {
+        JSONObject obj = new JSONObject();
+        JSONArray array = new JSONArray();
+        this.gfields.stream().map(GranularityField::toJSON).forEach(jsonObject-> {
+            array.put(jsonObject);
+        });
+        obj.put("field", array);
+        
+        obj.put("identifier", this.identifier);
+        obj.put("state", this.state);
+        
+        JSONArray rules = new JSONArray();
+        this.rules.stream().map(Marc911Rule::toJSON).forEach(jsonObject-> {
+            rules.put(jsonObject);
+        });
+        obj.put("rules", rules);
+        return obj;
+    }
+    
+    public SolrInputDocument toRomeSolrDocument() {
         SolrInputDocument idoc = new SolrInputDocument();
         idoc.setField(IDENTIFIER_FIELD, identifier);
-        List<String> collected = this.gfields.stream().map(GranularityField::toSDNNTSolrJson).map(JSONObject::toString).collect(Collectors.toList());
-        SolrJUtilities.atomicSet(idoc, collected, MarcRecordFields.GRANULARITY_FIELD);
+        SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.GRANULARITY_FIELD);
         return idoc;
+    }    
+    
+    public SolrInputDocument toSolrDocument() {
+        if (!this.gfields.isEmpty()) {
+            SolrInputDocument idoc = new SolrInputDocument();
+            idoc.setField(IDENTIFIER_FIELD, identifier);
+            List<String> collected = this.gfields.stream().map(GranularityField::toSDNNTSolrJson).map(JSONObject::toString).collect(Collectors.toList());
+            SolrJUtilities.atomicSet(idoc, collected, MarcRecordFields.GRANULARITY_FIELD);
+            return idoc;
+        } else return null;
     }
 
 

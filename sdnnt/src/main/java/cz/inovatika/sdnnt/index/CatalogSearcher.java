@@ -402,7 +402,7 @@ public class CatalogSearcher {
                 .setParam("stats", true)
                 .setParam("stats.field", "rokvydani")
                 .setParam("q.op", "AND")
-                .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
+                .setFields("*,raw:[json],masterlinks:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
 
         query.set("defType", "edismax");

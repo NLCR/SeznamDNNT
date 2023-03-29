@@ -23,6 +23,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -159,7 +160,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
+                    emitDocument(null, false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), License.dnnto.name(), false);
                 }
                 //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -208,7 +209,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name(), false);
+                    emitDocument(null,false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, License.dnntt.name(), false);
                 }
                 //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -259,7 +260,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc : rsp.getResults()) {
-                    emitDocument( false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null, false);
+                    emitDocument(null, false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS, null, false);
                 }
                 //response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -327,7 +328,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null, false);
+                    emitDocument(null,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, DEFAULT_OUTPUT_FIELDS,null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -525,7 +526,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 SolrDocumentOutput documentOutput = new CSVSolrDocumentOutput(printer);
                 // select only this fields
                 this.catalogIterationSupport.iterate(map, null, plusList, minusList,fetchingFields, (doc)->{
-                    emitDocument( onlyUniqPids, uniqe, doc, documentOutput, outputFields, label, doNotEmitParent);
+                    emitDocument(null,  onlyUniqPids, uniqe, doc, documentOutput, outputFields, label, doNotEmitParent);
                 }, "identifier");
             }
 
@@ -554,7 +555,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
      * @param doc Outputting doc
      * @param documentOutput DocumentOutput implementation
      */
-    private void emitDocument(/*String selectedInstitution, String documentLicense,*/ Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense, Boolean doNotEmit) {
+    private void emitDocument(Pair<String,String> digitalLibraryFilter, Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense, Boolean doNotEmit) {
         Collection<Object> nazev = doc.getFieldValues("nazev");
         String identifier = (String) doc.getFieldValue("identifier");
         
@@ -610,7 +611,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                         Map<String,Object> d =  doc(mdigitallibraries,minstitutions,  documentLicense, stav ,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
                         d = enIdSdnnt(d, doc);
                         d = enMarcFields(d, doc);
-                        documentOutput.output(d,outputFields, requestedLicense, doNotEmit);
+                        documentOutput.output(digitalLibraryFilter, d,outputFields, requestedLicense, doNotEmit);
                         uniqe.add(pids.get(i));
                     }
                 }
@@ -618,7 +619,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 Map<String,Object> d = doc(mdigitallibraries, minstitutions,  documentLicense,stav, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
                 d = enIdSdnnt(d, doc);
                 d = enMarcFields(d, doc);
-                documentOutput.output(d,outputFields, requestedLicense, doNotEmit);
+                documentOutput.output(digitalLibraryFilter,d,outputFields, requestedLicense, doNotEmit);
             }
         }
     }
@@ -708,7 +709,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 String nextCursorMark = rsp.getNextCursorMark();
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
+                    emitDocument(null,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 response.setResumptiontoken(nextCursorMark);
@@ -735,24 +736,36 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 q.addFilterQuery("dntstav:*");
                 q.addFilterQuery("id_pid:uuid");
                 
-                String dgFilterValue = null;
+                Pair<String,String> digitalLibraryPair = null;
+                
+                //String dgFilterValue = null;
                 if (digitalLibrary != null) {
+                    // acronym <=> sigla 
+                    // zadal acronym 
                     if (this.dlMap.containsKey(digitalLibrary.toLowerCase())) {
-                        dgFilterValue = this.dlMap.get(digitalLibrary.toLowerCase());
+                        String value = this.dlMap.get(digitalLibrary.toLowerCase());
+                        digitalLibraryPair = Pair.of(digitalLibrary.toLowerCase(), value);
                     } else {
-                        dgFilterValue = digitalLibrary;
+                        Set<String> keySet = this.dlMap.keySet();
+                        for (String key : keySet) {
+                            String value = this.dlMap.get(key);
+                            if (value.toLowerCase().equals(digitalLibrary.toLowerCase())) {
+                                digitalLibraryPair = Pair.of(key, value);
+                            }
+                            break;
+                        }
                     }
                 }
                 
-                if (dgFilterValue != null) {
-                    q.addFilterQuery("digital_libraries:"+dgFilterValue);
+                if (digitalLibraryPair != null) {
+                    q.addFilterQuery("digital_libraries:"+digitalLibraryPair.getRight());
                 }
                 
                 q.addFilterQuery("id_all_identifiers:\""+ident+"\" OR id_pid:\""+ident+"\" OR identifier:\""+ident+"\" OR id_sdnnt:\""+ident+"\"");
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
+                    emitDocument(digitalLibraryPair,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 return Response.ok().entity(response).build();

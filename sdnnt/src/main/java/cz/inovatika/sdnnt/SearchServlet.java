@@ -159,7 +159,7 @@ public class SearchServlet extends HttpServlet {
           SolrQuery query = new SolrQuery("*")
                   .setRows(100)
                   .addFilterQuery("identifier:\"" + req.getParameter("identifier") + "\"")
-                  .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                  .setFields("*,raw:[json],granularity:[json],masterlinks:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
           QueryRequest qreq = new QueryRequest(query);
           NoOpResponseParser rParser = new NoOpResponseParser();
           rParser.setWriterType("json");

@@ -95,7 +95,7 @@
    <!-- part of id -->
    <field name="id_parts" type="string" indexed="true" stored="true"  />
    <!-- full text -->
-   <field name="fullText" type="text_lowercase" indexed="true" stored="false" multiValued="true" />
+   <field name="fullText" type="text_lowercase" indexed="true" stored="true" multiValued="true" />
 
    <!-- Pomocne pole pro reindexaci v pripade zmeny schematu -->
    <field name="touch" type="boolean" indexed="true" stored="false" multiValued="true"  />
@@ -106,6 +106,8 @@
 	<copyField source="user" dest="fullText"/>
 	<copyField source="poznamka" dest="fullText"/>
 	<copyField source="pozadavek" dest="fullText"/>
+	<copyField source="identifiers" dest="fullText"/>
+	
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 

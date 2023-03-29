@@ -69,16 +69,6 @@ public class ZahorikUtils {
         return rok;
     }
 
-    /*
-    private static int parsingYear(String rocnik, Logger logger) {
-        try {
-            return Integer.parseInt(rocnik);
-        } catch (Exception e) {
-            LOGGER.warning(String.format("Input date parsing problem '%s'", rocnik));
-            return -1;
-        }
-    }*/
-
     
     public static void BK_DNNTO(String nState, String license, List<JSONObject> items, Logger logger) {
         for (JSONObject gItem : items) {
@@ -166,6 +156,7 @@ public class ZahorikUtils {
                     stavArr.put(nState);
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
+ 
                 // hranice je klouzava                  
                 } else if (rocnik > t2001 && rocnik < t2012) {
 

@@ -1,4 +1,4 @@
-package cz.inovatika.sdnnt.services.impl.granularities;
+package cz.inovatika.sdnnt.services.impl.kramerius.granularities;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,36 +12,29 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import cz.inovatika.sdnnt.services.impl.rules.Marc911Rule;
+
+import cz.inovatika.sdnnt.services.impl.kramerius.LinkitemField;
+import cz.inovatika.sdnnt.services.impl.kramerius.granularities.rules.Marc911Rule;
 import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
 import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
-public class GranularityField {
+public class GranularityField extends LinkitemField {
     
     public static final String STAV_KEY = "stav";
     public static final String KURATOR_KEY = "kuratorstav";
     public static final String LICENSE_KEY = "license";
-    public static final String LINK_KEY = "link";
     public static final String ROCNIK_KEY = "rocnik";
-    public static final String DOSTUPNOST_KEY = "dostupnost";
-    public static final String MODEL_KEY = "model";
-    public static final String PID_KEY = "pid";
     public static final String ROOT_PID_KEY = "rootPid";
     public static final String DETAILS_KEY = "details";
-    public static final String BASEURL_KEY = "baseUrl";
-    public static final String FETCHED_KEY = "fetched";
-    public static final String ACRONYM_KEY = "acronym";
     public static final String CISLO_KEY = "cislo";
-    public static final String DATE_KEY = "date";
-    public static final String PID_PATH_KEY ="pidpaths";
-    
-    public static final String KRAMERIUS_LICENSES = "kram_licenses";
     
     public static enum TypeOfRec {
-        SDNNT_SOLR,KRAM_SOLR;
+        SDNNT_SOLR,
+        KRAM_SOLR,
+        SDNNT_MOVED
     }
     
     /** SDNNT stuff **/
@@ -50,24 +43,9 @@ public class GranularityField {
     private String kuratorStav;
     private String rocnik;
     private String license;
-    private String link;
-    
-    /** Kramerius stuff */
-    private String pid;
     private String rootPid;
-    private String date;
-    private String model;
-    private String dostupnost;
     private String details;
 
-    /** Additional information */ 
-    private String baseUrl;
-    private String fetched;
-    private String acronym;
-    private List<String> pidPaths = new ArrayList<>();
-    
-    private List<String> kramLicenses = new ArrayList<>();
-    
     /** only runtime information */
     private TypeOfRec typeOfRec; 
     
@@ -96,14 +74,6 @@ public class GranularityField {
         this.rocnik = rocnik;
     }
     
-    public String getLink() {
-        return link;
-    }
-    
-    public void setLink(String link) {
-        this.link = link;
-    }
-    
     public String getLicense() {
         return license;
     }
@@ -113,68 +83,12 @@ public class GranularityField {
     }
     
     
-    public String getFetched() {
-        return fetched;
-    }
-    
-    public void setFetched(String fetched) {
-        this.fetched = fetched;
-    }
-    
-    
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-    
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-    
-    public String getDostupnost() {
-        return dostupnost;
-    }
-    
-    public void setDostupnost(String dostupnost) {
-        this.dostupnost = dostupnost;
-    }
-    
-    public void setPid(String pid) {
-        this.pid = pid;
-    }
-    
-    public String getPid() {
-        return pid;
-    }
-    
-    
-    public String getModel() {
-        return model;
-    }
-    public void setModel(String model) {
-        this.model = model;
-    }
-    
-    public String getAcronym() {
-        return acronym;
-    }
-    public void setAcronym(String acronym) {
-        this.acronym = acronym;
-    }
-    
-    
     public String getRootPid() {
         return rootPid;
     }
     
     public void setRootPid(String rootPid) {
         this.rootPid = rootPid;
-    }
-    
-    public String getDate() {
-        return date;
-    }
-    public void setDate(String date) {
-        this.date = date;
     }
     
     public String getDetails() {
@@ -199,24 +113,8 @@ public class GranularityField {
     }
     
     
-    public void setKramLicenses(List<String> kramLicenses) {
-        this.kramLicenses = kramLicenses;
-    }
-    
-    public List<String> getKramLicenses() {
-        return kramLicenses;
-    }
-    
     public TypeOfRec getTypeOfRec() {
         return typeOfRec;
-    }
-    
-    public List<String> getPidPaths() {
-        return pidPaths;
-    }
-    
-    public void setPidPaths(List<String> pidPaths) {
-        this.pidPaths = pidPaths;
     }
     
     @Override
@@ -238,7 +136,11 @@ public class GranularityField {
                 && Objects.equals(link, other.link) && Objects.equals(rocnik, other.rocnik)
                 && Objects.equals(stav, other.stav);
     }
-
+    public JSONObject toJSON() {
+        JSONObject retval = toSDNNTSolrJson();
+        retval.put("type", this.typeOfRec.name());
+        return retval;
+    }
     public JSONObject toSDNNTSolrJson() {
         JSONObject object = new JSONObject();
         
@@ -269,10 +171,10 @@ public class GranularityField {
         }
         
         if (this.getModel() != null) {
-            object.put(MODEL_KEY, this.getModel());
+            object.put(LinkitemField.MODEL_KEY, this.getModel());
         }
         
-        object.put(PID_KEY, this.getPid());
+        object.put(LinkitemField.PID_KEY, this.getPid());
         
         if (this.getRootPid() != null) {
             object.put(ROOT_PID_KEY, getRootPid());
@@ -283,15 +185,15 @@ public class GranularityField {
         }
         
         if (this.getBaseUrl() != null) {
-            object.put(BASEURL_KEY, this.getBaseUrl());
+            object.put(LinkitemField.BASEURL_KEY, this.getBaseUrl());
         }
         
         if (this.getFetched() != null) {
-            object.put(FETCHED_KEY, this.getFetched());
+            object.put(LinkitemField.FETCHED_KEY, this.getFetched());
         }
  
         if (this.getAcronym() != null) {
-            object.put(ACRONYM_KEY, getAcronym());
+            object.put(LinkitemField.ACRONYM_KEY, getAcronym());
         }
 
         if (this.getRocnik() != null) {
@@ -303,19 +205,19 @@ public class GranularityField {
         }
         
         if (this.getDate() != null) {
-            object.put(DATE_KEY, this.getDate());
+            object.put(LinkitemField.DATE_KEY, this.getDate());
         }
         
         if (this.getPidPaths() != null && !this.getPidPaths().isEmpty()) {
             JSONArray jsonArray = new JSONArray();
             this.getPidPaths().stream().forEach(jsonArray::put);
-            object.put(PID_PATH_KEY, jsonArray);
+            object.put(LinkitemField.PID_PATH_KEY, jsonArray);
         }
         
         if (this.getKramLicenses() != null && !this.getKramLicenses().isEmpty()) {
             JSONArray kramLicenses = new JSONArray();
             this.getKramLicenses().forEach(kramLicenses::put);
-            object.put(KRAMERIUS_LICENSES, kramLicenses);
+            object.put(LinkitemField.KRAMERIUS_LICENSES, kramLicenses);
         }
         
         
@@ -332,8 +234,8 @@ public class GranularityField {
         field.setRocnik(object.optString(ROCNIK_KEY));
 
         field.setDostupnost(object.optString(DOSTUPNOST_KEY));
-        field.setModel(object.optString(MODEL_KEY));
-        String pid = object.optString(PID_KEY);
+        field.setModel(object.optString(LinkitemField.MODEL_KEY));
+        String pid = object.optString(LinkitemField.PID_KEY);
         if (!StringUtils.isAnyString(pid)) {
             String link2 = field.getLink();
             int indexof = link2.indexOf("uuid:");
@@ -346,13 +248,13 @@ public class GranularityField {
         field.setRootPid(object.optString(ROOT_PID_KEY));
         field.setDetails(object.optString(DETAILS_KEY));
         
-        field.setFetched(object.optString(FETCHED_KEY));
-        field.setAcronym(object.optString(ACRONYM_KEY));
-        field.setBaseUrl(object.optString(BASEURL_KEY));
-        field.setDate(object.optString(DATE_KEY));
+        field.setFetched(object.optString(LinkitemField.FETCHED_KEY));
+        field.setAcronym(object.optString(LinkitemField.ACRONYM_KEY));
+        field.setBaseUrl(object.optString(LinkitemField.BASEURL_KEY));
+        field.setDate(object.optString(LinkitemField.DATE_KEY));
 
-        if (object.has(KRAMERIUS_LICENSES)) {
-            JSONArray kramLicensesJsonArray = object.getJSONArray(KRAMERIUS_LICENSES);
+        if (object.has(LinkitemField.KRAMERIUS_LICENSES)) {
+            JSONArray kramLicensesJsonArray = object.getJSONArray(LinkitemField.KRAMERIUS_LICENSES);
             List<String> kramLicenses = new ArrayList<>();
             for (int i = 0; i < kramLicensesJsonArray.length(); i++) {
                 kramLicenses.add(kramLicensesJsonArray.getString(i));
@@ -360,8 +262,8 @@ public class GranularityField {
             field.setKramLicenses(kramLicenses);
         }
         
-        if (object.has(PID_PATH_KEY)) {
-            JSONArray pidPathsJsonArray = object.getJSONArray(PID_PATH_KEY);
+        if (object.has(LinkitemField.PID_PATH_KEY)) {
+            JSONArray pidPathsJsonArray = object.getJSONArray(LinkitemField.PID_PATH_KEY);
             List<String> pidPathsList = new ArrayList<>();
             for (int i = 0; i < pidPathsJsonArray.length(); i++) {
                 pidPathsList.add(pidPathsJsonArray.getString(i));
@@ -388,8 +290,8 @@ public class GranularityField {
             field.setDostupnost(dostupnost);
         }
         
-        field.setModel(object.optString(MODEL_KEY));
-        String pid = object.optString(PID_KEY);
+        field.setModel(object.optString(LinkitemField.MODEL_KEY));
+        String pid = object.optString(LinkitemField.PID_KEY);
         if (!StringUtils.isAnyString(pid)) {
             String link2 = field.getLink();
             int indexof = link2.indexOf("uuid:");
@@ -403,8 +305,8 @@ public class GranularityField {
         field.setDetails(object.optString(DETAILS_KEY));
         field.setCislo(object.optString(CISLO_KEY));
         
-        field.setFetched(object.optString(FETCHED_KEY));
-        String baseUrl = object.optString(BASEURL_KEY);
+        field.setFetched(object.optString(LinkitemField.FETCHED_KEY));
+        String baseUrl = object.optString(LinkitemField.BASEURL_KEY);
         if (!StringUtils.isAnyString(baseUrl)) {
             String link = object.optString(LINK_KEY);
             String baseU = conf.baseUrl(link);
@@ -413,7 +315,7 @@ public class GranularityField {
             field.setBaseUrl(baseUrl);
         }
         
-        String acronym = object.optString(ACRONYM_KEY);
+        String acronym = object.optString(LinkitemField.ACRONYM_KEY);
         if (!StringUtils.isAnyString(acronym)) {
             InstanceConfiguration instance = conf.match(field.getBaseUrl());
             if (instance != null) {
@@ -422,13 +324,13 @@ public class GranularityField {
         }
         field.setAcronym(acronym);
 
-        if (object.has(KRAMERIUS_LICENSES)) {
-            Object kramLicensesObject = object.get(KRAMERIUS_LICENSES);
+        if (object.has(LinkitemField.KRAMERIUS_LICENSES)) {
+            Object kramLicensesObject = object.get(LinkitemField.KRAMERIUS_LICENSES);
             List<String> kramLicenses = new ArrayList<>();
             if (!(kramLicensesObject instanceof JSONArray)) {
                 kramLicenses.add(kramLicensesObject.toString());
             } else {
-                JSONArray kramLicensesJsonArray = object.getJSONArray(KRAMERIUS_LICENSES);
+                JSONArray kramLicensesJsonArray = object.getJSONArray(LinkitemField.KRAMERIUS_LICENSES);
                 for (int i = 0; i < kramLicensesJsonArray.length(); i++) {
                     kramLicenses.add(kramLicensesJsonArray.getString(i));
                 }
@@ -437,8 +339,8 @@ public class GranularityField {
             field.setKramLicenses(kramLicenses);
         }
 
-        if (object.has(PID_PATH_KEY)) {
-            JSONArray pidPathsJsonArray = object.getJSONArray(PID_PATH_KEY);
+        if (object.has(LinkitemField.PID_PATH_KEY)) {
+            JSONArray pidPathsJsonArray = object.getJSONArray(LinkitemField.PID_PATH_KEY);
             List<String> pidPathsList = new ArrayList<>();
             for (int i = 0; i < pidPathsJsonArray.length(); i++) {
                 pidPathsList.add(pidPathsJsonArray.getString(i));

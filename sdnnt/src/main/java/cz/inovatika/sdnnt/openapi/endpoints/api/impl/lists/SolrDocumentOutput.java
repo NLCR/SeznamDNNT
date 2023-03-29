@@ -3,6 +3,8 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 @FunctionalInterface
@@ -34,6 +36,6 @@ public interface SolrDocumentOutput {
     public static final String RAW_KEY = MarcRecordFields.RAW_FIELD;
 
     // vystupni metoda
-    void output(Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent);
+    void output(Pair<String,String> digitalLibraryFilter, Map<String, Object> outputDocument, List<String> fields, String endpointLicense, boolean doNotEmitParent);
 
 }

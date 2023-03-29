@@ -18,6 +18,8 @@ public class MarcRecordFields {
     public static final String LICENSE_FIELD = "license";
     public static final String LICENSE_HISTORY_FIELD = "license_history";
     public static final String GRANULARITY_FIELD = "granularity";
+    public static final String MASTERLINKS_FIELD = "masterlinks";
+    public static final String MASTERLINKS_DISABLED_FIELD = "masterlinks_disabled";
 
     public static final String IDENTIFIER_FIELD = "identifier";
     public static final String DATESTAMP_FIELD = "datestamp";

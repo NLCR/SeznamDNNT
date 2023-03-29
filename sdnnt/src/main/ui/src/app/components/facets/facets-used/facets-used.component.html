@@ -15,7 +15,7 @@
           <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
+          <ng-container *ngSwitchCase="'sigla'">{{  f.value  }}</ng-container>
           <ng-container *ngSwitchCase="'digital_libraries'">{{ 'sigla.' + f.value | translate }}</ng-container>
           <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
         </ng-container>

@@ -116,7 +116,13 @@
    <field name="license_history" type="string" indexed="true" stored="true" multiValued="true" />
 
 
+   <!-- granularita -->
    <field name="granularity" type="string" indexed="true" stored="true" multiValued="true"  />
+   <!-- master links -->
+   <field name="masterlinks" type="string" indexed="true" stored="true" multiValued="true"  />
+   <!-- master links, disabled -->
+   <field name="masterlinks_disabled" type="boolean" indexed="true" stored="true" multiValued="false"  />
+
 
    <field name="title_sort" type="icu_sort_cs" indexed="true" stored="true" multiValued="false"  />
 	

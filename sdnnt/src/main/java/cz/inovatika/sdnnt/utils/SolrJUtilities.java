@@ -70,4 +70,9 @@ public class SolrJUtilities {
         idoc.addField(fName, modifier);
     }
 
+    public static void atomicSetNull(SolrInputDocument idoc,  String fName) {
+        Map<String, Object> modifier = new HashMap<>(1);
+        modifier.put("set", null);
+        idoc.addField(fName, modifier);
+    }
 }

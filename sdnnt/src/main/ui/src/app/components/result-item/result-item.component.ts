@@ -114,31 +114,36 @@ export class ResultItemComponent implements OnInit {
 
     this.hasGranularity = this.doc.granularity && this.doc.granularity.length >= 1;
     this.dkLinks = [];
-    
-    // Podle https://github.com/NLCR/SeznamDNNT/issues/444 "měly být jen odkazy z 911"
-    // const tags = ['marc_956u', 'marc_911u', 'marc_856u'];
-
-    const tags = ['marc_911u','marc_856u'];
-    tags.forEach(t => {
-      if (this.doc[t]) {
-        this.doc[t].forEach((lorig: string) => {
-          // TODO: Config !! 
-          let l = lorig
-            .replace('//kramerius5.nkp.cz/uuid/', '//ndk.cz/uuid/')
-            .replace('//kramerius5.nkp.cz/search/handle/', '//ndk.cz/uuid/')
-            .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
-            .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
-            .split(' ')[0];
-
-            if (l.indexOf('uuid') > -1) {
-              l = this.normalizeLink(l);  
-              if (!this.dkLinks.includes(l)) {
-                this.dkLinks.push(l);
+    // Masterlinks && granularity     
+    if (this.doc.masterlinks || this.doc.masterlinks_disabled) {
+      this.doc?.masterlinks.forEach((mlink)=>{
+        this.dkLinks.push(mlink.link);
+      });
+    } else {
+      // jeste neexistuje masterlinks (zobrazi vsechno z poli 911u a 856u)
+      const tags = ['marc_911u','marc_856u'];
+      tags.forEach(t => {
+        if (this.doc[t]) {
+          this.doc[t].forEach((lorig: string) => {
+            // TODO: Config !! 
+            let l = lorig
+              .replace('//kramerius5.nkp.cz/uuid/', '//ndk.cz/uuid/')
+              .replace('//kramerius5.nkp.cz/search/handle/', '//ndk.cz/uuid/')
+              .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
+              .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
+              .split(' ')[0];
+  
+              if (l.indexOf('uuid') > -1) {
+                l = this.normalizeLink(l);  
+                if (!this.dkLinks.includes(l)) {
+                  this.dkLinks.push(l);
+                }
               }
-            }
-        });
-      }
-    });
+          });
+        }
+      });
+    }
+
 
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_911u ? this.doc.marc_911u : []);
     // this.dkLinks = this.dkLinks.concat(this.doc.marc_856u ? this.doc.marc_856u : []);
