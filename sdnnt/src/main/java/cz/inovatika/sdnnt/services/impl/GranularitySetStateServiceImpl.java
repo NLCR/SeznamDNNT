@@ -106,7 +106,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
             AtomicInteger counter = new AtomicInteger();
             
-            List<String> minusFilter = Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":D");
+            List<String> minusFilter = Arrays.asList( KURATORSTAV_FIELD + ":D");
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
                     Arrays.asList(IDENTIFIER_FIELD, 
                             SIGLA_FIELD, 
@@ -197,7 +197,6 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                     changedGranularity.set(true);
                                 }
                             }
-                            
                         } 
                         
                         // associate the same 
@@ -296,25 +295,48 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                             String controlField = (String) rsp.getFirstValue("controlfield_008");
                             String fmt = (String) rsp.getFirstValue(MarcRecordFields.FMT_FIELD);
                             String license = (String) rsp.getFirstValue(MarcRecordFields.LICENSE_FIELD);
+                            
 
-                            if (nState.equals(PublicItemState.N.name())) {
+                            if (nState.equals(PublicItemState.X.name())) {
                                 Set<String> keySet = secondterationNotResolved.keySet();
                                 for(String key: keySet) {
                                     List<JSONObject> list = secondterationNotResolved.get(key);
                                     for (int i = 0; i < list.size(); i++) {
                                         JSONObject gItemJSON = list.get(i);
                                         JSONArray stavArr = new JSONArray();
-                                        stavArr.put(PublicItemState.N.name());
+                                        stavArr.put(PublicItemState.X.name());
 
                                         gItemJSON.put("stav", stavArr);
                                         gItemJSON.put("kuratorstav", stavArr);
+                                        gItemJSON.remove("license");
                                         
                                     }
                                 }
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
                             } 
+
                             if (nState.equals(PublicItemState.N.name())) {
+                                Set<String> keySet = secondterationNotResolved.keySet();
+                                for(String key: keySet) {
+                                    List<JSONObject> list = secondterationNotResolved.get(key);
+                                    for (int i = 0; i < list.size(); i++) {
+                                        JSONObject gItemJSON = list.get(i);
+                                        JSONArray stavArr = new JSONArray();
+                                        stavArr.put(PublicItemState.N.name());
+
+                                        gItemJSON.put("stav", stavArr);
+                                        gItemJSON.put("kuratorstav", stavArr);
+                                        gItemJSON.remove("license");
+                                        
+                                    }
+                                }
+                                changedGranularity.set(true);
+                                changedIdentifiers.add(masterIdentifier.toString());
+                            } 
+                            
+                            if (nState.equals(PublicItemState.N.name())  || nState.equals(PublicItemState.X.name()) ) {
+                                /*
                                 Set<String> keySet = secondterationNotResolved.keySet();
                                 for(String key: keySet) {
                                     List<JSONObject> list = secondterationNotResolved.get(key);
@@ -330,6 +352,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                 }
                                 changedGranularity.set(true);
                                 changedIdentifiers.add(masterIdentifier.toString());
+                                */
                             } else {
                                 
                                 // kniha; 
@@ -395,7 +418,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                                                 ZahorikUtils.SE_1_DNNTO(nState, license, items, getLogger());
                                             }
                                         } else {
-                                            getLogger().warning("No license");
+                                            getLogger().warning("No license for "+masterIdentifier);
                                         }
                                     }
                                     changedIdentifiers.add(masterIdentifier.toString());

@@ -465,7 +465,7 @@ public class AccountServiceImpl implements AccountService {
                     .setStart(start)
                     .addFilterQuery("{!join fromIndex=zadost from=identifiers to=identifier} id:" + id)
                     .setSort(SolrQuery.SortClause.asc("title_sort"))
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],masterlinks:[json],historie_stavu:[json],historie_kurator_stavu:[json]");
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");

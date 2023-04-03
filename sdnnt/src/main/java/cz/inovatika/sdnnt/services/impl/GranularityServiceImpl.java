@@ -77,6 +77,7 @@ import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class GranularityServiceImpl extends AbstractGranularityService implements GranularityService {
 
+    
     public static Logger LOGGER = Logger.getLogger(GranularityServiceImpl.class.getName());
     
     private static final int MAX_FETCHED_DOCS = 1000;
@@ -156,6 +157,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     
     @Override
     public void refershGranularity() throws IOException {
+        
+        
+        
         try (final SolrClient solrClient = buildClient()) {
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "10000");
@@ -304,8 +308,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             LinksOnwer linksOnwer = this.linksOwner.get(key);
             Granularity granularity =  linksOnwer.getGranularity();
             MasterLinks masterLinks = linksOnwer.getMasterLinks();
-            
-            
             
             List<String> links = linksOnwer.getTitleUrls();
             boolean fullSkip = true;
@@ -576,10 +578,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 String link = renderLink(baseUrl, mf.getPid());
                                 mf.setLink( link);
 
-                                //gf.setTypeOfRec(TypeOfRec.KRAM_SOLR);
-                                
-
-                                
                                 // presunout na jine misto, bude se jenom zaznamenavat public a private a pak dle toho rozhodovat v sluzbe setstates
                                 /**
                                 if (gf.getDostupnost()  != null && gf.getDostupnost() .equals("public")) {
@@ -655,8 +653,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        //buffer.clear();
     }
     
     protected void clearBufferChildren(Map<String, List<Pair<String, String>>> buffer) {
@@ -841,7 +837,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
 //    private List<Map<String, String>> filterGranularity(List<String> rules, List<Map<String,String>> digitalized) {
 //        Set<Map<String,String>> set = new LinkedHashSet<>();
-//
 //        List<Pair<Integer, Integer>> pairs = rules.stream().map(SKCYearsUtils::skcRange).flatMap(Collection::stream).collect(Collectors.toList());
 //        for (Map<String, String> map : digitalized) {
 //            if (map.containsKey("datum_str")) {

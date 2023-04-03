@@ -172,6 +172,8 @@ public class DocumentProxy implements WorkflowOwner {
         if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
             ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm);
         }
+        
+        
     }
 
     @Override

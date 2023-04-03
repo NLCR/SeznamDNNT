@@ -71,7 +71,11 @@ public class MarcRecord {
   public List<String> previousKuratorstav = new ArrayList<>();
   public Date datum_krator_stavu;
 
-
+  // masterlinks
+  public JSONArray masterlinks;
+  //masterlinksdisabled
+  public Boolean masterLinksDisabled;
+  
   // licence
   public String license;
   // historie licenci
@@ -80,10 +84,11 @@ public class MarcRecord {
   @JsonIgnore
   public MarcRecordFlags recordsFlags;
 
-
   @JsonIgnore
   public JSONArray granularity; 
 
+  
+  
 
   public boolean isDeleted = false;
   
@@ -150,7 +155,10 @@ public class MarcRecord {
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
                     FLAG_PUBLIC_IN_DL+" ",
-                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ GRANULARITY_FIELD+":[json]");
+                    LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+
+                    GRANULARITY_FIELD+":[json]",
+                    MASTERLINKS_FIELD+":[json]",
+                    MASTERLINKS_DISABLED_FIELD);
 
     return fromIndex(client,q);
   }
@@ -221,6 +229,7 @@ public class MarcRecord {
         // mr.granularity = new JSONArray();
       }
 
+
       if (doc.containsKey(HISTORIE_GRANULOVANEHOSTAVU_FIELD)) {
         JSONArray jsonArray = new JSONArray(doc.getFieldValue(HISTORIE_GRANULOVANEHOSTAVU_FIELD).toString());
         mr.historie_granulovaneho_stavu = jsonArray;
@@ -243,6 +252,17 @@ public class MarcRecord {
           mr.digitalLibraries = collected;
       }
       
+      if (doc.containsKey(MASTERLINKS_FIELD)) {
+          JSONArray ma = new JSONArray( doc.getFieldValue(MASTERLINKS_FIELD).toString());
+          mr.masterlinks =  ma;
+      }
+
+      
+      if (doc.containsKey(MASTERLINKS_DISABLED_FIELD)) {
+          Boolean disabled = Boolean.valueOf(doc.getFieldValue(MASTERLINKS_DISABLED_FIELD).toString());
+          mr.masterLinksDisabled =  disabled;
+      }
+      
       return mr;
 }
 
@@ -259,6 +279,7 @@ public class MarcRecord {
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
     json.put(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu);
     json.put(GRANULARITY_FIELD, granularity);
+    
 
     json.put("controlFields", controlFields);
 
@@ -401,6 +422,18 @@ public class MarcRecord {
         sdoc.addField(GRANULARITY_FIELD, granularity.getJSONObject(i).toString());
     }
 
+    if (masterlinks != null) {
+        if (sdoc.containsKey(MASTERLINKS_FIELD)) {
+          sdoc.removeField(MASTERLINKS_FIELD);
+        }
+        for (int i = 0; i < masterlinks.length(); i++) sdoc.addField(MASTERLINKS_FIELD, masterlinks.getJSONObject(i).toString());
+    }
+    
+    if (masterLinksDisabled != null) {
+        sdoc.addField(MASTERLINKS_DISABLED_FIELD, this.masterLinksDisabled);
+    }
+    
+
     // Control fields
     for (String cf : controlFields.keySet()) {
       sdoc.addField("controlfield_" + cf, controlFields.get(cf));
@@ -513,6 +546,7 @@ public class MarcRecord {
             sdoc.addField(DIGITAL_LIBRARIES, f);
         });
     }
+    
     
     
     return sdoc;

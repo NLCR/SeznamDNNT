@@ -27,6 +27,7 @@ import cz.inovatika.sdnnt.services.impl.*;
 import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
 import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+import cz.inovatika.sdnnt.services.locks.LocksSupport;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -125,17 +126,24 @@ public class Job implements InterruptableJob {
             
             @Override
             void doPerform(JSONObject jobData) {
-                LOGGER.fine(name()+":configuration is "+jobData);
-                long start = System.currentTimeMillis();
-                JSONObject results = jobData.optJSONObject("results");
-                String loggerPostfix = jobData.optString("logger");
-                SKCJoinServiceImpl service = new SKCJoinServiceImpl(loggerPostfix, results);
                 try {
-                    service.updateFollowers();
-                } catch (IOException  e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
-                }finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    JSONObject results = jobData.optJSONObject("results");
+                    String loggerPostfix = jobData.optString("logger");
+                    SKCJoinServiceImpl service = new SKCJoinServiceImpl(loggerPostfix, results);
+                    try {
+                        service.updateFollowers();
+                    } catch (IOException  e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    }finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+                    }
+
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },
@@ -145,12 +153,18 @@ public class Job implements InterruptableJob {
         DL_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
-                long start = System.currentTimeMillis();
-                LOGGER.fine(name()+":configuration is "+jobData);
-                String loggerName = jobData.optString("logger");
-                UpdateDigitalLibrariesImpl digitalLibraries = new UpdateDigitalLibrariesImpl(loggerName);
-                digitalLibraries.updateDL();
-                QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    long start = System.currentTimeMillis();
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    String loggerName = jobData.optString("logger");
+                    UpdateDigitalLibrariesImpl digitalLibraries = new UpdateDigitalLibrariesImpl(loggerName);
+                    digitalLibraries.updateDL();
+                    QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
             }
         },
         
@@ -177,17 +191,23 @@ public class Job implements InterruptableJob {
             
             @Override
             void doPerform(JSONObject jobData) {
-                LOGGER.fine(name()+":configuration is "+jobData);
-                long start = System.currentTimeMillis();
-                JSONObject results = jobData.optJSONObject("results");
-                String loggerPostfix = jobData.optString("logger");
-                AbstractCheckDeleteService service = new SKCTypeServiceImpl(loggerPostfix, results);
                 try {
-                    service.update();
-                } catch (IOException | SolrServerException e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
-                }finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    JSONObject results = jobData.optJSONObject("results");
+                    String loggerPostfix = jobData.optString("logger");
+                    AbstractCheckDeleteService service = new SKCTypeServiceImpl(loggerPostfix, results);
+                    try {
+                        service.update();
+                    } catch (IOException | SolrServerException e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    }finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
 
             }
@@ -219,56 +239,62 @@ public class Job implements InterruptableJob {
         DATE_PX_CHECK {
             @Override
             void doPerform(JSONObject jobData) {
-                LOGGER.fine(name()+":configuration is "+jobData);
-                long start = System.currentTimeMillis();
-                JSONObject iteration = jobData.optJSONObject("iteration");
-                JSONObject results = jobData.optJSONObject("results");
-
-                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-                List<String> states = new ArrayList<>();
-                if (jsonArrayOfStates != null) {
-                    jsonArrayOfStates.forEach(it -> {
-                        states.add(it.toString());
-                    });
-                }
-
-                String loggerPostfix = jobData.optString("logger");
-
-                PXYearService service = new PXYearServiceImpl(loggerPostfix, iteration, results);
                 try {
-                    List<String> check = service.check();
-                    
-                    service.getLogger().info("Number of found candidates "+check.size());
-                    if (!check.isEmpty()) {
-                        int maximum = 100;
-                        if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
-                            maximum = results.getJSONObject("request").getInt("items");
-                        }
+                    LocksSupport.SERVICES_LOCK.lock();
 
-                        int numberOfBatch = check.size() / maximum;
-                        if (check.size() % maximum > 0) {
-                            numberOfBatch = numberOfBatch + 1;
-                        }
-                        for (int i = 0; i < numberOfBatch; i++) {
-
-                            int startIndex = i * maximum;
-                            int endIndex = Math.min((i + 1) * maximum, check.size());
-                            List<String> subList = check.subList(startIndex, endIndex);
-                            // posle zadost
-                            if (results.has("request")) {
-                                service.getLogger().info("Creating request for sublist "+subList);
-                                service.request(subList);
-                            }
-                            // provede pouze update
-                            if (results.has("state")) {
-                                service.update(subList);
-                            }
-                        }
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+    
+                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                    List<String> states = new ArrayList<>();
+                    if (jsonArrayOfStates != null) {
+                        jsonArrayOfStates.forEach(it -> {
+                            states.add(it.toString());
+                        });
                     }
-                } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
-                }finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
+    
+                    String loggerPostfix = jobData.optString("logger");
+    
+                    PXYearService service = new PXYearServiceImpl(loggerPostfix, iteration, results);
+                    try {
+                        List<String> check = service.check();
+                        
+                        service.getLogger().info("Number of found candidates "+check.size());
+                        if (!check.isEmpty()) {
+                            int maximum = 100;
+                            if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
+                                maximum = results.getJSONObject("request").getInt("items");
+                            }
+    
+                            int numberOfBatch = check.size() / maximum;
+                            if (check.size() % maximum > 0) {
+                                numberOfBatch = numberOfBatch + 1;
+                            }
+                            for (int i = 0; i < numberOfBatch; i++) {
+    
+                                int startIndex = i * maximum;
+                                int endIndex = Math.min((i + 1) * maximum, check.size());
+                                List<String> subList = check.subList(startIndex, endIndex);
+                                // posle zadost
+                                if (results.has("request")) {
+                                    service.getLogger().info("Creating request for sublist "+subList);
+                                    service.request(subList);
+                                }
+                                // provede pouze update
+                                if (results.has("state")) {
+                                    service.update(subList);
+                                }
+                            }
+                        }
+                    } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    }finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },
@@ -279,60 +305,66 @@ public class Job implements InterruptableJob {
         KRAMERIUS_PX_CHECK {
             @Override
             void doPerform(JSONObject jobData) {
-                LOGGER.fine(name()+":configuration is "+jobData);
-                long start = System.currentTimeMillis();
-                String loggerPostfix = jobData.optString("logger");
-                JSONObject iteration = jobData.optJSONObject("iteration");
-                JSONObject results = jobData.optJSONObject("results");
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
 
-                JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-                List<String> states = new ArrayList<>();
-                if (jsonArrayOfStates != null) {
-                    jsonArrayOfStates.forEach(it -> {
-                        states.add(it.toString());
-                    });
-                }
-
-                HttpsTrustManager.allowAllSSL();
-                
-                PXKrameriusService service = new PXKrameriusServiceImpl(loggerPostfix,iteration, results);
-                    try {
-
-                    List<String> check = service.check();
-                    service.getLogger().info("Number of found candidates "+check.size());
-                    if (!check.isEmpty()) {
-
-                        int maximum = 100;
-                        if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
-                            maximum = results.getJSONObject("request").getInt("items");
-                        }
-
-                        int numberOfBatch = check.size() / maximum;
-                        if (check.size() % maximum > 0) {
-                            numberOfBatch = numberOfBatch + 1;
-                        }
-                        for (int i = 0; i < numberOfBatch; i++) {
-
-                            int startIndex = i * maximum;
-                            int endIndex = Math.min((i + 1) * maximum, check.size());
-                            List<String> subList = check.subList(startIndex, endIndex);
-                            // posle zadost
-                            if (results.has("request")) {
-                                service.getLogger().info("Creating request for sublist "+subList);
-                                service.request(subList);
-                            }
-                            // provede pouze update
-                            if (results.has("state") || results.has("ctx")) {
-                                service.getLogger().info("Updating sublist "+subList);
-                                service.update(subList);
-                            }
-                        }
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    String loggerPostfix = jobData.optString("logger");
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+    
+                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                    List<String> states = new ArrayList<>();
+                    if (jsonArrayOfStates != null) {
+                        jsonArrayOfStates.forEach(it -> {
+                            states.add(it.toString());
+                        });
                     }
-                } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+    
+                    HttpsTrustManager.allowAllSSL();
+                    
+                    PXKrameriusService service = new PXKrameriusServiceImpl(loggerPostfix,iteration, results);
+                        try {
+    
+                        List<String> check = service.check();
+                        service.getLogger().info("Number of found candidates "+check.size());
+                        if (!check.isEmpty()) {
+    
+                            int maximum = 100;
+                            if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
+                                maximum = results.getJSONObject("request").getInt("items");
+                            }
+    
+                            int numberOfBatch = check.size() / maximum;
+                            if (check.size() % maximum > 0) {
+                                numberOfBatch = numberOfBatch + 1;
+                            }
+                            for (int i = 0; i < numberOfBatch; i++) {
+    
+                                int startIndex = i * maximum;
+                                int endIndex = Math.min((i + 1) * maximum, check.size());
+                                List<String> subList = check.subList(startIndex, endIndex);
+                                // posle zadost
+                                if (results.has("request")) {
+                                    service.getLogger().info("Creating request for sublist "+subList);
+                                    service.request(subList);
+                                }
+                                // provede pouze update
+                                if (results.has("state") || results.has("ctx")) {
+                                    service.getLogger().info("Updating sublist "+subList);
+                                    service.update(subList);
+                                }
+                            }
+                        }
+                    } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+    
+                    }
                 } finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
-
+                     LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },
@@ -343,24 +375,28 @@ public class Job implements InterruptableJob {
         GRANULARITY {
             @Override
             void doPerform(JSONObject jobData) {
-                long start = System.currentTimeMillis();
-                String logger = jobData.optString("logger");
-
-                GranularityServiceImpl gservice = new GranularityServiceImpl(logger);
-                GranularitySetStateServiceImpl sservice = new GranularitySetStateServiceImpl(logger);
-
                 try {
-                    gservice.initialize();
-                    gservice.refershGranularity();
-                    sservice.setStates(new ArrayList<>());
-                } catch (IOException e) {
-                    gservice.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    long start = System.currentTimeMillis();
+                    String logger = jobData.optString("logger");
+
+                    GranularityServiceImpl gservice = new GranularityServiceImpl(logger);
+                    GranularitySetStateServiceImpl sservice = new GranularitySetStateServiceImpl(logger);
+
+                    try {
+                        gservice.initialize();
+                        gservice.refershGranularity();
+                        sservice.setStates(new ArrayList<>());
+                    } catch (IOException e) {
+                        gservice.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(gservice.getLogger(), start);
+                    }
                 } finally {
-                    QuartzUtils.printDuration(gservice.getLogger(), start);
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
-                
             }
-            
         },
         
         /** Refresh granularit */
@@ -368,16 +404,22 @@ public class Job implements InterruptableJob {
             
             @Override
             void doPerform(JSONObject jobData) {
-                long start = System.currentTimeMillis();
-                String logger = jobData.optString("logger");
-                GranularityServiceImpl service = new GranularityServiceImpl(logger);
                 try {
-                    service.initialize();
-                    service.refershGranularity();
-                } catch (IOException e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    long start = System.currentTimeMillis();
+                    String logger = jobData.optString("logger");
+                    GranularityServiceImpl service = new GranularityServiceImpl(logger);
+                    try {
+                        service.initialize();
+                        service.refershGranularity();
+                    } catch (IOException e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+                    }
                 } finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },
@@ -387,15 +429,21 @@ public class Job implements InterruptableJob {
             
             @Override
             void doPerform(JSONObject jobData) {
-                long start = System.currentTimeMillis();
-                String logger = jobData.optString("logger");
-                GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(logger);
                 try {
-                    service.setStates(new ArrayList<>());
-                } catch (IOException e) {
-                    service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    long start = System.currentTimeMillis();
+                    String logger = jobData.optString("logger");
+                    GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(logger);
+                    try {
+                        service.setStates(new ArrayList<>());
+                    } catch (IOException e) {
+                        service.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(service.getLogger(), start);
+                    }
                 } finally {
-                    QuartzUtils.printDuration(service.getLogger(), start);
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },
@@ -404,11 +452,17 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 try {
-                    LOGGER.fine(name()+":configuration is "+jobData);
-                    AccountServiceImpl accountService = new AccountServiceImpl(null, null);
-                    accountService.schedulerSwitchStates();
-                } catch (ConflictException | AccountException | IOException | SolrServerException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    try {
+                        LOGGER.fine(name()+":configuration is "+jobData);
+                        AccountServiceImpl accountService = new AccountServiceImpl(null, null);
+                        accountService.schedulerSwitchStates();
+                    } catch (ConflictException | AccountException | IOException | SolrServerException e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         },

@@ -535,6 +535,20 @@ public class MarcRecordUtilsToRefactor {
       mr.granularity = jsonArray;
     }
     
+    if (doc.containsKey(MASTERLINKS_FIELD)) {
+        Collection fieldValues = doc.getFieldValues(MASTERLINKS_FIELD);
+        JSONArray jsonArray = new JSONArray();
+        fieldValues.stream().map(o-> {
+          return new JSONObject(o.toString());
+        }).forEach(jsonArray::put);
+        mr.masterlinks = jsonArray;
+    }
+    
+    if (doc.containsKey(MASTERLINKS_DISABLED_FIELD)) {
+        Object mDisabled = doc.getFieldValue(MASTERLINKS_DISABLED_FIELD);
+        mr.masterLinksDisabled = Boolean.valueOf(mDisabled.toString());
+    }
+    
     if (doc.containsKey(FMT_FIELD)) {
     	mr.fmt = (String) doc.getFieldValue(FMT_FIELD);
     }

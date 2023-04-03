@@ -323,6 +323,10 @@ public class Granularity {
         if (this.state != null && this.state == PublicItemState.X) {
             this.repairXStates(checkConf);
         }
+
+        if (this.state != null && this.state == PublicItemState.PA) {
+            this.repairNStates(checkConf);
+        }
     }
 
     // nekonzistentni stav N - polozky taky N

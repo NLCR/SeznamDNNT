@@ -58,7 +58,7 @@ public class CatalogSearcher {
         try {
             SolrClient solr = Indexer.getClient();
             SolrQuery query = new SolrQuery("frbr:\"" + id + "\"")
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json], masterlinks:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             // 50 is a maximum
             query.setRows(50);
@@ -164,12 +164,13 @@ public class CatalogSearcher {
     public JSONObject getById(String id, User user) {
         JSONObject ret = new JSONObject();
         try {
+
             SolrClient solr = Indexer.getClient();
             SolrQuery query = new SolrQuery("identifier:\"" + id + "\"")
                     .setRows(1)
                     .setStart(0)
                     .setSort("identifier", SolrQuery.ORDER.asc)
-                    .setFields("*,raw:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
+                    .setFields("*,raw:[json],granularity:[json],masterlinks:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
 
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
