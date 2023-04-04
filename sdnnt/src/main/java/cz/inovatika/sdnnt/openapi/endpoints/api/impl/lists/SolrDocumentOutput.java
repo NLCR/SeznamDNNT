@@ -22,7 +22,11 @@ public interface SolrDocumentOutput {
     public static final String FMT_KEY = "fmt";
     public static final String PIDS_KEY = "pids";
     public static final String GRANUARITY_KEY = "granularity";
+    public static final String MASTERLINKS_KEY = "masterlinks";
+    public static final String MASTERLINKS_DISABLED_KEY = "masterlinks_disabled";
 
+
+    
     public static final String DNTSTAV_KEY  = MarcRecordFields.DNTSTAV_FIELD;
     
     // SKC properties

@@ -611,6 +611,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                         Map<String,Object> d =  doc(mdigitallibraries,minstitutions,  documentLicense, stav ,  nazev, identifier, granularity,fmt.toString(), pids.get(i));
                         d = enIdSdnnt(d, doc);
                         d = enMarcFields(d, doc);
+                        d = enMasterLinks(d, doc);
                         documentOutput.output(digitalLibraryFilter, d,outputFields, requestedLicense, doNotEmit);
                         uniqe.add(pids.get(i));
                     }
@@ -619,6 +620,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 Map<String,Object> d = doc(mdigitallibraries, minstitutions,  documentLicense,stav, nazev, identifier, granularity, fmt.toString(),pids.toArray(new String[pids.size()]));
                 d = enIdSdnnt(d, doc);
                 d = enMarcFields(d, doc);
+                d = enMasterLinks(d, doc);
                 documentOutput.output(digitalLibraryFilter,d,outputFields, requestedLicense, doNotEmit);
             }
         }
@@ -678,7 +680,15 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
         return doc;
     }
-    
+
+    private Map<String, Object> enMasterLinks(Map<String, Object> doc, SolrDocument sdoc) {
+        Collection<Object> fieldValues = sdoc.getFieldValues(MarcRecordFields.MASTERLINKS_FIELD);
+        Object mdisabled = sdoc.getFieldValue(MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+        enDoc(doc, SolrDocumentOutput.MASTERLINKS_KEY, fieldValues != null ? fieldValues.stream().map(Objects::toString).collect(Collectors.toList()) : new ArrayList<>());
+        enDoc(doc, SolrDocumentOutput.MASTERLINKS_DISABLED_KEY, Boolean.valueOf(mdisabled.toString()));
+        return doc;
+    }
+
     @Override
     public Response changes(String dl, String format, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
             ContainerRequestContext containerRequestContext) throws NotFoundException {

@@ -109,6 +109,30 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         // ?? 
         List<String> digitalLibrary = outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) != null ? (List<String>)outputDocument.get(SolrDocumentOutput.SELECTED_DL_KEY) : null;
         
+        List<String> masterlinksVal = (List<String>) outputDocument.get(SolrDocumentOutput.MASTERLINKS_KEY);
+        Object masterlinksDisabledVal = outputDocument.get(MASTERLINKS_DISABLED_KEY);
+        boolean masterLinksDisabled = (masterlinksDisabledVal !=null && Boolean.valueOf(masterlinksDisabledVal.toString()));
+
+        
+        Map<String,List<String>> mmap = new HashMap<>();
+        masterlinksVal.stream().forEach(it-> {
+            JSONObject jsonObj = new JSONObject(it);
+            String mlinkAcronym = jsonObj.getString("acronym");
+            String mPid = jsonObj.getString("pid");
+            if(!mmap.containsKey(mlinkAcronym)) { mmap.put(mlinkAcronym, new ArrayList<>());}
+            mmap.get(mlinkAcronym).add(mPid);
+        });
+        
+        if (pid != null && digitalLibraryFilter !=null) {
+            List<String> pids = mmap.get(digitalLibraryFilter.getLeft());
+            if (pids != null && !pids.contains(pid)) {
+                // no pid associated with acronym
+                return;
+            }
+            
+        }
+        
+        
         Listitem item = new Listitem()
                 //.pid(pid)
                 .catalogIdentifier(identifier)
@@ -116,7 +140,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                 .state(stav)
                 .license(label);
         
-        if (pid != null) {
+        if (pid != null && !masterLinksDisabled) {
             item.setPid(pid);
         }
         
