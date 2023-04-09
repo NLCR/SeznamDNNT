@@ -431,6 +431,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     MasterLinks masterLinks = owner.getMasterLinks();
                     if (masterLinks != null) {
                         List<MasterLinkItem> links = masterLinks.getMasterLinks();
+
                         for (MasterLinkItem link : links) {
                             if (link.getModel().equals("monograph") || 
                                     link.getModel().equals("periodicalvolume") || 

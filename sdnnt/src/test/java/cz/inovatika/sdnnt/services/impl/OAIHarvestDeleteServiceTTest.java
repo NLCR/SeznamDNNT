@@ -29,10 +29,12 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.UserController;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class OAIHarvestDeleteServiceTTest {
 
@@ -58,6 +60,142 @@ public class OAIHarvestDeleteServiceTTest {
         prepare.deleteCores("zadost");
     }
 
+    
+    /** Stav A,X,N,...*/
+    @Test
+    public void testUpdateAndStateANX() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        try {
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na A");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na N");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na PA");
+
+            SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
+                    .withConstructor("test-logger",new JSONObject())
+                    .addMockedMethod("getOptions")
+                    .addMockedMethod("buildClient")
+                    .addMockedMethod("buildAccountService")
+                    .createMock();
+
+            Options options = EasyMock.createMock(Options.class);
+            EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
+                    new BuildSolrClientSupport()
+            ).anyTimes();
+            EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
+
+
+            User user = testUser();
+            UserController controler  = EasyMock.createMock(UserController.class);
+            ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
+            ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
+            AccountServiceImpl aService = EasyMock.createMockBuilder(AccountServiceImpl.class)
+                    .withConstructor(appSupport, bservice)
+                    .addMockedMethod("buildClient").createMock();
+
+            EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
+
+            EasyMock.expect(aService.buildClient()).andDelegateTo(
+                    new AccountServiceImplITTest.BuildSolrClientSupport()
+            ).anyTimes();
+            
+            EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
+            EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
+
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
+            
+            try(SolrClient client = SolrTestServer.getClient()) {
+                SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
+                        .setRows(1000);
+                SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
+                Assert.assertTrue(catalogDocs.size() == 1);
+                Assert.assertTrue(catalogDocs.get(0).containsKey(MarcRecordFields.DNTSTAV_FIELD));
+                Assert.assertTrue(catalogDocs.get(0).getFirstValue(MarcRecordFields.DNTSTAV_FIELD).equals(PublicItemState.PA.name()));
+                
+                Object firstValue = catalogDocs.get(0).getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
+                JSONArray inputArr = new JSONArray(firstValue.toString());
+                Assert.assertTrue(inputArr.length() == 3);
+
+                Assert.assertTrue(inputArr.getJSONObject(0).has("stav"));
+                Assert.assertTrue(inputArr.getJSONObject(0).getString("stav").equals(PublicItemState.A.name()));
+                
+                Assert.assertTrue(inputArr.getJSONObject(1).has("stav"));
+                Assert.assertTrue(inputArr.getJSONObject(1).getString("stav").equals(PublicItemState.N.name()));
+
+                Assert.assertTrue(inputArr.getJSONObject(2).has("stav"));
+                Assert.assertTrue(inputArr.getJSONObject(2).getString("stav").equals(PublicItemState.PA.name()));
+            }
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+    
+    /** Stav D*/
+    @Test
+    public void testUpdateAndStateD() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+        try {
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "D", null,"poznamka", new JSONArray(), "test");
+
+            SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
+                    .withConstructor("test-logger",new JSONObject())
+                    .addMockedMethod("getOptions")
+                    .addMockedMethod("buildClient")
+                    .addMockedMethod("buildAccountService")
+                    .createMock();
+
+            Options options = EasyMock.createMock(Options.class);
+            EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
+                    new BuildSolrClientSupport()
+            ).anyTimes();
+            EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
+
+
+            User user = testUser();
+            UserController controler  = EasyMock.createMock(UserController.class);
+            ApplicationUserLoginSupport appSupport = EasyMock.createMock(ApplicationUserLoginSupport.class);
+            ResourceServiceService bservice = EasyMock.createMock(ResourceServiceService.class);
+
+            AccountServiceImpl aService = EasyMock.createMockBuilder(AccountServiceImpl.class)
+                    .withConstructor(appSupport, bservice)
+                    .addMockedMethod("buildClient").createMock();
+
+            EasyMock.expect(appSupport.getUser()).andReturn(user).anyTimes();
+
+            EasyMock.expect(aService.buildClient()).andDelegateTo(
+                    new AccountServiceImplITTest.BuildSolrClientSupport()
+            ).anyTimes();
+            
+            EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
+            EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
+
+            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
+            
+            try(SolrClient client = SolrTestServer.getClient()) {
+                SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
+                        .setRows(1000);
+                SolrDocumentList catalogDocs = client.query(DataCollections.catalog.name(), catalogQuery).getResults();
+                Assert.assertTrue(catalogDocs.size() == 1);
+                Assert.assertFalse(catalogDocs.get(0).containsKey(MarcRecordFields.DNTSTAV_FIELD));
+            }
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+    
+    
+    
     /** Smazano a nema stav*/
     @Test
     public void testDeleteHasNoState() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
@@ -211,10 +349,10 @@ public class OAIHarvestDeleteServiceTTest {
     }
     
     
-    /** Smazano a nema stav*/
-    @Test
-    public void testDeleteHasStateAndSameCCNB() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
-    }
+//    /** Smazano a nema stav*/
+//    @Test
+//    public void testDeleteHasStateAndSameCCNB() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
+//    }
     
     protected User testUser() {
         User user = new User();

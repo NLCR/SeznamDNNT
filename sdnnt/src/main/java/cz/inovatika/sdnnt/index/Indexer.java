@@ -98,40 +98,51 @@ public class Indexer {
             LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
             client.add("catalog", rec);
           } else {
-              LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
-            String rawJSON =   (String) rec.getFieldValue("raw");
-            SolrInputDocument hDoc = new SolrInputDocument();
-            SolrInputDocument cDoc = mergeWithHistory(
-                    (String) rec.getFieldValue("raw"),
-                    docs.get(0), hDoc,
-                    user, update, ret);
-            if (cDoc != null) {
-                SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
-                client.add("catalog", cDoc);
-                client.add("history", hDoc);
 
-                MarcRecord origJSON = MarcRecord.fromRAWJSON(rawJSON);
-                MarcRecordUtilsToRefactor.marcFields(cDoc, origJSON.dataFields, MarcRecord.tagsToIndex);
+            boolean deletedDocument = false;
+            SolrDocument solrDocument = docs.get(0);
+            if (solrDocument.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+                Object state = solrDocument.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
+                deletedDocument = PublicItemState.D.name().equals(state);
             }
+            if (!deletedDocument) {
+                LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
+                String rawJSON =   (String) rec.getFieldValue("raw");
+                SolrInputDocument hDoc = new SolrInputDocument();
+                SolrInputDocument cDoc = mergeWithHistory(
+                        (String) rec.getFieldValue("raw"),
+                        docs.get(0), hDoc,
+                        user, update, ret);
+                if (cDoc != null) {
+                    SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
+                    client.add("catalog", cDoc);
+                    client.add("history", hDoc);
 
-            
-            if (updatesupportService != null && cDoc != null) {
-                Object identifier = cDoc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
-                if (cDoc.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
-                    
-                    // check format and place
-                    Object fieldValue = cDoc.getFieldValue(MarcRecordFields.FMT_FIELD);
-                    if (fieldValue == null || !Arrays.asList("BK","SE").contains(fieldValue.toString().trim().toUpperCase())) {
-                        LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not BK or SE !");
-                        updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
-                    }
-                    
-                    Object placeOfPub = cDoc.getFieldValue("place_of_pub");
-                    if (placeOfPub == null || !placeOfPub.toString().trim().toLowerCase().equals("xr")) {
-                        LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not xr !");
-                        updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
+                    MarcRecord origJSON = MarcRecord.fromRAWJSON(rawJSON);
+                    MarcRecordUtilsToRefactor.marcFields(cDoc, origJSON.dataFields, MarcRecord.tagsToIndex);
+                }
+
+                
+                if (updatesupportService != null && cDoc != null) {
+                    Object identifier = cDoc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
+                    if (cDoc.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+                        // check format and place
+                        Object fieldValue = cDoc.getFieldValue(MarcRecordFields.FMT_FIELD);
+                        if (fieldValue == null || !Arrays.asList("BK","SE").contains(fieldValue.toString().trim().toUpperCase())) {
+                            LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not BK or SE !");
+                            updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
+                        }
+                        
+                        Object placeOfPub = cDoc.getFieldValue("place_of_pub");
+                        if (placeOfPub == null || !placeOfPub.toString().trim().toLowerCase().equals("xr")) {
+                            LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " not xr !");
+                            updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
+                        }
                     }
                 }
+            } else {
+                LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog but state D. It is new");
+                client.add("catalog", rec);
             }
           }
         }

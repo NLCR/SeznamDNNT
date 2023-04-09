@@ -112,6 +112,17 @@ export class SearchComponent implements OnInit, OnDestroy {
  
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
+
+      Object.keys(this.facets).forEach(key => {
+        if (this.configuration.sortedFacets.includes(key)) {
+            let values = this.facets[key];
+            values.sort(function(a, b){
+              if(a.name < b.name) { return -1; }
+              if(a.name > b.name) { return 1; }
+              return 0;
+            });
+        }
+      });
       this.loading = false;
     });
 

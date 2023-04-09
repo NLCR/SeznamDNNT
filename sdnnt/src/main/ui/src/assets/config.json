@@ -19,6 +19,8 @@
   },
   "identifiers": ["015a", "020a", "022a", "id_sdnnt"],
   "filterFields": ["dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled", "digital_libraries","marc_260a"],
+  "sortedFacets":["sigla"], 
+
   "sorts":{
     "sort": [
       {"field": "score", "dir": "desc"},

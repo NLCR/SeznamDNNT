@@ -105,6 +105,12 @@ public class AccountServiceWorkflowImplITTest {
         service.curatorSwitchState(service.getRequest("01234"), null, "oai:aleph-nkp.cz:DNT01-000157765", "Reason 2 " );
         SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
 
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.zadost.name());
+
+        Zadost fromIndex3 =fromIndex = Zadost.fromJSON(service.getRequest("01234").toString());
+        service.curatorCloseRequest(fromIndex3.toJSON().toString());
+        
+        
         // Posunuti zaznamu z duvodu spusteni scheduleru
         try (SolrClient client = SolrTestServer.getClient()) {
 
@@ -129,7 +135,9 @@ public class AccountServiceWorkflowImplITTest {
         // NPA -> PA
         service.schedulerSwitchStates("01234");
         SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.zadost.name());
 
+        
         try (SolrClient client = SolrTestServer.getClient()) {
 
             MarcRecord oneRecord = MarcRecord.fromIndex(client, "oai:aleph-nkp.cz:DNT01-000157742");
@@ -151,6 +159,7 @@ public class AccountServiceWorkflowImplITTest {
         // PA -> A
         service.schedulerSwitchStates("01234");
         SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.catalog.name());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), DataCollections.zadost.name());
 
         try (SolrClient client = SolrTestServer.getClient()) {
 

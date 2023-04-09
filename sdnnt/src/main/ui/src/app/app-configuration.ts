@@ -12,6 +12,11 @@ import { User } from './shared/user';
     private config: Configuration;
     public invalidServer: boolean;
 
+
+    public get sortedFacets() {
+        return this.config.sortedFacets;
+    }
+
     public get context() {
         return this.config.context;
     }
@@ -55,6 +60,8 @@ import { User } from './shared/user';
     public get filterFields() {
         return this.config.filterFields;
     }
+
+
 
     public get userFilterFields() {
         return this.config.userFilterFields;

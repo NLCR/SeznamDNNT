@@ -685,7 +685,9 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         Collection<Object> fieldValues = sdoc.getFieldValues(MarcRecordFields.MASTERLINKS_FIELD);
         Object mdisabled = sdoc.getFieldValue(MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
         enDoc(doc, SolrDocumentOutput.MASTERLINKS_KEY, fieldValues != null ? fieldValues.stream().map(Objects::toString).collect(Collectors.toList()) : new ArrayList<>());
-        enDoc(doc, SolrDocumentOutput.MASTERLINKS_DISABLED_KEY, Boolean.valueOf(mdisabled.toString()));
+        if (mdisabled != null) {
+            enDoc(doc, SolrDocumentOutput.MASTERLINKS_DISABLED_KEY,   Boolean.valueOf(mdisabled.toString()));
+        }
         return doc;
     }
 
