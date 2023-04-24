@@ -290,7 +290,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 }
             }
         }
-        logger.info("Found candidates: " + this.linksOwner.size());
         logger.info("Found all checking pids : " + allPids.size());
         
         
@@ -485,7 +484,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 }
 
                 InstanceConfiguration configuration = this.checkConf.match(baseUrl);
-
+                
+                // TODO:Disable 
                 if (configuration == null || configuration.isShouldSkip()) {
                     getLogger().warning("Skipping url "+baseUrl+"'");
                     continue;
@@ -541,7 +541,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 mf.setModel(doc.optString("fedora.model"));
                                 mf.setDate(doc.optString("datum_str"));
                                 mf.setPid(doc.optString("PID"));
-                                //gf.setRootPid(doc.optString("root_pid"));
                                 mf.setDostupnost(doc.optString("dostupnost"));
                                 
                                 if (doc.has("dnnt-labels")) {
@@ -558,19 +557,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                             mf.setKramLicenses(kramLicenses);
                                         }
                                     }
-
                                 }
-                                
-                                /*
-                                if (doc.has("pid_path")) {
-                                    JSONArray pidPathJsonArray = doc.getJSONArray("pid_path");
-                                    List<String> pidPathList = new ArrayList<>();
-                                    for (int j = 0; j < pidPathJsonArray.length(); j++) {
-                                        pidPathList.add(pidPathJsonArray.getString(j));
-                                    }
-                                    gf.setPidPaths(pidPathList);
-                                }*/
-                                
+
                                 mf.setBaseUrl(baseUrl);
                                 mf.setFetched(SIMPLE_DATE_FORMAT.format(new Date()));
                                 
@@ -1036,6 +1024,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     
     
     public static void main(String[] args) throws IOException {
+        JSONObject checkKamerius = Options.getInstance().getJSONObject("check_kramerius");
+        CheckKrameriusConfiguration.initConfiguration(checkKamerius);
+
         GranularityServiceImpl service = new GranularityServiceImpl("test");
         try {
             service.initialize();

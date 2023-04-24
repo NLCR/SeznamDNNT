@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.services.utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -13,11 +14,13 @@ import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
+import cz.inovatika.sdnnt.utils.JSONUtils;
 
 public class ChangeProcessStatesUtility {
 
@@ -40,7 +43,7 @@ public class ChangeProcessStatesUtility {
             mr.license = null;
         }
         
-        granularityChange(mr, previous, kstav); 
+        granularityChange(mr, previous, kstav, "scheduler", message); 
         mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
         return mr.toSolrDoc();
     }
@@ -70,15 +73,24 @@ public class ChangeProcessStatesUtility {
     
     
     //TODO: Do it more general
-    public static void granularityChange(MarcRecord mr, List<String> previous, CuratorItemState current) {
+    public static void granularityChange(MarcRecord mr, List<String> previous, CuratorItemState current, String user, String poznamka) {
         
         if (previous != null && previous.size() > 0 && previous.get(0).equals(CuratorItemState.PA.name()) && current.equals(CuratorItemState.A)) {
             JSONArray granularity = mr.granularity;
-            if (granularity != null) {
+            if (granularity != null) {  
                 for (int i = 0; i < granularity.length(); i++) {
                     JSONObject gItem = granularity.getJSONObject(i);
+                    String stav = JSONUtils.first(gItem, "stav");
+                    String licence = JSONUtils.first(gItem, "license");
+
+                    // zmena stavu  
                     granularityItem(gItem, current, CuratorItemState.PA, "stav", new ArrayList<>());
                     granularityItem(gItem, current, CuratorItemState.PA, "kuratorstav", new ArrayList<>());
+
+                    if ((stav != null && !stav.equals(CuratorItemState.A.name()))  ) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
+                    }
                 }
             }
         }
@@ -87,10 +99,19 @@ public class ChangeProcessStatesUtility {
             JSONArray granularity = mr.granularity;
             if (granularity != null) {
                 for (int i = 0; i < granularity.length(); i++) {
+                    // zmena stavu
                     JSONObject gItem = granularity.getJSONObject(i);
+                    String stav = JSONUtils.first(gItem, "stav");
+                    String licence = JSONUtils.first(gItem, "license");
+                    
+                    
                     clearGranularityItem(gItem, CuratorItemState.N, "kuratorstav", Arrays.asList("license"));
                     clearGranularityItem(gItem, CuratorItemState.N, "stav", Arrays.asList("license"));
                     
+                    if ( (stav != null && ( !stav.equals(CuratorItemState.PA.name())  || !stav.equals(CuratorItemState.A.name())) )) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
+                    }
                 }
             }
         }
@@ -100,8 +121,17 @@ public class ChangeProcessStatesUtility {
             if (granularity != null) {
                 for (int i = 0; i < granularity.length(); i++) {
                     JSONObject gItem = granularity.getJSONObject(i);
+                    String stav = JSONUtils.first(gItem, "stav");
+                    String licence = JSONUtils.first(gItem, "license");
+
+                    // zmena stavu
                     clearGranularityItem(gItem, CuratorItemState.X, "kuratorstav", Arrays.asList("license"));
                     clearGranularityItem(gItem, CuratorItemState.X, "stav", Arrays.asList("license"));
+
+                    if ((stav != null && !stav.equals(CuratorItemState.X.name()) )  ) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
+                    }
                     
                 }
             }
@@ -111,7 +141,13 @@ public class ChangeProcessStatesUtility {
             JSONArray granularity = mr.granularity;
             if (granularity != null) {
                 for (int i = 0; i < granularity.length(); i++) {
+
                     JSONObject gItem = granularity.getJSONObject(i);
+
+                    String stav = JSONUtils.first(gItem, "stav");
+                    String licence = JSONUtils.first(gItem, "license");
+
+                    // zmena stavu
                     granularityItem(gItem, current, CuratorItemState.A, "stav", Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.PA, "stav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.NL, "stav",Arrays.asList("license"));
@@ -121,6 +157,11 @@ public class ChangeProcessStatesUtility {
                     granularityItem(gItem, current, CuratorItemState.PA, "kuratorstav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.NL, "kuratorstav",Arrays.asList("license"));
                     granularityItem(gItem, current, CuratorItemState.X, "kuratorstav",Arrays.asList("license"));
+
+                    if (!stav.equals("N")) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
+                    }
                 }
             }
         }
@@ -130,10 +171,20 @@ public class ChangeProcessStatesUtility {
             if (granularity != null) {
                 for (int i = 0; i < granularity.length(); i++) {
                     JSONObject gItem = granularity.getJSONObject(i);
-                    if (gItem.has("license")) {
-                        gItem.put("license", License.dnntt.name());
+                    String licence = JSONUtils.first(gItem, "license");
+                    String stav = JSONUtils.first(gItem, "stav");
+
+                    JSONArray xArray = new JSONArray();
+                    xArray.put(CuratorItemState.NL.name());
+                    gItem.put("stav", xArray);
+                    gItem.put("kuratorstav", xArray);
+                    gItem.put("license", License.dnntt.name());
+                    
+                    if ((stav != null && !stav.equals(CuratorItemState.NL.name())) || (licence != null && !licence.equals(License.dnntt.name()))) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
                     }
-                }
+                 }
             }
         }
         
@@ -143,12 +194,20 @@ public class ChangeProcessStatesUtility {
                 for (int i = 0; i < granularity.length(); i++) {
                     
                     JSONObject gItem = granularity.getJSONObject(i);
+
+                    String stav = JSONUtils.first(gItem, "stav");
+                    String licence = JSONUtils.first(gItem, "license");
+
                     JSONArray xArray = new JSONArray();
                     xArray.put("X");
                     gItem.put("stav", xArray);
                     gItem.put("kuratorstav", xArray);
                     gItem.remove("license");
                     
+                    if (!stav.equals("X")) {
+                        String formatted = MarcRecord.FORMAT.format(new Date());
+                        mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(gItem, user, poznamka, formatted));
+                    }
                 }
             }
         }

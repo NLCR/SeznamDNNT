@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,6 +42,8 @@ import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
+import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
@@ -48,6 +52,7 @@ import cz.inovatika.sdnnt.services.GranularityService;
 import cz.inovatika.sdnnt.services.GranularitySetStateService;
 import cz.inovatika.sdnnt.services.impl.utils.MarcUtils;
 import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
+import cz.inovatika.sdnnt.utils.JSONUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -114,6 +119,9 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                             MARC_956_U, 
                             MARC_856_U, 
                             GRANULARITY_FIELD,
+                            MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD,
+                            MarcRecordFields.HISTORIE_STAVU_FIELD,
+                            
                             MarcRecordFields.DNTSTAV_FIELD,
                             MarcRecordFields.LICENSE_FIELD,
                             MarcRecordFields.FMT_FIELD,
@@ -429,10 +437,65 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                         
                         
                         if (changedGranularity.get()) {
+                            String history = (String) rsp.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
+                            JSONObject lastHistoryObject = null;
+                            if (history !=  null) {
+                                JSONArray jsonArray = new JSONArray(history);
+                                if (jsonArray.length() > 0) {
+                                    lastHistoryObject = jsonArray.getJSONObject(jsonArray.length()-1);
+                                }
+                            }
+                            
+                            List<String> origGranularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
+                            Map<String,Pair<String,JSONObject>> origMap = new HashMap<>();
+                            origGranularity.stream().map(JSONObject::new).forEach(origJSON-> {
+                                String pid = origJSON.optString("pid");
+                                String acronym = origJSON.optString("acronym","null");
+                                
+                                String key = String.format("%s|%s", pid, acronym);
+
+                                String stav = JSONUtils.first(origJSON, "stav");
+                                String kuratorStav = JSONUtils.first(origJSON, "kuratorstav");
+                                String license = origJSON.optString("license","null");
+                                    
+                                String value = String.format("%s|%s|%s", stav, kuratorStav, license);
+                                origMap.put(key, Pair.of(value, origJSON));
+                            });
+                            
                             SolrInputDocument idoc = new SolrInputDocument();
                             idoc.setField(IDENTIFIER_FIELD, masterIdentifier);
+                            // json diff  
                             List<String> gStore = granularityJSONS.stream().map(JSONObject::toString).collect(Collectors.toList());
+                            Map<String,Pair<String,JSONObject>> changedMap = new HashMap<>();
+                            granularityJSONS.stream().forEach(changedJSON-> {
+
+                                String pid = changedJSON.optString("pid");
+                                String acronym = changedJSON.optString("acronym","null");
+                                
+                                String key = String.format("%s|%s", pid, acronym);
+
+                                String stav = JSONUtils.first(changedJSON, "stav");
+                                String kuratorStav = JSONUtils.first(changedJSON, "kuratorstav");
+                                String license = changedJSON.optString("license","null");
+                                    
+                                String value = String.format("%s|%s|%s", stav, kuratorStav, license);
+                                changedMap.put(key, Pair.of(value, changedJSON));
+                            });
+                            
+                            
+                            List<JSONObject> historyAdd = compare(origMap, changedMap, lastHistoryObject != null ? lastHistoryObject.optString("comment"): null,  lastHistoryObject != null ? lastHistoryObject.optString("user"): "granularity");
+                            if (!historyAdd.isEmpty()) {
+                                String historie = (String) rsp.getFirstValue(MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD);
+                                JSONArray historieGranulovanehoStavu = historie != null ? new JSONArray(historie) : new JSONArray();
+                                for (JSONObject historyItem : historyAdd) { historieGranulovanehoStavu.put(historyItem); }
+                                atomicSet(idoc, historieGranulovanehoStavu.toString(), MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD);
+                            }
+                            
+                            // porovnat rocniky, pokud zmena pak zapis 
+                            // historie ?? historie rucniku
                             atomicSet(idoc, gStore, MarcRecordFields.GRANULARITY_FIELD);
+                            
+                            
                             try {
                                 solrClient.add(DataCollections.catalog.name(), idoc);
                             } catch (SolrServerException | IOException e) {
@@ -448,6 +511,71 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
             SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
         }
         logger.info("Changed states finished. Updated identifiers ("+this.changedIdentifiers.size()+") "+this.changedIdentifiers);
+    }
+
+    private List<JSONObject> compare(Map<String, Pair<String, JSONObject>> origMap, Map<String, Pair<String, JSONObject>> changedMap, String masterComment, String user) {
+        List<JSONObject> history = new ArrayList<>();
+        Set<String> origKeys = origMap.keySet();
+        Set<String> changedKeys = changedMap.keySet();
+
+        List<Pair<Pair<String,JSONObject>, Pair<String,JSONObject>>> toCompare = new ArrayList<>();
+
+        for (String origkey : origKeys) {
+            if (changedKeys.contains(origkey)) {
+                toCompare.add(Pair.of(origMap.get(origkey), changedMap.get(origkey)));
+            } else {
+                Pair<String, JSONObject> pair = origMap.get(origkey);
+                if (pair != null) {
+                    JSONObject granitem = pair.getRight().put(HistoryObjectUtils.STAV_FIELD, PublicItemState.D.name());
+                    
+                    String stav = JSONUtils.first(granitem, "stav");
+                    String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                    String license = granitem.optString("license");
+                    String rocnik = granitem.optString("rocnik");
+                    String date = granitem.optString("date");
+                    String cislo = granitem.optString("cislo");
+
+                    history.add(HistoryObjectUtils.historyObjectGranularityField(cislo, rocnik, stav, license, null, user, masterComment, MarcRecord.FORMAT.format(new Date())));
+                }
+            }
+        }
+        for (String changedKey : changedKeys) {
+            if (!origKeys.contains(changedKey)) {
+
+                JSONObject granitem = changedMap.get(changedKey).getValue();
+
+                String stav = JSONUtils.first(granitem, "stav");
+                String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                String license = granitem.optString("license");
+                String rocnik = granitem.optString("rocnik");
+                String date = granitem.optString("date");
+                String cislo = granitem.optString("cislo");
+                
+                
+                history.add(HistoryObjectUtils.historyObjectGranularityField(cislo, rocnik, stav, license, null, user, masterComment, MarcRecord.FORMAT.format(new Date())));
+            }
+        }
+         
+        for (Pair<Pair<String,JSONObject>, Pair<String,JSONObject>> cmp : toCompare) {
+            Pair<String,JSONObject> left = cmp.getLeft();
+            Pair<String,JSONObject> right = cmp.getRight();
+            
+            if (!left.getKey().equals(right.getKey())) {
+                
+                JSONObject granitem = right.getValue();
+
+                String stav = JSONUtils.first(granitem, "stav");
+                String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                String license = granitem.optString("license");
+                String rocnik = granitem.optString("rocnik");
+                String date = granitem.optString("date");
+                String cislo = granitem.optString("cislo");
+                
+                
+                history.add(HistoryObjectUtils.historyObjectGranularityField( cislo, rocnik, stav, license, null, user, masterComment, MarcRecord.FORMAT.format(new Date())));
+            }
+        }
+        return history;
     }
 
     private Pair<String, String> same(List<Pair<String, String>> resolvedList) {

@@ -24,6 +24,9 @@ public class SurviveFieldUtils {
         ensureAndSetField(doc, cDoc,MarcRecordFields.GRANULARITY_FIELD);
         ensureAndSetField(doc, cDoc,MarcRecordFields.FLAG_PUBLIC_IN_DL);
         ensureAndSetField(doc, cDoc,MarcRecordFields.ALTERNATIVE_ALEPH_LINK);
+        ensureAndSetField(doc, cDoc,MarcRecordFields.MASTERLINKS_FIELD);
+        ensureAndSetField(doc, cDoc,MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+        
         MarcRecordUtils.derivedIdentifiers(doc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD).toString(), cDoc);
     }
 

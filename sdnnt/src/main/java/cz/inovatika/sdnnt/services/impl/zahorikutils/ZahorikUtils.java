@@ -59,7 +59,7 @@ public class ZahorikUtils {
                 if (minimum.isPresent()) {
                     return minimum.get();
                 } else {
-                    System.out.println("error");
+                    //System.out.println("error");
                 }
                 
             } catch (NumberFormatException | JSONException  e) {

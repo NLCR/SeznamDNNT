@@ -27,15 +27,15 @@ public class HistoryObjectUtils {
         return historyObject(null, null, stav, license, originator, user, poznamka, historyDate);
     }
 
-    public static JSONObject historyObjectGranularityField(String year, String number, String stav, String license, String originator, String user, String poznamka, String historyDate) {
-        return historyObject(year, number, stav, license, originator, user, poznamka, historyDate);
+    public static JSONObject historyObjectGranularityField(String numb, String yea, String stav, String license, String originator, String user, String poznamka, String historyDate) {
+        return historyObject(numb, yea, stav, license, originator, user, poznamka, historyDate);
     }
 
     public static JSONObject historyObjectGranularityField(JSONObject granularityField, String user, String poznamka, String historyDate) {
         return historyObjectGranularityField(
                 granularityField.optString(GranularityUtils.NUMBER_FIELD),
                 granularityField.optString(GranularityUtils.YEAR_FIELD),
-                // musi mit alespon jedno pole ?
+
                 granularityField.has(GranularityUtils.STAV_FIELD) ?  granularityField.optJSONArray(GranularityUtils.STAV_FIELD).getString(0) : null,
                 granularityField.optString(GranularityUtils.LICENSE_FIELD),
                 null,
@@ -71,27 +71,27 @@ public class HistoryObjectUtils {
     }
 
 
-    public static boolean eqHistoryObjectParent(JSONObject first, JSONObject second) {
-        String firstState = first.optString(HistoryObjectUtils.STAV_FIELD);
-        String firstLicense = first.optString(HistoryObjectUtils.LICENSE_FIELD);
-        String secondState = second.optString(HistoryObjectUtils.STAV_FIELD);
-        String secondLicense = second.optString(HistoryObjectUtils.LICENSE_FIELD);
-        boolean eq = StringUtils.equals(firstState,secondState);
-        if (eq  && firstLicense  != null && secondLicense != null) {
-            eq = StringUtils.equals(firstState,secondState);
-        }
-        return eq;
-    }
-
-    public static boolean eqHistoryObjectGranularity(JSONObject first, JSONObject second) {
-        boolean eq = eqHistoryObjectParent(first, second);
-        if (eq) {
-            String firstYear = first.optString(HistoryObjectUtils.YEAR_FIELD);
-            String secondYear = second.optString(HistoryObjectUtils.YEAR_FIELD);
-            eq = StringUtils.equals(firstYear,secondYear);
-        }
-        return eq;
-    }
+//    public static boolean eqHistoryObjectParent(JSONObject first, JSONObject second) {
+//        String firstState = first.optString(HistoryObjectUtils.STAV_FIELD);
+//        String firstLicense = first.optString(HistoryObjectUtils.LICENSE_FIELD);
+//        String secondState = second.optString(HistoryObjectUtils.STAV_FIELD);
+//        String secondLicense = second.optString(HistoryObjectUtils.LICENSE_FIELD);
+//        boolean eq = StringUtils.equals(firstState,secondState);
+//        if (eq  && firstLicense  != null && secondLicense != null) {
+//            eq = StringUtils.equals(firstState,secondState);
+//        }
+//        return eq;
+//    }
+//
+//    public static boolean eqHistoryObjectGranularity(JSONObject first, JSONObject second) {
+//        boolean eq = eqHistoryObjectParent(first, second);
+//        if (eq) {
+//            String firstYear = first.optString(HistoryObjectUtils.YEAR_FIELD);
+//            String secondYear = second.optString(HistoryObjectUtils.YEAR_FIELD);
+//            eq = StringUtils.equals(firstYear,secondYear);
+//        }
+//        return eq;
+//    }
     
     /** Raw history from aleph */
     public static void enhanceHistoryByLicense(JSONArray historyArray) {

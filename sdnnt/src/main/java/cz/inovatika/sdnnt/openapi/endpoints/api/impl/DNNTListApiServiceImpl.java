@@ -85,32 +85,28 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             "controlfield_001",
             "controlfield_003",
             "controlfield_005",
-            "controlfield_008"
+            "controlfield_008",
+            MASTERLINKS_FIELD,
+            MASTERLINKS_DISABLED_FIELD
             
             //MarcRecordFields.RAW_FIELD
     );
 
     // number of concurrent clients in case of exporting long csv file
-    public static int DEFAULT_CONCURRENT_CLIENTS = 10;
-    public static int MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST = 8000;
+    public static int DEFAULT_CONCURRENT_CSV_CLIENTS = Options.getInstance().intKey("openapi.threads.csv", 12);
+    public static int DEFAULT_CONCURRENT_JSON_CLIENTS = Options.getInstance().intKey("openapi.threads.csv", 22);
 
-    static {
-        JSONObject openapi = Options.getInstance().getJSONObject("openapi");
-        if (openapi != null) {
-            if (openapi.has("concurrent")) {
-                DEFAULT_CONCURRENT_CLIENTS = Integer.parseInt(openapi.getString("concurrent"));
-            }
-            if (openapi.has("maxiumrows")) {
-                MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST = Integer.parseInt(openapi.getString("maxiumrows"));
-            }
-        }
-    }
+    public static int MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST = Options.getInstance().intKey("openapi.maximumrows", 8000);;
 
-    protected static final Semaphore SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CLIENTS);
+    protected static final Semaphore CSV_SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_CSV_CLIENTS);
+    protected static final Semaphore JSON_SEMAPHORE = new Semaphore(DEFAULT_CONCURRENT_JSON_CLIENTS);
+
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd");
 
     public static final List<String> DEFAULT_OUTPUT_FIELDS = Arrays.asList(PID_KEY, SELECTED_INSTITUTION_KEY, LABEL_KEY, NAZEV_KEY,IDENTIFIER_KEY, LICENSE_FIELD, FMT_FIELD, DNTSTAV_FIELD);
     static Logger LOGGER = Logger.getLogger(DNNTListApiServiceImpl.class.getName());
+
+
 
 
     protected CatalogIterationSupport catalogIterationSupport = new CatalogIterationSupport();
@@ -345,7 +341,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     public Response addedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq, Boolean donotemitparent,List<String> list,SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
-            acquired = SEMAPHORE.tryAcquire();
+            acquired = CSV_SEMAPHORE.tryAcquire();
             if (acquired) {
                 List<String> plusList = 
                         new ArrayList<>(Arrays.asList( "license:"+ License.dnnto.name()+" OR "+"granularity_license_cut:"+License.dnnto.name(), "id_pid:uuid"));
@@ -373,7 +369,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }
         } finally {
             if (acquired) {
-                SEMAPHORE.release();
+                CSV_SEMAPHORE.release();
             }
         }
     }
@@ -396,7 +392,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     public Response addedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq, Boolean donotemitparent,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
-            acquired = SEMAPHORE.tryAcquire();
+            acquired = CSV_SEMAPHORE.tryAcquire();
             if (acquired) {
                 List<String> plusList = 
                         new ArrayList<>(Arrays.asList("license:"+ License.dnntt.name()+" OR "+"granularity_license_cut:"+License.dnntt.name(), "id_pid:uuid"));
@@ -426,7 +422,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }
         } finally {
             if (acquired) {
-                SEMAPHORE.release();
+                CSV_SEMAPHORE.release();
             }
         }
     }
@@ -436,7 +432,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     public Response removedDnntoCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
-            acquired = SEMAPHORE.tryAcquire();
+            acquired = CSV_SEMAPHORE.tryAcquire();
             if (acquired) {
                 //historie_stavu_cut
                 List<String> plusList = 
@@ -465,7 +461,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }
         } finally {
             if (acquired) {
-                SEMAPHORE.release();
+                CSV_SEMAPHORE.release();
             }
         }
     }
@@ -475,7 +471,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
     public Response removedDnnttCsvExport(String dl, String format, String institution, OffsetDateTime dateTime, Boolean uniq,List<String> list, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         boolean acquired =  false;
         try {
-            acquired = SEMAPHORE.tryAcquire();
+            acquired = CSV_SEMAPHORE.tryAcquire();
             if (acquired) {
 
                 List<String> plusList = 
@@ -505,7 +501,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             }
         } finally {
             if (acquired) {
-                SEMAPHORE.release();
+                CSV_SEMAPHORE.release();
             }
         }
     }
@@ -691,45 +687,96 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         return doc;
     }
 
+//    boolean acquired =  false;
+//    try {
+//        acquired = CSV_SEMAPHORE.tryAcquire();
+//        if (acquired) {
+//
+//            List<String> plusList = 
+//                    new ArrayList<>(Arrays.asList("historie_stavu_cut:"+License.dnntt.name()+ " OR dntstav:N", "id_pid:uuid"));
+//            List<String> minusList = new ArrayList<>(
+//                    Arrays.asList(MarcRecordFields.LICENSE_FIELD+":"+License.dnntt.name())
+//            );
+//
+//            
+//            if (dateTime != null) {
+//                String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
+//                plusList.add("datum_stavu:["+utc+" TO *]");
+//            }
+//            institutionFilterPlusList(institution, plusList);
+//            digitalLibrariesFilterPlusList(dl, plusList);
+//            formatFilterPlusList(format, plusList);
+//            
+//            removeDMinusList(minusList);
+//            
+//            if (list != null && !list.isEmpty()) {
+//                return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, makeSurePids(list),false);
+//            } else {
+//                return fullCSV(institution,License.dnntt.name(), uniq,plusList, minusList, CATALOG_FIELDS, DEFAULT_OUTPUT_FIELDS, false);
+//            }
+//        } else {
+//            return Response.status(429).entity(jsonError("Too many requests; Please wait and repeat request again")).build();
+//        }
+//    } finally {
+//        if (acquired) {
+//            CSV_SEMAPHORE.release();
+//        }
+//    }
+
+    
     @Override
     public Response changes(String dl, String format, String institution, OffsetDateTime dateTime, Integer rows, String resumptionToken, SecurityContext securityContext,
             ContainerRequestContext containerRequestContext) throws NotFoundException {
-        String token = resumptionToken != null ? resumptionToken : "*";
-
-        List<String> minusList = new ArrayList<>();
-
-        List<String> plusList = new ArrayList<>(Arrays.asList("id_pid:uuid", 
-                "dntstav:*"
-        ));
-        
-        institutionFilterPlusList(institution, plusList);
-        digitalLibrariesFilterPlusList(dl, plusList);
-        formatFilterPlusList(format, plusList);
-
-        removeDMinusList(minusList);
-        
-        if (dateTime != null) {
-            String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
-            plusList.add("datum_stavu:["+utc+" TO *]");
+          boolean acquired =  false;
+          try {
+              acquired = JSON_SEMAPHORE.tryAcquire();
+              if (acquired) {
+                  String token = resumptionToken != null ? resumptionToken : "*";
+                  List<String> minusList = new ArrayList<>();
+    
+                  List<String> plusList = new ArrayList<>(Arrays.asList("id_pid:uuid", 
+                          "dntstav:*"
+                  ));
+                  
+                  institutionFilterPlusList(institution, plusList);
+                  digitalLibrariesFilterPlusList(dl, plusList);
+                  formatFilterPlusList(format, plusList);
+    
+                  removeDMinusList(minusList);
+                  
+                  if (dateTime != null) {
+                      String utc = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.of("UTC")).format(dateTime.truncatedTo(ChronoUnit.MILLIS));
+                      plusList.add("datum_stavu:["+utc+" TO *]");
+                  }
+    
+                  final ListitemResponse response = new ListitemResponse();
+                  ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
+                  response.setItems(arrayOfListitem);
+                  if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
+                      this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
+                          String nextCursorMark = rsp.getNextCursorMark();
+                          SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
+                          for (SolrDocument resultDoc: rsp.getResults()) {
+                              emitDocument(null,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
+                          }
+                          response.setNumFound((int) rsp.getResults().getNumFound());
+                          response.setResumptiontoken(nextCursorMark);
+                      });
+                      return Response.ok().entity(response).build();
+                  } else {
+                      return Response.status(400).entity(jsonError( "Maximum number of items exceeded")).build();
+                  }
+              
+              } else {
+                  return Response.status(429).entity(jsonError("Too many requests; Please wait and repeat request again")).build();
+              }
+            } finally {
+            if (acquired) {
+                JSON_SEMAPHORE.release();
+            }
         }
 
-        final ListitemResponse response = new ListitemResponse();
-        ArrayOfListitem arrayOfListitem = new ArrayOfListitem();
-        response.setItems(arrayOfListitem);
-        if (rows <= MAXIMAL_NUMBER_OF_ITEMS_IN_REQUEST) {
-            this.catalogIterationSupport.iterateOnePage(rows, token, new HashMap<String,String>(),null, plusList, minusList,CATALOG_FIELDS, (rsp)->{
-                String nextCursorMark = rsp.getNextCursorMark();
-                SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
-                for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(null,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
-                }
-                response.setNumFound((int) rsp.getResults().getNumFound());
-                response.setResumptiontoken(nextCursorMark);
-            });
-            return Response.ok().entity(response).build();
-        } else {
-            return Response.status(400).entity(jsonError( "Maximum number of items exceeded")).build();
-        }
+          
     }
 
     

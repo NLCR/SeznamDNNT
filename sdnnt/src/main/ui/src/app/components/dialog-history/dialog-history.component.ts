@@ -52,7 +52,7 @@ export class DialogHistoryComponent implements OnInit {
       }
     });
 
-    this.granularity = this.data.fmt === 'SE' && this.data.granularity;
+    this.granularity = (this.data.fmt === 'SE' || this.data.fmt === 'BK') && this.data.granularity;
 
     this.granulaovaneStavy = this.data.historie_granulovaneho_stavu;
     this.granulaovaneStavy.map(h => {

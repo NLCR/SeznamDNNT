@@ -308,8 +308,15 @@ public class Granularity {
         if (!this.gfields.isEmpty()) {
             SolrInputDocument idoc = new SolrInputDocument();
             idoc.setField(IDENTIFIER_FIELD, identifier);
+            
             List<String> collected = this.gfields.stream().map(GranularityField::toSDNNTSolrJson).map(JSONObject::toString).collect(Collectors.toList());
             SolrJUtilities.atomicSet(idoc, collected, MarcRecordFields.GRANULARITY_FIELD);
+            
+            List<String> pids = this.gfields.stream().map(GranularityField::getPid).collect(Collectors.toList());
+            pids.stream().forEach(pid-> {
+                SolrJUtilities.atomicAddDistinct(idoc, pid, MarcRecordFields.ID_PID);
+            });
+            
             return idoc;
         } else return null;
     }

@@ -56,13 +56,12 @@ public class MasterLinks {
             idoc.setField(IDENTIFIER_FIELD, identifier);
             List<String> collected = this.masterLinks.stream().map(MasterLinkItem::toSDNNTSolrJson).map(JSONObject::toString).collect(Collectors.toList());
             SolrJUtilities.atomicSet(idoc, collected, MarcRecordFields.MASTERLINKS_FIELD);
-
+            
             SolrInputDocument ddoc = new SolrInputDocument();
             ddoc.setField(IDENTIFIER_FIELD, identifier);
             SolrJUtilities.atomicSet(ddoc, false, MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
             
             return Arrays.asList(idoc, ddoc);
-
         } else {
 
             SolrInputDocument idoc = new SolrInputDocument();

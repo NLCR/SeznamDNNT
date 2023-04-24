@@ -28,7 +28,9 @@
           <th>{{ 'desc.odkaz' | translate }}</th>
           <th class="app-col-stav">{{ 'desc.stav' | translate }}</th>
           <th class="app-col-licence">{{ 'desc.licence' | translate }}</th>
+          <!--
           <th></th>
+          -->
         </tr>
       </thead>
       <tbody>
@@ -38,7 +40,7 @@
             <td>{{ itm.cislo }}</td>
             <td>{{ itm.link }}</td>
             <td class="app-col-stav">
-              <mat-select name="newState" [(ngModel)]="itm.kuratorstav"  >
+              <mat-select disabled="true"  name="newState" [(ngModel)]="itm.kuratorstav"  >
                 <mat-option *ngFor="let stav of dntStatesItem" [value]="stav">
                   {{ stav }}
                 </mat-option>
@@ -46,47 +48,38 @@
             </td>
   
             <td class="app-col-licence">
-              <mat-select name="newState" [(ngModel)]="itm.license"  *ngIf="itm.kuratorstav == 'A' || itm.kuratorstav == 'PA'">
-                <mat-option *ngFor="let license of ['dnnto','dnntt']" [value]="license">
+              <mat-select  disabled="true" name="newState" [(ngModel)]="itm.license"  *ngIf="itm.kuratorstav == 'A' || itm.kuratorstav == 'PA'">
+                <mat-option *ngFor="let license of ['dnnto','dnntt']"  [value]="license">
                   {{ license }}
                 </mat-option>
               </mat-select>
   
             </td>
+            <!--
             <td class="app-col-action app-col-remove">
               <mat-icon class="app-mr-1">clear</mat-icon>
               <a (click)="removeGranularitu(idx)">{{ 'desc.odebrat_granularitu' | translate }}</a>
             </td>
+            -->
           </tr>
         </ng-container>
+
+          <!--
         <tr>
           <td><input name="rocnik" [(ngModel)]="rocnik" size="4" class="app-input" /></td>
           <td><input name="cislo" [(ngModel)]="cislo" size="4" class="app-input" /></td>
           <td><input name="link" [(ngModel)]="link" class="app-input" /></td>
           <td>
-              <!--
-            <mat-select name="newState" [(ngModel)]="stav">
-              <mat-option *ngFor="let stav of dntStates" [value]="stav">
-                {{ stav }}
-              </mat-option>
-            </mat-select>
-            -->
           </td>
           <td class="app-col-licence">
-            <!--
-            <mat-select name="newState" [(ngModel)]="stav">
-              <mat-option *ngFor="let stav of dntStates" [value]="stav">
-                dnnto
-              </mat-option>
-            </mat-select>
-            -->
           </td>
           <td class="app-col-action">
             <mat-icon class="app-mr-1">add</mat-icon>
             <a (click)="addGranularitu()">{{ 'desc.pridat_granularitu' | translate }}</a>
           </td>
         </tr>
-      </tbody>
+          -->
+        </tbody>
     </table>
   </div>
   

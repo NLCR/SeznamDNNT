@@ -267,6 +267,20 @@ public class MarcRecord {
 }
 
   // raw field json
+  public JSONObject rawJSON() {
+    JSONObject json = new JSONObject();
+    json.put(IDENTIFIER_FIELD, identifier);
+    json.put(DATESTAMP_FIELD, datestamp);
+    json.put(SET_SPEC_FIELD, setSpec);
+    json.put(LEADER_FIELD, leader);
+
+    json.put("controlFields", controlFields);
+
+    json.put("dataFields", dataFields);
+    return json;
+  }
+
+  // TODO: remove
   public JSONObject toJSON() {
     JSONObject json = new JSONObject();
     json.put(IDENTIFIER_FIELD, identifier);
@@ -279,6 +293,9 @@ public class MarcRecord {
     json.put(HISTORIE_STAVU_FIELD, historie_stavu);
     json.put(HISTORIE_GRANULOVANEHOSTAVU_FIELD, historie_granulovaneho_stavu);
     json.put(GRANULARITY_FIELD, granularity);
+    
+    json.put(MASTERLINKS_FIELD, masterlinks);
+    json.put(MASTERLINKS_DISABLED_FIELD, masterLinksDisabled);
     
 
     json.put("controlFields", controlFields);
@@ -401,7 +418,7 @@ public class MarcRecord {
     sdoc.setField(DATESTAMP_FIELD, datestamp);
     sdoc.setField(SET_SPEC_FIELD, setSpec);
     sdoc.setField(LEADER_FIELD, leader);
-    sdoc.setField(RAW_FIELD, toJSON().toString());
+    sdoc.setField(RAW_FIELD, rawJSON().toString());
 
     sdoc.setField(HISTORIE_STAVU_FIELD, historie_stavu.toString());
     sdoc.setField(HISTORIE_KURATORSTAVU_FIELD, historie_kurator_stavu.toString());

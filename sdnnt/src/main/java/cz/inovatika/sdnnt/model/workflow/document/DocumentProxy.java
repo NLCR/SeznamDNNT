@@ -115,7 +115,7 @@ public class DocumentProxy implements WorkflowOwner {
         
         // automaticky switch - PA,A,N
         if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
-            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm);
+            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm, user, poznamka);
         }
         
     }
@@ -170,7 +170,7 @@ public class DocumentProxy implements WorkflowOwner {
         
         // automaticky switch - PA,A,N
         if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
-            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm);
+            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm, user, poznamka);
         }
         
         
