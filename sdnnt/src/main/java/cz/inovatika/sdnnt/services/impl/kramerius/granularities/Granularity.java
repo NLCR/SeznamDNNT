@@ -323,6 +323,8 @@ public class Granularity {
 
 
     public void validation(CheckKrameriusConfiguration checkConf) {
+        
+        /*
         if (this.state != null && this.state == PublicItemState.N) {
             this.repairNStates(checkConf);
         } 
@@ -333,35 +335,35 @@ public class Granularity {
 
         if (this.state != null && this.state == PublicItemState.PA) {
             this.repairNStates(checkConf);
-        }
+        }*/
+        
     }
 
-    // nekonzistentni stav N - polozky taky N
-    public void repairNStates(CheckKrameriusConfiguration checkConf) {
-        List<GranularityField> nfields = new ArrayList<>(gfields);
-        for (GranularityField gf : nfields) {
-            if (gf.getStav() != null) {
-                PublicItemState state = PublicItemState.valueOf(gf.getStav());
-                if (state != null && state != PublicItemState.N) {
-                    gf.setStav(PublicItemState.N.name());
-                    gf.setLicense(null);
-                    this.dirty = true;
-                }
-            }
-        }
-    }
-
-    public void repairXStates(CheckKrameriusConfiguration checkConf) {
-        List<GranularityField> nfields = new ArrayList<>(gfields);
-        for (GranularityField gf : nfields) {
-            if (gf.getStav() != null) {
-                PublicItemState state = PublicItemState.valueOf(gf.getStav());
-                if (state != null && state != PublicItemState.X) {
-                    gf.setStav(PublicItemState.X.name());
-                    gf.setLicense(null);
-                    this.dirty = true;
-                }
-            }
-        }
-    }
+//    public void repairNStates(CheckKrameriusConfiguration checkConf) {
+//        List<GranularityField> nfields = new ArrayList<>(gfields);
+//        for (GranularityField gf : nfields) {
+//            if (gf.getStav() != null) {
+//                PublicItemState state = PublicItemState.valueOf(gf.getStav());
+//                if (state != null && state != PublicItemState.N) {
+//                    gf.setStav(PublicItemState.N.name());
+//                    gf.setLicense(null);
+//                    this.dirty = true;
+//                }
+//            }
+//        }
+//    }
+//
+//    public void repairXStates(CheckKrameriusConfiguration checkConf) {
+//        List<GranularityField> nfields = new ArrayList<>(gfields);
+//        for (GranularityField gf : nfields) {
+//            if (gf.getStav() != null) {
+//                PublicItemState state = PublicItemState.valueOf(gf.getStav());
+//                if (state != null && state != PublicItemState.X) {
+//                    gf.setStav(PublicItemState.X.name());
+//                    gf.setLicense(null);
+//                    this.dirty = true;
+//                }
+//            }
+//        }
+//    }
 }
