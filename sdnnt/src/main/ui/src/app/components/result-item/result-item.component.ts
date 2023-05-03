@@ -116,7 +116,7 @@ export class ResultItemComponent implements OnInit {
     this.dkLinks = [];
     // Masterlinks && granularity     
     if (this.doc.masterlinks || this.doc.masterlinks_disabled) {
-      this.doc?.masterlinks.forEach((mlink)=>{
+      this.doc.masterlinks?.forEach((mlink)=>{
         this.dkLinks.push(mlink.link);
       });
     } else {
@@ -281,12 +281,19 @@ export class ResultItemComponent implements OnInit {
 
     let itms =  this.doc.granularity.sort((a,b) => {
       if (a.rocnik && b.rocnik) {
-        return (a.rocnik > b.rocnik ? 1 : -1); 
+        if (a.rocnik == b.rocnik) {
+
+          if (a.acronym && b.acronym) {
+            return (a.acronym > b.acronym ? 1 : -1); 
+          } else  if (a.acronym && !b.acronym) {
+            return 1;
+          } else return -1;
+
+        } else  return (a.rocnik > b.rocnik ? 1 : -1); 
       } else if (a.rocnik && !b.rocnik) {
         return 1;
       } else return -1;
-    }
-    );
+    });
 
     const data = { title: this.doc.nazev, 
       //items: this.doc.granularity 

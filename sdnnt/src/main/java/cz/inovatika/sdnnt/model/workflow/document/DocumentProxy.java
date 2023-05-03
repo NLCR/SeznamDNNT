@@ -113,9 +113,8 @@ public class DocumentProxy implements WorkflowOwner {
             this.marcRecord.license = license;
         }
         
-        // automaticky switch - PA,A,N
         if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
-            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm, user, poznamka);
+            ChangeProcessStatesUtility.calculateGranularity(this.marcRecord,  user, poznamka, originator);
         }
         
     }
@@ -170,7 +169,7 @@ public class DocumentProxy implements WorkflowOwner {
         
         // automaticky switch - PA,A,N
         if (marcRecord.granularity != null && !marcRecord.granularity.isEmpty()) {
-            ChangeProcessStatesUtility.granularityChange(this.marcRecord, kuratorStav, itm, user, poznamka);
+            ChangeProcessStatesUtility.calculateGranularity(this.marcRecord,  user, poznamka, originator);
         }
         
         
@@ -181,10 +180,9 @@ public class DocumentProxy implements WorkflowOwner {
         if (period.getTransitionType().equals(TransitionType.kurator)) {
             return true;
         } else {
-            // predchozi deadline; pokud je za deadline zadosti
-            // z podaneho datumu vypocita novy deadline; musi se pocitat deadline 
-            // z predchoziho datumu prepnuti - dokument je v poradku ale muze se menit ->  
-            // tedy zadost -> Zadost musi but 
+            // predchozi deadline; pokud je za datumem (deadline) zadosti
+            // z podaneho datumu vypocita novy deadline
+            // Posledni radek je zjistovani zda je mensi nez jedna vterina  
             
             Date deadlineDate = period.defineDeadline(date);
             boolean after = currentDate().after(deadlineDate);

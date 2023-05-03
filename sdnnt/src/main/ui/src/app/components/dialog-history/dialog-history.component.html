@@ -42,6 +42,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let item of kuratorskestavy">
+
             <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
             <td>{{ item.user }}</td>
             <td>{{ item.stav }}</td>
@@ -58,33 +59,46 @@
     </mat-tab>
    
     <mat-tab  [label]="'desc.historie_rocniku' | translate" *ngIf=" granularity && (state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin')">
-      <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
-        <thead>
-          <tr>
-            <th>{{ 'desc.datum' | translate }}</th>
-            <th>{{ 'desc.kdo' | translate }}</th>
-            <th>{{ 'desc.cislo' | translate }}</th>
-            <th>{{ 'desc.rocnik' | translate }}</th>
-            <th>{{ 'desc.stav' | translate }}</th>
-            <th>{{ 'desc.licence' | translate }}</th>
-            <th>{{ 'desc.komentar' | translate }}</th>           
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of granulaovaneStavy">
-            <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
-            <td>{{ item.user }}</td>
-            <td>{{ item.cislo }}</td>
-            <td>{{ item.rocnik }}</td>
-            <td>{{ item.stav }}</td>
-            <td>{{ item.license }}</td>
-            <td>{{ item.comment }}</td>
-            <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
-                [matTooltip]=" item.zadost">
-             {{ item.zadost?.substring(item.zadost.length -8) }}</td>
-          </tr>
-        </tbody>
-      </table>
+ 
+
+      <ng-container *ngFor="let cat of kategorieGranulovanychStavu; let idx = index">
+        
+        <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
+          <thead>
+            <tr>
+              <th>{{ 'desc.datum' | translate }}</th>
+              <th>{{ 'desc.kdo' | translate }}</th>
+              <th>{{ 'desc.cislo' | translate }}</th>
+              <th>{{ 'desc.rocnik' | translate }}</th>
+              <th>{{ 'desc.stav' | translate }}</th>
+              <th>{{ 'desc.licence' | translate }}</th>
+              <th>{{ 'desc.acronym' | translate }}</th>
+              <th>{{ 'desc.komentar' | translate }}</th>           
+              <th *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>           
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of granulovaneStavyAggregated[cat]">
+  
+  
+              <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
+              <td>{{ item.user }}</td>
+              <td>{{ item.cislo }}</td>
+              <td>{{ item.rocnik }}</td>
+              <td>{{ item.stav }}</td>
+              <td>{{ item.license }}</td>
+              <td><a href="{{ item.link }}" target="_blank">  {{ item.acronym }}</a></td>
+              <td  [matTooltip]=" item.comment">{{ shortText(item.comment)  }}  </td>
+              <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+                  [matTooltip]=" item.zadost">
+               {{ item.zadost?.substring(item.zadost.length -8) }}</td>
+            </tr>
+          </tbody>
+        </table>
+  
+      </ng-container>
+
+
     </mat-tab>
 
     <mat-tab [label]="'desc.historie_bibliografickeho_zaznamu' | translate">

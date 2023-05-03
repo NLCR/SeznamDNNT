@@ -55,7 +55,7 @@ public class ZahorikUtils {
             try {
                 String rocnik = gItem.getString("rocnik");
                 List<Integer> collected = parseYears(rocnik).stream().map(Integer::valueOf).collect(Collectors.toList());
-                Optional<Integer> minimum = collected.stream().min(Integer::compareTo);
+                Optional<Integer> minimum = collected.stream().filter(it -> it > 1700).min(Integer::compareTo);
                 if (minimum.isPresent()) {
                     return minimum.get();
                 } else {

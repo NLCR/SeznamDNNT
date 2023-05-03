@@ -148,13 +148,14 @@ public class MarcRecord {
             .addFilterQuery(IDENTIFIER_FIELD+":\"" + identifier + "\"")
             .setFields(RAW_FIELD+" "+
                     DNTSTAV_FIELD+" "+
+                    FMT_FIELD+" "+
                     KURATORSTAV_FIELD+" "+
                     HISTORIE_STAVU_FIELD+" " +
                     HISTORIE_KURATORSTAVU_FIELD+" " +
                     HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                     DATUM_STAVU_FIELD+" "+
                     DATUM_KURATOR_STAV_FIELD+" "+
-                    FLAG_PUBLIC_IN_DL+" ",
+                    FLAG_PUBLIC_IN_DL+" "+
                     LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+
                     GRANULARITY_FIELD+":[json]",
                     MASTERLINKS_FIELD+":[json]",

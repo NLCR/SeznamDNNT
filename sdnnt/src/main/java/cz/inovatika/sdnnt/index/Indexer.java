@@ -455,32 +455,9 @@ public class Indexer {
       mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, granularityChange);
 
 
-// Rucni zmena granularity 
-// Disabled 
-//      if (!granularityChange.isEmpty()) {
-//        JSONArray granularityFromIndex = mr.granularity;
-//        int commonIndex = Math.min(granularityFromIndex.length(), granularityChange.length());
-//        for (int i = 0; i < commonIndex; i++) {
-//          JSONObject fromParam = granularityChange.getJSONObject(i);
-//          JSONObject fromIndex = granularityFromIndex.getJSONObject(i);
-//          if (!GranularityUtils.eqGranularityObject(fromParam, fromIndex)) {
-//            String formatted = MarcRecord.FORMAT.format(new Date());
-//            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(fromParam, user, poznamka, formatted));
-//          }
-//        }
-//        // pridano
-//        if (granularityChange.length() > commonIndex) {
-//          for (int i = commonIndex; i < granularityChange.length(); i++) {
-//            String formatted = MarcRecord.FORMAT.format(new Date());
-//            mr.historie_granulovaneho_stavu.put(HistoryObjectUtils.historyObjectGranularityField(granularityChange.getJSONObject(i), user, poznamka, formatted));
-//          }
-//        }
-//        // zmenit stavy granularity
-//        mr.setGranularity(granularityChange, poznamka, user);
-//      }
 
-      // tady je teprve to porovnani 
-      ChangeProcessStatesUtility.granularityChange(mr, previous, kstav, user, poznamka);
+      
+      ChangeProcessStatesUtility.calculateGranularity(mr,  user, poznamka, null);
 
       
       solrClient.add("catalog", mr.toSolrDoc());

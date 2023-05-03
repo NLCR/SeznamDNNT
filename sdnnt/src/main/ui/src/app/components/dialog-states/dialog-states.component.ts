@@ -50,7 +50,9 @@ export class DialogStatesComponent implements OnInit {
 
       let kramlics;
       if (itm.kram_licenses) {
-        kramlics = itm.kram_licenses.join(',');
+        //let kramlics = [];
+        kramlics = itm.kram_licenses.sort().join(',');
+
       }
 
       let retval=  DialogStatesComponent.flat(itm);
@@ -58,6 +60,16 @@ export class DialogStatesComponent implements OnInit {
       return retval;
 
     });
+
+    let itms =  this.granularity.sort((a,b) => {
+      if (a.rocnik && b.rocnik) {
+        return (a.rocnik > b.rocnik ? 1 : -1); 
+      } else if (a.rocnik && !b.rocnik) {
+        return 1;
+      } else return -1;
+    });
+
+
 
   }
 

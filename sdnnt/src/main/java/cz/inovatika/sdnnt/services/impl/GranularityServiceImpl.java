@@ -969,7 +969,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                
                 SolrInputDocument idoc = new SolrInputDocument();
                 idoc.setField(IDENTIFIER_FIELD, identifier);
-                atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
+                SolrJUtilities.atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
                 solr.add(DataCollections.catalog.name(), idoc);
 
                 this.changedIdentifiers.add(identifier);

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+
 /**
- * Fill states in granularity
+ * Calculate states and licenses for granularity items & create history record
  * @author happy
  */
 public interface GranularitySetStateService {
@@ -17,10 +19,20 @@ public interface GranularitySetStateService {
     Logger getLogger();
     
     /**
-     * Set sates
+     * Set sates for whole set 
      * @param addFilters
      * @throws IOException
      */
     public void setStates(List<String> addFilters) throws IOException;
-
+    
+    
+    /**
+     * Set states for one record
+     * @throws IOException
+     */
+    public void setStatesForOneRecord(MarcRecord marcRecord) throws IOException;
+    
+    
+    
+    
 }

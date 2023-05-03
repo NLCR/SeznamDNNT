@@ -945,7 +945,8 @@
     "zaznam": "Record",
     "akceptovat": "Accept",
     "zobrazit_vice": "Show more",
-    "zobrazit_mene": "Show less"
+    "zobrazit_mene": "Show less",
+	"acronym":"Library"
   },
 
   "tooltip": {

@@ -27,23 +27,29 @@ public class HistoryObjectUtils {
         return historyObject(null, null, stav, license, originator, user, poznamka, historyDate);
     }
 
-    public static JSONObject historyObjectGranularityField(String numb, String yea, String stav, String license, String originator, String user, String poznamka, String historyDate) {
-        return historyObject(numb, yea, stav, license, originator, user, poznamka, historyDate);
+    public static JSONObject historyObjectGranularityField(
+            String numb,  // cislo 
+            String yea,  // rok 
+            String stav,  // stav
+            String license, // licence 
+            String originator, // puvodce zmeny
+            String user,  //uzivatel
+            String poznamka, // poznamka 
+            String historyDate, //datum zmeny 
+            String group,  //skupina
+            String acronym, 
+            String pid, 
+            String link
+            ) {
+        JSONObject granularityField = historyObject(numb, yea, stav, license, originator, user, poznamka, historyDate);
+        if (group != null) granularityField.put("group", group);
+        if (acronym != null) granularityField.put("acronym", acronym);
+        if (pid != null) granularityField.put("pid", pid);
+        if (link != null) granularityField.put("link", link);
+        
+        return granularityField;
     }
 
-    public static JSONObject historyObjectGranularityField(JSONObject granularityField, String user, String poznamka, String historyDate) {
-        return historyObjectGranularityField(
-                granularityField.optString(GranularityUtils.NUMBER_FIELD),
-                granularityField.optString(GranularityUtils.YEAR_FIELD),
-
-                granularityField.has(GranularityUtils.STAV_FIELD) ?  granularityField.optJSONArray(GranularityUtils.STAV_FIELD).getString(0) : null,
-                granularityField.optString(GranularityUtils.LICENSE_FIELD),
-                null,
-                user,
-                poznamka,
-                historyDate
-                );
-    }
 
     private static JSONObject historyObject(String number,String year, String stav, String license, String originator, String user, String poznamka, String historyDate) {
         JSONObject historyObject = new JSONObject();
