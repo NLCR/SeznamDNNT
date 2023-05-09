@@ -167,7 +167,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             AtomicInteger counter = new AtomicInteger();
 
             CatalogIterationSupport support = new CatalogIterationSupport();
-            List<String> plusFilter = Arrays.asList("(id_pid:uuid OR granularity:*)", KURATORSTAV_FIELD + ":*");
+            List<String> plusFilter = Arrays.asList("(id_pid:uuid OR granularity:*)", 
+                    KURATORSTAV_FIELD + ":*"
+                    );
 
             List<String> minusFilter = Arrays.asList( KURATORSTAV_FIELD + ":D",
                     KURATORSTAV_FIELD + ":DX");
@@ -509,7 +511,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     baseUrl = baseUrl + "/";
                 }
 
-                // Vsechny deti  
+                // TODO: Move it to instance  
                 String encodedCondition = URLEncoder.encode(
                         "PID:(" + condition + ")", "UTF-8");
                 
@@ -528,6 +530,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     if (numFound > 0) {
                             JSONArray docs = responseObject.optJSONArray("docs");
                             for (int i = 0; i < docs.length(); i++) {
+                                //TODO: Move it to instance
                                 JSONObject doc = docs.getJSONObject(i);
                                 String rootPid = doc.optString("root_pid");
                                 String pid = doc.optString("PID");
@@ -917,88 +920,28 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         }
     }
 
-    // pouze jedna baseUrl
-    private void compare(SolrClient solr, String identifier, String baseUrl, List<String> solrGran,
-            List<Map<String, String>> list) throws SolrServerException, IOException {
-        getLogger().fine("Comparing granularity for identifier " + identifier);
-        
-        Map<Pair,JSONObject> pairsToGranularity = pairsToGranularity(solrGran);
-        Set<Pair> pidsFromSolr = pairsToGranularity.keySet();
 
-        String baseUrlDomain = domain(baseUrl);
-        List<Pair> pidsFromKram = list.stream().map(p -> {
-            return Pair.of(baseUrlDomain, p.get("pid"));
-        }).collect(Collectors.toList());
-        
-        
-        for (int i = 0; i < pidsFromKram.size(); i++) {
-            // ADD  
-            if (!pidsFromSolr.contains(pidsFromKram.get(i))) {
-
-                String pid = pidsFromKram.get(i).getRight().toString();
-                String link = renderLink(baseUrl, pid);
-
-                JSONObject object = new JSONObject();
-                object.put("link", link);
-
-                Map<String, String> oDoc = list.get(i);
-                if (oDoc.containsKey("datum_str")) {
-                    object.put("rocnik", oDoc.get("datum_str"));
-                }
-                if (oDoc.containsKey("details")) {
-                    // oDoc.
-                    String details = oDoc.get("details");
-                    String[] splitted = details.split("##");
-                    if (splitted.length > 1) {
-                        object.put("cislo", splitted[1]);
-                    }
-                }
-                
-                if (oDoc.containsKey("dostupnost")) {
-                    String dostupnost = oDoc.get("dostupnost");
-                    object.put("policy", dostupnost);
-                    if (dostupnost != null && dostupnost.equals("public")) {
-                        JSONArray stav = new JSONArray();
-                        stav.put("X");
-                        object.put("kuratorstav", stav);
-                        object.put("stav", stav);
-                    }
-                }
-                
-                object.put("fetched", SIMPLE_DATE_FORMAT.format(new Date()));
-               
-                SolrInputDocument idoc = new SolrInputDocument();
-                idoc.setField(IDENTIFIER_FIELD, identifier);
-                SolrJUtilities.atomicAdd(idoc, object.toString(), MarcRecordFields.GRANULARITY_FIELD);
-                solr.add(DataCollections.catalog.name(), idoc);
-
-                this.changedIdentifiers.add(identifier);
-                getLogger().fine(String.format("Updating granularity for %s", identifier));
-            }
-        }
-    }
-
-    private Map<Pair, JSONObject> pairsToGranularity(List<String> solrGran) {
-        Map<Pair, JSONObject> docsFromSolr = new HashMap<>();
-        solrGran.stream().forEach(s-> {
-            try {
-                JSONObject jObject = new JSONObject(s);
-                String link = jObject.optString("link");
-                String domain = domain(link);
-                String pid = null;
-                if (link != null && link.indexOf("uuid:") > 0) {
-                    pid = link.substring(link.indexOf("uuid:"));
-                }
-
-                Pair pair = Pair.of(domain, pid);
-                docsFromSolr.put(pair, jObject);
-            } catch (JSONException e) {
-                getLogger().log(Level.SEVERE, e.getMessage(), e);
-            }
-            
-        });
-        return docsFromSolr;
-    }
+//    private Map<Pair, JSONObject> pairsToGranularity(List<String> solrGran) {
+//        Map<Pair, JSONObject> docsFromSolr = new HashMap<>();
+//        solrGran.stream().forEach(s-> {
+//            try {
+//                JSONObject jObject = new JSONObject(s);
+//                String link = jObject.optString("link");
+//                String domain = domain(link);
+//                String pid = null;
+//                if (link != null && link.indexOf("uuid:") > 0) {
+//                    pid = link.substring(link.indexOf("uuid:"));
+//                }
+//
+//                Pair pair = Pair.of(domain, pid);
+//                docsFromSolr.put(pair, jObject);
+//            } catch (JSONException e) {
+//                getLogger().log(Level.SEVERE, e.getMessage(), e);
+//            }
+//            
+//        });
+//        return docsFromSolr;
+//    }
 
     public static String pid(String surl) {
         

@@ -55,7 +55,11 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_HISTORY_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_DISABLED_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
+
 
 import java.io.IOException;
 import java.util.*;
@@ -665,7 +669,11 @@ public class AccountServiceImpl implements AccountService {
                                 DATUM_STAVU_FIELD+" "+
                                 DATUM_KURATOR_STAV_FIELD+" "+
                                 FLAG_PUBLIC_IN_DL+" ",
-                                LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ GRANULARITY_FIELD+":[json]");
+                                FMT_FIELD+" ",
+                                LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ 
+                                GRANULARITY_FIELD+":[json]"+" "+ 
+                                MASTERLINKS_FIELD+":[json]"+" "+
+                                MASTERLINKS_DISABLED_FIELD);
                 
 
                 SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();

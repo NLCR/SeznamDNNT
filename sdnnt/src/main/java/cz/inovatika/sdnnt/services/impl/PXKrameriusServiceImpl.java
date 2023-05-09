@@ -9,6 +9,9 @@ import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -42,14 +45,15 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrameriusService {
 
     boolean contextInformation = false;
-    private Map<String, String> mappingHosts = new HashMap<>();
-    private Map<String, String> mappingApi = new HashMap<>();
-    private Map<String, Boolean> skipHosts = new HashMap<>();
+//    private Map<String, String> mappingHosts = new HashMap<>();
+//    private Map<String, String> mappingApi = new HashMap<>();
+//    private Map<String, Boolean> skipHosts = new HashMap<>();
 
     private AtomicInteger fetchedInfoCounter = new AtomicInteger();
     private AtomicInteger requestedInfoCounter = new AtomicInteger();
 
     private Logger logger = Logger.getLogger(PXKrameriusService.class.getName());
+    private CheckKrameriusConfiguration checkConf;
     
     
     public PXKrameriusServiceImpl(String logger, JSONObject iteration, JSONObject results) {
@@ -114,26 +118,28 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     
     public void initialize() {
         JSONObject checkKamerius = getOptions().getJSONObject("check_kramerius");
-        if (checkKamerius != null && checkKamerius.has("urls")) {
-            JSONObject urlobject = checkKamerius.getJSONObject("urls");
-            Set<String> urls = urlobject.keySet();
-            for (String key : urls) {
-                JSONObject jObject = urlobject.getJSONObject(key);
-                String api = jObject.optString("api");
-                if (api != null) {
-                    this.mappingHosts.put(key, api);
-                    String version = jObject.optString("version");
-                    if (version != null) {
-                        this.mappingApi.put(key, version);
-                    }
-                }
-                
-                if (jObject.has("skip")) {
-                    this.skipHosts.put(key, true);
-                    this.skipHosts.put(api, true);
-                }
-            }
-        }
+        this.checkConf = CheckKrameriusConfiguration.initConfiguration(checkKamerius);
+
+//        if (checkKamerius != null && checkKamerius.has("urls")) {
+//            JSONObject urlobject = checkKamerius.getJSONObject("urls");
+//            Set<String> urls = urlobject.keySet();
+//            for (String key : urls) {
+//                JSONObject jObject = urlobject.getJSONObject(key);
+//                String api = jObject.optString("api");
+//                if (api != null) {
+//                    this.mappingHosts.put(key, api);
+//                    String version = jObject.optString("version");
+//                    if (version != null) {
+//                        this.mappingApi.put(key, version);
+//                    }
+//                }
+//                
+//                if (jObject.has("skip")) {
+//                    this.skipHosts.put(key, true);
+//                    this.skipHosts.put(api, true);
+//                }
+//            }
+//        }
     }
 
 
@@ -223,12 +229,25 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
             for (String link : links) {
                 String pid = pid(link);
                 if (pid != null) {
-                    String baseUrl = baseUrl(link);
-                    if (!buffer.containsKey(baseUrl)) {
-                        buffer.put(baseUrl, new ArrayList<>());
+                    //String baseUrl = baseUrl(link);
+                    String baseUrl = checkConf.baseUrl(link);
+                    InstanceConfiguration configuration = checkConf.match(baseUrl);
+
+                    if (configuration !=  null && !configuration.isShouldSkip()) {
+                        //fullSkip = false;
+                        if (!buffer.containsKey(baseUrl)) {
+                            buffer.put(baseUrl, new ArrayList<>());
+                        }
+                        getLogger().fine("baseurl " + baseUrl + " pair " + Pair.of(key, pid));
+                        buffer.get(baseUrl).add(Pair.of(key, pid));
+                        
+
+                        checkBuffer(buffer, foundCandidates);
+                    } else {
+                        getLogger().fine("Skipping instance '"+configuration+"'");
                     }
-                    buffer.get(baseUrl).add(Pair.of(key, pid));
-                    checkBuffer(buffer, foundCandidates);
+
+                    
                 }
                 
             }
@@ -260,11 +279,13 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null) continue;
-                
-                if (this.skipHosts.containsKey(baseUrl)) {
+
+                InstanceConfiguration configuration = this.checkConf.match(baseUrl);
+                // TODO:Disable 
+                if (configuration == null || configuration.isShouldSkip()) {
                     getLogger().warning("Skipping url "+baseUrl+"'");
                     continue;
-                }
+                } 
 
                 List<Pair<String, String>> pairs = buffer.get(baseUrl);
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
@@ -325,34 +346,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         return SimpleGET.get(url);
     }
 
-    public String baseUrl(String surl) {
-        if (surl.contains("/search/")) {
-            String val = surl.substring(0, surl.indexOf("/search") + "/search".length());
-            String foundByPrefix = findValueByPrefix(val);
-            return foundByPrefix != null ? foundByPrefix : val;
-        } else {
-            List<String> prefixes = Arrays.asList("view", "uuid");
-            for (String pref : prefixes) {
-                if (surl.contains(pref)) {
-                    String remapping = surl.substring(0, surl.indexOf(pref));
-                    String foundByPrefix = findValueByPrefix(remapping);
-                    return foundByPrefix != null ? foundByPrefix : (remapping + (remapping.endsWith("/") ? "": "/")+"search");
-                }
-
-            }
-            return null;
-        }
-    }
-
-
-    private String findValueByPrefix(String val) {
-        for (String key : this.mappingHosts.keySet()) {
-            if (val.startsWith(key)) {
-                return this.mappingHosts.get(key);
-            }
-        }
-        return null;
-    }
     
     @Override
     public void update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException {
@@ -403,6 +396,16 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         return this.logger;
     }
     
-    
 
+        
+    public static void main(String[] args) {
+        
+        HttpsTrustManager.allowAllSSL();
+        
+        PXKrameriusService service = new PXKrameriusServiceImpl("",new JSONObject(), new JSONObject());
+        List<String> check = service.check();
+        System.out.println(check);
+    }
+
+    
 }
