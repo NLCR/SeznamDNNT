@@ -348,7 +348,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             Detail detail = new Detail();
             detail.setIdentifier(ni);
             detail.state(StateEnum.REJECTED);
-            detail.setReason("Identifier doesnt exists");
+            detail.setReason("Identifier does not exist");
             details.add(detail);
             
             alreadyRendered.add(ni);
@@ -401,7 +401,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             detail.setIdentifier(iS);
             detail.state(StateEnum.REJECTED);
             
-            detail.setReason("Already used in request '"+iS+"'");
+            detail.setReason("Given identifier has been alredy used in another request");
             details.add(detail);
             
         });
