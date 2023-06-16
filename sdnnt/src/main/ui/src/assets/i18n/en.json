@@ -847,7 +847,7 @@
     "zobrazit_granularitu": "Show granularity",
     "zustat_prihlasen": "Stay logged in",
     "licence": "License",
-	"kramerius_license":"License in DL",
+	  "kramerius_license":"License in DL",
     "ean_se_shoduje": "Ean agrees",
     "ean_se_neshoduje": "Ean doesn't match",
     "otevrit_zdroj": "Open the source",
@@ -946,7 +946,8 @@
     "akceptovat": "Accept",
     "zobrazit_vice": "Show more",
     "zobrazit_mene": "Show less",
-	"acronym":"Library"
+	  "acronym":"Library",
+    "euipo_badge_tooltip": "Exported to the EUIPO portal"
   },
 
   "tooltip": {

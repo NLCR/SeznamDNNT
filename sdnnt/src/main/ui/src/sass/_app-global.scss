@@ -318,11 +318,25 @@ table {
     margin-right: $app-gap-icon;
   }
 
-  &.app-kramerius {
-    @extend .app-clean-bg;
+  &.app-bordered {
+    background-color: $app-color-lightnes;
     height: calc(#{$app-badge-height} - 2px);
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  &.app-kramerius {
     color: $app-color-kramerius;
-    border: 1px solid #{$app-color-kramerius};
+    border-color: $app-color-kramerius;
+  }
+
+  &.app-img-in {
+    vertical-align: bottom;
+    border-color: $app-brand-border-color;
+
+    img {
+      height: 10px;
+    }
   }
 }
 

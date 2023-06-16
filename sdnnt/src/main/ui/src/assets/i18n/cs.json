@@ -847,7 +847,7 @@
     "zobrazit_granularitu": "Zobrazit granularitu",
     "zustat_prihlasen": "Zůstat přihlášen",
     "licence": "Licence",
-	"kramerius_license":"Licence v DK",
+	  "kramerius_license":"Licence v DK",
     "ean_se_shoduje": "Ean se shoduje",
     "ean_se_neshoduje": "Ean se neshoduje",
     "otevrit_zdroj": "Otevřít zdroj",
@@ -946,7 +946,8 @@
     "akceptovat": "Akceptovat",
     "zobrazit_vice": "Zobrazit více",
     "zobrazit_mene": "Zobrazit méně",
-	"acronym":"Knihovna"
+	  "acronym":"Knihovna",
+    "euipo_badge_tooltip": "Exportovano do portalu EUIPO"
   },
 
   "tooltip": {
