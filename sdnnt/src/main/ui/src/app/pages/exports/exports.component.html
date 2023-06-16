@@ -1,1 +1,45 @@
-<p>exports works!</p>
+<div class="app-container">
+  <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+    <div fxFlex class="app-left">
+      {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+    </div>
+    <div class="app-right">
+      <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
+    </div>
+  </div>
+  <div class="app-results-wrapper app-overflow-x-auto">
+    <table mat-table [dataSource]="imports" class="mat-elevation-z0 app-table-responsive">
+      <ng-container matColumnDef="import_date">
+        <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_exportu' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'desc.datum_exportu' | translate }}</span>
+          <span class="app-fx-right">{{ element.date | date : 'dd.MM.yyyy HH:mm' }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="import_url">
+        <th mat-header-cell *matHeaderCellDef>{{ 'URL' | translate }}</th>
+        <td mat-cell *matCellDef="let element">
+          <span class="app-fx-left mat-header-cell">{{ 'URL' | translate }}</span>
+          <span class="app-fx-right">{{ element.url }}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element" class="app-text-right">
+          <mat-button-toggle-group>
+            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.vysledek_exportu' | translate" matTooltipPosition="above">
+              <mat-icon class="material-icons-outlined">visibility</mat-icon>
+            </mat-button-toggle>    
+          </mat-button-toggle-group> 
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+  
+  <div class="app-mt-4">
+    <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
+  </div>
+</div>
