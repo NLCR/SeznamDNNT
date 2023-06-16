@@ -14,20 +14,20 @@ import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/
 import { UserResetPasswordComponent } from './pages/user-reset-password/user-reset-password.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 import { ExportsComponent } from './pages/exports/exports.component';
+import { ExportComponent } from './pages/export/export.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'help', component: HelpComponent },
   { path: 'account', component: AccountComponent },
   { path: 'zadost/:id', component: ZadostComponent },
-
   { path: 'exports', component: ExportsComponent },
-
+  { path: 'exports/export/:id', component: ExportComponent },
   { path: 'imports', component: ImportsComponent },
   { path: 'import/:id', component: ImportComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'search', component: SearchComponent},
-   { path: 'pswd/:token', component: ResetPasswordComponent},
+  { path: 'pswd/:token', component: ResetPasswordComponent},
   { path: 'userpswd', component: UserResetPasswordComponent},
   { path: 'fgtpswd', component: InputLoginNameComponent},
   { path: 'shibboleth-landing', component: ShibbolethLandingPageComponent},

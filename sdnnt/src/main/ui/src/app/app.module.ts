@@ -73,6 +73,7 @@ import { DialogBulkNotificationsComponent } from './components/dialog-bulk-notif
 import { DialogNotificationsSettingsComponent } from './components/dialog-notifications-settings/dialog-notifications-settings.component';
 import { DialogSuccessorRecordsComponent } from './components/dialog-successor-records/dialog-successor-records.component';
 import { ExportsComponent } from './pages/exports/exports.component';
+import { ExportComponent } from './pages/export/export.component';
 //import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
@@ -148,6 +149,7 @@ const providers: any[] =[
     DialogNotificationsSettingsComponent,
     DialogSuccessorRecordsComponent,
     ExportsComponent,
+    ExportComponent,
   ],
   imports: [
     BrowserModule,

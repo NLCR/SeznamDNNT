@@ -27,7 +27,7 @@
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element" class="app-text-right">
           <mat-button-toggle-group>
-            <mat-button-toggle (click)="showImport(element)" [matTooltip]="'desc.vysledek_exportu' | translate" matTooltipPosition="above">
+            <mat-button-toggle (click)="showExport(element)" [matTooltip]="'desc.vysledek_exportu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">visibility</mat-icon>
             </mat-button-toggle>    
           </mat-button-toggle-group> 

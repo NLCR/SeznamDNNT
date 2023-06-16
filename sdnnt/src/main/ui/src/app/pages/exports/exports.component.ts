@@ -108,8 +108,8 @@ export class ExportsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
-  showImport(imp: Import) {
-    this.router.navigate(['import/'+ imp.id], {queryParams:{controlled: false}});
+  showExport(imp: Import) {
+    this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
   }
 
   process(imp: Import) {
