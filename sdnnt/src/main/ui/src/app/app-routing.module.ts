@@ -13,12 +13,16 @@ import { SearchComponent } from './pages/search/search.component';
 import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/shibboleth-landing-page.component';
 import { UserResetPasswordComponent } from './pages/user-reset-password/user-reset-password.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
+import { ExportsComponent } from './pages/exports/exports.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'help', component: HelpComponent },
   { path: 'account', component: AccountComponent },
   { path: 'zadost/:id', component: ZadostComponent },
+
+  { path: 'exports', component: ExportsComponent },
+
   { path: 'imports', component: ImportsComponent },
   { path: 'import/:id', component: ImportComponent },
   { path: 'admin', component: AdminComponent },

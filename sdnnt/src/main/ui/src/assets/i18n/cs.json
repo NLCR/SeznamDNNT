@@ -947,7 +947,8 @@
     "zobrazit_vice": "Zobrazit více",
     "zobrazit_mene": "Zobrazit méně",
 	  "acronym":"Knihovna",
-    "euipo_badge_tooltip": "Exportovano do portalu EUIPO"
+    "euipo_badge_tooltip": "Exportovano do portalu EUIPO",
+    "exports": "Exporty"
   },
 
   "tooltip": {

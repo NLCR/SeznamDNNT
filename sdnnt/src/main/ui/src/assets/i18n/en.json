@@ -947,7 +947,8 @@
     "zobrazit_vice": "Show more",
     "zobrazit_mene": "Show less",
 	  "acronym":"Library",
-    "euipo_badge_tooltip": "Exported to the EUIPO portal"
+    "euipo_badge_tooltip": "Exported to the EUIPO portal",
+    "exports": "Exports"
   },
 
   "tooltip": {
