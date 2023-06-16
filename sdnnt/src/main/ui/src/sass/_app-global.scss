@@ -331,12 +331,18 @@ table {
   }
 
   &.app-img-in {
-    vertical-align: bottom;
+    &:not(.app-facet-wrapper &) {
+      vertical-align: bottom;
+    }
     border-color: $app-brand-border-color;
 
     img {
       height: 10px;
     }
+  }
+
+  &.app-facet-euipo {
+    color: $app-color-euipo;
   }
 }
 
