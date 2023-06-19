@@ -5,7 +5,7 @@ import { AccountComponent } from './pages/account/account.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { HelpComponent } from './pages/help/help.component';
 import { HomeComponent } from './pages/home/home.component';
-import { ImportComponent } from './pages/import/import.component';
+import { ImportComponent } from './pages/imports/import/import.component';
 import { ImportsComponent } from './pages/imports/imports.component';
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
@@ -24,7 +24,7 @@ const routes: Routes = [
   { path: 'exports', component: ExportsComponent },
   { path: 'exports/export/:id', component: ExportComponent },
   { path: 'imports', component: ImportsComponent },
-  { path: 'import/:id', component: ImportComponent },
+  { path: 'imports/import/:id', component: ImportComponent },
   { path: 'admin', component: AdminComponent },
   { path: 'search', component: SearchComponent},
   { path: 'pswd/:token', component: ResetPasswordComponent},

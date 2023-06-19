@@ -44,7 +44,7 @@ import { ZadostComponent } from './pages/zadost/zadost.component';
 import { DialogPromptComponent } from './components/dialog-prompt/dialog-prompt.component';
 import { ExpressionDialogComponent } from './components/expression-dialog/expression-dialog.component';
 import { ImportsComponent } from './pages/imports/imports.component';
-import { ImportComponent } from './pages/import/import.component';
+import { ImportComponent } from './pages/imports/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
 import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';

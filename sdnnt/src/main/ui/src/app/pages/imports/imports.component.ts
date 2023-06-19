@@ -115,7 +115,7 @@ export class ImportsComponent implements OnInit {
   }
 
   showImport(imp: Import) {
-    this.router.navigate(['import/'+ imp.id], {queryParams:{controlled: false}});
+    this.router.navigate(['imports/import/'+ imp.id], {queryParams:{controlled: false}});
   }
 
   process(imp: Import) {
