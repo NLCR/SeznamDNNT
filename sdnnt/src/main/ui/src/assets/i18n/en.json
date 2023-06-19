@@ -950,7 +950,8 @@
     "euipo_badge_tooltip": "Exported to the EUIPO portal",
     "exports": "Exports",
     "vysledek_exportu": "Export result",
-    "datum_exportu": "Date of export"
+    "datum_exportu": "Date of export",
+    "vyhledavani_v_exportech": "Search in exports"
   },
 
   "tooltip": {
