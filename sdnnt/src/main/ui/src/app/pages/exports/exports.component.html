@@ -7,9 +7,12 @@
       <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
-  <mat-form-field class="app-w-100" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
+  <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
     <mat-label>{{ 'desc.vyhledavani_v_exportech' | translate }}</mat-label>
-    <input type="text" matInput>
+    <input type="text" matInput [ngModel]="state.prefixsearch['exports']">
+    <button *ngIf="state.prefixsearch['exports']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExport()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+      <mat-icon class="app-color-warning">close</mat-icon>
+    </button>
   </mat-form-field>
   <div class="app-results-wrapper app-overflow-x-auto">
     <table mat-table [dataSource]="imports" class="mat-elevation-z0 app-table-responsive">

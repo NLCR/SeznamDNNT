@@ -54,6 +54,8 @@ export class ExportsComponent implements OnInit {
       this.newStavFilter = val.navrh;
       this.stateFilter = val.state;
     });
+
+    this.state.prefixsearch['account'] = '';
   }
 
   search(params: Params) {
@@ -124,4 +126,8 @@ export class ExportsComponent implements OnInit {
     });
   }
 
+  // not delete
+  cleanFilterExport() {
+   // to do
+  }
 }

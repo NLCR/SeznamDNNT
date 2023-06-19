@@ -141,6 +141,10 @@ export class AccountComponent implements OnInit {
     this.subject.next(target.value);
   }
 
+  cleanFilterZadost() {
+    this.subject.next('');
+  }
+
 
   
   search(params: Params) {

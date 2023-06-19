@@ -2,12 +2,6 @@
   <div fxLayout="row" fxLayoutGap="32px" class="app-account-wrapper">
 
     <div class="app-left app-fx-facets">
-      <mat-form-field class="app-w-100 app-mb-1" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
-        <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
-        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)"  [ngModel]="state.prefixsearch['account']" >
-
-      </mat-form-field>
-
       <div class="app-facets-used">
         <mat-list *ngIf="state.facetsstore.getFacet('account','stateFilter')?.length       || 
                         state.facetsstore.getFacet('account','newStavFilter')?.length      || 
@@ -170,6 +164,14 @@
           <app-paginator  [storeStateKey]="'account'"  [numFound]="numFound"  [showSort]="true"  [sortType]="(state.user.role === 'kurator' || state.user.role === 'mainKurator' || state.user.role === 'admin')  ?   'sort_account':  'user_sort_account'"></app-paginator>
         </div>
       </div>
+
+      <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
+        <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
+        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)" [ngModel]="state.prefixsearch['account']">
+        <button *ngIf="state.prefixsearch['account']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterZadost()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+          <mat-icon class="app-color-warning">close</mat-icon>
+        </button>
+      </mat-form-field>
 
       <div class="app-results-wrapper app-overflow-x-auto">
         <table mat-table [dataSource]="zadosti" class="mat-elevation-z0 app-table-responsive">
