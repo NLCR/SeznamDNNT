@@ -1,7 +1,29 @@
 <app-facets-used></app-facets-used>
 
 <mat-accordion multi>
-    <ng-container *ngFor="let facet of facets">
+
+  <mat-expansion-panel [expanded]="getPanelExpansion()">
+    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+      <mat-panel-title>
+        {{ 'desc.exports' | translate }}
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <div class="app-facet-wrapper">
+      <a>
+        <span class="app-badge app-bordered app-img-in" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
+          <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
+        </span>
+        {{ 'desc.euipo_badge_tooltip' | translate }}
+      </a>
+      &#160;<span class="app-count">(25)</span>
+     <!--  <a>
+        <div class="app-badge app-bordered app-img-in app-facet-euipo app-mr-1">EU</div>
+        {{ 'desc.euipo_badge_tooltip' | translate }}
+      </a> -->
+    </div>
+  </mat-expansion-panel>
+
+  <ng-container *ngFor="let facet of facets">
     <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="getPanelExpansion()">
       <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
         <mat-panel-title>
@@ -39,11 +61,6 @@
             </ng-container>
           </div>
         </ng-container>
-        <!-- TO DO: move to the for cycle, do methods etc. -->
-        <a>
-          <div class="app-badge app-bordered app-img-in app-facet-euipo app-mr-1">EU</div>
-          {{ 'desc.kramerius_badge_tooltip' | translate }}
-        </a>
       </div>
     </mat-expansion-panel>
   </ng-container>
