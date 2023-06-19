@@ -14,7 +14,7 @@ import { ShibbolethLandingPageComponent } from './pages/shibboleth-landing-page/
 import { UserResetPasswordComponent } from './pages/user-reset-password/user-reset-password.component';
 import { ZadostComponent } from './pages/zadost/zadost.component';
 import { ExportsComponent } from './pages/exports/exports.component';
-import { ExportComponent } from './pages/export/export.component';
+import { ExportComponent } from './pages/exports/export/export.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent },
