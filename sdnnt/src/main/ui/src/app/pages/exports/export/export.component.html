@@ -13,48 +13,7 @@
       </div>
     </div>
     <div class="app-results-wrapper">
-      <mat-card>
-        <mat-card-header fxLayout="row" fxLayoutGap="16px">
-          <div *ngIf="imgSrc">
-            <img [src]="imgSrc" />
-          </div>
-          <div>
-            <mat-card-title><span>Karla a jiné povídky / Božena Němcová</span></mat-card-title>
-            <mat-card-subtitle class="app-m-0">
-              <div>2. vydání</div>
-              <div>V Praze : Albatros, 1979</div>
-            </mat-card-subtitle>
-          </div>
-        </mat-card-header>
-      </mat-card>
-      <mat-card>
-        <mat-card-header fxLayout="row" fxLayoutGap="16px">
-          <div *ngIf="imgSrc">
-            <img [src]="imgSrc" />
-          </div>
-          <div>
-            <mat-card-title><span>O mužích ve zbrani : výbor ze světové válečné literatury. Svazek 2, Druhá světová válka / [uspořádal, úvodní slovo a vysvětlivky napsal František Nesvadba ; obrazové přílohy vybral Jan Solpera]</span></mat-card-title>
-            <mat-card-subtitle class="app-m-0">
-              <div>1. vyd.</div>
-              <div>Praha : Albatros, 1978</div>
-            </mat-card-subtitle>
-          </div>
-        </mat-card-header>
-      </mat-card>
-      <mat-card>
-        <mat-card-header fxLayout="row" fxLayoutGap="16px">
-          <div *ngIf="imgSrc">
-            <img [src]="imgSrc" />
-          </div>
-          <div>
-            <mat-card-title><span>Kavkaz básníků a bájí : výbor z arménské, gruzínské a ruské literatury / uspořádal, rozpravy o literatuře a vysvětlivky napsal Radegast Parolek</span></mat-card-title>
-            <mat-card-subtitle class="app-m-0">
-              <div>1. vydání</div>
-              <div>Praha : Albatros, 1979</div>
-            </mat-card-subtitle>
-          </div>
-        </mat-card-header>
-      </mat-card>
+      <app-export-item></app-export-item>
     </div>
     <div class="app-mt-4">
       <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>

@@ -74,6 +74,7 @@ import { DialogNotificationsSettingsComponent } from './components/dialog-notifi
 import { DialogSuccessorRecordsComponent } from './components/dialog-successor-records/dialog-successor-records.component';
 import { ExportsComponent } from './pages/exports/exports.component';
 import { ExportComponent } from './pages/exports/export/export.component';
+import { ExportItemComponent } from './components/export-item/export-item.component';
 //import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
@@ -150,6 +151,7 @@ const providers: any[] =[
     DialogSuccessorRecordsComponent,
     ExportsComponent,
     ExportComponent,
+    ExportItemComponent,
   ],
   imports: [
     BrowserModule,
