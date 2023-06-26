@@ -136,7 +136,10 @@
 
     "Priorita 1": "Priority 1",
     "Priorita 2": "Priority 2",
-    "Priorita 3": "Priority 3"
+    "Priorita 3": "Priority 3",
+
+    "export":"Export"
+
   },
 
   "controlled": {

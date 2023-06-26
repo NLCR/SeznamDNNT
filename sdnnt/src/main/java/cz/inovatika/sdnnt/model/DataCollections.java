@@ -5,5 +5,7 @@ public enum DataCollections {
     catalog, 
     users, 
     shibusers, 
-    zadost, history;
+    zadost, 
+    history,
+    ;
 }

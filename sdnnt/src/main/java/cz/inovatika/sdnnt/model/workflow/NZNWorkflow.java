@@ -42,7 +42,7 @@ public class NZNWorkflow extends Workflow {
                     } else return null;
                     
 
-                // dilo je predmetem zadosti o volna dila 
+                // dilo je predmetem zadosti o volna dila nebo zadosti o duplicitu
                 case PX:
                 case DX:
                     if (pState != null) {

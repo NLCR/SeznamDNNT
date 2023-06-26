@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,11 +22,117 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.ZadostProcess;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
 
 public class DuplicateUtilsTest {
+
+    
+    
+    //** merge */
+    @Test 
+    public void testFollowersIOP() throws IOException, SolrServerException {
+        MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000392643".replaceAll("\\:","_")).get(0));
+        MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        
+        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        
+        Assert.assertTrue(origin.idEuipo != null);
+        Assert.assertTrue(origin.idEuipo.size() == 1);
+        Assert.assertTrue(origin.idEuipo.get(0).equals("euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"));
+        
+        Assert.assertTrue(origin.idEuipoExports != null);
+        Assert.assertTrue(origin.idEuipoExports.size() == 1);
+        Assert.assertTrue(origin.idEuipoExports.get(0).equals("inital-bk"));
+        
+        Assert.assertTrue(origin.exportsFacets != null);
+        Assert.assertTrue(origin.exportsFacets.size() == 1);
+        Assert.assertTrue(origin.exportsFacets.get(0).equals("euipo"));
+
+        //===============================
+
+        Assert.assertTrue(follower.idEuipo != null);
+        Assert.assertTrue(follower.idEuipo.size() == 2);
+        Assert.assertTrue(follower.idEuipo.contains("euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"));
+        Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
+        
+        Assert.assertTrue(follower.idEuipoExports != null);
+        Assert.assertTrue(follower.idEuipoExports.size() == 2);
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-se"));
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-bk"));
+
+        Assert.assertTrue(follower.exportsFacets != null);
+        Assert.assertTrue(follower.exportsFacets.size() == 1);
+        Assert.assertTrue(follower.exportsFacets.get(0).equals("euipo"));
+        
+    }
+
+    /** merge */
+    @Test
+    public void testFollowersIOP2() throws IOException, SolrServerException {
+        MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
+        MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        
+        
+        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+
+        Assert.assertTrue(follower.idEuipo.size() == 2);
+        Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
+        Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
+
+        Assert.assertTrue(follower.idEuipoExports.size() == 2);
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-se"));
+        
+    }
+
+
+    @Test
+    public void testFollowersIOP3() throws IOException, SolrServerException {
+        // NPA stav
+        MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
+
+        // Naslednik je N ale bude NPA
+        MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        follower.dntstav = Arrays.asList(PublicItemState.N.name());
+        
+        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        
+        Assert.assertTrue(follower.idEuipo.size() == 1);
+        Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
+        Assert.assertFalse(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
+
+        Assert.assertTrue(follower.idEuipoExports.size() == 1);
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
+        Assert.assertFalse(follower.idEuipoExports.contains("inital-se"));
+        
+    }
+
+
+    @Test
+    public void testFollowersIOP4() throws IOException, SolrServerException {
+        // NPA 
+        MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
+        
+        // mimo seznam 
+        MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        follower.dntstav = null;
+        follower.kuratorstav = null;
+        follower.historie_kurator_stavu=new JSONArray();
+        
+        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        
+        Assert.assertTrue(follower.idEuipo.size() == 1);
+        Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
+        Assert.assertFalse(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
+
+        Assert.assertTrue(follower.idEuipoExports.size() == 1);
+        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
+        Assert.assertFalse(follower.idEuipoExports.contains("inital-se"));
+        
+    }
 
     @Test
     public void testFollowers() throws IOException, SolrServerException {
@@ -80,6 +187,7 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(sKC.isPresent());
     }
 
+    
     
     @Test
     public void testZadost_emptyIdentifiers_Processed() throws JsonMappingException, JsonProcessingException, IOException {

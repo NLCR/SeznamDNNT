@@ -42,11 +42,11 @@ public class OAIIterationTest {
         int numberOfDocs = 0;
         do {
 
-        	String url =  devBaseUrl();
+        	String url =  localBaseUrl();
         	if (resumptionToken != null) {
         		url = url +"&resumptionToken="+resumptionToken;
         	} else {
-        		url = url + DNNTO();
+        		url = url + ALL();
         	}
         	LOGGER.info(String.format("Requesting url %s",url));
         	String string = SimpleGET.get(url);
@@ -97,10 +97,20 @@ public class OAIIterationTest {
 		return "&metadataFormat=marc21&set=DNNTT";
 	}
 
+	   private static String ALL() {
+	        return "&metadataFormat=marc21&set=SDNNT-ALL";
+	    }
+
+	
 	private static String devBaseUrl() {
 		String devBaseUrl = "https://sdnnt-dev.nkp.cz/sdnnt/oai?verb=ListIdentifiers";
 		return devBaseUrl;
 	}
+
+	   private static String localBaseUrl() {
+	        String devBaseUrl = "http://localhost:18080/sdnnt/oai?verb=ListRecords";
+	        return devBaseUrl;
+	    }
 
 	private static String testBaseUrl() {
 		String devBaseUrl = "https://sdnnt-test.nkp.cz/sdnnt/oai?verb=ListRecords";

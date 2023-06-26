@@ -105,12 +105,6 @@ public class IndexerITTest {
         Assert.assertTrue(changedMarcRercord.kuratorstav.size() == 1);
         Assert.assertTrue(changedMarcRercord.kuratorstav.get(0).equals("N"));
         
-//        JSONArray granularity = changedMarcRercord.granularity;
-//        for (int i = 0; i < granularity.length(); i++) {
-//            JSONObject jsonObj = granularity.getJSONObject(i);
-//            System.out.println(jsonObj.getString("state"));
-//        }
-        
     }
 
     @Test
@@ -139,7 +133,5 @@ public class IndexerITTest {
         Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000083605", "N", null,"poznamka", new JSONArray(), "test");
         SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
 
-        
-        
     }
 }

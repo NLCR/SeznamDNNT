@@ -136,7 +136,9 @@
 
     "Priorita 1": "Priorita 1",
     "Priorita 2": "Priorita 2",
-    "Priorita 3": "Priorita 3"
+    "Priorita 3": "Priorita 3",
+    "export":"Export",
+    "id_euipo":"EUIPO identifikátor"
   },
 
   "controlled": {

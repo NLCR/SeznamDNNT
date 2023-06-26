@@ -166,10 +166,6 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
 
     
-    public static void main(String[] args) throws IOException {
-        GranularitySetStateServiceImpl service = new GranularitySetStateServiceImpl(null);
-        service.setStates(Arrays.asList("identifier:\"oai:aleph-nkp.cz:SKC01-002114585\""));
-    }
 
 
 }

@@ -94,24 +94,21 @@ public class MarcRecord {
   
   // followers
   public List<String> followers = new ArrayList<>();
+
+  /** EUIPO stuf **/
+  // idEuipo
+  public List<String> idEuipo = new ArrayList<>();
+  // exports ids
+  public List<String> idEuipoExports = new ArrayList<>();
+  // exports facets - only make sure that facest is set during switching object
+  public List<String> exportsFacets = new ArrayList<>();
+
   
   // digital librarires
   public List<String> digitalLibraries = new ArrayList<>();
   
-  // <marc:controlfield tag="001">000000075</marc:controlfield>
-  // <marc:controlfield tag="003">CZ PrDNT</marc:controlfield>
   public Map<String, String> controlFields = new HashMap();
 
-//  <marc:datafield tag="650" ind1="0" ind2="7">
-//    <marc:subfield code="a">dějiny</marc:subfield>
-//    <marc:subfield code="7">ph114390</marc:subfield>
-//    <marc:subfield code="2">czenas</marc:subfield>
-//  </marc:datafield>
-//  <marc:datafield tag="651" ind1=" " ind2="7">
-//    <marc:subfield code="a">Praha (Česko)</marc:subfield>
-//    <marc:subfield code="7">ge118011</marc:subfield>
-//    <marc:subfield code="2">czenas</marc:subfield>
-//  </marc:datafield> 
   public Map<String, List<DataField>> dataFields = new HashMap();
   //public SolrInputDocument sdoc = new SolrInputDocument();
 
@@ -159,7 +156,13 @@ public class MarcRecord {
                     LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+
                     GRANULARITY_FIELD+":[json]",
                     MASTERLINKS_FIELD+":[json]",
-                    MASTERLINKS_DISABLED_FIELD);
+                    MASTERLINKS_DISABLED_FIELD,
+                    ID_EUIPO,
+                    ID_EUIPO_EXPORT,
+                    EXPORT
+
+                    
+                    );
 
     return fromIndex(client,q);
   }
@@ -252,7 +255,8 @@ public class MarcRecord {
           List<String> collected = doc.getFieldValues(DIGITAL_LIBRARIES).stream().map(Object::toString).collect(Collectors.toList());
           mr.digitalLibraries = collected;
       }
-      
+
+      /** granularity stuff */
       if (doc.containsKey(MASTERLINKS_FIELD)) {
           JSONArray ma = new JSONArray( doc.getFieldValue(MASTERLINKS_FIELD).toString());
           mr.masterlinks =  ma;
@@ -264,6 +268,19 @@ public class MarcRecord {
           mr.masterLinksDisabled =  disabled;
       }
       
+      /** euipo stuff */
+      if (doc.containsKey(ID_EUIPO)) {
+          mr.idEuipo = (List<String>) doc.getFieldValue(ID_EUIPO);
+      }
+
+      if (doc.containsKey(ID_EUIPO_EXPORT)) {
+          mr.idEuipoExports = (List<String>) doc.getFieldValue(ID_EUIPO_EXPORT);
+      }
+
+      if (doc.containsKey(EXPORT)) {
+          mr.exportsFacets = (List<String>) doc.getFieldValue(EXPORT);
+      }
+
       return mr;
 }
 
@@ -566,9 +583,29 @@ public class MarcRecord {
             sdoc.addField(DIGITAL_LIBRARIES, f);
         });
     }
+
+    // euipo stuff
+    if (this.idEuipo != null && !this.idEuipo.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipo);
+        uniqSet.stream().forEach(id-> {
+            sdoc.addField(ID_EUIPO, id);
+        });
+    }
+
+    if (this.idEuipoExports != null && !this.idEuipoExports.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoExports);
+        uniqSet.stream().forEach(export-> {
+            sdoc.addField(ID_EUIPO_EXPORT, export);
+        });
+    }
     
-    
-    
+    if (this.exportsFacets != null && !this.exportsFacets.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.exportsFacets);
+        uniqSet.stream().forEach(export-> {
+            sdoc.addField(EXPORT, export);
+        });
+    }
+
     return sdoc;
   }
 

@@ -67,7 +67,7 @@ public class DuplicateProxy extends DocumentProxy {
                 // pokud je dx, musi se pri zmene stavu vratit stav z historie
                 if (mr.kuratorstav.get(0).equals(CuratorItemState.DX.name())) {
                     List<String> previous = mr.kuratorstav;
-                    mr.kuratorstav = mr.dntstav;
+                    mr.kuratorstav = mr.dntstav; // ?? Verejny stav ?? 
                     JSONObject historyObject = HistoryObjectUtils.historyObjectParent(mr.kuratorstav.get(0), mr.license, originator, user, poznamka, MarcRecord.FORMAT.format(new Date()));
                     mr.historie_kurator_stavu.put(historyObject);
                     mr.previousKuratorstav = previous;

@@ -2,6 +2,7 @@
 
 <mat-accordion multi>
 
+  <!--
   <mat-expansion-panel [expanded]="getPanelExpansion()">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>
@@ -16,12 +17,9 @@
         {{ 'desc.euipo_badge_tooltip' | translate }}
       </a>
       &#160;<span class="app-count">(25)</span>
-     <!--  <a>
-        <div class="app-badge app-bordered app-img-in app-facet-euipo app-mr-1">EU</div>
-        {{ 'desc.euipo_badge_tooltip' | translate }}
-      </a> -->
     </div>
   </mat-expansion-panel>
+-->
 
   <ng-container *ngFor="let facet of facets">
     <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="getPanelExpansion()">
@@ -34,6 +32,17 @@
         <ng-container *ngFor="let f of facet_fields[facet]">
           <div *ngIf="f.name !== '   '" class="app-facet-item-wrapper">
             <ng-container [ngSwitch]="facet">
+
+
+
+              <a *ngSwitchCase="'export'" (click)="addFilter(facet, f)">
+                <div [class]="'app-badge app-bordered app-img-in'" class="app-mr-1">
+                  <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
+                </div>
+                {{ 'desc.euipo_badge_tooltip' | translate }}
+              </a>
+
+
               <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">
                 <div [class]="'app-badge app-icon-in ' + f.name" class="app-mr-1">
                   <mat-icon class="material-icons-outlined app-m-0">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
@@ -57,6 +66,7 @@
               <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
               <a *ngSwitchCase="'sigla'" (click)="addFilter(facet, f)">{{  f.name  }}</a>
               <a *ngSwitchCase="'digital_libraries'" (click)="addFilter(facet, f)">{{ 'sigla.' + f.name | translate }}</a>
+
               <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
             </ng-container>
           </div>

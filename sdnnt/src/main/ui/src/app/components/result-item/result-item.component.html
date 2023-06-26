@@ -36,7 +36,10 @@
       <div *ngIf="doc.flag_public_in_dl && (state.logged && (state.user?.role ==='knihovna' || state.user?.role === 'kurator' || state.user?.role === 'mainKurator') )" class="app-badge app-bordered app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
         {{ 'desc.kramerius_badge' | translate }}
       </div>
-      <div class="app-badge app-bordered app-img-in app-ml-1" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
+
+      
+
+      <div *ngIf="doc.id_euipo" class="app-badge app-bordered app-img-in app-ml-1" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
         <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
       </div>
     </div>

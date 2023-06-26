@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt.model.workflow.duplicate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +33,9 @@ import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
+import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.ZadostProcess;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
@@ -114,7 +117,62 @@ public class DuplicateUtils {
         // historie granulovaneho stavu 
         // granularity ?? 
         
+        // "id_euipo_export":["inital-bk"],
+        //"id_oaiident":["SKC01-000392643"],
+        //"id_euipo":["euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"],
+        //"export":["euipo"],
+        
         followers.stream().forEach(mr-> {
+
+            // verejny stav naslednika A,PA, NL a zaroven stav puvodce A, PA, NL, NPA  => Merge
+            if (isOIPAcceptingPublic(mr.dntstav) && (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu))) {
+                List<String> mergedIdentifiers = new ArrayList<>();
+
+                if (mr.idEuipo != null) {
+                    mergedIdentifiers.addAll(mr.idEuipo);
+                }
+                
+                if (origin.idEuipo != null) {
+                    mergedIdentifiers.addAll(origin.idEuipo);
+                }
+                
+                if (!mergedIdentifiers.isEmpty()) {
+                    mr.idEuipo = mergedIdentifiers;
+                }
+                
+                
+                List<String> mergedExports = new ArrayList<>();
+                if (mr.idEuipoExports != null) {
+                    mergedExports.addAll(mr.idEuipoExports);
+                }
+                if (origin.idEuipoExports != null) {
+                    mergedExports.addAll(origin.idEuipoExports);
+                }
+
+                if (!mergedExports.isEmpty()) {
+                    mr.idEuipoExports = mergedExports;
+                }
+                
+                List<String> mergedFacets = new ArrayList<>();
+                if (mr.exportsFacets != null) {
+                    mergedFacets.addAll(mr.exportsFacets);
+                }
+                if (origin.exportsFacets != null) {
+                    mergedFacets.addAll(origin.exportsFacets);
+                }
+                
+                if (!mergedFacets.isEmpty()) {
+                    mr.exportsFacets = new ArrayList<>(new LinkedHashSet<>( mergedFacets));
+                }
+
+            // Verejny stav puvodce A,PA,NL, NPA => Dedi
+            } else if (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu)) {
+                mr.idEuipo = origin.idEuipo;
+                mr.idEuipoExports = origin.idEuipoExports;
+                mr.exportsFacets = origin.exportsFacets;
+            }
+            
+            
             mr.dntstav = new ArrayList<>(origin.dntstav);
             mr.kuratorstav = new ArrayList<>(origin.kuratorstav);
             
@@ -125,9 +183,6 @@ public class DuplicateUtils {
             //mr.historie_stavu = origin.historie_stavu != null ? ;
             if (origin.historie_kurator_stavu != null) {
                 mr.historie_kurator_stavu = jsonArray(origin.historie_kurator_stavu);
-//                JSONObject historyObject = HistoryObjectUtils.historyObjectParent(mr.kuratorstav.get(0), mr.license, originator, user, poznamka, MarcRecord.FORMAT.format(new Date()));
-//                mr.historie_kurator_stavu.put(historyObject);
-
             }
             
             if (origin.historie_granulovaneho_stavu != null) {
@@ -142,14 +197,48 @@ public class DuplicateUtils {
             if (origin.granularity != null) {
                 mr.granularity = jsonArray(origin.granularity);
             }
+            // TODO:Remove; unused
             mr.previousDntstav = origin.previousDntstav;
             mr.previousKuratorstav = origin.previousKuratorstav;
+           
+            
             if (consumer != null) {
                 consumer.accept(mr);
             }
         });
         
     }
+    
+    // kontrola, zda posledni v historii byl NPA ?? 
+    
+    public static boolean isOIPAcceptingCuratorState(JSONArray curatorStateHistory) {
+        int length = curatorStateHistory.length();
+        if (length > 1) {
+            JSONObject historyItem = curatorStateHistory.getJSONObject(length-2);
+            boolean has = historyItem.has("stav");
+            if (has) {
+                String stav = historyItem.getString("stav");
+                return stav.equals(CuratorItemState.NPA.name());
+            } else return false;
+        }
+        return false;
+    }
+    
+    public static boolean isOIPAcceptingPublic(List<String> publicState) {
+        List<String> mergeStates = Arrays.asList(
+                PublicItemState.A.name(),
+                PublicItemState.PA.name(),
+                PublicItemState.NL.name()
+        );
+        if (publicState != null && publicState.size() > 0) {
+            return mergeStates.contains(publicState.get(0));
+        }
+        return false;
+    }
+    
+
+
+
 
 
     private static JSONArray jsonArray(JSONArray source) {

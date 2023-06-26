@@ -17,8 +17,8 @@
     "admin": ["undefined", "PA", "A", "VS", "VN", "N", "NZN", "VVN", "VVS"],
     "user": ["undefined","PA", "N"]
   },
-  "identifiers": ["015a", "020a", "022a", "id_sdnnt"],
-  "filterFields": ["dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled", "digital_libraries","marc_260a"],
+  "identifiers": ["015a", "020a", "022a", "id_sdnnt","id_euipo"],
+  "filterFields": ["export","dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled", "digital_libraries","marc_260a"],
   "sortedFacets":["sigla"], 
 
   "sorts":{

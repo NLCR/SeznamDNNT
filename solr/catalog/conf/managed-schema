@@ -116,6 +116,7 @@
    <field name="license_history" type="string" indexed="true" stored="true" multiValued="true" />
 
 
+
    <!-- granularita -->
    <field name="granularity" type="string" indexed="true" stored="true" multiValued="true"  />
    <!-- master links -->
@@ -131,7 +132,6 @@
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
  	
    <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
-
 
 
    <!-- sjednocovani dle ccnb -->
@@ -154,6 +154,16 @@
    <field name="id_issn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ismn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
+ 
+   <!-- identifikator pro euipo -->	
+   <field name="id_euipo" type="string" indexed="true" stored="false" multiValued="true"  />
+   <!-- identifikator exportu -->
+   <field name="id_euipo_export" type="string" indexed="true" stored="false" multiValued="true"  />
+			
+   <!-- facet field --> 			
+   <field name="export"  type="string"	indexed="true" stored="false" multiValued="true"  docValues="true" />	
+	
+
    <!-- identifikator derivovany z oai -->
    <field name="id_oaiident" type="string" indexed="true" stored="false" multiValued="true"  />
    <!-- iterni sdnnt identifikator -->
@@ -240,6 +250,8 @@
     <copyField source="ean" dest="id_all_identifiers"/>
     <copyField source="ean" dest="id_all_identifiers_cuts"/>
 
+
+
 	<!-- links / pids (TODO: preprocess it) -->
 	<copyField source="marc_911u" dest="id_pid" />
 	<copyField source="marc_956u" dest="id_pid" />
@@ -262,6 +274,9 @@
 	
 	<!-- sdnnt identifier -->
 	<copyField source="id_sdnnt" dest="id_all_identifiers" />
+
+	<!-- euipo identifier -->
+	<copyField source="id_euipo" dest="id_all_identifiers" />
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"

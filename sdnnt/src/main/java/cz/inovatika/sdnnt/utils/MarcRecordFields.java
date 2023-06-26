@@ -118,14 +118,27 @@ public class MarcRecordFields {
 
     // CCNB pole
     public static final String ID_CCNB_FIELD = "id_ccnb";
-    // 
+    
+    // skc oai identifier 
     public static final String ID_OAIIDENT = "id_oaiident";
+    // internal sddnt identifier
     public static final String ID_SDNNT = "id_sdnnt";
+    // kramerius pid
     public static final String ID_PID="id_pid";
     
     public static final String ID_ISSN="id_issn";
     public static final String ID_ISBN="id_isbn";
     public static final String ID_ISMN="id_ismn";
+    
+    // identifikator exportovaneho zaznamu do euipo
+    public static final String ID_EUIPO = "id_euipo";
+
+    // identifikator exportu pro euipo
+    public static final String ID_EUIPO_EXPORT = "id_euipo_export";
+
+    // export field - nyni bude obsahovat pouze euipo
+    public static final String EXPORT = "export";
+    
     
     
     // sigla of digital libraries
