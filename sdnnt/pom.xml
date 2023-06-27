@@ -4,7 +4,7 @@
 
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt</artifactId>
-  <version>1.0.8.2</version>
+  <version>1.0.8.3</version>
   <packaging>war</packaging>
 
   <name>sdnnt</name>
@@ -278,6 +278,18 @@
       <scope>test</scope>
     </dependency>
     -->
+    
+    <dependency>
+          <groupId>org.apache.poi</groupId>
+          <artifactId>poi</artifactId>
+          <version>5.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.2</version>
+    </dependency>
 
   </dependencies>
 
