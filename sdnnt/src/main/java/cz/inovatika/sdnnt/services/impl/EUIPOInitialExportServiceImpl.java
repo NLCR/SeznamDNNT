@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileSystemUtils;
@@ -67,17 +68,32 @@ import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
+    
+    private Logger logger = Logger.getLogger(EUIPOInitalExportService.class.getName());
 
+    
+    /** Configuration key for filters; only one for both types **/
     private static final String FILTERS_KEY = "filters";
 
+    private final String NONPARSABLE_DATES_KEY  ="nonparsabledates";
+    
+    
+    /** SE template key */
     private static final String SE_TEMPLATE_KEY = "setemplate";
-
+    
+    /** BK template  key */
     private static final String BK_TEMPLATE_KEY = "bktemplate";
-
+    
+    /** Set of iteration states key  */
     private static final String STATES_KEY = "states";
 
+    /** Maximum rows in spreadsheet */
     private static final String MAXROWS_KEY = "maxrows";
 
+    /** Maximum rows in spreadsheet */
+    private static final String BATCHROWS_KEY = "batchrows";
+
+    /** Output folder key */
     private static final String FOLDER_KEY = "folder";
 
     public static final Map<String, String> ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY = new HashMap<>();
@@ -113,12 +129,24 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
         ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
     }
+    
+    /** Default output folder  */
     public static final String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/dump";
 
     // default initial filter
-    private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList("date1_int:[* TO 2003]", "setSpec:SKC");
+    /** Default initial bk filter */
+    //private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList("( (NOT date1_int:*) OR  date1_int:[* TO 2003] )", "setSpec:SKC");
+    //private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList("( (NOT date1_int:*) )", "setSpec:SKC");
+    private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList( "setSpec:SKC");
+    
+    /** Default initial se filter */
     private static final List<String> DEFAULT_INITIAL_SE_FILTER = Arrays.asList("setSpec:SKC");
-
+    
+    public static final List<Pattern> DEFAULT_REGULAR_EXPRESSIONS_NONPARSABLE_DATES  = Arrays.asList(
+        Pattern.compile("1.*", Pattern.CASE_INSENSITIVE),
+        Pattern.compile("200.*", Pattern.CASE_INSENSITIVE)
+    );
+    
     // Default states for initial import
     public static final List<String> DEFAULT_STATES = Arrays.asList("A", "PA", "NL", "NPA");
 
@@ -129,10 +157,14 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
     public static final int FETCH_LIMIT = 1000;
 
-    private Logger logger = Logger.getLogger(EUIPOInitalExportService.class.getName());
     private List<String> states = DEFAULT_STATES;
 
+    //private List<String> filters = new ArrayList<>(Arrays.asList("identifier:\"oai:aleph-nkp.cz:SKC01-000208367\""));
     private List<String> filters = null;// DEFAULT_INITIAL_BK_FILTER;
+    private List<Pattern> compiledPatterns = DEFAULT_REGULAR_EXPRESSIONS_NONPARSABLE_DATES;
+    
+    
+    
     private String outputFolder = DEFAULT_OUTPUT_FOLDER;
     
     private String bkTemplate = null;
@@ -140,6 +172,8 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     
     private int spredsheetLimit = SPREADSHEET_LIMIT;
 
+    private int updateBatchLimit = UPDATE_BATCH_LIMIT;
+    
     /**
      * Vsem stavajicim zaznamum prideli identifiaktor a zaroven vytvori inicalni
      * export
@@ -161,7 +195,6 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
             this.logger = Logger.getLogger(logger);
         }
 
-        int size = ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.keySet().size();
     }
 
     private void iterationResults(JSONObject results) {
@@ -174,6 +207,11 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
             if (results.has(MAXROWS_KEY)) {
                 this.spredsheetLimit = results.getInt(MAXROWS_KEY);
             }
+            
+            if (results.has(BATCHROWS_KEY)) {
+                this.updateBatchLimit = results.getInt(BATCHROWS_KEY);
+            }
+            
         }
     }
 
@@ -212,10 +250,25 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                     this.filters = listFilters;
                 }
             }
+            if (iteration.has(NONPARSABLE_DATES_KEY)) {
+                JSONArray nonParsble = iteration.optJSONArray(NONPARSABLE_DATES_KEY);
+                List<String> listExpressions = new ArrayList<>();
+                if (listExpressions != null) {
+                    nonParsble.forEach(f -> {
+                        listExpressions.add(f.toString());
+                    });
+                }
+                if (listExpressions != null) {
+                    this.compiledPatterns = listExpressions.stream().map(Pattern::compile).collect(Collectors.toList());
+                }
+            }
         }
     }
 
     public List<String> check(String formatFilter) {
+
+        getLogger().info(String.format(" Config for iteration -> iteration states %s; templates %s, %s; filters %s; nonparsable dates %s ", this.states.toString(), this.bkTemplate, this.seTemplate, this.filters, this.compiledPatterns));
+
         List<String> foundCandidates = new ArrayList<>();
         CatalogIterationSupport support = new CatalogIterationSupport();
         Map<String, String> reqMap = new HashMap<>();
@@ -261,7 +314,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         try (SolrClient solrClient = buildClient()) {
             support.iterate(
                     solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X",
-                            KURATORSTAV_FIELD + ":PX", KURATORSTAV_FIELD + ":D", MarcRecordFields.ID_EUIPO + ":*"),
+                            KURATORSTAV_FIELD + ":D", MarcRecordFields.ID_EUIPO + ":*"),
                     Arrays.asList(IDENTIFIER_FIELD), (rsp) -> {
                         Object identifier = rsp.getFieldValue("identifier");
                         foundCandidates.add(identifier.toString());
@@ -278,18 +331,21 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     public void update(String format, String identifier, List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
         if (!docs.isEmpty()) {
+
+            List<String> toRemove = new ArrayList<>();
+            
             try (SolrClient solrClient = buildClient()) {
                 getLogger().info("Export identifier '" + identifier + "' number of records "+docs.size());
 
-                int numberOfUpdateBatches = docs.size() / UPDATE_BATCH_LIMIT;
-                if (docs.size() % UPDATE_BATCH_LIMIT > 0) {
+                int numberOfUpdateBatches = docs.size() / updateBatchLimit;
+                if (docs.size() % updateBatchLimit > 0) {
                     numberOfUpdateBatches += 1;
                 }
                 Map<String, Map<String, List<String>>> recordValues = new HashMap<>();
 
                 for (int i = 0; i < numberOfUpdateBatches; i++) {
-                    int startIndex = i * UPDATE_BATCH_LIMIT;
-                    int endIndex = (i + 1) * UPDATE_BATCH_LIMIT;
+                    int startIndex = i * updateBatchLimit;
+                    int endIndex = (i + 1) * updateBatchLimit;
                     List<String> subList = docs.subList(startIndex, Math.min(endIndex, docs.size()));
 
                     ModifiableSolrParams params = new ModifiableSolrParams();
@@ -299,88 +355,101 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                     SolrDocumentList byids = solrClient.getById(DataCollections.catalog.name(), subList, params);
                     for (int j = 0; j < byids.size(); j++) {
                         SolrDocument doc = byids.get(j);
-
+                        
+                        Object date1int = doc.getFieldValue("date1_int");
+                        
                         Object ident = doc.getFieldValue("identifier");
                         Object raw = doc.getFieldValue("raw");
                         Object date1 = doc.getFieldValue("date1");
                         Object date2 = doc.getFieldValue("date2");
+                        
                         Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
                         Object fmt = doc.getFieldValue(MarcRecordFields.FMT_FIELD);
 
                         Object controlField008 = doc.getFirstValue("controlfield_008");
+                        
+                        if (accept(fmt, date1int,  date1)) {
+                            
+                            JSONObject object = new JSONObject(raw.toString());
+                            Map<String, List<String>> oneRecordValues = new HashMap<>();
 
-                        JSONObject object = new JSONObject(raw.toString());
-                        Map<String, List<String>> oneRecordValues = new HashMap<>();
+                            // title
+                            oneRecordValues.put("Title", generateTitle(object));
 
-                        // title
-                        oneRecordValues.put("Title", generateTitle(object));
+                            // author
+                            oneRecordValues.put("AuthorPerfomer", generateAuthor(object));
 
-                        // author
-                        oneRecordValues.put("AuthorPerfomer", generateAuthor(object));
-
-                        // description
-                        List<String> description = generateDescription(object);
-                        if (description != null && !description.isEmpty()) {
-                            oneRecordValues.put("Description", description);
-                        }
-
-                        // publisher
-                        List<String> publisher = generatePublisher(object);
-                        if (publisher != null && !publisher.isEmpty()) {
-                            oneRecordValues.put("Publisher", publisher);
-                        }
-
-                        // language
-                        List<String> language = generateLanguage(object);
-                        if (language != null && !language.isEmpty()) {
-                            oneRecordValues.put("Language", language);
-                        } else {
-                            String field = controlField008.toString();
-                            oneRecordValues.put("Language", Arrays.asList(field.substring(35, 38)));
-                        }
-
-                        // specific for bk
-                        if (fmt.equals("BK")) {
-                            // isbn
-                            List<String> isbn = generateISBN(object);
-                            if (isbn != null && !isbn.isEmpty()) {
-                                String isbnText = isbn.get(0);
-                                if (StringUtils.isAnyString(isbnText)) {
-                                    oneRecordValues.put("ISN", isbn);
-                                    oneRecordValues.put("ISNType", Arrays.asList("ISBN"));
-                                }
+                            // description
+                            List<String> description = generateDescription(object);
+                            if (description != null && !description.isEmpty()) {
+                                oneRecordValues.put("Description", description);
                             }
-                            // dates
-                            if ( date2 != null && !date2.toString().trim().startsWith("99") && !date2.toString().trim().contains("--")
-                                    && !date2.toString().trim().contains("u") && StringUtils.isAnyString(date2.toString())) {
-                                oneRecordValues.put("PublisherDate",
-                                        Arrays.asList(date1.toString() + "/" + date2.toString()));
+
+                            // publisher
+                            List<String> publisher = generatePublisher(object);
+                            if (publisher != null && !publisher.isEmpty()) {
+                                oneRecordValues.put("Publisher", publisher);
+                            }
+
+                            // language
+                            List<String> language = generateLanguage(object);
+                            if (language != null && !language.isEmpty()) {
+                                oneRecordValues.put("Language", language);
                             } else {
-                                oneRecordValues.put("PublisherDate", Arrays.asList(date1.toString()));
+                                String field = controlField008.toString();
+                                oneRecordValues.put("Language", Arrays.asList(field.substring(35, 38)));
                             }
 
-                            oneRecordValues.put("Type", Arrays.asList("INDIVIDUAL"));
-
-                        } else {
-                            // specific for SE
-                            // issn
-                            List<String> isbn = generateISSN(object);
-                            if (isbn != null && !isbn.isEmpty()) {
-                                String isbnText = isbn.get(0);
-                                if (StringUtils.isAnyString(isbnText)) {
-                                    oneRecordValues.put("ISN", isbn);
-                                    oneRecordValues.put("ISNType", Arrays.asList("ISSN"));
+                            // specific for bk
+                            if (fmt.equals("BK")) {
+                                // isbn
+                                List<String> isbn = generateISBN(object);
+                                if (isbn != null && !isbn.isEmpty()) {
+                                    String isbnText = isbn.get(0);
+                                    if (StringUtils.isAnyString(isbnText)) {
+                                        oneRecordValues.put("ISN", isbn);
+                                        oneRecordValues.put("ISNType", Arrays.asList("ISBN"));
+                                    }
                                 }
-                            }
-                            // type is set
-                            oneRecordValues.put("Type", Arrays.asList("SET"));
-                        }
+                                // dates
+                                if ( date2 != null && !date2.toString().trim().startsWith("99") && !date2.toString().trim().contains("--")
+                                        && !date2.toString().trim().contains("u") && StringUtils.isAnyString(date2.toString())) {
+                                    oneRecordValues.put("PublisherDate",
+                                            Arrays.asList(date1.toString() + "/" + date2.toString()));
+                                } else {
+                                    oneRecordValues.put("PublisherDate", Arrays.asList(date1.toString()));
+                                }
 
-                        oneRecordValues.put("euipo", Arrays.asList(MarcRecordUtils.generateEUIPOIdent()));
-                        recordValues.put(ident.toString(), oneRecordValues);
+                                oneRecordValues.put("Type", Arrays.asList("INDIVIDUAL"));
+
+                            } else {
+                                // specific for SE
+                                // issn
+                                List<String> isbn = generateISSN(object);
+                                if (isbn != null && !isbn.isEmpty()) {
+                                    String isbnText = isbn.get(0);
+                                    if (StringUtils.isAnyString(isbnText)) {
+                                        oneRecordValues.put("ISN", isbn);
+                                        oneRecordValues.put("ISNType", Arrays.asList("ISSN"));
+                                    }
+                                }
+                                // type is set
+                                oneRecordValues.put("Type", Arrays.asList("SET"));
+                            }
+
+                            oneRecordValues.put("euipo", Arrays.asList(MarcRecordUtils.generateEUIPOIdent()));
+                            recordValues.put(ident.toString(), oneRecordValues);
+                        } else {
+                            toRemove.add(ident.toString());
+                        }
                     }
                 }
-
+                
+                // remove skipped monograph
+                //toRemove.stream().forEach(docs::remove);
+                
+                docs.removeAll(toRemove);
+                
                 int numberOfSpredsheets = docs.size() / this.spredsheetLimit;
                 if (docs.size() % this.spredsheetLimit > 0) {
                     numberOfSpredsheets += 1;
@@ -396,21 +465,21 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                         File nFile = generateSpreadSheet(format, identifier, i, spreadSheetBatch, recordValues);
                         getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
                         
-                        int numberOfUpdates = spreadSheetBatch.size() / UPDATE_BATCH_LIMIT;
-                        if (spreadSheetBatch.size() % UPDATE_BATCH_LIMIT > 0) {
+                        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
+                        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
                             numberOfUpdates += 1;
                         }
                        
                         // update items from spreadsheet
                         for (int update = 0; update < numberOfUpdates; update++) {
-                            int upateStartIndex = update * UPDATE_BATCH_LIMIT;
-                            int endStartIndex = (update + 1) * UPDATE_BATCH_LIMIT;
+                            int upateStartIndex = update * updateBatchLimit;
+                            int endStartIndex = (update + 1) * updateBatchLimit;
                             getLogger().info(String.format("Updating records from spreadsheet  %d and index of update %d", i, update));
                             
                             List<String> updateBatch = spreadSheetBatch.subList(upateStartIndex,
                                     Math.min(endStartIndex, spreadSheetBatch.size()));
  
-                            getLogger().fine(String.format("First 5 identifiers %s", updateBatch.subList(0, 5).toString()));
+                            //getLogger().fine(String.format("First 5 identifiers %s", updateBatch.subList(0, 5).toString()));
                             
 
                             UpdateRequest uReq = new UpdateRequest();
@@ -454,6 +523,23 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                 }
             }
         }
+    }
+
+    private boolean accept(Object fmt, Object date1int, Object date1) {
+        if (fmt != null && fmt.toString().equals("BK")) {
+            if (date1int == null) {
+                String date1str = date1.toString();
+                for (Pattern pattern : this.compiledPatterns) {
+                    if (pattern.matcher(date1str).matches()) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                Integer compareVal = (Integer) date1int;
+                return compareVal <= 2003;
+            }
+        } else return true;
     }
 
     private File generateSpreadSheet(String format, String exportid, int batchNumber, List<String> subList,
@@ -521,7 +607,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         XSSFRow newRow = useOfWorkSheet.createRow(rowIndex);
 
         newRow.createCell(SpreadSheetIndexMapper.A).setCellValue(recordValues.get(skcIdent).get("euipo").get(0));
-        newRow.createCell(SpreadSheetIndexMapper.B).setCellValue("LICENSE");
+        newRow.createCell(SpreadSheetIndexMapper.B).setCellValue("LICENCE");
         newRow.createCell(SpreadSheetIndexMapper.D).setCellValue("CZ");
 
         newRow.createCell(SpreadSheetIndexMapper.E).setCellValue("National Library of the Czech Republic");
@@ -534,7 +620,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                 .setCellValue("DILIA, divadelní, literární, audiovizuální agentura, z.s.");
         newRow.createCell(SpreadSheetIndexMapper.L).setCellValue("kraupnerova@dilia.cz");
         newRow.createCell(SpreadSheetIndexMapper.M).setCellValue("+420266199813");
-        newRow.createCell(SpreadSheetIndexMapper.H).setCellValue("https://www.dilia.eu/");
+        newRow.createCell(SpreadSheetIndexMapper.N).setCellValue("https://www.dilia.eu/");
         newRow.createCell(SpreadSheetIndexMapper.O).setCellValue("CZ");
     }
 
@@ -558,11 +644,17 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         // author performer - 5, 6
 
         List<String> authors = recordValues.get(skcIdent).get("AuthorPerfomer");
-        for (int iaddress = 0, idata = 0; iaddress < authors.size(); iaddress += 2, idata++) {
+        if (authors.size() > 1) {
+            getLogger().fine(String.format(" Identifier %s, Authors %s", recordValues.get(skcIdent).get("euipo").get(0), authors.toString()));
+        }
+        for (int iaddress = 0, idata = 0; idata < authors.size(); iaddress += 2, idata++) {
             int authorPerformerNameIndex = SpreadSheetIndexMapper.F + iaddress;
+            
             String author = authors.get(idata).trim();
             if (author.endsWith(",")) {
                 newRow.createCell(authorPerformerNameIndex).setCellValue(author.substring(0, author.length() - 1));
+            } else {
+                newRow.createCell(authorPerformerNameIndex).setCellValue(author);
             }
         }
 
@@ -678,7 +770,12 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                                         sfvals.add(val);
                                     });
 
-                                    mapping.put(datafieldKey + sf, sfvals);
+                                    if (mapping.containsKey(datafieldKey + sf)) {
+                                        mapping.get(datafieldKey + sf).addAll(sfvals);
+                                    } else {
+                                        mapping.put(datafieldKey + sf, sfvals);
+                                    }
+                                    
                                 }
                             }
                         }
@@ -722,13 +819,14 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         long start = System.currentTimeMillis();
         EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
         List<String> checkBK = impl.check("BK");
+        //System.out.println(checkBK);
         impl.update("BK", "inital-bk", checkBK);
         System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
-
-        start = System.currentTimeMillis();
-        List<String> checkSE = impl.check("SE");
-        impl.update("SE", "inital-se", checkSE);
-        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
+//
+//        start = System.currentTimeMillis();
+//        List<String> checkSE = impl.check("SE");
+//        impl.update("SE", "inital-se", checkSE);
+//        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
 
     }
 }
