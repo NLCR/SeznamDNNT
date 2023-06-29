@@ -69,13 +69,16 @@ import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     
+    private static final int MAX_YEAR = 2100;
+    private static final int MIN_YEAR = 1440;
+
     private Logger logger = Logger.getLogger(EUIPOInitalExportService.class.getName());
 
     
     /** Configuration key for filters; only one for both types **/
     private static final String FILTERS_KEY = "filters";
 
-    private final String NONPARSABLE_DATES_KEY  ="nonparsabledates";
+    private static final String NONPARSABLE_DATES_KEY  ="nonparsabledates";
     
     
     /** SE template key */
@@ -411,13 +414,18 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                                         oneRecordValues.put("ISNType", Arrays.asList("ISBN"));
                                     }
                                 }
-                                // dates
+                                // TODO: changes 
                                 if ( date2 != null && !date2.toString().trim().startsWith("99") && !date2.toString().trim().contains("--")
                                         && !date2.toString().trim().contains("u") && StringUtils.isAnyString(date2.toString())) {
-                                    oneRecordValues.put("PublisherDate",
-                                            Arrays.asList(date1.toString() + "/" + date2.toString()));
+                                    
+                                    if (isValidDate(date1.toString())) {
+                                        oneRecordValues.put("PublisherDate",
+                                                Arrays.asList(date1.toString() + "/" + date2.toString()));
+                                    }
                                 } else {
-                                    oneRecordValues.put("PublisherDate", Arrays.asList(date1.toString()));
+                                    if (isValidDate(date1.toString())) {
+                                        oneRecordValues.put("PublisherDate", Arrays.asList(date1.toString()));
+                                    }
                                 }
 
                                 oneRecordValues.put("Type", Arrays.asList("INDIVIDUAL"));
@@ -525,6 +533,19 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         }
     }
 
+    private boolean isValidDate(String string) {
+        if (string != null) {
+            try {
+                int parsed = Integer.parseInt(string);
+                return parsed > MIN_YEAR && parsed < MAX_YEAR;
+            } catch (NumberFormatException e) {
+                getLogger().info(String.format("Date omitted: %s", string));
+                // ommit 
+            }
+        }
+        return false;
+    }
+
     private boolean accept(Object fmt, Object date1int, Object date1) {
         if (fmt != null && fmt.toString().equals("BK")) {
             if (date1int == null) {
@@ -594,7 +615,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         XSSFRow newRow = holdingInstitutionSheet.createRow(rowIndex);
 
         newRow.createCell(SpreadSheetIndexMapper.A).setCellValue(recordValues.get(skcIdent).get("euipo").get(0));
-        newRow.createCell(SpreadSheetIndexMapper.B).setCellValue("National Library of the Czech republic");
+        newRow.createCell(SpreadSheetIndexMapper.B).setCellValue("National Library of the Czech Republic");
         newRow.createCell(SpreadSheetIndexMapper.C).setCellValue("dnnt-podpora@nkp.cz");
         newRow.createCell(SpreadSheetIndexMapper.D).setCellValue("+420221663111");
         newRow.createCell(SpreadSheetIndexMapper.E).setCellValue("https://www.en.nkp.cz/");
