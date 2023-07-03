@@ -138,8 +138,8 @@
     "Priorita 2": "Priority 2",
     "Priorita 3": "Priority 3",
 
-    "export":"Export"
-
+    "export":"Export",
+    "id_euipo":"EUIPO identifier"
   },
 
   "controlled": {
