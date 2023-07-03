@@ -442,38 +442,15 @@ public class CatalogSearcher {
         // Vseobecne filtry podle misto vydani (xr ) a roky
         // dat to mimo
         // fq=fmt:BK%20AND%20place_of_pub:"xr%20"%20AND%20date1_int:%5B1910%20TO%202007%5D&fq=marc_338a:svazek&fq=-marc_245h:*&fq=marc_338b:nc&fq=marc_3382:rdacarrier
+        
+        // From mail
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int fromYear = opts.getJSONObject("search").getInt("fromYear");
-        int yearsBK = opts.getJSONObject("search").getInt("yearsBK");
-        String bkDate = "((date1_int:["
-                + fromYear
-                + " TO "
-                + (year - yearsBK)
-                + "] AND -date2_int:*"
-                + ") OR " + "(date1_int:["
-                + fromYear
-                + " TO "
-                + (year - yearsBK)
-                + "] AND date2_int:["
-                + fromYear
-                + " TO "
-                + (year - yearsBK)
-                + "]))";
-
-        String bk = "(fmt:BK AND " + bkDate + ")";
-
-        int yearsSE = opts.getJSONObject("search").getInt("yearsSE");
-        String seDate = "((date1_int:["
-                + fromYear
-                + " TO "
-                + (year - yearsSE)
-                + "] AND date2_int:9999"
-                + ") OR " + "date2_int:["
-                + fromYear
-                + " TO "
-                + (year - yearsSE)
-                + "])";
-        String se = "(fmt:SE AND " + seDate + ")";
+        
+        
+        // Issue #510; Only lower bouds is used 
+        String bk = QueryUtils.catalogBKFilterQueryPartOnlyLowerBound(opts, year, fromYear);
+        String se = QueryUtils.catalogSEFilterQueryPartOnlyLowerBound(opts, year, fromYear);
 
         // https://github.com/NLCR/SeznamDNNT/issues/164
         query.addFilterQuery("(place_of_pub:\"xr \" OR dntstav:*)");
