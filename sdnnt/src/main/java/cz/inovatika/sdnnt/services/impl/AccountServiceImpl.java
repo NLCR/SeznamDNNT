@@ -60,6 +60,10 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.EXPORT;
+
 
 import java.io.IOException;
 import java.util.*;
@@ -535,7 +539,6 @@ public class AccountServiceImpl implements AccountService {
             zadostJSON = Zadost.save(client, zadost, false);
         }
         
-
         
         if (!exceptions.isEmpty()) {
             batchInform.failedItems(exceptions);
@@ -673,6 +676,9 @@ public class AccountServiceImpl implements AccountService {
                                 LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ 
                                 GRANULARITY_FIELD+":[json]"+" "+ 
                                 MASTERLINKS_FIELD+":[json]"+" "+
+                                ID_EUIPO+" "+
+                                ID_EUIPO_EXPORT+" "+
+                                EXPORT+" "+
                                 MASTERLINKS_DISABLED_FIELD);
                 
 
