@@ -78,6 +78,26 @@ public class AccountServiceImpl implements AccountService {
 
     private static final int DEFAULT_SEARCH_RESULT_SIZE = 20;
 
+    private static final String BATCH_FIELDS =   RAW_FIELD+" "+
+            DNTSTAV_FIELD+" "+
+            KURATORSTAV_FIELD+" "+
+            HISTORIE_STAVU_FIELD+" " +
+            HISTORIE_KURATORSTAVU_FIELD+" " +
+            HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
+            DATUM_STAVU_FIELD+" "+
+            DATUM_KURATOR_STAV_FIELD+" "+
+            FLAG_PUBLIC_IN_DL+" "+
+            FMT_FIELD+" "+
+            LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ 
+            GRANULARITY_FIELD+":[json]"+" "+ 
+            MASTERLINKS_FIELD+":[json]"+" "+
+            ID_EUIPO+" "+
+            ID_EUIPO_EXPORT+" "+
+            EXPORT+" "+
+            MASTERLINKS_DISABLED_FIELD;
+
+    
+    
     //private UserControler userControler;
     private ApplicationUserLoginSupport loginSupport;
 
@@ -510,16 +530,7 @@ public class AccountServiceImpl implements AccountService {
                 SolrQuery q = new SolrQuery("*")
                         .addFilterQuery(orQuery)
                         .setRows(subList.size())
-                        .setFields(RAW_FIELD+" "+
-                                DNTSTAV_FIELD+" "+
-                                KURATORSTAV_FIELD+" "+
-                                HISTORIE_STAVU_FIELD+" " +
-                                HISTORIE_KURATORSTAVU_FIELD+" " +
-                                HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
-                                DATUM_STAVU_FIELD+" "+
-                                DATUM_KURATOR_STAV_FIELD+" "+
-                                FLAG_PUBLIC_IN_DL+" ",
-                                LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ GRANULARITY_FIELD+":[json]");
+                        .setFields(BATCH_FIELDS);
                 
                 
                 SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();
@@ -659,27 +670,13 @@ public class AccountServiceImpl implements AccountService {
                 int to = Math.min(documentIds.size(), (i+1)*maxSizeInBatch);
                 List<String> subList = documentIds.subList(from, to);
                 String orQuery = subList.stream().map(it -> {return "identifier:"+'"'+it+'"'; }).collect(Collectors.joining(" OR "));
+
+
                 
                 SolrQuery q = new SolrQuery("*")
                         .setRows(subList.size()+1)
                         .addFilterQuery(orQuery)
-                        .setFields(RAW_FIELD+" "+
-                                DNTSTAV_FIELD+" "+
-                                KURATORSTAV_FIELD+" "+
-                                HISTORIE_STAVU_FIELD+" " +
-                                HISTORIE_KURATORSTAVU_FIELD+" " +
-                                HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
-                                DATUM_STAVU_FIELD+" "+
-                                DATUM_KURATOR_STAV_FIELD+" "+
-                                FLAG_PUBLIC_IN_DL+" ",
-                                FMT_FIELD+" ",
-                                LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+ 
-                                GRANULARITY_FIELD+":[json]"+" "+ 
-                                MASTERLINKS_FIELD+":[json]"+" "+
-                                ID_EUIPO+" "+
-                                ID_EUIPO_EXPORT+" "+
-                                EXPORT+" "+
-                                MASTERLINKS_DISABLED_FIELD);
+                        .setFields(BATCH_FIELDS);
                 
 
                 SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();
