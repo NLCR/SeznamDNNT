@@ -38,6 +38,7 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.ZadostProcess;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
@@ -106,7 +107,7 @@ public class DuplicateUtils {
     
     
     
-    public static void moveProperties(MarcRecord origin, List<MarcRecord> followers, Consumer<MarcRecord> consumer) {
+    public static void moveProperties( MarcRecordDependencyStore depStore, MarcRecord origin, List<MarcRecord> followers, Consumer<MarcRecord> consumer) {
         // historie stavu, 
         // historie kuratorskeho stavu
         // stav
@@ -126,8 +127,18 @@ public class DuplicateUtils {
 
             // verejny stav naslednika A,PA, NL a zaroven stav puvodce A, PA, NL, NPA  => Merge
             if (isOIPAcceptingPublic(mr.dntstav) && (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu))) {
+                
+                // do identifikatoru dat vsecchny predchazejici 
                 List<String> mergedIdentifiers = new ArrayList<>();
-
+                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
+                    List<String> idEuIpo = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                        return dpr.idEuipo;
+                    }).flatMap(List::stream).collect(Collectors.toList());
+                    
+                    mergedIdentifiers.addAll(idEuIpo);
+                }
+                
+                
                 if (mr.idEuipo != null) {
                     mergedIdentifiers.addAll(mr.idEuipo);
                 }
@@ -137,11 +148,19 @@ public class DuplicateUtils {
                 }
                 
                 if (!mergedIdentifiers.isEmpty()) {
-                    mr.idEuipo = mergedIdentifiers;
+                    mr.idEuipo = new ArrayList<>(new LinkedHashSet<>(mergedIdentifiers));
                 }
                 
                 
                 List<String> mergedExports = new ArrayList<>();
+                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
+                    List<String> idEuIpoExports = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                        return dpr.idEuipoExports;
+                    }).flatMap(List::stream).collect(Collectors.toList());
+                    
+                    mergedExports.addAll(idEuIpoExports);
+                }
+                
                 if (mr.idEuipoExports != null) {
                     mergedExports.addAll(mr.idEuipoExports);
                 }
@@ -154,6 +173,15 @@ public class DuplicateUtils {
                 }
                 
                 List<String> mergedFacets = new ArrayList<>();
+                
+                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
+                    List<String> mFacets = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                        return dpr.exportsFacets;
+                    }).flatMap(List::stream).collect(Collectors.toList());
+                    
+                    mergedFacets.addAll(mFacets);
+                }
+                
                 if (mr.exportsFacets != null) {
                     mergedFacets.addAll(mr.exportsFacets);
                 }
@@ -223,6 +251,7 @@ public class DuplicateUtils {
         }
         return false;
     }
+    
     
     public static boolean isOIPAcceptingPublic(List<String> publicState) {
         List<String> mergeStates = Arrays.asList(

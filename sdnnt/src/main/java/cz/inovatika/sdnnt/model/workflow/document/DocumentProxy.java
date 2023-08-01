@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
@@ -66,9 +67,9 @@ public class DocumentProxy implements WorkflowOwner {
 
     //TODO: move to one method 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
-            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
-            String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore dependencyStore, SwitchStateOptions options,
+            CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState,
+            Period period, String originator, String user, String poznamka) {
         Date date = currentDate();
 
         List<String> dntstav = this.marcRecord.dntstav;
@@ -120,7 +121,7 @@ public class DocumentProxy implements WorkflowOwner {
     }
 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore depStore, SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         Date date = currentDate();
 
         List<String> dntstav = this.marcRecord.dntstav;

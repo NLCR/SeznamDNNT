@@ -8,6 +8,7 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowState;
@@ -383,11 +384,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    private JSONObject closeRequest(Zadost zadost, String requestCloseState) throws ConflictException {
+    private JSONObject closeRequest( Zadost zadost, String requestCloseState) throws ConflictException {
         Workflow wfl = ZadostWorkflowFactory.create(zadost);
         if (!wfl.isClosableState()) {
             WorkflowState wflState = wfl.nextState();
-            wflState.switchState( zadost.getId() , zadost.getUser(), zadost.getId(), null);
+            wflState.switchState( zadost.getId() , zadost.getUser(), zadost.getId(), null, null);
             TransitionType transitionType = TransitionType.valueOf(zadost.getTransitionType());
             switch (transitionType) {
                 case scheduler:
@@ -627,7 +628,7 @@ public class AccountServiceImpl implements AccountService {
 
                 // prene se a
                 WorkflowState workflowState = workflow.nextAlternativeState(alternative, options);
-                workflowState.switchState(zadost.getId(), this.loginSupport.getUser().getUsername(), reason, options);
+                workflowState.switchState(zadost.getId(), this.loginSupport.getUser().getUsername(), reason, options, null);
                 
                 // az tady a jeden 
                 List<Pair<String,SolrInputDocument>> save = workflow.getOwner().getStateToSave(options);
@@ -651,7 +652,11 @@ public class AccountServiceImpl implements AccountService {
     
 
     public JSONObject curatorSwitchStateBatch(JSONObject zadostJSON, String sopts, List<String> documentIds, String reason, AccountServiceBatchInform batchInform) throws ConflictException, AccountException, IOException, SolrServerException {
+        
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+        
         Map<String,AccountException> exceptions = new HashMap<>();
+
         int maxSizeInBatch = 100;
         
         Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
@@ -683,13 +688,14 @@ public class AccountServiceImpl implements AccountService {
                 for (SolrDocument doc : dlist) {
                     MarcRecord mr = MarcRecord.fromSolrDoc(doc);
                     try {
-                        curatorSwitchStateBatch(zadost, mr.identifier, reason,  options, zadost.getId(), mr, processDocuments);
+                        curatorSwitchStateBatch(depStore, zadost, mr.identifier, reason,  options, zadost.getId(), mr, processDocuments);
                     } catch (DocumentProxyException e) {
                         LOGGER.log(Level.SEVERE,e.getMessage());
                         throw new AccountException("account.nocuratorworkflow", "account.nocuratorworkflow");
                     } catch(AccountException ex) {
                         exceptions.put(mr.identifier, ex);
                     }
+                    
                 }
                 
                 // ulozit dokumenty a pak zadost
@@ -743,10 +749,11 @@ public class AccountServiceImpl implements AccountService {
         return zadostJSON;
     }
 
-    private void curatorSwitchStateBatch(Zadost zadost, String documentId, String reason, 
+    private void curatorSwitchStateBatch(MarcRecordDependencyStore store,  Zadost zadost, String documentId, String reason, 
             SwitchStateOptions options, String zadostId, MarcRecord marcRecord, List<Pair<String,SolrInputDocument>> processingUpdate)
             throws DocumentProxyException, SolrServerException, IOException, AccountException {
         if (marcRecord != null) {
+
             Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
             if (workflow != null) {
                 if (workflow.isSwitchPossible()) {
@@ -754,7 +761,7 @@ public class AccountServiceImpl implements AccountService {
                     WorkflowState workflowState = workflow.nextState();
                     if (workflowState != null && (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator))) {
                         // switch state
-                        workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason, options);
+                        workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason, options,store);
                         // update request 
                         List<Pair<String,SolrInputDocument>> states = workflow.getOwner().getStateToSave(options);
                         for (Pair<String, SolrInputDocument> state : states) {
@@ -762,7 +769,10 @@ public class AccountServiceImpl implements AccountService {
                         }
 
                         String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
-
+                        
+                        // store marc record
+                        store.addMarcRecord(marcRecord);
+                        
                         Zadost.approveBatch(documentId, zadost, reason, 
                                 this.loginSupport.getUser().getUsername(),null, transitionName, processingUpdate);
 
@@ -791,7 +801,7 @@ public class AccountServiceImpl implements AccountService {
                     WorkflowState workflowState = workflow.nextState();
                     if (workflowState != null && (workflowState.getPeriod()  == null || workflowState.getPeriod().getTransitionType().equals(TransitionType.kurator))) {
                         // switch state
-                        workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason, options);
+                        workflowState.switchState(zadostId, this.loginSupport.getUser().getUsername(), reason, options, null);
                         // update request 
                         List<Pair<String,SolrInputDocument>> states = workflow.getOwner().getStateToSave(options);
                         for (Pair<String, SolrInputDocument> state : states) {
@@ -852,6 +862,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void schedulerSwitchStates(String id) throws ConflictException, AccountException, IOException, SolrServerException {
+        
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+        
         JSONObject request = getRequest(id);
         if ( request != null) {
             
@@ -889,7 +902,7 @@ public class AccountServiceImpl implements AccountService {
                                         WorkflowState workflowState = workflow.nextState();
                                         if (workflowState != null && workflowState.getPeriod() !=null && workflowState.getPeriod().getTransitionType().equals(TransitionType.scheduler)) {
                                             String oldRaw = marcRecord.toJSON().toString();
-                                            workflowState.switchState(id, zadost.getUser(), "", null);
+                                            workflowState.switchState(id, zadost.getUser(), "", null, depStore);
                                             try {
                                                 try (SolrClient docClient = buildClient()) {
                                                     new HistoryImpl(docClient).log(marcRecord.identifier, oldRaw, marcRecord.toJSON().toString(), zadost.getUser(), DataCollections.catalog.name(), zadost.getId());
@@ -928,7 +941,7 @@ public class AccountServiceImpl implements AccountService {
             Workflow wfl = ZadostWorkflowFactory.create(zadost);
             if (wfl.isSwitchPossible()) {
                 WorkflowState wflState = wfl.nextState();
-                wflState.switchState( zadost.getId() , zadost.getUser(), zadost.getId(), new SwitchStateOptions());
+                wflState.switchState( zadost.getId() , zadost.getUser(), zadost.getId(), new SwitchStateOptions(), depStore);
                 TransitionType transitionType = TransitionType.valueOf(zadost.getTransitionType());
                 switch (transitionType) {
                     case scheduler:

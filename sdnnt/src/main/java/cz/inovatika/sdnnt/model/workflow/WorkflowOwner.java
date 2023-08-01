@@ -63,9 +63,9 @@ public interface WorkflowOwner {
     
     
     
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
+    public void switchWorkflowState(MarcRecordDependencyStore depStore, SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
 
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
+    public void switchWorkflowState(MarcRecordDependencyStore dependencyStore, SwitchStateOptions options, CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka);
 
     public boolean isSwitchToNextStatePossible(Date date, Period period);
 

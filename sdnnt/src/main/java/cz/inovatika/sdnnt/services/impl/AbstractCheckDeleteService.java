@@ -28,6 +28,7 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateUtils;
 import cz.inovatika.sdnnt.services.LoggerAware;
@@ -70,6 +71,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
             @Override
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
                     List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
+                    MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
                     try {
                         for (Pair<String, List<String>> pair : batch) {
                             
@@ -85,6 +87,11 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                                 }
                             }).filter(mr-> Objects.nonNull(mr)).collect(Collectors.toList());
 
+                            if (depStore != null) {
+                                depStore.addMarcRecord(origin);
+                                followers.stream().forEach(depStore::addMarcRecord);
+                            }
+                            
                             
                             // pri zmene stavu se taky musi menit v zadostech
                             AccountServiceImpl accountService = reqService.buildAccountService();
@@ -95,7 +102,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                             List<Zadost> allRequests = foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
                             
                             DuplicateUtils.changeRequests(origin, followers, allRequests);
-                            DuplicateUtils.moveProperties(origin, followers, null);
+                            DuplicateUtils.moveProperties(depStore, origin, followers, null);
                             
                             origin.followers = pair.getRight();
                             SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin, "scheduler/"+cs);

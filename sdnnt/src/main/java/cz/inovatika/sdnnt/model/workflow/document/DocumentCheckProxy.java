@@ -4,6 +4,7 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 
@@ -49,15 +50,15 @@ public class DocumentCheckProxy implements WorkflowOwner {
     }
 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore depStore, SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         // class is only for checking
     }
 
     
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
-            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
-            String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore dependencyStore, SwitchStateOptions options,
+            CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState,
+            Period period, String originator, String user, String poznamka) {
         
     }
 

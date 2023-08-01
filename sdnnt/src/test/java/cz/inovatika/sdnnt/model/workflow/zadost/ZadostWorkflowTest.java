@@ -19,13 +19,13 @@ public class ZadostWorkflowTest {
         List<String> expectedStates = new ArrayList<>(Arrays.asList("NPA","PA","A"));
         Workflow workflow = ZadostWorkflowFactory.create(zadost);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
-            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null);
+            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null, null);
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
             Assert.assertTrue(state.getLicense() == null || state.getLicense().name().equals("dnnto"));
         }
         Assert.assertTrue(state.isFinalSate());
         if (state.isFinalSate()) {
-            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null);
+            state.switchState("mojeid", zadost.getUser(), zadost.getId(), null, null);
             Assert.assertTrue(state.getCuratorState().name().equals(expectedStates.remove(0)));
             Assert.assertTrue(state.getLicense().name().equals("dnnto"));
         }
@@ -64,7 +64,7 @@ public class ZadostWorkflowTest {
             if (map.containsKey(remove)) {
                 Assert.assertEquals(state.getLicense(), License.valueOf(map.get(remove)));
             }
-            owner.switchWorkflowState(null, state.getCuratorState(), state.getLicense().name(),  true, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, null, state.getCuratorState(),  state.getLicense().name(), true, state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
         if (state.isFinalSate()) {
@@ -85,7 +85,7 @@ public class ZadostWorkflowTest {
         VNZWorkflow workflow = new VNZWorkflow(owner);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
             Assert.fail("Cannot be here");
-            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, null, state.getCuratorState() ,  null,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
         if (state.isFinalSate()) {
@@ -104,7 +104,7 @@ public class ZadostWorkflowTest {
         PXWorkflow workflow = new PXWorkflow(owner);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
             Assert.fail("Cannot be here");
-            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, null, state.getCuratorState() ,  null,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
 
         if (state.isFinalSate()) {
@@ -122,7 +122,7 @@ public class ZadostWorkflowTest {
         DXWorkflow workflow = new DXWorkflow(owner);
         while((state = workflow.nextState()) != null && !state.isFinalSate()) {
             Assert.fail("Cannot be here");
-            owner.switchWorkflowState(null, state.getCuratorState(), null ,  false,state.getPeriod() , "mojeid", zadost.getUser(), zadost.getId());
+            owner.switchWorkflowState(null, null, state.getCuratorState() ,  null,false , state.getPeriod(), "mojeid", zadost.getUser(), zadost.getId());
         }
         if (state.isFinalSate()) {
             System.out.println(state.getCuratorState());

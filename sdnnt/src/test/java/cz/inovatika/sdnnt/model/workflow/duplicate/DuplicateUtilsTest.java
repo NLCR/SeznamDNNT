@@ -25,19 +25,23 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.ZadostProcess;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.utils.MarcModelTestsUtils;
 
 public class DuplicateUtilsTest {
 
     
+    /** More origins -> one follower */
+    
     
     //** merge */
     @Test 
     public void testFollowersIOP() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
         MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000392643".replaceAll("\\:","_")).get(0));
         MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
         
-        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        DuplicateUtils.moveProperties(depStore, origin, Arrays.asList(follower), null);
         
         Assert.assertTrue(origin.idEuipo != null);
         Assert.assertTrue(origin.idEuipo.size() == 1);
@@ -72,11 +76,13 @@ public class DuplicateUtilsTest {
     /** merge */
     @Test
     public void testFollowersIOP2() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+
         MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
         MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
         
         
-        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        DuplicateUtils.moveProperties(depStore, origin, Arrays.asList(follower), null);
 
         Assert.assertTrue(follower.idEuipo.size() == 2);
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
@@ -91,6 +97,8 @@ public class DuplicateUtilsTest {
 
     @Test
     public void testFollowersIOP3() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+
         // NPA stav
         MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
 
@@ -98,7 +106,7 @@ public class DuplicateUtilsTest {
         MarcRecord follower = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
         follower.dntstav = Arrays.asList(PublicItemState.N.name());
         
-        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        DuplicateUtils.moveProperties(depStore, origin, Arrays.asList(follower), null);
         
         Assert.assertTrue(follower.idEuipo.size() == 1);
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
@@ -113,6 +121,8 @@ public class DuplicateUtilsTest {
 
     @Test
     public void testFollowersIOP4() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+        
         // NPA 
         MarcRecord origin = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
         
@@ -122,7 +132,7 @@ public class DuplicateUtilsTest {
         follower.kuratorstav = null;
         follower.historie_kurator_stavu=new JSONArray();
         
-        DuplicateUtils.moveProperties(origin, Arrays.asList(follower), null);
+        DuplicateUtils.moveProperties(depStore, origin, Arrays.asList(follower), null);
         
         Assert.assertTrue(follower.idEuipo.size() == 1);
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
@@ -134,15 +144,44 @@ public class DuplicateUtilsTest {
         
     }
 
+    
+    @Test
+    public void testFollowersIOP5() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+        
+        MarcRecord origin1 = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000392643".replaceAll("\\:","_")).get(0));
+        origin1.idEuipo = new ArrayList<>(Arrays.asList("origin1"));
+        MarcRecord origin2 = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-000813372".replaceAll("\\:","_")).get(0));
+        origin2.idEuipo = new ArrayList<>(Arrays.asList("origin2"));
+
+        MarcRecord follower1 = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        follower1.idEuipo = new ArrayList<>(Arrays.asList("oneFollower"));
+
+        MarcRecord follower2 = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:SKC01-002778029".replaceAll("\\:","_")).get(0));
+        follower2.idEuipo = new ArrayList<>(Arrays.asList("oneFollower"));
+
+        depStore.addMarcRecord(origin1); depStore.addMarcRecord(origin2);
+        depStore.addMarcRecord(follower1); depStore.addMarcRecord(follower2);
+
+        DuplicateUtils.moveProperties(depStore, origin1, Arrays.asList(follower1), null);
+        DuplicateUtils.moveProperties(depStore, origin2, Arrays.asList(follower2), null);
+        
+        Assert.assertEquals(follower1.idEuipo, Arrays.asList("oneFollower", "origin1"));
+        Assert.assertEquals(follower2.idEuipo, Arrays.asList("oneFollower", "origin1", "origin2"));
+    }
+
+
     @Test
     public void testFollowers() throws IOException, SolrServerException {
+        MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
+
         MarcRecord marcRecord = MarcRecord.fromSolrDoc(prepareResultList("oai:aleph-nkp.cz:DNT01-000102092".replaceAll("\\:","_")).get(0));
 
         Assert.assertNotNull(marcRecord.datum_stavu);
         Assert.assertNotNull(marcRecord.dntstav);
         
         MarcRecord follower = MarcRecord.fromDocDep(prepareResultList("oai:aleph-nkp.cz:SKC01-000995692".replaceAll("\\:","_")).get(0));
-        DuplicateUtils.moveProperties(marcRecord, Arrays.asList(follower), null);
+        DuplicateUtils.moveProperties(depStore, marcRecord, Arrays.asList(follower), null);
         
         Assert.assertNotNull(follower.dntstav);
         Assert.assertTrue(follower.dntstav.size() > 0);

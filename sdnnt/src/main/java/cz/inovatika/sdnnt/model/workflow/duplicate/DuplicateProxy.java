@@ -20,11 +20,13 @@ import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 
 public class DuplicateProxy extends DocumentProxy {
+    
     
     public static final String ACCEPT_ALL_KEYWORD = "all";
     
@@ -42,7 +44,8 @@ public class DuplicateProxy extends DocumentProxy {
     
 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore depStore, SwitchStateOptions options, CuratorItemState itm, String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+        
         Map<String,MarcRecord> map = new HashMap<>();
 
         this.allFollowers.stream().forEach(m-> {
@@ -61,9 +64,18 @@ public class DuplicateProxy extends DocumentProxy {
                 });
             }
         }
+        
+        //if (dep)
+        if (depStore != null) {
+            this.affectedFollowers.forEach(depStore::addMarcRecord);
+        }
+        
+        // vymenuje v zadostech puvodni dila za nasledniky 
         DuplicateUtils.changeRequests(this.marcRecord, this.affectedFollowers, reqs);
-        DuplicateUtils.moveProperties(this.marcRecord, this.affectedFollowers, (mr) -> {
+        // presune vlatnosti na naslednika
+        DuplicateUtils.moveProperties(depStore, this.marcRecord, this.affectedFollowers, (mr) -> {
             if (mr.kuratorstav!= null && mr.kuratorstav.size() > 0) {
+                
                 // pokud je dx, musi se pri zmene stavu vratit stav z historie
                 if (mr.kuratorstav.get(0).equals(CuratorItemState.DX.name())) {
                     List<String> previous = mr.kuratorstav;
@@ -74,7 +86,7 @@ public class DuplicateProxy extends DocumentProxy {
                 }
             }
         });
-        super.switchWorkflowState(options, itm, license, changingLicenseState, period, originator, user, poznamka);
+        super.switchWorkflowState(depStore, options, itm, license, changingLicenseState, period, originator, user, poznamka);
         this.marcRecord.followers = this.affectedFollowers.stream().map(m-> {
             return m.identifier;
         }).collect(Collectors.toList());
@@ -120,7 +132,7 @@ public class DuplicateProxy extends DocumentProxy {
             // if marc  record has kontext 
             List<String> dntstav = this.marcRecord.dntstav;
             CuratorItemState itm = CuratorItemState.valueOf(dntstav.get(0));
-            super.switchWorkflowState(null, itm, getLicense(), false, null, originator, user, poznamka);
+            super.switchWorkflowState(null, null, itm, getLicense(), false, null, originator, user, poznamka);
 
             this.marcRecord.followers = this.affectedFollowers.stream().map(m-> {
                 return m.identifier;

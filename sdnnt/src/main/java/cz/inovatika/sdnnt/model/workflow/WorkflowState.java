@@ -94,7 +94,7 @@ public class WorkflowState {
         return this.firstTransition;
     }
 
-    public void switchState(String originator, String user, String poznamka, SwitchStateOptions options) {
+    public void switchState(String originator, String user, String poznamka, SwitchStateOptions options, MarcRecordDependencyStore depStore) {
 
         boolean shouldChangeLicense = false;
         License expectingLicense = getLicense();
@@ -107,10 +107,11 @@ public class WorkflowState {
         }
         // pokud workflow ocekava public state, prepinani NZN pro kuratorske stavy PX a DX
         if (this.expectingPublicState != null) {
-            this.workflowOwner.switchWorkflowState(options, getCuratorState(),expectingPublicState, getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
+            this.workflowOwner.switchWorkflowState(depStore, options,getCuratorState(), expectingPublicState, getLicense() != null ? getLicense().name() : null,shouldChangeLicense , this. getPeriod(), originator, user, poznamka);
         } else {
-            this.workflowOwner.switchWorkflowState(options, getCuratorState(), getLicense() != null ? getLicense().name() : null, shouldChangeLicense,this. getPeriod() , originator, user, poznamka);
+            this.workflowOwner.switchWorkflowState(depStore, options, getCuratorState(), getLicense() != null ? getLicense().name() : null,shouldChangeLicense , this. getPeriod(), originator, user, poznamka);
         }
         this.workflowOwner.setPeriodBetweenStates(getPeriod());
+        
     }
 }

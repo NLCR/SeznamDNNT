@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.BreakIterator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,11 +64,15 @@ import cz.inovatika.sdnnt.services.EUIPOInitalExportService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
+import cz.inovatika.sdnnt.services.utils.ISO693Converter;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
+    
+    private static final int MAX_TITLE_LENGTH = 500;
+    private static final int MAX_AUTHOR_LENGTH = 100;
     
     private static final int MAX_YEAR = 2100;
     private static final int MIN_YEAR = 1440;
@@ -99,39 +104,39 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     /** Output folder key */
     private static final String FOLDER_KEY = "folder";
 
-    public static final Map<String, String> ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY = new HashMap<>();
-    static {
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("alb", "sqi");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("arm", "hye");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("tib", "bod");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ger", "deu");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("gre", "ell");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("per", "fas");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("fre", "fra");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("geo", "kat");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ice", "isl");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mac", "mkd");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mao", "mri");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("rum", "ron");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("slo", "slk");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
-        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
-    }
+//    public static final Map<String, String> ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY = new HashMap<>();
+//    static {
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("alb", "sqi");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("arm", "hye");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("tib", "bod");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ger", "deu");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("gre", "ell");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("per", "fas");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("fre", "fra");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("geo", "kat");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ice", "isl");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mac", "mkd");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mao", "mri");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("rum", "ron");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("slo", "slk");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
+//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
+//    }
     
     /** Default output folder  */
     public static final String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/dump";
@@ -219,7 +224,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     }
 
     public EUIPOInitialExportServiceImpl() {
-        int size = ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.keySet().size();
+        //int size = ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.keySet().size();
     }
 
     protected void iterationConfig(JSONObject iteration) {
@@ -353,7 +358,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
                     ModifiableSolrParams params = new ModifiableSolrParams();
                     params.set("fl",
-                            "identifier, raw, date1, date2, date1_int, date2_int, controlfield_008, leader, fmt");
+                            "identifier, raw, date1, date2, date1_int, date2_int, controlfield_008, leader, fmt, type_of_date");
 
                     SolrDocumentList byids = solrClient.getById(DataCollections.catalog.name(), subList, params);
                     for (int j = 0; j < byids.size(); j++) {
@@ -368,6 +373,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                         
                         Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
                         Object fmt = doc.getFieldValue(MarcRecordFields.FMT_FIELD);
+                        Object typeOfDate = doc.getFieldValue(MarcRecordFields.TYPE_OF_DATE);
 
                         Object controlField008 = doc.getFirstValue("controlfield_008");
                         
@@ -414,9 +420,11 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                                         oneRecordValues.put("ISNType", Arrays.asList("ISBN"));
                                     }
                                 }
-                                // TODO: changes 
+                                // TODO: changes
                                 if ( date2 != null && !date2.toString().trim().startsWith("99") && !date2.toString().trim().contains("--")
-                                        && !date2.toString().trim().contains("u") && StringUtils.isAnyString(date2.toString())) {
+                                        && !date2.toString().trim().contains("u") && StringUtils.isAnyString(date2.toString()) && 
+                                        !typeOfDate.equals("t") ) {
+                                    
                                     
                                     if (isValidDate(date1.toString())) {
                                         oneRecordValues.put("PublisherDate",
@@ -659,6 +667,17 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
             int slashIndex = title.lastIndexOf('/');
             title = title.substring(0, slashIndex);
         }
+        
+        if (title != null && title.length() >= MAX_TITLE_LENGTH) {
+            Pair<Integer, Integer> pair = maxIndexOfWord(MAX_TITLE_LENGTH - 4, title);
+            if (pair != null) {
+                title = title.substring(0,pair.getLeft())+" ...";
+            } else {
+                title = title.substring(0, MAX_TITLE_LENGTH);
+            }
+            
+        }
+        
         newRow.createCell(SpreadSheetIndexMapper.E)
                 .setCellValue(title);
 
@@ -673,10 +692,12 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
             
             String author = authors.get(idata).trim();
             if (author.endsWith(",")) {
-                newRow.createCell(authorPerformerNameIndex).setCellValue(author.substring(0, author.length() - 1));
-            } else {
-                newRow.createCell(authorPerformerNameIndex).setCellValue(author);
+                author = author.substring(0, author.length() - 1);
             }
+            if (author.length() > MAX_AUTHOR_LENGTH) {
+                author  = author.substring(0, MAX_AUTHOR_LENGTH-1);
+            }
+            newRow.createCell(authorPerformerNameIndex).setCellValue(author);
         }
 
         if (recordValues.get(skcIdent).containsKey("Description")) {
@@ -692,6 +713,8 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                 publisher = publisher.substring(0, publisher.length() - 1);
             }
             newRow.createCell(SpreadSheetIndexMapper.BR).setCellValue(publisher);
+        } else {
+            newRow.createCell(SpreadSheetIndexMapper.BR).setCellValue("Unknown");
         }
 
         // Country
@@ -704,12 +727,10 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
         // TODO: Delete
         if (recordValues.get(skcIdent).containsKey("Language")) {
+            ISO693Converter converter = new ISO693Converter();
+            
             List<String> language = recordValues.get(skcIdent).get("Language");
-            language = language.stream().map(lg -> {
-                return ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.containsKey(lg)
-                        ? ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.get(lg)
-                        : lg;
-            }).collect(Collectors.toList());
+            language = language.stream().map(converter::convertToISO6933).collect(Collectors.toList());
             String joined = language.stream().collect(Collectors.joining(";"));
             newRow.createCell(SpreadSheetIndexMapper.BU).setCellValue(joined);
         }
@@ -767,6 +788,29 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
     private List<String> generateISSN(JSONObject object) {
         return extractField(object, "022", "a");
+    }
+    
+    public static Pair<Integer,Integer> maxIndexOfWord(int maxCharacters, String input) {
+        List<Pair<Integer,Integer>> pairs = new ArrayList<>();
+        
+        BreakIterator breakIterator = BreakIterator.getWordInstance();
+        breakIterator.setText(input);
+
+        // Nalezení začátku prvního slova
+        int start = breakIterator.first();
+
+        // Vypsání jednotlivých slov
+        while (BreakIterator.DONE != breakIterator.next()) {
+            int end = breakIterator.current();
+            if (end > maxCharacters) {
+                break;
+            }
+            pairs.add(Pair.of(start,end));
+
+            start = end;
+        }
+        
+        return !pairs.isEmpty() ?  pairs.get(pairs.size() -1) : null;
     }
 
     private List<String> extractField(JSONObject object, String datafieldKey, String... subfields) {
@@ -837,17 +881,20 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
     public static void main(String[] args)
             throws AccountException, ConflictException, IOException, SolrServerException, InvalidFormatException {
-        long start = System.currentTimeMillis();
-        EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
-        List<String> checkBK = impl.check("BK");
-        //System.out.println(checkBK);
-        impl.update("BK", "inital-bk", checkBK);
-        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
-//
-//        start = System.currentTimeMillis();
-//        List<String> checkSE = impl.check("SE");
-//        impl.update("SE", "inital-se", checkSE);
+//        long start = System.currentTimeMillis();
+//        EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
+//        List<String> checkBK = impl.check("BK");
+//        //System.out.println(checkBK);
+//        impl.update("BK", "inital-bk", checkBK);
 //        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
-
+//
+//        String title = "Spalovací turbiny, turbodmychadla a ventilátory : přeplňování spalovacích motorů / Jan Macek, Vladimír Kliment";
+//        Pair<Integer,Integer> maxIndexOfWord = maxIndexOfWord(49-3, title);
+//        System.out.println(maxIndexOfWord);
+//        System.out.println(title.substring(0, maxIndexOfWord.getLeft())+"...");
+//        System.out.println(title.substring(0, maxIndexOfWord.getLeft()).length());
+//        
+//        
+        
     }
 }

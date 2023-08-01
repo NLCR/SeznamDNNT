@@ -55,6 +55,8 @@ public class MarcRecordFields {
     
     public static final String RECORD_STATUS_FIELD = "record_status";
     public static final String TYPE_OF_RESOURCE_FIELD = "type_of_resource";
+    public static final String TYPE_OF_DATE = "type_of_date";
+
     public static final String ITEM_TYPE_FIELD = "item_type";
 
     

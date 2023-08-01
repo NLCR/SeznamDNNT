@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
 import cz.inovatika.sdnnt.model.*;
+import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
@@ -40,7 +41,7 @@ public class ZadostProxy implements WorkflowOwner  {
     }
 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm, String license,  boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore depStore, SwitchStateOptions options, CuratorItemState itm,  String license, boolean changingLicenseState, Period period, String originator, String user, String poznamka) {
         this.zadost.setDesiredItemState(itm.name());
         if (changingLicenseState)  this.zadost.setDesiredLicense(license);
         // zadost, nova deadline
@@ -79,9 +80,9 @@ public class ZadostProxy implements WorkflowOwner  {
     
 
     @Override
-    public void switchWorkflowState(SwitchStateOptions options, CuratorItemState itm,
-            PublicItemState expectingPublicState, String license, boolean changingLicenseState, Period period,
-            String originator, String user, String poznamka) {
+    public void switchWorkflowState(MarcRecordDependencyStore dependencyStore, SwitchStateOptions options,
+            CuratorItemState itm, PublicItemState expectingPublicState, String license, boolean changingLicenseState,
+            Period period, String originator, String user, String poznamka) {
         throw new UnsupportedOperationException("Unsupported for 'Zadost'");
     }
 
