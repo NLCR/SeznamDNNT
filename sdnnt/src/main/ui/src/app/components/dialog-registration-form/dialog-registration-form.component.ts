@@ -7,6 +7,8 @@ import { User } from 'src/app/shared/user';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dialog-registration-form',
@@ -14,6 +16,10 @@ import { MatCheckbox } from '@angular/material/checkbox';
   styleUrls: ['./dialog-registration-form.component.scss']
 })
 export class DialogRegistrationFormComponent implements OnInit, OnChanges {
+  // institution autocomplete
+  myControl = new FormControl();
+  options: string[] = ['One', 'Two', 'Three'];
+  filteredOptions: Observable<string[]>;
 
   @Input() user: User;
   @Input() isRegister: boolean;
@@ -113,7 +119,26 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
           return val.acronym;
         });
       });
-  
+
+      // institution autocomplete
+      this.filteredOptions = this.myControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filter(value))
+      );
+  }
+
+  // institution autocomplete
+  private _filter(value: string): string[] {
+    const filterValue = value.toLowerCase();
+    return this.options.filter(inst => inst.toLowerCase().includes(filterValue));
+  }
+
+  // institution autocomplete
+  addNewInstitution() {
+    // to do with snackbar
+    this.service.showSnackBar('alert.addNewInstitution.success');
+    //this.service.showSnackBar('alert.addNewInstitution.error');
   }
 
 

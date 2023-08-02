@@ -111,7 +111,6 @@
         </mat-form-field>
       </div>
     </div>
-
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
@@ -120,6 +119,17 @@
             <mat-option *ngFor="let inst of institutions" [value]="inst"  >{{ inst | translate }}</mat-option>
           </mat-select>
         </mat-form-field>
+
+        <!-- <mat-form-field appearance="outline" class="app-w-100">
+          <mat-label>{{ 'desc.institution' | translate }}</mat-label>
+          <input type="text" matInput [formControl]="myControl" [matAutocomplete]="auto" [(ngModel)]="user.institution">
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let inst of filteredOptions | async" [value]="inst">
+              {{ inst | translate }}
+            </mat-option>
+          </mat-autocomplete>
+          <button matSuffix mat-button mat-icon-button color="accent" [matTooltip]="'desc.pridat_novou_instituci' | translate" (click)="addNewInstitution()" *ngIf="user.institution"><mat-icon>add</mat-icon></button>
+        </mat-form-field> -->
       </div>
     </div>
 
