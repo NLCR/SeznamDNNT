@@ -47,6 +47,13 @@ import cz.inovatika.sdnnt.openapi.endpoints.api.ApiResponseMessage;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.RFC3339DateFormat;
 import cz.inovatika.sdnnt.openapi.endpoints.api.RequestApiService;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.EmptyRequestValidation;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.InvalidIdentifiersValdation;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.MaximumSizeExceededDNNTRequestValidation;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.SearchibilityValidation;
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.UserUsedIdentifierValidation;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfDetails;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfFailedRequest;
 import cz.inovatika.sdnnt.openapi.endpoints.model.ArrayOfSavedRequest;
@@ -191,11 +198,11 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
 
                 AccountService accountService = new AccountServiceImpl( openApiLoginSupport, new ResourceBundleServiceImpl(crc));
                 // validation results 
-                List<String> alreadyUsedIdentifiers= new ArrayList<>();
-                List<String> notExistentIdentifiers= new ArrayList<>();
-                List<String> invalidFormatIdentifiers = new ArrayList<>();  
-                List<String> invalidPlaceIdentifiers = new ArrayList<>();
-                List<Pair<String,String>> invalidStateIdentifiers =  new ArrayList<>();
+                //List<String> alreadyUsedIdentifiers= new ArrayList<>();
+                //List<String> notExistentIdentifiers= new ArrayList<>();
+                //List<String> invalidFormatIdentifiers = new ArrayList<>();  
+                //List<String> invalidPlaceIdentifiers = new ArrayList<>();
+                //List<Pair<String,String>> invalidStateIdentifiers =  new ArrayList<>();
 
                 if (openApiLoginSupport.getUser() != null) {
                     List<Request> batch = body.getBatch();
@@ -216,80 +223,100 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 }
                               }).collect(Collectors.toList()));
 
+
                             
                             List<String> identifiers = req.getIdentifiers();
+                            List<DNNTRequestApiServiceValidation> validators = Arrays.asList(
+                                    new EmptyRequestValidation(solr),
+                                    new MaximumSizeExceededDNNTRequestValidation(solr),
+                                    new SearchibilityValidation(solr),
+                                    new UserUsedIdentifierValidation(solr),
+                                    new InvalidIdentifiersValdation(solr)
+                                    
+                            );
                             
-                            try {
-                                verifyIdentifiers(solr, openApiLoginSupport.getUser(), accountService,mockZadost, identifiers);
-                            } catch(BadFieldsValidationFailedException ie) {
                             
-                                invalidFormatIdentifiers = ie.getInvalidFormatIdentifiers();
-                                identifiers.removeAll(invalidFormatIdentifiers);
-                                
-                                invalidPlaceIdentifiers = ie.getInvalidPlaceIdentifiers();
-                                identifiers.removeAll(invalidPlaceIdentifiers);
-                                
-                                invalidStateIdentifiers = ie.getInvalidStateIdentifiers();
-                                List<String> invalidStatePids = invalidStateIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList());
-                                identifiers.removeAll(invalidStatePids);
-                                
-                                alreadyUsedIdentifiers = ie.getAlreadyUsedIdents();
-                                identifiers.removeAll(alreadyUsedIdentifiers);
-                                
-                                notExistentIdentifiers = ie.getNotExistentIdents();
-                                identifiers.removeAll(notExistentIdentifiers);
-                            }
-
-                            
-                            if (identifiers != null && !identifiers.isEmpty()) {
-
-                                JSONObject prepare = accountService.prepare(navrh);
-                                Zadost zadost = Zadost.fromJSON(prepare.toString());
-
-                                zadost.setIdentifiers(identifiers);
-
-                                zadost.setPozadavek(req.getPozadavek());
-                                zadost.setPoznamka(req.getPoznamka());
-                                
-
+                            List<DNNTRequestApiServiceValidation> failingValidation = new ArrayList<>();
+                            List<String> validIdentifiers = new ArrayList<>(identifiers);
+                            for (DNNTRequestApiServiceValidation validator : validators) {
+                                boolean validate = false;
                                 try {
-                                    JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
-                                    SuccessRequestSaved readValue = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
-                                    
-                                    ArrayOfDetails details = details(alreadyUsedIdentifiers,  notExistentIdentifiers, invalidFormatIdentifiers, invalidPlaceIdentifiers, invalidStateIdentifiers, openApiLoginSupport.getUser());
-                                    if (!details.isEmpty()) {
-                                        readValue.setDetails(details);
-                                    }
-                                    
-                                    if (readValue.getIdentifiers() == null || readValue.getIdentifiers().isEmpty()) {
-                                        
-                                        throw new BadRequestEmptyIdentifiersException();
-                                    }
-                                    
-
-                                    response.getSaved().add(readValue);
-                                } catch ( ConflictException e) {
-                                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-
-                                    FailedRequestNotSaved ns = new FailedRequestNotSaved();
-                                    ns.identifiers(req.getIdentifiers())
-                                            .pozadavek(req.getPozadavek())
-                                            .poznamka(req.getPoznamka());
-
-                                    response.getNotsaved().add(ns.reason(e.getMessage()));
-
+                                    validate = validator.validate(openApiLoginSupport.getUser(), accountService, mockZadost, validIdentifiers, catalogSearcher);
+                                    validIdentifiers = validator.getValidIdentifiers(validIdentifiers);
+                                } catch (Exception e) {
+                                    LOGGER.log(Level.SEVERE,e.getMessage(),e);
                                 }
-                            } else {
-                                throw new BadRequestEmptyIdentifiersException();
+                                if (!validate) { failingValidation.add(validator); }
                             }
-
                             
-                        }catch (BadRequestMaximumNumberOfIdentifiersExceeded e) {
+                            boolean containsHardFailingValidation = failingValidation.stream()
+                                    .anyMatch(validation -> !validation.isSoftValidation());
+                                
+                            if (containsHardFailingValidation) {
+
+                                List<DNNTRequestApiServiceValidation> hardValidations = failingValidation.stream()
+                                        .filter(validation -> !validation.isSoftValidation())
+                                        .collect(Collectors.toList());
+
+                                throw new BadRequestException(hardValidations);
+
+                            } else {
+                                //new identifiers;
+                                //List<String> nidentifiers = new ArrayList<>(identifiers);
+                                if (!validIdentifiers.isEmpty()) {
+
+                                    JSONObject prepare = accountService.prepare(navrh);
+                                    Zadost zadost = Zadost.fromJSON(prepare.toString());
+
+                                    zadost.setIdentifiers(validIdentifiers);
+
+                                    zadost.setPozadavek(req.getPozadavek());
+                                    zadost.setPoznamka(req.getPoznamka());
+                                    
+
+                                    try {
+                                        JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
+                                        SuccessRequestSaved readValue = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
+                                
+                                        ArrayOfDetails details = details(failingValidation);
+                                        if (!details.isEmpty()) {
+                                            readValue.setDetails(details);
+                                        }
+                                        
+                                        if (readValue.getIdentifiers() == null || readValue.getIdentifiers().isEmpty()) {
+                                            throw new BadRequestEmptyIdentifiersException();
+                                        }
+                                        
+
+                                        response.getSaved().add(readValue);
+                                    } catch ( ConflictException e) {
+                                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+
+                                        FailedRequestNotSaved ns = new FailedRequestNotSaved();
+                                        ns.identifiers(req.getIdentifiers())
+                                                .pozadavek(req.getPozadavek())
+                                                .poznamka(req.getPoznamka());
+
+                                        response.getNotsaved().add(ns.reason(e.getMessage()));
+
+                                    }
+                                    
+                                } else {
+                                    throw new BadRequestException(failingValidation);
+                                }
+                            }
+                            
+
+                        } catch(BadRequestException e) {
+                            
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
-                            response.getNotsaved().add(ns.reason("Maximum number of items exceeded. Number of items:"+e.getNumberOfIdentifiers()+". Maximum: "+e.getMaximum()));
+                            
+                            ns.setDetails(details(e.getFailingValidations()));
+                            
+                            response.getNotsaved().add(ns.reason("Nothing to save !"));
                         } catch (SolrServerException e) {
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
@@ -299,18 +326,13 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             
                             response.getNotsaved().add(ns.reason("Solr exception: "+e.getMessage()));
                         } catch(BadRequestEmptyIdentifiersException e) {
+
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
                             
                             
-                            ArrayOfDetails details = details(alreadyUsedIdentifiers, notExistentIdentifiers, invalidFormatIdentifiers, invalidPlaceIdentifiers,
-                                    invalidStateIdentifiers, openApiLoginSupport.getUser());
-                            if (!details.isEmpty()) {
-                                ns.setDetails(details);
-                            }
-
                             response.getNotsaved().add(ns.reason("Nothing to save !"));
                             
                         } catch (ConflictException e) {
@@ -333,201 +355,133 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private ArrayOfDetails details(
-            List<String> alreadyUsedIdentifiers, 
-            List<String> notExistentIdentifiers, 
-            List<String> invalidFormatIdentifiers,
-            List<String> invalidPlaceIdentifiers, 
-            List<Pair<String,String>> invalidStateIdentifiers, User user) {
-
-        List<String> alreadyRendered = new ArrayList<>();
-        
+    private ArrayOfDetails details(List<DNNTRequestApiServiceValidation> failingValidations) {
         ArrayOfDetails details = new ArrayOfDetails();
-        
-        notExistentIdentifiers.stream().forEach(ni-> {
-            Detail detail = new Detail();
-            detail.setIdentifier(ni);
-            detail.state(StateEnum.REJECTED);
-            detail.setReason("Identifier does not exist");
-            details.add(detail);
-            
-            alreadyRendered.add(ni);
-        });
-        
-        
-        invalidFormatIdentifiers.stream().forEach(iI -> {
-            
-            if (!alreadyRendered.contains(iI)) {
-                Detail detail = new Detail();
-                detail.setIdentifier(iI);
-                detail.state(StateEnum.REJECTED);
-                detail.setReason("Invalid format (!BK AND !SE)");
-                details.add(detail);
-                
-                alreadyRendered.add(iI);
-            }
-        });
-        
-        
-        invalidPlaceIdentifiers.stream().forEach(iP-> {
-            if (!alreadyRendered.contains(iP)) {
-                Detail detail = new Detail();
-                detail.setIdentifier(iP);
-                detail.state(StateEnum.REJECTED);
-                detail.setReason("Invalid place of publication (!xr)");
-                details.add(detail);
 
-                alreadyRendered.add(iP);
-            }
+        failingValidations.stream().filter(DNNTRequestApiServiceValidation::isSoftValidation).forEach(valid-> {
+            valid.getErrorDetails().forEach(details::add);
         });
-        invalidStateIdentifiers.stream().forEach(iS-> {
-
-            if (!alreadyRendered.contains(iS.getKey())) {
-                Detail detail = new Detail();
-                detail.setIdentifier(iS.getLeft());
-                detail.state(StateEnum.REJECTED);
-                
-                detail.setReason("Invalid state '"+iS.getRight()+"'");
-                details.add(detail);
-
-                alreadyRendered.add(iS.getKey());
-}            
-            
-        });
-        
-        alreadyUsedIdentifiers.stream().forEach(iS-> {
-
-            Detail detail = new Detail();
-            detail.setIdentifier(iS);
-            detail.state(StateEnum.REJECTED);
-            
-            detail.setReason("Given identifier has been alredy used in another request");
-            details.add(detail);
-            
-        });
-
         return details;
     }
+    
 
-    private void verifyIdentifiers(SolrClient solr, User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws  IOException, SolrServerException, BadRequestEmptyIdentifiersException, AccountException, BadRequestMaximumNumberOfIdentifiersExceeded, BadFieldsValidationFailedException {
-        if (identifiers.isEmpty()) throw new BadRequestEmptyIdentifiersException();
-        
-       JSONObject apiObject = Options.getInstance().getJSONObject("api");
-        if (apiObject != null) {
-            int maximum = apiObject.optInt("maximumItemInRequest",-1);
-            if (maximum > -1 ) {
-                if (identifiers.size() > maximum) {
-                    throw new BadRequestMaximumNumberOfIdentifiersExceeded(identifiers.size(), maximum);   
-                }
-            }
-        }
-        
-        // Issue 430 // only remove duplicates
-        if (!identifiers.isEmpty()) {
-            Set<String> linkedHashSet = new LinkedHashSet<>(identifiers);
-            identifiers = new ArrayList<>(linkedHashSet);
-        }
-
-        List<String> usedByUser = new ArrayList<>();
-        List<String> usedStates = Arrays.asList(
-                "open",
-                "waiting",
-                "waiting_for_automatic_process"
-        );
-        
-
-        List<String> nonExistentIdentifiers = new ArrayList<>();
-        List<String> invalidFormatIdentifiers = new ArrayList<>();
-        List<String> invalidPlaceIdentifiers = new ArrayList<>();
-        List<Pair<String,String>> invalidStateIdentifiers = new ArrayList<>();
-        //List<String> allUsed = new ArrayList<>();
-        
-        Set<String> invalidIdentifiers = new HashSet<>();
-        
-
-        // validace na jiz pouzite v zadostech
-        List<String> allUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), usedStates);
-        identifiers.stream().forEach(ident-> {
-            if (allUsed.contains(ident)) {
-                usedByUser.add(ident);
-            }
-        });
-
-
-        // validace na dntstav, place_of_pub, format
-        for (String documentId :  identifiers) {
-            MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
-            if (marcRecord != null) {
-                try {
-                    Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
-                    //marcRecord.dntstav
-                    if (workflow == null || (workflow.nextState() != null && !workflow.nextState().isFirstTransition())) {
-                        invalidStateIdentifiers.add(Pair.of(documentId, marcRecord.dntstav != null && marcRecord.dntstav.size() > 0 ? marcRecord.dntstav.get(0) : "none"));
-                        invalidIdentifiers.add(documentId);
-                    }
-
-                    SolrDocument solrDoc = solr.getById(DataCollections.catalog.name(), documentId);
-                    String placeOfPub = (String) solrDoc.getFieldValue("place_of_pub");
-                    if (placeOfPub != null) {
-                        if (!placeOfPub.trim().toLowerCase().equals("xr")) {
-                            if (!invalidIdentifiers.contains(documentId)) {
-                                invalidPlaceIdentifiers.add(documentId);
-                                invalidIdentifiers.add(documentId);
-                            }
-                        }
-                    }
-                    String format = (String) solrDoc.getFieldValue("fmt");
-                    if (format != null) {
-                        if (!format.trim().toUpperCase().equals("BK") && !format.trim().toUpperCase().equals("SE")) {
-                            if (!invalidIdentifiers.contains(documentId)) {
-                                invalidIdentifiers.add(documentId);
-                                invalidPlaceIdentifiers.add(documentId);
-                            }
-                        }
-                    }
-                } catch (DocumentProxyException e) {
-                    LOGGER.log(Level.SEVERE,e.getMessage());
-                }
-            } else {
-                nonExistentIdentifiers.add(documentId);
-            }
-        }
-        
-        // validace na dohledatelnost #461
-        for (String documentId :  identifiers) {
-            Map<String, String> parameters = new HashMap<>();
-            // proverit ?? 
-            parameters.put("fullCatalog", "true");
-            parameters.put("q", documentId);
-            JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
-            if (search.has("response")) {
-                JSONObject response = search.getJSONObject("response");
-                if (response.has("numFound")) {
-                    if (response.has("numFound")) {
-                        int numFound = response.getInt("numFound");
-                        if (numFound == 0) {
-                            nonExistentIdentifiers.add(documentId);
-                        }
-                    }
-                }
-            }
-        }
-        
-        
-        if (!nonExistentIdentifiers.isEmpty() || 
-                !invalidIdentifiers.isEmpty() || 
-                !usedByUser.isEmpty()) {
-       
-            throw new BadFieldsValidationFailedException(
-                    allUsed, 
-                    nonExistentIdentifiers,
-                    invalidFormatIdentifiers,
-                    invalidPlaceIdentifiers,
-                    invalidStateIdentifiers);
-        }
-        
-        
-   }
+//    private void verifyIdentifiers(SolrClient solr, User user, AccountService accountService, Zadost zadost, List<String> identifiers) throws  IOException, SolrServerException, BadRequestEmptyIdentifiersException, AccountException, BadRequestMaximumNumberOfIdentifiersExceeded, BadFieldsValidationFailedException {
+//        if (identifiers.isEmpty()) throw new BadRequestEmptyIdentifiersException();
+//        
+//       JSONObject apiObject = Options.getInstance().getJSONObject("api");
+//        if (apiObject != null) {
+//            int maximum = apiObject.optInt("maximumItemInRequest",-1);
+//            if (maximum > -1 ) {
+//                if (identifiers.size() > maximum) {
+//                    throw new BadRequestMaximumNumberOfIdentifiersExceeded(identifiers.size(), maximum);   
+//                }
+//            }
+//        }
+//        
+//        // Issue 430 // only remove duplicates
+//        if (!identifiers.isEmpty()) {
+//            Set<String> linkedHashSet = new LinkedHashSet<>(identifiers);
+//            identifiers = new ArrayList<>(linkedHashSet);
+//        }
+//        
+//        
+//        List<String> usedByUser = new ArrayList<>();
+//        List<String> usedStates = Arrays.asList(
+//                "open",
+//                "waiting",
+//                "waiting_for_automatic_process"
+//        );
+//        
+//
+//        List<String> nonExistentIdentifiers = new ArrayList<>();
+//        List<String> invalidFormatIdentifiers = new ArrayList<>();
+//        List<String> invalidPlaceIdentifiers = new ArrayList<>();
+//        List<Pair<String,String>> invalidStateIdentifiers = new ArrayList<>();
+//        
+//        Set<String> invalidIdentifiers = new HashSet<>();
+//        
+//
+//        // validace na jiz pouzite v zadostech
+//        List<String> allUsed = accountService.findIdentifiersUsedInRequests(user.getUsername(), usedStates);
+//        identifiers.stream().forEach(ident-> {
+//            if (allUsed.contains(ident)) {
+//                usedByUser.add(ident);
+//            }
+//        });
+//
+//
+//        // validace na dntstav, place_of_pub, format
+//        for (String documentId :  identifiers) {
+//            MarcRecord marcRecord = MarcRecord.fromIndex(solr, documentId);
+//            if (marcRecord != null) {
+//                try {
+//                    Workflow workflow = DocumentWorkflowFactory.create(marcRecord, zadost);
+//                    //marcRecord.dntstav
+//                    if (workflow == null || (workflow.nextState() != null && !workflow.nextState().isFirstTransition())) {
+//                        invalidStateIdentifiers.add(Pair.of(documentId, marcRecord.dntstav != null && marcRecord.dntstav.size() > 0 ? marcRecord.dntstav.get(0) : "none"));
+//                        invalidIdentifiers.add(documentId);
+//                    }
+//
+//                    SolrDocument solrDoc = solr.getById(DataCollections.catalog.name(), documentId);
+//                    String placeOfPub = (String) solrDoc.getFieldValue("place_of_pub");
+//                    if (placeOfPub != null) {
+//                        if (!placeOfPub.trim().toLowerCase().equals("xr")) {
+//                            if (!invalidIdentifiers.contains(documentId)) {
+//                                invalidPlaceIdentifiers.add(documentId);
+//                                invalidIdentifiers.add(documentId);
+//                            }
+//                        }
+//                    }
+//                    String format = (String) solrDoc.getFieldValue("fmt");
+//                    if (format != null) {
+//                        if (!format.trim().toUpperCase().equals("BK") && !format.trim().toUpperCase().equals("SE")) {
+//                            if (!invalidIdentifiers.contains(documentId)) {
+//                                invalidIdentifiers.add(documentId);
+//                                invalidPlaceIdentifiers.add(documentId);
+//                            }
+//                        }
+//                    }
+//                } catch (DocumentProxyException e) {
+//                    LOGGER.log(Level.SEVERE,e.getMessage());
+//                }
+//            } else {
+//                nonExistentIdentifiers.add(documentId);
+//            }
+//        }
+//        
+//        // validace na dohledatelnost #461
+//        for (String documentId :  identifiers) {
+//            Map<String, String> parameters = new HashMap<>();
+//            // proverit ?? 
+//            parameters.put("fullCatalog", "true");
+//            parameters.put("q", documentId);
+//            JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
+//            if (search.has("response")) {
+//                JSONObject response = search.getJSONObject("response");
+//                if (response.has("numFound")) {
+//                    if (response.has("numFound")) {
+//                        int numFound = response.getInt("numFound");
+//                        if (numFound == 0) {
+//                            nonExistentIdentifiers.add(documentId);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        
+//        
+//        if (!nonExistentIdentifiers.isEmpty() || 
+//                !invalidIdentifiers.isEmpty() || 
+//                !usedByUser.isEmpty()) {
+//       
+//            throw new BadFieldsValidationFailedException(
+//                    usedByUser, 
+//                    nonExistentIdentifiers,
+//                    invalidFormatIdentifiers,
+//                    invalidPlaceIdentifiers,
+//                    invalidStateIdentifiers);
+//        }
+//   }
 
     private String findId(String documentId, SolrClient solr) throws SolrServerException, IOException {
         if (!documentId.startsWith("oai:aleph-nkp.cz") && documentId.contains("-")) {
@@ -544,8 +498,29 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         return documentId;
     }
     
+    
+    
+    public static class BadRequestException extends Exception {
+        List<DNNTRequestApiServiceValidation> failingValidations;
+
+        public BadRequestException(List<DNNTRequestApiServiceValidation> failingValidations) {
+            super();
+            this.failingValidations = failingValidations;
+        }
+
+        public List<DNNTRequestApiServiceValidation> getFailingValidations() {
+            return failingValidations;
+        }
+
+        public void setFailingValidations(List<DNNTRequestApiServiceValidation> failingValidations) {
+            this.failingValidations = failingValidations;
+        }
+        
+    }
+    
     // 
     public static class BadRequestEmptyIdentifiersException extends Exception {
+        
         public BadRequestEmptyIdentifiersException() {
         }
     }
