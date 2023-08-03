@@ -137,7 +137,6 @@
     "Priorita 1": "Priority 1",
     "Priorita 2": "Priority 2",
     "Priorita 3": "Priority 3",
-
     "export":"Export",
     "id_euipo":"EUIPO identifier"
   },
@@ -205,7 +204,11 @@
     "smazani_zadosti_error": "Error deleting request.",
     "komentar_chybi":"Note is missing",
     "doduvodneni_chybi": "No justification",
-    "text_byl_zkopirovan_do_schranky": "The text has been copied to the clipboard"
+    "text_byl_zkopirovan_do_schranky": "The text has been copied to the clipboard",
+    "addNewInstitution": {
+      "success": "The new institution has been successfully added",
+      "error": "Error saving institution"
+    }
   },
 
   "paginator": {
@@ -954,7 +957,8 @@
     "exports": "Exports",
     "vysledek_exportu": "Export result",
     "datum_exportu": "Date of export",
-    "vyhledavani_v_exportech": "Search in exports"
+    "vyhledavani_v_exportech": "Search in exports",
+    "pridat_novou_instituci": "Add a new institution"
   },
 
   "tooltip": {

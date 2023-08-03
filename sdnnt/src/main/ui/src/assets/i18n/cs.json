@@ -204,7 +204,11 @@
     "smazani_zadosti_error": "Chyba při smazání žádosti.",
     "komentar_chybi":"Chybí komentář",
     "doduvodneni_chybi": "Chybí odůvodnění",
-    "text_byl_zkopirovan_do_schranky": "Text byl zkopírován do schránky"
+    "text_byl_zkopirovan_do_schranky": "Text byl zkopírován do schránky",
+    "addNewInstitution": {
+      "success": "Nová instituce byla úspěšně přidána",
+      "error": "Chyba při uložení instituce"
+    }
   },
 
   "paginator": {
@@ -953,7 +957,8 @@
     "exports": "Exporty",
     "vysledek_exportu": "Výsledek exportu",
     "datum_exportu": "Datum exportu",
-    "vyhledavani_v_exportech": "Vyhledávání v exportech"
+    "vyhledavani_v_exportech": "Vyhledávání v exportech",
+    "pridat_novou_instituci": "Přidat novou instituci"
   },
 
   "tooltip": {
