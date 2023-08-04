@@ -10,8 +10,6 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.BadRequestMaximumNumberOfIdentifiersExceeded;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
 import cz.inovatika.sdnnt.services.AccountService;
 

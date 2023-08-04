@@ -10,8 +10,8 @@ import org.apache.solr.client.solrj.SolrClient;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
+import cz.inovatika.sdnnt.openapi.endpoints.model.DetailMarc;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail.StateEnum;
 import cz.inovatika.sdnnt.services.AccountService;
 
@@ -87,6 +87,14 @@ public class UserUsedIdentifierValidation extends DNNTRequestApiServiceValidatio
             detail.setIdentifier(id);
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_MESSAGE);
+
+            List<String> format910ax = format910ax(id);
+            if (format910ax != null) {
+                DetailMarc marc = new DetailMarc();
+                format910ax.stream().forEach(marc::addMarc910Item);
+                detail.setMarc(marc);
+            }
+
             return detail;
             
         }).collect(Collectors.toList());

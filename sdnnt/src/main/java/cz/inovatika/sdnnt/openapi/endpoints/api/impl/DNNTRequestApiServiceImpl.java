@@ -3,12 +3,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -22,7 +17,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 //import org.apache.solr.common.util.Pair;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.common.SolrDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jvnet.hk2.annotations.Service;
@@ -35,20 +29,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.workflow.Workflow;
-import cz.inovatika.sdnnt.model.workflow.document.DocumentProxyException;
-import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateUtils;
 import cz.inovatika.sdnnt.openapi.endpoints.api.ApiResponseMessage;
 import cz.inovatika.sdnnt.openapi.endpoints.api.NotFoundException;
 import cz.inovatika.sdnnt.openapi.endpoints.api.RFC3339DateFormat;
 import cz.inovatika.sdnnt.openapi.endpoints.api.RequestApiService;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.EmptyRequestValidation;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.InvalidIdentifiersValdation;
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.MaximumSizeExceededDNNTRequestValidation;
@@ -63,7 +50,6 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
 import cz.inovatika.sdnnt.openapi.endpoints.model.FailedRequestNotSaved;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Request;
 import cz.inovatika.sdnnt.openapi.endpoints.model.SuccessRequestSaved;
-import cz.inovatika.sdnnt.openapi.endpoints.model.Detail.StateEnum;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
@@ -258,7 +244,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                         .filter(validation -> !validation.isSoftValidation())
                                         .collect(Collectors.toList());
 
-                                throw new BadRequestException(hardValidations);
+                                
+                                throw new BadRequestException(new ArrayList<>());
 
                             } else {
                                 //new identifiers;
@@ -302,7 +289,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     }
                                     
                                 } else {
-                                    throw new BadRequestException(failingValidation);
+                                    List<Detail> details = failingValidation.stream().map(DNNTRequestApiServiceValidation::getErrorDetails).flatMap(List::stream).collect(Collectors.toList());
+                                    throw new BadRequestException(details);
                                 }
                             }
                             
@@ -314,7 +302,9 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     .pozadavek(req.getPozadavek())
                                     .poznamka(req.getPoznamka());
                             
-                            ns.setDetails(details(e.getFailingValidations()));
+                            ArrayOfDetails aDetails = new ArrayOfDetails();
+                            e.getFailingValidationDetails().forEach(aDetails::add);
+                            ns.setDetails(aDetails);
                             
                             response.getNotsaved().add(ns.reason("Nothing to save !"));
                         } catch (SolrServerException e) {
@@ -487,8 +477,8 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         if (!documentId.startsWith("oai:aleph-nkp.cz") && documentId.contains("-")) {
             String[] splitted = documentId.split("-");
             if (splitted.length >= 2) {
-                String m910a = splitted[0];
-                String m910x = splitted[1];
+                String m910a = splitted[0].trim();
+                String m910x = splitted[1].trim();
                 List<String> found = DuplicateUtils.findBy910ax(solr, m910a, m910x);
                 if (found.size() == 1) {
                     documentId = found.get(0);
@@ -501,20 +491,19 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     
     
     public static class BadRequestException extends Exception {
-        List<DNNTRequestApiServiceValidation> failingValidations;
+        List<Detail> failingValidationDetails;
+        //List<DNNTRequestApiServiceValidation> failingValidations;
 
-        public BadRequestException(List<DNNTRequestApiServiceValidation> failingValidations) {
+
+        public BadRequestException(List<Detail> failingValidationDetails) {
             super();
-            this.failingValidations = failingValidations;
+            this.failingValidationDetails = failingValidationDetails;
+        }
+        
+        public List<Detail> getFailingValidationDetails() {
+            return failingValidationDetails;
         }
 
-        public List<DNNTRequestApiServiceValidation> getFailingValidations() {
-            return failingValidations;
-        }
-
-        public void setFailingValidations(List<DNNTRequestApiServiceValidation> failingValidations) {
-            this.failingValidations = failingValidations;
-        }
         
     }
     

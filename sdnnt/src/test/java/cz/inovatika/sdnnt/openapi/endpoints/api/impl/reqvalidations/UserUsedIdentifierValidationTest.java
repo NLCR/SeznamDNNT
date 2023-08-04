@@ -12,7 +12,6 @@ import org.junit.Test;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
 import cz.inovatika.sdnnt.services.AccountService;
 
@@ -31,7 +30,8 @@ public class UserUsedIdentifierValidationTest {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
         UserUsedIdentifierValidation val = EasyMock.createMockBuilder(UserUsedIdentifierValidation.class)
-            .withConstructor(client).createMock();
+                .addMockedMethod("format910ax")
+                .withConstructor(client).createMock();
         
         User user = EasyMock.createMock(User.class);
         AccountService accounts = EasyMock.createMock(AccountService.class);
@@ -46,13 +46,15 @@ public class UserUsedIdentifierValidationTest {
         EasyMock.expect(user.getUsername()).andReturn("testuser").anyTimes();
         EasyMock.expect(zadost.getIdentifiers()).andReturn(identifiers).anyTimes();
         
+        EasyMock.expect(val.format910ax("oai-record3")).andReturn(Arrays.asList("910 |a xxxx |x zzzz")).anyTimes();
+        
         EasyMock.expect(
                 accounts.findIdentifiersUsedInRequests(EasyMock.eq("testuser"), 
                 EasyMock.eq(Arrays.asList("open","waiting","waiting_for_automatic_process"))))
         .andReturn(allUsedIdentifiers())
         .anyTimes();
         
-        EasyMock.replay(user,accounts,searcher, zadost);
+        EasyMock.replay(user,accounts,searcher, zadost, val);
         
         
         boolean validate = val.validate(user, accounts, zadost, identifiers, searcher);
@@ -79,6 +81,7 @@ public class UserUsedIdentifierValidationTest {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
         UserUsedIdentifierValidation val = EasyMock.createMockBuilder(UserUsedIdentifierValidation.class)
+            .addMockedMethod("format910ax")
             .withConstructor(client).createMock();
         
         User user = EasyMock.createMock(User.class);
@@ -98,13 +101,18 @@ public class UserUsedIdentifierValidationTest {
         EasyMock.expect(user.getUsername()).andReturn("testuser").anyTimes();
         EasyMock.expect(zadost.getIdentifiers()).andReturn(identifiers).anyTimes();
         
+        EasyMock.expect(val.format910ax("oai-record3")).andReturn(Arrays.asList("910 |a xxxx |x zzzz")).anyTimes();
+        EasyMock.expect(val.format910ax("oai-record4")).andReturn(Arrays.asList("910 |a xxxx |x zzzz")).anyTimes();
+        EasyMock.expect(val.format910ax("oai-record5")).andReturn(Arrays.asList("910 |a xxxx |x zzzz")).anyTimes();
+        EasyMock.expect(val.format910ax("oai-record6")).andReturn(Arrays.asList("910 |a xxxx |x zzzz")).anyTimes();
+
         EasyMock.expect(
                 accounts.findIdentifiersUsedInRequests(EasyMock.eq("testuser"), 
                 EasyMock.eq(Arrays.asList("open","waiting","waiting_for_automatic_process"))))
         .andReturn(allUsedIdentifiers())
         .anyTimes();
         
-        EasyMock.replay(user,accounts,searcher, zadost);
+        EasyMock.replay(user,accounts,searcher, zadost,val);
         
         
         boolean validate = val.validate(user, accounts, zadost, identifiers, searcher);

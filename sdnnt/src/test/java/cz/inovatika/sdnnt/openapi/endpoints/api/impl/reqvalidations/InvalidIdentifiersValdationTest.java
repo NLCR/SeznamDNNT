@@ -10,6 +10,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.easymock.EasyMock;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -21,7 +22,6 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
 import cz.inovatika.sdnnt.services.AccountService;
 
@@ -33,7 +33,7 @@ public class InvalidIdentifiersValdationTest {
     public void testOk() throws Exception {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
-        InvalidIdentifiersValdation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
+        DNNTRequestApiServiceValidation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
                 .addMockedMethod("markRecordFromSolr")
                 .addMockedMethod("documentById")
                 .withConstructor(client).createMock();
@@ -80,25 +80,35 @@ public class InvalidIdentifiersValdationTest {
     public void testInvalidStateIdentifiers() throws Exception {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
-        InvalidIdentifiersValdation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
+        DNNTRequestApiServiceValidation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
                 .addMockedMethod("markRecordFromSolr")
                 .addMockedMethod("documentById")
                 .withConstructor(client).createMock();
 
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
+        MarcRecord mr =  mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
             marcRecord.dntstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
             marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
         });
+
+        String mock029Raw = mr.rawJSON().toString();
+        
+        
         SolrDocument mock029 = EasyMock.createMock(SolrDocument.class);
         EasyMock.expect(mock029.getFieldValue("place_of_pub")).andReturn("xr ").anyTimes();
         EasyMock.expect(mock029.getFieldValue("fmt")).andReturn("BK").anyTimes();
+        EasyMock.expect(mock029.getFieldValue("raw")).andReturn(mock029Raw).anyTimes();
+
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-002778029")).andReturn(mock029).anyTimes();
 
         
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{});
+        mr = mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{});
+        String mock836Raw = mr.rawJSON().toString();
+
         SolrDocument mock836 = EasyMock.createMock(SolrDocument.class);
         EasyMock.expect(mock836.getFieldValue("place_of_pub")).andReturn("xb ").anyTimes();
         EasyMock.expect(mock836.getFieldValue("fmt")).andReturn("BK").anyTimes();
+        EasyMock.expect(mock836.getFieldValue("raw")).andReturn(mock836Raw).anyTimes();
+
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-000392836")).andReturn(mock836).anyTimes();
 
         
@@ -139,12 +149,12 @@ public class InvalidIdentifiersValdationTest {
     public void testPlaceOfPublicationIdentifiers() throws Exception {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
-        InvalidIdentifiersValdation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
+        DNNTRequestApiServiceValidation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
                 .addMockedMethod("markRecordFromSolr")
                 .addMockedMethod("documentById")
                 .withConstructor(client).createMock();
 
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
+        MarcRecord mr = mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
             marcRecord.dntstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
             marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
         });
@@ -153,15 +163,21 @@ public class InvalidIdentifiersValdationTest {
         EasyMock.expect(mock029.getFieldValue("fmt")).andReturn("BK").anyTimes();
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-002778029")).andReturn(mock029).anyTimes();
 
+        String mock029Raw = mr.rawJSON().toString();
+        EasyMock.expect(mock029.getFieldValue("raw")).andReturn(mock029Raw).anyTimes();
+
         
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{
+        mr = mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{
             marcRecord.dntstav = new ArrayList<>();
             marcRecord.kuratorstav = new ArrayList<>();
             
         });
+        String mock836Raw = mr.rawJSON().toString();
+
         SolrDocument mock836 = EasyMock.createMock(SolrDocument.class);
         EasyMock.expect(mock836.getFieldValue("place_of_pub")).andReturn("xb ").anyTimes();
         EasyMock.expect(mock836.getFieldValue("fmt")).andReturn("BK").anyTimes();
+        EasyMock.expect(mock836.getFieldValue("raw")).andReturn(mock836Raw).anyTimes();
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-000392836")).andReturn(mock836).anyTimes();
 
         
@@ -203,22 +219,25 @@ public class InvalidIdentifiersValdationTest {
     public void testFormatIdentifiers() throws Exception {
         SolrClient client = EasyMock.createMock(SolrClient.class);
 
-        InvalidIdentifiersValdation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
+        DNNTRequestApiServiceValidation val = EasyMock.createMockBuilder(InvalidIdentifiersValdation.class)
                 .addMockedMethod("markRecordFromSolr")
                 .addMockedMethod("documentById")
                 .withConstructor(client).createMock();
 
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
+        MarcRecord mr =  mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-002778029", (marcRecord) ->{
             marcRecord.dntstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
             marcRecord.kuratorstav = new ArrayList<>(Arrays.asList(PublicItemState.N.name()));
         });
         SolrDocument mock029 = EasyMock.createMock(SolrDocument.class);
         EasyMock.expect(mock029.getFieldValue("place_of_pub")).andReturn("xr ").anyTimes();
         EasyMock.expect(mock029.getFieldValue("fmt")).andReturn("BK").anyTimes();
+        String mock029Raw = mr.rawJSON().toString();
+        EasyMock.expect(mock029.getFieldValue("raw")).andReturn(mock029Raw).anyTimes();
+
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-002778029")).andReturn(mock029).anyTimes();
 
         
-        mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{
+        mr = mockMarcRecord(val, "oai:aleph-nkp.cz:SKC01-000392836", (marcRecord) ->{
             marcRecord.dntstav = new ArrayList<>();
             marcRecord.kuratorstav = new ArrayList<>();
             
@@ -226,6 +245,11 @@ public class InvalidIdentifiersValdationTest {
         SolrDocument mock836 = EasyMock.createMock(SolrDocument.class);
         EasyMock.expect(mock836.getFieldValue("place_of_pub")).andReturn("xr ").anyTimes();
         EasyMock.expect(mock836.getFieldValue("fmt")).andReturn("MP").anyTimes();
+
+        String mock836Raw = mr.rawJSON().toString();
+
+        EasyMock.expect(mock836.getFieldValue("raw")).andReturn(mock836Raw).anyTimes();
+
         EasyMock.expect(val.documentById("oai:aleph-nkp.cz:SKC01-000392836")).andReturn(mock836).anyTimes();
 
         
@@ -261,12 +285,14 @@ public class InvalidIdentifiersValdationTest {
 
     }
 
-    private void mockMarcRecord(InvalidIdentifiersValdation val, String id, Consumer<MarcRecord> consumer)
+    private MarcRecord mockMarcRecord(DNNTRequestApiServiceValidation val, String id, Consumer<MarcRecord> consumer)
             throws JsonProcessingException, JsonMappingException, IOException, SolrServerException {
         MarcRecord marcRecord = MarcRecord.fromSolrDoc(prepareResultList(id.replaceAll("\\:","_")).get(0));
         
         consumer.accept(marcRecord);
 
         EasyMock.expect(val.markRecordFromSolr(id)).andReturn(marcRecord).anyTimes();
+        
+        return marcRecord;
     }
 }

@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -9,21 +8,17 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxyException;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations.DNNTRequestApiServiceValidation.DividedIdentifiers;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
+import cz.inovatika.sdnnt.openapi.endpoints.model.DetailMarc;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail.StateEnum;
 import cz.inovatika.sdnnt.services.AccountService;
 
@@ -108,15 +103,6 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
         return invalidIdentifiers.isEmpty();
     }
 
-    protected SolrDocument documentById( String documentId) throws SolrServerException, IOException {
-        return getSolr().getById(DataCollections.catalog.name(), documentId);
-    }
-
-    protected MarcRecord markRecordFromSolr( String documentId)
-            throws JsonProcessingException, SolrServerException, IOException {
-        return MarcRecord.fromIndex(getSolr(), documentId);
-    }
-
     @Override
     public String getErrorMessage() {
         List<String> messages = new ArrayList<>();
@@ -141,14 +127,22 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
     
     @Override
     public List<Detail> getErrorDetails() {
-        List<Detail> retdetails = new ArrayList<>();
         
+        List<Detail> retdetails = new ArrayList<>();
         // nonexistent 
         this.nonExistentIdentifiers.stream().map(id-> {
             Detail detail = new Detail();
             detail.setIdentifier(id);
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_NONEXISTENT_MSG);
+            
+            List<String> format910ax = format910ax(id);
+            if (format910ax != null) {
+                DetailMarc marc = new DetailMarc();
+                format910ax.stream().forEach(marc::addMarc910Item);
+                detail.setMarc(marc);
+            }
+            
             return detail;
         }).forEach(retdetails::add);
         // invalid format
@@ -157,6 +151,14 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.setIdentifier(id);
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_FORMAT_MSG);
+
+            List<String> format910ax = format910ax(id);
+            if (format910ax != null) {
+                DetailMarc marc = new DetailMarc();
+                format910ax.stream().forEach(marc::addMarc910Item);
+                detail.setMarc(marc);
+            }
+
             return detail;
         }).forEach(retdetails::add);
         // invalid place
@@ -165,6 +167,15 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.setIdentifier(id);
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_PLACE_MSG);
+            
+            List<String> format910ax = format910ax(id);
+            if (format910ax != null) {
+                DetailMarc marc = new DetailMarc();
+                format910ax.stream().forEach(marc::addMarc910Item);
+                detail.setMarc(marc);
+                
+            }
+
             return detail;
         }).forEach(retdetails::add);
 
@@ -173,6 +184,14 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.setIdentifier(p.getLeft());
             detail.state(StateEnum.REJECTED);
             detail.setReason(String.format(ERR_WORKFLOW_MSG, p.toString()));
+
+            List<String> format910ax = format910ax(p.getLeft());
+            if (format910ax != null) {
+                DetailMarc marc = new DetailMarc();
+                format910ax.stream().forEach(marc::addMarc910Item);
+                detail.setMarc(marc);
+            }
+
             return detail;
         }).forEach(retdetails::add);
         
