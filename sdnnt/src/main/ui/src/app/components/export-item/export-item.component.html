@@ -4,6 +4,59 @@
       <img [src]="imgSrc" />
     </div>
     <div>
+      <p>TEST </p>
+      <mat-card-title><span>{{ doc.marc_245a }} {{ doc.marc_245b }} {{ doc.marc_245n }} {{ doc.marc_245p }} {{ doc.marc_245c }} {{ doc.marc_245i }}  </span></mat-card-title>
+      <mat-card-subtitle>
+        <div>{{ doc.marc_250a }}</div>
+        <div *ngIf="doc.marc_260a">{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>
+        <div *ngIf="!doc.marc_260a">{{ doc.marc_264a }} {{ doc.marc_264b }} {{ doc.marc_264c }}</div>
+        <div class="app-break-w">{{ doc.marc_020a }}</div>
+      </mat-card-subtitle>
+    </div>
+  </mat-card-header>
+  <mat-card-actions fxLayout="row" fxLayoutGap="32px">
+    <div fxFlex fxFlexAlign="flex-end">
+      <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
+        {{ doc.dntstav[doc.dntstav.length-1] }}   
+      </div>
+      <!--
+      <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
+        {{ 'state.' + processed.state | translate }}
+      </div>
+      -->
+      <div *ngIf="doc.license" [class]="'app-badge app-icon-in ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
+        <mat-icon class="material-icons-outlined">{{ doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+        {{ 'license.' + doc.license + '-badge' | translate }}
+      </div>
+      <!--
+      <div *ngIf="hasNavhr && !inZadost && state.logged" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
+        {{  doc.zadost.navrh }}
+      </div>
+      -->
+      <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent()">
+        <div [class]="'app-badge app-ml-1 ' + doc.kuratorstav[doc.kuratorstav.length-1]" *ngIf="doc.kuratorstav" [matTooltip]="'state.tooltip.' + doc.kuratorstav[doc.kuratorstav.length-1] | translate">
+          {{ doc.kuratorstav[doc.kuratorstav.length-1] }}   
+        </div>
+      </ng-container>
+      <div *ngIf="doc.flag_public_in_dl && (state.logged && (state.user?.role ==='knihovna' || state.user?.role === 'kurator' || state.user?.role === 'mainKurator') )" class="app-badge app-bordered app-kramerius app-ml-1" [matTooltip]="'desc.kramerius_badge_tooltip' | translate">
+        {{ 'desc.kramerius_badge' | translate }}
+      </div>
+
+      
+
+      <div *ngIf="doc.id_euipo" class="app-badge app-bordered app-img-in app-ml-1" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
+        <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
+      </div>
+    </div>
+
+
+<!--
+<mat-card>
+  <mat-card-header fxLayout="row" fxLayoutGap="16px">
+    <div *ngIf="imgSrc">
+      <img [src]="imgSrc" />
+    </div>
+    <div>
       <mat-card-title><span>Karla a jiné povídky / Božena Němcová</span></mat-card-title>
       <mat-card-subtitle class="app-m-0">
         <div>2. vydání</div>
@@ -40,3 +93,4 @@
     </div>
   </mat-card-header>
 </mat-card>
+-->

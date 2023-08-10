@@ -119,8 +119,6 @@ public class AccountServiceImpl implements AccountService {
 
         NamedList<Object> qresp = null;
         JSONObject ret = new JSONObject();
-        //Options opts = Options.getInstance();
-        //try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
         try (SolrClient solr = buildClient()) {
             //String q = req.getParameter("q");
             if (q == null) {

@@ -1,9 +1,24 @@
 <div class="app-container">
   <ul class="app-breadcrumb">
     <li><a routerLink="/exports">{{ 'desc.exports' | translate }}</a></li>
-    <li>{{ 'desc.vysledek_exportu' | translate }}</li>
+    <li><strong> {{export}}</strong>
+      
+    </li>
   </ul>
   <div class="app-export-wrapper">
+
+    <div class="button-wrapper" (click)="filesExpanded = !filesExpanded">
+      <mat-icon>{{ filesExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon><strong>Exportované soubory</strong>
+    </div>
+
+    <div class="button-wrapper">
+      <div *ngIf="filesExpanded">
+      <div *ngFor="let expFile of exportFiles">
+        <a href="api/exports/exported_file?path={{ encodePath(expFile.path) }}&export={{export}}"> {{expFile.name}}</a>
+      </div>
+    </div>
+  </div>      
+
     <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
       <div fxFlex class="app-left">
         {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
@@ -12,8 +27,13 @@
         <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
       </div>
     </div>
+
     <div class="app-results-wrapper">
-      <app-export-item></app-export-item>
+
+      <ng-container *ngFor="let doc of docs">
+        <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+      </ng-container>
+
     </div>
     <div class="app-mt-4">
       <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>

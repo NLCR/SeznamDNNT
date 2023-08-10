@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { Export } from 'src/app/shared/exports';
 import { Import } from 'src/app/shared/import';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
@@ -12,6 +13,12 @@ import { SolrResponse } from 'src/app/shared/solr-response';
   styleUrls: ['./exports.component.scss']
 })
 export class ExportsComponent implements OnInit {
+
+  // id: string;
+  // date: Date;
+  // processed: boolean;
+  // num_docs: number;
+
 
   filterState = [
     { id: "open", val: "neodeslano" },
@@ -29,9 +36,10 @@ export class ExportsComponent implements OnInit {
   facets;
   numFound: number;
 
-  displayedColumns = ['import_date', 'import_url', 'actions'];
-  imports: Import[] = [];
-  stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
+  displayedColumns = ['indextime', 'id','export_type','stav','export_num_docs','actions'];
+
+  exports: Export[] = [];
+
 
   stateFilter: string;
   newStavFilter: string;
@@ -48,7 +56,7 @@ export class ExportsComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
-    this.state.activePage = 'Imports';
+    this.state.activePage = 'Exports';
     this.route.queryParams.subscribe(val => {
       this.search(val);
       this.newStavFilter = val.navrh;
@@ -62,14 +70,14 @@ export class ExportsComponent implements OnInit {
     this.loading = true;
     const p = Object.assign({}, params);
 
-    this.imports = [];
+    this.exports = [];
     this.searchResponse = null;
     this.facets = null;
-    this.service.searchImports(p as HttpParams).subscribe((resp: any) => {
+    this.service.searchExports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
         this.searchResponse = resp;
-        this.imports = resp.response.docs;
-        this.numFound = this.imports.length;
+        this.exports = resp.response.docs;
+        this.numFound = this.exports.length;
         this.loading = false;
       }
     });
@@ -110,11 +118,11 @@ export class ExportsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
-  showExport(imp: Import) {
+  showExport(imp: Export) {
     this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
   }
 
-  process(imp: Import) {
+  process(imp: Export) {
     this.service.getImportNotControlled(imp.id).subscribe(resp => {
       if (resp.response.numFound > 0) {
         this.service.showSnackBar('nejsou vsechny zkontrollovane');

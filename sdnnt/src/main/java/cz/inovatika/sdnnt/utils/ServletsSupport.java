@@ -21,7 +21,12 @@ public class ServletsSupport {
         return new JSONObject(req.getParameter("json"));
       }
     }
-
+    
+    
+    public static JSONObject errorMissingParameterJson(HttpServletResponse response,  String parameter) {
+        return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, String.format("Missing parameter %s", parameter));
+    } 
+    
     /** Error json */
     public static JSONObject errorJson(HttpServletResponse response, int statusCode, String errorMessage) {
         // must handle on client side

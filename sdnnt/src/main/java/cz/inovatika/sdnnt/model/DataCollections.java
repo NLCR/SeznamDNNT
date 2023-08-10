@@ -7,5 +7,8 @@ public enum DataCollections {
     shibusers, 
     zadost, 
     history,
-    ;
+
+    exports,
+    imports,
+    imports_documents;
 }

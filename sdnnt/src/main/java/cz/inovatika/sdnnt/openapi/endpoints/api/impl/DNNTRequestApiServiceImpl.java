@@ -3,6 +3,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,15 +139,17 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
             JSONObject process = jsonObject.getJSONObject("process");
             ArrayOfDetails details = new ArrayOfDetails();
             process.keySet().stream().forEach(key -> {
-                JSONObject detailJSON = process.getJSONObject(key);
-                Detail.StateEnum state = Detail.StateEnum.fromValue(detailJSON.optString("state"));
-                if (intStatus == null || (state != null && state.toString().equals(intStatus))) {
-                    Detail detail =  new Detail()
-                            .identifier(key)
-                            .reason(detailJSON.optString("reason"))
-                            .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
-                            .user(detailJSON.optString("user"));
-                    details.add(detail);
+                if (!key.endsWith("_")) {
+                    JSONObject detailJSON = process.getJSONObject(key);
+                    Detail.StateEnum state = Detail.StateEnum.fromValue(detailJSON.optString("state"));
+                    if (intStatus == null || (state != null && state.toString().equals(intStatus))) {
+                        Detail detail =  new Detail()
+                                .identifier(key)
+                                .reason(detailJSON.optString("reason"))
+                                .state(Detail.StateEnum.fromValue(detailJSON.optString("state")))
+                                .user(detailJSON.optString("user"));
+                        details.add(detail);
+                    }
                 }
             });
             return details;
@@ -209,16 +212,16 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 }
                               }).collect(Collectors.toList()));
 
+                            List<String> identifiers = new ArrayList<>(new LinkedHashSet<>( req.getIdentifiers() ));    
+                            req.setIdentifiers(identifiers);
 
                             
-                            List<String> identifiers = req.getIdentifiers();
                             List<DNNTRequestApiServiceValidation> validators = Arrays.asList(
                                     new EmptyRequestValidation(solr),
                                     new MaximumSizeExceededDNNTRequestValidation(solr),
                                     new SearchibilityValidation(solr),
                                     new UserUsedIdentifierValidation(solr),
                                     new InvalidIdentifiersValdation(solr)
-                                    
                             );
                             
                             

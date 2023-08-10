@@ -71,6 +71,8 @@ import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     
+    private static final int MAX_ACCEPTING_YEAR = 2003;
+
     private static final int MAX_TITLE_LENGTH = 500;
     private static final int MAX_AUTHOR_LENGTH = 100;
     
@@ -83,6 +85,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     /** Configuration key for filters; only one for both types **/
     private static final String FILTERS_KEY = "filters";
 
+    // nonparsable date 
     private static final String NONPARSABLE_DATES_KEY  ="nonparsabledates";
     
     
@@ -104,47 +107,12 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
     /** Output folder key */
     private static final String FOLDER_KEY = "folder";
 
-//    public static final Map<String, String> ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY = new HashMap<>();
-//    static {
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("alb", "sqi");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("arm", "hye");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("tib", "bod");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("cze", "ces");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ger", "deu");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("gre", "ell");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("baq", "eus");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("per", "fas");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("fre", "fra");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("geo", "kat");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("ice", "isl");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mac", "mkd");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("mao", "mri");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("may", "msa");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("bur", "mya");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("dut", "nld");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("rum", "ron");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("slo", "slk");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("wel", "cym");
-//        ISO_639_2_BIBLIOGRAPHIC_2_TERMINOLOGY.put("chi", "zho");
-//    }
     
     /** Default output folder  */
     public static final String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/dump";
 
     // default initial filter
     /** Default initial bk filter */
-    //private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList("( (NOT date1_int:*) OR  date1_int:[* TO 2003] )", "setSpec:SKC");
-    //private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList("( (NOT date1_int:*) )", "setSpec:SKC");
     private static final List<String> DEFAULT_INITIAL_BK_FILTER = Arrays.asList( "setSpec:SKC");
     
     /** Default initial se filter */
@@ -556,6 +524,7 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
     private boolean accept(Object fmt, Object date1int, Object date1) {
         if (fmt != null && fmt.toString().equals("BK")) {
+            // nonparsable date
             if (date1int == null) {
                 String date1str = date1.toString();
                 for (Pattern pattern : this.compiledPatterns) {
@@ -565,8 +534,10 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                 }
                 return false;
             } else {
+                // 
                 Integer compareVal = (Integer) date1int;
-                return compareVal <= 2003;
+                
+                return compareVal <= MAX_ACCEPTING_YEAR;
             }
         } else return true;
     }
@@ -881,12 +852,17 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
 
     public static void main(String[] args)
             throws AccountException, ConflictException, IOException, SolrServerException, InvalidFormatException {
-//        long start = System.currentTimeMillis();
-//        EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
-//        List<String> checkBK = impl.check("BK");
-//        //System.out.println(checkBK);
-//        impl.update("BK", "inital-bk", checkBK);
-//        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
+        long start = System.currentTimeMillis();
+        EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
+        List<String> checkBK = impl.check("BK");
+        //System.out.println(checkBK);
+        impl.update("BK", "test", checkBK);
+        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
+
+        List<String> checkSE = impl.check("SE");
+        //System.out.println(checkBK);
+        impl.update("SE", "test", checkSE);
+        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
 //
 //        String title = "Spalovací turbiny, turbodmychadla a ventilátory : přeplňování spalovacích motorů / Jan Macek, Vladimír Kliment";
 //        Pair<Integer,Integer> maxIndexOfWord = maxIndexOfWord(49-3, title);

@@ -226,8 +226,55 @@ public class SearchServlet extends HttpServlet {
           return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
         }
       }
-
     },
+
+    EXPORTS {
+        @Override
+        JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+            if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+
+                JSONObject ret = new JSONObject();
+                Options opts = Options.getInstance();
+
+                int rows = opts.getClientConf().getInt("rows");
+                if (req.getParameter("rows") != null) {
+                  rows = Integer.parseInt(req.getParameter("rows"));
+                }
+                int start = 0;
+                if (req.getParameter("page") != null) {
+                  start = Integer.parseInt(req.getParameter("page")) * rows;
+                }
+                try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+                  SolrQuery query = new SolrQuery("*")
+                          .setRows(rows)
+                          .setStart(start)
+                          .setSort("indextime", SolrQuery.ORDER.desc)
+                          .setFacet(true)
+                          .addFacetField("processed")
+                          .setParam("json.nl", "arrntv")
+                          .setFields("*");
+
+                  
+                  QueryRequest qreq = new QueryRequest(query);
+                  NoOpResponseParser rParser = new NoOpResponseParser();
+                  rParser.setWriterType("json");
+                  qreq.setResponseParser(rParser);
+                  NamedList<Object> qresp = solr.request(qreq, "imports");
+
+                  return new JSONObject((String) qresp.get("response"));
+                } catch (SolrServerException | IOException ex) {
+                  LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                  return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+                }
+              } else {
+                return errorJson(response, SC_FORBIDDEN, "not allowed");
+              }
+                
+        }
+        
+    },
+
+    
     IMPORT {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
@@ -304,10 +351,10 @@ public class SearchServlet extends HttpServlet {
           return errorJson(response, SC_FORBIDDEN, "not allowed");
         }
 
-
-        //return ret;
       }
     },
+
+    
     IMPORT_DOCUMENTS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
