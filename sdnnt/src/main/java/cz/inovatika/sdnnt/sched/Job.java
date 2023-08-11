@@ -488,7 +488,47 @@ public class Job implements InterruptableJob {
             
         },
         
-        
+
+        EUIPO_REGULAR {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    String logger = jobData.optString("logger");
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+    
+                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+                    List<String> states = new ArrayList<>();
+                    if (jsonArrayOfStates != null) {
+                        jsonArrayOfStates.forEach(it -> {
+                            states.add(it.toString());
+                        });
+                    }
+                    
+                    EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl(logger, iteration, results);
+                    try {
+                        List<String> checkBK = impl.check("BK");
+                        impl.update("BK", "initial-bk", checkBK);
+                        List<String> checkSE = impl.check("SE");
+                        impl.update("SE", "initial-se", checkSE);
+                    } catch (Exception e) {
+                        impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(impl.getLogger(), start);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+            
+        },
+
         WORKFLOW {
             @Override
             void doPerform(JSONObject jobData) {

@@ -24,16 +24,9 @@ public interface EUIPOInitalExportService extends LoggerAware{
 
 
 
-    /**
-     * Update titles
-     * @param identifiers
-     * @throws AccountException
-     * @throws IOException
-     * @throws ConflictException
-     * @throws SolrServerException
-     */
-    public void update(String format, String exortIdentifier, List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
+    public int update(String format, String exortIdentifier, List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
+    public void createExport(String exportIdentifier, int numberOfDocs) throws AccountException, IOException, ConflictException, SolrServerException;
     
     public String getLastExportedDate();
 

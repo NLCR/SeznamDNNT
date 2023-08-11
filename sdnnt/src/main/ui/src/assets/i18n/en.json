@@ -958,7 +958,10 @@
     "vysledek_exportu": "Export result",
     "datum_exportu": "Date of export",
     "vyhledavani_v_exportech": "Search in exports",
-    "pridat_novou_instituci": "Add a new institution"
+    "pridat_novou_instituci": "Add a new institution",
+    "exportovane_soubory": "Exported files",
+    "seznam_exportovanych_souboru": "List of exported files",
+    "vyhledavani_ve_vysledcich_exportu": "Search in export results"
   },
 
   "tooltip": {

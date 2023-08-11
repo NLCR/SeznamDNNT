@@ -1,10 +1,12 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
-import { AppState } from 'src/app/app.state';
+import { DialogExportedFilesComponent } from 'src/app/components/dialog-exported-files/dialog-exported-files.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { AppState } from 'src/app/app.state';
 
 @Component({
   selector: 'app-export',
@@ -12,10 +14,6 @@ import { SolrDocument } from 'src/app/shared/solr-document';
   styleUrls: ['./export.component.scss']
 })
 export class ExportComponent implements OnInit {
-
-  //files:string[] = [];
-
-  filesExpanded:boolean = false;
 
   subs: Subscription[] = [];
   docs: SolrDocument[] = [];
@@ -36,7 +34,9 @@ export class ExportComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private service: AppService,
-    public state: AppState) { }
+    public state: AppState,
+    public dialog: MatDialog
+    ) { }
 
 
     ngOnInit(): void {
@@ -78,7 +78,6 @@ export class ExportComponent implements OnInit {
     //   //
     //   console.log("ID "+id);
     // }));
-
   }
 
   getDocs(params: Params) {
@@ -93,4 +92,25 @@ export class ExportComponent implements OnInit {
   encodePath(path) {
     return encodeURIComponent(path);
   }
+  openExportedFilesDialog() {
+
+    const data = {
+      export: this.export,
+      files: []
+    }
+    this.exportFiles.forEach((e)=> {
+      data.files.push(e);
+    });
+ 
+    const dialogRef = this.dialog.open(DialogExportedFilesComponent, {
+      data,
+      width: '600px',
+      panelClass: 'app-dialog-exported-files'
+    });
+  }
+
+  cleanFilterExport() {
+    // todo
+  }
+
 }

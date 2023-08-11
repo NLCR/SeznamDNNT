@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -300,12 +301,36 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         }
 
         return foundCandidates;
+    }
 
+    
+    
+    @Override
+    public void createExport(String exportIdentifier, int numberOfDocs)
+            throws AccountException, IOException, ConflictException, SolrServerException {
+        try (SolrClient solrClient = buildClient()) {
+            SolrInputDocument doc = new SolrInputDocument();
+            doc.setField("id", exportIdentifier);
+            doc.setField("export_date", new Date());
+            doc.setField("export_folder", new File(new File(this.outputFolder), exportIdentifier).getAbsolutePath());
+            doc.setField("export_num_docs", numberOfDocs);
+            doc.setField("export_type", "include");
+
+            UpdateRequest uReq = new UpdateRequest();
+            uReq.add(doc);
+            UpdateResponse response = uReq.process(solrClient, DataCollections.exports.name());
+            if (response.getStatus() != 200) {
+            }
+            SolrJUtilities.quietCommit(solrClient, DataCollections.exports.name());
+        }        
     }
 
     @Override
-    public void update(String format, String identifier, List<String> docs)
+    public int update(String format, String identifier, List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
+
+        AtomicInteger retVal = new AtomicInteger();
+        
         if (!docs.isEmpty()) {
 
             List<String> toRemove = new ArrayList<>();
@@ -323,7 +348,8 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                     int startIndex = i * updateBatchLimit;
                     int endIndex = (i + 1) * updateBatchLimit;
                     List<String> subList = docs.subList(startIndex, Math.min(endIndex, docs.size()));
-
+                    
+                   
                     ModifiableSolrParams params = new ModifiableSolrParams();
                     params.set("fl",
                             "identifier, raw, date1, date2, date1_int, date2_int, controlfield_008, leader, fmt, type_of_date");
@@ -429,10 +455,10 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                     }
                 }
                 
-                // remove skipped monograph
-                //toRemove.stream().forEach(docs::remove);
                 
                 docs.removeAll(toRemove);
+                // pri vzniku 
+                //prepareExport.put("export_size", docs.size());
                 
                 int numberOfSpredsheets = docs.size() / this.spredsheetLimit;
                 if (docs.size() % this.spredsheetLimit > 0) {
@@ -463,9 +489,6 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                             List<String> updateBatch = spreadSheetBatch.subList(upateStartIndex,
                                     Math.min(endStartIndex, spreadSheetBatch.size()));
  
-                            //getLogger().fine(String.format("First 5 identifiers %s", updateBatch.subList(0, 5).toString()));
-                            
-
                             UpdateRequest uReq = new UpdateRequest();
                             for (String id : updateBatch) {
                                 SolrInputDocument idoc = new SolrInputDocument();
@@ -483,6 +506,9 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                             if (!uReq.getDocuments().isEmpty()) {
                                 UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
                                 if (response.getStatus() != 200) {
+
+                                    retVal.addAndGet(spreadSheetBatch.size());
+
                                 }
                             }
 
@@ -490,13 +516,10 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                         }
 
                         File finalFile = new File(nFile.getParentFile(), nFile.getName().replace("proc", "xlsx"));
-                        
                         com.google.common.io.Files.move(nFile, finalFile);
-                        
                         if (finalFile.length() == nFile.length()) {
                             nFile.delete();
                         }
-
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     } catch (InvalidFormatException e) {
@@ -507,6 +530,9 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
                 }
             }
         }
+        
+        //
+        return retVal.get();
     }
 
     private boolean isValidDate(String string) {
@@ -856,14 +882,16 @@ public class EUIPOInitialExportServiceImpl implements EUIPOInitalExportService {
         EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl();
         List<String> checkBK = impl.check("BK");
         //System.out.println(checkBK);
-        impl.update("BK", "test", checkBK);
+        int updatedBK = impl.update("BK", "test", checkBK);
         System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
 
         List<String> checkSE = impl.check("SE");
         //System.out.println(checkBK);
-        impl.update("SE", "test", checkSE);
+        int updatedSE = impl.update("SE", "test", checkSE);
         System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
 //
+        impl.createExport("test", updatedBK+updatedSE);
+        
 //        String title = "Spalovací turbiny, turbodmychadla a ventilátory : přeplňování spalovacích motorů / Jan Macek, Vladimír Kliment";
 //        Pair<Integer,Integer> maxIndexOfWord = maxIndexOfWord(49-3, title);
 //        System.out.println(maxIndexOfWord);
