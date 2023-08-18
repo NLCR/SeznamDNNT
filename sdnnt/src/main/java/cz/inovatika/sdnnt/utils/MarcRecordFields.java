@@ -134,10 +134,12 @@ public class MarcRecordFields {
     
     // identifikator exportovaneho zaznamu do euipo
     public static final String ID_EUIPO = "id_euipo";
+    public static final String ID_EUIPO_CANCELED = "id_euipo_canceled";
 
     // identifikator exportu pro euipo
     public static final String ID_EUIPO_EXPORT = "id_euipo_export";
-
+    public static final String ID_EUIPO_EXPORT_ACTIVE = "id_euipo_export_active";
+    
     // export field - nyni bude obsahovat pouze euipo
     public static final String EXPORT = "export";
     

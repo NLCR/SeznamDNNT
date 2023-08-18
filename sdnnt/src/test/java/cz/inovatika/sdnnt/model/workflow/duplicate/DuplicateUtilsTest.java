@@ -47,9 +47,9 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(origin.idEuipo.size() == 1);
         Assert.assertTrue(origin.idEuipo.get(0).equals("euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"));
         
-        Assert.assertTrue(origin.idEuipoExports != null);
-        Assert.assertTrue(origin.idEuipoExports.size() == 1);
-        Assert.assertTrue(origin.idEuipoExports.get(0).equals("inital-bk"));
+        Assert.assertTrue(origin.idEuipoExport != null);
+        Assert.assertTrue(origin.idEuipoExport.size() == 1);
+        Assert.assertTrue(origin.idEuipoExport.get(0).equals("inital-bk"));
         
         Assert.assertTrue(origin.exportsFacets != null);
         Assert.assertTrue(origin.exportsFacets.size() == 1);
@@ -62,10 +62,10 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(follower.idEuipo.contains("euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"));
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
         
-        Assert.assertTrue(follower.idEuipoExports != null);
-        Assert.assertTrue(follower.idEuipoExports.size() == 2);
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-se"));
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-bk"));
+        Assert.assertTrue(follower.idEuipoExport != null);
+        Assert.assertTrue(follower.idEuipoExport.size() == 2);
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-se"));
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-bk"));
 
         Assert.assertTrue(follower.exportsFacets != null);
         Assert.assertTrue(follower.exportsFacets.size() == 1);
@@ -88,9 +88,9 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
 
-        Assert.assertTrue(follower.idEuipoExports.size() == 2);
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-se"));
+        Assert.assertTrue(follower.idEuipoExport.size() == 2);
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-ch"));
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-se"));
         
     }
 
@@ -112,9 +112,9 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
         Assert.assertFalse(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
 
-        Assert.assertTrue(follower.idEuipoExports.size() == 1);
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
-        Assert.assertFalse(follower.idEuipoExports.contains("inital-se"));
+        Assert.assertTrue(follower.idEuipoExport.size() == 1);
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-ch"));
+        Assert.assertFalse(follower.idEuipoExport.contains("inital-se"));
         
     }
 
@@ -138,9 +138,9 @@ public class DuplicateUtilsTest {
         Assert.assertTrue(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-changed"));
         Assert.assertFalse(follower.idEuipo.contains("euipo:9382b2ea-2d48-4fa3-8580-d3b03c5828fb"));
 
-        Assert.assertTrue(follower.idEuipoExports.size() == 1);
-        Assert.assertTrue(follower.idEuipoExports.contains("inital-ch"));
-        Assert.assertFalse(follower.idEuipoExports.contains("inital-se"));
+        Assert.assertTrue(follower.idEuipoExport.size() == 1);
+        Assert.assertTrue(follower.idEuipoExport.contains("inital-ch"));
+        Assert.assertFalse(follower.idEuipoExport.contains("inital-se"));
         
     }
 

@@ -155,21 +155,21 @@ public class DuplicateUtils {
                 List<String> mergedExports = new ArrayList<>();
                 if (depStore != null &&  depStore.containsKey(mr.identifier)) {
                     List<String> idEuIpoExports = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
-                        return dpr.idEuipoExports;
+                        return dpr.idEuipoExport;
                     }).flatMap(List::stream).collect(Collectors.toList());
                     
                     mergedExports.addAll(idEuIpoExports);
                 }
                 
-                if (mr.idEuipoExports != null) {
-                    mergedExports.addAll(mr.idEuipoExports);
+                if (mr.idEuipoExport != null) {
+                    mergedExports.addAll(mr.idEuipoExport);
                 }
-                if (origin.idEuipoExports != null) {
-                    mergedExports.addAll(origin.idEuipoExports);
+                if (origin.idEuipoExport != null) {
+                    mergedExports.addAll(origin.idEuipoExport);
                 }
 
                 if (!mergedExports.isEmpty()) {
-                    mr.idEuipoExports = mergedExports;
+                    mr.idEuipoExport = mergedExports;
                 }
                 
                 List<String> mergedFacets = new ArrayList<>();
@@ -196,7 +196,7 @@ public class DuplicateUtils {
             // Verejny stav puvodce A,PA,NL, NPA => Dedi
             } else if (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu)) {
                 mr.idEuipo = origin.idEuipo;
-                mr.idEuipoExports = origin.idEuipoExports;
+                mr.idEuipoExport = origin.idEuipoExport;
                 mr.exportsFacets = origin.exportsFacets;
             }
             

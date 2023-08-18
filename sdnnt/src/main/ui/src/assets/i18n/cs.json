@@ -138,7 +138,9 @@
     "Priorita 2": "Priorita 2",
     "Priorita 3": "Priorita 3",
     "export":"Export",
-    "id_euipo":"EUIPO identifikátor"
+    "id_euipo":"EUIPO identifikátor(y)",
+    "id_euipo_canceled":"Nepoužívané EUIPO identifikátory"
+
   },
 
   "controlled": {
@@ -961,7 +963,9 @@
     "pridat_novou_instituci": "Přidat novou instituci",
     "exportovane_soubory": "Exportované soubory",
     "seznam_exportovanych_souboru": "Seznam exporovaných souborů",
-    "vyhledavani_ve_vysledcich_exportu": "Vyhledávání ve vysledcích exportu"
+    "vyhledavani_ve_vysledcich_exportu": "Vyhledávání ve vysledcích exportu",
+    "typ_exportu":"Typ exportu",
+    "export_num_docs":"Počet dokumentů v exportu"
   },
 
   "tooltip": {

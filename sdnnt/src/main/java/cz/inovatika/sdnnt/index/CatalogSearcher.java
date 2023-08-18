@@ -49,9 +49,25 @@ import org.json.JSONObject;
  */
 public class CatalogSearcher {
     
+    private static final String DEFAULT_FIELDLIST = "*,raw:[json],masterlinks:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]";
+
     public static final String ID_PREFIX = "oai:aleph-nkp.cz:";
     
     public static final Logger LOGGER = Logger.getLogger(CatalogSearcher.class.getName());
+    
+    
+    private String fieldList;
+    
+    public CatalogSearcher(String fieldList) {
+        super();
+        this.fieldList = fieldList;
+    }
+
+
+    public CatalogSearcher() {
+        super();
+    }
+
 
     public JSONObject frbr(String id) {
         JSONObject ret = new JSONObject();
@@ -397,15 +413,22 @@ public class CatalogSearcher {
         SolrQuery query = new SolrQuery(q)
                 .setRows(rows)
                 .setStart(start)
-                .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export")
+                .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export","id_euipo_export")
                 .setFacetMinCount(1)
                 .setParam("json.nl", "arrntv")
                 .setParam("stats", true)
                 .setParam("stats.field", "rokvydani")
-                .setParam("q.op", "AND")
-                .setFields("*,raw:[json],masterlinks:[json],granularity:[json],historie_stavu:[json],historie_kurator_stavu:[json],historie_granulovaneho_stavu:[json]");
+                .setParam("q.op", "AND");
 
-
+                //.setFields(DEFAULT_FIELDLIST);
+        
+        if (this.fieldList != null) {
+            query.setFields(this.fieldList);
+        } else {
+            query.setFields(DEFAULT_FIELDLIST);
+        }
+        
+        
         query.set("defType", "edismax");
         if (q.startsWith(QueryUtils.IDENTIFIER_PREFIX) ||q.startsWith('"'+QueryUtils.IDENTIFIER_PREFIX)) {
             query.set("qf", "identifier");

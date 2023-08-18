@@ -136,24 +136,32 @@ export class AppService {
     return this.get(url, params);
   }
 
+
+  processExport(id: string): Observable<any> {
+    let url = '/iexports/process_export';
+    const params: HttpParams = new HttpParams().set('export', id);
+    return this.get(url, params);
+  }
+
+
   searchExports(params: HttpParams): Observable<any> {
-    let url = '/exports/search';
+    let url = '/iexports/search';
     return this.get(url, params);
   }
 
   searchInExports(params: HttpParams): Observable<any> {
-    let url = '/exports/search_export';
+    let url = '/iexports/search_export';
     return this.get(url, params);
   }
 
   getExport(id: string): Observable<any> {
-    let url = '/exports/export';
+    let url = '/iexports/export';
     const params: HttpParams = new HttpParams().set('export', id);
     return this.get(url, params);
   }
 
   getExportFiles(id: string): Observable<any> {
-    let url = '/exports/exported_files_desc';
+    let url = '/iexports/exported_files_desc';
     const params: HttpParams = new HttpParams().set('export', id);
     return this.get(url, params);
   }

@@ -45,7 +45,8 @@ import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 
 
-@WebServlet(value = "/exports/*")
+
+@WebServlet(value = "/iexports/*")
 public class ExportServlet extends HttpServlet {
     
     public static final Logger LOGGER = Logger.getLogger(ExportServlet.class.getName());
@@ -113,7 +114,23 @@ public class ExportServlet extends HttpServlet {
 
 
     enum Actions {
+        
+        PROCESS_EXPORT {
 
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                String id = req.getParameter("export");
+                if (id != null) {
+                    UserControlerImpl uc = new UserControlerImpl(req);
+                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                    return ex.setExportProcessed(id);
+                } else {
+                    return errorMissingParameterJson(response, "export");
+                }
+            }
+            
+        },
+        
         PREPARE_EXPORT {
 
             @Override
@@ -259,6 +276,8 @@ public class ExportServlet extends HttpServlet {
                 }
             }
         },
+        
+        
         
         EXPORTED_FILE {
             @Override

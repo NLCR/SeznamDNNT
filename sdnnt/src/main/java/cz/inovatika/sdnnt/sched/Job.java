@@ -12,7 +12,9 @@ import cz.inovatika.sdnnt.index.OAIHarvester;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -448,14 +450,55 @@ public class Job implements InterruptableJob {
             }
         },
         
-        EUIPO_INITIAL {
+//        EUIPO_INITIAL {
+//
+//            @Override
+//            void doPerform(JSONObject jobData) {
+//                try {
+//                    LocksSupport.SERVICES_LOCK.lock();
+//
+//                    
+//                    LOGGER.fine(name()+":configuration is "+jobData);
+//                    long start = System.currentTimeMillis();
+//                    String logger = jobData.optString("logger");
+//                    JSONObject iteration = jobData.optJSONObject("iteration");
+//                    JSONObject results = jobData.optJSONObject("results");
+//    
+//                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
+//                    List<String> states = new ArrayList<>();
+//                    if (jsonArrayOfStates != null) {
+//                        jsonArrayOfStates.forEach(it -> {
+//                            states.add(it.toString());
+//                        });
+//                    }
+//                    
+//                    EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl(logger, iteration, results);
+//                    try {
+//                        List<String> checkBK = impl.check("BK");
+//                        impl.update("BK", "initial-bk", checkBK);
+//                        List<String> checkSE = impl.check("SE");
+//                        impl.update("SE", "initial-se", checkSE);
+//                    } catch (Exception e) {
+//                        impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
+//                    } finally {
+//                        QuartzUtils.printDuration(impl.getLogger(), start);
+//                    }
+//                } finally {
+//                    LocksSupport.SERVICES_LOCK.unlock();
+//                }
+//            }
+//            
+//        },
+        
+
+
+        EUIPO_IOCP {
 
             @Override
             void doPerform(JSONObject jobData) {
                 try {
                     LocksSupport.SERVICES_LOCK.lock();
 
-                    
                     LOGGER.fine(name()+":configuration is "+jobData);
                     long start = System.currentTimeMillis();
                     String logger = jobData.optString("logger");
@@ -469,13 +512,23 @@ public class Job implements InterruptableJob {
                             states.add(it.toString());
                         });
                     }
-                    
-                    EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl(logger, iteration, results);
+                  EUIPOImportService impl = new EUIPOImportServiceImpl(logger, iteration, results);
                     try {
+                        SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm");
+                        String name = String.format("euipo_iocp_%s", nameformat.format(new Date()));
+                        
                         List<String> checkBK = impl.check("BK");
-                        impl.update("BK", "initial-bk", checkBK);
+                        int updatedBK = impl.update("BK", name, checkBK);
+    
                         List<String> checkSE = impl.check("SE");
-                        impl.update("SE", "initial-se", checkSE);
+                        int updatedSE = impl.update("SE", name, checkSE);
+
+                        int total = updatedBK+updatedSE;
+                        if (total > 0) {
+                            impl.createExport(name, updatedBK+updatedSE);
+                        }
+
+                        
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {
@@ -485,11 +538,9 @@ public class Job implements InterruptableJob {
                     LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
-            
         },
-        
 
-        EUIPO_REGULAR {
+        EUIPO_UOCP {
 
             @Override
             void doPerform(JSONObject jobData) {
@@ -510,13 +561,20 @@ public class Job implements InterruptableJob {
                             states.add(it.toString());
                         });
                     }
-                    
-                    EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl(logger, iteration, results);
+                  EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
                     try {
+                        SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm");
+                        String name = String.format("euipo_uocp_%s", nameformat.format(new Date()));
+                        
                         List<String> checkBK = impl.check("BK");
-                        impl.update("BK", "initial-bk", checkBK);
+                        int updatedBK = impl.update("BK", name, checkBK);
+    
                         List<String> checkSE = impl.check("SE");
-                        impl.update("SE", "initial-se", checkSE);
+                        int updatedSE = impl.update("SE", name, checkSE);
+                        int total = updatedBK+updatedSE;
+                        if (total > 0) {
+                            impl.createExport(name, updatedBK+updatedSE);
+                        }
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {

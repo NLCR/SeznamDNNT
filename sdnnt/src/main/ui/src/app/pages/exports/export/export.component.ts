@@ -2,11 +2,13 @@ import { HttpParams } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { DialogExportedFilesComponent } from 'src/app/components/dialog-exported-files/dialog-exported-files.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { AppState } from 'src/app/app.state';
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
+
 
 @Component({
   selector: 'app-export',
@@ -15,7 +17,9 @@ import { AppState } from 'src/app/app.state';
 })
 export class ExportComponent implements OnInit {
 
-  subs: Subscription[] = [];
+  private subject: Subject<string> = new Subject();
+
+
   docs: SolrDocument[] = [];
 
   public numFound: number = 30;
@@ -47,10 +51,10 @@ export class ExportComponent implements OnInit {
       }
    
       const id = this.route.snapshot.paramMap.get('id');
-
-      this.subs.push(this.route.queryParams.subscribe(val => {
+      
+      this.route.queryParams.subscribe(val => {
         this.export = id;
-        this.query = this.route.snapshot.queryParamMap.get('q') ;
+        this.query = this.route.snapshot.queryParamMap.get('exportq') ;
 
         this.getDocs(val);
         this.service.getExport(this.export).subscribe((exp)=> {
@@ -60,29 +64,29 @@ export class ExportComponent implements OnInit {
         this.service.getExportFiles(this.export).subscribe((exp)=> {
           this.exportFiles = exp.files;
         });
-      }));
+        
+        this.state.prefixsearch['export'] = val.exportq;
+      });
+
+      this.subject.pipe(
+        debounceTime(400)
+      ).subscribe(searchTextValue => {
   
-
-
-    //this.service.searchInExports
-
-
-    // this.route.queryParams.subscribe(val => {
-    //   this.search(val);
-    //   this.newStavFilter = val.navrh;
-    //   this.stateFilter = val.state;
-    // });
-
-
-    // this.subs.push(this.route.queryParams.subscribe(val => {
-    //   //
-    //   console.log("ID "+id);
-    // }));
+        const req: any = {};
+  
+        req.exportq = searchTextValue;
+  
+        this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
+      });
+  
   }
 
   getDocs(params: Params) {
     const p = Object.assign({}, params);
     p.export = this.export;
+    if (this.query) {
+      p.q = this.query;
+    }
     this.service.searchInExports(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
@@ -109,8 +113,13 @@ export class ExportComponent implements OnInit {
     });
   }
 
+
+  onFilterExportKeyUp(target) {
+    this.subject.next(target.value);
+  }
+
   cleanFilterExport() {
-    // todo
+    this.subject.next('');
   }
 
 }

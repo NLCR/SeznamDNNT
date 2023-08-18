@@ -5,7 +5,9 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { Export } from 'src/app/shared/exports';
 import { Import } from 'src/app/shared/import';
+import { Subject, Subscription } from 'rxjs';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
 
 @Component({
   selector: 'app-exports',
@@ -14,35 +16,16 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 })
 export class ExportsComponent implements OnInit {
 
-  // id: string;
-  // date: Date;
-  // processed: boolean;
-  // num_docs: number;
-
-
-  filterState = [
-    { id: "open", val: "neodeslano" },
-    { id: "waiting", val: "ceka_na_posouzeni" },
-    { id: "processed", val: "zpracovano" }
-  ];
-
-  filterType = [
-    { id: "NZN", val: "navrzeno_na_zarazeni" },
-    { id: "VVS", val: "navrzeno_na_vyrazeni" }
-  ];
+  private subject: Subject<string> = new Subject();
 
   loading: boolean;
-  searchResponse: SolrResponse;
-  facets;
   numFound: number;
 
   displayedColumns = ['indextime', 'id','export_type','stav','export_num_docs','actions'];
 
   exports: Export[] = [];
+  query:string;
 
-
-  stateFilter: string;
-  newStavFilter: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -57,57 +40,45 @@ export class ExportsComponent implements OnInit {
       return;
     }
     this.state.activePage = 'Exports';
+
+    // this.route.queryParams.subscribe(val => {
+    //   this.search(val);
+    // });
+
+
+
     this.route.queryParams.subscribe(val => {
+      this.query = this.route.snapshot.queryParamMap.get('exportq') ;
+      this.state.prefixsearch['export'] = this.query;
       this.search(val);
-      this.newStavFilter = val.navrh;
-      this.stateFilter = val.state;
     });
 
-    this.state.prefixsearch['account'] = '';
+    this.subject.pipe(
+      debounceTime(400)
+    ).subscribe(searchTextValue => {
+
+      const req: any = {};
+      req.exportq = searchTextValue;
+
+      this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
+    });
+
   }
 
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
-
+    if (this.query) {
+      p.q = this.query;
+    }
     this.exports = [];
-    this.searchResponse = null;
-    this.facets = null;
     this.service.searchExports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
-        this.searchResponse = resp;
         this.exports = resp.response.docs;
         this.numFound = this.exports.length;
         this.loading = false;
-      }
+     }
     });
-
-  }
-  setStav(navrh: string) {
-    const q: any = {};
-    // added by peter
-    if (this.newStavFilter === navrh) {
-      q.navrh = null;
-    } else {
-      q.navrh = navrh;
-    }
-
-
-    q.page = null;
-    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
-  }
-
-
-  setStavZadosti(state: string) {
-    const q: any = {};
-    if (this.stateFilter === state) {
-      q.state = null;
-    } else {
-      q.state = state;
-    }
-
-    q.page = null;
-    this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
   removeAllFilters() {
@@ -119,23 +90,39 @@ export class ExportsComponent implements OnInit {
   }
 
   showExport(imp: Export) {
-    this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
+    this.router.navigate(['exports/export/'+ imp.id], { queryParams:{}, queryParamsHandling: 'merge' });
+
+    //this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
   }
 
-  process(imp: Export) {
+  process(exp: Export) {
+    this.service.processExport(exp.id).subscribe(res => {
+
+      this.route.queryParams.subscribe(val => {
+        this.query = this.route.snapshot.queryParamMap.get('exportq') ;
+        this.state.prefixsearch['export'] = this.query;
+        this.search(val);
+      });
+
+    });
+    /*
     this.service.getImportNotControlled(imp.id).subscribe(resp => {
       if (resp.response.numFound > 0) {
         this.service.showSnackBar('nejsou vsechny zkontrollovane');
       } else {
-        this.service.setImportProcessed(imp.id).subscribe(res => {
+        this.service.app(imp.id).subscribe(res => {
           this.search(this.route.snapshot.queryParams);
         });
       }
     });
+    */
   }
 
-  // not delete
-  cleanFilterExport() {
-   // to do
+  onFilterExportsKeyUp(target) {
+    this.subject.next(target.value);
+  }
+
+  cleanFilterExports() {
+    this.subject.next('');
   }
 }

@@ -63,6 +63,7 @@ public class SolrJUtilities {
         modifier.put("add", fValue);
         idoc.addField(fName, modifier);
     }
+    
     public static void atomicAddDistinct(SolrInputDocument idoc, Object fValue, String fName) {
         Map<String, Object> modifier = new HashMap<>(1);
         modifier.put("add-distinct", fValue);

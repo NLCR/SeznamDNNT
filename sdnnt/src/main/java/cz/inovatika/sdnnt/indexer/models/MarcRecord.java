@@ -98,8 +98,14 @@ public class MarcRecord {
   /** EUIPO stuf **/
   // idEuipo
   public List<String> idEuipo = new ArrayList<>();
+  public List<String> idEuipoCanceled = new ArrayList<>();
+  
   // exports ids
-  public List<String> idEuipoExports = new ArrayList<>();
+  public List<String> idEuipoExport = new ArrayList<>();
+
+  // canceled exports ids
+  public String idEuipoActiveExport = null;
+
   // exports facets - only make sure that facest is set during switching object
   public List<String> exportsFacets = new ArrayList<>();
 
@@ -158,7 +164,10 @@ public class MarcRecord {
                     MASTERLINKS_FIELD+":[json]",
                     MASTERLINKS_DISABLED_FIELD,
                     ID_EUIPO,
+                    ID_EUIPO_CANCELED,
                     ID_EUIPO_EXPORT,
+                    ID_EUIPO_EXPORT_ACTIVE,
+                    
                     EXPORT
 
                     
@@ -273,8 +282,17 @@ public class MarcRecord {
           mr.idEuipo = (List<String>) doc.getFieldValue(ID_EUIPO);
       }
 
+      /** euipo stuff */
+      if (doc.containsKey(ID_EUIPO_CANCELED)) {
+          mr.idEuipoCanceled = (List<String>) doc.getFieldValue(ID_EUIPO_CANCELED);
+      }
+      
       if (doc.containsKey(ID_EUIPO_EXPORT)) {
-          mr.idEuipoExports = (List<String>) doc.getFieldValue(ID_EUIPO_EXPORT);
+          mr.idEuipoExport = (List<String>) doc.getFieldValue(ID_EUIPO_EXPORT);
+      }
+
+      if (doc.containsKey(ID_EUIPO_EXPORT_ACTIVE)) {
+          mr.idEuipoActiveExport =  doc.getFirstValue(ID_EUIPO_EXPORT_ACTIVE).toString();
       }
 
       if (doc.containsKey(EXPORT)) {
@@ -592,8 +610,15 @@ public class MarcRecord {
         });
     }
 
-    if (this.idEuipoExports != null && !this.idEuipoExports.isEmpty()) {
-        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoExports);
+    if (this.idEuipoCanceled != null && !this.idEuipoCanceled.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoCanceled);
+        uniqSet.stream().forEach(id-> {
+            sdoc.addField(ID_EUIPO_CANCELED, id);
+        });
+    }
+
+    if (this.idEuipoExport != null && !this.idEuipoExport.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoExport);
         uniqSet.stream().forEach(export-> {
             sdoc.addField(ID_EUIPO_EXPORT, export);
         });

@@ -17,7 +17,7 @@
     "admin": ["undefined", "PA", "A", "VS", "VN", "N", "NZN", "VVN", "VVS"],
     "user": ["undefined","PA", "N"]
   },
-  "identifiers": ["015a", "020a", "022a", "id_sdnnt","id_euipo"],
+  "identifiers": ["015a", "020a", "022a", "id_sdnnt","id_euipo","id_euipo_canceled"],
   "filterFields": ["export","dntstav","kuratorstav","license", "fmt", "language", "sigla", "marc_856a", "nakladatel", "rokvydani", "controlled", "digital_libraries","marc_260a"],
   "sortedFacets":["sigla"], 
 

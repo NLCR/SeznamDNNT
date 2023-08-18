@@ -157,8 +157,15 @@
  
    <!-- identifikator pro euipo -->	
    <field name="id_euipo" type="string" indexed="true" stored="false" multiValued="true"  />
-   <!-- identifikator exportu -->
+
+   <!-- zrusene identifikatory -->
+   <field name="id_euipo_canceled" type="string" indexed="true" stored="false" multiValued="true"  />
+
+   <!-- identifikatory vsech exportu -->
    <field name="id_euipo_export" type="string" indexed="true" stored="false" multiValued="true"  />
+	
+   <!-- identifikator aktivniho exportu -->
+   <field name="id_euipo_export_active" type="string" indexed="true" stored="true" multiValued="false"  />
 			
    <!-- facet field --> 			
    <field name="export"  type="string"	indexed="true" stored="false" multiValued="true"  docValues="true" />	
@@ -277,6 +284,8 @@
 
 	<!-- euipo identifier -->
 	<copyField source="id_euipo" dest="id_all_identifiers" />
+
+	<copyField source="id_euipo_canceled" dest="id_all_identifiers" />
 
     <!-- field type definitions. The "name" attribute is
        just a label to be used by field definitions.  The "class"

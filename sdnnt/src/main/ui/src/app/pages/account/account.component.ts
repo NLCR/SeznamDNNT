@@ -117,8 +117,6 @@ export class AccountComponent implements OnInit {
       
       this.state.prefixsearch['account'] = val.prefix;
 
-     
-
     });
 
 
@@ -129,8 +127,6 @@ export class AccountComponent implements OnInit {
       const q: any = {};
 
       q.prefix = searchTextValue;
-
-      //console.log(this.state.prefixsearch);
 
       this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
     });

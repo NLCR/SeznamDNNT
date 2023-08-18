@@ -4,7 +4,7 @@
     <table class="app-table" [cellPadding]="0" [cellSpacing]="0">
       <tbody>
         <tr *ngFor="let expFile of data.files">
-          <td><a href="api/exports/exported_file?path={{ encodePath(expFile.path) }}&export={{data.export}}">{{ expFile.name }}</a>
+          <td><a href="api/iexports/exported_file?path={{ encodePath(expFile.path) }}&export={{data.export}}">{{ expFile.name }}</a>
 
           </td>
         </tr>

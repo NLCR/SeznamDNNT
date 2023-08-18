@@ -77,6 +77,7 @@ public class ExportServiceImpl implements ExportService {
         req.put("rows", ""+rows);
         req.put("page", ""+page);
         req.put("q", q);
+        req.put("fullCatalog","true");
         
         JSONObject result = searcher.search(req, Arrays.asList(String.format("id_euipo_export:%s", exportName)), loginSupport.getUser());
         return result;
@@ -195,13 +196,15 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public JSONObject search(String q, ExportType type, int rows, int page)
             throws SolrServerException, IOException {
-        
-        CatalogSearcher searcher = new CatalogSearcher();
+
+        CatalogSearcher searcher = new CatalogSearcher(String.format("%s, %s", MarcRecordFields.IDENTIFIER_FIELD, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE));
         Map<String,String> req = new HashMap<>();
-        req.put("rows", "0");
+        req.put("rows", "100");
         req.put("q", q);
+        req.put("fullCatalog","true");
+
         
-        List<String> allFacets  = new ArrayList<>();
+        List<String> idEuExportNames  = new ArrayList<>();
 
         JSONObject result = searcher.search(req, new ArrayList<>(), loginSupport.getUser());
         if (result.has(SearchResultsUtils.FACET_COUNTS_KEY)) {
@@ -213,7 +216,7 @@ public class ExportServiceImpl implements ExportService {
                     JSONArray idEuipoArray = fFields.getJSONArray(MarcRecordFields.ID_EUIPO_EXPORT);
                     idEuipoArray.forEach(obj-> {
                         JSONObject valObj = (JSONObject) obj;
-                        allFacets.add(valObj.getString("name"));
+                        idEuExportNames.add(valObj.getString("name"));
                     });
                 }
             }
@@ -225,7 +228,7 @@ public class ExportServiceImpl implements ExportService {
         JSONObject ret = new JSONObject();
         try (SolrClient solr = buildClient()) {
             // pokud je null nebo neco naslo hledani v katalogu
-            if (q == null || allFacets.size() > 0) {
+            if (q == null || idEuExportNames.size() > 0) {
                 q = "*";
             } else {
                 q = QueryUtils.query(q);
@@ -247,8 +250,8 @@ public class ExportServiceImpl implements ExportService {
                 query.addFilterQuery("export_type:"+type.name());
             }
 
-            if (allFacets.size() > 0) {
-                String exportIdQuery = allFacets.stream().collect(Collectors.joining(" OR "));
+            if (idEuExportNames.size() > 0) {
+                String exportIdQuery = idEuExportNames.stream().collect(Collectors.joining(" OR "));
                 query.addFilterQuery("id:("+exportIdQuery+")");
             }
             QueryRequest qreq = new QueryRequest(query);

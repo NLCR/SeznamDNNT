@@ -29,8 +29,10 @@ public class SurviveFieldUtils {
         
         // musi zustat vlastnosti pro export euipo
         ensureAndSetField(doc, cDoc,MarcRecordFields.ID_EUIPO);
+        ensureAndSetField(doc, cDoc,MarcRecordFields.ID_EUIPO_CANCELED);
         ensureAndSetField(doc, cDoc,MarcRecordFields.EXPORT);
         ensureAndSetField(doc, cDoc,MarcRecordFields.ID_EUIPO_EXPORT);
+        ensureAndSetField(doc, cDoc,MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);
         
         
         MarcRecordUtils.derivedIdentifiers(doc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD).toString(), cDoc);

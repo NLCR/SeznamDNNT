@@ -62,6 +62,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_CANCELED;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.EXPORT;
 
@@ -93,6 +94,7 @@ public class AccountServiceImpl implements AccountService {
             GRANULARITY_FIELD+":[json]"+" "+ 
             MASTERLINKS_FIELD+":[json]"+" "+
             ID_EUIPO+" "+
+            ID_EUIPO_CANCELED +" "+
             ID_EUIPO_EXPORT+" "+
             EXPORT+" "+
             MASTERLINKS_DISABLED_FIELD;

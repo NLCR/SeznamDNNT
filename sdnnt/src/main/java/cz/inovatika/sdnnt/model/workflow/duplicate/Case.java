@@ -13,9 +13,9 @@ public enum Case {
 
     SKC_4,
 
-    SKC_4a,
+    SKC_4a, // spatny format 
 
-    SKC_4b,
+    SKC_4b,  // ceka se na naslednika 
     
     DNT_1,
     
