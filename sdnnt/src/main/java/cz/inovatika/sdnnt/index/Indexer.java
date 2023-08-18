@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
+import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
@@ -104,7 +105,13 @@ public class Indexer {
             SolrDocument solrDocument = docs.get(0);
             if (solrDocument.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
                 Object state = solrDocument.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
-                deletedDocument = PublicItemState.D.name().equals(state);
+                if (PublicItemState.D.name().equals(state)) {
+                    deletedDocument = true;
+                    Object historieStavu = solrDocument.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
+                    boolean case4a = historyCase( historieStavu, Case.SKC_4a);
+                    // nesmi byt case4a 
+                    deletedDocument = !case4a;
+                }
             }
             if (!deletedDocument) {
                 LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
@@ -144,6 +151,8 @@ public class Indexer {
             } else {
                 LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " found in catalog but state D. It is new");
                 client.add("catalog", rec);
+                
+                
             }
           }
         }
@@ -195,6 +204,20 @@ public class Indexer {
     }
     return ret;
   }
+
+public static boolean historyCase(Object historieStavu, Case cs) {
+    if (historieStavu != null) {
+        JSONArray jsonArray = new JSONArray(historieStavu.toString());
+        if (jsonArray.length() > 0) {
+            JSONObject lastObject = jsonArray.getJSONObject(jsonArray.length() -1);
+            if (lastObject.has("comment")) {
+                String comment = lastObject.getString("comment");
+                return comment.contains(cs.name());
+            }
+        } 
+    }
+    return false;
+}
 
   // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
   // keepDNTFields = false => zmena pouze DNT (990, 992) poli
