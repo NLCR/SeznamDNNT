@@ -404,7 +404,7 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                 return false;
             } else {
                 Integer compareVal = (Integer) date1int;
-                return compareVal <= MAX_ACCEPTING_YEAR;
+                return compareVal <= this.maxAcceptingBKYear;
             }
         } else return true;
     }
@@ -599,29 +599,4 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
 
-//    public static void main(String[] args)
-//            throws AccountException, ConflictException, IOException, SolrServerException, InvalidFormatException {
-//        long start = System.currentTimeMillis();
-//        EUIPOUploadService impl = new EUIPOUploadServiceImpl();
-//        List<String> checkBK = impl.check("BK");
-//        //System.out.println(checkBK);
-//        int updatedBK = impl.update("BK", "test", checkBK);
-//        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
-//
-//        List<String> checkSE = impl.check("SE");
-//        //System.out.println(checkBK);
-//        int updatedSE = impl.update("SE", "test", checkSE);
-//        System.out.println("It took: " + (System.currentTimeMillis() - start) + "ms; Size: " + checkBK.size());
-////
-//        impl.createExport("test", updatedBK+updatedSE);
-//        
-//        String title = "Spalovací turbiny, turbodmychadla a ventilátory : přeplňování spalovacích motorů / Jan Macek, Vladimír Kliment";
-//        Pair<Integer,Integer> maxIndexOfWord = maxIndexOfWord(49-3, title);
-//        System.out.println(maxIndexOfWord);
-//        System.out.println(title.substring(0, maxIndexOfWord.getLeft())+"...");
-//        System.out.println(title.substring(0, maxIndexOfWord.getLeft()).length());
-//        
-//        
-//        
-//    }
 }
