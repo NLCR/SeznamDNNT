@@ -138,7 +138,8 @@
     "Priorita 2": "Priority 2",
     "Priorita 3": "Priority 3",
     "export":"Export",
-    "id_euipo":"EUIPO identifier"
+    "id_euipo":"EUIPO identifier",
+    "id_euipo_canceled":"Canceled EUIPO identifiers"
   },
 
   "controlled": {
@@ -961,7 +962,9 @@
     "pridat_novou_instituci": "Add a new institution",
     "exportovane_soubory": "Exported files",
     "seznam_exportovanych_souboru": "List of exported files",
-    "vyhledavani_ve_vysledcich_exportu": "Search in export results"
+    "vyhledavani_ve_vysledcich_exportu": "Search in export results",
+    "typ_exportu":"Export type",
+    "export_num_docs":"Number of documents in export"
   },
 
   "tooltip": {
