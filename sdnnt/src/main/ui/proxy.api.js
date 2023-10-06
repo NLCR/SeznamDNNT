@@ -1,6 +1,6 @@
 const PROXY_CONFIG = {
     "/api/**": {
-        "target": "http://localhost:18080/sdnnt/api",
+        "target": "http://localhost:8080/sdnnt/api",
         "changeOrigin": true,
         "secure": false,
         "logLevel": "debug",
@@ -20,7 +20,7 @@ const PROXY_CONFIG = {
         }
    },
    "/assets/**": {
-        "target": "http://localhost:18080/sdnnt/assets/",
+        "target": "http://localhost:8080/sdnnt/assets/",
         "changeOrigin": true,
         "secure": false,
         "logLevel": "debug",
