@@ -140,7 +140,6 @@
     "export":"Export",
     "id_euipo":"EUIPO identifikátor(y)",
     "id_euipo_canceled":"Nepoužívané EUIPO identifikátory"
-
   },
 
   "controlled": {
@@ -970,7 +969,9 @@
 
   "tooltip": {
     "hromadne_notifikace_disabled": "Nelze provést hromadné notifikace, protože není vybrán žadný filter!",
-    "sledovat_zaznam_disabled": "Tento záznam nelze sledovat, protože je již zahrnut v hromadných notifikacích!"
+    "sledovat_zaznam_disabled": "Tento záznam nelze sledovat, protože je již zahrnut v hromadných notifikacích!",
+    "seznam_zmen_pro_euipo_ooc_uocp": "Seznam změn pro EUIPO OoC (zkratka UOCP)",
+    "importni_soubor_do_euipo_ooc_iocp": "Importní soubor do EUIPO OoC (zkratka IOCP)"
   },
 
   "msg": {

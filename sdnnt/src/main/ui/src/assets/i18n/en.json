@@ -969,7 +969,9 @@
 
   "tooltip": {
     "hromadne_notifikace_disabled": "Bulk notifications cannot be performed because no filter is selected!",
-    "sledovat_zaznam_disabled": "This record cannot be tracked because it is already included in bulk notifications!"
+    "sledovat_zaznam_disabled": "This record cannot be tracked because it is already included in bulk notifications!",
+    "seznam_zmen_pro_euipo_ooc_uocp": "List of changes for EUIPO OoC (abbreviation UOCP)",
+    "importni_soubor_do_euipo_ooc_iocp": "Import file to EUIPO OoC (abbreviation IOCP)"
   },
 
   "msg": {

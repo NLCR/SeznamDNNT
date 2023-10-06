@@ -9,9 +9,7 @@
   </div>
   <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
     <mat-label>{{ 'desc.vyhledavani_v_exportech' | translate }}</mat-label>
-
     <input type="text" matInput (keyup)="onFilterExportsKeyUp($event.target)"[ngModel]="state.prefixsearch['export']">
-
     <button *ngIf="state.prefixsearch['export']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExports()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
       <mat-icon class="app-color-warning">close</mat-icon>
     </button>
@@ -19,12 +17,10 @@
 
   <div class="app-results-wrapper app-overflow-x-auto">
     <table mat-table [dataSource]="exports" class="mat-elevation-z0 app-table-responsive">
-
- 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.identifikatory' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          <span class="app-fx-left mat-header-cell">{{ 'desc.datum_exportu' | translate }}</span>
+          <span class="app-fx-left mat-header-cell">{{ 'desc.identifikatory' | translate }}</span>
           <span class="app-fx-right">{{ element.id }}</span>
         </td>
       </ng-container>
@@ -40,8 +36,8 @@
       <ng-container matColumnDef="export_type">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.typ_exportu' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          <span class="app-fx-left mat-header-cell">{{ 'URL' | translate }}</span>
-          <span class="app-fx-right">{{ element.export_type }}</span>
+          <span class="app-fx-left mat-header-cell">{{ 'desc.typ_exportu' | translate }}</span>
+          <span class="app-fx-right" [matTooltip]="element.export_type === 'UOCP' ? ('tooltip.seznam_zmen_pro_euipo_ooc_uocp' | translate) : ('tooltip.importni_soubor_do_euipo_ooc_iocp' | translate)">{{ element.export_type }}</span>
         </td>
       </ng-container>
 
@@ -58,11 +54,10 @@
         </td>
       </ng-container>
 
-
       <ng-container matColumnDef="export_num_docs">
         <th mat-header-cell *matHeaderCellDef>{{ 'desc.export_num_docs' | translate }}</th>
         <td mat-cell *matCellDef="let element">
-          <span class="app-fx-left mat-header-cell">{{ 'URL' | translate }}</span>
+          <span class="app-fx-left mat-header-cell">{{ 'desc.export_num_docs' | translate }}</span>
           <span class="app-fx-right">{{ element.export_num_docs }}</span>
         </td>
       </ng-container>
@@ -105,9 +100,8 @@
       </ng-container>
     -->
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
   
