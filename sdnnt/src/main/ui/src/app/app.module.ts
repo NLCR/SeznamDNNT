@@ -76,6 +76,8 @@ import { ExportsComponent } from './pages/exports/exports.component';
 import { ExportComponent } from './pages/exports/export/export.component';
 import { ExportItemComponent } from './components/export-item/export-item.component';
 import { DialogExportedFilesComponent } from './components/dialog-exported-files/dialog-exported-files.component';
+import { ResultActionsSearchComponent } from './components/result-item/result-actions-search/result-actions-search.component';
+import { ResultActionsExportComponent } from './components/result-item/result-actions-export/result-actions-export.component';
 //import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
@@ -154,6 +156,8 @@ const providers: any[] =[
     ExportComponent,
     ExportItemComponent,
     DialogExportedFilesComponent,
+    ResultActionsSearchComponent,
+    ResultActionsExportComponent,
   ],
   imports: [
     BrowserModule,
