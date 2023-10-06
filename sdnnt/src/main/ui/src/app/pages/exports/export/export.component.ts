@@ -121,5 +121,4 @@ export class ExportComponent implements OnInit {
   cleanFilterExport() {
     this.subject.next('');
   }
-
 }

@@ -6,31 +6,52 @@
     </div>
     <div><strong><a (click)="openExportedFilesDialog()">{{ 'desc.exportovane_soubory' | translate }}</a></strong></div>
   </ul>
-  <div class="app-export-wrapper">
-
-    <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
-      <div fxFlex class="app-left">
-        {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+  <div fxLayout="row" fxLayoutGap="32px" class="app-export-wrapper">
+    <div class="app-left app-fx-facets">
+      <!-- to do - happy -->
+      <app-facets></app-facets>
+    </div>
+    <div fxFlex class="app-right">
+      <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+        <div fxFlex class="app-left">
+          {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
+        </div>
+        <div class="app-right">
+          <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
+        </div>
       </div>
-      <div class="app-right">
+      <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
+        <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
+          <mat-label>{{ 'desc.vyhledavani_ve_vysledcich_exportu' | translate }}</mat-label>
+          <input type="text" matInput (keyup)="onFilterExportKeyUp($event.target)" [ngModel]="state.prefixsearch['export']">
+          <button *ngIf="state.prefixsearch['export']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExport()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+            <mat-icon class="app-color-warning">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+      <div class="app-results-wrapper">
+        <mat-card>
+          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+            <div fxFlex></div>
+            <div>
+              <mat-button-toggle mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
+                <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_exportu' | translate }}
+              </mat-button-toggle>
+              <mat-menu #menuVyrizeniZadosti="matMenu">
+                <button mat-menu-item>{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
+                <button mat-menu-item>{{ 'desc.hromadne_schvalit' | translate }}</button>
+                <button mat-menu-item>{{ 'desc.hromadne_odmitnout' | translate }}</button>
+              </mat-menu>
+            </div>
+          </div>
+        </mat-card>
+        <ng-container *ngFor="let doc of docs">
+          <app-result-item [doc]="doc"></app-result-item>
+        </ng-container>
+      </div>
+      <div class="app-mt-2">
         <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
       </div>
-      <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
-        <mat-label>{{ 'desc.vyhledavani_ve_vysledcich_exportu' | translate }}</mat-label>
-        <input type="text" matInput (keyup)="onFilterExportKeyUp($event.target)" [ngModel]="state.prefixsearch['export']">
-        <button *ngIf="state.prefixsearch['export']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExport()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
-          <mat-icon class="app-color-warning">close</mat-icon>
-        </button>
-      </mat-form-field>
-    </div>
-
-    <div class="app-results-wrapper">
-      <ng-container *ngFor="let doc of docs">
-        <app-result-item [doc]="doc"></app-result-item>
-      </ng-container>
-    </div>
-    
-    <div class="app-mt-4">
-      <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
+</div>

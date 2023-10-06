@@ -964,7 +964,8 @@
     "seznam_exportovanych_souboru": "Seznam exporovaných souborů",
     "vyhledavani_ve_vysledcich_exportu": "Vyhledávání ve vysledcích exportu",
     "typ_exportu":"Typ exportu",
-    "export_num_docs":"Počet dokumentů v exportu"
+    "export_num_docs":"Počet dokumentů v exportu",
+    "vyrizeni_exportu": "Vyřízení exportu"
   },
 
   "tooltip": {

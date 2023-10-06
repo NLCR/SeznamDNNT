@@ -964,7 +964,8 @@
     "seznam_exportovanych_souboru": "List of exported files",
     "vyhledavani_ve_vysledcich_exportu": "Search in export results",
     "typ_exportu":"Export type",
-    "export_num_docs":"Number of documents in export"
+    "export_num_docs":"Number of documents in export",
+    "vyrizeni_exportu": "Processing of export"
   },
 
   "tooltip": {
