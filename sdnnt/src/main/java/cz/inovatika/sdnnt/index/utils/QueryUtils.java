@@ -23,9 +23,11 @@ public class QueryUtils {
     
     private QueryUtils() {}
     
-    
     public static String query(String inputQuery) {
-        if (inputQuery != null && inputQuery.startsWith(IDENTIFIER_PREFIX)) {
+        return query(inputQuery, IDENTIFIER_PREFIX);
+    }    
+    public static String query(String inputQuery, String identifierPrefix) {
+        if (inputQuery != null && inputQuery.startsWith(identifierPrefix)) {
             return "\""+ inputQuery +"\"";
         } else {
             List<String> words = new ArrayList<>();

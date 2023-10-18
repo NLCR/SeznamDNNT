@@ -75,7 +75,7 @@ export class ExportsComponent implements OnInit {
     this.service.searchExports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
         this.exports = resp.response.docs;
-        this.numFound = this.exports.length;
+        this.numFound = resp.response.numFound;
         this.loading = false;
      }
     });
@@ -90,21 +90,22 @@ export class ExportsComponent implements OnInit {
   }
 
   showExport(imp: Export) {
-    this.router.navigate(['exports/export/'+ imp.id], { queryParams:{}, queryParamsHandling: 'merge' });
+
+    const queryParams = this.query?.match(/^\s*euipo_/) ? {} : { exportq: this.query };
+    this.router.navigate(['exports/export/'+ imp.id], { queryParams });
 
     //this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
   }
 
-  process(exp: Export) {
-    this.service.processExport(exp.id).subscribe(res => {
+  approveANDProcess(exp: Export) {
 
+    this.service.approveAndProcessExport(exp.id).subscribe((exp)=> {
       this.route.queryParams.subscribe(val => {
         this.query = this.route.snapshot.queryParamMap.get('exportq') ;
         this.state.prefixsearch['export'] = this.query;
         this.search(val);
       });
-
-    });
+  });
     /*
     this.service.getImportNotControlled(imp.id).subscribe(resp => {
       if (resp.response.numFound > 0) {

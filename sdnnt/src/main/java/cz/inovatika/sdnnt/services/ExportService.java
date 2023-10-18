@@ -2,11 +2,13 @@ package cz.inovatika.sdnnt.services;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
+import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exports.ExportType;
 
 public interface ExportService {
@@ -20,7 +22,7 @@ public interface ExportService {
     /** 
      * Search inside exports. Result is filtered content of one export
      */
-    public JSONObject searchInExport(String expName,String q ,  int page, int rows) throws SolrServerException, IOException;
+    public JSONObject searchInExport(Map<String, String>  request, String expName,String q ,  int page, int rows) throws SolrServerException, IOException;
 
     /**
      * Returns all exported files
@@ -43,4 +45,9 @@ public interface ExportService {
     
     
     
+    
+    
+    public JSONObject approveExportItem(String exportId, String identifier) throws SolrServerException, IOException;
+
+    public JSONObject approveExport(String exportId) throws SolrServerException, IOException;
 }

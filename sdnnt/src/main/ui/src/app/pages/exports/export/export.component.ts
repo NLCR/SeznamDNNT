@@ -24,11 +24,12 @@ export class ExportComponent implements OnInit {
 
   public numFound: number = 30;
   public imgSrc: boolean = false;
-  public export:string;
+  public exportname:string;
   public query:string;
 
   public exportObj:any;
   public exportFiles:any[];
+  facets: any;
 
   loading: boolean;
 
@@ -53,15 +54,17 @@ export class ExportComponent implements OnInit {
       const id = this.route.snapshot.paramMap.get('id');
       
       this.route.queryParams.subscribe(val => {
-        this.export = id;
+        this.exportname = id;
         this.query = this.route.snapshot.queryParamMap.get('exportq') ;
 
         this.getDocs(val);
-        this.service.getExport(this.export).subscribe((exp)=> {
-          this.exportObj = exp;
+        this.service.getExport(this.exportname).subscribe((exp)=> {
+          if (exp.response.docs && exp.response.docs.length > 0) {
+            this.exportObj = exp.response.docs[0];
+          }
         });
 
-        this.service.getExportFiles(this.export).subscribe((exp)=> {
+        this.service.getExportFiles(this.exportname).subscribe((exp)=> {
           this.exportFiles = exp.files;
         });
         
@@ -78,18 +81,45 @@ export class ExportComponent implements OnInit {
   
         this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
       });
-  
   }
 
   getDocs(params: Params) {
     const p = Object.assign({}, params);
-    p.export = this.export;
+    p.exportname = this.exportname;
     if (this.query) {
       p.q = this.query;
     }
     this.service.searchInExports(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
       this.numFound = resp.response.numFound;
+      this.facets = resp.facet_counts.facet_fields;
+
+    });
+  }
+
+
+  setProcessed() {
+    this.service.processExport(this.exportname).subscribe(res => {
+      this.getDocs({});
+
+      this.service.getExport(this.exportname).subscribe((exp)=> {
+        if (exp.response.docs && exp.response.docs.length > 0) {
+          this.exportObj = exp.response.docs[0];
+        }
+      });
+    });
+  }
+  
+
+  approveAll() {
+    this.service.approveExport(this.exportname).subscribe((exp)=> {
+      this.getDocs({});
+      
+      this.service.getExport(this.exportname).subscribe((exp)=> {
+        if (exp.response.docs && exp.response.docs.length > 0) {
+          this.exportObj = exp.response.docs[0];
+        }
+      });
     });
   }
 
@@ -99,7 +129,7 @@ export class ExportComponent implements OnInit {
   openExportedFilesDialog() {
 
     const data = {
-      export: this.export,
+      exportname: this.exportname,
       files: []
     }
     this.exportFiles.forEach((e)=> {
@@ -112,6 +142,7 @@ export class ExportComponent implements OnInit {
       panelClass: 'app-dialog-exported-files'
     });
   }
+
 
 
   onFilterExportKeyUp(target) {

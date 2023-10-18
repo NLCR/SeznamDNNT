@@ -512,21 +512,16 @@ public class Job implements InterruptableJob {
                             states.add(it.toString());
                         });
                     }
-                  EUIPOImportService impl = new EUIPOImportServiceImpl(logger, iteration, results);
+                    EUIPOImportService impl = new EUIPOImportServiceImpl(logger, iteration, results);
                     try {
-                        SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm");
-                        String name = String.format("euipo_iocp_%s", nameformat.format(new Date()));
+                        
                         
                         List<String> checkBK = impl.check("BK");
-                        int updatedBK = impl.update("BK", name, checkBK);
+                        List<Integer> updated = new ArrayList<>();
+                        int updatedBKCount = impl.update("BK", checkBK);
     
                         List<String> checkSE = impl.check("SE");
-                        int updatedSE = impl.update("SE", name, checkSE);
-
-                        int total = updatedBK+updatedSE;
-                        if (total > 0) {
-                            impl.createExport(name, updatedBK+updatedSE);
-                        }
+                        int updatedSECount = impl.update("SE", checkSE);
 
                         
                     } catch (Exception e) {
@@ -561,20 +556,27 @@ public class Job implements InterruptableJob {
                             states.add(it.toString());
                         });
                     }
-                  EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
+                    EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
                     try {
-                        SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm");
-                        String name = String.format("euipo_uocp_%s", nameformat.format(new Date()));
                         
-                        List<String> checkBK = impl.check("BK");
-                        int updatedBK = impl.update("BK", name, checkBK);
-    
-                        List<String> checkSE = impl.check("SE");
-                        int updatedSE = impl.update("SE", name, checkSE);
-                        int total = updatedBK+updatedSE;
-                        if (total > 0) {
-                            impl.createExport(name, updatedBK+updatedSE);
+                        List<Integer> updated = new ArrayList<>();
+
+                        List<List<String>> checkBK = impl.check("BK");
+                        for (List<String> batch : checkBK) {
+                            SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
+                            String name = String.format("euipo_uocp_bk_%s", nameformat.format(new Date()));
+                            int updatedBK = impl.update("BK", name, batch);
+                            updated.add(updatedBK);
                         }
+    
+                        List<List<String>> checkSE = impl.check("SE");
+                        for (List<String> batch : checkSE) {
+                            SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
+                            String name = String.format("euipo_uocp_bk_%s", nameformat.format(new Date()));
+                            int updatedSE = impl.update("SE", name, batch);
+                            updated.add(updatedSE);
+                        }
+
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {

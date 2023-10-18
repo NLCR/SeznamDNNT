@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -209,7 +210,7 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
         }
 
         logger.info("Current iteration filter " + plusFilter);
-
+       
         try (SolrClient solrClient = buildClient()) {
             support.iterate(
                     solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X",
@@ -221,7 +222,22 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
         } catch (Exception e) {
             this.logger.log(Level.SEVERE, e.getMessage(), e);
         }
-
+        
+        
+//        List<List<String>> retvals = new ArrayList<>();
+//        
+//        int itemsInBatch = DEFAULT_MAX_EXPORT_ITEMS;
+//        int numberOfBatches =  foundCandidates.size() / itemsInBatch;
+//        numberOfBatches += foundCandidates.size() % itemsInBatch == 0 ? 0 : 1;
+//        for (int i = 0; i < numberOfBatches; i++) {
+//            int start = i*itemsInBatch;
+//            int stop = Math.min((i+1)*itemsInBatch, foundCandidates.size());
+//            retvals.add(foundCandidates.subList(start, stop));
+//
+//        }
+//        
+//        return retvals;
+        
         return foundCandidates;
     }
 
@@ -248,16 +264,19 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public int update(String format, String identifier, List<String> docs)
+    public int update(String format,  List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
 
+        //LinkedHashSet<String> docs = new LinkedHashSet<>(a);
+        
+        
         AtomicInteger retVal = new AtomicInteger();
         if (!docs.isEmpty()) {
 
             List<String> toRemove = new ArrayList<>();
             
             try (SolrClient solrClient = buildClient()) {
-                getLogger().info("Export identifier '" + identifier + "' number of records "+docs.size());
+                //getLogger().info("Export identifier '" + identifier + "' number of records "+docs.size());
 
                 int numberOfUpdateBatches = docs.size() / updateBatchLimit;
                 if (docs.size() % updateBatchLimit > 0) {
@@ -305,89 +324,126 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                     }
                 }
                 
-                
+                long start = System.currentTimeMillis();
                 docs.removeAll(toRemove);
-                // pri vzniku 
-                //prepareExport.put("export_size", docs.size());
+                getLogger().info("Removing all items took "+(System.currentTimeMillis() - start)+" ms ");
                 
-                int numberOfSpredsheets = docs.size() / this.spredsheetLimit;
-                if (docs.size() % this.spredsheetLimit > 0) {
-                    numberOfSpredsheets += 1;
-                }
-                for (int i = 0; i < numberOfSpredsheets; i++) {
-                    int startIndex = i * this.spredsheetLimit;
-                    int endIndex = (i + 1) * this.spredsheetLimit;
-                    List<String> spreadSheetBatch = docs.subList(startIndex, Math.min(endIndex, docs.size()));
+                int numberOfExports = numberOfExports(docs);
+                for (int export = 0; export < numberOfExports; export++) {
+                    
+                    List<String> exportPids = subList(docs, export, this.exportLimit);
+                    SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
+                    String exportName = String.format("euipo_iocp_%s_%s",format, nameformat.format(new Date()));
+                    getLogger().info(String.format("Creating  export %s ", exportName));
+                    this.createExport(exportName, exportPids.size());
+                    
+                    int numberOfSpredsheets = numberOfSpreadsheets(exportPids);
+                    for (int i = 0; i < numberOfSpredsheets; i++) {
 
-                    getLogger().info(String.format("Generating spreadsheet number %d and size is %d", i, spreadSheetBatch.size()));
+                        List<String> spreadSheetBatch =  subList(exportPids, i, spredsheetLimit);
 
-                    try {
-                        File nFile = generateSpreadSheet(format, identifier, i, spreadSheetBatch, recordValues);
-                        getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
-                        
-                        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
-                        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
-                            numberOfUpdates += 1;
-                        }
-                       
-                        // update items from spreadsheet
-                        for (int update = 0; update < numberOfUpdates; update++) {
-                            int upateStartIndex = update * updateBatchLimit;
-                            int endStartIndex = (update + 1) * updateBatchLimit;
-                            getLogger().info(String.format("Updating records from spreadsheet  %d and index of update %d (%d-%d)", i, update, upateStartIndex, endStartIndex));
+                        getLogger().info(String.format("Generating spreadsheet number %d and size is %d", i, spreadSheetBatch.size()));
+
+                        try {
+                            File nFile = generateSpreadSheet(format, exportName, i, spreadSheetBatch, recordValues);
+                            getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
                             
-                            List<String> updateBatch = spreadSheetBatch.subList(upateStartIndex,
-                                    Math.min(endStartIndex, spreadSheetBatch.size()));
- 
-                            UpdateRequest uReq = new UpdateRequest();
-                            for (String id : updateBatch) {
-                                SolrInputDocument idoc = new SolrInputDocument();
-                                idoc.setField(IDENTIFIER_FIELD, id);
+                            int numberOfUpdates = numberOfUpdates(spreadSheetBatch);
+                           
+                            // update items from spreadsheet
+                            for (int update = 0; update < numberOfUpdates; update++) {
+                                int upateStartIndex = update * updateBatchLimit;
+                                int endStartIndex = (update + 1) * updateBatchLimit;
 
-                                String generateEUIPOIdent = recordValues.get(id).get("euipo").get(0);
-
-                                SolrJUtilities.atomicAddDistinct(idoc, generateEUIPOIdent, MarcRecordFields.ID_EUIPO);
-                                SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
-
+                                getLogger().info(String.format("Updating records from spreadsheet  %d and index of update %d (%d-%d)", i, update, upateStartIndex, endStartIndex));
                                 
-                                SolrJUtilities.atomicAddDistinct(idoc, identifier, MarcRecordFields.ID_EUIPO_EXPORT);
-                                SolrJUtilities.atomicSet(idoc, identifier, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);
+                                List<String> updateBatch =  subList(spreadSheetBatch, update, updateBatchLimit);
+     
+                                UpdateRequest uReq = new UpdateRequest();
+                                for (String id : updateBatch) {
+                                    SolrInputDocument idoc = new SolrInputDocument();
+                                    idoc.setField(IDENTIFIER_FIELD, id);
 
-                                uReq.add(idoc);
-                            }
+                                    String generateEUIPOIdent = recordValues.get(id).get("euipo").get(0);
 
-                            if (!uReq.getDocuments().isEmpty()) {
-                                UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
-                                if (response.getStatus() != 200) {
+                                    SolrJUtilities.atomicAddDistinct(idoc, generateEUIPOIdent, MarcRecordFields.ID_EUIPO);
+                                    /** Must be set manually */
+                                    //SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
+                                    
+                                    SolrJUtilities.atomicAddDistinct(idoc, exportName, MarcRecordFields.ID_EUIPO_EXPORT);
+                                    SolrJUtilities.atomicSet(idoc, exportName, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);
 
-                                    retVal.addAndGet(updateBatch.size());
-
-                                    getLogger().info(String.format("Updated retval  %d", retVal.get()));
-
+                                    uReq.add(idoc);
                                 }
+
+                                if (!uReq.getDocuments().isEmpty()) {
+                                    UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
+                                    if (response.getStatus() != 200) {
+
+                                        retVal.addAndGet(updateBatch.size());
+
+                                        getLogger().info(String.format("Updated retval  %d", retVal.get()));
+
+                                    }
+                                }
+
+                                SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
                             }
 
-                            SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
+                            File finalFile = new File(nFile.getParentFile(), nFile.getName().replace("proc", "xlsx"));
+                            com.google.common.io.Files.move(nFile, finalFile);
+                            if (finalFile.length() == nFile.length()) {
+                                nFile.delete();
+                            }
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidFormatException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-
-                        File finalFile = new File(nFile.getParentFile(), nFile.getName().replace("proc", "xlsx"));
-                        com.google.common.io.Files.move(nFile, finalFile);
-                        if (finalFile.length() == nFile.length()) {
-                            nFile.delete();
-                        }
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvalidFormatException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
                     }
-                }
+
+                } 
+                
+                
+                
             }
         }
         
         //
         return retVal.get();
+    }
+
+    private List<String> subList(List<String> docs, int export, int limit) {
+        int startExportIndex = export * limit;
+        int endExportIndex = (export + 1) * limit;
+        List<String> exportPids = docs.subList(startExportIndex, Math.min(endExportIndex, docs.size()));
+        return exportPids;
+    }
+
+    private int numberOfExports(List<String> docs) {
+        int numberOfExports = docs.size() / this.exportLimit;
+        if (docs.size() % this.exportLimit > 0) {
+            numberOfExports += 1;
+        }
+        return numberOfExports;
+    }
+
+    private int numberOfSpreadsheets(List<String> exportPids) {
+        int numberOfSpredsheets = exportPids.size() / this.spredsheetLimit;
+        if (exportPids.size() % this.spredsheetLimit > 0) {
+            numberOfSpredsheets += 1;
+        }
+        return numberOfSpredsheets;
+    }
+
+    private int numberOfUpdates(List<String> spreadSheetBatch) {
+        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
+        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
+            numberOfUpdates += 1;
+        }
+        return numberOfUpdates;
     }
 
 

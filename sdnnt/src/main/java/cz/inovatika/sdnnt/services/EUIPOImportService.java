@@ -18,7 +18,7 @@ public interface EUIPOImportService extends LoggerAware{
 
     public List<String> check(String format);
 
-    public int update(String format, String exortIdentifier, List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
+    public int update(String format,  List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
     public void createExport(String exportIdentifier, int numberOfDocs) throws AccountException, IOException, ConflictException, SolrServerException;
     

@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface ExportedFilesData {
-  export: string;
+  exportname: string;
   files : {
     name: string;
     path: string;
@@ -24,7 +24,9 @@ export class DialogExportedFilesComponent implements OnInit {
   ) { 
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    
+  }
 
   encodePath(path) {
     return encodeURIComponent(path);

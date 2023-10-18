@@ -62,20 +62,26 @@ public class AbstractEUIPOService {
     /** Default solr update batch limit */
     public static final int UPDATE_BATCH_LIMIT = 100;
     /** Default spreadsheet limit; max number of rows per one document */
-    public static final int SPREADSHEET_LIMIT = 20000;
+    public static final int SPREADSHEET_LIMIT = 2000;
     /** Default fetching limit; for reading data from solr */
     public static final int FETCH_LIMIT = 1000;
     /** Default max accepting year */
     public static final int MAX_ACCEPTING_YEAR = 2003;
+    /** Default export items */
+    public static final int DEFAULT_MAX_EXPORT_ITEMS = 5000;
+    
+    
     
     
     protected String outputFolder = AbstractEUIPOService.DEFAULT_OUTPUT_FOLDER;
 
     protected String seTemplate = null;
     protected String bkTemplate = null;
-
+    
     protected int spredsheetLimit = AbstractEUIPOService.SPREADSHEET_LIMIT;
     protected int updateBatchLimit = AbstractEUIPOService.UPDATE_BATCH_LIMIT;
+    protected int exportLimit = AbstractEUIPOService.DEFAULT_MAX_EXPORT_ITEMS;
+    
     
     protected List<String> states = null; //DEFAULT_STATES;
 

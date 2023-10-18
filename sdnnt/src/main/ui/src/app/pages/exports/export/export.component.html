@@ -9,7 +9,8 @@
   <div fxLayout="row" fxLayoutGap="32px" class="app-export-wrapper">
     <div class="app-left app-fx-facets">
       <!-- to do - happy -->
-      <app-facets></app-facets>
+      <app-facets *ngIf="facets" [facet_fields]="facets" ></app-facets>
+
     </div>
     <div fxFlex class="app-right">
       <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
@@ -17,7 +18,7 @@
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div class="app-right">
-          <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
+          <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="true"></app-paginator>
         </div>
       </div>
       <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
@@ -30,17 +31,16 @@
         </mat-form-field>
       </div>
       <div class="app-results-wrapper">
-        <mat-card>
+        <mat-card  *ngIf="exportObj && (!exportObj.export_processed || !exportObj.all_exported_identifiers_flag)">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-            <div fxFlex></div>
+            <div fxFlex ></div>
             <div>
               <mat-button-toggle mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
                 <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_exportu' | translate }}
               </mat-button-toggle>
-              <mat-menu #menuVyrizeniZadosti="matMenu">
-                <button mat-menu-item>{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
-                <button mat-menu-item>{{ 'desc.hromadne_schvalit' | translate }}</button>
-                <button mat-menu-item>{{ 'desc.hromadne_odmitnout' | translate }}</button>
+              <mat-menu  #menuVyrizeniZadosti="matMenu">
+                <button *ngIf="exportObj &&  !exportObj.export_processed && exportObj.all_exported_identifiers_flag"  (click)="setProcessed()" mat-menu-item>{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
+                <button  *ngIf="exportObj  &&  !exportObj.all_exported_identifiers_flag" (click)="approveAll()" mat-menu-item>{{ 'desc.oznacit_jako_exportovane' | translate }}</button>
               </mat-menu>
             </div>
           </div>

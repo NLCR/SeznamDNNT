@@ -139,7 +139,19 @@ export class AppService {
 
   processExport(id: string): Observable<any> {
     let url = '/iexports/process_export';
-    const params: HttpParams = new HttpParams().set('export', id);
+    const params: HttpParams = new HttpParams().set('exportname', id);
+    return this.get(url, params);
+  }
+
+  approveAndProcessExport(id: string): Observable<any> {
+    let url = '/iexports/approve_and_process_export';
+    const params: HttpParams = new HttpParams().set('exportname', id);
+    return this.get(url, params);
+  }
+
+  approveExport(id: string): Observable<any> {
+    let url = '/iexports/approve_export';
+    const params: HttpParams = new HttpParams().set('exportname', id);
     return this.get(url, params);
   }
 
@@ -156,13 +168,13 @@ export class AppService {
 
   getExport(id: string): Observable<any> {
     let url = '/iexports/export';
-    const params: HttpParams = new HttpParams().set('export', id);
+    const params: HttpParams = new HttpParams().set('exportname', id);
     return this.get(url, params);
   }
 
   getExportFiles(id: string): Observable<any> {
     let url = '/iexports/exported_files_desc';
-    const params: HttpParams = new HttpParams().set('export', id);
+    const params: HttpParams = new HttpParams().set('exportname', id);
     return this.get(url, params);
   }
 

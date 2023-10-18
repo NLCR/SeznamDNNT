@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +32,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
@@ -115,17 +118,53 @@ public class ExportServlet extends HttpServlet {
 
     enum Actions {
         
+        APPROVE_AND_PROCESS_EXPORT {
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                String id = req.getParameter("exportname");
+                if (id != null) {
+                    UserControlerImpl uc = new UserControlerImpl(req);
+                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                    JSONObject approvedExport = ex.approveExport(id);
+                    if (approvedExport != null) {
+                        return ex.setExportProcessed(id);
+                    } else return null;
+                } else {
+                    return errorMissingParameterJson(response, "exportname");
+                }
+            }
+            
+        },
+        
+        
         PROCESS_EXPORT {
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                String id = req.getParameter("export");
+                String id = req.getParameter("exportname");
                 if (id != null) {
                     UserControlerImpl uc = new UserControlerImpl(req);
                     ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
                     return ex.setExportProcessed(id);
                 } else {
-                    return errorMissingParameterJson(response, "export");
+                    return errorMissingParameterJson(response, "exportname");
+                }
+            }
+            
+        },
+        
+        APPROVE_EXPORT {
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                String id = req.getParameter("exportname");
+                if (id != null) {
+                    UserControlerImpl uc = new UserControlerImpl(req);
+                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                    return ex.approveExport(id);
+                } else {
+                    return errorMissingParameterJson(response, "exportname");
                 }
             }
             
@@ -177,15 +216,26 @@ public class ExportServlet extends HttpServlet {
 
 
                     String q = req.getParameter("q");
-                    String exportName = req.getParameter("export");
+                    String exportName = req.getParameter("exportname");
                     String page = req.getParameter("page");
                     page = page != null ? page : "0";
                     String rows = req.getParameter("rows");
                     rows = rows != null ? rows : "20";
+                    
                     try {
                         UserControlerImpl uc = new UserControlerImpl(req);
+
+                        // 
+                        Map<String, String[]> parameterMap = new HashMap<>(req.getParameterMap());
+                        parameterMap.remove("exportname");
+                        
+                        Map<String, String> resmap = new HashMap<>();
+                        parameterMap.entrySet().stream().forEach(stringEntry -> {
+                            resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+                        });
+
                         ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
-                        return ex.searchInExport( exportName != null ? exportName : "-", q, Integer.parseInt(page), Integer.parseInt(rows));
+                        return ex.searchInExport(resmap,  exportName != null ? exportName : "-", q, Integer.parseInt(page), Integer.parseInt(rows));
                     } catch (SolrServerException | IOException ex) {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -213,7 +263,7 @@ public class ExportServlet extends HttpServlet {
                     try {
                         UserControlerImpl uc = new UserControlerImpl(req);
                         ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
-                        return ex.search(q, exportType != null ? ExportType.valueOf(exportType) : null, Integer.parseInt(page), Integer.parseInt(rows));
+                        return ex.search(q, exportType != null ? ExportType.valueOf(exportType) : null,  Integer.parseInt(rows),Integer.parseInt(page));
                     } catch (SolrServerException | IOException ex) {
                         LOGGER.log(Level.SEVERE, null, ex);
                         return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
@@ -229,7 +279,7 @@ public class ExportServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(),new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
 
-                    String exportName = req.getParameter("export");
+                    String exportName = req.getParameter("exportname");
                     if (exportName != null) {
                         try {
                             UserControlerImpl uc = new UserControlerImpl(req);
@@ -243,7 +293,7 @@ public class ExportServlet extends HttpServlet {
                             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
                         }
                     } else {
-                        return errorMissingParameterJson(response, "export");
+                        return errorMissingParameterJson(response, "exportname");
                         
                     }
                 } else {
@@ -257,7 +307,7 @@ public class ExportServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(),new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
 
-                    String exportName = req.getParameter("export");
+                    String exportName = req.getParameter("exportname");
                     if (exportName != null) {
                         try {
                             UserControlerImpl uc = new UserControlerImpl(req);
@@ -268,7 +318,7 @@ public class ExportServlet extends HttpServlet {
                             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
                         }
                     } else {
-                        return errorMissingParameterJson(response, "export");
+                        return errorMissingParameterJson(response, "exportname");
                         
                     }
                 } else {
@@ -284,7 +334,7 @@ public class ExportServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(),new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
 
-                    String exportName = req.getParameter("export");
+                    String exportName = req.getParameter("exportname");
                     String exportFilePath = req.getParameter("path");
                     if (exportName != null &&  exportFilePath != null) {
                         try {
@@ -305,7 +355,7 @@ public class ExportServlet extends HttpServlet {
                             return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
                         }
                     } else {
-                        if (exportName == null)  return errorMissingParameterJson(response, "export");
+                        if (exportName == null)  return errorMissingParameterJson(response, "exportname");
                         else return errorMissingParameterJson(response, "path");
                     }
                 } else {

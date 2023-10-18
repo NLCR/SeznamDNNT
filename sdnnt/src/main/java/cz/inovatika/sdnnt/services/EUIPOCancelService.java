@@ -10,7 +10,7 @@ import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 
 public interface EUIPOCancelService extends LoggerAware{
 
-    public List<String> check(String format);
+    public List<List<String>> check(String format);
 
     public int update(String format, String exortIdentifier, List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 

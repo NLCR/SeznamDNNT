@@ -11,9 +11,8 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Represents a service for handling requests
- * 
- * TODO: return types
+ * This class is responsible for comprehensive request management within the application. 
+ * It encapsulates various operations related to handling requests, allowing for a structured and efficient approach to managing incoming and outgoing data. 
  */
 public interface AccountService {
     

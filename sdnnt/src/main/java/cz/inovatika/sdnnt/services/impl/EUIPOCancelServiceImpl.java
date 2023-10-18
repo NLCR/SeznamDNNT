@@ -94,7 +94,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public List<String> check(String formatFilter) {
+    public List<List<String>> check(String formatFilter) {
         getLogger().info(String.format(" Config for iteration -> iteration states %s; templates %s, %s; filters %s; nonparsable dates %s ", this.states.toString(), this.bkTemplate, this.seTemplate, this.filters, this.compiledPatterns));
 
         List<String> foundCandidates = new ArrayList<>();
@@ -146,8 +146,20 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
         } catch (Exception e) {
             this.logger.log(Level.SEVERE, e.getMessage(), e);
         }
+        
+        List<List<String>> retvals = new ArrayList<>();
+        
+        int itemsInBatch = DEFAULT_MAX_EXPORT_ITEMS;
+        int numberOfBatches =  foundCandidates.size() / itemsInBatch;
+        numberOfBatches += foundCandidates.size() % itemsInBatch == 0 ? 0 : 1;
+        for (int i = 0; i < numberOfBatches; i++) {
+            int start = i*itemsInBatch;
+            int stop = Math.min((i+1)*i, foundCandidates.size());
+            retvals.add(foundCandidates.subList(start, stop));
 
-        return foundCandidates;
+        }
+        
+        return retvals;
     }
 
     
@@ -304,7 +316,8 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                                 
                                 // zrusim euipo identfikator, facet ze byl exportovan
                                 SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.ID_EUIPO);
-                                SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.EXPORT);
+                                /** Must be set manually */
+                                // SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.EXPORT);
 
                                 SolrJUtilities.atomicAddDistinct(idoc, exortIdentifier, MarcRecordFields.ID_EUIPO_EXPORT);
                                 SolrJUtilities.atomicSet(idoc, exortIdentifier, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);

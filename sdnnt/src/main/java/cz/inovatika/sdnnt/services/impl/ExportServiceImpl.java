@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileSystemUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -38,14 +39,17 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.AccountServiceInform;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
+import cz.inovatika.sdnnt.services.EUIPOImportService;
 import cz.inovatika.sdnnt.services.ExportService;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exports.ExportType;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -69,17 +73,22 @@ public class ExportServiceImpl implements ExportService {
 
     
     @Override
-    public JSONObject searchInExport(String exportName,String q, int page, int rows)
+    public JSONObject searchInExport(Map<String, String>  givenReq,  String exportName,String q, int page, int rows)
             throws SolrServerException, IOException {
         
         CatalogSearcher searcher = new CatalogSearcher();
-        Map<String,String> req = new HashMap<>();
-        req.put("rows", ""+rows);
-        req.put("page", ""+page);
-        req.put("q", q);
-        req.put("fullCatalog","true");
+        Map<String,String> searchReq = new HashMap<>();
         
-        JSONObject result = searcher.search(req, Arrays.asList(String.format("id_euipo_export:%s", exportName)), loginSupport.getUser());
+        givenReq.keySet().forEach(key-> {searchReq.put(key, givenReq.get(key));});
+        
+        searchReq.put("rows", ""+rows);
+        searchReq.put("page", ""+page);
+        searchReq.put("q", q);
+        searchReq.put("fullCatalog","true");
+        // search 
+        
+        
+        JSONObject result = searcher.search(searchReq, Arrays.asList(String.format("id_euipo_export:%s", exportName)), loginSupport.getUser());
         return result;
     }
 
@@ -170,7 +179,9 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     public JSONObject setExportProcessed(String exportName) throws SolrServerException, IOException {
+
         JSONObject export = getExport(exportName);
+        // validace ??  Vsechny objekty, ktere maji aktivni export 'exportName' a zaroven musi byt vsechny identifikatory 
         JSONObject responseJSON = export.getJSONObject("response");
         int optInt = responseJSON.optInt("numFound",0);
         if (optInt > 0) {
@@ -179,7 +190,6 @@ public class ExportServiceImpl implements ExportService {
 
                 SolrInputDocument idoc = new SolrInputDocument();
                 idoc.setField("id", exportName);
-
                 
                 SolrJUtilities.atomicSet(idoc, true, "export_processed");
 
@@ -188,7 +198,93 @@ public class ExportServiceImpl implements ExportService {
                 SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
             }
         }
-        return new JSONObject();
+        return getExport(exportName);
+    }
+
+    
+    
+
+
+
+
+
+    @Override
+    public JSONObject approveExportItem(String exportId, String identifier) throws SolrServerException, IOException {
+        throw new UnsupportedOperationException("unsupported");
+    }
+
+
+
+    @Override
+    public JSONObject approveExport(String exportId) throws SolrServerException, IOException {
+
+        List<Pair<String, String>> euipoIdentifiers = new ArrayList<>();
+        try (SolrClient solr = buildClient()) {
+            SolrQuery query = new SolrQuery("*")
+                    .setParam("json.nl", "arrntv")
+                    .setFields(MarcRecordFields.IDENTIFIER_FIELD+" "+MarcRecordFields.ID_EUIPO);
+            query.addFilterQuery("id_euipo_export_active:"+exportId);
+            query.setRows(AbstractEUIPOService.DEFAULT_MAX_EXPORT_ITEMS);
+            
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+            //solr.close();
+            JSONObject jsonObject = new JSONObject((String) qresp.get("response"));
+            JSONArray docs = jsonObject.getJSONObject("response").getJSONArray("docs");
+            for (int i = 0; i < docs.length(); i++) {
+                JSONObject doc = docs.getJSONObject(i);
+                String identifier = doc.getString("identifier");
+                String euipoIdentifier = doc.getJSONArray("id_euipo").optString(0);
+                if (euipoIdentifier != null) {
+                    euipoIdentifiers.add(Pair.of(identifier, euipoIdentifier));
+                }
+            }
+        }
+
+        
+        try (SolrClient solr = buildClient()) {
+
+            int batchSize = 500;
+            int numberOfBatches = euipoIdentifiers.size() /batchSize;
+            if (euipoIdentifiers.size() % batchSize > 0) {
+                numberOfBatches += 1;
+            }
+            for (int i = 0; i < numberOfBatches; i++) {
+                int startExportIndex = i * batchSize;
+                int endExportIndex = (i + 1) * batchSize;
+                List<Pair<String, String>> exportPids = euipoIdentifiers.subList(startExportIndex, Math.min(endExportIndex, euipoIdentifiers.size()));
+                UpdateRequest uReq = new UpdateRequest();
+                for (Pair<String, String> identPair : exportPids) {
+                    SolrInputDocument idoc = new SolrInputDocument();
+                    idoc.setField(IDENTIFIER_FIELD, identPair.getLeft());
+                    SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
+                    uReq.add(idoc);
+                }
+            
+                UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
+            }
+            
+            
+            UpdateRequest exportReq = new UpdateRequest();
+            SolrInputDocument exportDoc = new SolrInputDocument();
+            exportDoc.setField("id", exportId);
+            
+            euipoIdentifiers.stream().map(Pair::getRight).collect(Collectors.toList());
+            SolrJUtilities.atomicSet(exportDoc, euipoIdentifiers.stream().map(Pair::getRight).collect(Collectors.toList()), "exported_identifiers");
+
+            SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
+            
+            exportReq.add(exportDoc);
+            UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
+            SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
+        }
+        // return result
+        return getExport(exportId);
     }
 
 
@@ -197,30 +293,34 @@ public class ExportServiceImpl implements ExportService {
     public JSONObject search(String q, ExportType type, int rows, int page)
             throws SolrServerException, IOException {
 
-        CatalogSearcher searcher = new CatalogSearcher(String.format("%s, %s", MarcRecordFields.IDENTIFIER_FIELD, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE));
-        Map<String,String> req = new HashMap<>();
-        req.put("rows", "100");
-        req.put("q", q);
-        req.put("fullCatalog","true");
-
-        
         List<String> idEuExportNames  = new ArrayList<>();
+        if (q != null && !q.trim().startsWith("euipo_")) {
 
-        JSONObject result = searcher.search(req, new ArrayList<>(), loginSupport.getUser());
-        if (result.has(SearchResultsUtils.FACET_COUNTS_KEY)) {
-            // filtr public state from kurator state
-            JSONObject fCounts = result.getJSONObject(SearchResultsUtils.FACET_COUNTS_KEY);
-            if (fCounts.has(SearchResultsUtils.FACET_FIELDS_KEY)) {
-                JSONObject fFields = fCounts.getJSONObject(SearchResultsUtils.FACET_FIELDS_KEY);
-                if (fFields.has(MarcRecordFields.ID_EUIPO_EXPORT)) {
-                    JSONArray idEuipoArray = fFields.getJSONArray(MarcRecordFields.ID_EUIPO_EXPORT);
-                    idEuipoArray.forEach(obj-> {
-                        JSONObject valObj = (JSONObject) obj;
-                        idEuExportNames.add(valObj.getString("name"));
-                    });
+            CatalogSearcher searcher = new CatalogSearcher(String.format("%s, %s", MarcRecordFields.IDENTIFIER_FIELD, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE));
+            Map<String,String> req = new HashMap<>();
+            req.put("rows", "90");
+            req.put("q", q);
+            req.put("fullCatalog","true");
+            
+
+            JSONObject result = searcher.search(req, new ArrayList<>(), loginSupport.getUser());
+            if (result.has(SearchResultsUtils.FACET_COUNTS_KEY)) {
+                // filtr public state from kurator state
+                JSONObject fCounts = result.getJSONObject(SearchResultsUtils.FACET_COUNTS_KEY);
+                if (fCounts.has(SearchResultsUtils.FACET_FIELDS_KEY)) {
+                    JSONObject fFields = fCounts.getJSONObject(SearchResultsUtils.FACET_FIELDS_KEY);
+                    if (fFields.has(MarcRecordFields.ID_EUIPO_EXPORT)) {
+                        JSONArray idEuipoArray = fFields.getJSONArray(MarcRecordFields.ID_EUIPO_EXPORT);
+                        idEuipoArray.forEach(obj-> {
+                            JSONObject valObj = (JSONObject) obj;
+                            idEuExportNames.add(valObj.getString("name"));
+                        });
+                    }
                 }
             }
+            
         }
+        
 
         
         
@@ -240,7 +340,7 @@ public class ExportServiceImpl implements ExportService {
             //query.setSort("export_processed", )
             //query.addSort("export_processed", );
             query.addSort(SortClause.asc("export_processed"));
-            query.addSort(SortClause.desc("indextime"));
+            query.addSort(SortClause.desc("export_date"));
             
             
             if (rows >0 ) query.setRows(rows);  else query.setRows(DEFAULT_SEARCH_RESULT_SIZE);
@@ -253,7 +353,13 @@ public class ExportServiceImpl implements ExportService {
             if (idEuExportNames.size() > 0) {
                 String exportIdQuery = idEuExportNames.stream().collect(Collectors.joining(" OR "));
                 query.addFilterQuery("id:("+exportIdQuery+")");
+            } else {
+                if (q.trim().startsWith("euipo_") ||q.trim().startsWith('"'+"euipo_")) {
+                    query.set("defType", "edismax");
+                    query.set("qf", "id");
+                }
             }
+
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
