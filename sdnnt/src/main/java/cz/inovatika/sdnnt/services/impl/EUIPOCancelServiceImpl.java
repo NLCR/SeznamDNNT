@@ -94,7 +94,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public List<List<String>> check(String formatFilter) {
+    public List<String> check(String formatFilter) {
         getLogger().info(String.format(" Config for iteration -> iteration states %s; templates %s, %s; filters %s; nonparsable dates %s ", this.states.toString(), this.bkTemplate, this.seTemplate, this.filters, this.compiledPatterns));
 
         List<String> foundCandidates = new ArrayList<>();
@@ -103,7 +103,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
         reqMap.put("rows", "" + AbstractEUIPOService.FETCH_LIMIT);
 
         List<String> plusFilter = new ArrayList<>();
-        plusFilter.add("id_euipo:*");
+        plusFilter.add("id_euipo:* AND export:euipo");
         
         if (!this.states.isEmpty()) {
 
@@ -143,23 +143,14 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                         Object identifier = rsp.getFieldValue("identifier");
                         foundCandidates.add(identifier.toString());
                     }, IDENTIFIER_FIELD);
+            
+            
         } catch (Exception e) {
             this.logger.log(Level.SEVERE, e.getMessage(), e);
         }
         
-        List<List<String>> retvals = new ArrayList<>();
-        
-        int itemsInBatch = DEFAULT_MAX_EXPORT_ITEMS;
-        int numberOfBatches =  foundCandidates.size() / itemsInBatch;
-        numberOfBatches += foundCandidates.size() % itemsInBatch == 0 ? 0 : 1;
-        for (int i = 0; i < numberOfBatches; i++) {
-            int start = i*itemsInBatch;
-            int stop = Math.min((i+1)*i, foundCandidates.size());
-            retvals.add(foundCandidates.subList(start, stop));
-
-        }
-        
-        return retvals;
+        // nesmi byt v zadnem dalsim otevrenem exportu typu  
+        return foundCandidates;
     }
 
     
@@ -189,7 +180,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public int update(String format, String exortIdentifier, List<String> docs)
+    public int update(String format,  List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
         AtomicInteger retVal = new AtomicInteger();
         if (!docs.isEmpty()) {
@@ -197,7 +188,6 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
             List<String> toRemove = new ArrayList<>();
             
             try (SolrClient solrClient = buildClient()) {
-                getLogger().info("Export identifier '" + exortIdentifier + "' number of records "+docs.size());
 
                 int numberOfUpdateBatches = docs.size() / updateBatchLimit;
                 if (docs.size() % updateBatchLimit > 0) {
@@ -277,89 +267,94 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                 
                 
                 docs.removeAll(toRemove);
-                // pri vzniku 
-                //prepareExport.put("export_size", docs.size());
-                
-                int numberOfSpredsheets = docs.size() / this.spredsheetLimit;
-                if (docs.size() % this.spredsheetLimit > 0) {
-                    numberOfSpredsheets += 1;
-                }
-                for (int i = 0; i < numberOfSpredsheets; i++) {
-                    int startIndex = i * this.spredsheetLimit;
-                    int endIndex = (i + 1) * this.spredsheetLimit;
-                    List<String> spreadSheetBatch = docs.subList(startIndex, Math.min(endIndex, docs.size()));
 
-                    getLogger().info(String.format("Generating spreadsheet number %d and size is %d", i, spreadSheetBatch.size()));
+                int numberOfExports = numberOfExports(docs);
+                for (int export = 0; export < numberOfExports; export++) {
+                    
+                    List<String> exportPids = subList(docs, export, this.exportLimit);
+                    SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
+                    String exportName = String.format("euipo_uocp_%s_%s",format, nameformat.format(new Date()));
+                    getLogger().info(String.format("Creating  export %s ", exportName));
+                    this.createExport(exportName, exportPids.size());
 
-                    try {
-                        File nFile = generateSpreadSheet(format, exortIdentifier, i, spreadSheetBatch, recordValues);
-                        getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
-                        
-                        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
-                        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
-                            numberOfUpdates += 1;
-                        }
-                       
-                        // update items from spreadsheet
-                        for (int update = 0; update < numberOfUpdates; update++) {
-                            int upateStartIndex = update * updateBatchLimit;
-                            int endStartIndex = (update + 1) * updateBatchLimit;
-                            getLogger().info(String.format("Updating records from spreadsheet  %d and index of update %d", i, update));
+                    int numberOfSpredsheets = numberOfSpreadsheets(exportPids);
+
+                    for (int i = 0; i < numberOfSpredsheets; i++) {
+                        int startIndex = i * this.spredsheetLimit;
+                        int endIndex = (i + 1) * this.spredsheetLimit;
+                        List<String> spreadSheetBatch = exportPids.subList(startIndex, Math.min(endIndex, exportPids.size()));
+
+                        getLogger().info(String.format("Generating spreadsheet number %d and size is %d", i, spreadSheetBatch.size()));
+
+                        try {
+                            File nFile = generateSpreadSheet(format, exportName, i, spreadSheetBatch, recordValues);
+                            getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
                             
-                            List<String> updateBatch = spreadSheetBatch.subList(upateStartIndex,
-                                    Math.min(endStartIndex, spreadSheetBatch.size()));
- 
-                            UpdateRequest uReq = new UpdateRequest();
-                            for (String id : updateBatch) {
-                                SolrInputDocument idoc = new SolrInputDocument();
-                                idoc.setField(IDENTIFIER_FIELD, id);
-                                
-                                // zrusim euipo identfikator, facet ze byl exportovan
-                                SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.ID_EUIPO);
-                                /** Must be set manually */
-                                // SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.EXPORT);
-
-                                SolrJUtilities.atomicAddDistinct(idoc, exortIdentifier, MarcRecordFields.ID_EUIPO_EXPORT);
-                                SolrJUtilities.atomicSet(idoc, exortIdentifier, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);
-                                
-                                // nastavim id_euipo zrusene exporty 
-                                List<String> euipo = recordValues.get(id).get("euipo");
-                                SolrJUtilities.atomicAddDistinct(idoc, euipo, MarcRecordFields.ID_EUIPO_CANCELED);
-
-
-
-                                uReq.add(idoc);
+                            int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
+                            if (spreadSheetBatch.size() % updateBatchLimit > 0) {
+                                numberOfUpdates += 1;
                             }
+                           
+                            // update items from spreadsheet
+                            for (int update = 0; update < numberOfUpdates; update++) {
+                                int upateStartIndex = update * updateBatchLimit;
+                                int endStartIndex = (update + 1) * updateBatchLimit;
+                                getLogger().info(String.format("Updating records from spreadsheet  %d and index of update %d", i, update));
+                                
+                                List<String> updateBatch = spreadSheetBatch.subList(upateStartIndex,
+                                        Math.min(endStartIndex, spreadSheetBatch.size()));
+     
+                                UpdateRequest uReq = new UpdateRequest();
+                                for (String id : updateBatch) {
+                                    SolrInputDocument idoc = new SolrInputDocument();
+                                    idoc.setField(IDENTIFIER_FIELD, id);
+                                    
+                                    // zrusim euipo identfikator, facet ze byl exportovan
+                                    SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.ID_EUIPO);
+                                    /** Must be set manually */
+                                    // SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.EXPORT);
 
-                            if (!uReq.getDocuments().isEmpty()) {
-                                UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
-                                if (response.getStatus() != 200) {
-                                    retVal.addAndGet(updateBatch.size());
+                                    SolrJUtilities.atomicAddDistinct(idoc, exportName, MarcRecordFields.ID_EUIPO_EXPORT);
+                                    SolrJUtilities.atomicSet(idoc, exportName, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE);
+                                    
+                                    // nastavim id_euipo zrusene exporty 
+                                    List<String> euipo = recordValues.get(id).get("euipo");
+                                    SolrJUtilities.atomicAddDistinct(idoc, euipo, MarcRecordFields.ID_EUIPO_CANCELED);
+                                    SolrJUtilities.atomicSet(idoc, euipo, MarcRecordFields.ID_EUIPO_LASTACTIVE);
 
-                                    getLogger().info(String.format("Updated retval  %d", retVal.get()));
+
+
+                                    uReq.add(idoc);
                                 }
+
+                                if (!uReq.getDocuments().isEmpty()) {
+                                    UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
+                                    if (response.getStatus() != 200) {
+                                        retVal.addAndGet(updateBatch.size());
+
+                                        getLogger().info(String.format("Updated retval  %d", retVal.get()));
+                                    }
+                                }
+
+                                SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
                             }
 
-                            SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
+                            File finalFile = new File(nFile.getParentFile(), nFile.getName().replace("proc", "xlsx"));
+                            com.google.common.io.Files.move(nFile, finalFile);
+                            if (finalFile.length() == nFile.length()) {
+                                nFile.delete();
+                            }
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        } catch (InvalidFormatException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         }
-
-                        File finalFile = new File(nFile.getParentFile(), nFile.getName().replace("proc", "xlsx"));
-                        com.google.common.io.Files.move(nFile, finalFile);
-                        if (finalFile.length() == nFile.length()) {
-                            nFile.delete();
-                        }
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvalidFormatException e) {
-                        throw new RuntimeException(e);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             }
         }
-        
-        //
         return retVal.get();
     }
 

@@ -18,14 +18,14 @@
       <div [class]="'app-badge ' + doc.dntstav[doc.dntstav.length-1]" *ngIf="doc.dntstav" [matTooltip]="'state.tooltip.' + doc.dntstav[doc.dntstav.length-1] | translate">
         {{ doc.dntstav[doc.dntstav.length-1] }}   
       </div>
-      <div class="app-badge app-ml-1" *ngIf="inZadost && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
+      <div class="app-badge app-ml-1" *ngIf="(view && view === 'zadost') && processed?.state" [class]="processed.state" [matTooltip]="processedTooltip">
         {{ 'state.' + processed.state | translate }}
       </div>
       <div *ngIf="doc.license" [class]="'app-badge app-icon-in ' + doc.license" class="app-ml-1" [matTooltip]="doc.license === 'dnnto' ? ('license.' + doc.license | translate) : ('license.' + doc.license | translate)">
         <mat-icon class="material-icons-outlined">{{ doc.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
         {{ 'license.' + doc.license + '-badge' | translate }}
       </div>
-      <div *ngIf="hasNavhr && !inZadost && state.logged" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
+      <div *ngIf="hasNavhr && (!view || view !== 'zadost') && state.logged" [class]="'app-badge ' + doc.zadost.navrh" class="app-ml-1" [matTooltip]="'state.tooltip.' + doc.zadost.navrh | translate">
         {{  doc.zadost.navrh }}
       </div>
       <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent()">
@@ -37,34 +37,37 @@
         {{ 'desc.kramerius_badge' | translate }}
       </div>
 
-      
-
       <div *ngIf="doc.export && doc.export.includes('euipo')" class="app-badge app-bordered app-img-in app-ml-1" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
         <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
       </div>
     </div>
+
     <div fxLayout="row">
       <mat-button-toggle-group>
-        <mat-button-toggle *ngIf="!hasNavhr && (state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && !inZadost && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
+        <!-- prihlaseny; vyhledavani -->
+        <mat-button-toggle *ngIf="!hasNavhr && (state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && (!view || view !== 'zadost') && doc.license !== null && doc.license == 'dnnto'" (click)="addToZadostForReduction()">
           <mat-icon class="material-icons-outlined app-mr-1">no_photography</mat-icon>{{ 'desc.omezit_na_terminal' | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="!hasNavhr && (state.logged &&  state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && !inZadost && notPublic(doc)" (click)="addToZadost()">
+        <!-- prihlaseny; vyhledavani-->
+        <mat-button-toggle *ngIf="!hasNavhr && (state.logged &&  state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && (!view || view !== 'zadost') && notPublic(doc)" (click)="addToZadost()">
           <mat-icon class="app-mr-1">check</mat-icon>{{ (isZarazeno ? 'desc.navrh_na_vyrazeni' : 'desc.navrh_na_zarazeni') | translate }}
         </mat-button-toggle>
-        <mat-button-toggle *ngIf="(state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && inZadost && (zadost.state === 'open')" (click)="removeFromZadost()">
+        <!-- prihlaseny; zadost-->
+        <mat-button-toggle *ngIf="(state.logged && state.user?.role !== 'kurator' && state.user?.role !== 'mainKurator') && (view && view === 'zadost') && (zadost.state === 'open')" (click)="removeFromZadost()">
           <mat-icon>close</mat-icon>{{ 'desc.odstranit_z_zadosti' | translate }}
         </mat-button-toggle>
-        
-        <mat-button-toggle *ngIf="!doc.hasRuleNotifications && (state.logged   && doc.hasNotifications)" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
+
+        <!-- prihlaseny; vyhledavani-->
+        <mat-button-toggle *ngIf="!doc.hasRuleNotifications && (state.logged   && doc.hasNotifications) && (view && view === 'search')" (click)="setFollow(false)" [matTooltip]="'desc.ne_sledovat' | translate">
           <mat-icon class="app-color-warning">notifications_active</mat-icon>
         </mat-button-toggle>
-        <!--!doc.hasRuleNotifications  &&  (state.logged && (state.user?.role==='user' || state.user?.role==='knihovna') &&  !doc.hasNotifications)-->
-        <mat-button-toggle *ngIf="(state.logged &&  !doc.hasNotifications)" (click)="!doc.hasRuleNotifications ? setFollow(true) : false" [matTooltip]="!doc.hasRuleNotifications ? ('desc.sledovat' | translate) : ('tooltip.sledovat_zaznam_disabled' | translate)" [disabled]="doc.hasRuleNotifications">
+        <!-- prihlaseny; vyhleavani-->
+        <mat-button-toggle *ngIf="(state.logged &&  !doc.hasNotifications) && (view && view === 'search')" (click)="!doc.hasRuleNotifications ? setFollow(true) : false" [matTooltip]="!doc.hasRuleNotifications ? ('desc.sledovat' | translate) : ('tooltip.sledovat_zaznam_disabled' | translate)" [disabled]="doc.hasRuleNotifications">
           <mat-icon class="material-icons-outlined">notifications</mat-icon>
         </mat-button-toggle>
 
-        <!-- TODO: Do it more general; set of actions from server. Client will dont't care about them -->
-        <ng-container *ngIf="(state.user && inZadost && !processed?.state) || (curratorInteractionNeedAfterProcessed(zadost, doc))">
+        <!--prihlaseny; zadost  -->
+        <ng-container *ngIf="(state.user && (view && view === 'zadost') && !processed?.state) || (curratorInteractionNeedAfterProcessed(zadost, doc))">
           <ng-container *ngIf="(state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && zadost.state === 'waiting'">
 
             <!-- ready for happy -->
@@ -90,12 +93,21 @@
             <mat-button-toggle value="releasedProved" *ngIf="(curratorInteractionNeedAfterProcessed(zadost, doc) && doc.license !== null && doc.license == 'dnntt')" (click)="releasedProved()" [matTooltip]="'acts.dilo_publikovano' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">library_books</mat-icon>
             </mat-button-toggle>
+
           </ng-container>
         </ng-container>
 
-        <mat-button-toggle [matMenuTriggerFor]="menuMore">
+        <!-- export actions -->
+        <app-result-actions-export *ngIf="view === 'exports' && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator')" 
+          [export]="export"
+          [doc]="doc"
+          [processExportEvent]="processExportEvent">
+        </app-result-actions-export>
+
+        <mat-button-toggle   [matMenuTriggerFor]="menuMore">
           <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
         </mat-button-toggle>
+
       </mat-button-toggle-group>
 
       <mat-menu #menuMore="matMenu">
@@ -130,7 +142,7 @@
           <mat-icon>update</mat-icon>
           <a>{{ 'desc.historie_zmen' | translate }}</a>
         </button>
-        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost" (click)="showStates()">
+        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && (!view || view !== 'zadost')" (click)="showStates()">
           <mat-icon>edit</mat-icon>
           <a>{{ 'desc.zmenit_stav'| translate }}</a>
         </button>
@@ -138,7 +150,7 @@
           <mat-icon>format_list_numbered</mat-icon>
           <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
         </button>
-        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && !inZadost && (doc.kuratorstav && (doc.kuratorstav[doc.kuratorstav.length-1] ==='D' || doc.kuratorstav[doc.kuratorstav.length-1] ==='DX')) " (click)="openSuccessorRecords(false)">
+        <button mat-menu-item *ngIf="state.logged && (state.user?.role === 'kurator' || state.user?.role === 'mainKurator') && (!view || view !== 'zadost') && (doc.kuratorstav && (doc.kuratorstav[doc.kuratorstav.length-1] ==='D' || doc.kuratorstav[doc.kuratorstav.length-1] ==='DX')) " (click)="openSuccessorRecords(false)">
           <mat-icon class="material-icons-outlined">double_arrow</mat-icon>
           <a>{{ 'acts.zobrazit_naslednicke_zaznamy' | translate }}</a>
         </button>

@@ -18,7 +18,7 @@
           {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
         </div>
         <div class="app-right">
-          <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="true"></app-paginator>
+          <app-paginator [storeStateKey]="'export'" [numFound]="numFound" [showSort]="true"></app-paginator>
         </div>
       </div>
       <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
@@ -46,11 +46,16 @@
           </div>
         </mat-card>
         <ng-container *ngFor="let doc of docs">
-          <app-result-item [doc]="doc"></app-result-item>
+          <app-result-item 
+          [doc]="doc" 
+          [view]="'exports'" 
+          [export]="exportObj"
+          (processExportEvent)="processExport($event)"
+          ></app-result-item>
         </ng-container>
       </div>
       <div class="app-mt-2">
-        <app-paginator [storeStateKey]="'import'" [numFound]="numFound" [showSort]="false"></app-paginator>
+        <app-paginator [storeStateKey]="'export'" [numFound]="numFound" [showSort]="false"></app-paginator>
       </div>
     </div>
   </div>

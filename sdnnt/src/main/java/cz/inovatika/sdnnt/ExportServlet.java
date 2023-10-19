@@ -118,58 +118,109 @@ public class ExportServlet extends HttpServlet {
 
     enum Actions {
         
-        APPROVE_AND_PROCESS_EXPORT {
+        APPROVE_ITEM_EXPORT_IOCP {
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                String id = req.getParameter("exportname");
-                if (id != null) {
-                    UserControlerImpl uc = new UserControlerImpl(req);
-                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
-                    JSONObject approvedExport = ex.approveExport(id);
-                    if (approvedExport != null) {
-                        return ex.setExportProcessed(id);
-                    } else return null;
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    String exportId = req.getParameter("exportname");
+                    String item = req.getParameter("id");
+                    if (exportId != null) {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        JSONObject approvedExport = ex.approveExportItemIOCP(exportId, item);
+                        return approvedExport;
+                    } else {
+                        return errorMissingParameterJson(response, "exportname");
+                    }
                 } else {
-                    return errorMissingParameterJson(response, "exportname");
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
                 }
             }
-            
         },
+
+        APPROVE_ITEM_EXPORT_UOCP {
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    String exportId = req.getParameter("exportname");
+                    String item = req.getParameter("id");
+                    if (exportId != null) {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        JSONObject approvedExport = ex.approveExportItemUOCP(exportId, item);
+                        return approvedExport;
+                    } else {
+                        return errorMissingParameterJson(response, "exportname");
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
         
         
         PROCESS_EXPORT {
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                String id = req.getParameter("exportname");
-                if (id != null) {
-                    UserControlerImpl uc = new UserControlerImpl(req);
-                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
-                    return ex.setExportProcessed(id);
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    String id = req.getParameter("exportname");
+                    if (id != null) {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return ex.setExportProcessed(id);
+                    } else {
+                        return errorMissingParameterJson(response, "exportname");
+                    }
                 } else {
-                    return errorMissingParameterJson(response, "exportname");
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
                 }
             }
             
         },
         
-        APPROVE_EXPORT {
+        APPROVE_EXPORT_IOCP {
 
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                String id = req.getParameter("exportname");
-                if (id != null) {
-                    UserControlerImpl uc = new UserControlerImpl(req);
-                    ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
-                    return ex.approveExport(id);
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    String id = req.getParameter("exportname");
+                    if (id != null) {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return ex.approveExportIOCP(id);
+                    } else {
+                        return errorMissingParameterJson(response, "exportname");
+                    }
                 } else {
-                    return errorMissingParameterJson(response, "exportname");
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
                 }
             }
             
         },
-        
+
+        APPROVE_EXPORT_UOCP {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(kurator, mainKurator)).permit()) {
+                    String id = req.getParameter("exportname");
+                    if (id != null) {
+                        UserControlerImpl uc = new UserControlerImpl(req);
+                        ExportService ex = new ExportServiceImpl(uc, new ResourceBundleServiceImpl(req));
+                        return ex.approveExportUOCP(id);
+                    } else {
+                        return errorMissingParameterJson(response, "exportname");
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+            
+        },
+
         PREPARE_EXPORT {
 
             @Override

@@ -47,7 +47,9 @@ public interface ExportService {
     
     
     
-    public JSONObject approveExportItem(String exportId, String identifier) throws SolrServerException, IOException;
+    public JSONObject approveExportItemUOCP(String exportId, String identifier) throws SolrServerException, IOException;
+    public JSONObject approveExportItemIOCP(String exportId, String identifier) throws SolrServerException, IOException;
 
-    public JSONObject approveExport(String exportId) throws SolrServerException, IOException;
+    public JSONObject approveExportUOCP(String exportId) throws SolrServerException, IOException;
+    public JSONObject approveExportIOCP(String exportId) throws SolrServerException, IOException;
 }

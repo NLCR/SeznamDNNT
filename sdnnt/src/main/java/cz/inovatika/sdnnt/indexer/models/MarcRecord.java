@@ -98,6 +98,7 @@ public class MarcRecord {
   /** EUIPO stuf **/
   // idEuipo
   public List<String> idEuipo = new ArrayList<>();
+  public List<String> idEuipoLastactive = new ArrayList<>();
   public List<String> idEuipoCanceled = new ArrayList<>();
   
   // exports ids
@@ -165,6 +166,7 @@ public class MarcRecord {
                     MASTERLINKS_DISABLED_FIELD,
                     ID_EUIPO,
                     ID_EUIPO_CANCELED,
+                    ID_EUIPO_LASTACTIVE,
                     ID_EUIPO_EXPORT,
                     ID_EUIPO_EXPORT_ACTIVE,
                     
@@ -282,9 +284,16 @@ public class MarcRecord {
           mr.idEuipo = (List<String>) doc.getFieldValue(ID_EUIPO);
       }
 
+
       /** euipo stuff */
       if (doc.containsKey(ID_EUIPO_CANCELED)) {
           mr.idEuipoCanceled = (List<String>) doc.getFieldValue(ID_EUIPO_CANCELED);
+      }
+
+      
+      /** euipo stuff */
+      if (doc.containsKey(ID_EUIPO_LASTACTIVE)) {
+          mr.idEuipoLastactive = (List<String>) doc.getFieldValue(ID_EUIPO_LASTACTIVE);
       }
       
       if (doc.containsKey(ID_EUIPO_EXPORT)) {
@@ -617,6 +626,14 @@ public class MarcRecord {
         });
     }
 
+    if (this.idEuipoLastactive != null && !this.idEuipoLastactive.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoLastactive);
+        uniqSet.stream().forEach(id-> {
+            sdoc.addField(ID_EUIPO_LASTACTIVE, id);
+        });
+    }
+
+    
     if (this.idEuipoExport != null && !this.idEuipoExport.isEmpty()) {
         Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoExport);
         uniqSet.stream().forEach(export-> {

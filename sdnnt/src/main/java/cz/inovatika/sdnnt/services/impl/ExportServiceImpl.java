@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,16 +209,290 @@ public class ExportServiceImpl implements ExportService {
 
 
 
+    public JSONObject approveExportItemUOCP(String exportId, String identifier) throws SolrServerException, IOException {
+        List<Pair<String, List<String>>> discardedEuipoIdentifiers = discardedEuipoIdentifiers(exportId);
+        JSONObject export = getExport(exportId);
+        //String type = "IOCP";
+        List<String> exportedIdentifiers = new ArrayList<>();
+        JSONArray jsonArray = export.getJSONObject("response").getJSONArray("docs");
+        if (jsonArray.length() > 0) {
+            JSONArray exporetedIdents = jsonArray.getJSONObject(0).optJSONArray("exported_identifiers");
+            //type = jsonArray.getJSONObject(0).optString("export_type");
+            if (exporetedIdents != null) {
+                exporetedIdents.forEach(e-> exportedIdentifiers.add(e.toString()));
+            }
+        }
+        try (SolrClient solr = buildClient()) {
+            if (!exportedIdentifiers.contains(identifier)) {
+                
+                exportedIdentifiers.add(identifier);
+                
+                /** catalog update */
+                UpdateRequest recordItem = new UpdateRequest();
+                SolrInputDocument idoc = new SolrInputDocument();
+                idoc.setField(IDENTIFIER_FIELD, identifier);
+                
+                SolrJUtilities.atomicRemove(idoc, "euipo", MarcRecordFields.EXPORT);
+
+//                if ("IOCP".equals(type)) {
+//                } else {
+//                    SolrJUtilities.atomicRemove(idoc, "euipo", MarcRecordFields.EXPORT);
+//                    
+//                }
+                
+
+                recordItem.add(idoc);
+                UpdateResponse cResponse = recordItem.process(solr, DataCollections.catalog.name());
+                
+                /** Export; exported identifiers */
+                UpdateRequest exportReq = new UpdateRequest();
+                SolrInputDocument exportDoc = new SolrInputDocument();
+                exportDoc.setField("id", exportId);
+                // skc identifier
+                SolrJUtilities.atomicAddDistinct(exportDoc, identifier, "exported_identifiers");
+                
+                List<String> discardedSKCIdentifiers = discardedEuipoIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList());
+
+                Collections.sort(discardedSKCIdentifiers);
+                Collections.sort(exportedIdentifiers);
+                if (discardedSKCIdentifiers.equals(exportedIdentifiers)) {
+                    // muze se zavrit 
+                    SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
+                }
+                
+                exportReq.add(exportDoc);
+                
+                UpdateResponse eResponse = exportReq.process(solr, DataCollections.exports.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
+
+                exportedIdentifiers.add(identifier);
+                
+
+            }
+        }
+        
+        return getExport(exportId);
+    }
+
     @Override
-    public JSONObject approveExportItem(String exportId, String identifier) throws SolrServerException, IOException {
-        throw new UnsupportedOperationException("unsupported");
+    public JSONObject approveExportItemIOCP(String exportId, String identifier) throws SolrServerException, IOException {
+
+        List<Pair<String, String>> euipoIdentifiers = euipoIdentifiers(exportId);
+        JSONObject export = getExport(exportId);
+        //String type = "IOCP";
+        List<String> exportedIdentifiers = new ArrayList<>();
+        JSONArray jsonArray = export.getJSONObject("response").getJSONArray("docs");
+        if (jsonArray.length() > 0) {
+            JSONArray exporetedIdents = jsonArray.getJSONObject(0).optJSONArray("exported_identifiers");
+            //type = jsonArray.getJSONObject(0).optString("export_type");
+            if (exporetedIdents != null) {
+                exporetedIdents.forEach(e-> exportedIdentifiers.add(e.toString()));
+            }
+        }
+        
+        try (SolrClient solr = buildClient()) {
+            if (!exportedIdentifiers.contains(identifier)) {
+                /** catalog update */
+                UpdateRequest recordItem = new UpdateRequest();
+                SolrInputDocument idoc = new SolrInputDocument();
+                idoc.setField(IDENTIFIER_FIELD, identifier);
+                
+                SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
+                exportedIdentifiers.add(identifier);
+                
+//                if ("IOCP".equals(type)) {
+//                } else {
+//                    SolrJUtilities.atomicRemove(idoc, "euipo", MarcRecordFields.EXPORT);
+//                    
+//                }
+                
+
+                recordItem.add(idoc);
+                UpdateResponse cResponse = recordItem.process(solr, DataCollections.catalog.name());
+                
+                /** Export; exported identifiers */
+                UpdateRequest exportReq = new UpdateRequest();
+                SolrInputDocument exportDoc = new SolrInputDocument();
+                exportDoc.setField("id", exportId);
+                // skc identifier
+                SolrJUtilities.atomicAddDistinct(exportDoc, identifier, "exported_identifiers");
+                
+                List<String> exportedSKCIdentifiers = euipoIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList());
+                
+                
+                Collections.sort(exportedIdentifiers);
+                Collections.sort(exportedSKCIdentifiers);
+                if (exportedSKCIdentifiers.equals(exportedIdentifiers)) {
+                    // muze se zavrit 
+                    SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
+                }
+                
+                exportReq.add(exportDoc);
+                
+                UpdateResponse eResponse = exportReq.process(solr, DataCollections.exports.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
+
+                //exportedIdentifiers.add(identifier);
+                
+            }
+        }
+        return getExport(exportId);
     }
 
 
+    
+    
+    @Override
+    public JSONObject approveExportUOCP(String exportId) throws SolrServerException, IOException {
+        List<Pair<String, List<String>>> discardedEuipoIdentifiers = discardedEuipoIdentifiers(exportId);
+        JSONObject export = getExport(exportId);
+        List<String> exportedIdentifiers = new ArrayList<>();
+        JSONArray jsonArray = export.getJSONObject("response").getJSONArray("docs");
+        if (jsonArray.length() > 0) {
+            JSONArray exporetedIdents = jsonArray.getJSONObject(0).optJSONArray("exported_identifiers");
+            if (exporetedIdents != null) {
+                exporetedIdents.forEach(e-> exportedIdentifiers.add(e.toString()));
+            }
+        }
+
+        try (SolrClient solr = buildClient()) {
+
+            int batchSize = 500;
+            int numberOfBatches = discardedEuipoIdentifiers.size() /batchSize;
+            if (discardedEuipoIdentifiers.size() % batchSize > 0) {
+                numberOfBatches += 1;
+            }
+            for (int i = 0; i < numberOfBatches; i++) {
+                int startExportIndex = i * batchSize;
+                int endExportIndex = (i + 1) * batchSize;
+                List<Pair<String, List<String>>> exportPids = discardedEuipoIdentifiers.subList(startExportIndex, Math.min(endExportIndex, discardedEuipoIdentifiers.size()));
+                UpdateRequest uReq = new UpdateRequest();
+                for (Pair<String, List<String>> identPair : exportPids) {
+                    SolrInputDocument idoc = new SolrInputDocument();
+                    idoc.setField(IDENTIFIER_FIELD, identPair.getLeft());
+
+                    SolrJUtilities.atomicRemove(idoc, "euipo", MarcRecordFields.EXPORT);
+                    uReq.add(idoc);
+                }
+            
+                UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
+            }
+            
+            
+            UpdateRequest exportReq = new UpdateRequest();
+            SolrInputDocument exportDoc = new SolrInputDocument();
+            exportDoc.setField("id", exportId);
+            //euipo identifiers
+            List<String> result = discardedEuipoIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList());
+            
+            SolrJUtilities.atomicSet(exportDoc, result, "exported_identifiers");
+
+            SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
+            
+            exportReq.add(exportDoc);
+            UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
+            SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
+        }
+        // return result
+        return getExport(exportId);
+
+    }
 
     @Override
-    public JSONObject approveExport(String exportId) throws SolrServerException, IOException {
+    public JSONObject approveExportIOCP(String exportId) throws SolrServerException, IOException {
+        List<Pair<String, String>> euipoIdentifiers = euipoIdentifiers(exportId);
+        JSONObject export = getExport(exportId);
+        List<String> exportedIdentifiers = new ArrayList<>();
+        JSONArray jsonArray = export.getJSONObject("response").getJSONArray("docs");
+        if (jsonArray.length() > 0) {
+            JSONArray exporetedIdents = jsonArray.getJSONObject(0).optJSONArray("exported_identifiers");
+            if (exporetedIdents != null) {
+                exporetedIdents.forEach(e-> exportedIdentifiers.add(e.toString()));
+            }
+        }
 
+        try (SolrClient solr = buildClient()) {
+
+            int batchSize = 500;
+            int numberOfBatches = euipoIdentifiers.size() /batchSize;
+            if (euipoIdentifiers.size() % batchSize > 0) {
+                numberOfBatches += 1;
+            }
+            for (int i = 0; i < numberOfBatches; i++) {
+                int startExportIndex = i * batchSize;
+                int endExportIndex = (i + 1) * batchSize;
+                List<Pair<String, String>> exportPids = euipoIdentifiers.subList(startExportIndex, Math.min(endExportIndex, euipoIdentifiers.size()));
+                UpdateRequest uReq = new UpdateRequest();
+                for (Pair<String, String> identPair : exportPids) {
+                    SolrInputDocument idoc = new SolrInputDocument();
+                    idoc.setField(IDENTIFIER_FIELD, identPair.getLeft());
+
+                    SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
+                    uReq.add(idoc);
+                }
+            
+                UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
+                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
+            }
+            
+            
+            UpdateRequest exportReq = new UpdateRequest();
+            SolrInputDocument exportDoc = new SolrInputDocument();
+            exportDoc.setField("id", exportId);
+            
+            //TODO: Zkusit 
+            SolrJUtilities.atomicSet(exportDoc, euipoIdentifiers.stream().map(Pair::getLeft).collect(Collectors.toList()), "exported_identifiers");
+
+            SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
+            
+            exportReq.add(exportDoc);
+            UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
+            SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
+        }
+        // return result
+        return getExport(exportId);
+    }
+
+
+    private List<Pair<String, List<String>>> discardedEuipoIdentifiers(String exportId) throws SolrServerException, IOException {
+        List<Pair<String, List<String>>> euipoIdentifiers = new ArrayList<>();
+        try (SolrClient solr = buildClient()) {
+            SolrQuery query = new SolrQuery("*")
+                    .setParam("json.nl", "arrntv")
+                    .setFields(MarcRecordFields.IDENTIFIER_FIELD+" "+MarcRecordFields.ID_EUIPO_LASTACTIVE);
+            query.addFilterQuery("id_euipo_export_active:"+exportId);
+            query.setRows(AbstractEUIPOService.DEFAULT_MAX_EXPORT_ITEMS);
+            
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+            //solr.close();
+            JSONObject jsonObject = new JSONObject((String) qresp.get("response"));
+            JSONArray docs = jsonObject.getJSONObject("response").getJSONArray("docs");
+            for (int i = 0; i < docs.length(); i++) {
+                JSONObject doc = docs.getJSONObject(i);
+                String identifier = doc.getString("identifier");
+                if (doc.has(MarcRecordFields.ID_EUIPO_LASTACTIVE)) {
+                    List<String> euipo = new ArrayList<>();
+                    JSONArray jsonArray = doc.getJSONArray(MarcRecordFields.ID_EUIPO_LASTACTIVE);
+                    jsonArray.forEach(obj-> {euipo.add(obj.toString());});
+                    if (euipo != null) {
+                        euipoIdentifiers.add(Pair.of(identifier, euipo));
+                    }
+                }
+            }
+        }
+        return euipoIdentifiers;
+    }
+
+
+    private List<Pair<String, String>> euipoIdentifiers(String exportId) throws SolrServerException, IOException {
         List<Pair<String, String>> euipoIdentifiers = new ArrayList<>();
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("*")
@@ -238,53 +513,15 @@ public class ExportServiceImpl implements ExportService {
             for (int i = 0; i < docs.length(); i++) {
                 JSONObject doc = docs.getJSONObject(i);
                 String identifier = doc.getString("identifier");
-                String euipoIdentifier = doc.getJSONArray("id_euipo").optString(0);
-                if (euipoIdentifier != null) {
-                    euipoIdentifiers.add(Pair.of(identifier, euipoIdentifier));
+                if (doc.has("id_euipo")) {
+                    String euipoIdentifier = doc.getJSONArray("id_euipo").optString(0);
+                    if (euipoIdentifier != null) {
+                        euipoIdentifiers.add(Pair.of(identifier, euipoIdentifier));
+                    }
                 }
             }
         }
-
-        
-        try (SolrClient solr = buildClient()) {
-
-            int batchSize = 500;
-            int numberOfBatches = euipoIdentifiers.size() /batchSize;
-            if (euipoIdentifiers.size() % batchSize > 0) {
-                numberOfBatches += 1;
-            }
-            for (int i = 0; i < numberOfBatches; i++) {
-                int startExportIndex = i * batchSize;
-                int endExportIndex = (i + 1) * batchSize;
-                List<Pair<String, String>> exportPids = euipoIdentifiers.subList(startExportIndex, Math.min(endExportIndex, euipoIdentifiers.size()));
-                UpdateRequest uReq = new UpdateRequest();
-                for (Pair<String, String> identPair : exportPids) {
-                    SolrInputDocument idoc = new SolrInputDocument();
-                    idoc.setField(IDENTIFIER_FIELD, identPair.getLeft());
-                    SolrJUtilities.atomicAddDistinct(idoc, "euipo", MarcRecordFields.EXPORT);
-                    uReq.add(idoc);
-                }
-            
-                UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
-                SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
-            }
-            
-            
-            UpdateRequest exportReq = new UpdateRequest();
-            SolrInputDocument exportDoc = new SolrInputDocument();
-            exportDoc.setField("id", exportId);
-            
-            euipoIdentifiers.stream().map(Pair::getRight).collect(Collectors.toList());
-            SolrJUtilities.atomicSet(exportDoc, euipoIdentifiers.stream().map(Pair::getRight).collect(Collectors.toList()), "exported_identifiers");
-
-            SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
-            
-            exportReq.add(exportDoc);
-            UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
-            SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
-        }
-        // return result
-        return getExport(exportId);
+        return euipoIdentifiers;
     }
 
 

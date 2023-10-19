@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
   selector: 'app-result-actions-search',
@@ -6,6 +7,12 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./result-actions-search.component.scss']
 })
 export class ResultActionsSearchComponent implements OnInit {
+
+  @Input() doc:SolrDocument;
+
+  hasNavhr:boolean;
+  view:string;
+
 
   constructor() { }
 

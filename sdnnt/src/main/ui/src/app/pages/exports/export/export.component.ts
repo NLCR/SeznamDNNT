@@ -112,15 +112,33 @@ export class ExportComponent implements OnInit {
   
 
   approveAll() {
-    this.service.approveExport(this.exportname).subscribe((exp)=> {
-      this.getDocs({});
-      
-      this.service.getExport(this.exportname).subscribe((exp)=> {
-        if (exp.response.docs && exp.response.docs.length > 0) {
-          this.exportObj = exp.response.docs[0];
-        }
+
+    if (this.exportObj.export_type === 'IOCP') {
+
+      this.service.approveExportIOCP(this.exportname).subscribe((exp)=> {
+        this.getDocs({});
+        
+        this.service.getExport(this.exportname).subscribe((exp)=> {
+          if (exp.response.docs && exp.response.docs.length > 0) {
+            this.exportObj = exp.response.docs[0];
+          }
+        });
       });
-    });
+  
+    } else {
+
+      this.service.approveExportUOCP(this.exportname).subscribe((exp)=> {
+        this.getDocs({});
+        
+        this.service.getExport(this.exportname).subscribe((exp)=> {
+          if (exp.response.docs && exp.response.docs.length > 0) {
+            this.exportObj = exp.response.docs[0];
+          }
+        });
+      });
+  
+    }
+
   }
 
   encodePath(path) {
@@ -152,4 +170,48 @@ export class ExportComponent implements OnInit {
   cleanFilterExport() {
     this.subject.next('');
   }
+
+
+  
+  processExport(data: { type: string, identifier: string }) {
+    switch (data.type) {
+      case 'exported': 
+
+        if (this.exportObj.export_type === 'UOCP') {
+          this.service.approveExportItemUOCP(this.exportObj.id, data.identifier).subscribe((res: any) => {
+            if (res.error) {
+              this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+            } else {
+              this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+
+              this.service.getExport(this.exportname).subscribe((exp)=> {
+                if (exp.response.docs && exp.response.docs.length > 0) {
+                  this.exportObj = exp.response.docs[0];
+
+                  this.getDocs(this.route.snapshot.queryParams);
+                }
+              });
+            }
+          });
+
+      } else {
+        this.service.approveExportItemIOCP(this.exportObj.id, data.identifier).subscribe((res: any) => {
+          if (res.error) {
+            this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
+          } else {
+            this.service.showSnackBar('alert.schvaleni_navrhu_success', '', false);
+
+            this.service.getExport(this.exportname).subscribe((exp)=> {
+              if (exp.response.docs && exp.response.docs.length > 0) {
+                this.exportObj = exp.response.docs[0];
+
+                this.getDocs(this.route.snapshot.queryParams);
+              }
+            });
+          }
+        });
+      }
+        break;
+      }
+    }
 }

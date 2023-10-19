@@ -132,9 +132,11 @@ public class MarcRecordFields {
     public static final String ID_ISBN="id_isbn";
     public static final String ID_ISMN="id_ismn";
     
-    // identifikator exportovaneho zaznamu do euipo
+    // aktivni euipo identifikatory; muze jich byt vic 
     public static final String ID_EUIPO = "id_euipo";
+    // vsechny nepouzivane euipo identifikatory
     public static final String ID_EUIPO_CANCELED = "id_euipo_canceled";
+    public static final String ID_EUIPO_LASTACTIVE = "id_euipo_lastactive";
 
     // identifikator exportu pro euipo
     public static final String ID_EUIPO_EXPORT = "id_euipo_export";

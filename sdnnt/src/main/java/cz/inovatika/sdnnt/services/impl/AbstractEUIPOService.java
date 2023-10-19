@@ -395,4 +395,39 @@ public class AbstractEUIPOService {
                 oneRecordValues.put("euipo", Arrays.asList(MarcRecordUtils.generateEUIPOIdent()));
                 return oneRecordValues;
             }
+
+
+    protected int numberOfExports(List<String> docs) {
+        int numberOfExports = docs.size() / this.exportLimit;
+        if (docs.size() % this.exportLimit > 0) {
+            numberOfExports += 1;
+        }
+        return numberOfExports;
+    }
+
+
+    protected int numberOfSpreadsheets(List<String> exportPids) {
+        int numberOfSpredsheets = exportPids.size() / this.spredsheetLimit;
+        if (exportPids.size() % this.spredsheetLimit > 0) {
+            numberOfSpredsheets += 1;
+        }
+        return numberOfSpredsheets;
+    }
+
+
+    protected int numberOfUpdates(List<String> spreadSheetBatch) {
+        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
+        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
+            numberOfUpdates += 1;
+        }
+        return numberOfUpdates;
+    }
+
+
+    protected List<String> subList(List<String> docs, int export, int limit) {
+        int startExportIndex = export * limit;
+        int endExportIndex = (export + 1) * limit;
+        List<String> exportPids = docs.subList(startExportIndex, Math.min(endExportIndex, docs.size()));
+        return exportPids;
+    }
 }

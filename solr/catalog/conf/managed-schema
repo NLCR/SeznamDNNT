@@ -158,6 +158,10 @@
    <!-- identifikator pro euipo -->	
    <field name="id_euipo" type="string" indexed="true" stored="false" multiValued="true"  />
 
+   <!-- posledni platne euipo identifikatory -->	
+   <field name="id_euipo_lastactive" type="string" indexed="true" stored="false" multiValued="true"  />
+
+
    <!-- zrusene identifikatory -->
    <field name="id_euipo_canceled" type="string" indexed="true" stored="false" multiValued="true"  />
 

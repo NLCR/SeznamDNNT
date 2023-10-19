@@ -149,12 +149,29 @@ export class AppService {
     return this.get(url, params);
   }
 
-  approveExport(id: string): Observable<any> {
-    let url = '/iexports/approve_export';
+  approveExportItemUOCP(expid: string, itemid:string): Observable<any> {
+    let url = '/iexports/approve_item_export_uocp';
+    const params: HttpParams = new HttpParams().set('exportname', expid).set('id',itemid );
+    return this.get(url, params);
+  }
+
+  approveExportItemIOCP(expid: string, itemid:string): Observable<any> {
+    let url = '/iexports/approve_item_export_iocp';
+    const params: HttpParams = new HttpParams().set('exportname', expid).set('id',itemid );
+    return this.get(url, params);
+  }
+
+  approveExportUOCP(id: string): Observable<any> {
+    let url = '/iexports/approve_export_uocp';
     const params: HttpParams = new HttpParams().set('exportname', id);
     return this.get(url, params);
   }
 
+  approveExportIOCP(id: string): Observable<any> {
+    let url = '/iexports/approve_export_iocp';
+    const params: HttpParams = new HttpParams().set('exportname', id);
+    return this.get(url, params);
+  }
 
   searchExports(params: HttpParams): Observable<any> {
     let url = '/iexports/search';

@@ -95,11 +95,14 @@
 
       <ng-container *ngFor="let doc of docs">
         <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
-        [inZadost]="true" [zadost]="zadost" 
+
+        [zadost]="zadost" 
+        [view]="'zadost'"
         (removeFromZadostEvent)="removeDoc($event)"
         (processZadostEvent)="processNavrh($event)">
         </app-result-item>
       </ng-container>
+
     </div>
     <div class="app-mt-2">
       <app-paginator [storeStateKey]="'zadost'" [numFound]="numFound" [showSort]="false"></app-paginator>

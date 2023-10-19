@@ -266,9 +266,6 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
     @Override
     public int update(String format,  List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
-
-        //LinkedHashSet<String> docs = new LinkedHashSet<>(a);
-        
         
         AtomicInteger retVal = new AtomicInteger();
         if (!docs.isEmpty()) {
@@ -276,7 +273,6 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
             List<String> toRemove = new ArrayList<>();
             
             try (SolrClient solrClient = buildClient()) {
-                //getLogger().info("Export identifier '" + identifier + "' number of records "+docs.size());
 
                 int numberOfUpdateBatches = docs.size() / updateBatchLimit;
                 if (docs.size() % updateBatchLimit > 0) {
@@ -326,7 +322,7 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                 
                 long start = System.currentTimeMillis();
                 docs.removeAll(toRemove);
-                getLogger().info("Removing all items took "+(System.currentTimeMillis() - start)+" ms ");
+                //getLogger().info("Removing all items took "+(System.currentTimeMillis() - start)+" ms ");
                 
                 int numberOfExports = numberOfExports(docs);
                 for (int export = 0; export < numberOfExports; export++) {
@@ -405,47 +401,12 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                     }
 
                 } 
-                
-                
-                
             }
         }
         
         //
         return retVal.get();
     }
-
-    private List<String> subList(List<String> docs, int export, int limit) {
-        int startExportIndex = export * limit;
-        int endExportIndex = (export + 1) * limit;
-        List<String> exportPids = docs.subList(startExportIndex, Math.min(endExportIndex, docs.size()));
-        return exportPids;
-    }
-
-    private int numberOfExports(List<String> docs) {
-        int numberOfExports = docs.size() / this.exportLimit;
-        if (docs.size() % this.exportLimit > 0) {
-            numberOfExports += 1;
-        }
-        return numberOfExports;
-    }
-
-    private int numberOfSpreadsheets(List<String> exportPids) {
-        int numberOfSpredsheets = exportPids.size() / this.spredsheetLimit;
-        if (exportPids.size() % this.spredsheetLimit > 0) {
-            numberOfSpredsheets += 1;
-        }
-        return numberOfSpredsheets;
-    }
-
-    private int numberOfUpdates(List<String> spreadSheetBatch) {
-        int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
-        if (spreadSheetBatch.size() % updateBatchLimit > 0) {
-            numberOfUpdates += 1;
-        }
-        return numberOfUpdates;
-    }
-
 
     private boolean accept(Object fmt, Object date1int, Object date1) {
         if (fmt != null && fmt.toString().equals("BK")) {

@@ -20,6 +20,7 @@ import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { DialogSuccessorRecordsComponent } from '../dialog-successor-records/dialog-successor-records.component';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { Export } from 'src/app/shared/exports';
 
 
 @Component({
@@ -29,11 +30,20 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 })
 export class ResultItemComponent implements OnInit {
 
+  //@Input() inZadost: boolean;
+
+
+  // Pouziti komponenty 
+  @Input() view:string;
+  @Input() export: Export;
+
   @Input() doc: SolrDocument;
-  @Input() inZadost: boolean;
   @Input() zadost: Zadost;
+
   @Output() removeFromZadostEvent = new EventEmitter<string>();
   @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string, options:string }>();
+
+  @Output() processExportEvent = new EventEmitter<{ type: string, identifier: string}>();
 
 
   newState = new FormControl();
@@ -85,7 +95,7 @@ export class ResultItemComponent implements OnInit {
 
     // TODO: Prepsat, neprehledne 
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
-    const z = this.inZadost ? this.zadost : this.doc.zadost;
+    const z = this.view === 'zadost' ? this.zadost : this.doc.zadost;
     if (z?.process) {
       //let tablekey = this.doc.identifier;
       let stateKey = (z.desired_item_state ? z.desired_item_state : "_");
@@ -217,7 +227,7 @@ export class ResultItemComponent implements OnInit {
 
   setHasNavrhFlag() {
     //this.doc.dntstav?
-    const z = this.inZadost ? this.zadost : this.doc.zadost;
+    const z = this.view ==='zadost' ? this.zadost : this.doc.zadost;
     if (z && z?.state !== 'processed') {
       this.hasNavhr = true;
     } else {

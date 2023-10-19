@@ -41,11 +41,6 @@ export class ExportsComponent implements OnInit {
     }
     this.state.activePage = 'Exports';
 
-    // this.route.queryParams.subscribe(val => {
-    //   this.search(val);
-    // });
-
-
 
     this.route.queryParams.subscribe(val => {
       this.query = this.route.snapshot.queryParamMap.get('exportq') ;
@@ -57,9 +52,12 @@ export class ExportsComponent implements OnInit {
       debounceTime(400)
     ).subscribe(searchTextValue => {
 
+      this.state.navigationstore.setPage("export", 0);
+
       const req: any = {};
       req.exportq = searchTextValue;
 
+      
       this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
     });
 
@@ -90,16 +88,26 @@ export class ExportsComponent implements OnInit {
   }
 
   showExport(imp: Export) {
+    let queryParams = {};
+    if (this.query) {
+      if (this.query.match(/^\s*euipo_/)) {
+        queryParams = {sort: "title_sort asc"}; 
+      }  else {
+         queryParams =  {  exportq: this.query };
+      }     
+    } else {
+      queryParams = {sort: "title_sort asc"}; 
 
-    const queryParams = this.query?.match(/^\s*euipo_/) ? {} : { exportq: this.query };
+    }
+
+    //const queryParams = (this.query && this.query.match(/^\s*euipo_/)) ? {} : {  exportq: this.query };
     this.router.navigate(['exports/export/'+ imp.id], { queryParams });
 
-    //this.router.navigate(['exports/export/'+ imp.id], {queryParams:{controlled: false}});
   }
 
   approveANDProcess(exp: Export) {
 
-    this.service.approveAndProcessExport(exp.id).subscribe((exp)=> {
+    this.service.processExport(exp.id).subscribe((exp)=> {
       this.route.queryParams.subscribe(val => {
         this.query = this.route.snapshot.queryParamMap.get('exportq') ;
         this.state.prefixsearch['export'] = this.query;

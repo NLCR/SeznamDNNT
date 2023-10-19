@@ -53,7 +53,7 @@
             </div>
           </div>
         </mat-card>
-        <app-result-item *ngFor="let doc of docs" [doc]="doc"></app-result-item>
+        <app-result-item *ngFor="let doc of docs" [doc]="doc" [view]="'search'"></app-result-item>
       </div>
       <div class="app-mt-4">
         <app-paginator [numFound]="numFound" [showSort]="true" [storeStateKey]="'search'"></app-paginator>

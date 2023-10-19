@@ -523,7 +523,6 @@ public class Job implements InterruptableJob {
                         List<String> checkSE = impl.check("SE");
                         int updatedSECount = impl.update("SE", checkSE);
 
-                        
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {
@@ -559,23 +558,14 @@ public class Job implements InterruptableJob {
                     EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
                     try {
                         
-                        List<Integer> updated = new ArrayList<>();
 
-                        List<List<String>> checkBK = impl.check("BK");
-                        for (List<String> batch : checkBK) {
-                            SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
-                            String name = String.format("euipo_uocp_bk_%s", nameformat.format(new Date()));
-                            int updatedBK = impl.update("BK", name, batch);
-                            updated.add(updatedBK);
-                        }
+                        List<String> checkBK = impl.check("BK");
+                        List<Integer> updated = new ArrayList<>();
+                        int updatedBKCount = impl.update("BK", checkBK);
+//
     
-                        List<List<String>> checkSE = impl.check("SE");
-                        for (List<String> batch : checkSE) {
-                            SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
-                            String name = String.format("euipo_uocp_bk_%s", nameformat.format(new Date()));
-                            int updatedSE = impl.update("SE", name, batch);
-                            updated.add(updatedSE);
-                        }
+                        List<String> checkSE = impl.check("SE");
+                        int updatedSECount = impl.update("SE", checkSE);
 
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);

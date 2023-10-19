@@ -1,1 +1,19 @@
-<p>result-actions-export works!</p>
+<!-- IOCP export -->
+<ng-container *ngIf="export.export_type === 'IOCP' && (!doc.export || !doc.export.includes('euipo'))">
+    <ng-container>
+        <mat-button-toggle value="approvedExport"[matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above" (click)="exported()">
+            <mat-icon class="material-icons-outlined">add_circle</mat-icon>
+          </mat-button-toggle>
+    </ng-container>
+</ng-container>
+
+<!-- UOCP export -->
+<ng-container *ngIf="export.export_type === 'UOCP' && (!export.exported_identifiers || !export.exported_identifiers.includes(doc.identifier)) && doc.export?.includes('euipo')">
+    <ng-container>
+        <mat-button-toggle value="approvedExport"[matTooltip]="'acts.schvalit_zmenu_stavu' | translate" matTooltipPosition="above" (click)="exported()">
+            <mat-icon class="material-icons-outlined">remove</mat-icon>
+          </mat-button-toggle>
+    </ng-container>
+</ng-container>
+
+
