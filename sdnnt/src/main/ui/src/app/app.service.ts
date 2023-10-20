@@ -459,6 +459,13 @@ export class AppService {
     return this.get(url);
   }
 
+  registerInstitutions(inst:string): Observable<any> {
+    let url = 'user/add_institution';
+    const params: HttpParams = new HttpParams()
+      .set('institution', inst);
+    return this.get(url, params);
+  }
+
   registerUser(user: User): Observable<User> {
     let url = '/user/register';
     return this.post(url, user);

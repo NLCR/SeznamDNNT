@@ -115,5 +115,14 @@ public class ShibUsersControllerImpl extends AbstractUserController implements U
         String collection = DataCollections.shibusers.name();
         return getUsersImpl(collection);
     }
-    
+
+    @Override
+    public List<String> getAllInstitutions() throws UserControlerException {
+        throw new NotImplementedException("not implemented for shib users"); 
+    }
+
+    @Override
+    public List<String> registerInstitution(String inst) throws UserControlerException {
+        throw new NotImplementedException("not implemented for shib users"); 
+    }
 }

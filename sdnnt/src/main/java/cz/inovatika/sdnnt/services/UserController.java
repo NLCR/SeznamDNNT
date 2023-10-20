@@ -160,4 +160,11 @@ public interface UserController {
      * @throws UserControlerException Something happened ;-)
      */
     public User changeIntervalForUser(String username, NotificationInterval interval) throws UserControlerException;
+
+    
+    
+    public List<String> getAllInstitutions() throws UserControlerException;
+    
+    
+    public List<String> registerInstitution(String inst) throws UserControlerException;
 }

@@ -15,6 +15,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenExcept
 import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -23,14 +24,23 @@ import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.NoOpResponseParser;
+import org.apache.solr.client.solrj.request.QueryRequest;
+import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.util.NamedList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -347,5 +357,63 @@ public class UserControlerImpl  extends AbstractUserController implements UserCo
         return changeIntervalImpl(username, interval, DataCollections.users.name());
     }
 
+    @Override
+    public List<String> getAllInstitutions() throws UserControlerException {
+        int max = Options.getInstance().getInt("max.institutions", 1000);
+        List<String> institutions = new ArrayList<>();
+        NamedList<Object> qresp = null;
+        try (SolrClient solr = buildClient()) {
+                SolrQuery query = new SolrQuery("*")
+                    .setRows(max)
+                    .setFields("*");
+                QueryRequest qreq = new QueryRequest(query);
+                NoOpResponseParser rParser = new NoOpResponseParser();
+                rParser.setWriterType("json");
+                qreq.setResponseParser(rParser);
+                qresp = solr.request(qreq, DataCollections.institutions.name());
+                JSONObject ret = new JSONObject((String) qresp.get("response"));
+                
+                JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+                for (int i = 0; i < docs.length(); i++) {
+                    JSONObject jdoc = docs.getJSONObject(i);
+                    String name = jdoc.optString("name");
+                    if (name != null) {
+                        institutions.add(name);
+                    }
+                }
+        } catch (IOException | SolrServerException ex) {
+            throw new UserControlerException(ex.getMessage());
+        }
+        Collections.sort(institutions);
+        return institutions;
+    }
 
+    @Override
+    public List<String> registerInstitution(String inst) throws UserControlerException {
+        List<String> allInstitutions = getAllInstitutions();
+        if (!allInstitutions.contains(inst)) {
+
+            int max = Options.getInstance().getInt("max.institutions", 1000);
+            if (allInstitutions.size() >= max) {
+                throw new UserControlerException("The maximum number of institutions has been exceeded.");
+            } else {
+                try (SolrClient solr = buildClient()) {
+                    UpdateRequest recordItem = new UpdateRequest();
+                    SolrInputDocument idoc = new SolrInputDocument();
+                    idoc.setField("name", inst);
+                    recordItem.add(idoc);
+                    UpdateResponse cResponse = recordItem.process(solr, DataCollections.institutions.name());
+                    SolrJUtilities.quietCommit(solr, DataCollections.institutions.name());
+                } catch (IOException | SolrServerException ex) {
+                  throw new UserControlerException(ex.getMessage());
+              }
+            }
+
+            allInstitutions.add(inst);
+            Collections.sort(allInstitutions);
+        }
+        return allInstitutions;
+    }
+    
+    
 }

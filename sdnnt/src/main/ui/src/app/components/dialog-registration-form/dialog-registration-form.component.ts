@@ -4,7 +4,7 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { Observable } from 'rxjs';
@@ -17,8 +17,11 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   // institution autocomplete
+
+  //autocompleteForm: FormGroup; 
+
   myControl = new FormControl();
-  options: string[] = ['One', 'Two', 'Three'];
+  //options: string[] = ['One', 'Two', 'Three'];
   filteredOptions: Observable<string[]>;
 
   @Input() user: User;
@@ -65,7 +68,9 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   constructor(
     public config: AppConfiguration,
     public state: AppState,
-    private service: AppService) { }
+    private service: AppService) {
+
+  }
   
   
   ngOnChanges(changes: SimpleChanges): void {
@@ -115,30 +120,46 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   ngOnInit(): void {
 
       this.service.getInstitutions().subscribe(res => {
-        this.institutions = res.institutions.map(function(val,index) {
-          return val.acronym;
-        });
+        this.institutions = res.institutions;
+
+
+        this.filteredOptions = this.myControl.valueChanges
+        .pipe(
+          startWith(''),
+          map(value => value.toLowerCase()),
+          map(filterValue => this.institutions.filter(inst => inst.toLowerCase().startsWith(filterValue)))
+        );
+
       });
 
       // institution autocomplete
-      this.filteredOptions = this.myControl.valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(value))
-      );
   }
 
-  // institution autocomplete
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.options.filter(inst => inst.toLowerCase().includes(filterValue));
+    return this.institutions.filter(inst => inst.toLowerCase().startsWith(filterValue));
+  }
+
+  nonExistentInstitution() :boolean {
+    return this.user?.institution &&  (this.institutions && this.institutions.indexOf(this.user.institution) < 0);
   }
 
   // institution autocomplete
   addNewInstitution() {
-    // to do with snackbar
-    this.service.showSnackBar('alert.addNewInstitution.success');
-    //this.service.showSnackBar('alert.addNewInstitution.error');
+
+    this.service.registerInstitutions(this.user.institution).subscribe(res => {
+      this.service.showSnackBar('alert.addNewInstitution.success');
+      this.institutions = res.institutions;
+      
+
+      this.filteredOptions = this.myControl.valueChanges
+      .pipe(
+        startWith(''),
+        map(value => value.toLowerCase()),
+        map(filterValue => this.institutions.filter(inst => inst.toLowerCase().startsWith(filterValue)))
+      );
+
+    });
   }
 
 

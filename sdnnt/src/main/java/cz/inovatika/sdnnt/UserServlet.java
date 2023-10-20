@@ -654,10 +654,54 @@ public class UserServlet extends HttpServlet {
         INSTITUTIONS {
             @Override
             JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                List<String> config = new ArrayList<>();
                 JSONArray institutions = Options.getInstance().getJSONArray("institutions");
+                if (institutions != null) {
+                    institutions.forEach(i-> { 
+                        if (i instanceof JSONObject) {
+                            JSONObject iObj = (JSONObject) i;
+                            config.add(iObj.optString("acronym"));
+                        }
+                    });
+                }
+                
+                UserControlerImpl controller = new UserControlerImpl(request, new MailServiceImpl());
+                List<String> insts = controller.getAllInstitutions();
+                config.addAll(insts);
+                
+                JSONArray allJSONArray = new JSONArray();
+                config.forEach(allJSONArray::put);
+                
                 JSONObject retVal = new JSONObject();
-                retVal.put("institutions", institutions != null ? institutions : new JSONArray());
+                retVal.put("institutions", allJSONArray);
                 return retVal;
+            }
+        },
+        
+        ADD_INSTITUTION {
+            @Override
+            JSONObject doPerform(HttpServletRequest request, HttpServletResponse response) throws Exception {
+                
+                try {
+                    String inst = request.getParameter("institution");
+                    UserControlerImpl controller = new UserControlerImpl(request, new MailServiceImpl());
+                    List<String> registerInstitution = null;
+                    if (inst != null) {
+                        registerInstitution = controller.registerInstitution(inst);
+                    } else {
+                        registerInstitution = controller.getAllInstitutions();
+                    }
+
+                    JSONArray allJSONArray = new JSONArray();
+                    registerInstitution.forEach(allJSONArray::put);
+                    
+                    JSONObject retVal = new JSONObject();
+                    retVal.put("institutions", allJSONArray);
+                    return retVal;
+                    
+                } catch (UserControlerException e) {
+                    return errorJson(response, SC_BAD_REQUEST, e.getMessage());
+                }
             }
         };
 

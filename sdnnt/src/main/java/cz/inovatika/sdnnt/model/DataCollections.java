@@ -10,5 +10,7 @@ public enum DataCollections {
 
     exports,
     imports,
-    imports_documents;
+    imports_documents,
+    
+    institutions;
 }
