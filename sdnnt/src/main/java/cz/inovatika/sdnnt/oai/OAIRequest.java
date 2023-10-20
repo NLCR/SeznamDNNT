@@ -249,7 +249,7 @@ public static String getRecord(HttpServletRequest req) {
       SolrQuery query = new SolrQuery("*")
               .setRows(1)
               .addFilterQuery("identifier:\"" + id + "\" OR id_sdnnt:\""+id+"\"")
-              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
+              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity, masterlinks, masterlinks_disabled");
 
       /** to je blbe */
       String set = req.getParameter("set");

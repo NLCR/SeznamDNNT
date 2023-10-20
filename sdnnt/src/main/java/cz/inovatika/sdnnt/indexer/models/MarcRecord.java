@@ -427,6 +427,19 @@ public class MarcRecord {
       }
 
       // master links 
+      if (this.masterlinks != null && !this.masterLinksDisabled) {
+          for (int i = 0; i<masterlinks.length(); i++) {
+                  
+              xml.append("<marc:datafield tag=\"956\" ind1=\" \" ind2=\" \">");
+                JSONObject gr = masterlinks.getJSONObject(i);
+                  xml.append("<marc:subfield code=\"u\" >").append(gr.optString("link")).append("</marc:subfield>");
+                  if (this.dntstav != null && this.dntstav.size() > 0) {
+                      String stav = this.dntstav.get(0);
+                      xml.append("<marc:subfield code=\"9\" >").append(stav).append("</marc:subfield>");
+                  }
+              xml.append("</marc:datafield>");
+          }
+      }
       
       // Granularita
       if (granularity != null) {
