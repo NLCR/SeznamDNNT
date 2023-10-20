@@ -425,6 +425,8 @@ public class MarcRecord {
           }
         xml.append("</marc:datafield>");
       }
+
+      // master links 
       
       // Granularita
       if (granularity != null) {

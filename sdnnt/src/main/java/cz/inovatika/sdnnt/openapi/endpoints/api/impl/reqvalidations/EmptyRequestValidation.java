@@ -35,7 +35,7 @@ public class EmptyRequestValidation extends DNNTRequestApiServiceValidation {
 
     
     @Override
-    public List<Detail> getErrorDetails() {
+    public List<Detail> getErrorDetails(String navrh) {
         // TODO Auto-generated method stub
         return null;
     }

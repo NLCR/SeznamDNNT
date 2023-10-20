@@ -174,7 +174,7 @@ public class SearchibilityValidationTest {
 
         Assert.assertEquals(val.getInvalidIdentifiers(), Arrays.asList("oai-record1","oai-record2"));
 
-        List<Detail> errorDetails = val.getErrorDetails();
+        List<Detail> errorDetails = val.getErrorDetails("NZN");
         for (Detail detail : errorDetails) {
             System.out.println(detail);
         }

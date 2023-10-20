@@ -21,6 +21,7 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
 import cz.inovatika.sdnnt.openapi.endpoints.model.DetailMarc;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail.StateEnum;
 import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation {
 
@@ -32,7 +33,8 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
     public static String ERR_FORMAT_MSG = "The identifier has an incorrect format. Expecting a book or a serial (BK, SE).";
 
     public static String GENERIC_ERR_WORKFLOW_MSG = "The following identifiers %s cannot be included in the DNNT list proposal.";
-    public static String ERR_WORKFLOW_MSG = "The identifier %s cannot be included in the DNNT list proposal.";
+    public static String ERR_WORKFLOW_NZN_MSG = "The identifier %s cannot be included in the DNNT list proposal.";
+    public static String ERR_WORKFLOW_VN_MSG = "The identifier %s cannot be added to the proposal.";
 
     public static String GENERIC_ERR_NONEXISTENT_MSG = "The following records %s do not exist.";
     public static String ERR_NONEXISTENT_MSG = "The record does not exist.";
@@ -126,7 +128,7 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
     
     
     @Override
-    public List<Detail> getErrorDetails() {
+    public List<Detail> getErrorDetails(String navrh) {
         
         List<Detail> retdetails = new ArrayList<>();
         // nonexistent 
@@ -136,12 +138,13 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_NONEXISTENT_MSG);
             
+            /*
             List<String> format910ax = format910ax(id);
             if (format910ax != null) {
                 DetailMarc marc = new DetailMarc();
                 format910ax.stream().forEach(marc::addMarc910Item);
                 detail.setMarc(marc);
-            }
+            }*/
             
             return detail;
         }).forEach(retdetails::add);
@@ -152,12 +155,13 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_FORMAT_MSG);
 
+            /*
             List<String> format910ax = format910ax(id);
             if (format910ax != null) {
                 DetailMarc marc = new DetailMarc();
                 format910ax.stream().forEach(marc::addMarc910Item);
                 detail.setMarc(marc);
-            }
+            }*/
 
             return detail;
         }).forEach(retdetails::add);
@@ -168,13 +172,14 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_PLACE_MSG);
             
+            /*
             List<String> format910ax = format910ax(id);
             if (format910ax != null) {
                 DetailMarc marc = new DetailMarc();
                 format910ax.stream().forEach(marc::addMarc910Item);
                 detail.setMarc(marc);
                 
-            }
+            }*/
 
             return detail;
         }).forEach(retdetails::add);
@@ -183,14 +188,19 @@ public class InvalidIdentifiersValdation extends DNNTRequestApiServiceValidation
             Detail detail = new Detail();
             detail.setIdentifier(p.getLeft());
             detail.state(StateEnum.REJECTED);
-            detail.setReason(String.format(ERR_WORKFLOW_MSG, p.toString()));
-
+            if (StringUtils.isAnyString(navrh) && (navrh.equals("NZN"))) {
+                detail.setReason(String.format(ERR_WORKFLOW_NZN_MSG, p.toString()));
+            } else {
+                detail.setReason(String.format(ERR_WORKFLOW_VN_MSG, p.toString()));
+            }
+            
+            /*
             List<String> format910ax = format910ax(p.getLeft());
             if (format910ax != null) {
                 DetailMarc marc = new DetailMarc();
                 format910ax.stream().forEach(marc::addMarc910Item);
                 detail.setMarc(marc);
-            }
+            }*/
 
             return detail;
         }).forEach(retdetails::add);

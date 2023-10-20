@@ -268,7 +268,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                         JSONObject jsonObject = accountService.userCloseRequest(zadost.toJSON().toString());
                                         SuccessRequestSaved readValue = objectMapper.readValue(jsonObject.toString(), SuccessRequestSaved.class);
                                 
-                                        ArrayOfDetails details = details(failingValidation);
+                                        ArrayOfDetails details = details(failingValidation, navrh);
                                         if (!details.isEmpty()) {
                                             readValue.setDetails(details);
                                         }
@@ -292,7 +292,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                     }
                                     
                                 } else {
-                                    List<Detail> details = failingValidation.stream().map(DNNTRequestApiServiceValidation::getErrorDetails).flatMap(List::stream).collect(Collectors.toList());
+                                    List<Detail> details = failingValidation.stream().map(validation ->  { return validation.getErrorDetails(navrh); } ).flatMap(List::stream).collect(Collectors.toList());
                                     throw new BadRequestException(details);
                                 }
                             }
@@ -348,11 +348,11 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
         }
     }
 
-    private ArrayOfDetails details(List<DNNTRequestApiServiceValidation> failingValidations) {
+    private ArrayOfDetails details(List<DNNTRequestApiServiceValidation> failingValidations, String navrh) {
         ArrayOfDetails details = new ArrayOfDetails();
 
         failingValidations.stream().filter(DNNTRequestApiServiceValidation::isSoftValidation).forEach(valid-> {
-            valid.getErrorDetails().forEach(details::add);
+            valid.getErrorDetails(navrh).forEach(details::add);
         });
         return details;
     }

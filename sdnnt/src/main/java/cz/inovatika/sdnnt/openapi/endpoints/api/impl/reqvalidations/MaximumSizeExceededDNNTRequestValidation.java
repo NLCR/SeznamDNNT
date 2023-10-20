@@ -54,7 +54,7 @@ public class MaximumSizeExceededDNNTRequestValidation extends DNNTRequestApiServ
     
 
     @Override
-    public List<Detail> getErrorDetails() {
+    public List<Detail> getErrorDetails(String navr) {
         return new ArrayList<>();
     }
 

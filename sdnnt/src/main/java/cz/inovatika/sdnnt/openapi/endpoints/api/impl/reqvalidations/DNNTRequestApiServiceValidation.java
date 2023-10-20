@@ -53,7 +53,7 @@ public abstract class DNNTRequestApiServiceValidation {
 
     public abstract String getErrorMessage();
     
-    public abstract List<Detail> getErrorDetails();
+    public abstract List<Detail> getErrorDetails(String navrh);
     
     // soft validation - invalid identifiers can be removed and result is stored
     // hard validation - nothing to store

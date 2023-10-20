@@ -91,7 +91,7 @@ public class SearchibilityValidation extends DNNTRequestApiServiceValidation{
     }
 
     @Override
-    public List<Detail> getErrorDetails() {
+    public List<Detail> getErrorDetails(String navrh) {
         return this.nonExistentIdentifiers.stream().map(id-> {
             Detail detail = new Detail();
             detail.setIdentifier(id);

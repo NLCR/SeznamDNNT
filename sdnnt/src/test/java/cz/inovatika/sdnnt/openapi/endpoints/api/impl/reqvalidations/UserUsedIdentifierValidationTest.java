@@ -137,7 +137,7 @@ public class UserUsedIdentifierValidationTest {
                         "oai-record2"));
 
         
-        List<Detail> errorDetails = val.getErrorDetails();
+        List<Detail> errorDetails = val.getErrorDetails("NZN");
         for (Detail detail : errorDetails) {
             System.out.println(detail);
         }

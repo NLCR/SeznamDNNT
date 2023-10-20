@@ -138,7 +138,7 @@ public class InvalidIdentifiersValdationTest {
         Assert.assertEquals(Arrays.asList("oai:aleph-nkp.cz:SKC01-002778029"), validIdentifiers);
         Assert.assertEquals(Arrays.asList("oai:aleph-nkp.cz:SKC01-000392836"), invalidIdentifiers);
 
-        List<Detail> errorDetails = val.getErrorDetails();
+        List<Detail> errorDetails = val.getErrorDetails("NZN");
         for (Detail detail : errorDetails) {
             System.out.println(detail);
         }
@@ -207,7 +207,7 @@ public class InvalidIdentifiersValdationTest {
         Assert.assertEquals(Arrays.asList("oai:aleph-nkp.cz:SKC01-000392836"), invalidIdentifiers);
 
 
-        List<Detail> errorDetails = val.getErrorDetails();
+        List<Detail> errorDetails = val.getErrorDetails("NZN");
         for (Detail detail : errorDetails) {
             System.out.println(detail);
         }
@@ -278,7 +278,7 @@ public class InvalidIdentifiersValdationTest {
         Assert.assertEquals(Arrays.asList("oai:aleph-nkp.cz:SKC01-002778029"), validIdentifiers);
         Assert.assertEquals(Arrays.asList("oai:aleph-nkp.cz:SKC01-000392836"), invalidIdents);
         
-        List<Detail> errorDetails = val.getErrorDetails();
+        List<Detail> errorDetails = val.getErrorDetails("NZN");
         for (Detail detail : errorDetails) {
             System.out.println(detail);
         }

@@ -80,20 +80,21 @@ public class UserUsedIdentifierValidation extends DNNTRequestApiServiceValidatio
     }
 
     @Override
-    public List<Detail> getErrorDetails() {
+    public List<Detail> getErrorDetails(String navrh) {
         return this.usedByUser.stream().map(id-> {
 
             Detail detail = new Detail();
             detail.setIdentifier(id);
             detail.state(StateEnum.REJECTED);
             detail.setReason(ERR_MESSAGE);
-
+            
+            /*
             List<String> format910ax = format910ax(id);
             if (format910ax != null) {
                 DetailMarc marc = new DetailMarc();
                 format910ax.stream().forEach(marc::addMarc910Item);
                 detail.setMarc(marc);
-            }
+            }*/
 
             return detail;
             
