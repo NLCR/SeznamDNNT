@@ -123,15 +123,15 @@ public class DuplicateUtils {
         //"id_euipo":["euipo:0a715715-30eb-474a-a02b-3b6a0f6bd840"],
         //"export":["euipo"],
         
-        followers.stream().forEach(mr-> {
+        followers.stream().forEach(follower-> {
 
             // verejny stav naslednika A,PA, NL a zaroven stav puvodce A, PA, NL, NPA  => Merge
-            if (isOIPAcceptingPublic(mr.dntstav) && (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu))) {
+            if (isOIPAcceptingPublic(follower.dntstav) && (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu))) {
                 
                 // do identifikatoru dat vsecchny predchazejici 
                 List<String> mergedIdentifiers = new ArrayList<>();
-                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
-                    List<String> idEuIpo = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                if (depStore != null &&  depStore.containsKey(follower.identifier)) {
+                    List<String> idEuIpo = depStore.getMarcRecord(follower.identifier).stream().map(dpr -> {
                         return dpr.idEuipo;
                     }).flatMap(List::stream).collect(Collectors.toList());
                     
@@ -139,8 +139,8 @@ public class DuplicateUtils {
                 }
                 
                 
-                if (mr.idEuipo != null) {
-                    mergedIdentifiers.addAll(mr.idEuipo);
+                if (follower.idEuipo != null) {
+                    mergedIdentifiers.addAll(follower.idEuipo);
                 }
                 
                 if (origin.idEuipo != null) {
@@ -148,90 +148,114 @@ public class DuplicateUtils {
                 }
                 
                 if (!mergedIdentifiers.isEmpty()) {
-                    mr.idEuipo = new ArrayList<>(new LinkedHashSet<>(mergedIdentifiers));
+                    follower.idEuipo = new ArrayList<>(new LinkedHashSet<>(mergedIdentifiers));
                 }
                 
                 
                 List<String> mergedExports = new ArrayList<>();
-                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
-                    List<String> idEuIpoExports = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                if (depStore != null &&  depStore.containsKey(follower.identifier)) {
+                    List<String> idEuIpoExports = depStore.getMarcRecord(follower.identifier).stream().map(dpr -> {
                         return dpr.idEuipoExport;
                     }).flatMap(List::stream).collect(Collectors.toList());
                     
                     mergedExports.addAll(idEuIpoExports);
                 }
                 
-                if (mr.idEuipoExport != null) {
-                    mergedExports.addAll(mr.idEuipoExport);
+                if (follower.idEuipoExport != null) {
+                    mergedExports.addAll(follower.idEuipoExport);
                 }
                 if (origin.idEuipoExport != null) {
                     mergedExports.addAll(origin.idEuipoExport);
                 }
 
                 if (!mergedExports.isEmpty()) {
-                    mr.idEuipoExport = mergedExports;
+                    follower.idEuipoExport = mergedExports;
                 }
                 
                 List<String> mergedFacets = new ArrayList<>();
                 
-                if (depStore != null &&  depStore.containsKey(mr.identifier)) {
-                    List<String> mFacets = depStore.getMarcRecord(mr.identifier).stream().map(dpr -> {
+                if (depStore != null &&  depStore.containsKey(follower.identifier)) {
+                    List<String> mFacets = depStore.getMarcRecord(follower.identifier).stream().map(dpr -> {
                         return dpr.exportsFacets;
                     }).flatMap(List::stream).collect(Collectors.toList());
                     
                     mergedFacets.addAll(mFacets);
                 }
                 
-                if (mr.exportsFacets != null) {
-                    mergedFacets.addAll(mr.exportsFacets);
+                if (follower.exportsFacets != null) {
+                    mergedFacets.addAll(follower.exportsFacets);
                 }
                 if (origin.exportsFacets != null) {
                     mergedFacets.addAll(origin.exportsFacets);
                 }
                 
                 if (!mergedFacets.isEmpty()) {
-                    mr.exportsFacets = new ArrayList<>(new LinkedHashSet<>( mergedFacets));
+                    follower.exportsFacets = new ArrayList<>(new LinkedHashSet<>( mergedFacets));
                 }
 
             // Verejny stav puvodce A,PA,NL, NPA => Dedi
             } else if (isOIPAcceptingPublic(origin.dntstav) || isOIPAcceptingCuratorState(origin.historie_kurator_stavu)) {
-                mr.idEuipo = origin.idEuipo;
-                mr.idEuipoExport = origin.idEuipoExport;
-                mr.exportsFacets = origin.exportsFacets;
-            }
+
+                follower.idEuipo = new ArrayList<>(origin.idEuipo);
+                follower.idEuipoExport = new ArrayList<>(origin.idEuipoExport);
+                follower.exportsFacets = new ArrayList<>(origin.exportsFacets);
+                
+                List<String> mergedIdentifiers = new ArrayList<>();
+                if (depStore != null &&  depStore.containsKey(follower.identifier)) {
+                    List<String> idEuIpo = depStore.getMarcRecord(follower.identifier).stream().map(dpr -> {
+                        return dpr.idEuipo;
+                    }).flatMap(List::stream).collect(Collectors.toList());
+                    
+                    mergedIdentifiers.addAll(idEuIpo);
+
+                    follower.idEuipo.addAll (new ArrayList<>(new LinkedHashSet<>(mergedIdentifiers)));
+                }
+                
+                List<String> mergedFacets = new ArrayList<>();
+                if (depStore != null &&  depStore.containsKey(follower.identifier)) {
+                    List<String> mFacets = depStore.getMarcRecord(follower.identifier).stream().map(dpr -> {
+                        return dpr.exportsFacets;
+                    }).flatMap(List::stream).collect(Collectors.toList());
+                    
+                    mergedFacets.addAll(mFacets);
+                }
+
+            } /* else {
+                
+            }*/
             
             
-            mr.dntstav = new ArrayList<>(origin.dntstav);
-            mr.kuratorstav = new ArrayList<>(origin.kuratorstav);
+            follower.dntstav = new ArrayList<>(origin.dntstav);
+            follower.kuratorstav = new ArrayList<>(origin.kuratorstav);
             
-            mr.datum_stavu = origin.datum_stavu != null ?  new Date(origin.datum_stavu.getTime()) : null;
+            follower.datum_stavu = origin.datum_stavu != null ?  new Date(origin.datum_stavu.getTime()) : null;
             if (origin.historie_stavu !=  null) {
-                mr.historie_stavu =  jsonArray(origin.historie_stavu);
+                follower.historie_stavu =  jsonArray(origin.historie_stavu);
             }
             //mr.historie_stavu = origin.historie_stavu != null ? ;
             if (origin.historie_kurator_stavu != null) {
-                mr.historie_kurator_stavu = jsonArray(origin.historie_kurator_stavu);
+                follower.historie_kurator_stavu = jsonArray(origin.historie_kurator_stavu);
             }
             
             if (origin.historie_granulovaneho_stavu != null) {
-                mr.historie_granulovaneho_stavu = jsonArray(origin.historie_granulovaneho_stavu);
+                follower.historie_granulovaneho_stavu = jsonArray(origin.historie_granulovaneho_stavu);
             }
-            mr.license = origin.license;
+            follower.license = origin.license;
 
             if (origin.licenseHistory != null) {
-                mr.licenseHistory = new ArrayList<String>(origin.licenseHistory);
+                follower.licenseHistory = new ArrayList<String>(origin.licenseHistory);
             }
             
             if (origin.granularity != null) {
-                mr.granularity = jsonArray(origin.granularity);
+                follower.granularity = jsonArray(origin.granularity);
             }
             // TODO:Remove; unused
-            mr.previousDntstav = origin.previousDntstav;
-            mr.previousKuratorstav = origin.previousKuratorstav;
+            follower.previousDntstav = origin.previousDntstav;
+            follower.previousKuratorstav = origin.previousKuratorstav;
            
             
             if (consumer != null) {
-                consumer.accept(mr);
+                consumer.accept(follower);
             }
         });
         
