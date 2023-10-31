@@ -156,25 +156,22 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     
     private boolean accept(Object dntstav, Object history) {
         if (dntstav.toString().equals(PublicItemState.D.name())) {
+            List<String> schedulerComments = new ArrayList<>();
+
             JSONArray jsonArray = new JSONArray(history.toString());
             if (jsonArray.length() > 0) {
-                List<String> comments = new ArrayList<>();
+                //List<String> comments = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject lastObject = jsonArray.getJSONObject(i);
                     String comment = lastObject.optString("comment");
-                    comments.add(comment != null ? comment : "");
-                }
-                
-                long count = comments.stream()
-                        .filter(comment -> comment.startsWith("scheduler/"))
-                        .count();
-                if (count == 1)  {
-                    if (comments.contains("scheduler/"+Case.SKC_4a.name()) || comments.contains("scheduler/"+Case.SKC_4b.name())) {
-                        return true;
+                    if (comment.startsWith("scheduler/"+Case.SKC_4a.name()) || comment.startsWith("scheduler/"+Case.SKC_4b.name())) {
+                        schedulerComments.add(comment);
                     }
                 }
+                if (schedulerComments.size() > 0) {
+                    return true;
+                }
             } 
-
             return false;
         } else return true;
     }
