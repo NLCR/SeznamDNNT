@@ -4,7 +4,7 @@
       {{ 'desc.num_found' | translate }}: <strong>{{ numFound }}</strong>
     </div>
     <div class="app-right">
-      <app-paginator [storeStateKey]="'export'" [numFound]="numFound" [showSort]="false"></app-paginator>
+      <app-paginator [storeStateKey]="'exports'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
   <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
@@ -108,6 +108,6 @@
   </div>
   
   <div class="app-mt-4">
-    <app-paginator [storeStateKey]="'export'" [numFound]="numFound" [showSort]="false"></app-paginator>
+    <app-paginator [storeStateKey]="'exports'" [numFound]="numFound" [showSort]="false"></app-paginator>
   </div>
 </div>

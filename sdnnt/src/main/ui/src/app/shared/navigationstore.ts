@@ -11,7 +11,11 @@ export class NavigationStore {
         this.initDefault('imports');
         this.initDefault('account');   
         this.initDefault('search');  
-        this.initDefault('zadost');      
+        this.initDefault('zadost');    
+        this.initDefault('exports');    
+
+        this.initDefault('export');    
+
     }
 
     public contains(key:string) : boolean {

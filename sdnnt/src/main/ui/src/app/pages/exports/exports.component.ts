@@ -52,7 +52,7 @@ export class ExportsComponent implements OnInit {
       debounceTime(400)
     ).subscribe(searchTextValue => {
 
-      this.state.navigationstore.setPage("export", 0);
+      this.state.navigationstore.setPage("exports", 0);
 
       const req: any = {};
       req.exportq = searchTextValue;
