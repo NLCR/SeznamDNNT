@@ -169,7 +169,12 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                     }
                 }
                 if (schedulerComments.size() > 0) {
-                    return true;
+                    String lastComment = schedulerComments.get(schedulerComments.size() - 1);
+                    
+                    if (lastComment.startsWith("scheduler/"+Case.SKC_4a.name()) || lastComment.startsWith("scheduler/"+Case.SKC_4b.name())) {
+                        return true;
+                    }
+
                 }
             } 
             return false;
