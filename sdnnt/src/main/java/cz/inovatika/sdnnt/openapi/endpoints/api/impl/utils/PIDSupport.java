@@ -25,9 +25,15 @@ public class PIDSupport {
     public static String pidFromLink(String link) {
         int indexOf = link.indexOf("uuid:");
         if (indexOf > 0 ) { 
-            return link.substring(indexOf);
+            int end = Math.min(indexOf+41, link.length());
+            return link.substring(indexOf,end);
         }
         return link;
     }
+    
+    
+
+    
+    
     
 }

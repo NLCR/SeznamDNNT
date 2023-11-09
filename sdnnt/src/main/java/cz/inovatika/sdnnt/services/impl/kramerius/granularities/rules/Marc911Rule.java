@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONObject;
 
-
+import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 import cz.inovatika.sdnnt.services.impl.kramerius.LinkitemField;
 import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
 import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
@@ -45,13 +45,7 @@ public class Marc911Rule {
     }
 
     public String getPid() {
-        String u = this.url.trim();
-        int indexOf = u.indexOf("uuid:");
-        if (indexOf > -1) {
-            return u.substring(indexOf);
-        } else {
-            return null;
-        }
+        return PIDSupport.pidFromLink(this.url);
     }
     
     

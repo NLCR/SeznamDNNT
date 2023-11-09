@@ -22,6 +22,7 @@ import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.*;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -67,7 +68,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_LASTACTIVE;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.EXPORT;
 
-
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -503,6 +504,9 @@ public class AccountServiceImpl implements AccountService {
             rParser.setWriterType("json");
             qreq.setResponseParser(rParser);
             NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+
+            
+            
             JSONObject ret = new JSONObject((String) qresp.get("response"));
 
             List<String> ids = SearchResultsUtils.getIdsFromResult(ret);

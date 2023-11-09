@@ -77,7 +77,8 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         logger.info("Current iteration filter " + plusFilter);
  
         try (SolrClient solrClient = buildClient()){
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX"), 
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", 
+                    KURATORSTAV_FIELD + ":PX",KURATORSTAV_FIELD + ":DX"), 
                     
                     Arrays.asList(
                     IDENTIFIER_FIELD,
