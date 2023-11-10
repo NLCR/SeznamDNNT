@@ -692,6 +692,18 @@ public class UserServlet extends HttpServlet {
                         registerInstitution = controller.getAllInstitutions();
                     }
 
+                    JSONArray institutions = Options.getInstance().getJSONArray("institutions");
+                    if (institutions != null) {
+                        for (Object i : institutions) {
+                            if (i instanceof JSONObject) {
+                                JSONObject iObj = (JSONObject) i;
+                                registerInstitution.add(iObj.optString("acronym"));
+                            }
+                            
+                        }
+                    }
+
+                    
                     JSONArray allJSONArray = new JSONArray();
                     registerInstitution.forEach(allJSONArray::put);
                     
