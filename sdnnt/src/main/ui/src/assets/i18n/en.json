@@ -966,14 +966,16 @@
     "vyhledavani_ve_vysledcich_exportu": "Search in export results",
     "typ_exportu":"Export type",
     "export_num_docs":"Number of documents in export",
-    "vyrizeni_exportu": "Processing of export"
+    "vyrizeni_exportu": "Processing of export",
+    "select_or_add_an_institution": "Select or add an institution"
   },
 
   "tooltip": {
     "hromadne_notifikace_disabled": "Bulk notifications cannot be performed because no filter is selected!",
     "sledovat_zaznam_disabled": "This record cannot be tracked because it is already included in bulk notifications!",
     "seznam_zmen_pro_euipo_ooc_uocp": "List of changes for EUIPO OoC (abbreviation UOCP)",
-    "importni_soubor_do_euipo_ooc_iocp": "Import file to EUIPO OoC (abbreviation IOCP)"
+    "importni_soubor_do_euipo_ooc_iocp": "Import file to EUIPO OoC (abbreviation IOCP)",
+    "unable_to_add_institution": "Cannot add an institution that already exists"
   },
 
   "msg": {

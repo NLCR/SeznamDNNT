@@ -248,6 +248,20 @@
   &.mat-form-field-appearance-outline {
     .mat-form-field-wrapper {
       margin-bottom: -0.34375em;
+
+      .mat-form-field-suffix {
+        top: .15em;
+        
+        .mat-flat-button {
+          @extend .app-p-0, .app-pr-2, .app-pl-1;
+
+          .mat-button-wrapper {
+            display: flex;
+            align-items: center;
+            line-height: 0;
+          }
+        }
+      }
     }
     
     &.app-clean-bottom-gap {
