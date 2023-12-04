@@ -94,7 +94,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public List<String> check(String formatFilter) {
+    public List<String> check() {
         getLogger().info(String.format(" Config for iteration -> iteration states %s; templates %s, %s; filters %s; nonparsable dates %s ", this.states.toString(), this.bkTemplate, this.seTemplate, this.filters, this.compiledPatterns));
 
         List<String> foundCandidates = new ArrayList<>();
@@ -114,19 +114,13 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
             plusFilter.add("(" + collected + ")");
         }
 
-        // tady filtr pro format 
-        plusFilter.add(String.format("fmt:%s", formatFilter));
 
         if (this.filters != null && !this.filters.isEmpty()) {
             plusFilter.addAll(this.filters);
         }
         
         if (this.filters == null || this.filters.isEmpty()) {
-            if ("BK".equals(formatFilter)) {
-                plusFilter.addAll(AbstractEUIPOService.DEFAULT_INITIAL_BK_FILTER);
-            } else {
-                plusFilter.addAll(AbstractEUIPOService.DEFAULT_INITIAL_SE_FILTER);
-            }
+            plusFilter.addAll(Arrays.asList( "setSpec:SKC"));
         } else {
             if (!this.filters.isEmpty()) {
                 plusFilter.addAll(this.filters);
@@ -154,13 +148,12 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     
-    private boolean accept(Object dntstav, Object history) {
+    public static boolean accept(Object dntstav, Object history) {
         if (dntstav.toString().equals(PublicItemState.D.name())) {
             List<String> schedulerComments = new ArrayList<>();
 
             JSONArray jsonArray = new JSONArray(history.toString());
             if (jsonArray.length() > 0) {
-                //List<String> comments = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject lastObject = jsonArray.getJSONObject(i);
                     String comment = lastObject.optString("comment");
@@ -182,7 +175,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     @Override
-    public int update(String format,  List<String> docs)
+    public int update( List<String> docs)
             throws AccountException, IOException, ConflictException, SolrServerException {
         AtomicInteger retVal = new AtomicInteger();
         if (!docs.isEmpty()) {
@@ -256,9 +249,6 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                                 oneRecordValues.put("ccnb", ccnb);
                                 
                             }
-
-                            //marc_015a
-                            
  
                             recordValues.put(ident.toString(), oneRecordValues);
                         } else {
@@ -275,7 +265,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                     
                     List<String> exportPids = subList(docs, export, this.exportLimit);
                     SimpleDateFormat nameformat = new SimpleDateFormat("yyyy_MMMMM_dd_hh_mm_ss.SSS");
-                    String exportName = String.format("euipo_uocp_%s_%s",format, nameformat.format(new Date()));
+                    String exportName = String.format("euipo_uocp_%s", nameformat.format(new Date()));
                     getLogger().info(String.format("Creating  export %s ", exportName));
                     this.createExport(exportName, exportPids.size());
 
@@ -289,7 +279,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                         getLogger().info(String.format("Generating spreadsheet number %d and size is %d", i, spreadSheetBatch.size()));
 
                         try {
-                            File nFile = generateSpreadSheet(format, exportName, i, spreadSheetBatch, recordValues);
+                            File nFile = generateSpreadSheet(exportName, i, spreadSheetBatch, recordValues);
                             getLogger().info(String.format("Generated file is %s", nFile.getAbsolutePath()));
                             
                             int numberOfUpdates = spreadSheetBatch.size() / updateBatchLimit;
@@ -396,19 +386,11 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
     }
 
     
-    private File generateSpreadSheet(String format, String exportid, int batchNumber, List<String> subList,
+    private File generateSpreadSheet( String exportid, int batchNumber, List<String> subList,
             Map<String, Map<String, List<String>>> recordValues)
             throws IOException, FileNotFoundException, InvalidFormatException {
 
-        InputStream templateStream = null;
-        if (format.equals("BK") && this.bkTemplate != null) {
-            templateStream = new FileInputStream(this.bkTemplate);
-        } else if (format.equals("SE") && this.seTemplate != null) {
-            templateStream = new FileInputStream(this.seTemplate);
-            
-        } else {
-            templateStream = this.getClass().getResourceAsStream("EUIPO_seznam_zmen_empty.xlsx");
-        }
+        InputStream templateStream = this.getClass().getResourceAsStream("EUIPO_seznam_zmen_empty.xlsx");;
 
         File parentFolder = new File(new File(this.outputFolder), exportid);
         parentFolder.mkdirs();
@@ -416,7 +398,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
         SimpleDateFormat sdf = new SimpleDateFormat("hhMMss");
 
         File nFile = new File(parentFolder,
-                String.format("%s_%s_%d_%s.proc", format, exportid, batchNumber, sdf.format(new Date())));
+                String.format("%s_%d_%s.proc", exportid, batchNumber, sdf.format(new Date())));
         nFile.createNewFile();
 
         try (XSSFWorkbook workbook = new XSSFWorkbook(templateStream)) {

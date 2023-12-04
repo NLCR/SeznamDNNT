@@ -10,9 +10,9 @@ import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 
 public interface EUIPOCancelService extends LoggerAware{
 
-    public List<String> check(String format);
+    public List<String> check();
 
-    public int update(String format,  List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
+    public int update(List<String> identifiers) throws AccountException, IOException, ConflictException, SolrServerException;
 
     public void createExport(String exportIdentifier, int numberOfDocs) throws AccountException, IOException, ConflictException, SolrServerException;
     
