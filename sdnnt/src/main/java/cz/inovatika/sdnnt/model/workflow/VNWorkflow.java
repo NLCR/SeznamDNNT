@@ -24,10 +24,18 @@ public class VNWorkflow extends Workflow {
     public WorkflowState nextState() {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
-
-        if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
-            return new WorkflowState(this.owner, N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
+        // check 
+        if (currentState == CuratorItemState.DX || currentState == PX) {
+            if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
+                return new WorkflowState(this.owner, currentState, PublicItemState.N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
+            }
+        } else {
+            if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
+                return new WorkflowState(this.owner, N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
+            }
+            
         }
+     
         return null;
     }
 

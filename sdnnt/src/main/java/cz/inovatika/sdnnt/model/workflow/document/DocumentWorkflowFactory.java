@@ -61,7 +61,7 @@ public class DocumentWorkflowFactory {
                 zadostTypNavrhs.add(ZadostTypNavrh.VNL);
             }
         }
-        if (vnzDocument(kuratorstav, license)) {
+        if (vnzDocument(kuratorstav, license, stav)) {
             VNZWorkflow vnzWorkflow = new VNZWorkflow(checkProxy);
             WorkflowState workflowState = vnzWorkflow.nextState();
             if (workflowState != null && workflowState.isFirstTransition()) {
@@ -95,7 +95,7 @@ public class DocumentWorkflowFactory {
                     else return null;
                 }
                 case VNZ: {
-                    if (vnzDocument(kuratorstav, license)) { return new VNZWorkflow(new DocumentProxy(record, zadost));}
+                    if (vnzDocument(kuratorstav, license, publicstav)) { return new VNZWorkflow(new DocumentProxy(record, zadost));}
                     else return null;
                 }
                 case VN: {
@@ -142,18 +142,37 @@ public class DocumentWorkflowFactory {
                 kuratorstav.contains(CuratorItemState.PA.name());
     }
 
-    private static boolean vnzDocument(List<String> kuratorstav, String license) {
-        boolean inState =  kuratorstav.contains(CuratorItemState.A.name()) ||
+    private static boolean vnzDocument(List<String> kuratorstav, String license, List<String> publicstav) {
+        boolean inStateAPA =  kuratorstav.contains(CuratorItemState.A.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name());
-        boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
-        return inState && isCorrectLicense;
+
+        boolean inCurratorStavDXPX = kuratorstav.contains(CuratorItemState.DX.name()) || kuratorstav.contains(CuratorItemState.PX.name());
+        
+        if (inStateAPA) {
+            boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
+            return inStateAPA && isCorrectLicense;
+        } else if (inCurratorStavDXPX) {
+            
+            boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
+
+            boolean inPublicStateAPA =  publicstav.contains(PublicItemState.A.name()) ||
+                    publicstav.contains(PublicItemState.PA.name());
+
+            return inPublicStateAPA && isCorrectLicense;
+        }
+        
+        return false;
     }
 
     private static boolean vnDocument(List<String> kuratorstav) {
         return  kuratorstav.contains(CuratorItemState.A.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name()) ||
                 kuratorstav.contains(CuratorItemState.NL.name()) ||
-                kuratorstav.contains(CuratorItemState.NLX.name());
+                kuratorstav.contains(CuratorItemState.NLX.name()) ||
+                // zda muze vyrazovat ?? 
+                kuratorstav.contains(CuratorItemState.DX.name()) ||
+                kuratorstav.contains(CuratorItemState.PX.name());
+                
     }
 
     private static boolean pxnDocument(List<String> kuratorstav) {

@@ -20,13 +20,17 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public WorkflowState nextState() {
+        CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(owner.getWorkflowState(), owner.getLicense() != null ? License.valueOf(owner.getLicense()) : null);
-        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() ==null || owner.getLicense().equals(License.dnnto.name()))) {
+        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA || owner.getWorkflowState()== DX ||owner.getWorkflowState() == PX ) && (owner.getLicense() ==null || owner.getLicense().equals(License.dnnto.name()))) {
             if (owner.getWorkflowState() == null) {
                 return new WorkflowState(this.owner, A, License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true, true);
             } else {
-                return new WorkflowState(this.owner, getOwner().getWorkflowState(), License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true,  true);
-
+                if (currentState == CuratorItemState.DX || currentState == CuratorItemState.PX) {
+                    return new WorkflowState(this.owner, currentState, owner.getPublicState(), License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true,  true);
+                } else {
+                    return new WorkflowState(this.owner, getOwner().getWorkflowState(), License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true,  true);
+                }
             }
         }
         return null;
@@ -44,9 +48,17 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
+        
         if ((owner.getWorkflowState() != null) &&  (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
             return true;
-        } else return false;
+        } else {
+            if (owner.getWorkflowState() == CuratorItemState.PX || owner.getWorkflowState() == CuratorItemState.DX) {
+                if ((owner.getPublicState() != null) &&  (owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     @Override
