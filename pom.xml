@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt-project</artifactId>
-  <version>1.0.8.8</version>
+  <version>1.0.8.9</version>
   <packaging>pom</packaging>
   <name>SDNNT Project</name>
   <description>SDNNT projekt</description>

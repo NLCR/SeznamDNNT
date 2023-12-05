@@ -20,6 +20,7 @@ import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +30,14 @@ import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
+import cz.inovatika.sdnnt.services.impl.EUIPOCancelServiceImpl;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import cz.inovatika.sdnnt.services.impl.SKCUpdateSupportServiceImpl;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -46,6 +49,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -105,12 +109,14 @@ public class Indexer {
             SolrDocument solrDocument = docs.get(0);
             if (solrDocument.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
                 Object state = solrDocument.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
+                // neni d, je dx ??
                 if (PublicItemState.D.name().equals(state)) {
                     deletedDocument = true;
                     Object historieStavu = solrDocument.getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
                     boolean case4a = historyCase( historieStavu, Case.SKC_4a);
                     // nesmi byt case4a 
                     deletedDocument = !case4a;
+                    LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier") + " is in state D and case "+(case4a ? " is " : "is not ")+"SKC_4a. Deleted document flag is "+deletedDocument);
                 }
             }
             if (!deletedDocument) {
@@ -207,14 +213,32 @@ public class Indexer {
 
 public static boolean historyCase(Object historieStavu, Case cs) {
     if (historieStavu != null) {
-        JSONArray jsonArray = new JSONArray(historieStavu.toString());
-        if (jsonArray.length() > 0) {
-            JSONObject lastObject = jsonArray.getJSONObject(jsonArray.length() -1);
-            if (lastObject.has("comment")) {
-                String comment = lastObject.getString("comment");
-                return comment.contains(cs.name());
+        List<Pair<String,Date>> comments = new ArrayList<>();
+        try {
+            JSONArray jsonArray = new JSONArray(historieStavu.toString());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String comment = jsonObject.optString("comment");
+                if (comment != null) {
+                    String date = jsonObject.getString("date");
+                    if (comment.contains("scheduler/")) {
+                        Date parsed = EUIPOCancelServiceImpl.HISTORY_DATE_INPUTFORMAT.parse(date);
+                        comments.add(Pair.of(comment, parsed));
+                    }
+                    
+                }
             }
-        } 
+            Collections.sort(comments,(left,right) ->{
+                return left.getRight().compareTo(right.getRight());
+            });
+        } catch (JSONException |  ParseException e) {
+            LOGGER.log(Level.SEVERE,e.getMessage(),e);
+        }
+        
+        if (!comments.isEmpty()) {
+            Pair<String, Date> last = comments.get(comments.size() - 1);
+            return last.getKey().contains(cs.name());
+        }
     }
     return false;
 }
