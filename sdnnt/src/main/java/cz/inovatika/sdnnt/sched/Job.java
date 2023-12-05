@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -557,15 +558,8 @@ public class Job implements InterruptableJob {
                     }
                     EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
                     try {
-                        
-
-                        List<String> checkBK = impl.check("BK");
-                        List<Integer> updated = new ArrayList<>();
-                        int updatedBKCount = impl.update("BK", checkBK);
-//
-    
-                        List<String> checkSE = impl.check("SE");
-                        int updatedSECount = impl.update("SE", checkSE);
+                        List<String> checkBK = impl.check();
+                        int updatedBKCount = impl.update(checkBK);
 
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
