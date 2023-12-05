@@ -165,7 +165,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         }
         logger.info("Current iteration filter " + plusFilter);
         try (final SolrClient solrClient = buildClient()) {
-            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX", DNTSTAV_FIELD+":D"), Arrays.asList(
+            support.iterate(solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X", KURATORSTAV_FIELD + ":PX",KURATORSTAV_FIELD + ":DX", DNTSTAV_FIELD+":D"), Arrays.asList(
                     IDENTIFIER_FIELD,
                     SIGLA_FIELD,
                     MARC_911_U,
