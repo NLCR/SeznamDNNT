@@ -76,25 +76,26 @@ public class ZahorikUtils {
             if (license != null && license.equals(License.dnnto.name())) {
                 int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
                 
-                int t2002 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2002);
+                int t2003 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2003);
                 // hranice je klouzaval 
-                if (rocnik > publicLicense &&  rocnik <= t2002) {
+                if (rocnik > publicLicense &&  rocnik <= t2003) {
                     gItem.put("license", License.dnnto.name());
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(nState);
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
-                // hranice je klouzava                  
-                } else if (rocnik > t2002 && rocnik <= 2007) {
-    
-                    gItem.put("license", License.dnntt.name());
-                    JSONArray stavArr = new JSONArray();
-                    stavArr.put(nState);
-                    gItem.put("stav", stavArr);
-                    gItem.put("kuratorstav", stavArr);
-                    
+
+                    // po novu neni rok 2007                  
+//                } else if (rocnik > t2002 && rocnik <= 2007) {
+//    
+//                    gItem.put("license", License.dnntt.name());
+//                    JSONArray stavArr = new JSONArray();
+//                    stavArr.put(nState);
+//                    gItem.put("stav", stavArr);
+//                    gItem.put("kuratorstav", stavArr);
+//                    
                 // hranice je pevna - je dana smlouvou s dilii 
-                } else if (rocnik > 2007) {
+                } else {
     
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(PublicItemState.N.name());
@@ -115,19 +116,19 @@ public class ZahorikUtils {
             int rocnik = rocnik(gItem, logger);
 
             int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
+            // 
+            int t2003 = Options.getInstance().intKey("granularity.bk.dnntt_dnntt", 2003);
 
             if (license != null && license.equals(License.dnntt.name())) {
-                // hranice je pevna - smlouva s Diliii
-                if (rocnik > publicLicense && rocnik <= 2007) {
+                if (rocnik > publicLicense && rocnik <= t2003) {
     
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(nState);
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
-                                 
                     
-                } else if (rocnik > 2007) {
+                } else {
     
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(PublicItemState.N.name());
@@ -145,7 +146,7 @@ public class ZahorikUtils {
             if (license != null && license.equals(License.dnnto.name())) {
                 int publicLicense = Options.getInstance().intKey("granularity.public_license", 1912);
 
-                int t2002 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2002);
+                int t2002 = Options.getInstance().intKey("granularity.bk.dnnto_dnnto", 2003);
                 int t2013 = Options.getInstance().intKey("granularity.bk.dnnto_dnntt", 2013);
 
                 // hranice je klouzaval, více než dvacet let 

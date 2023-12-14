@@ -110,6 +110,8 @@ public class MarcRecord {
   // exports facets - only make sure that facest is set during switching object
   public List<String> exportsFacets = new ArrayList<>();
 
+  // currator facets 
+  public List<String> curratorsFacets = new ArrayList<>();
   
   // digital librarires
   public List<String> digitalLibraries = new ArrayList<>();
@@ -170,7 +172,9 @@ public class MarcRecord {
                     ID_EUIPO_EXPORT,
                     ID_EUIPO_EXPORT_ACTIVE,
                     
-                    EXPORT
+                    EXPORT,
+                    
+                    CURRATOR_ACTIONS
 
                     
                     );
@@ -306,6 +310,10 @@ public class MarcRecord {
 
       if (doc.containsKey(EXPORT)) {
           mr.exportsFacets = (List<String>) doc.getFieldValue(EXPORT);
+      }
+      
+      if (doc.containsKey(CURRATOR_ACTIONS)) {
+          mr.exportsFacets = (List<String>) doc.getFieldValue(CURRATOR_ACTIONS);
       }
 
       return mr;
@@ -660,6 +668,13 @@ public class MarcRecord {
         Set<String> uniqSet = new LinkedHashSet<>(this.exportsFacets);
         uniqSet.stream().forEach(export-> {
             sdoc.addField(EXPORT, export);
+        });
+    }
+    
+    if (this.curratorsFacets !=null && !this.curratorsFacets.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.curratorsFacets);
+        uniqSet.stream().forEach(curr-> {
+            sdoc.addField(CURRATOR_ACTIONS, curr);
         });
     }
 
