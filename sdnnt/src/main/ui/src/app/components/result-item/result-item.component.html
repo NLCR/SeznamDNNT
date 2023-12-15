@@ -40,6 +40,11 @@
       <div *ngIf="doc.export && doc.export.includes('euipo')" class="app-badge app-bordered app-img-in app-ml-1" [matTooltip]="'desc.euipo_badge_tooltip' | translate">
         <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
       </div>
+
+      <!-- ready for happy -->
+      <div class="app-badge app-icon-in state-change app-ml-1" [matTooltip]="'Převod stavu 23' | translate">
+        <mat-icon class="material-icons-outlined">track_changes</mat-icon>
+      </div>
     </div>
 
     <div fxLayout="row">
