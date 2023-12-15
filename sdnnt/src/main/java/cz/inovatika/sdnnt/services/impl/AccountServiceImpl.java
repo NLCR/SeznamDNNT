@@ -774,7 +774,6 @@ public class AccountServiceImpl implements AccountService {
                         for (Pair<String, SolrInputDocument> state : states) {
                             processingUpdate.add(Pair.of(state.getKey(), state.getRight()));
                         }
-
                         String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
                         
                         // store marc record

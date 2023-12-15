@@ -171,9 +171,7 @@ public class MarcRecord {
                     ID_EUIPO_LASTACTIVE,
                     ID_EUIPO_EXPORT,
                     ID_EUIPO_EXPORT_ACTIVE,
-                    
                     EXPORT,
-                    
                     CURRATOR_ACTIONS
 
                     

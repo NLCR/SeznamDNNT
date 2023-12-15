@@ -20,6 +20,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -35,6 +36,7 @@ import cz.inovatika.sdnnt.services.CurratorActionsSet;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class CurratorActionsSetImpl implements CurratorActionsSet {
     
@@ -43,19 +45,18 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     public static final String DEFAULT_ACTION_NAME="selected";
     public static final String ACTION_KEY = "action";
     
-    public static final String ACTION_NAME_KEY="actionName";
+    public static final String NAME_KEY="name";
     
     public static enum Action {
         set, unset;
     }
     
     
-    protected List<Pattern> compiledPatterns = AbstractEUIPOService.DEFAULT_REGULAR_EXPRESSIONS_NONPARSABLE_DATES;
+    protected List<Pattern> compiledPatterns = new ArrayList<>();
     private List<String> filters = new ArrayList<>();
     private Action action = Action.set;
     
     protected int updateBatchLimit = AbstractEUIPOService.UPDATE_BATCH_LIMIT;
-
     private String actionName;
 
     
@@ -76,9 +77,10 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     
     public void iterationResults(JSONObject results) {
         if (results != null) {
-            String actKey = results.optString(ACTION_KEY);
+            String actKey = results.optString(ACTION_KEY, Action.set.name());
+            
             this.action = Action.valueOf(actKey);
-            this.actionName = results.optString(ACTION_NAME_KEY) == null ? DEFAULT_ACTION_NAME : results.optString(ACTION_NAME_KEY);
+            this.actionName = StringUtils.isAnyString(results.optString(NAME_KEY))  ? results.optString(NAME_KEY): DEFAULT_ACTION_NAME ;
             if (!isValidAsciiWithoutWhitespace(this.actionName)) {
                 throw new IllegalStateException(String.format("Invalid action name %s", this.actionName));
             }
@@ -150,11 +152,22 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
        
         try (SolrClient solrClient = buildClient()) {
             support.iterate(
-                    solrClient, reqMap, null, plusFilter, Arrays.asList(KURATORSTAV_FIELD + ":X",
-                            KURATORSTAV_FIELD + ":D", MarcRecordFields.ID_EUIPO + ":*"),
-                    Arrays.asList(IDENTIFIER_FIELD), (rsp) -> {
+                    solrClient, reqMap, null, plusFilter, new ArrayList<>(),
+
+                    Arrays.asList(IDENTIFIER_FIELD, "date1","date1_int","date2","date2_int"), (rsp) -> {
                         Object identifier = rsp.getFieldValue("identifier");
-                        foundCandidates.add(identifier.toString());
+
+                        Object date1Int = rsp.getFieldValue("date1_int");
+                        //Object date2Int = rsp.getFieldValue("date2_int");
+                        if (date1Int == null && this.compiledPatterns.size() > 0) {
+                            
+                            if (matchNonparsableDate(date1Int, date1Int)) {
+                                foundCandidates.add(identifier.toString());
+                            }
+                        } else {
+                            // parsovatelne datum
+                            foundCandidates.add(identifier.toString());
+                        }
                     }, IDENTIFIER_FIELD);
         } catch (Exception e) {
             this.logger.log(Level.SEVERE, e.getMessage(), e);
@@ -181,16 +194,27 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
                     for (String identifier : subList) {
                         SolrInputDocument idoc = new SolrInputDocument();
                         idoc.setField(IDENTIFIER_FIELD, identifier);
-                        SolrJUtilities.atomicAddDistinct(idoc, this.actionName, MarcRecordFields.CURRATOR_ACTIONS);
+                        switch(this.action) {
+                            case  set: 
+                                SolrJUtilities.atomicAddDistinct(idoc, this.actionName, MarcRecordFields.CURRATOR_ACTIONS);
+                                break;
+                            case unset:
+                                SolrJUtilities.atomicRemove(idoc, this.actionName, MarcRecordFields.CURRATOR_ACTIONS);
+                                break;
+                        }
+                        uReq.add(idoc);
                     }
                     if (!uReq.getDocuments().isEmpty()) {
-                        uReq.process(solrClient, DataCollections.catalog.name());
+                        UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
+                        retVal.addAndGet(subList.size());
                     }
                     logger.info("Updating identifier "+identifiers);
                 }
+                logger.info("Commiting ");
+                SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
             }
         }
-        return 0;
+        return retVal.get();
     }
 
     protected Options getOptions() {
@@ -200,8 +224,46 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     protected SolrClient buildClient() {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
+    
+    private boolean matchNonparsableDate(Object date1int, Object date1) {
+        // nonparsable date
+        if (date1int == null) {
+            String date1str = date1.toString();
+            for (Pattern pattern : this.compiledPatterns) {
+                if (pattern.matcher(date1str).matches()) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return false;
+        }
+    }
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws ConflictException, IOException, SolrServerException {
+        JSONObject iteration = new JSONObject();
+
+        JSONArray flist = new JSONArray();
+        flist.put("fmt:BK");
+        flist.put("dntstav:A");
+        flist.put("kuratorstav:DX");
+
+        //flist.put("-kuratorstav:DX");
+        
+        iteration.put("filters", flist);
+        
+        JSONObject results =new JSONObject();
+        results.put("name", "PresunStavu2023");
+        results.put("action", "set");
+        
+        
+        CurratorActionsSetImpl set = new CurratorActionsSetImpl("", iteration, results);
+        List<String> check = set.check();
+        int update = set.update(check);
+
+        System.out.println("CHECKED "+check.size());
+        System.out.println("UPDATED "+update);
         
     }
 }

@@ -43,6 +43,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.UpdateRequest;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest.Update;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -476,7 +478,47 @@ public static boolean historyCase(Object historieStavu, Case cs) {
     }
   }
 
-//  TODO: Move and do Junit tests; TODO:rewrite
+  
+  public static void changeStavDirectNonCommitingVersion(List<MarcRecord> marcRecords, SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularityChange, String user) throws IOException, SolrServerException {
+      try {
+          UpdateRequest req = new UpdateRequest();
+          for (MarcRecord mr : marcRecords) {
+             JSONObject before = mr.toJSON();
+             // sync to solr doc
+             SolrInputDocument sdoc = mr.toSolrDoc();
+             CuratorItemState kstav = CuratorItemState.valueOf(newStav);
+             PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
+             if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {
+               mr.license = licence;
+             } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
+               mr.license = License.dnntt.name();
+             } else {
+                 // delete licenses
+                 mr.license = null;
+                 licence = null;
+             }
+
+             // zapis do historie
+             mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, granularityChange);
+             
+             ChangeProcessStatesUtility.calculateGranularity(mr,  user, poznamka, null);
+             
+             //solrClient.add("catalog", mr.toSolrDoc());
+             req.add( mr.toSolrDoc());
+             
+             new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user, DataCollections.catalog.name(), null, false);
+         }
+         
+          if (req.getDocuments() != null && req.getDocuments().size() > 0) {
+              req.process(solrClient, "catalog");
+          }
+     } finally {
+         SolrJUtilities.quietCommit(solrClient, "catalog");
+         SolrJUtilities.quietCommit(solr, "history");
+     }
+  }
+
+  //TODO: Move and do Junit tests; TODO:rewrite
   public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularityChange, String user) throws IOException, SolrServerException {
     JSONObject ret = new JSONObject();
     try {
@@ -500,12 +542,8 @@ public static boolean historyCase(Object historieStavu, Case cs) {
 
       // zapis do historie
       mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, granularityChange);
-
-
-
       
       ChangeProcessStatesUtility.calculateGranularity(mr,  user, poznamka, null);
-
       
       solrClient.add("catalog", mr.toSolrDoc());
       new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user, DataCollections.catalog.name(), null);
