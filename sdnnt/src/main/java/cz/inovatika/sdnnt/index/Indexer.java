@@ -479,7 +479,7 @@ public static boolean historyCase(Object historieStavu, Case cs) {
   }
 
   
-  public static void changeStavDirectNonCommitingVersion(List<MarcRecord> marcRecords, SolrClient solrClient, String identifier, String newStav, String licence, String poznamka, JSONArray granularityChange, String user) throws IOException, SolrServerException {
+  public static void changeStavDirectNonCommitingVersion(List<MarcRecord> marcRecords, SolrClient solrClient,  String newStav, String licence, String poznamka, /*JSONArray granularityChange,*/ String user) throws IOException, SolrServerException {
       try {
           UpdateRequest req = new UpdateRequest();
           for (MarcRecord mr : marcRecords) {
@@ -499,7 +499,7 @@ public static boolean historyCase(Object historieStavu, Case cs) {
              }
 
              // zapis do historie
-             mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, granularityChange);
+             mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null , licence, user, poznamka, mr.granularity);
              
              ChangeProcessStatesUtility.calculateGranularity(mr,  user, poznamka, null);
              

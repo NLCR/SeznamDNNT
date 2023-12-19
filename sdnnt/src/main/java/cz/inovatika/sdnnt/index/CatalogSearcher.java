@@ -417,7 +417,9 @@ public class CatalogSearcher {
                 .setFacetMinCount(1)
                 .setParam("json.nl", "arrntv")
                 .setParam("stats", true)
-                .setParam("stats.field", "rokvydani")
+                
+                //.setParam("stats.field", "rokvydani")
+                .setParam("stats.field", "date1_int")
                 .setParam("q.op", "AND");
 
                 //.setFields(DEFAULT_FIELDLIST);
@@ -454,7 +456,9 @@ public class CatalogSearcher {
             String field = (String) o;
             if (req.containsKey(field)) {
                 if (field.equals("rokvydani")) {
-                    query.addFilterQuery(field + ":[" + req.get(field).replace(",", " TO ") + "]");
+                    // 
+                    query.addFilterQuery( "date1_int:[" + req.get(field).replace(",", " TO ") + "]");
+                    //query.addFilterQuery(field + ":[" + req.get(field).replace(",", " TO ") + "]");
                 } else {
                     query.addFilterQuery(field + ":\"" + req.get(field) + "\"");
                 }

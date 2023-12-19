@@ -157,7 +157,7 @@ public class MarcRecordFields {
     public static final String FOLLOWERS = "followers";
     
     // currators actions 
-    public static final String CURRATOR_ACTIONS = "c_actions";
+    public static final String CURATOR_ACTIONS = "c_actions";
     
     
     private MarcRecordFields() {}

@@ -27,10 +27,37 @@ import cz.inovatika.sdnnt.utils.JSONUtils;
 public class ChangeProcessStatesUtility {
 
     private ChangeProcessStatesUtility() {}
+
+    
+    public static SolrInputDocument changeProcessState(String curState, String license, MarcRecord mr, String message) {
+        List<String> previous = mr.dntstav;
+        CuratorItemState kstav = CuratorItemState.valueOf(curState);
+        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
+        if (license != null) {
+            mr.license = license;
+        } else {
+            if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {
+                if (mr.license == null) {
+                    mr.license = License.dnnto.name();
+                }
+            } else if (pstav != null && pstav.equals(PublicItemState.NL)) {
+                if (mr.license == null) {
+                    mr.license = License.dnntt.name();
+                }
+            } else {
+                mr.license = null;
+            }
+        }
+        // TODO: 
+        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
+
+        // REcalculate granularity
+        calculateGranularity(mr, "scheduler", message, null); 
+        return mr.toSolrDoc();
+    }
     
     public static SolrInputDocument changeProcessState(String state, MarcRecord mr, String message) {
         List<String> previous = mr.dntstav;
-
         CuratorItemState kstav = CuratorItemState.valueOf(state);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
         if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {

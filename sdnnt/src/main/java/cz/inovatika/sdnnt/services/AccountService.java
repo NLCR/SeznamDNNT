@@ -306,7 +306,7 @@ public interface AccountService {
      */
     public List<String> findIdentifiersUsedInRequests(String user, String navrh, String requestState) throws  AccountException, IOException, SolrServerException; 
     
-    
+    public List<JSONObject> findAllRequests(String user, List<String> navrhy, String requestState) throws  AccountException, IOException, SolrServerException; 
     
     public List<JSONObject> findAllRequestForGivenIds(String user, List<String> navrhy, String requestState, List<String> ids) throws  AccountException, IOException, SolrServerException; 
     

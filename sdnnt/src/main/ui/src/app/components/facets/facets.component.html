@@ -32,6 +32,14 @@
         <ng-container *ngFor="let f of facet_fields[facet]">
           <div *ngIf="f.name !== '   '" class="app-facet-item-wrapper">
             <ng-container [ngSwitch]="facet">
+
+              <a *ngSwitchCase="'c_actions'" (click)="addFilter(facet, f)">
+                <div class="app-badge state-change app-icon-in app-mr-1">
+                  <mat-icon class="material-icons-outlined app-m-0">track_changes</mat-icon>
+                </div>
+                {{ f.name }}
+              </a>
+
               <a *ngSwitchCase="'export'" (click)="addFilter(facet, f)">
                 <div [class]="'app-badge app-bordered app-img-in'" class="app-mr-1">
                   <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />

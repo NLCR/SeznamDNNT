@@ -32,20 +32,21 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.services.CurratorActionsSet;
+import cz.inovatika.sdnnt.services.CuratorActionsSet;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
-public class CurratorActionsSetImpl implements CurratorActionsSet {
+public class CuratorActionsSetImpl implements CuratorActionsSet {
     
-    private Logger logger = Logger.getLogger(CurratorActionsSetImpl.class.getName());
+    private Logger logger = Logger.getLogger(CuratorActionsSetImpl.class.getName());
     
     public static final String DEFAULT_ACTION_NAME="selected";
     public static final String ACTION_KEY = "action";
     
-    public static final String NAME_KEY="name";
+    public static final String SELECTION_NAME_KEY="name";
     
     public static enum Action {
         set, unset;
@@ -61,12 +62,16 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
 
     
     
-    public CurratorActionsSetImpl(String logger, JSONObject iteration, JSONObject results) {
+    public CuratorActionsSetImpl(String logger, JSONObject iteration, JSONObject results) {
         if (iteration != null) {
             iterationConfig(iteration);
+        } else {
+            throw configurationPropertyIsMissing("iteration", null);
         }
         if (results != null) {
             iterationResults(results);
+        } else {
+            throw configurationPropertyIsMissing("results", null);
         }
 
         if (logger != null) {
@@ -80,10 +85,21 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
             String actKey = results.optString(ACTION_KEY, Action.set.name());
             
             this.action = Action.valueOf(actKey);
-            this.actionName = StringUtils.isAnyString(results.optString(NAME_KEY))  ? results.optString(NAME_KEY): DEFAULT_ACTION_NAME ;
+            this.actionName = StringUtils.isAnyString(results.optString(SELECTION_NAME_KEY))  ? results.optString(SELECTION_NAME_KEY): DEFAULT_ACTION_NAME ;
+            if (!results.has(SELECTION_NAME_KEY)) {
+                throw configurationPropertyIsMissing(SELECTION_NAME_KEY, "iteration");
+            }
             if (!isValidAsciiWithoutWhitespace(this.actionName)) {
                 throw new IllegalStateException(String.format("Invalid action name %s", this.actionName));
             }
+        }
+    }
+
+    private IllegalStateException configurationPropertyIsMissing(String field, String structName) {
+        if (structName != null) {
+            return new IllegalStateException(String.format(" Configuration key '%s' is missing in the '%s' section", field, structName));
+        } else {
+            return new IllegalStateException(String.format(" Configuration key '%s' is missing", field));
         }
     }
 
@@ -136,9 +152,18 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     }
     
     @Override
-    public List<String> check() {
+    public List<String> check() throws AccountException, IOException, SolrServerException {
         getLogger().info(String.format(" Config for iteration ->  filters %s; nonparsable dates %s ",  this.filters, this.compiledPatterns));
-
+        
+        AccountServiceImpl acService = new AccountServiceImpl();
+        
+        //TODO: To configuration
+        List<JSONObject> vnzAndVnl = acService.findAllRequests(null, Arrays.asList("VNL","VNZ"), null);
+        List<String> vnzAndVnlIds = vnzAndVnl.stream().map(j-> {
+            return j.optString("id");
+        }).collect(Collectors.toList());
+        
+        
         List<String> foundCandidates = new ArrayList<>();
         CatalogIterationSupport support = new CatalogIterationSupport();
         Map<String, String> reqMap = new HashMap<>();
@@ -154,19 +179,37 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
             support.iterate(
                     solrClient, reqMap, null, plusFilter, new ArrayList<>(),
 
-                    Arrays.asList(IDENTIFIER_FIELD, "date1","date1_int","date2","date2_int"), (rsp) -> {
+                    Arrays.asList(IDENTIFIER_FIELD, "date1","date1_int","date2","date2_int", "historie_kurator_stavu"), (rsp) -> {
                         Object identifier = rsp.getFieldValue("identifier");
-
-                        Object date1Int = rsp.getFieldValue("date1_int");
-                        //Object date2Int = rsp.getFieldValue("date2_int");
-                        if (date1Int == null && this.compiledPatterns.size() > 0) {
+                        
+                        String zadostId = null;
+                        
+                        if (rsp.containsKey(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD)) {
                             
-                            if (matchNonparsableDate(date1Int, date1Int)) {
+                            Object historie = rsp.getFieldValue(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD);
+                            JSONArray historieJSONArr = new JSONArray(historie.toString());
+                            if (historieJSONArr.length() > 0) {
+                                JSONObject jsonObject = historieJSONArr.getJSONObject(historieJSONArr.length() -1);
+                                if(jsonObject.has("zadost")) {
+                                    zadostId =  jsonObject.getString("zadost");
+                                }
+                            }
+                        }
+                        
+                        if (zadostId != null && vnzAndVnlIds.contains(zadostId)) {
+                            getLogger().info(String.format("Skipping %s", identifier));
+                        } else {
+                            
+                            Object date1Int = rsp.getFieldValue("date1_int");
+                            if (date1Int == null && this.compiledPatterns.size() > 0) {
+                                
+                                if (matchNonparsableDate(date1Int, date1Int)) {
+                                    foundCandidates.add(identifier.toString());
+                                }
+                            } else {
+                                // parsovatelne datum
                                 foundCandidates.add(identifier.toString());
                             }
-                        } else {
-                            // parsovatelne datum
-                            foundCandidates.add(identifier.toString());
                         }
                     }, IDENTIFIER_FIELD);
         } catch (Exception e) {
@@ -179,7 +222,6 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     public int update(List<String> identifiers) throws IOException, ConflictException, SolrServerException {
         AtomicInteger retVal = new AtomicInteger();
         if (!identifiers.isEmpty()) {
-            //List<String> toRemove = new ArrayList<>();
             try (SolrClient solrClient = buildClient()) {
                 int numberOfUpdateBatches = identifiers.size() / updateBatchLimit;
                 if (identifiers.size() % updateBatchLimit > 0) {
@@ -196,10 +238,10 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
                         idoc.setField(IDENTIFIER_FIELD, identifier);
                         switch(this.action) {
                             case  set: 
-                                SolrJUtilities.atomicAddDistinct(idoc, this.actionName, MarcRecordFields.CURRATOR_ACTIONS);
+                                SolrJUtilities.atomicAddDistinct(idoc, this.actionName, MarcRecordFields.CURATOR_ACTIONS);
                                 break;
                             case unset:
-                                SolrJUtilities.atomicRemove(idoc, this.actionName, MarcRecordFields.CURRATOR_ACTIONS);
+                                SolrJUtilities.atomicRemove(idoc, this.actionName, MarcRecordFields.CURATOR_ACTIONS);
                                 break;
                         }
                         uReq.add(idoc);
@@ -241,13 +283,13 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
     }
 
 
-    public static void main(String[] args) throws ConflictException, IOException, SolrServerException {
+    public static void main(String[] args) throws ConflictException, IOException, SolrServerException, AccountException {
         JSONObject iteration = new JSONObject();
 
         JSONArray flist = new JSONArray();
         flist.put("fmt:BK");
         flist.put("dntstav:A");
-        flist.put("kuratorstav:DX");
+        //flist.put("kuratorstav:DX");
 
         //flist.put("-kuratorstav:DX");
         
@@ -258,12 +300,12 @@ public class CurratorActionsSetImpl implements CurratorActionsSet {
         results.put("action", "set");
         
         
-        CurratorActionsSetImpl set = new CurratorActionsSetImpl("", iteration, results);
+        CuratorActionsSetImpl set = new CuratorActionsSetImpl("", iteration, results);
         List<String> check = set.check();
-        int update = set.update(check);
+        //int update = set.update(check);
 
         System.out.println("CHECKED "+check.size());
-        System.out.println("UPDATED "+update);
+        //System.out.println("UPDATED "+update);
         
     }
 }

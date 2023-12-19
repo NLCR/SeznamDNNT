@@ -42,7 +42,7 @@
       </div>
 
       <!-- ready for happy -->
-      <div class="app-badge app-icon-in state-change app-ml-1" [matTooltip]="'Převod stavu 23' | translate">
+      <div *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') &&  doc.c_actions" class="app-badge app-icon-in state-change app-ml-1" [matTooltip]="doc.c_actions.join(', ')">
         <mat-icon class="material-icons-outlined app-m-0">track_changes</mat-icon>
       </div>
     </div>

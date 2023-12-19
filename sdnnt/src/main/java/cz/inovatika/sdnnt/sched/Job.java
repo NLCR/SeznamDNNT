@@ -373,7 +373,7 @@ public class Job implements InterruptableJob {
         },
 
         /** Currator action */
-        CURRATOR_ACTION {
+        CURATOR_ACTION {
 
             @Override
             void doPerform(JSONObject jobData) {
@@ -385,27 +385,64 @@ public class Job implements InterruptableJob {
                     JSONObject results = jobData.optJSONObject("results");
                     String logger = jobData.optString("logger");
 
-                    CurratorActionsSetImpl currActionsSet = new CurratorActionsSetImpl(logger, iteration, results);
+                    CuratorActionsSetImpl currActionsSet = new CuratorActionsSetImpl(logger, iteration, results);
                     try {
-                        currActionsSet.check();
-                        
-//                    } catch (IOException e) {
-//                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                        List<String> checkList = currActionsSet.check();
+                        currActionsSet.getLogger().info("Found candidates "+checkList.size());
+                        currActionsSet.update(checkList);
+
+                    } catch (IOException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (ConflictException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (SolrServerException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {
                         QuartzUtils.printDuration(currActionsSet.getLogger(), start);
                     }
-                    List<String> check = currActionsSet.check();
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE,ex.getMessage(), ex);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+            
+        },
+        
+        
+        SETSTATE_CURATOR_ACTION {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    long start = System.currentTimeMillis();
+                    
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+                    String logger = jobData.optString("logger");
+
+                    ChangeStateFromCurratorActionImpl currActionsSet = new ChangeStateFromCurratorActionImpl(logger, iteration, results);
+                    try {
+                        List<String> checkList = currActionsSet.check();
+                        currActionsSet.update(checkList);
+                    } catch (IOException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (SolrServerException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(currActionsSet.getLogger(), start);
+                    }
                     
                     
-                    
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE,ex.getMessage(), ex);
                 } finally {
                     LocksSupport.SERVICES_LOCK.unlock();
                 }
                 
             }
-            
         },
-        
         
         
         /** Refresh and set granularity */
