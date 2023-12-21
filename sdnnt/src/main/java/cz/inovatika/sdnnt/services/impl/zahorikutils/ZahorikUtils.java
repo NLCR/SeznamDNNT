@@ -101,6 +101,9 @@ public class ZahorikUtils {
                 int t2007 = Options.getInstance().intKey(GRANULARITY_BK_DNNTO_DNNTT, 2007);
                 boolean t2007Enabled  = Options.getInstance().boolKey(GRANULARITY_BK_DNNTO_DNNTT_ENABLED, true);
                 
+                // pokud je mensi nez verejny rocnik
+                if (rocnik <= publicLicense) continue;
+
                 // hranice je klouzaval 
                 if (rocnik > publicLicense &&  rocnik <= t2003) {
                     gItem.put("license", License.dnnto.name());
@@ -142,6 +145,9 @@ public class ZahorikUtils {
             int t2003 = Options.getInstance().intKey(GRANULARITY_BK_DNNTT_DNNTT, 2002);
 
             if (license != null && license.equals(License.dnntt.name())) {
+                // pokud je mensi nez verejny rocnik
+                if (rocnik <= publicLicense) continue;
+                
                 if (rocnik > publicLicense && rocnik <= t2003) {
     
                     gItem.put("license", License.dnntt.name());
@@ -172,6 +178,9 @@ public class ZahorikUtils {
                 int t2003 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTO_DNNTO, 2002);
                 int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTO_DNNTT, 2012);
                 boolean t2013Enabled = Options.getInstance().boolKey(GRANULARITY_SE_NP_DNNTO_DNNTT_ENABLED, true);
+                
+                // pokud je mensi nez verejny rocnik
+                if (rocnik <= publicLicense) continue;
                 
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&   rocnik <= t2003) {
@@ -212,6 +221,10 @@ public class ZahorikUtils {
 
                 int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
                 int t2013 = Options.getInstance().intKey(GRANULARITY_SE_P_DNNTO_DNNTO, 2012);
+
+                // pokud je mensi nez verejny rocnik
+                if (rocnik <= publicLicense) continue;
+
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&  rocnik <= t2013) {
 
@@ -241,6 +254,11 @@ public class ZahorikUtils {
             int rocnik = rocnik(gItem, logger);
             int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
             int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTT_DNNTT, 2013);
+
+            // pokud je mensi nez verejny rocnik
+            if (rocnik <= publicLicense) continue;
+
+            
             if (license != null && license.equals(License.dnntt.name())) {
                 // rok je klouzavy 
                 if (rocnik > publicLicense && rocnik <= t2013) {
