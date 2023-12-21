@@ -19,19 +19,29 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 
 public class ZahorikUtils {
+    // neprava periodika
 
-    private static final String GRANULARITY_SE_DNNTT_DNNTT = "granularity.se.dnntt_dnntt";
+    private static final String GRANULARITY_SE_NP_DNNTT_DNNTT = "granularity.se.np.dnntt_dnntt";
 
-    private static final String GRANULARITY_SE_DNNTO_DNNTT = "granularity.se.dnnto_dnntt";
+    private static final String GRANULARITY_SE_NP_DNNTO_DNNTT = "granularity.se.np.dnnto_dnntt";
+    private static final String GRANULARITY_SE_NP_DNNTO_DNNTT_ENABLED = "granularity.se.np.dnnto_dnntt_enabled";
 
-    private static final String GRANULARITY_BK_DNNTT_DNNTT = "granularity.bk.dnntt_dnntt";
-
-    private static final String GRANULARITY_SE_DNNTO_DNNTO = "granularity.se.dnnto_dnnto";
+    private static final String GRANULARITY_SE_NP_DNNTO_DNNTO = "granularity.se.np.dnnto_dnnto";
+    
+    private static final String GRANULARITY_SE_P_DNNTO_DNNTO = "granularity.se.p.dnnto_dnnto";
 
     private static final String GRANULARITY_PUBLIC_LICENSE = "granularity.public_license";
 
     private static final String GRANULARITY_BK_DNNTO_DNNTO = "granularity.bk.dnnto_dnnto";
 
+    private static final String GRANULARITY_BK_DNNTO_DNNTT = "granularity.bk.dnnto_dnntt";
+
+    private static final String GRANULARITY_BK_DNNTO_DNNTT_ENABLED = "granularity.bk.dnnto_dnntt_enabled";
+
+    private static final String GRANULARITY_BK_DNNTT_DNNTT = "granularity.bk.dnntt_dnntt";
+    
+    
+    
     static java.util.logging.Logger LOGGER = Logger.getLogger(ZahorikUtils.class.getName());
     
     private ZahorikUtils() {}
@@ -87,8 +97,10 @@ public class ZahorikUtils {
             if (license != null && license.equals(License.dnnto.name())) {
                 int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
                 
-                int t2003 = Options.getInstance().intKey(GRANULARITY_BK_DNNTO_DNNTO, 2003);
-
+                int t2003 = Options.getInstance().intKey(GRANULARITY_BK_DNNTO_DNNTO, 2002);
+                int t2007 = Options.getInstance().intKey(GRANULARITY_BK_DNNTO_DNNTT, 2007);
+                boolean t2007Enabled  = Options.getInstance().boolKey(GRANULARITY_BK_DNNTO_DNNTT_ENABLED, true);
+                
                 // hranice je klouzaval 
                 if (rocnik > publicLicense &&  rocnik <= t2003) {
                     gItem.put("license", License.dnnto.name());
@@ -97,15 +109,14 @@ public class ZahorikUtils {
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
 
-                    // po novu neni rok 2007                  
-//                } else if (rocnik > t2002 && rocnik <= 2007) {
-//    
-//                    gItem.put("license", License.dnntt.name());
-//                    JSONArray stavArr = new JSONArray();
-//                    stavArr.put(nState);
-//                    gItem.put("stav", stavArr);
-//                    gItem.put("kuratorstav", stavArr);
-//                    
+                } else if (rocnik > t2003 && rocnik <= t2007 && t2007Enabled) {
+    
+                    gItem.put("license", License.dnntt.name());
+                    JSONArray stavArr = new JSONArray();
+                    stavArr.put(nState);
+                    gItem.put("stav", stavArr);
+                    gItem.put("kuratorstav", stavArr);
+                    
                 // hranice je pevna - je dana smlouvou s dilii 
                 } else {
     
@@ -128,8 +139,7 @@ public class ZahorikUtils {
             int rocnik = rocnik(gItem, logger);
 
             int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
-            // 
-            int t2003 = Options.getInstance().intKey(GRANULARITY_BK_DNNTT_DNNTT, 2003);
+            int t2003 = Options.getInstance().intKey(GRANULARITY_BK_DNNTT_DNNTT, 2002);
 
             if (license != null && license.equals(License.dnntt.name())) {
                 if (rocnik > publicLicense && rocnik <= t2003) {
@@ -159,9 +169,10 @@ public class ZahorikUtils {
             if (license != null && license.equals(License.dnnto.name())) {
                 int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
 
-                int t2003 = Options.getInstance().intKey(GRANULARITY_SE_DNNTO_DNNTO, 2003);
-                int t2013 = Options.getInstance().intKey(GRANULARITY_SE_DNNTO_DNNTT, 2013);
-
+                int t2003 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTO_DNNTO, 2002);
+                int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTO_DNNTT, 2012);
+                boolean t2013Enabled = Options.getInstance().boolKey(GRANULARITY_SE_NP_DNNTO_DNNTT_ENABLED, true);
+                
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&   rocnik <= t2003) {
 
@@ -172,7 +183,7 @@ public class ZahorikUtils {
                     gItem.put("kuratorstav", stavArr);
  
                 // hranice je klouzava                  
-                } else if (rocnik > t2003 && rocnik <= t2013) {
+                } else if (rocnik > t2003 && rocnik <= t2013 && t2013Enabled) {
 
                     gItem.put("license", License.dnntt.name());
                     JSONArray stavArr = new JSONArray();
@@ -180,7 +191,7 @@ public class ZahorikUtils {
                     gItem.put("stav", stavArr);
                     gItem.put("kuratorstav", stavArr);
                     
-                } else if (rocnik > t2013) {
+                } else  {
 
                     JSONArray stavArr = new JSONArray();
                     stavArr.put(PublicItemState.N.name());
@@ -200,8 +211,7 @@ public class ZahorikUtils {
             if (license != null && license.equals(License.dnnto.name())) {
 
                 int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
-
-                int t2013 = Options.getInstance().intKey(GRANULARITY_SE_DNNTO_DNNTT, 2013);
+                int t2013 = Options.getInstance().intKey(GRANULARITY_SE_P_DNNTO_DNNTO, 2012);
                 // hranice je klouzaval, více než dvacet let 
                 if (rocnik > publicLicense &&  rocnik <= t2013) {
 
@@ -230,7 +240,7 @@ public class ZahorikUtils {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
             int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
-            int t2013 = Options.getInstance().intKey(GRANULARITY_SE_DNNTT_DNNTT, 2013);
+            int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTT_DNNTT, 2013);
             if (license != null && license.equals(License.dnntt.name())) {
                 // rok je klouzavy 
                 if (rocnik > publicLicense && rocnik <= t2013) {
