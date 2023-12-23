@@ -372,6 +372,77 @@ public class Job implements InterruptableJob {
             }
         },
 
+        /** Currator action */
+        CURATOR_ACTION {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    long start = System.currentTimeMillis();
+                    
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+                    String logger = jobData.optString("logger");
+
+                    CuratorActionsSetImpl currActionsSet = new CuratorActionsSetImpl(logger, iteration, results);
+                    try {
+                        List<String> checkList = currActionsSet.check();
+                        currActionsSet.getLogger().info("Found candidates "+checkList.size());
+                        currActionsSet.update(checkList);
+
+                    } catch (IOException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (ConflictException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (SolrServerException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(currActionsSet.getLogger(), start);
+                    }
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE,ex.getMessage(), ex);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+            
+        },
+        
+        
+        SETSTATE_CURATOR_ACTION {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    long start = System.currentTimeMillis();
+                    
+                    JSONObject iteration = jobData.optJSONObject("iteration");
+                    JSONObject results = jobData.optJSONObject("results");
+                    String logger = jobData.optString("logger");
+
+                    ChangeStateFromCurratorActionImpl currActionsSet = new ChangeStateFromCurratorActionImpl(logger, iteration, results);
+                    try {
+                        List<String> checkList = currActionsSet.check();
+                        currActionsSet.update(checkList);
+                    } catch (IOException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } catch (SolrServerException e) {
+                        currActionsSet.getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(currActionsSet.getLogger(), start);
+                    }
+                    
+                    
+                } catch (Exception ex) {
+                    LOGGER.log(Level.SEVERE,ex.getMessage(), ex);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+                
+            }
+        },
         
         
         /** Refresh and set granularity */
@@ -451,45 +522,8 @@ public class Job implements InterruptableJob {
             }
         },
         
-//        EUIPO_INITIAL {
-//
-//            @Override
-//            void doPerform(JSONObject jobData) {
-//                try {
-//                    LocksSupport.SERVICES_LOCK.lock();
-//
-//                    
-//                    LOGGER.fine(name()+":configuration is "+jobData);
-//                    long start = System.currentTimeMillis();
-//                    String logger = jobData.optString("logger");
-//                    JSONObject iteration = jobData.optJSONObject("iteration");
-//                    JSONObject results = jobData.optJSONObject("results");
-//    
-//                    JSONArray jsonArrayOfStates = jobData.optJSONArray("states");
-//                    List<String> states = new ArrayList<>();
-//                    if (jsonArrayOfStates != null) {
-//                        jsonArrayOfStates.forEach(it -> {
-//                            states.add(it.toString());
-//                        });
-//                    }
-//                    
-//                    EUIPOInitialExportServiceImpl impl = new EUIPOInitialExportServiceImpl(logger, iteration, results);
-//                    try {
-//                        List<String> checkBK = impl.check("BK");
-//                        impl.update("BK", "initial-bk", checkBK);
-//                        List<String> checkSE = impl.check("SE");
-//                        impl.update("SE", "initial-se", checkSE);
-//                    } catch (Exception e) {
-//                        impl.getLogger().log(Level.SEVERE, e.getMessage(), e);
-//                    } finally {
-//                        QuartzUtils.printDuration(impl.getLogger(), start);
-//                    }
-//                } finally {
-//                    LocksSupport.SERVICES_LOCK.unlock();
-//                }
-//            }
-//            
-//        },
+
+        
         
 
 

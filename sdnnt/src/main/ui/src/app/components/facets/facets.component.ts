@@ -41,6 +41,8 @@ export class FacetsComponent implements OnInit {
       let flag:boolean = true;
       if (f && f ==="kuratorstav") {
         flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');        
+      } else  if (f && f ==="c_actions") {
+        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');        
       }
       if (flag) {
         if (this.facet_fields[f]) {
@@ -50,10 +52,14 @@ export class FacetsComponent implements OnInit {
     });
 
     if (this.stats) {
+      // TODO: zmenit      
       const year = (new Date()).getFullYear();
-      this.rokod = (this.stats['rokvydani'].min ? this.stats['rokvydani'].min : 1915);
-      this.rokdo = Math.min(year, (this.stats['rokvydani'].max ? this.stats['rokvydani'].max : 2008));
-      
+      // this.rokod = (this.stats['rokvydani'].min ? this.stats['rokvydani'].min : 1915);
+      // this.rokdo = Math.min(year, (this.stats['rokvydani'].max ? this.stats['rokvydani'].max : 2008));
+
+      this.rokod = (this.stats['date1_int'].min ? this.stats['date1_int'].min : 1915);
+      this.rokdo = Math.min(year, (this.stats['date1_int'].max ? this.stats['date1_int'].max : 2008));
+
 
       this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
       this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));

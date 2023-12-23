@@ -774,7 +774,6 @@ public class AccountServiceImpl implements AccountService {
                         for (Pair<String, SolrInputDocument> state : states) {
                             processingUpdate.add(Pair.of(state.getKey(), state.getRight()));
                         }
-
                         String transitionName = workflow.createTransitionName(zadost.getDesiredItemState(), zadost.getDesiredLicense());
                         
                         // store marc record
@@ -1163,6 +1162,42 @@ public class AccountServiceImpl implements AccountService {
         return new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
     }
     
+    
+    
+
+    @Override
+    public List<JSONObject> findAllRequests(String user, List<String> navrhy, String requestState)
+            throws AccountException, IOException, SolrServerException {
+        List<JSONObject> retvals = new ArrayList<>();
+
+        try (SolrClient solr = buildClient()) {
+            SolrQuery query = new SolrQuery("*")
+                    .setRows(3000);
+            String q = "*";
+            
+            addFilter(query, user, navrhy, requestState);
+
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, "zadost");
+
+            JSONObject ret = new JSONObject((String) qresp.get("response"));
+            JSONArray docs = ret.getJSONObject("response").getJSONArray("docs");
+            for (int i = 0; i < docs.length(); i++) {
+                JSONObject zadostJSON = docs.getJSONObject(i);
+                Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
+                if (zadost.isExpired()) {
+                    zadostJSON.put("expired", true);
+                } else if (zadost.isEscalated()) {
+                    zadostJSON.put("escalated", true);
+                }
+                retvals.add(zadostJSON);
+            }
+        }
+        return retvals;
+    }
 
     @Override
     public List<JSONObject> findAllRequestForGivenIds(String user, List<String> navrhy, String requestState, List<String> ids)

@@ -21,6 +21,7 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -110,6 +111,8 @@ public class MarcRecord {
   // exports facets - only make sure that facest is set during switching object
   public List<String> exportsFacets = new ArrayList<>();
 
+  // currator facets 
+  public List<String> curatorsFacets = new ArrayList<>();
   
   // digital librarires
   public List<String> digitalLibraries = new ArrayList<>();
@@ -147,6 +150,57 @@ public class MarcRecord {
   public static MarcRecord fromIndex(String identifier) throws JsonProcessingException, SolrServerException, IOException {
         return fromIndex(Indexer.getClient(),identifier);
   }
+
+
+  public static Pair<List<MarcRecord>, List<String>> fromIndex(SolrClient client, List<String> identifiers) throws JsonProcessingException, SolrServerException, IOException {
+
+      String qident = identifiers.stream().map(it-> {
+          return "\""+it+"\"";
+      }).collect(Collectors.joining(" OR "));
+      
+      SolrQuery q = new SolrQuery("*").setRows(identifiers.size())
+              .addFilterQuery(IDENTIFIER_FIELD+":(" + qident + ")")
+              .setFields(RAW_FIELD+" "+
+                      DNTSTAV_FIELD+" "+
+                      FMT_FIELD+" "+
+                      KURATORSTAV_FIELD+" "+
+                      HISTORIE_STAVU_FIELD+" " +
+                      HISTORIE_KURATORSTAVU_FIELD+" " +
+                      HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
+                      DATUM_STAVU_FIELD+" "+
+                      DATUM_KURATOR_STAV_FIELD+" "+
+                      FLAG_PUBLIC_IN_DL+" "+
+                      LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD+" "+" "+FOLLOWERS+" "+" "+DIGITAL_LIBRARIES+" "+
+                      GRANULARITY_FIELD+":[json]",
+                      MASTERLINKS_FIELD+":[json]",
+                      MASTERLINKS_DISABLED_FIELD,
+                      ID_EUIPO,
+                      ID_EUIPO_CANCELED,
+                      ID_EUIPO_LASTACTIVE,
+                      ID_EUIPO_EXPORT,
+                      ID_EUIPO_EXPORT_ACTIVE,
+                      EXPORT,
+                      CURATOR_ACTIONS
+                      );
+
+      List<MarcRecord> mrecs = new ArrayList<>();
+      SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();
+      for (SolrDocument sDoc : dlist) {
+          MarcRecord mr = fromSolrDoc(sDoc);
+          mrecs.add(mr);
+      }
+      if (mrecs.size() != identifiers.size()) {
+          List<String> found = mrecs.stream().map(mr-> mr.identifier).collect(Collectors.toList());
+          List<String> all = new ArrayList<>(identifiers);
+          all.removeAll(found);
+          
+          return Pair.of(mrecs, all);
+      } else {
+          return Pair.of(mrecs, new ArrayList<>());
+      }
+  }
+  
+  
   public static MarcRecord fromIndex( SolrClient client, String identifier) throws JsonProcessingException, SolrServerException, IOException {
     SolrQuery q = new SolrQuery("*").setRows(1)
             .addFilterQuery(IDENTIFIER_FIELD+":\"" + identifier + "\"")
@@ -169,18 +223,14 @@ public class MarcRecord {
                     ID_EUIPO_LASTACTIVE,
                     ID_EUIPO_EXPORT,
                     ID_EUIPO_EXPORT_ACTIVE,
-                    
-                    EXPORT
-
-                    
+                    EXPORT,
+                    CURATOR_ACTIONS
                     );
 
     return fromIndex(client,q);
   }
 
-  // testable method
   static MarcRecord fromIndex( SolrClient client, SolrQuery q) throws SolrServerException, IOException {
-
     SolrDocumentList dlist = client.query(DataCollections.catalog.name(), q).getResults();
     if (dlist.getNumFound() > 0) {
       SolrDocument doc = dlist.get(0);;
@@ -306,6 +356,11 @@ public class MarcRecord {
 
       if (doc.containsKey(EXPORT)) {
           mr.exportsFacets = (List<String>) doc.getFieldValue(EXPORT);
+      }
+      
+      if (doc.containsKey(CURATOR_ACTIONS)) {
+          List<String> cActions =  (List<String>) doc.getFieldValue(CURATOR_ACTIONS);
+          mr.curatorsFacets = cActions;
       }
 
       return mr;
@@ -660,6 +715,13 @@ public class MarcRecord {
         Set<String> uniqSet = new LinkedHashSet<>(this.exportsFacets);
         uniqSet.stream().forEach(export-> {
             sdoc.addField(EXPORT, export);
+        });
+    }
+    
+    if (this.curatorsFacets !=null && !this.curatorsFacets.isEmpty()) {
+        Set<String> uniqSet = new LinkedHashSet<>(this.curatorsFacets);
+        uniqSet.stream().forEach(curr-> {
+            sdoc.addField(CURATOR_ACTIONS, curr);
         });
     }
 
