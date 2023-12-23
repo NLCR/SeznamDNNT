@@ -4,7 +4,7 @@
 
   <groupId>cz.inovatika.sdnnt</groupId>
   <artifactId>sdnnt-openapi</artifactId>
-  <version>1.0.9.2</version>
+  <version>1.0.9.3</version>
   <packaging>jar</packaging>
 
   <name>sdnnt-openapi</name>

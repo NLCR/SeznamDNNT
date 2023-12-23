@@ -253,7 +253,7 @@ public class ZahorikUtils {
         for (JSONObject gItem : items) {
             int rocnik = rocnik(gItem, logger);
             int publicLicense = Options.getInstance().intKey(GRANULARITY_PUBLIC_LICENSE, 1912);
-            int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTT_DNNTT, 2013);
+            int t2013 = Options.getInstance().intKey(GRANULARITY_SE_NP_DNNTT_DNNTT, 2012);
 
             // pokud je mensi nez verejny rocnik
             if (rocnik <= publicLicense) continue;
