@@ -168,10 +168,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
             CatalogIterationSupport support = new CatalogIterationSupport();
             List<String> plusFilter = Arrays.asList("(id_pid:uuid OR granularity:*)", 
-                    KURATORSTAV_FIELD + ":*"
-                    
-                    
-                    );
+                    KURATORSTAV_FIELD + ":*",
+                    DNTSTAV_FIELD+ ":*"
+            );
 
             List<String> minusFilter = Arrays.asList( KURATORSTAV_FIELD + ":D",
                     KURATORSTAV_FIELD + ":DX");
