@@ -139,7 +139,8 @@
     "Priorita 3": "Priorita 3",
     "export":"Export",
     "id_euipo":"EUIPO identifikátor(y)",
-    "id_euipo_canceled":"Nepoužívané EUIPO identifikátory"
+    "id_euipo_canceled":"Nepoužívané EUIPO identifikátory",
+    "c_actions":"Připravené akce:"
   },
 
   "controlled": {

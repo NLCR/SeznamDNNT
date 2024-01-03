@@ -688,6 +688,12 @@ public class MarcRecord {
             sdoc.addField(ID_EUIPO, id);
         });
     }
+    
+    
+    if (this.idEuipoActiveExport != null) {
+        sdoc.addField(ID_EUIPO_EXPORT_ACTIVE, this.idEuipoActiveExport);
+    }
+    
 
     if (this.idEuipoCanceled != null && !this.idEuipoCanceled.isEmpty()) {
         Set<String> uniqSet = new LinkedHashSet<>(this.idEuipoCanceled);

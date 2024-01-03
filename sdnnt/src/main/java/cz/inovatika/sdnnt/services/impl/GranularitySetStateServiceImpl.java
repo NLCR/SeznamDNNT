@@ -108,6 +108,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
             CatalogIterationSupport support = new CatalogIterationSupport();
             List<String> plusFilter = new ArrayList<>(Arrays.asList(
                 MarcRecordFields.GRANULARITY_FIELD + ":*",
+                MarcRecordFields.DNTSTAV_FIELD+ ":*",
                 "setSpec:SKC"
             ));
             
