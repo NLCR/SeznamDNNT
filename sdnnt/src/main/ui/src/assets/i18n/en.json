@@ -140,9 +140,7 @@
     "export":"Export",
     "id_euipo":"EUIPO identifier",
     "id_euipo_canceled":"Canceled EUIPO identifiers",
-
     "c_actions":"Prepared actions:"
-
   },
 
   "controlled": {
@@ -970,7 +968,11 @@
     "typ_exportu":"Export type",
     "export_num_docs":"Number of documents in export",
     "vyrizeni_exportu": "Processing of export",
-    "select_or_add_an_institution": "Select or add an institution"
+    "select_or_add_an_institution": "Select or add an institution",
+    "search": "Search",
+    "in_the_list": "Im the list",
+    "off_the_list": "Off the list",
+    "all": "All"
   },
 
   "tooltip": {

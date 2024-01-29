@@ -968,7 +968,11 @@
     "typ_exportu":"Typ exportu",
     "export_num_docs":"Počet dokumentů v exportu",
     "vyrizeni_exportu": "Vyřízení exportu",
-    "select_or_add_an_institution": "Vybrat nebo přidat instituci"
+    "select_or_add_an_institution": "Vybrat nebo přidat instituci",
+    "search": "Vyhledávat",
+    "in_the_list": "V seznamu",
+    "off_the_list": "Mimo seznam",
+    "all": "Vše"
   },
 
   "tooltip": {
