@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
@@ -25,11 +25,23 @@ export class FacetsComponent implements OnInit {
 
   showRoky: boolean;
 
+  selectedRadioButton:string = 'in_list';
+
   constructor(
     private router: Router,
+    private route : ActivatedRoute,
     public config: AppConfiguration,
     public state: AppState
-  ) { }
+  ) { 
+
+
+    this.route.queryParams.subscribe((params) => {
+      const catalogParam = params['catalog'];
+      this.selectedRadioButton = catalogParam || 'in_list';
+    });
+    
+
+  }
 
   ngOnInit(): void {
     // get breakpoint
@@ -67,6 +79,15 @@ export class FacetsComponent implements OnInit {
     }
 
   }
+
+
+  onRadioButtonChange() {
+      const q: any = {};
+      q['catalog'] =  this.selectedRadioButton;
+      q.page = null;
+      this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
+  }
+  
 
   addFilter(field: string, f:{name: string, type: string, value: number}) {
     const q: any = {};

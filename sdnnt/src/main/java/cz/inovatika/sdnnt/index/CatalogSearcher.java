@@ -484,13 +484,39 @@ public class CatalogSearcher {
 
         query.addFilterQuery(bk + " OR " + se + " OR dntstav:*");
 
-        
-        // Filtry podle role
-        if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.getRole())) {
-            query.addFilterQuery("dntstav:*");
-        }
+        // full catalog true = bez stavu 
+        // user 
 
+        
+        
+        // Filtry podle role;TODO - Delete it in future
+//        if (req.containsKey("fullCatalog")) {
+//            if (!"true".equals(req.get("fullCatalog")) || user == null || "user".equals(user.getRole())) {
+//                query.addFilterQuery("dntstav:*");
+//            }
+//        }
+        
+        if (req.containsKey("fullCatalog")) {
+            if ("true".equals(req.get("fullCatalog"))) {
+                req.put("catalog", "all");
+            }
+        }        
+        
+        // catalog - in_list; outside_list; all
+        if (user != null && user.getRole() != null && !user.getRole().equals("user")) {
+            String catalog =  req.containsKey("catalog")  ? req.get("catalog") : "in_list";
+            // in list - musi mit stav
+            if (catalog.equals("in_list")) {
+                query.addFilterQuery("dntstav:*");
+            // outside list - nesmi mit stav
+            } else  if (catalog.equals("outside_list")) {
+                query.addFilterQuery("-dntstav:*");
+            } 
+        }
+        
+        // rusi  X D v pripade uzivatele
         ensureUserRoleFilter(user, query);
+        // rusi D v pripade knihovny
         ensureKnihovnaRoleFilter(user, query);
 
         // notifikace
@@ -525,6 +551,9 @@ public class CatalogSearcher {
 
     private void ensureUserRoleFilter(User user, SolrQuery query) {
         if (user == null || "user".equals(user.getRole())) {
+
+            query.addFilterQuery("dntstav:*");
+            
             query.addFilterQuery("-dntstav:X");
             query.addFilterQuery("-dntstav:D");
         }

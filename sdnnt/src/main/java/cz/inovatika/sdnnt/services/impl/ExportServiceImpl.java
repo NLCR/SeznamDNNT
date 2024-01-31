@@ -86,6 +86,7 @@ public class ExportServiceImpl implements ExportService {
         searchReq.put("page", ""+page);
         searchReq.put("q", q);
         searchReq.put("fullCatalog","true");
+        searchReq.put("catalog","all");
         // search 
         
         

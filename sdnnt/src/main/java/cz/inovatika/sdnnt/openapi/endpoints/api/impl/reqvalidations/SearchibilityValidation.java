@@ -36,7 +36,9 @@ public class SearchibilityValidation extends DNNTRequestApiServiceValidation{
         for (String documentId :  identifiers) {
             Map<String, String> parameters = new HashMap<>();
             // proverit ?? 
+            parameters.put("catalog", "all");
             parameters.put("fullCatalog", "true");
+            
             parameters.put("q", documentId);
             JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
             if (search.has("response")) {

@@ -56,6 +56,7 @@ public class SearchibilityValidationTest {
  
         Map<String, String> parametersRecord1 = new HashMap<>();
         parametersRecord1.put("fullCatalog", "true");
+        parametersRecord1.put("catalog", "all");
         parametersRecord1.put("q", "oai-record1");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
@@ -66,6 +67,7 @@ public class SearchibilityValidationTest {
         
         Map<String, String> parametersRecord2 = new HashMap<>();
         parametersRecord2.put("fullCatalog", "true");
+        parametersRecord2.put("catalog", "all");
         parametersRecord2.put("q", "oai-record2");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
@@ -103,6 +105,7 @@ public class SearchibilityValidationTest {
  
         Map<String, String> parametersRecord1 = new HashMap<>();
         parametersRecord1.put("fullCatalog", "true");
+        parametersRecord1.put("catalog", "all");
         parametersRecord1.put("q", "oai-record1");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
@@ -113,6 +116,7 @@ public class SearchibilityValidationTest {
         
         Map<String, String> parametersRecord2 = new HashMap<>();
         parametersRecord2.put("fullCatalog", "true");
+        parametersRecord2.put("catalog", "all");
         parametersRecord2.put("q", "oai-record2");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
@@ -149,6 +153,7 @@ public class SearchibilityValidationTest {
  
         Map<String, String> parametersRecord1 = new HashMap<>();
         parametersRecord1.put("fullCatalog", "true");
+        parametersRecord1.put("catalog", "all");
         parametersRecord1.put("q", "oai-record1");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
@@ -159,6 +164,7 @@ public class SearchibilityValidationTest {
         
         Map<String, String> parametersRecord2 = new HashMap<>();
         parametersRecord2.put("fullCatalog", "true");
+        parametersRecord2.put("catalog", "all");
         parametersRecord2.put("q", "oai-record2");
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
