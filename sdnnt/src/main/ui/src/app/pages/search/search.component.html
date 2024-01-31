@@ -16,9 +16,12 @@
       <div class="app-results-wrapper" [ngClass]="state.logged ? 'app-role-' + state.user.role : null">
         <mat-card *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+
             <div fxFlex>
+              <!--
               <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
-            </div>
+               -->
+           </div>
             <div>
               <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' || state.user.role == 'kurator' || state.user.role == 'mainKurator'))">
                 <mat-button-toggle [matMenuTriggerFor]="menuFilter">
