@@ -157,13 +157,12 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject lastObject = jsonArray.getJSONObject(i);
                     String comment = lastObject.optString("comment");
-                    if (comment.startsWith("scheduler/"+Case.SKC_4a.name()) || comment.startsWith("scheduler/"+Case.SKC_4b.name())) {
+                    if (comment.startsWith("scheduler/SKC")) {
                         schedulerComments.add(comment);
                     }
                 }
                 if (schedulerComments.size() > 0) {
                     String lastComment = schedulerComments.get(schedulerComments.size() - 1);
-                    
                     if (lastComment.startsWith("scheduler/"+Case.SKC_4a.name()) || lastComment.startsWith("scheduler/"+Case.SKC_4b.name())) {
                         return true;
                     }
