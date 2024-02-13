@@ -11,11 +11,17 @@ import { Filter } from 'src/app/shared/filter';
   styleUrls: ['./facets.component.scss']
 })
 export class FacetsComponent implements OnInit {
+
+
   public getScreenWidth: any;
   public facetBreakpoint: number = 1040; 
 
   @Input() facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
   @Input() stats:{ [field: string]: {min: any, max: any, count: number, from: any, until: any}};
+
+  @Input() view:string="search";
+
+
   facets: string[];
 
   rokoddate = new FormControl(new Date());

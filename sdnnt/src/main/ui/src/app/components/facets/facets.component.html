@@ -2,12 +2,13 @@
 
 <mat-accordion multi>
 
-  <mat-expansion-panel [expanded]="getPanelExpansion()" *ngIf="state.user && state.user.role !== 'user'">
+  <mat-expansion-panel  [expanded]="getPanelExpansion()" *ngIf="state.user && state.user.role !== 'user' && view === 'search'">
     <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
       <mat-panel-title>
         {{ 'desc.search' | translate }}
       </mat-panel-title>
     </mat-expansion-panel-header>
+
     <mat-radio-group fxLayout="column" [(ngModel)]="selectedRadioButton"  (ngModelChange)="onRadioButtonChange()">
       <mat-radio-button value="in_list">{{ 'desc.in_the_list' | translate }}</mat-radio-button>
       <mat-radio-button value="outside_list"  >{{ 'desc.off_the_list' | translate }}</mat-radio-button>
