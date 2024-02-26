@@ -32,11 +32,13 @@ public class CheckKrameriusConfiguration {
     }
     
     public InstanceConfiguration match(String key) {
+        // only name configuration
         Set<String> keySet = this.matchNameConfigurations.keySet();
         for (String kIter : keySet) {
             boolean matches = key.matches(kIter);
             if (matches) return this.matchNameConfigurations.get(kIter);
         }
+        
         return null;
     }
     

@@ -17,11 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.services.*;
+import cz.inovatika.sdnnt.services.PXKrameriusService.CheckResults;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
@@ -330,7 +334,9 @@ public class Job implements InterruptableJob {
                     PXKrameriusService service = new PXKrameriusServiceImpl(loggerPostfix,iteration, results);
                     try {
     
-                        List<String> check = service.check();
+                        // check true, check private 
+                        Map<CheckResults,Set<String>> map = service.check();
+                        Set<String> check = map.get(CheckResults.public_dl_results);
                         service.getLogger().info("Number of found candidates "+check.size());
                         if (!check.isEmpty()) {
     
@@ -347,19 +353,56 @@ public class Job implements InterruptableJob {
     
                                 int startIndex = i * maximum;
                                 int endIndex = Math.min((i + 1) * maximum, check.size());
-                                List<String> subList = check.subList(startIndex, endIndex);
+                                //List<String> subList = check.subList(startIndex, endIndex);
+                                List<String> subList = check.stream()
+                                        .skip(startIndex)
+                                        .limit(endIndex - startIndex)
+                                        .collect(Collectors.toList());
+                                
                                 // posle zadost
                                 if (results.has("request")) {
                                     service.getLogger().info("Creating request for sublist "+subList);
                                     service.request(subList);
                                 }
+
                                 // provede pouze update
                                 if (results.has("state") || results.has("ctx")) {
                                     service.getLogger().info("Updating sublist "+subList);
                                     service.update(subList);
                                 }
+                                
+                                
                             }
                         }
+                        
+                        Set<String> disableCtx = map.get(CheckResults.disable_ctx_results);
+                        if (!disableCtx.isEmpty()) {
+                            
+                            int maximum = 100;
+                            if (results != null && results.has("request") && results.getJSONObject("request").has("items")) {
+                                maximum = results.getJSONObject("request").getInt("items");
+                            }
+    
+                            int numberOfBatch = disableCtx.size() / maximum;
+                            if (disableCtx.size() % maximum > 0) {
+                                numberOfBatch = numberOfBatch + 1;
+                            }
+                            for (int i = 0; i < numberOfBatch; i++) {
+                                int startIndex = i * maximum;
+                                int endIndex = Math.min((i + 1) * maximum, disableCtx.size());
+                                //List<String> subList = check.subList(startIndex, endIndex);
+                                List<String> subList = disableCtx.stream()
+                                        .skip(startIndex)
+                                        .limit(endIndex - startIndex)
+                                        .collect(Collectors.toList());
+                                // provede pouze update
+                                if (results.has("ctx")) {
+                                    service.getLogger().info("Updating sublist "+subList);
+                                    service.disableContext(subList);
+                                }
+                            }
+                        }
+                        
                     } catch (ConflictException | AccountException | IOException | SolrServerException e) {
                         service.getLogger().log(Level.SEVERE, e.getMessage(), e);
                     } finally {

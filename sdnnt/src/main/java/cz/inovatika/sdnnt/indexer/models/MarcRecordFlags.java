@@ -36,6 +36,8 @@ public class MarcRecordFlags {
     public void enhanceDoc(SolrInputDocument sdoc) {
         if (isPublicInDl()) {
             sdoc.setField(FLAG_PUBLIC_IN_DL, isPublicInDl());
+        } else {
+            sdoc.remove(FLAG_PUBLIC_IN_DL);
         }
     }
 

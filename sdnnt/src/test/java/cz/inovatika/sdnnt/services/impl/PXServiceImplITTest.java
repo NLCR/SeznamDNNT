@@ -6,6 +6,7 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.*;
+import cz.inovatika.sdnnt.services.PXKrameriusService.CheckResults;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
@@ -26,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class PXServiceImplITTest {
@@ -119,7 +122,7 @@ public class PXServiceImplITTest {
         
         EasyMock.replay(pxService, options);
 
-        List<String> check = pxService.check();
+        Set<String> check = pxService.check().get("public");
         Assert.assertTrue(check.size() == 1);
         Assert.assertTrue(check.contains("oai:aleph-nkp.cz:SKC01-000688007"));
         
@@ -163,10 +166,10 @@ public class PXServiceImplITTest {
 
         EasyMock.replay(pxService, options);
 
-        List<String> check = pxService.check();
-        Assert.assertTrue(check.size() == 2);
-        Assert.assertTrue(check.contains("oai:aleph-nkp.cz:DNT01-000008886"));
-        Assert.assertTrue(check.contains("oai:aleph-nkp.cz:DNT01-000008874"));
+        Map<CheckResults, Set<String>> check = pxService.check();
+        Assert.assertTrue(check.get(CheckResults.public_dl_results).size() == 2);
+        Assert.assertTrue(check.get(CheckResults.public_dl_results).contains("oai:aleph-nkp.cz:DNT01-000008886"));
+        Assert.assertTrue(check.get(CheckResults.public_dl_results).contains("oai:aleph-nkp.cz:DNT01-000008874"));
 
     }
 

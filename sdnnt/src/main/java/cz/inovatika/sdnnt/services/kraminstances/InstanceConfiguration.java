@@ -5,23 +5,31 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
+import cz.inovatika.sdnnt.utils.StringUtils;
+
 public class InstanceConfiguration {
     
     public static enum KramVersion {
+        
+        
         V5, V7;
+        
+        public static KramVersion load(String vinfo) {
+            switch(vinfo.toLowerCase()) {
+                case "v5":
+                case "k5":
+                    return V5;
+                case "v7":
+                case "k7":
+                    return V7;
+                    
+                 default:
+                     return V5;
+            }
+        }
     }
     
-    /*
-     *                  "description":"Vysoká škola ekonomická v Praze",
-                    "api":"https://kramerius.vse.cz/search/",
-                    "client":"https://kramerius.vse.cz/search/handle/{0}",
-                    "acronym":"vse",
-                    "sigla":"ABA006",
-                    "skip": true
-
-     */
-    
-    //private List<String>  matchNames = new ArrayList<>();
 
     private String apiPoint;
     private String clientAddress;
@@ -29,6 +37,8 @@ public class InstanceConfiguration {
     private String acronym;
     private String description;
     private String sigla;
+    
+    private KramVersion version = KramVersion.V5;
     
     private boolean shouldSkip = false;
     
@@ -101,6 +111,14 @@ public class InstanceConfiguration {
         this.sigla = sigla;
     }
     
+    public void setVersion(KramVersion version) {
+        this.version = version;
+    }
+    
+    public KramVersion getVersion() {
+        return version;
+    }
+    
     public static InstanceConfiguration initConfiguration(String name, JSONObject instOBject) {
 
         InstanceConfiguration configuration = new InstanceConfiguration();
@@ -112,7 +130,22 @@ public class InstanceConfiguration {
         configuration.setDescription(instOBject.optString("description"));
         configuration.setSigla(instOBject.optString("sigla"));
         
+        String version = instOBject.optString("version");
+        if (version != null && StringUtils.isAnyString(version)) {
+            configuration.setVersion(KramVersion.load(version));
+        }
+        
         return configuration;
     }
+
+
+    @Override
+    public String toString() {
+        return "InstanceConfiguration [apiPoint=" + apiPoint + ", clientAddress=" + clientAddress + ", domain=" + domain
+                + ", acronym=" + acronym + ", description=" + description + ", sigla=" + sigla + ", version=" + version
+                + ", shouldSkip=" + shouldSkip + "]";
+    }
+    
+    
     
 }

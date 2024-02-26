@@ -215,14 +215,17 @@ export class ResultItemComponent implements OnInit {
   }
 
   thumb(link:string) {
+    //http://localhost:18080/sdnnt/image?kramurl=http://krameriusndk.mzk.cz/search/handle/uuid:c683efa0-91f1-11e6-baa5-005056827e51
+    return "api/image?kramurl="+link;    
+    /*
     link = this.normalizeLink(link);
-    // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
     if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
-      //TODO: Support K7 !!
       return  link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
     } else if (link.indexOf('/uuid/') > -1 && link.indexOf('uuid:') > -1) {
       return  link.replace('/uuid/', '/search/api/v5.0/item/').split(' ')[0] + '/thumb';
-    }
+    }*/
+
+
   }
 
   setHasNavrhFlag() {
