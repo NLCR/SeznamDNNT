@@ -9,6 +9,10 @@ import { User } from './shared/user';
     providedIn: 'root'
 }) export class AppConfiguration {
 
+    // version 
+    static sdnntClientVersion = 'v1.0.9.7';
+
+
     private config: Configuration;
     public invalidServer: boolean;
 
