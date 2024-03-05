@@ -560,38 +560,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         return this.logger;
     }
     
-    /*
-     *        "kram_kontextova_informace": {
-                                "type":"kramerius_px_check",
-                                "logger": "krameriove_kontext_px_check",
-                                "cron": "0 55 12 ? * * *",
-                                "iteration": {},
-                                "results":{
-                                        "ctx": true
-                                }
-                        },
-
-     */
-
         
-    public static void main(String[] args) throws AccountException, ConflictException, IOException, SolrServerException {
-        
-        HttpsTrustManager.allowAllSSL();
-        JSONObject iteration = new JSONObject();
-        iteration.put("data", PXKrameriusService.DataTypeCheck.granularity.name());
-        
-        JSONObject result = new JSONObject();
-        result.put("ctx", true);
-        
-        PXKrameriusService service = new PXKrameriusServiceImpl("", iteration, result);
-        Map<CheckResults,Set<String>> check = service.check();
-        Set<String> disableCTXResults = check.get(PXKrameriusService.CheckResults.disable_ctx_results);
-
-        //System.out.println("Disabled ctx results :"+disableCTXResults);
-        Set<String> publicDLResults = check.get(PXKrameriusService.CheckResults.public_dl_results);
-        //System.out.println("Public dl results "+publicDLResults);
-        
-    }
 
     
 }
