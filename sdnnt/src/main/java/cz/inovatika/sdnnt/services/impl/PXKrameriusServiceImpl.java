@@ -242,6 +242,9 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     // used in reuqest; must not be in case of context information
                     Set<String> used = usedInRequest(solr, batch, this.typeOfRequest);
                     used.stream().forEach(identifiers2Links::remove);
+                    used.stream().forEach(identifiers2MasterLinks::remove);
+                    used.stream().forEach(identifiers2FlagInDl::remove);
+                    
                 }
             }
         } catch (IOException e) {
