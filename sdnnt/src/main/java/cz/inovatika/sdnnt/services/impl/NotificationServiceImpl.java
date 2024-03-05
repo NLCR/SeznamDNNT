@@ -459,7 +459,7 @@ public class NotificationServiceImpl implements NotificationsService {
 
                     map.put("identifier", doc.getFieldValue("identifier").toString());
 
-                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())) {
+                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())|| kuratorStavStr.equals(CuratorItemState.PX.name())) {
                         // ommiting ; or previous state was d or dx 
                         
                     } else {
