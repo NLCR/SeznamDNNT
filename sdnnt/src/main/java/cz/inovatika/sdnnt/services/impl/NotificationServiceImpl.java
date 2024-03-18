@@ -389,7 +389,7 @@ public class NotificationServiceImpl implements NotificationsService {
                         String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
 
                         String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
-                        String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : kuratorstav.toString();
+                        String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                         
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
@@ -445,7 +445,7 @@ public class NotificationServiceImpl implements NotificationsService {
                     Collection<Object> license = doc.getFieldValues("license");
 
                     String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
-                    String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : kuratorstav.toString();
+                    String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                     
                     
                     Map<String, String> map = new HashMap<>();
@@ -459,8 +459,9 @@ public class NotificationServiceImpl implements NotificationsService {
 
                     map.put("identifier", doc.getFieldValue("identifier").toString());
 
-                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())) {
-                        // ommiting
+                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())|| kuratorStavStr.equals(CuratorItemState.PX.name())) {
+                        // ommiting ; or previous state was d or dx 
+                        
                     } else {
                         documents.add(map);
                     }

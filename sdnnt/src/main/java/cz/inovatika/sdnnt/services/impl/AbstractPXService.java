@@ -100,17 +100,23 @@ public abstract class AbstractPXService extends AbstractRequestService  {
         return fq;
     }
     
-    protected void enahanceContextInformation(SolrInputDocument idoc) {
-        idoc.addField(MarcRecordFields.FLAG_PUBLIC_IN_DL, true);
+    
+    protected void enahanceContextInformation(SolrInputDocument idoc, boolean flag) {
+        idoc.addField(MarcRecordFields.FLAG_PUBLIC_IN_DL, flag);
     }
 
-    protected SolrInputDocument changeContextInformation(SolrClient solr, String identifier) throws JsonProcessingException, SolrServerException, IOException {
+    protected void removeContextInformation(SolrInputDocument idoc, boolean flag) {
+        idoc.addField(MarcRecordFields.FLAG_PUBLIC_IN_DL, flag);
+    }
+
+    
+    protected SolrInputDocument changeContextInformation(SolrClient solr, String identifier, boolean flag) throws JsonProcessingException, SolrServerException, IOException {
         MarcRecord mr = MarcRecord.fromIndex(solr, identifier);
         if (mr != null) {
             if (mr.recordsFlags == null) {
                 mr.recordsFlags = new MarcRecordFlags(true);
             }
-            mr.recordsFlags.setPublicInDl(true);
+            mr.recordsFlags.setPublicInDl(flag);
             return mr.toSolrDoc();
         } else return null;
     }
