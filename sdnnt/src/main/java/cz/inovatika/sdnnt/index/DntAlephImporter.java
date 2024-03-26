@@ -18,7 +18,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -182,32 +184,26 @@ public class DntAlephImporter {
         MarcRecordUtilsToRefactor.addRokVydani(sdoc);
 
         
-        JSONObject kramInstances = Options.getInstance().getJSONObject("check_kramerius");
         CheckKrameriusConfiguration kramConf = CheckKrameriusConfiguration.initConfiguration(Options.getInstance().getJSONObject("check_kramerius"));
         
-        
-        JSONObject digitalized = Options.getInstance().getJSONObject("digitalized");
-        if (digitalized != null) { 
+        Collection<Object> mlinks911u = sdoc.getFieldValues("marc_911u");
+        Collection<Object> mlinks856u =  sdoc.getFieldValues("marc_856u");
+        Collection<Object> mlinks956u =  sdoc.getFieldValues("marc_956u");
 
-            
-            Collection<Object> mlinks911u = sdoc.getFieldValues("marc_911u");
-            Collection<Object> mlinks856u =  sdoc.getFieldValues("marc_856u");
-            Collection<Object> mlinks956u =  sdoc.getFieldValues("marc_956u");
-            //Object fmt = sdoc.getFieldValue(FMT_FIELD);
-            final List<String> links = new ArrayList<>();
-            
-            if (mlinks911u != null && !mlinks911u.isEmpty()) {
-                mlinks911u.stream().map(Object::toString).forEach(links::add);
-            } else if (mlinks956u != null) {
-                mlinks956u.stream().map(Object::toString).forEach(links::add);
-            } else if (mlinks856u != null) {
-                mlinks856u.stream().map(Object::toString).forEach(links::add);
-            }
-            
-            List<String> siglas = LinksUtilities.digitalizedKeys(kramConf,  links);
-            if (!siglas.isEmpty()) {
-                sdoc.setField(DIGITAL_LIBRARIES, siglas);
-            }
+        final List<String> links = new ArrayList<>();
+        
+        if (mlinks911u != null && !mlinks911u.isEmpty()) {
+            mlinks911u.stream().map(Object::toString).forEach(links::add);
+        } else if (mlinks956u != null) {
+            mlinks956u.stream().map(Object::toString).forEach(links::add);
+        } else if (mlinks856u != null) {
+            mlinks856u.stream().map(Object::toString).forEach(links::add);
+        }
+        
+        List<String> siglas = LinksUtilities.digitalizedKeys(kramConf,  links);
+        if (!siglas.isEmpty()) {
+            List<String> nsiglas = new ArrayList<>(new LinkedHashSet<>(siglas));
+            sdoc.setField(DIGITAL_LIBRARIES, nsiglas);
         }
         return sdoc;
     }

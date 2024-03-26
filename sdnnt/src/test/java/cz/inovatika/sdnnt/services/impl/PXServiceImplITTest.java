@@ -63,7 +63,11 @@ public class PXServiceImplITTest {
 
         CatalogSupport.inserAIdentifiersSKC();
 
-        String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+        //String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+
+        String optionsConfig="{\"check_kramerius\":{\"urls\":{   \"http://krameriusndk.nkp.cz.*\":{ \"skip\": false, \"api\": \"http://krameriusndk.nkp.cz/search\" },\r\n"
+                + " \"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\",\"skip\":false},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\",\"skip\":false},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\",\"skip\":false},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\",\"skip\":false},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false}}}}";
+
         JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
         System.out.println(optionsConfigJSONObject.toString(2));
         
@@ -121,8 +125,9 @@ public class PXServiceImplITTest {
 
         
         EasyMock.replay(pxService, options);
-
-        Set<String> check = pxService.check().get("public");
+        Map<CheckResults, Set<String>> checkMap = pxService.check();
+        
+        Set<String> check = checkMap.get(CheckResults.public_dl_results);
         Assert.assertTrue(check.size() == 1);
         Assert.assertTrue(check.contains("oai:aleph-nkp.cz:SKC01-000688007"));
         
@@ -137,8 +142,11 @@ public class PXServiceImplITTest {
 
         CatalogSupport.inserAIdentifiers();
 
-        String optionsConfig="{\"check_kramerius\":{\"urls\":{\"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\"},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\"},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\"},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\"}}}}";
+        String optionsConfig="{\"check_kramerius\":{\"urls\":{   \"http://krameriusndk.nkp.cz.*\":{ \"skip\": false, \"api\": \"http://krameriusndk.nkp.cz/search\" },\r\n"
+                + " \"https://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"http://www.digitalniknihovna.cz/mlp/\":{\"api\":\"https://kramerius4.mlp.cz/search/\",\"skip\":false},\"http://www.digitalniknihovna.cz/mzk/\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"https://digitalniknihovna.mlp.cz/\":{\"api\":\"https://kramerius4.mlp.cz/search/\",\"skip\":false},\"https://kramerius.lib.cas.cz/\":{\"api\":\"https://kramerius.lib.cas.cz/search/\",\"skip\":false},\"https://kramerius.techlib.cz/kramerius-web-client/\":{\"api\":\"https://kramerius.techlib.cz/search/\",\"skip\":false},\"http://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false},\"https://krameriusndk.mzk.cz/search\":{\"api\":\"https://kramerius.mzk.cz/search/\",\"skip\":false}}}}";
         JSONObject optionsConfigJSONObject = new JSONObject(optionsConfig);
+        
+        //System.out.println(optionsConfigJSONObject.toString(2));
 
         String jonbConfig="{\"iteration\":{\"date_range\":\"[* TO 2020]\",\"states\":[\"A\",\"PA\",\"NL\"]},\"results\":{\"state\":\"PX\",\"ctx\":true,\"request\":{\"type\":\"PXN\",\"items\":50}}}";
         JSONObject jobJSONObject = new JSONObject(jonbConfig);
@@ -170,7 +178,6 @@ public class PXServiceImplITTest {
         Assert.assertTrue(check.get(CheckResults.public_dl_results).size() == 2);
         Assert.assertTrue(check.get(CheckResults.public_dl_results).contains("oai:aleph-nkp.cz:DNT01-000008886"));
         Assert.assertTrue(check.get(CheckResults.public_dl_results).contains("oai:aleph-nkp.cz:DNT01-000008874"));
-
     }
 
     @Test
