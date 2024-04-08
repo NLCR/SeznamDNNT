@@ -408,6 +408,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           } else if (elementName.equals("metadata")) {
             readRecordMetadata(reader, mr);
             if (!mr.isDeleted) {
+                // TODO: Change it !!! 
                 SolrInputDocument solrDoc = DntAlephImporter.toSolrDoc(mr);
                 if (solrDoc != null) {
                     recs.add(DntAlephImporter.toSolrDoc(mr));
@@ -418,7 +419,6 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
               LOGGER.log(Level.INFO, "Record {0} is deleted", mr.identifier);
               toDelete.add(mr.identifier);
             }
-            // ret.append("records", mr.toJSON());
           } else {
             skipElement(reader, elementName);
           }

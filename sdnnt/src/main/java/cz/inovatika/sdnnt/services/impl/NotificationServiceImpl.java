@@ -383,35 +383,38 @@ public class NotificationServiceImpl implements NotificationsService {
                 try {
                     iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
-                        Collection<Object> dntstav = doc.getFieldValues("dntstav");
-                        Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
-                        Collection<Object> license = doc.getFieldValues("license");
-                        String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
-
-                        String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
-                        String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                         
-                        Map<String, String> map = new HashMap<>();
-                        map.put("nazev", (String) doc.getFirstValue("nazev"));
-                        map.put("dntstav", dntStavStr);
+                        Collection<Object> dntstav = doc.getFieldValues("dntstav");
+                        if (dntstav != null && dntstav.size() > 0) {
+                            Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
+                            Collection<Object> license = doc.getFieldValues("license");
+                            String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
 
-                        if ( license != null) {
-                            map.put("license",
-                                    license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                            String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
+                            String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                             
-                        }
-                        map.put("identifier", doc.getFieldValue("identifier").toString());
-                        if (historieStavu != null) {
-                            map.put("historie_stavu", historieStavu);
-                        }
-                        if (ruleNotification.accept(map)) {
-                            if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())) {
-                                // ommiting
-                            } else {
-                                documents.add(map);
+                            Map<String, String> map = new HashMap<>();
+                            map.put("nazev", (String) doc.getFirstValue("nazev"));
+                            map.put("dntstav", dntStavStr);
+
+                            if ( license != null) {
+                                map.put("license",
+                                        license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                                
+                            }
+                            map.put("identifier", doc.getFieldValue("identifier").toString());
+                            if (historieStavu != null) {
+                                map.put("historie_stavu", historieStavu);
+                            }
+                            if (ruleNotification.accept(map)) {
+                                if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name()) || kuratorStavStr.equals(CuratorItemState.PX.name())) {
+                                    // ommiting
+                                } else {
+                                    documents.add(map);
+                                }
                             }
                         }
-                        
+
                         return doc;
                     });
                 } catch (SolrServerException | IOException ex) {
@@ -441,29 +444,33 @@ public class NotificationServiceImpl implements NotificationsService {
                 iteration(client, "catalog", CursorMarkParams.CURSOR_MARK_START, q, (doc) -> {
 
                     Collection<Object> dntstav = doc.getFieldValues("dntstav");
-                    Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
-                    Collection<Object> license = doc.getFieldValues("license");
 
-                    String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
-                    String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
-                    
-                    
-                    Map<String, String> map = new HashMap<>();
-                    map.put("nazev", (String) doc.getFirstValue("nazev"));
-                    map.put("dntstav",dntStavStr);
-                    if ( license != null) {
-                        map.put("license",
-                                license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                    if (dntstav != null && dntstav.size() > 0) {
+                        Collection<Object> kuratorstav = doc.getFieldValues(MarcRecordFields.KURATORSTAV_FIELD);
+                        Collection<Object> license = doc.getFieldValues("license");
+
+                        String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
+                        String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                         
-                    }
-
-                    map.put("identifier", doc.getFieldValue("identifier").toString());
-
-                    if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())|| kuratorStavStr.equals(CuratorItemState.PX.name())) {
-                        // ommiting ; or previous state was d or dx 
                         
-                    } else {
-                        documents.add(map);
+                        Map<String, String> map = new HashMap<>();
+                        map.put("nazev", (String) doc.getFirstValue("nazev"));
+                        map.put("dntstav",dntStavStr);
+                        if ( license != null) {
+                            map.put("license",
+                                    license.size() == 1 ? (String) new ArrayList<>(license).get(0) : license.toString());
+                            
+                        }
+
+                        map.put("identifier", doc.getFieldValue("identifier").toString());
+
+                        if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())|| kuratorStavStr.equals(CuratorItemState.PX.name())) {
+                            // ommiting ; or previous state was d or dx 
+                            
+                        } else {
+                            documents.add(map);
+                        }
+                        
                     }
 
                     return doc;
@@ -566,5 +573,9 @@ public class NotificationServiceImpl implements NotificationsService {
         }
     }
     
+    
+    public static void main(String[] args) {
+        NotificationServiceImpl service = new NotificationServiceImpl(null, null);
+    }
     
 }
