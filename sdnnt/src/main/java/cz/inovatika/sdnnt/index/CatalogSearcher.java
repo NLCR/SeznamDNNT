@@ -456,9 +456,18 @@ public class CatalogSearcher {
             String field = (String) o;
             if (req.containsKey(field)) {
                 if (field.equals("rokvydani")) {
-                    // 
-                    query.addFilterQuery( "date1_int:[" + req.get(field).replace(",", " TO ") + "]");
-                    //query.addFilterQuery(field + ":[" + req.get(field).replace(",", " TO ") + "]");
+                    
+                    String[] limits = req.get(field).split(",");
+                    if(limits.length >= 2) {
+                        String lowerUI = limits[0];
+                        String upperUI = limits[1];
+                        
+                        String case1= String.format("date1_int:[%s TO %s]", lowerUI,upperUI); // case 1
+                        String case2 =  String.format("date2_int:[%s TO %s]", lowerUI,upperUI); //case 2
+                        String case3 =  String.format("(date1_int:[* TO %s] AND date2_int:[%s TO *])", upperUI,lowerUI); //case 2
+                        String orcase = Arrays.asList(case1,case2,case3).stream().collect(Collectors.joining(" OR "));
+                        query.addFilterQuery("("+orcase+")");
+                    }
                 } else {
                     query.addFilterQuery(field + ":\"" + req.get(field) + "\"");
                 }
@@ -473,7 +482,6 @@ public class CatalogSearcher {
         // From mail
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int fromYear = opts.getJSONObject("search").getInt("fromYear");
-        
         
         // Issue #510; Only lower bouds is used 
         String bk = QueryUtils.catalogBKFilterQueryPartOnlyLowerBound(opts, year, fromYear);

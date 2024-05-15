@@ -19,6 +19,8 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.utils.DetectYear;
+import cz.inovatika.sdnnt.utils.DetectYear.Bound;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -626,16 +628,19 @@ public class MarcRecord {
       String date2 = controlFields.get("008").substring(11, 15);
       sdoc.setField("date1", date1);
       sdoc.setField("date2", date2);
-      try {
-        sdoc.setField("date1_int", Integer.parseInt(date1));
-      } catch (NumberFormatException ex) {
-    	  // TODO:
+
+      int date1Int = DetectYear.detectYear(date1, Bound.DOWN);
+      sdoc.setField("date1_int", date1Int);
+      
+      
+      // pokud horni mez obsahuje mezery, pak doplnit to co je v horni 
+      if (date2!= null && date2.trim().equals("")) {
+          sdoc.setField("date2_int", date1Int);
+      } else {
+          int date2Int = DetectYear.detectYear(date2, Bound.UP);
+          sdoc.setField("date2_int", date2Int);
       }
-      try {
-        sdoc.setField("date2_int", Integer.parseInt(date2));
-      } catch (NumberFormatException ex) {
-    	  // TODO:
-      }
+
     }
 
     MarcRecordUtilsToRefactor.setIsProposable(sdoc);
