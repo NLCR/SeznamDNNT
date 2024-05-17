@@ -972,7 +972,9 @@
     "search": "Search",
     "in_the_list": "Im the list",
     "off_the_list": "Off the list",
-    "all": "All"
+    "all": "All",
+    "show_all": "Show all",
+    "all_publishers": "All publishers"
   },
 
   "tooltip": {

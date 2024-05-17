@@ -1,9 +1,11 @@
 import { Component, Input, OnInit, HostListener } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
+import { DialogAllPublishersComponent } from '../dialog-all-publishers/dialog-all-publishers.component';
 
 @Component({
   selector: 'app-facets',
@@ -37,7 +39,8 @@ export class FacetsComponent implements OnInit {
     private router: Router,
     private route : ActivatedRoute,
     public config: AppConfiguration,
-    public state: AppState
+    public state: AppState,
+    public dialog: MatDialog
   ) { 
 
 
@@ -135,6 +138,13 @@ export class FacetsComponent implements OnInit {
     } else {
       return true;
     }
+  }
+
+  showAllPublishers() {
+    const dialogRef = this.dialog.open(DialogAllPublishersComponent, {
+      width: '750px',
+      panelClass: 'app-dialog-all-publishers'
+    });
   }
 
 }
