@@ -79,6 +79,7 @@ import { DialogExportedFilesComponent } from './components/dialog-exported-files
 import { ResultActionsSearchComponent } from './components/result-item/result-actions-search/result-actions-search.component';
 import { ResultActionsExportComponent } from './components/result-item/result-actions-export/result-actions-export.component';
 import { ResultActionsZadostComponent } from './components/result-item/result-actions-zadost/result-actions-zadost.component';
+import { DialogAllPublishersComponent } from './components/dialog-all-publishers/dialog-all-publishers.component';
 //import { NgxJsonViewerModule } from 'ngx-json-viewer';
 
 echarts.use([TitleComponent, TooltipComponent, GridComponent, BarChart, LineChart,CanvasRenderer]);
@@ -160,6 +161,7 @@ const providers: any[] =[
     ResultActionsSearchComponent,
     ResultActionsExportComponent,
     ResultActionsZadostComponent,
+    DialogAllPublishersComponent,
   ],
   imports: [
     BrowserModule,

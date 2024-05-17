@@ -1,0 +1,26 @@
+::ng-deep {
+  .app-dialog-all-publishers {
+    .mat-checkbox {
+      .mat-checkbox-layout {
+        height: 15px;
+        align-items: center;
+        vertical-align: middle;
+    
+        .mat-checkbox-inner-container {
+          $app-checkbox-height: 14px;
+          margin-top: 0 !important;
+          width: $app-checkbox-height;
+          height: $app-checkbox-height;
+
+          .mat-checkbox-ripple {
+            $app-ripple-height: 15px;
+            left: calc(50% - #{ $app-ripple-height});
+            top: calc(50% - #{$app-ripple-height});
+            height: calc(#{$app-ripple-height} * 2);
+            width: calc(#{$app-ripple-height} * 2);
+          }
+        }
+      }
+    }
+  } 
+}

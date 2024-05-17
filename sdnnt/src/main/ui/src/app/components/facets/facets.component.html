@@ -74,6 +74,7 @@
           </div>
         </ng-container>
       </div>
+      <button *ngIf="facet === 'nakladatel'" (click)="showAllPublishers()" mat-stroked-button class="app-w-100 app-mt-4">{{ 'desc.show_all' | translate }}</button>
     </mat-expansion-panel>
   </ng-container>
 
