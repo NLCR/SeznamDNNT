@@ -15,6 +15,7 @@ export class FacetsUsedComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
+  
   }
 
   removeFilter(filter: Filter) {
@@ -22,7 +23,19 @@ export class FacetsUsedComponent implements OnInit {
     if (this.state.page > 0) {
       this.state.page = 0;
     }
-    q[filter.field] = null;
+
+    let vals: string[] = this.state.usedFilters
+      .filter((f: Filter) => f.field === filter.field)
+      .map((f: Filter) => f.value);
+
+
+    vals = vals.filter(value => value !== filter.value);
+
+    if (vals.length >= 1) {
+      q[filter.field] = vals;
+    } else {
+      q[filter.field] = null;
+    }
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }

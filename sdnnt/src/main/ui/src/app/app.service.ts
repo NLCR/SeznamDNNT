@@ -118,6 +118,12 @@ export class AppService {
     });
   }
 
+  /** facet search  */
+  facetSearch(params: HttpParams): Observable<any> {
+    let url = 'search/facet';
+    return this.get(url, params);
+  }
+  
   /** catalog serach  */
   search(params: HttpParams): Observable<any> {
     let url = 'search/catalog';

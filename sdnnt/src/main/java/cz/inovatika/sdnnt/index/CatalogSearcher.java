@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -91,13 +92,57 @@ public class CatalogSearcher {
         }
         return ret;
     }
+    
 
+    public JSONObject facetSearch(HttpServletRequest req) {
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        Map<String, String> resmap = new HashMap<>();
+        parameterMap.entrySet().stream().forEach(stringEntry -> {
+            resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+        });
+        User user = new UserControlerImpl(req).getUser();
+        String facetSearchField = req.getParameter("facetSearchField");
+        String facetSearchOffset = req.getParameter("facetSearchOffset");
+        return facetSearch(resmap, new ArrayList<>(), user, facetSearchField, facetSearchOffset);
+    }
 
+    
+    public JSONObject facetSearch(Map<String, String> req, List<String> filters, User user, String facetField, String offset) {
+        JSONObject ret = new JSONObject();
+        try {
+            SolrClient solr = Indexer.getClient();
+
+            SolrQuery query = doQuery(req, filters, user, (solrQuery)->{
+                solrQuery.setFacet(true).addFacetField(facetField);
+                solrQuery.setFacetMinCount(1);
+                solrQuery.setParam(FacetParams.FACET_OFFSET, offset);
+            }); 
+            
+            query.setRows(0).setStart(0);
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+            ret = new JSONObject((String) qresp.get("response"));
+            return ret;
+        } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        SearchResultsUtils.removePublicStatesFromCuratorStatesFacets(ret);
+        return ret;
+    }
+    
+    
     public JSONObject search(Map<String, String> req, List<String> filters, User user) {
         JSONObject ret = new JSONObject();
         try {
             SolrClient solr = Indexer.getClient();
-            SolrQuery query = doQuery(req, filters, user);
+            SolrQuery query = doQuery(req, filters, user,(solrQuery)-> {
+                solrQuery.setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export","id_euipo_export","c_actions");
+                solrQuery.setFacetMinCount(1);
+            });
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
@@ -118,7 +163,6 @@ public class CatalogSearcher {
                     ret.put("rnotifications", ruleNotifications);
                     
                 }
-
 
                 Set<String> usedIdentifiers = new LinkedHashSet<>();
                 zadosti.forEach(z -> {
@@ -341,7 +385,7 @@ public class CatalogSearcher {
     }
 
     //  "filterFields": ["dntstav", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
-    private SolrQuery doQuery(HttpServletRequest req, User user) {
+    private SolrQuery doQuery(HttpServletRequest req, User user, FacetFieldConfigObject facetConfig) {
         Map<String, String> map = new HashMap<>();
         Enumeration<String> parameterNames = req.getParameterNames();
         while (parameterNames.hasMoreElements()) {
@@ -350,7 +394,7 @@ public class CatalogSearcher {
             map.put(name, vals.length > 0 ? vals[0] : "");
 
         }
-        return doQuery(map, new ArrayList<>(), user);
+        return doQuery(map, new ArrayList<>(), user, facetConfig);
     }
 
     // dat to jinam
@@ -391,7 +435,14 @@ public class CatalogSearcher {
 
     }
 
-    private SolrQuery doQuery(Map<String, String> req, List<String> filters, User user) {
+    /** facet field configuration */
+    @FunctionalInterface
+    public static interface FacetFieldConfigObject {
+        public void configFacets(SolrQuery sQuery);
+    }
+    
+    
+    private SolrQuery doQuery(Map<String, String> req, List<String> filters, User user, FacetFieldConfigObject confobject) {
         String q = req.containsKey("q") ? req.get("q") : null;
         if (q == null) {
             q = "*";
@@ -407,22 +458,24 @@ public class CatalogSearcher {
         if (req.containsKey("page")) {
             start = Integer.parseInt(req.get("page")) * rows;
         }
-        // select from identifiers;
-        // fulltext or id_pid or id_all_identifiers or id_all_identifiers_cuts
-        //String modifiedQuery = String.format("fullText:%s OR id_pid:%s OR id_all_identifiers:%s OR id_all_identifiers_cuts:%s", q,q,q,q);
         SolrQuery query = new SolrQuery(q)
                 .setRows(rows)
                 .setStart(start)
+                /*
                 .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export","id_euipo_export","c_actions")
                 .setFacetMinCount(1)
+                */
                 .setParam("json.nl", "arrntv")
                 .setParam("stats", true)
                 
-                //.setParam("stats.field", "rokvydani")
                 .setParam("stats.field", "date1_int")
                 .setParam("q.op", "AND");
 
                 //.setFields(DEFAULT_FIELDLIST);
+        /** Facet fields configuration */
+        if (confobject != null) {
+            confobject.configFacets(query);
+        }
         
         if (this.fieldList != null) {
             query.setFields(this.fieldList);
