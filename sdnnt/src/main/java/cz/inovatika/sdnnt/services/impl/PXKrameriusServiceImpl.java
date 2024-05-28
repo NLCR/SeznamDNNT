@@ -1,28 +1,37 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.model.*;
-import cz.inovatika.sdnnt.model.workflow.ZadostTyp;
-import cz.inovatika.sdnnt.services.AccountService;
-import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
-import cz.inovatika.sdnnt.services.PXKrameriusService;
-import cz.inovatika.sdnnt.services.PXKrameriusService.CheckResults;
-import cz.inovatika.sdnnt.services.exceptions.AccountException;
-import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
-import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
-import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
-import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
-import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
-import cz.inovatika.sdnnt.utils.KrameriusFields;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.utils.SimpleGET;
-import cz.inovatika.sdnnt.utils.SolrJUtilities;
-import cz.inovatika.sdnnt.utils.StringUtils;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.FLAG_PUBLIC_IN_DL;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_856_U;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_911_U;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_956_U;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_DISABLED_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_FIELD;
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.SIGLA_FIELD;
+import static cz.inovatika.sdnnt.utils.PIDUtils.pid;
 
-import org.apache.commons.collections.map.HashedMap;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -35,17 +44,25 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
-
-import static cz.inovatika.sdnnt.utils.PIDUtils.*;
+import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.CatalogIterationSupport;
+import cz.inovatika.sdnnt.model.CuratorItemState;
+import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.services.PXKrameriusService;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
+import cz.inovatika.sdnnt.services.exceptions.ConflictException;
+import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
+import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
+import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
+import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
+import cz.inovatika.sdnnt.utils.KrameriusFields;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
+import cz.inovatika.sdnnt.utils.SimpleGET;
+import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 /**
  * Sluzba kontroluje zda je v krameriovi dilo volne ci nikoliv 
@@ -243,7 +260,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     Set<String> used = usedInRequest(solr, batch, this.typeOfRequest);
                     used.stream().forEach(identifiers2Links::remove);
                     used.stream().forEach(identifiers2MasterLinks::remove);
-                    used.stream().forEach(identifiers2FlagInDl::remove);
+                    //used.stream().forEach(identifiers2FlagInDl::remove);
                     
                 }
             }
@@ -561,6 +578,4 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
     }
     
         
-
-    
 }
