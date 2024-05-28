@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,12 @@ public class SearchibilityValidation extends DNNTRequestApiServiceValidation{
 
         // validace na dohledatelnost #461
         for (String documentId :  identifiers) {
-            Map<String, String> parameters = new HashMap<>();
+            Map<String, List<String>> parameters = new HashMap<>();
             // proverit ?? 
-            parameters.put("catalog", "all");
-            parameters.put("fullCatalog", "true");
+            parameters.put("catalog", Arrays.asList("all"));
+            parameters.put("fullCatalog", Arrays.asList("true"));
             
-            parameters.put("q", documentId);
+            parameters.put("q", Arrays.asList(documentId));
             JSONObject search = catalogSearcher.search(parameters, new ArrayList<>(), user);
             if (search.has("response")) {
                 JSONObject response = search.getJSONObject("response");

@@ -78,15 +78,15 @@ public class ExportServiceImpl implements ExportService {
             throws SolrServerException, IOException {
         
         CatalogSearcher searcher = new CatalogSearcher();
-        Map<String,String> searchReq = new HashMap<>();
+        Map<String,List<String>> searchReq = new HashMap<>();
         
-        givenReq.keySet().forEach(key-> {searchReq.put(key, givenReq.get(key));});
+        givenReq.keySet().forEach(key-> {searchReq.put(key, Arrays.asList(givenReq.get(key)));});
         
-        searchReq.put("rows", ""+rows);
-        searchReq.put("page", ""+page);
-        searchReq.put("q", q);
-        searchReq.put("fullCatalog","true");
-        searchReq.put("catalog","all");
+        searchReq.put("rows", Arrays.asList(""+rows));
+        searchReq.put("page", Arrays.asList(""+page));
+        searchReq.put("q", Arrays.asList(q));
+        searchReq.put("fullCatalog",Arrays.asList("true"));
+        searchReq.put("catalog",Arrays.asList("all"));
         // search 
         
         
@@ -535,10 +535,11 @@ public class ExportServiceImpl implements ExportService {
         if (q != null && !q.trim().startsWith("euipo_")) {
 
             CatalogSearcher searcher = new CatalogSearcher(String.format("%s, %s", MarcRecordFields.IDENTIFIER_FIELD, MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE));
-            Map<String,String> req = new HashMap<>();
-            req.put("rows", "90");
-            req.put("q", q);
-            req.put("fullCatalog","true");
+
+            Map<String, List<String>> req = new HashMap<>();
+            req.put("rows", Arrays.asList("90"));
+            req.put("q", Arrays.asList(q));
+            req.put("fullCatalog",Arrays.asList("true"));
             
 
             JSONObject result = searcher.search(req, new ArrayList<>(), loginSupport.getUser());

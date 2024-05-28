@@ -731,6 +731,7 @@
     "num_found": "Number of records found",
     "vybrat_vse": "Select all",
     "vybrat": "Select",
+    "vybrano":"Current selection",
     "hromadna_zmena_stavu": "Mass status change",
     "export": "Export",
     "stav": "State",

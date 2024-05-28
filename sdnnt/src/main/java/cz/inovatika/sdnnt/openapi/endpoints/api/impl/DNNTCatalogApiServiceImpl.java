@@ -45,10 +45,10 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
 
     @Override
     public Response catalogGet(String query, String state, String license, String fmt,  Integer integer, Integer integer1,  SecurityContext securityContext, ContainerRequestContext crc) throws NotFoundException {
-        Map<String,String> map = new HashMap<>();
-        map.put("q", query);
-        map.put("rows", integer.toString());
-        map.put("page", integer1.toString());
+        Map<String,List<String>> map = new HashMap<>();
+        map.put("q", Arrays.asList(query));
+        map.put("rows", Arrays.asList(integer.toString()));
+        map.put("page", Arrays.asList(integer1.toString()));
 
         List<String> filters = new ArrayList<>();
         if (state != null && state.length()> 0) {

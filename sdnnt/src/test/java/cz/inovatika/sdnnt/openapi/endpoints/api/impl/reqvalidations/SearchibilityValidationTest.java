@@ -54,10 +54,10 @@ public class SearchibilityValidationTest {
 
         EasyMock.expect(zadost.getIdentifiers()).andReturn(identifiers).anyTimes();
  
-        Map<String, String> parametersRecord1 = new HashMap<>();
-        parametersRecord1.put("fullCatalog", "true");
-        parametersRecord1.put("catalog", "all");
-        parametersRecord1.put("q", "oai-record1");
+        Map<String, List<String>> parametersRecord1 = new HashMap<>();
+        parametersRecord1.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord1.put("catalog", Arrays.asList("all"));
+        parametersRecord1.put("q", Arrays.asList("oai-record1"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
                 EasyMock.eq(new ArrayList<>()), 
@@ -65,10 +65,10 @@ public class SearchibilityValidationTest {
             .andReturn(foundOneResult()).anyTimes();
 
         
-        Map<String, String> parametersRecord2 = new HashMap<>();
-        parametersRecord2.put("fullCatalog", "true");
-        parametersRecord2.put("catalog", "all");
-        parametersRecord2.put("q", "oai-record2");
+        Map<String, List<String>> parametersRecord2 = new HashMap<>();
+        parametersRecord2.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord2.put("catalog", Arrays.asList("all"));
+        parametersRecord2.put("q", Arrays.asList("oai-record2"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
                 EasyMock.eq(new ArrayList<>()), 
@@ -103,10 +103,10 @@ public class SearchibilityValidationTest {
 
         EasyMock.expect(zadost.getIdentifiers()).andReturn(identifiers).anyTimes();
  
-        Map<String, String> parametersRecord1 = new HashMap<>();
-        parametersRecord1.put("fullCatalog", "true");
-        parametersRecord1.put("catalog", "all");
-        parametersRecord1.put("q", "oai-record1");
+        Map<String, List<String>> parametersRecord1 = new HashMap<>();
+        parametersRecord1.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord1.put("catalog", Arrays.asList("all"));
+        parametersRecord1.put("q", Arrays.asList("oai-record1"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
                 EasyMock.eq(new ArrayList<>()), 
@@ -114,10 +114,10 @@ public class SearchibilityValidationTest {
             .andReturn(foundOneResult()).anyTimes();
 
         
-        Map<String, String> parametersRecord2 = new HashMap<>();
-        parametersRecord2.put("fullCatalog", "true");
-        parametersRecord2.put("catalog", "all");
-        parametersRecord2.put("q", "oai-record2");
+        Map<String, List<String>> parametersRecord2 = new HashMap<>();
+        parametersRecord2.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord2.put("catalog", Arrays.asList("all"));
+        parametersRecord2.put("q", Arrays.asList("oai-record2"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
                 EasyMock.eq(new ArrayList<>()), 
@@ -151,10 +151,10 @@ public class SearchibilityValidationTest {
 
         EasyMock.expect(zadost.getIdentifiers()).andReturn(identifiers).anyTimes();
  
-        Map<String, String> parametersRecord1 = new HashMap<>();
-        parametersRecord1.put("fullCatalog", "true");
-        parametersRecord1.put("catalog", "all");
-        parametersRecord1.put("q", "oai-record1");
+        Map<String, List<String>> parametersRecord1 = new HashMap<>();
+        parametersRecord1.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord1.put("catalog", Arrays.asList("all"));
+        parametersRecord1.put("q", Arrays.asList("oai-record1"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord1), 
                 EasyMock.eq(new ArrayList<>()), 
@@ -162,10 +162,10 @@ public class SearchibilityValidationTest {
             .andReturn(foundNoResult()).anyTimes();
 
         
-        Map<String, String> parametersRecord2 = new HashMap<>();
-        parametersRecord2.put("fullCatalog", "true");
-        parametersRecord2.put("catalog", "all");
-        parametersRecord2.put("q", "oai-record2");
+        Map<String, List<String>> parametersRecord2 = new HashMap<>();
+        parametersRecord2.put("fullCatalog", Arrays.asList("true"));
+        parametersRecord2.put("catalog", Arrays.asList("all"));
+        parametersRecord2.put("q", Arrays.asList("oai-record2"));
         EasyMock.expect(searcher.search(
                 EasyMock.eq(parametersRecord2), 
                 EasyMock.eq(new ArrayList<>()), 
