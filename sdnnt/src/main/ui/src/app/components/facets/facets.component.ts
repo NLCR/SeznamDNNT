@@ -114,12 +114,13 @@ export class FacetsComponent implements OnInit {
         this.showRoky = true;
   
       }
-
-
-
     }
-
   }
+
+  isYearsButtonDisabled(): boolean {
+    return this.rokod > this.rokdo;
+  }
+
 
 
   onRadioButtonChange() {

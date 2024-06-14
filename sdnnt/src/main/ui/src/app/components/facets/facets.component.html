@@ -95,7 +95,7 @@
         <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">
         </mat-datepicker>
       </mat-form-field>
-      <button fxFlex="24%" mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
+      <button fxFlex="24%" [disabled]="isYearsButtonDisabled()"  mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
     </div>
   </mat-expansion-panel>
 </mat-accordion>
