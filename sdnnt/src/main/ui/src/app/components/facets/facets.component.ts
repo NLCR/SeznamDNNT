@@ -44,6 +44,8 @@ export class FacetsComponent implements OnInit {
   facetSearchOffset=0;
   facetFieldsInDialog:{};
 
+  rokvydaniParam:string;
+
 
   constructor(
     private router: Router,
@@ -59,6 +61,7 @@ export class FacetsComponent implements OnInit {
       const catalogParam = params['catalog'];
       this.selectedRadioButton = catalogParam || 'in_list';
       this.queryParams = params;
+      this.rokvydaniParam = params['rokvydani'];
     });
 
     
@@ -91,13 +94,29 @@ export class FacetsComponent implements OnInit {
       // this.rokod = (this.stats['rokvydani'].min ? this.stats['rokvydani'].min : 1915);
       // this.rokdo = Math.min(year, (this.stats['rokvydani'].max ? this.stats['rokvydani'].max : 2008));
 
-      this.rokod = (this.stats['date1_int'].min ? this.stats['date1_int'].min : 1915);
-      this.rokdo = Math.min(year, (this.stats['date1_int'].max ? this.stats['date1_int'].max : 2008));
+      if (this.rokvydaniParam) {
+
+        let [start, end]: number[] = this.rokvydaniParam.split(',').map(Number);
+        this.rokod = start;
+        this.rokdo = end;
+
+        this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
+        this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
+        this.showRoky = true;
+
+      } else {
+        this.rokod = (this.stats['date1_int'].min ? this.stats['date1_int'].min : 1915);
+        this.rokdo = Math.min(year, (this.stats['date1_int'].max ? this.stats['date1_int'].max : 2008));
+  
+  
+        this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
+        this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
+        this.showRoky = true;
+  
+      }
 
 
-      this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
-      this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
-      this.showRoky = true;
+
     }
 
   }
