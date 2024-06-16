@@ -1,6 +1,7 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
@@ -10,6 +11,7 @@ import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
+import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
@@ -410,7 +412,15 @@ public class NotificationServiceImpl implements NotificationsService {
                                 if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name()) || kuratorStavStr.equals(CuratorItemState.PX.name())) {
                                     // ommiting
                                 } else {
-                                    documents.add(map);
+                                    if (historieStavu != null) {
+                                        List<Pair<String,Date>> sortedHistory = Indexer.sortedHistory(historieStavu);
+                                        String comment = sortedHistory.size() > 0 ? sortedHistory.get(sortedHistory.size() -1).getLeft() : "";
+                                        if (StringUtils.isAnyString(comment) && comment.contains("SKC_")) {
+                                            // ommit
+                                        } else {
+                                            documents.add(map);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -452,6 +462,7 @@ public class NotificationServiceImpl implements NotificationsService {
                         String dntStavStr = dntstav.size() == 1 ? (String) new ArrayList<>(dntstav).get(0) : dntstav.toString();
                         String kuratorStavStr = kuratorstav.size() == 1 ? (String) new ArrayList<>(kuratorstav).get(0) : kuratorstav.toString();
                         
+                        String historieStavu = doc.containsKey("historie_stavu") ?  (String) doc.getFieldValue("historie_stavu") : null;
                         
                         Map<String, String> map = new HashMap<>();
                         map.put("nazev", (String) doc.getFirstValue("nazev"));
@@ -466,11 +477,17 @@ public class NotificationServiceImpl implements NotificationsService {
 
                         if (dntStavStr.equals(PublicItemState.D.name()) || kuratorStavStr.equals(CuratorItemState.DX.name())|| kuratorStavStr.equals(CuratorItemState.PX.name())) {
                             // ommiting ; or previous state was d or dx 
-                            
                         } else {
-                            documents.add(map);
+                            if (historieStavu != null) {
+                                List<Pair<String,Date>> sortedHistory = Indexer.sortedHistory(historieStavu);
+                                String comment = sortedHistory.size() > 0 ? sortedHistory.get(sortedHistory.size() -1).getLeft() : "";
+                                if (StringUtils.isAnyString(comment) && comment.contains("SKC_")) {
+                                    // ommit
+                                } else {
+                                    documents.add(map);
+                                }
+                            }
                         }
-                        
                     }
 
                     return doc;
