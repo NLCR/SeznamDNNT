@@ -535,6 +535,7 @@
     "BRE302":"Muzeum v Bruntále",
     "BVE301":"Regionální muzeum v Mikulově",
     "CBA001":"Jihočeská vědecká knihovna v Českých Budějovicích",
+    "D":"DiFMOE",
     "CHE302":"Muzeum Cheb",
     "FME301":"Muzeum Beskyd Frýdek-Místek",
     "HBG001":"Krajská knihovna Vysočiny",
@@ -559,6 +560,7 @@
     "KVG001":"Krajská knihovna Karlovy Vary",
     "LIA001":"Krajská vědecká knihovna v Liberci",
     "NAE802":"Městské muzeum v Jaroměři",
+    "LMDA": "Lesnický a myslivecký digitální archiv",
     "NJE303":"Muzeum Novojičínska",
     "OLA001":"Vědecká knihovna v Olomouci",
     "OLD012": "Univerzita Palackého v Olomouci - Knihovna UP",
@@ -691,7 +693,8 @@
     "KHG001": "Městská knihovna Kutná Hora",
     "NBG001": "Městská knihovna Nymburk",
     "TPG502": "Městská knihovna Duchcov",
-    "LTG001": "Knihovna Karla Hynka Máchy v Litoměřicích, příspěvková organizace"
+    "LTG001": "Knihovna Karla Hynka Máchy v Litoměřicích, příspěvková organizace",
+    "VUGTK":"Výzkumný ústav geodetický, topografický a kartografický" 
   },
 
   "desc": {
@@ -906,7 +909,7 @@
     "period_nzn_0_5wd":"5 pracovních dnů",
     "period_nzn_1_12_18": "1.3 nebo 1.9",
     "period_nzn_2_6m": "6 měsíců",  
-    "period_vn_0_28d": "28 dnů",  
+    "period_vn_0_28d": "15 dnů",  
     "period_vln_0_5wd": "5 pracovních dnů",  
     "period_vnl_1_10d":"10 kalendářních dnů",
     "period_vln_2_18m": "18 měsíců",

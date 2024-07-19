@@ -535,6 +535,7 @@
     "BRE302":"Museum in Bruntal",
     "BVE301":"Regional Museum in Mikulov",
     "CBA001":"Research Library of South Bohemia in Ceske Budejovice",
+    "D":"DiFMOE",
     "CHE302":"Museum Cheb",
     "FME301":"Beskydy Museum Frýdek-Místek",
     "HBG001":"Regional Library of Highlands",
@@ -558,6 +559,7 @@
     "KVE303":"Museum of Karlovy Vary Region",
     "KVG001":"Regional Library Karlovy Vary",
     "LIA001":"Research Library in Liberec",
+    "LMDA": "Forestry and Hunting Digital Archive",
     "NAE802":"Town Museum Jaromer",
     "NJE303":"Museum of Novy Jicin Region",
     "OLA001":"Research Library in Olomouc",
@@ -636,7 +638,6 @@
     "KMG502": "Městská knihovna Holešov",
     "PND003": "University of West Bohemia - University Library - Bory Library Pilsen",
     "BNG501": "Votice Municipal Library",
-
     "DCG302": "Děčín Municipal Library, contribution organization",
     "BNG001": "Benešov City Library",
     "DCG501": "Municipal library Varnsdorf, p.o.",
@@ -691,7 +692,9 @@
     "KHG001": "Kutná Hora City Library",
     "NBG001": "Nymburk City Library",
     "TPG502": "Duchcov City Library",
-    "LTG001": "Library of Karel Hynk Máchy in Litoměřice, contribution organization"
+    "LTG001": "Library of Karel Hynk Máchy in Litoměřice, contribution organization",
+    "VUGTK":"Výzkumný ústav geodetický, topografický a kartografický",
+    "DSMO":"Digital library of the Ministry of Defense of the Czech Republic"
   },
 
   "desc": {
@@ -906,7 +909,7 @@
     "period_nzn_0_5wd":"5 working days",
     "period_nzn_1_12_18": "1.2 or 1.8",
     "period_nzn_2_6m": "6 months",  
-    "period_vn_0_28d": "28 days",  
+    "period_vn_0_28d": "15 days",  
     "period_vln_0_5wd": "5 working days",  
     "period_vnl_1_10d":"10 calendar days",
     "period_vln_2_18m": "18 months",
