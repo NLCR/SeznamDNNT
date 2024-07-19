@@ -54,6 +54,7 @@ import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
 import cz.inovatika.sdnnt.utils.VersionStringCast;
 import cz.inovatika.sdnnt.utils.ZadostUtils;
 
@@ -84,7 +85,9 @@ public class ExportServiceImpl implements ExportService {
         
         searchReq.put("rows", Arrays.asList(""+rows));
         searchReq.put("page", Arrays.asList(""+page));
-        searchReq.put("q", Arrays.asList(q));
+        if (StringUtils.isAnyString(q)) {
+            searchReq.put("q",  Arrays.asList(q));
+        }
         searchReq.put("fullCatalog",Arrays.asList("true"));
         searchReq.put("catalog",Arrays.asList("all"));
         // search 
