@@ -8,7 +8,7 @@ package cz.inovatika.sdnnt.oai;
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.indexer.models.oai.Format;
+import cz.inovatika.sdnnt.indexer.models.oai.OAIMetadataFormat;
 
 import static cz.inovatika.sdnnt.oai.OAIServlet.LOGGER;
 import java.io.IOException;
@@ -111,7 +111,7 @@ public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
 
   public static String metadataFormats(HttpServletRequest req) {
 
-      String prefixes = Arrays.asList(Format.values()).stream().map(f-> {
+      String prefixes = Arrays.asList(OAIMetadataFormat.values()).stream().map(f-> {
           StringBuilder builder = new StringBuilder("<metadataFormat>");
           builder.append( String.format("<metadataPrefix>%s</metadataPrefix>", f.name()));
           if (f.getSchema() != null) {
@@ -166,9 +166,9 @@ public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
           query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       } 
       
-      Format format = Format.marc21;
+      OAIMetadataFormat format = OAIMetadataFormat.marc21;
       if (StringUtils.isAnyString(req.getParameter(METADATA_PREFIX_PARAMETER))) {
-          format = Format.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
+          format = OAIMetadataFormat.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
       }
 
       
@@ -186,7 +186,7 @@ public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
                               .getJSONObject(set).getString("filter"));
                   }
                   if (parts.length>=3) {
-                      format=Format.valueOf(parts[2]);
+                      format=OAIMetadataFormat.valueOf(parts[2]);
                   }
               }
           }
@@ -300,9 +300,9 @@ public static String getRecord(HttpServletRequest req) {
         query.addFilterQuery("dntstav:*");
       }
       
-      Format format = Format.marc21;
+      OAIMetadataFormat format = OAIMetadataFormat.marc21;
       if (StringUtils.isAnyString(req.getParameter(METADATA_PREFIX_PARAMETER))) {
-          Format.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
+          format=OAIMetadataFormat.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
       }
       
       
