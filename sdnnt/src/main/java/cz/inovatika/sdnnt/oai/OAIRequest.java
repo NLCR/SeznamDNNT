@@ -8,6 +8,8 @@ package cz.inovatika.sdnnt.oai;
 import cz.inovatika.sdnnt.Options;
 import static cz.inovatika.sdnnt.index.Indexer.getClient;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.indexer.models.oai.Format;
+
 import static cz.inovatika.sdnnt.oai.OAIServlet.LOGGER;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -16,12 +18,16 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+
 import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -40,7 +46,9 @@ import org.json.JSONObject;
  */
 public class OAIRequest {
     
-   public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
+   private static final String METADATA_PREFIX_PARAMETER = "metadataPrefix";
+
+public static String SDNNT_PREFIX_IDENTIFIER = "sdnnt.nkp.cz";
     
   // Muze byt indextime nebo datestamp
   static String SORT_FIELD = "indextime";
@@ -94,7 +102,7 @@ public class OAIRequest {
     JSONObject sets = Options.getInstance().getJSONObject("OAI").getJSONObject("sets");
     for (Object spec: sets.keySet()) {
       JSONObject set = sets.getJSONObject((String) spec);
-      xml += "<set><setSpec>"+spec+"</setSpec><setName>"+set.getString("name")+"</setName></set>\n";
+      xml += "<set><setSpec>"+((StringUtils.isAnyString(spec.toString()) ?  spec.toString():"none")) +"</setSpec><setName>"+set.getString("name")+"</setName></set>\n";
     }
     xml += "</ListSets>\n"
            + "</OAI-PMH>";
@@ -102,14 +110,30 @@ public class OAIRequest {
   }
 
   public static String metadataFormats(HttpServletRequest req) {
-    String xml = headerOAI() + responseDateTag() + requestTag(req)
-            + "<ListMetadataFormats>"
-            + "<metadataFormat><metadataPrefix>marc21</metadataPrefix><schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>"
-            + "<metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>"
-            + "</metadataFormat>"
-            + "</ListMetadataFormats>"
-            + "</OAI-PMH>";
-    return xml;
+
+      String prefixes = Arrays.asList(Format.values()).stream().map(f-> {
+          StringBuilder builder = new StringBuilder("<metadataFormat>");
+          builder.append( String.format("<metadataPrefix>%s</metadataPrefix>", f.name()));
+          if (f.getSchema() != null) {
+              builder.append(String.format("<schema>%s</schema>", f.getSchema()));
+          }
+          if (f.getDefaultNamespace() != null) {
+              builder.append(String.format("<metadataNamespace>%s</metadataNamespace>", f.getDefaultNamespace()));
+          }
+          builder.append("</metadataFormat>");
+          return builder.toString();
+      }).collect(Collectors.joining("\n"));
+      
+      
+      String xml = headerOAI() + responseDateTag() + requestTag(req)+String.format("<ListMetadataFormats>%s</ListMetadataFormats>", prefixes)+ "</OAI-PMH>";
+//      + "<ListMetadataFormats>"
+//            + "<metadataFormat><metadataPrefix>marc21</metadataPrefix><schema>http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd</schema>"
+//            + "<metadataNamespace>http://www.loc.gov/MARC21/slim</metadataNamespace>"
+//            + "</metadataFormat>"
+//            + "</ListMetadataFormats>"
+//            + "</OAI-PMH>";
+
+      return xml;
   }
 
   public static String listRecords(HttpServletRequest req, boolean onlyIdentifiers) {
@@ -127,7 +151,7 @@ public class OAIRequest {
               .setRows(rows)
               .addSort(SORT_FIELD, SolrQuery.ORDER.asc)
               .addSort(CURSOR_FIELD, SolrQuery.ORDER.asc)
-              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
+              .setFields(SORT_FIELD, "identifier,id_sdnnt,raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity,masterlinks,masterlinks_disabled,digital_libraries");
       if (req.getParameter("from") != null) {
         String from = req.getParameter("from");
         String until = "*";
@@ -142,6 +166,12 @@ public class OAIRequest {
           query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets").getJSONObject(set).getString("filter"));
       } 
       
+      Format format = Format.marc21;
+      if (StringUtils.isAnyString(req.getParameter(METADATA_PREFIX_PARAMETER))) {
+          format = Format.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
+      }
+
+      
       if (req.getParameter("resumptionToken") != null) {
           String rt = req.getParameter("resumptionToken").replaceAll(" ", "+");
           // Change it by PS; only checks (configurations, aio exceptions etc..)
@@ -155,6 +185,9 @@ public class OAIRequest {
                       query.addFilterQuery(Options.getInstance().getJSONObject("OAI").getJSONObject("sets")
                               .getJSONObject(set).getString("filter"));
                   }
+                  if (parts.length>=3) {
+                      format=Format.valueOf(parts[2]);
+                  }
               }
           }
           query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
@@ -162,6 +195,8 @@ public class OAIRequest {
           query.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
       }
 
+
+      
       QueryResponse qr = getClient().query(DataCollections.catalog.name(), query);
       String nextCursorMark = qr.getNextCursorMark();
       SolrDocumentList docs = qr.getResults();
@@ -191,7 +226,10 @@ public class OAIRequest {
 
           // Changed identifiers
           if (!deletedStatus) {
-              ret.append(mr.toXml(onlyIdentifiers, false));
+              if (!onlyIdentifiers) {
+                  ret.append(format.record(mr));
+              }
+              //ret.append(mr.toXml(onlyIdentifiers, false));
           }
           ret.append("</record>");
         }
@@ -201,7 +239,7 @@ public class OAIRequest {
 
           ret.append("<resumptionToken completeListSize=\"" + docs.getNumFound() + "\">")
                   //.append(DateTimeFormatter.ofPattern("yyyyMMddHHmmss.SSS").withZone(ZoneId.systemDefault()).format(last.toInstant()))
-                  .append(nextCursorMark).append(":").append(set).append(":").append("marc21")
+                  .append(nextCursorMark).append(":").append(set).append(":").append(format.name())
                   .append("</resumptionToken>");
         }
         ret.append("</" + verb + ">");
@@ -234,6 +272,7 @@ private static Object oaiIdentifier(SolrDocument doc) {
   }
   
 public static String getRecord(HttpServletRequest req) {
+
     Options opts = Options.getInstance();
     StringBuilder ret = new StringBuilder();
     ret.append(headerOAI())
@@ -260,6 +299,13 @@ public static String getRecord(HttpServletRequest req) {
       } else {
         query.addFilterQuery("dntstav:*");
       }
+      
+      Format format = Format.marc21;
+      if (StringUtils.isAnyString(req.getParameter(METADATA_PREFIX_PARAMETER))) {
+          Format.valueOf(req.getParameter(METADATA_PREFIX_PARAMETER));
+      }
+      
+      
 
       SolrDocumentList docs = solr.query(DataCollections.catalog.name(), query).getResults();
       if (docs.getNumFound() == 0) {
@@ -289,7 +335,8 @@ public static String getRecord(HttpServletRequest req) {
           }
           ret.append("</header>");
           if (!deletedStatus) {
-              ret.append(mr.toXml(false, false));
+              ret.append(format.record(mr));
+              //ret.append(mr.toXml(false, false));
           }
           ret.append("</record>");
         }
