@@ -58,12 +58,6 @@
                 <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
                 {{ ('field.' + f.name | translate) }}
               </a>
-              <!-- ready for happy <a>
-                <div class="app-badge state-change app-icon-in app-mr-1">
-                  <mat-icon class="material-icons-outlined app-m-0">track_changes</mat-icon>
-                </div>
-                {{ 'Převod stavu 23' | translate }}
-              </a> -->
               <a *ngSwitchCase="'controlled'" (click)="addFilter(facet, f)">{{ 'controlled.' + f.name | translate }}</a>
               <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
               <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
@@ -74,6 +68,7 @@
           </div>
         </ng-container>
       </div>
+      <button *ngIf=" state.user &&  facet === 'nakladatel' && usedFacet('nakladatel').length == 0 " (click)="showAllPublishers()" mat-stroked-button class="app-w-100 app-mt-4">{{ 'desc.show_all' | translate }}</button>
     </mat-expansion-panel>
   </ng-container>
 
@@ -100,7 +95,7 @@
         <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">
         </mat-datepicker>
       </mat-form-field>
-      <button fxFlex="24%" mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
+      <button fxFlex="24%" [disabled]="isYearsButtonDisabled()"  mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
     </div>
   </mat-expansion-panel>
 </mat-accordion>

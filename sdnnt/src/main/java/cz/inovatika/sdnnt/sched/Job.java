@@ -174,7 +174,26 @@ public class Job implements InterruptableJob {
                 }
             }
         },
-        
+
+        /** Update dates libraries */
+        DATE_UPDATE {
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+
+                    long start = System.currentTimeMillis();
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    String loggerName = jobData.optString("logger");
+                    UpdateDatesImpl digitalLibraries = new UpdateDatesImpl(loggerName);
+                    digitalLibraries.updateDates();
+                    QuartzUtils.printDuration(UpdateAlternativeAlephLinksImpl.LOGGER, start);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+        },
+
         /** SKC Update */
         SKC_UPDATE {
             @Override

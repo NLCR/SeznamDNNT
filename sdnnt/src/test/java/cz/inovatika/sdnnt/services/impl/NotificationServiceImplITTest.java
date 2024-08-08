@@ -644,6 +644,142 @@ public class NotificationServiceImplITTest {
         service.processNotifications(NotificationInterval.den);
     }
 
+    /** Posilani rule notifikaci  - vynechani stavu pokud v komentari bylo SKC_ */
+    @Test
+    public void testSendNotifications_SKC_Incomments() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        MarcRecord marcRecord1 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
+        Assert.assertNotNull(marcRecord1);
+
+        MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
+        Assert.assertNotNull(marcRecord2);
+
+        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        long numFound = catalog.getResults().getNumFound();
+        Assert.assertTrue(numFound == 2);
+        // saved marc record
+        MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
+        MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
+        
+        
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "SKC_1", null);
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+
+        Calendar calendar1 = Calendar.getInstance();
+        //calendar1.add(Calendar.DAY_OF_WEEK, -1);
+        solrMarc1.datum_stavu = calendar1.getTime();
+
+
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.add(Calendar.DAY_OF_WEEK, -1);
+        solrMarc2.datum_stavu = calendar2.getTime();
+ 
+        // save and commit
+        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
+                .addMockedMethod("sendNotificationEmail")
+                .createMock();
+
+        UserController controler = EasyMock.createMock(UserController.class);
+        UserController shibController = EasyMock.createMock(UserController.class);
+
+        EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+
+        EasyMock.expect(shibController.findUsersByNotificationInterval(NotificationInterval.den.name()))
+            .andReturn(createNotificationShibUsers())
+            .anyTimes();
+
+        EasyMock.expect(controler.findUser("shibtest1"))
+            .andReturn(null)
+            .anyTimes();
+
+        EasyMock.expect(shibController.findUser("shibtest1"))
+            .andReturn(testShibUser())
+            .anyTimes();
+
+        EasyMock.expect(controler.findUser("test1"))
+            .andReturn(testUser())
+            .anyTimes();
+
+        EasyMock.expect(controler.getAll())
+            .andReturn(createNotificationSimpleUsers())
+            .anyTimes();
+
+        EasyMock.expect(shibController.getAll())
+            .andReturn(createNotificationShibUsers())
+            .anyTimes();
+
+
+        NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
+                .withConstructor(controler, shibController, mailService)
+                .addMockedMethod("buildClient").createMock();
+
+
+
+        mailService.sendNotificationEmail(
+                EasyMock.isA(Pair.class),
+                EasyMock.isA(List.class)
+        );
+
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
+                List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
+                Assert.assertTrue(pair.getLeft().equals("test@testovic.cz") || pair.getLeft().equals("shib_test@testovic.cz"));
+                
+                List<String> stavy = documents.stream().map(m-> {
+                    return m.get("dntstav");
+                }).collect(Collectors.toList());
+                
+                Assert.assertFalse(stavy.contains("D"));
+                
+                documents.stream().forEach(d-> {
+                    Assert.assertTrue(d.containsKey("license"));
+                });
+                return null;
+            }
+        }).times(2);
+
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+
+        EasyMock.replay(mailService, controler, shibController, service);
+
+        service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057930.json"));
+        service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
+        service.saveNotificationRule(ruleNotification("test1", "notification_knihovna_rulebased_dntstavA.json"));
+
+        service.saveSimpleNotification(simpleNotification("shibtest1", "notification_testshib_oai_aleph-nkp.cz_SKC01-57931.json"));
+
+        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
+        Assert.assertTrue(notificationsByInterval.size() == 4);
+        
+        service.processNotifications(NotificationInterval.den);
+    }
+
     @Test
     public void testSendNotifications_QUERY() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException, FactoryConfigurationError, XMLStreamException {
         if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {

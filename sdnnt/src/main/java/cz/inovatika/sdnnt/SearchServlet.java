@@ -97,6 +97,15 @@ public class SearchServlet extends HttpServlet {
               }
           }
     },
+    
+    FACET {
+        @Override
+        JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+          CatalogSearcher searcher = new CatalogSearcher();
+          return searcher.facetSearch(req);
+        }
+    },
+    
     CATALOG {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

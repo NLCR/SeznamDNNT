@@ -63,46 +63,17 @@ public enum Period {
     period_nzn_1_12_18 {
         @Override
         public Date defineDeadline(Date inputDate) {
+
             // nema smysl to delat konfiguratovatlne ?
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(inputDate);
 
-            // winter wall 
-            List<Integer> winterWall =  winterWall(Arrays.asList(8,9,10,11,12,1));
-            
-            // summer wall 
-            List<Integer> sumerWall = summerWall( Arrays.asList(2,3,4,5,6,7));
-            int month = calendar.get(Calendar.MONTH)+1;
+            calendar.add(Calendar.MONTH, 1);  
+            calendar.set(Calendar.DAY_OF_MONTH, 1);  
 
-            Calendar retValueCalendar = Calendar.getInstance();
-            if (winterWall.contains(month)) {
-                Integer lastFebWall = winterWall.get(winterWall.size()-1);
-                Integer expectedFebWall = lastFebWall + 1;
-                // pokud je mesic vetsi nez ocekavana zed, pak rok je vetsi 
-                if (month > expectedFebWall) {
-                    retValueCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR)+1);
-                } else {
-                    retValueCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
-                }
-                
-                retValueCalendar.set(Calendar.MONTH, expectedFebWall-1);
-                
-            } else if (sumerWall.contains(month)) {
-                // neprepina se rok 
-                retValueCalendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+            dayAlign(calendar);
 
-                Integer lastSummerMonth = sumerWall.get(sumerWall.size()-1);
-                Integer expectedWall = lastSummerMonth + 1;
-
-                retValueCalendar.set(Calendar.MONTH, expectedWall -1);
-            }
-
-            retValueCalendar.set(Calendar.DAY_OF_MONTH, 1);
-            retValueCalendar.set(Calendar.DAY_OF_MONTH, 1);
-
-            dayAlign(retValueCalendar);
-
-            return retValueCalendar.getTime();
+            return calendar.getTime();
         }
 
         @Override
@@ -424,29 +395,29 @@ public enum Period {
     }
     
     
-    static List<Integer> winterWall(List<Integer> defaultval) {
-        Options opts = Options.getInstance();
-        if (opts.getJSONObject("workflow").has("periods")) {
-            JSONObject periods = opts.getJSONObject("workflow").getJSONObject("periods");
-            if (periods.has(Period.period_nzn_1_12_18.name()) &&  periods.getJSONObject(Period.period_nzn_1_12_18.name()).has("winter")) {
-                String winterWall = periods.getJSONObject(Period.period_nzn_1_12_18.name()).getString("winter");
-                return Arrays.stream(winterWall.split(",")).map(Integer::valueOf).collect(Collectors.toList());
-            }
-        }
-        return defaultval;
-    }
-
-    static List<Integer> summerWall(List<Integer> defaultval) {
-        Options opts = Options.getInstance();
-        if (opts.getJSONObject("workflow").has("periods")) {
-            JSONObject periods = opts.getJSONObject("workflow").getJSONObject("periods");
-            if (periods.has(Period.period_nzn_1_12_18.name()) &&  periods.getJSONObject(Period.period_nzn_1_12_18.name()).has("summer")) {
-                String winterWall = periods.getJSONObject(Period.period_nzn_1_12_18.name()).getString("summer");
-                return Arrays.stream(winterWall.split(",")).map(Integer::valueOf).collect(Collectors.toList());
-            }
-        }
-        return defaultval;
-    }
+//    static List<Integer> winterWall(List<Integer> defaultval) {
+//        Options opts = Options.getInstance();
+//        if (opts.getJSONObject("workflow").has("periods")) {
+//            JSONObject periods = opts.getJSONObject("workflow").getJSONObject("periods");
+//            if (periods.has(Period.period_nzn_1_12_18.name()) &&  periods.getJSONObject(Period.period_nzn_1_12_18.name()).has("winter")) {
+//                String winterWall = periods.getJSONObject(Period.period_nzn_1_12_18.name()).getString("winter");
+//                return Arrays.stream(winterWall.split(",")).map(Integer::valueOf).collect(Collectors.toList());
+//            }
+//        }
+//        return defaultval;
+//    }
+//
+//    static List<Integer> summerWall(List<Integer> defaultval) {
+//        Options opts = Options.getInstance();
+//        if (opts.getJSONObject("workflow").has("periods")) {
+//            JSONObject periods = opts.getJSONObject("workflow").getJSONObject("periods");
+//            if (periods.has(Period.period_nzn_1_12_18.name()) &&  periods.getJSONObject(Period.period_nzn_1_12_18.name()).has("summer")) {
+//                String winterWall = periods.getJSONObject(Period.period_nzn_1_12_18.name()).getString("summer");
+//                return Arrays.stream(winterWall.split(",")).map(Integer::valueOf).collect(Collectors.toList());
+//            }
+//        }
+//        return defaultval;
+//    }
 
     public abstract Date defineDeadline(Date inputDate);
 

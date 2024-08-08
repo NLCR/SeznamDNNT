@@ -283,10 +283,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     }, IDENTIFIER_FIELD);
         }
 
-        if (this.linksOwner.containsKey("oai:aleph-nkp.cz:SKC01-000904487")) {
-            System.out.println(" OAI identifier ");
-        }
-        
         // mapuje id na seznam titulu v knihovnach
         logger.info("Found candidates: " + this.linksOwner.size());
         List<String> allPids = new ArrayList<>();
@@ -390,8 +386,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     if (sDocs != null) {
                         sDocs.forEach(changes::add);
                     }
-                } else {
-                    System.out.println("NO masterlinks");
                 }
                 
             }
@@ -504,6 +498,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 if (baseUrl == null) {
                     continue;
                 }
+                
 
                 InstanceConfiguration configuration = this.checkConf.match(baseUrl);
                 if (configuration == null || configuration.isShouldSkip()) {

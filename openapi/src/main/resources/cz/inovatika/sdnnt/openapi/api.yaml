@@ -141,7 +141,7 @@ paths:
         Řeší návrh k zařazení na seznam.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
           - Dílo je identifikováno identifikátorem ze souborného katalogu.
-          - Dílo musí být ve stavu **N**
+          - Dílo musí být ve stavu **N** nebo mimo seznam.
       operationId: requestBatchNzn
       requestBody:
         description: Hromadný návrh (jeden nebo více, identifikátor musí existovat v souborném katalogu, dokument u sebe musí mít přítomné pole stavů marc_911a)
@@ -154,7 +154,20 @@ paths:
 
       responses:
         '200':
-          description: Žádost vytvořena a ve stavu waiting. V poli  **saved** jsou uloženy dávky, které se podařilo uložit. V poli  **notsaved** jsou dávky, které se nepodařilo uložit.
+          description: |
+            Návratová hodnota obsahuje pole **saved** a **notsaved**. V poli **saved** jsou uložené žádosti, které byly úspěšně uloženy a jdou dohledat v uživatelském rozhraní.  
+            Žádost se uloží vždy, pokud obsahuje alespoň jednu validní položku. Validní položka musí splňovat:
+             - kritérium dohledatelnosti - Jde vyhledat v uživatelském rozhraní
+             - kritérium místa vydání - V poli marc 008 je uvedena hodnota **XR**  - Místo vydání ČR 
+             - kritérium formátu - Formát musí být BK (kniha) nebo SE (Seriál)
+             - kritérium akceptovatelného stavu - Dílo nesmí být ve stavu A (Zařazeno), PA (Návrh na zařazení), X (Volné dílo)
+            ---
+            Všechny položky v žádosti, které se neuložili jsou vidět ve struktuře **details**, kde je uvedeno: 
+             - identifikátor 
+             - stav 
+             - důvod odmítnutí záznamu 
+            ---
+            Pokud žádost nemá ani jeden uložitelný záznam je obsažena v poli  **notsaved** 
           content:
             application/json:
               schema:

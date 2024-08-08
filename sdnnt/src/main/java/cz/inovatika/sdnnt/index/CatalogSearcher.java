@@ -40,6 +40,7 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -91,13 +92,58 @@ public class CatalogSearcher {
         }
         return ret;
     }
+    
 
+    public JSONObject facetSearch(HttpServletRequest req) {
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        Map<String, List<String>> resmap = new HashMap<>();
+        parameterMap.entrySet().stream().forEach(stringEntry -> {
+            List<String> vals = new ArrayList<String>(Arrays.asList(stringEntry.getValue()));
+            resmap.put(stringEntry.getKey(), vals);
+        });
+        User user = new UserControlerImpl(req).getUser();
+        String facetSearchField = req.getParameter("facetSearchField");
+        String facetSearchOffset = req.getParameter("facetSearchOffset");
+        return facetSearch(resmap, new ArrayList<>(), user, facetSearchField, facetSearchOffset);
+    }
 
-    public JSONObject search(Map<String, String> req, List<String> filters, User user) {
+    
+    public JSONObject facetSearch(Map<String, List<String>> req, List<String> filters, User user, String facetField, String offset) {
         JSONObject ret = new JSONObject();
         try {
             SolrClient solr = Indexer.getClient();
-            SolrQuery query = doQuery(req, filters, user);
+
+            SolrQuery query = doQuery(req, filters, user, (solrQuery)->{
+                solrQuery.setFacet(true).addFacetField(facetField);
+                solrQuery.setFacetMinCount(1);
+                solrQuery.setParam(FacetParams.FACET_OFFSET, offset);
+            }); 
+            
+            query.setRows(0).setStart(0);
+            QueryRequest qreq = new QueryRequest(query);
+            NoOpResponseParser rParser = new NoOpResponseParser();
+            rParser.setWriterType("json");
+            qreq.setResponseParser(rParser);
+            NamedList<Object> qresp = solr.request(qreq, DataCollections.catalog.name());
+            ret = new JSONObject((String) qresp.get("response"));
+            return ret;
+        } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex);
+        }
+        SearchResultsUtils.removePublicStatesFromCuratorStatesFacets(ret);
+        return ret;
+    }
+    
+    
+    public JSONObject search(Map<String, List<String>> req, List<String> filters, User user) {
+        JSONObject ret = new JSONObject();
+        try {
+            SolrClient solr = Indexer.getClient();
+            SolrQuery query = doQuery(req, filters, user,(solrQuery)-> {
+                solrQuery.setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export","id_euipo_export","c_actions");
+                solrQuery.setFacetMinCount(1);
+            });
             QueryRequest qreq = new QueryRequest(query);
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
@@ -118,7 +164,6 @@ public class CatalogSearcher {
                     ret.put("rnotifications", ruleNotifications);
                     
                 }
-
 
                 Set<String> usedIdentifiers = new LinkedHashSet<>();
                 zadosti.forEach(z -> {
@@ -259,9 +304,10 @@ public class CatalogSearcher {
     
     public JSONObject search(HttpServletRequest req) {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        Map<String, String> resmap = new HashMap<>();
+        Map<String, List<String>> resmap = new HashMap<>();
         parameterMap.entrySet().stream().forEach(stringEntry -> {
-            resmap.put(stringEntry.getKey(), stringEntry.getValue()[0]);
+            List<String> list = new ArrayList<>(Arrays.asList(stringEntry.getValue()));
+            resmap.put(stringEntry.getKey(), list);
         });
         //UserControler controler = new UserControlerImpl(req)
         User user = new UserControlerImpl(req).getUser();
@@ -341,16 +387,15 @@ public class CatalogSearcher {
     }
 
     //  "filterFields": ["dntstav", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
-    private SolrQuery doQuery(HttpServletRequest req, User user) {
-        Map<String, String> map = new HashMap<>();
+    private SolrQuery doQuery(HttpServletRequest req, User user, FacetFieldConfigObject facetConfig) {
+        Map<String, List<String>> map = new HashMap<>();
         Enumeration<String> parameterNames = req.getParameterNames();
         while (parameterNames.hasMoreElements()) {
             String name = parameterNames.nextElement();
             String[] vals = req.getParameterMap().get(name);
-            map.put(name, vals.length > 0 ? vals[0] : "");
-
+            map.put(name, new ArrayList<>(Arrays.asList(vals)));
         }
-        return doQuery(map, new ArrayList<>(), user);
+        return doQuery(map, new ArrayList<>(), user, facetConfig);
     }
 
     // dat to jinam
@@ -391,38 +436,43 @@ public class CatalogSearcher {
 
     }
 
-    private SolrQuery doQuery(Map<String, String> req, List<String> filters, User user) {
-        String q = req.containsKey("q") ? req.get("q") : null;
-        if (q == null) {
+    /** facet field configuration */
+    @FunctionalInterface
+    public static interface FacetFieldConfigObject {
+        public void configFacets(SolrQuery sQuery);
+    }
+    
+    
+    private SolrQuery doQuery(Map<String, List<String>> req, List<String> filters, User user, FacetFieldConfigObject confobject) {
+        List<String> qlist = req.containsKey("q") ? req.get("q") : null;
+        String q = null;
+        if (qlist == null || qlist.size() == 0) {
             q = "*";
         } else {
-            q = QueryUtils.query(q);
+            q = QueryUtils.query(qlist.get(0));
         }
         Options opts = Options.getInstance();
         int rows = opts.getClientConf().getInt("rows");
         if (req.containsKey("rows")) {
-            rows = Integer.parseInt(req.get("rows"));
+            rows = Integer.parseInt(req.get("rows").get(0));
         }
         int start = 0;
         if (req.containsKey("page")) {
-            start = Integer.parseInt(req.get("page")) * rows;
+            start = Integer.parseInt(req.get("page").get(0)) * rows;
         }
-        // select from identifiers;
-        // fulltext or id_pid or id_all_identifiers or id_all_identifiers_cuts
-        //String modifiedQuery = String.format("fullText:%s OR id_pid:%s OR id_all_identifiers:%s OR id_all_identifiers_cuts:%s", q,q,q,q);
         SolrQuery query = new SolrQuery(q)
                 .setRows(rows)
                 .setStart(start)
-                .setFacet(true).addFacetField("fmt", "language", "dntstav", "kuratorstav", "license", "sigla", "nakladatel","digital_libraries", "export","id_euipo_export","c_actions")
-                .setFacetMinCount(1)
                 .setParam("json.nl", "arrntv")
                 .setParam("stats", true)
                 
-                //.setParam("stats.field", "rokvydani")
                 .setParam("stats.field", "date1_int")
                 .setParam("q.op", "AND");
 
-                //.setFields(DEFAULT_FIELDLIST);
+        /** Facet fields configuration */
+        if (confobject != null) {
+            confobject.configFacets(query);
+        }
         
         if (this.fieldList != null) {
             query.setFields(this.fieldList);
@@ -439,12 +489,13 @@ public class CatalogSearcher {
         }
 
         if (req.containsKey("sort")) {
-            if (req.get("sort").startsWith("date1")) {
-                String dir = req.get("sort").split(" ")[1];
+            String sort = req.get("sort").get(0);
+            if (sort.startsWith("date1")) {
+                String dir = sort.split(" ")[1];
                 query.addSort("date1_int", SolrQuery.ORDER.valueOf(dir));
                 query.addSort("date2_int", SolrQuery.ORDER.valueOf(dir));
             } else {
-                query.setParam("sort", req.get("sort"));
+                query.setParam("sort", sort);
             }
 
         }
@@ -456,11 +507,26 @@ public class CatalogSearcher {
             String field = (String) o;
             if (req.containsKey(field)) {
                 if (field.equals("rokvydani")) {
-                    // 
-                    query.addFilterQuery( "date1_int:[" + req.get(field).replace(",", " TO ") + "]");
-                    //query.addFilterQuery(field + ":[" + req.get(field).replace(",", " TO ") + "]");
+                    String  rokVydani = req.get(field).get(0);
+                    String[] limits = rokVydani.split(",");
+                    if(limits.length >= 2) {
+                        String lowerUI = limits[0];
+                        String upperUI = limits[1];
+                        
+                        String case1= String.format("date1_int:[%s TO %s]", lowerUI,upperUI); // case 1
+                        String case2 =  String.format("date2_int:[%s TO %s]", lowerUI,upperUI); //case 2
+                        String case3 =  String.format("(date1_int:[* TO %s] AND date2_int:[%s TO *])", upperUI,lowerUI); //case 2
+                        String orcase = Arrays.asList(case1,case2,case3).stream().collect(Collectors.joining(" OR "));
+                        query.addFilterQuery("("+orcase+")");
+                    }
                 } else {
-                    query.addFilterQuery(field + ":\"" + req.get(field) + "\"");
+                    List<String> vals = req.get(field);
+                    if (vals.size() == 1) {
+                        query.addFilterQuery(field + ":\"" + vals.get(0) + "\"");
+                    } else if (vals.size() > 1){
+                        String orCondition =  vals.stream().map(it-> { return '"'+it+'"'; }).collect(Collectors.joining(" OR "));
+                        query.addFilterQuery(field + ":(" + orCondition + ")");
+                    }
                 }
             }
         }
@@ -473,7 +539,6 @@ public class CatalogSearcher {
         // From mail
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int fromYear = opts.getJSONObject("search").getInt("fromYear");
-        
         
         // Issue #510; Only lower bouds is used 
         String bk = QueryUtils.catalogBKFilterQueryPartOnlyLowerBound(opts, year, fromYear);
@@ -498,13 +563,13 @@ public class CatalogSearcher {
         
         if (req.containsKey("fullCatalog")) {
             if ("true".equals(req.get("fullCatalog"))) {
-                req.put("catalog", "all");
+                req.put("catalog", new ArrayList<String>(Arrays.asList("all")));
             }
         }        
         
         // catalog - in_list; outside_list; all
         if (user != null && user.getRole() != null && !user.getRole().equals("user")) {
-            String catalog =  req.containsKey("catalog")  ? req.get("catalog") : "in_list";
+            String catalog =  req.containsKey("catalog")  ? req.get("catalog").get(0) : "in_list";
             // in list - musi mit stav
             if (catalog.equals("in_list")) {
                 query.addFilterQuery("dntstav:*");
@@ -529,7 +594,7 @@ public class CatalogSearcher {
         // Notification filter
         if (user != null && req.containsKey("notificationFilter")) {
             try {
-                String nFilter = req.get("notificationFilter");
+                String nFilter = req.get("notificationFilter").get(0);
                 if (nFilter.equals("simple")) {
                     // should be in service
                     query.addFilterQuery("{!join fromIndex=notifications from=identifier to=identifier} user:" + user.getUsername());

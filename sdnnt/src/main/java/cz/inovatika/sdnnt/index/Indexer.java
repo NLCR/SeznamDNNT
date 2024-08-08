@@ -215,27 +215,7 @@ public class Indexer {
 
 public static boolean historyCase(Object historieStavu, Case cs) {
     if (historieStavu != null) {
-        List<Pair<String,Date>> comments = new ArrayList<>();
-        try {
-            JSONArray jsonArray = new JSONArray(historieStavu.toString());
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String comment = jsonObject.optString("comment");
-                if (comment != null) {
-                    String date = jsonObject.getString("date");
-                    if (comment.contains("scheduler/")) {
-                        Date parsed = EUIPOCancelServiceImpl.HISTORY_DATE_INPUTFORMAT.parse(date);
-                        comments.add(Pair.of(comment, parsed));
-                    }
-                    
-                }
-            }
-            Collections.sort(comments,(left,right) ->{
-                return left.getRight().compareTo(right.getRight());
-            });
-        } catch (JSONException |  ParseException e) {
-            LOGGER.log(Level.SEVERE,e.getMessage(),e);
-        }
+        List<Pair<String, Date>> comments = sortedHistorySKCCase(historieStavu);
         
         if (!comments.isEmpty()) {
             Pair<String, Date> last = comments.get(comments.size() - 1);
@@ -243,6 +223,53 @@ public static boolean historyCase(Object historieStavu, Case cs) {
         }
     }
     return false;
+}
+
+public static List<Pair<String, Date>> sortedHistorySKCCase(Object historieStavu) {
+    List<Pair<String,Date>> comments = new ArrayList<>();
+    try {
+        JSONArray jsonArray = new JSONArray(historieStavu.toString());
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String comment = jsonObject.optString("comment");
+            if (comment != null) {
+                String date = jsonObject.getString("date");
+                if (comment.contains("scheduler/")) {
+                    Date parsed = EUIPOCancelServiceImpl.HISTORY_DATE_INPUTFORMAT.parse(date);
+                    comments.add(Pair.of(comment, parsed));
+                }
+                
+            }
+        }
+        Collections.sort(comments,(left,right) ->{
+            return left.getRight().compareTo(right.getRight());
+        });
+    } catch (JSONException |  ParseException e) {
+        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+    }
+    return comments;
+}
+
+public static List<Pair<String, Date>> sortedHistory(Object historieStavu) {
+    List<Pair<String,Date>> comments = new ArrayList<>();
+    try {
+        JSONArray jsonArray = new JSONArray(historieStavu.toString());
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String comment = jsonObject.optString("comment");
+            if (comment != null) {
+                String date = jsonObject.getString("date");
+                Date parsed = EUIPOCancelServiceImpl.HISTORY_DATE_INPUTFORMAT.parse(date);
+                comments.add(Pair.of(comment, parsed));
+            }
+        }
+        Collections.sort(comments,(left,right) ->{
+            return left.getRight().compareTo(right.getRight());
+        });
+    } catch (JSONException |  ParseException e) {
+        LOGGER.log(Level.SEVERE,e.getMessage(),e);
+    }
+    return comments;
 }
 
   // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)

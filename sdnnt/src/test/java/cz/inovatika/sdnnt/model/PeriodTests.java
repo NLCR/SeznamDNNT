@@ -16,15 +16,14 @@ public class PeriodTests {
 
     @Test
     public void testPeriod_0() throws ParseException {
-        // 1.8 deadline
         String format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-03-02")));
-        Assert.assertEquals("1993-08-01 00:00:00", format);
-
+        Assert.assertEquals("1993-04-01 00:00:00", format);
+        
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-04-28")));
-        Assert.assertEquals("1993-08-01 00:00:00", format);
+        Assert.assertEquals("1993-05-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-06-15")));
-        Assert.assertEquals("1993-08-01 00:00:00", format);
+        Assert.assertEquals("1993-07-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-07-02")));
         Assert.assertEquals("1993-08-01 00:00:00", format);
@@ -35,24 +34,23 @@ public class PeriodTests {
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("1993-07-31")));
         Assert.assertEquals("1993-08-01 00:00:00", format);
 
-        //1.2
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-01-02")));
         Assert.assertEquals("2020-02-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2019-12-01")));
-        Assert.assertEquals("2020-02-01 00:00:00", format);
+        Assert.assertEquals("2020-01-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-11-15")));
-        Assert.assertEquals("2021-02-01 00:00:00", format);
+        Assert.assertEquals("2020-12-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-01-31")));
         Assert.assertEquals("2020-02-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-08-02")));
-        Assert.assertEquals("2021-02-01 00:00:00", format);
+        Assert.assertEquals("2020-09-01 00:00:00", format);
 
         format = SIMPLE_DATE_FORMAT_2.format(period_nzn_1_12_18.defineDeadline(SIMPLE_DATE_FORMAT_1.parse("2020-08-01")));
-        Assert.assertEquals("2021-02-01 00:00:00", format);
+        Assert.assertEquals("2020-09-01 00:00:00", format);
 
     }
 

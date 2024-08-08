@@ -105,6 +105,8 @@ export class AppState {
 
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
+      const params = searchParams.getAll(p);
+
       if (p === 'q') {
         this.q = param;
       } else if (p === 'rows') {
@@ -136,9 +138,15 @@ export class AppState {
          this.notificationSettings.selected = selectedNotification;
 
       } else {
-        //let fFields =  this.user != null && (this.user.role === "kurator" || this.user.role === "mainKurator" || this.user.role === "admin") ?  this.config.filterFields : this.config.userFilterFields;     
         if (this.config.filterFields.includes(p)) {
-          this.usedFilters.push({field: p, value: param});
+          if (params.length>1) {
+            params.forEach(op=> {
+              this.usedFilters.push({field: p, value: op});
+            });
+          } else {
+            this.usedFilters.push({field: p, value: param});
+          }
+
         }
       }
     });
