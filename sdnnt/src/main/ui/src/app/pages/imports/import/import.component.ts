@@ -51,6 +51,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
     private router: Router,
+    private appState: AppState,
     private config: AppConfiguration,
     private service: AppService,
     public state: AppState) { }
@@ -60,11 +61,19 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.router.navigate(['/']);
       return;
     }
+
+    
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.importId = this.route.snapshot.paramMap.get('id');
+
+
       this.onlyEAN = this.route.snapshot.queryParamMap.get('onlyEAN') === 'true';
       this.onlyNoHits = this.route.snapshot.queryParamMap.get('onlyNoHits') === 'true';
       this.fullCatalog = this.route.snapshot.queryParamMap.get('fullCatalog') === 'true';
+
+      if (!this.appState.isNavigationStoreKeyInitialized(this.importId)) {
+        this.appState.initDefaultNavitionStoreKey(this.importId);
+      }
 
       this.getDocs(val);
       this.getImport();

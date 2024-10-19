@@ -13,7 +13,6 @@ export class NavigationStore {
         this.initDefault('search');  
         this.initDefault('zadost');    
         this.initDefault('exports');    
-
         this.initDefault('export');    
 
     }
@@ -56,7 +55,8 @@ export class NavigationStore {
         this._navigationUIStore.set(key, obj);
     }
 
-    public findKey(url: string) {
+
+    public findKeyFromUrl(url: string) {
         let found = Array.from(this._navigationUIStore.keys()).find(fragment => url.indexOf(fragment) > 0);
         return found;
     }
