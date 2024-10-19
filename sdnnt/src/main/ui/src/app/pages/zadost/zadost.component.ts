@@ -104,10 +104,21 @@ export class ZadostComponent implements OnInit {
     this.docs = [];
     const p = Object.assign({}, params);
     p.id = this.zadost.id;
+    if (this.state.isNavigationStoreKeyInitialized(this.zadost.id)) {
+      p.page = this.state.navigationstore.getPage(this.zadost.id);
+      p.rows = this.state.navigationstore.getRows(this.zadost.id);
+    }
+
     this.service.getZadostRecords(p as HttpParams).subscribe((resp: SolrResponse) => {
       this.docs = resp.response.docs;
       const process = this.zadost.process;
       this.numFound = resp.response.numFound;
+      
+      if (!this.state.isNavigationStoreKeyInitialized(this.zadost.id)) {
+        this.state.initDefaultNavitionStoreKey(this.zadost.id);
+      }
+
+
 
       const notifications = resp.notifications;
       // TODO: Should not be dependent on type 
