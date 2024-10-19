@@ -51,16 +51,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.search(val);
     }));
-
-
-    /*
-    this.subs.push(this.state.paramsProcessed.subscribe(val => {
-      this.hasStateFilter = this.state.usedFilters.findIndex(f => f.field === 'dntstav') > -1;
-    }));
-    */
-
-
   }
+
+
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
@@ -76,7 +69,6 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.searchResponse = null;
     this.facets = null;
     this.service.search(p as HttpParams).subscribe((resp: SolrResponse) => {
-
 
       this.searchResponse = resp;
       this.docs = resp.response.docs;
@@ -125,7 +117,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
       this.loading = false;
     });
-
   }
 
   hromadnaZadostEnabled() {

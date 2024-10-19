@@ -31,4 +31,14 @@ export class SearchBarComponent implements OnInit {
     this.state.q = null;
   }
 
+  onLoginSuccess() {
+    const p: any = {};
+    p.q = this.state.q ? (this.state.q !== '' ? this.state.q : null) : null;
+    p.page = 0;
+    // dummy parameter - time of logged user
+    p.timestamp = new Date().getTime();
+    this.router.navigate(['/search'], { queryParams: p, queryParamsHandling: 'merge' });
+  }
+
+
 }

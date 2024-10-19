@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter  } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild  } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
@@ -9,6 +9,8 @@ import { User } from 'src/app/shared/user';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
+import { SearchComponent } from 'src/app/pages/search/search.component';
+import { SearchBarComponent } from '../searchbar/searchbar.component';
 
 @Component({
   selector: 'app-navbar',
@@ -17,6 +19,8 @@ import { DialogNotificationsSettingsComponent } from '../dialog-notifications-se
 })
 export class NavbarComponent implements OnInit {
   
+  @ViewChild(SearchBarComponent) searchBarComponent: SearchBarComponent; 
+
   // sidenav
   @Output() public sidenavToggle = new EventEmitter();
 
@@ -47,6 +51,10 @@ export class NavbarComponent implements OnInit {
       width: '450px',
       panelClass: 'app-dialog-login',
       data: null
+    }).afterClosed().subscribe(r=> {
+      if (r.logged) {
+        this.searchBarComponent.onLoginSuccess();
+      }
     });
   }
 

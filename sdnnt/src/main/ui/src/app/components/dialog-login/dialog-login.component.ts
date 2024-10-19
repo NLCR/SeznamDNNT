@@ -49,15 +49,14 @@ export class DialogLoginComponent implements OnInit {
         this.user = '';
         this.pwd = '';
         this.loading = false;
-        this.dialogRef.close();
 
-        //this.state.startTrackSession(this.bnIdle);
+        this.dialogRef.close({"user":this.user, "logged":true});
       }
     });
   }
 
   resetPwd() {
-    this.dialogRef.close();
+    this.dialogRef.close({"user":null, "logged":false});
     this.router.navigate(['/fgtpswd'], {});
   }
 
@@ -77,7 +76,10 @@ export class DialogLoginComponent implements OnInit {
       this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
       this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
       localStorage.removeItem('user');
-      this.dialogRef.close();
+      
+
+      this.dialogRef.close({"user":null, "logged":false});
+
     });
   }
 
