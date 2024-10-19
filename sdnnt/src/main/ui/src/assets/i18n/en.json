@@ -979,7 +979,9 @@
     "off_the_list": "Off the list",
     "all": "All",
     "show_all": "Show all",
-    "all_publishers": "All publishers"
+    "all_publishers": "All publishers",
+	"prefixsearch": "Prefix search"
+
   },
 
   "tooltip": {

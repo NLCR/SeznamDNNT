@@ -82,9 +82,10 @@ export class AppState {
     this.currentLang = cfg.lang;
   }
 
+
   processParams(searchParams: ParamMap, url: string) {
 
-    let navigationKey = this.navigationstore.findKey(url);
+    let navigationKey = this.navigationstore.findKeyFromUrl(url);
 
     this.usedFilters = [];
 
@@ -187,4 +188,12 @@ export class AppState {
     this.loggedSubject.next(changed === this.logged);
   }
 
+
+  isNavigationStoreKeyInitialized(key:string){ 
+    return this.navigationstore.contains(key);    
+  }
+
+  initDefaultNavitionStoreKey(key:string) {
+    this.navigationstore.initDefault(key);
+  }
 }

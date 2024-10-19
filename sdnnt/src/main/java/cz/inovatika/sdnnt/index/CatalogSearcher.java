@@ -31,6 +31,8 @@ import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.NotificationUtils;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
+import cz.inovatika.sdnnt.utils.StringUtils;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -104,11 +106,12 @@ public class CatalogSearcher {
         User user = new UserControlerImpl(req).getUser();
         String facetSearchField = req.getParameter("facetSearchField");
         String facetSearchOffset = req.getParameter("facetSearchOffset");
-        return facetSearch(resmap, new ArrayList<>(), user, facetSearchField, facetSearchOffset);
+        String facetPrefix = req.getParameter("facetSearchPrefix");
+        return facetSearch(resmap, new ArrayList<>(), user, facetSearchField, facetSearchOffset,facetPrefix);
     }
 
     
-    public JSONObject facetSearch(Map<String, List<String>> req, List<String> filters, User user, String facetField, String offset) {
+    public JSONObject facetSearch(Map<String, List<String>> req, List<String> filters, User user, String facetField, String offset, String facetPrefix) {
         JSONObject ret = new JSONObject();
         try {
             SolrClient solr = Indexer.getClient();
@@ -116,6 +119,9 @@ public class CatalogSearcher {
             SolrQuery query = doQuery(req, filters, user, (solrQuery)->{
                 solrQuery.setFacet(true).addFacetField(facetField);
                 solrQuery.setFacetMinCount(1);
+                if (StringUtils.isAnyString(facetPrefix)) {
+                    solrQuery.setFacetPrefix(facetPrefix);
+                }
                 solrQuery.setParam(FacetParams.FACET_OFFSET, offset);
             }); 
             

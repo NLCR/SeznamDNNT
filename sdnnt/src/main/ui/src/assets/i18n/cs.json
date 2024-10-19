@@ -980,7 +980,8 @@
     "off_the_list": "Mimo seznam",
     "all": "Vše",
     "show_all": "Zobrazit vše",
-    "all_publishers": "Všichni nakladatelé"
+    "all_publishers": "Všichni nakladatelé",
+	"prefixsearch": "Vyhledávání dle prefixu"
   },
 
   "tooltip": {

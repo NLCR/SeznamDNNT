@@ -5,6 +5,8 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 import { DataDialogData } from '../dialog-identifier/dialog-identifier.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppState } from 'src/app/app.state';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dialog-all-publishers',
@@ -13,11 +15,16 @@ import { AppState } from 'src/app/app.state';
 })
 export class DialogAllPublishersComponent implements OnInit {
 
+  private subject: Subject<string> = new Subject();
+
+
   visibleShowMoreButton:boolean = true;
 
   facetSearchOffset=0;
   facetFieldsInDialog:any;
   selectedFacets: any[] = [];
+
+  searchTerm:string;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAllPublishersComponent>,
@@ -28,15 +35,37 @@ export class DialogAllPublishersComponent implements OnInit {
 
   ngOnInit(): void {
 
-    const p = Object.assign({}, this.data['queryParams'], {
+    let p = Object.assign({}, this.data['queryParams'], {
       facetSearchField: 'nakladatel',
-      facetSearchOffset: this.facetSearchOffset
+      facetSearchOffset: this.facetSearchOffset,
+      ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
     });
 
     this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
       this.facetFieldsInDialog = resp.facet_counts.facet_fields['nakladatel'];
-
     });
+  
+    this.subject.pipe(
+      debounceTime(600)
+    ).subscribe(searchTextValue => {
+
+      this.searchTerm = searchTextValue;
+
+      const p = Object.assign({}, this.data['queryParams'], {
+        facetSearchField: 'nakladatel',
+        facetSearchOffset: this.facetSearchOffset,
+        ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
+      });
+
+      this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
+        this.facetFieldsInDialog = resp.facet_counts.facet_fields['nakladatel'];
+      });
+    });
+
+  }
+
+  onFilterByPrefixKeyUp(target) {
+    this.subject.next(target.value);
   }
 
   onCheckboxChange(facet: any, isChecked: boolean) {
@@ -63,7 +92,8 @@ export class DialogAllPublishersComponent implements OnInit {
 
     const p = Object.assign({}, this.data['queryParams'], {
       facetSearchField: 'nakladatel',
-      facetSearchOffset: this.facetSearchOffset
+      facetSearchOffset: this.facetSearchOffset,
+      ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
     });
 
     this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
