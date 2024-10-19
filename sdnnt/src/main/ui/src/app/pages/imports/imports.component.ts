@@ -69,11 +69,7 @@ export class ImportsComponent implements OnInit {
       if (!resp.error) {
         this.searchResponse = resp;
         this.imports = resp.response.docs;
-        // this.imports.forEach(doc => {
-        //   this.imports.push(doc);
-        // });
-
-        this.numFound = this.imports.length;
+        this.numFound = resp.response.numFound;
         this.loading = false;
       }
     });
@@ -81,7 +77,6 @@ export class ImportsComponent implements OnInit {
   }
   setStav(navrh: string) {
     const q: any = {};
-    // added by peter
     if (this.newStavFilter === navrh) {
       q.navrh = null;
     } else {

@@ -16,6 +16,8 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.utils.StringUtils;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -429,14 +431,23 @@ public class SearchServlet extends HttpServlet {
           Options opts = Options.getInstance();
           try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
 
-            final TermsFacetMap categoryFacet = new TermsFacetMap("import_id")
-                    .setLimit(100)
-                    .withStatSubFacet( "hits_na_vyrazeni", "sum(hits_na_vyrazeni)");
-            final JsonQueryRequest request = new JsonQueryRequest()
+          String page = req.getParameter("page");
+          page = page != null ? page : "0";
+          String rows = req.getParameter("rows");
+          rows = rows != null ? rows : "20";
+              
+//            final TermsFacetMap categoryFacet = new TermsFacetMap("import_id")
+//                    .setLimit(100)
+//                    .withStatSubFacet( "hits_na_vyrazeni", "sum(hits_na_vyrazeni)");
+
+            JsonQueryRequest request = new JsonQueryRequest()
                     .setQuery("*:*")
-                    .setLimit(100)
+                    .setLimit(Integer.parseInt(rows))
+                    .setOffset(Integer.parseInt(page)*Integer.parseInt(rows))
                     .setSort("indextime desc")
                     .returnFields("*");
+            
+
             NoOpResponseParser rParser = new NoOpResponseParser();
             rParser.setWriterType("json");
             request.setResponseParser(rParser);
