@@ -83,8 +83,7 @@ public class Marc911Rule {
 
     public boolean acceptField(LinkitemField f, Logger logger) {
         try {
-            List<Pair<Integer, Integer>> rules = SKCYearsUtils.skcRange(this.range);
-
+            List<Pair<Integer, Integer>> rules = SKCYearsUtils.parseYearRanges(this.range);
             String date = f.getDate();
             if (date != null) {
                 Integer date2 = SolrYearsUtils.solrDate(date);

@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -176,7 +177,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
                     Arrays.asList(IDENTIFIER_FIELD, DNTSTAV_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U,
                             GRANULARITY_FIELD, "marc_911r", MarcRecordFields.FMT_FIELD, "controlfield_008",
-                            MarcRecordFields.LEADER_FIELD
+                            MarcRecordFields.LEADER_FIELD, MarcRecordFields.RAW_FIELD
 
                     ), (rsp) -> {
 
@@ -241,8 +242,60 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         }
 
                         if (links1 != null && !links1.isEmpty()) {
+
                             Collection<Object> yearsColl = rsp.getFieldValues("marc_911r");
                             if (yearsColl != null) {
+                                
+                                
+                                List<Triple<String,String, String>> siglaYearsMapping = new ArrayList<>();
+                                
+                                // check against raw field 
+                                Object rawField = rsp.getFieldValue(MarcRecordFields.RAW_FIELD);
+                                JSONObject rawFieldJSON = new JSONObject(rawField.toString());
+                                if (rawFieldJSON.has("dataFields")) {
+                                    if (rawFieldJSON.getJSONObject("dataFields").has("911")) {
+                                        JSONArray field911 = rawFieldJSON.getJSONObject("dataFields").getJSONArray("911");
+                                        for(int i= 0;i<field911.length();i++) {
+                                            if (field911.getJSONObject(i).has("subFields")) {
+                                                JSONObject subFields = field911.getJSONObject(i).getJSONObject("subFields");
+                                                if (subFields.has("a") && subFields.has("r") && subFields.has("u")) {
+
+                                                    JSONArray a = subFields.getJSONArray("a");
+                                                    String aVal = a.getJSONObject(0).optString("value");
+                                                    
+                                                    JSONArray r = subFields.getJSONArray("r");
+                                                    String rVal = r.getJSONObject(0).optString("value");
+
+                                                    JSONArray u = subFields.getJSONArray("u");
+                                                    String uVal = u.getJSONObject(0).optString("value");
+
+                                                    if (aVal != null && rVal != null && uVal!= null) {
+                                                        siglaYearsMapping.add(Triple.of(aVal, rVal, uVal));
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if (siglaYearsMapping.size() > 0) {
+                                    LOGGER.info("Sigla years mapping :"+siglaYearsMapping);
+                                    for(int i= 0;i<siglaYearsMapping.size();i++) {
+                                        Triple<String, String, String> triple = siglaYearsMapping.get(i);
+                                        InstanceConfiguration instanceConfiguration = checkConf.findBySigla(triple.getLeft());
+                                        if (instanceConfiguration != null) {
+
+                                            Marc911Rule rule = new Marc911Rule(triple.getMiddle(), triple.getRight(), instanceConfiguration.getAcronym());
+
+                                            if (this.linksOwner.containsKey(identifier.toString())) {
+                                                this.linksOwner.get(identifier.toString()).getGranularity().addTitleRule(rule);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                
+                                /*
                                 List<String> years = yearsColl.stream().map(Objects::toString)
                                         .collect(Collectors.toList());
                                 List<String> lls = links1.stream().map(Objects::toString).collect(Collectors.toList());
@@ -256,7 +309,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                                     .addTitleRule(rule);
                                         }
                                     }
-                                }
+                                }*/
                             }
 
                             List<String> ll = links1.stream().map(Object::toString).collect(Collectors.toList());
@@ -847,6 +900,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 }
 
                                 identifiers.stream().forEach(ident -> {
+
                                     if (linksOwner.containsKey(ident)) {
                                         Granularity granularity = linksOwner.get(ident).getGranularity();
                                         // 911r
@@ -974,13 +1028,11 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     public static void main(String[] args) throws IOException {
 
 //        String url ="https://api.kramerius.mzk.cz/search";
-//        
 //        JSONObject checkKamerius = Options.getInstance().getJSONObject("check_kramerius");
 //        CheckKrameriusConfiguration initConfiguration = CheckKrameriusConfiguration.initConfiguration(checkKamerius);
 //        InstanceConfiguration match = initConfiguration.match(url);
 //        System.out.println(match);
 //        List<InstanceConfiguration> instances = initConfiguration.getInstances();
-
 //        System.out.println(initConfiguration);
 
         GranularityServiceImpl service = new GranularityServiceImpl("test");
