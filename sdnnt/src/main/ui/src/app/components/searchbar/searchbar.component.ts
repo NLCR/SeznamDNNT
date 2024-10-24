@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 
@@ -10,12 +10,18 @@ import { AppState } from 'src/app/app.state';
 })
 export class SearchBarComponent implements OnInit {
 
+  currentPath: string;
+
+
   constructor(
-    
     private router: Router,
     public state: AppState,
-    public config: AppConfiguration
-    ) { }
+    public config: AppConfiguration,
+    private route: ActivatedRoute
+    ) { 
+
+
+    }
 
   ngOnInit(): void {
   }
@@ -32,13 +38,16 @@ export class SearchBarComponent implements OnInit {
   }
 
   onLoginSuccess() {
-    const p: any = {};
-    p.q = this.state.q ? (this.state.q !== '' ? this.state.q : null) : null;
-    p.page = 0;
-    // dummy parameter - time of logged user
-    p.timestamp = new Date().getTime();
-    this.router.navigate(['/search'], { queryParams: p, queryParamsHandling: 'merge' });
+
+    
+    let currentUrl = this.router.url;
+    // reload is necessary of if we are on the search page
+    if (currentUrl.startsWith('/search')) {
+      const p: any = {};
+      p.q = this.state.q ? (this.state.q !== '' ? this.state.q : null) : null;
+      p.page = 0;
+      p.timestamp = new Date().getTime();
+      this.router.navigate(['/search'], { queryParams: p, queryParamsHandling: 'merge' });
+    }
   }
-
-
 }

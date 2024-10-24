@@ -1,7 +1,10 @@
 <h1 mat-dialog-title>{{ 'desc.all_publishers' | translate }}</h1>
 
 <div>
-  <h3>{{ 'desc.vybrano' | translate }}<strong>:&nbsp; {{ selectedFacetsNames }}</strong></h3>
+  <h3>{{ 'desc.vybrano' | translate }}
+    <strong>:&nbsp; 
+    <div  matTooltip="{{ selectedFacetsNames }}" class="app-text-cutter" matTooltipClass="app-separated-line">{{ selectedFacetsNames }}</div> 
+  </strong></h3>
 </div>
 
 <div>
