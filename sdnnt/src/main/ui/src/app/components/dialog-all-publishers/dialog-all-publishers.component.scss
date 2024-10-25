@@ -30,7 +30,8 @@
         }
 
         .mat-checkbox-label {
-          //line-height: unset;
+          line-height: 15px;
+          max-width: 580px;
         }
       }
     }
