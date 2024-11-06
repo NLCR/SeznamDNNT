@@ -126,7 +126,8 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                     }
                 }
             }
-            if (comments.size() == 1 && (comments.get(0).equals("SKC_4b") || comments.get(0).equals("SKC_4"))) {
+            // last is SKC_4b
+            if (comments.size() >= 1 && (lastComment(comments).equals("SKC_4b") || lastComment(comments).equals("SKC_4"))) {
                 try {
                     String identifier = (String) rsp.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
                     SolrDocument document = solrClient.getById(DataCollections.catalog.name(),identifier);
@@ -143,9 +144,15 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                 } catch (SolrException | SolrServerException | IOException e) {
                     getLogger().log(Level.SEVERE, e.getMessage(),e);
                 }
+//            } else {
+//                getLogger().log(Level.INFO, String.format(" TEST "));
             }
         }, IDENTIFIER_FIELD);
         
+    }
+
+    private String lastComment(List<String> comments) {
+        return comments.get(comments.size() -1);
     }
 
     @Override
