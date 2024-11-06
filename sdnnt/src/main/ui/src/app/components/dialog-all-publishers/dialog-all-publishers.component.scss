@@ -1,5 +1,13 @@
 ::ng-deep {
   .app-dialog-all-publishers {
+    .app-selected-bar {
+      max-height: 80px;
+      overflow-y: auto;
+      margin-right: -24px;
+      margin-bottom: 16px;
+      padding-right: 24px;
+    }
+
     .mat-checkbox {
       .mat-checkbox-layout {
         height: 15px;
@@ -19,6 +27,11 @@
             height: calc(#{$app-ripple-height} * 2);
             width: calc(#{$app-ripple-height} * 2);
           }
+        }
+
+        .mat-checkbox-label {
+          line-height: 15px;
+          max-width: 580px;
         }
       }
     }

@@ -1,14 +1,40 @@
+<!-- <div fxLayout="column" fxFlexFill>
+  <div style="background-color: red;">TOP</div>
+  <div fxFlex style="overflow: hidde">
+    <div class="app-overflow-y-aut">
+      <table class="app-table" cellpadding="0" cellspacing="0">
+        <tbody>
+          <tr *ngFor="let facet of facetFieldsInDialog">
+            <td><mat-checkbox (change)="onCheckboxChange(facet, $event.checked)"><strong>{{facet.name}}</strong></mat-checkbox></td>
+            <td><span class="app-count">({{facet.value}})</span></td>
+          </tr>
+          <tr *ngIf="visibleShowMoreButton" >
+            <td colspan="2"><a (click)="showMore()">{{ 'desc.zobrazit_vice' | translate }} ...</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div style="background-color: blue;">Bottom</div>
+</div> -->
+
+
+
 <h1 mat-dialog-title>{{ 'desc.all_publishers' | translate }}</h1>
 
-<div>
+<!-- <div>
   <h3>{{ 'desc.vybrano' | translate }}
     <strong>:&nbsp; 
     <div  matTooltip="{{ selectedFacetsNames }}" class="app-text-cutter" matTooltipClass="app-separated-line">{{ selectedFacetsNames }}</div> 
   </strong></h3>
+</div> -->
+
+<div *ngIf="selectedFacetsNames" class="app-selected-bar">
+  <span class="app-label">{{ 'desc.vybrano' | translate }}</span>:&nbsp;<strong>{{ selectedFacetsNames }}</strong>
 </div>
 
-<div>
-  <mat-form-field>
+<div class="app-pr-4">
+  <mat-form-field class="app-w-100">
     <input matInput placeholder="{{ 'desc.prefixsearch' | translate }}"  (keyup)="onFilterByPrefixKeyUp($event.target)"  />
   </mat-form-field>
 </div>
@@ -18,17 +44,19 @@
   <table class="app-table" cellpadding="0" cellspacing="0">
     <tbody>
       <tr *ngFor="let facet of facetFieldsInDialog">
-        <td><mat-checkbox (change)="onCheckboxChange(facet, $event.checked)"><strong>{{facet.name}}</strong></mat-checkbox></td>
+        <td> 
+          <mat-checkbox (change)="onCheckboxChange(facet, $event.checked)">
+            <div class="app-text-cutter"><strong [matTooltip]="facet.name">{{ facet.name }}</strong></div>
+          </mat-checkbox>
+        </td>
         <td><span class="app-count">({{facet.value}})</span></td>
       </tr>
-
       <tr *ngIf="visibleShowMoreButton" >
         <td colspan="2"><a (click)="showMore()">{{ 'desc.zobrazit_vice' | translate }} ...</a></td>
       </tr>
     </tbody>
   </table>
 </div>
-
 
 <div mat-dialog-actions>
   <button mat-flat-button color="primary" (click)="applyAndClose()">{{ 'desc.vybrat' | translate }}</button>
