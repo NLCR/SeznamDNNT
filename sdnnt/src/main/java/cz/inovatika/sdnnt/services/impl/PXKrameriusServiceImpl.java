@@ -164,14 +164,21 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 ));
         
         
+        // and vs or -> or on every cases
+        
+        List<String> yearsAndStatesFilter = new ArrayList<String>();
         if (yearConfiguration != null && !this.yearConfiguration.trim().equals("")) {
-            plusFilter.add(yearFilter());
+            yearsAndStatesFilter.add(yearFilter());
         }
 
         if (!this.states.isEmpty()) {
             String collected = states.stream().collect(Collectors.joining(" OR "));
-            plusFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
+            yearsAndStatesFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
         }
+        
+        String fullCondition = yearsAndStatesFilter.stream().collect(Collectors.joining(" OR "));
+        plusFilter.add(fullCondition);
+        
         
         List<String> minusFilter = new ArrayList<>(Arrays.asList(KURATORSTAV_FIELD + ":X", 
                 KURATORSTAV_FIELD + ":PX", // pak resit px stavy a kontextove informace 
