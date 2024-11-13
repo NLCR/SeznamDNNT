@@ -74,7 +74,7 @@ public class CheckKrameriusConfiguration {
     public InstanceConfiguration findBySigla(String sigla) {
         Collection<InstanceConfiguration> values = this.matchNameConfigurations.values();
         for (InstanceConfiguration inst : values) {
-            if (inst.getSigla() != null && inst.getSigla().equals(sigla)) return inst;
+            if (inst.matchSigla(sigla)) return inst;
             else {
                 String acronym = inst.getAcronym();
                 if (acronym != null && acronym.toUpperCase().equals(sigla)) {

@@ -3,15 +3,21 @@ package cz.inovatika.sdnnt.services.kraminstances;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
+/**
+ * Main instance configuration
+ * @author happy
+ *
+ */
 public class InstanceConfiguration {
     
+    /** Version enum */
     public static enum KramVersion {
-        
         
         V5, V7;
         
@@ -30,13 +36,20 @@ public class InstanceConfiguration {
         }
     }
     
-
+    /** API point */
     private String apiPoint;
+    /** Link to client */
     private String clientAddress;
+    /** Domain where kramerius sits on */
     private String domain;
+    /** Acronym for DL */
     private String acronym;
+    /** Only description */
     private String description;
+    /** Main sigla */
     private String sigla;
+    
+    private List<String> additionalSiglas = new ArrayList<String>();
     
     private KramVersion version = KramVersion.V5;
     
@@ -78,14 +91,6 @@ public class InstanceConfiguration {
         return shouldSkip;
     }
     
-//    public void addMatchName(String matchName) {
-//        this.matchNames.add(matchName);
-//    }
-//    
-//    public void removeMatchName(String matchName) {
-//        this.matchNames.remove(matchName);
-//    }
-    
     public void setAcronym(String acronym) {
         this.acronym = acronym;
     }
@@ -119,6 +124,23 @@ public class InstanceConfiguration {
         return version;
     }
     
+    public List<String> getAdditionalSiglas() {
+        return additionalSiglas;
+    }
+
+
+    public void setAdditionalSiglas(List<String> additionalSiglas) {
+        this.additionalSiglas = additionalSiglas;
+    }
+    
+    public boolean matchSigla(String sigla) {
+        if (this.sigla.endsWith(sigla)) return true;
+        else {
+            return this.additionalSiglas.contains(sigla);
+        }
+    }
+
+
     public static InstanceConfiguration initConfiguration(String name, JSONObject instOBject) {
 
         InstanceConfiguration configuration = new InstanceConfiguration();
@@ -130,15 +152,34 @@ public class InstanceConfiguration {
         configuration.setDescription(instOBject.optString("description"));
         configuration.setSigla(instOBject.optString("sigla"));
         
+        JSONArray jsonArray = instOBject.optJSONArray("additional_sigla");
+        if (jsonArray != null && jsonArray.length() > 0) {
+            List<String> siglas = new ArrayList();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                String aSigla = jsonArray.getString(i);
+                siglas.add(aSigla);
+            }
+            if (!siglas.isEmpty()) {
+                configuration.setAdditionalSiglas(siglas);
+            }
+        }
+
+        
+        
+        
         String version = instOBject.optString("version");
         if (version != null && StringUtils.isAnyString(version)) {
             configuration.setVersion(KramVersion.load(version));
         }
         
+        
+        
         return configuration;
     }
+    
+    
 
-
+    
     @Override
     public String toString() {
         return "InstanceConfiguration [apiPoint=" + apiPoint + ", clientAddress=" + clientAddress + ", domain=" + domain
