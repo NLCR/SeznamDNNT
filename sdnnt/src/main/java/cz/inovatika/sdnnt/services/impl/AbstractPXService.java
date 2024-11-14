@@ -40,6 +40,9 @@ public abstract class AbstractPXService extends AbstractRequestService  {
     // iteration properties
     protected String yearConfiguration = null;
     protected List<String> states = new ArrayList<>();
+    protected boolean disabledState = false;
+    protected String fqOperator = "OR";
+    
     //
     protected String destinationState;
     protected String loggerPostfix;
@@ -72,12 +75,18 @@ public abstract class AbstractPXService extends AbstractRequestService  {
     protected void iterationConfig(JSONObject iteration) {
         if (iteration != null) {
             yearConfiguration = iteration.optString("date_range");
+            this.fqOperator = iteration.optString("fqoperator","OR");
             if (iteration.has("states")) {
+                
                 JSONArray iterationOverStates = iteration.optJSONArray("states");
                 if (iterationOverStates != null) {
                     iterationOverStates.forEach(it -> {
                         states.add(it.toString());
                     });
+                }
+            } else {
+                if (iteration.has("disabled_states")) {
+                    this.disabledState = iteration.optBoolean("disabled_states");
                 }
             }
         }

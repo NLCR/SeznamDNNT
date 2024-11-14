@@ -174,9 +174,13 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         if (!this.states.isEmpty()) {
             String collected = states.stream().collect(Collectors.joining(" OR "));
             yearsAndStatesFilter.add(DNTSTAV_FIELD + ":(" + collected + ")");
+        } else if (this.disabledState){
+            yearsAndStatesFilter.add("-"+DNTSTAV_FIELD + ":*");
         }
+
         
-        String fullCondition = yearsAndStatesFilter.stream().collect(Collectors.joining(" OR "));
+        String operator = String.format(" %s ", this.fqOperator);
+        String fullCondition = yearsAndStatesFilter.stream().collect(Collectors.joining(operator));
         plusFilter.add(fullCondition);
         
         
