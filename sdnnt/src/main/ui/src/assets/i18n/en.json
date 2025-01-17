@@ -980,7 +980,7 @@
     "all": "All",
     "show_all": "Show all",
     "all_publishers": "All publishers",
-	"prefixsearch": "Prefix search"
+	  "prefixsearch": "Prefix search"
 
   },
 
@@ -989,7 +989,8 @@
     "sledovat_zaznam_disabled": "This record cannot be tracked because it is already included in bulk notifications!",
     "seznam_zmen_pro_euipo_ooc_uocp": "List of changes for EUIPO OoC (abbreviation UOCP)",
     "importni_soubor_do_euipo_ooc_iocp": "Import file to EUIPO OoC (abbreviation IOCP)",
-    "unable_to_add_institution": "Cannot add an institution that already exists"
+    "unable_to_add_institution": "Cannot add an institution that already exists",
+    "removing_work_from_the_list": "Removing a work from the list"
   },
 
   "msg": {

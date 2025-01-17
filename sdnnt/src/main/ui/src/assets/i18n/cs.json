@@ -981,7 +981,7 @@
     "all": "Vše",
     "show_all": "Zobrazit vše",
     "all_publishers": "Všichni nakladatelé",
-	"prefixsearch": "Vyhledávání dle prefixu"
+	  "prefixsearch": "Vyhledávání dle prefixu"
   },
 
   "tooltip": {
@@ -989,7 +989,8 @@
     "sledovat_zaznam_disabled": "Tento záznam nelze sledovat, protože je již zahrnut v hromadných notifikacích!",
     "seznam_zmen_pro_euipo_ooc_uocp": "Seznam změn pro EUIPO OoC (zkratka UOCP)",
     "importni_soubor_do_euipo_ooc_iocp": "Importní soubor do EUIPO OoC (zkratka IOCP)",
-    "unable_to_add_institution": "Nelze přidat instituci, která již existuje"
+    "unable_to_add_institution": "Nelze přidat instituci, která již existuje",
+    "removing_work_from_the_list": "Vyřazení díla ze seznamu"
   },
 
   "msg": {
