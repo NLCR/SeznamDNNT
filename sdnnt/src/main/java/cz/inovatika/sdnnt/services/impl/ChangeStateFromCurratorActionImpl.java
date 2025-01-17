@@ -151,7 +151,7 @@ public class ChangeStateFromCurratorActionImpl implements ChangeStateFromCurrato
                     long reqStart = System.currentTimeMillis();
                     UpdateRequest stateReq = new UpdateRequest();
                     mrFound.getLeft().forEach(mr-> {
-                        SolrInputDocument uDoc = ChangeProcessStatesUtility.changeProcessState(this.curState, this.license, mr, this.action);
+                        SolrInputDocument uDoc = ChangeProcessStatesUtility.changeProcessState(this.curState, this.license, mr,"scheduler", this.action);
                         
                         // change.. remove action
                         List fieldValues = (List) uDoc.getFieldValues(MarcRecordFields.CURATOR_ACTIONS);

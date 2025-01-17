@@ -15,7 +15,6 @@ import static cz.inovatika.sdnnt.model.Period.*;
  */
 public class VNWorkflow extends Workflow {
 
-
     public VNWorkflow(WorkflowOwner owner) {
         super(owner);
     }
@@ -25,9 +24,13 @@ public class VNWorkflow extends Workflow {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
         // check 
-        if (currentState == CuratorItemState.DX || currentState == PX) {
+        if (currentState == CuratorItemState.DX || currentState == PX || currentState == PN) {
             if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
                 return new WorkflowState(this.owner, currentState, PublicItemState.N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
+            }
+        } else if (currentState == PN) {
+            if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {
+                return new WorkflowState(this.owner, CuratorItemState.N, PublicItemState.N,null,/*owner.getWorkflowDate(),*/ period, true,true,  true);
             }
         } else {
             if (owner.getWorkflowState() == null ||owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA ||  owner.getPublicState() == PublicItemState.NL) {

@@ -35,7 +35,7 @@ public class MarcModelTests {
         marcRecord.dntstav = new ArrayList<>(Arrays.asList("PA"));
         System.out.println(marcRecord.license);
         System.out.println(marcRecord.dntstav);
-        ChangeProcessStatesUtility.changeProcessState("A", marcRecord, "message");
+        ChangeProcessStatesUtility.changeProcessState("A", marcRecord, "scheduler", "message");
         System.out.println(marcRecord.dntstav);
         System.out.println(marcRecord.license);
     }

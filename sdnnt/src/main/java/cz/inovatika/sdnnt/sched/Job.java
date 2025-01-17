@@ -9,6 +9,12 @@ import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.OAIHarvester;
+import cz.inovatika.sdnnt.index.XMLImporterDistri;
+import cz.inovatika.sdnnt.index.XMLImporterHeureka;
+import cz.inovatika.sdnnt.index.XMLImporterKosmas;
+
+import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -669,6 +676,44 @@ public class Job implements InterruptableJob {
             
         },
 
+        
+        
+        /** import from distri */
+        IMPORT {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    
+                    LinkedHashSet<String> processingSet = new LinkedHashSet<>();
+                    
+                    JSONObject distriConf = jobData.optJSONObject("distri.cz");
+                    String distriUrl = distriConf != null ? distriConf.optString("url") : null;
+                    JSONObject kosmasConf = jobData.optJSONObject("kosmas");
+                    String kosmasUrl = kosmasConf != null ? kosmasConf.optString("url") : null;
+                    JSONObject heurekaConf = jobData.optJSONObject("heureka");
+                    String heurekaUrl = heurekaConf != null ? heurekaConf.optString("url"):null;
+
+                    String logger = jobData.optString("logger");
+                    try {
+                        XMLImporterKosmas kosmas = new XMLImporterKosmas(logger,kosmasUrl);
+                        processingSet =  kosmas.doImport(null, false, processingSet);
+
+                        XMLImporterDistri distri = new XMLImporterDistri(logger,distriUrl);
+                        processingSet = distri.doImport(null, false, processingSet);
+                        
+                        XMLImporterHeureka heureka = new XMLImporterHeureka(logger,heurekaUrl);
+                        processingSet = heureka.doImport(null, false,processingSet );
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+        },
+
         WORKFLOW {
             @Override
             void doPerform(JSONObject jobData) {
@@ -688,6 +733,7 @@ public class Job implements InterruptableJob {
             }
         },
 
+        
         // Posila email o zmenu stavu zaznamu podle nastaveni uzivatelu
         NOTIFICATIONS {
             @Override

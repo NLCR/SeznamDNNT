@@ -146,12 +146,12 @@ public class DocumentWorkflowFactory {
         boolean inStateAPA =  kuratorstav.contains(CuratorItemState.A.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name());
 
-        boolean inCurratorStavDXPX = kuratorstav.contains(CuratorItemState.DX.name()) || kuratorstav.contains(CuratorItemState.PX.name());
+        boolean inCurratorStavDXPXPN = kuratorstav.contains(CuratorItemState.DX.name()) || kuratorstav.contains(CuratorItemState.PX.name()) || kuratorstav.contains(CuratorItemState.PN.name());
         
         if (inStateAPA) {
             boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
             return inStateAPA && isCorrectLicense;
-        } else if (inCurratorStavDXPX) {
+        } else if (inCurratorStavDXPXPN) {
             
             boolean isCorrectLicense =  license != null && License.dnnto.name().equals(license);
 
@@ -171,6 +171,7 @@ public class DocumentWorkflowFactory {
                 kuratorstav.contains(CuratorItemState.NLX.name()) ||
                 // zda muze vyrazovat ?? 
                 kuratorstav.contains(CuratorItemState.DX.name()) ||
+                kuratorstav.contains(CuratorItemState.PN.name()) ||
                 kuratorstav.contains(CuratorItemState.PX.name());
                 
     }
@@ -187,7 +188,6 @@ public class DocumentWorkflowFactory {
     private static boolean nznDocument(List<String> kuratorstav, List<String> publicstav) {
         if (kuratorstav.isEmpty()) return true;
         else {
-            // kurator stav PX, DX
             if (kuratorstav.contains(CuratorItemState.N.name()) ||
                 kuratorstav.contains(CuratorItemState.NPA.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name())) {

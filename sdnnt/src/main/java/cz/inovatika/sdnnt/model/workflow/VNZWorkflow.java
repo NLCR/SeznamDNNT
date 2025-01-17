@@ -22,7 +22,7 @@ public class VNZWorkflow extends Workflow {
     public WorkflowState nextState() {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(owner.getWorkflowState(), owner.getLicense() != null ? License.valueOf(owner.getLicense()) : null);
-        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA || owner.getWorkflowState()== DX ||owner.getWorkflowState() == PX ) && (owner.getLicense() ==null || owner.getLicense().equals(License.dnnto.name()))) {
+        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA || owner.getWorkflowState()== DX ||owner.getWorkflowState() == PX || owner.getWorkflowState() == PN ) && (owner.getLicense() ==null || owner.getLicense().equals(License.dnnto.name()))) {
             if (owner.getWorkflowState() == null) {
                 return new WorkflowState(this.owner, A, License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true, true);
             } else {

@@ -80,6 +80,19 @@ export class ImportComponent implements OnInit, OnDestroy {
     }));
   }
 
+  /*
+  curatorAndPublicStateAreDifferent(id): boolean {
+
+    if (this.doc.kuratorstav && !this.doc.dntstav) {
+      return true;
+      // verejny a kuratorsky stav je rozdilny
+    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] != this.doc.dntstav[this.doc.dntstav.length - 1]) {
+      return true;
+    }
+    return false;
+  }*/
+ 
+
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }
@@ -172,6 +185,8 @@ export class ImportComponent implements OnInit, OnDestroy {
 
   }
 
+
+
   approve(doc, identifier) {
     this.service.approveNavrhInImport(identifier, doc).subscribe((res: any) => {
       if (res.error) {
@@ -203,6 +218,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.service.getCatalogDoc(id.identifier).subscribe(res => {
       if (res.response.docs.length > 0) {
 
+
         const data = {
           title: res.response.docs[0].title,
           items: [],
@@ -210,11 +226,14 @@ export class ImportComponent implements OnInit, OnDestroy {
         data.items.push({ label: 'Aleph identifier', value: res.response.docs[0]['identifier'] })
 
         this.config.identifiers.forEach(f => {
-          if (res.response.docs[0]['marc_' + f]) {
+          let doc = res.response.docs[0];
+          if (doc['marc_' + f]) {
             data.items.push({ label: 'field.' + f, value: res.response.docs[0]['marc_' + f] })
+          } else if (doc[f] ){
+            data.items.push({ label: 'field.' + f, value: doc[ f] })
           }
         });
-
+    
 
         const dialogRef = this.dialog.open(DialogIdentifierComponent, {
           width: '750px',
@@ -266,14 +285,12 @@ export class ImportComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.change) {
         this.service.changeStavDirect(id.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
-
           if (res.response.docs.length > 0) {
             id.dntstav = res.response.docs[0].dntstav;
             id.kuratorstav = res.response.docs[0].kuratorstav;
             id.license = res.response.docs[0].license;
             id.changedInImport = true;
             this.service.changeStavImport(doc).subscribe(res => {
-              // this.getDocs(this.route.snapshot.queryParams);
             });
           }
         });

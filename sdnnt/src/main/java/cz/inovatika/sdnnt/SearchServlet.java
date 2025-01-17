@@ -393,8 +393,6 @@ public class SearchServlet extends HttpServlet {
                     .addFacetField("{!ex=ct}controlled")
                     .setFacetMinCount(1)
                     .setParam("json.nl", "arrntv")
-//                    .setParam("stats", true)
-//                    .setParam("stats.field","na_vyrazeni")
                     .setFields("*,identifiers:[json],catalog:[json],item:[json]");
             
             if (req.getParameter("dntstav") != null) {

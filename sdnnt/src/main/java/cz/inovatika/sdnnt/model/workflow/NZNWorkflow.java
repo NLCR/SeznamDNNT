@@ -43,6 +43,7 @@ public class NZNWorkflow extends Workflow {
                     
 
                 // dilo je predmetem zadosti o volna dila nebo zadosti o duplicitu
+                case PN:
                 case PX:
                 case DX:
                     if (pState != null) {
@@ -82,7 +83,6 @@ public class NZNWorkflow extends Workflow {
     @Override
     public boolean isSwitchPossible(CuratorItemState desiredState) {
         
-        //|| this.owner.getWorkflowState().equals(PX))
         
         
         // NPA -> PA
@@ -98,7 +98,7 @@ public class NZNWorkflow extends Workflow {
                 return desiredState.equals(A);
             } else return true;
             
-        } else if (this.getOwner().getWorkflowState() != null && (this.owner.getWorkflowState().equals(PX) || this.owner.getWorkflowState().equals(DX))) {
+        } else if (this.getOwner().getWorkflowState() != null && (this.owner.getWorkflowState().equals(PX) || this.owner.getWorkflowState().equals(DX) || this.owner.getWorkflowState().equals(PN))) {
 
             PublicItemState publicState = this.owner.getPublicState();
             if (publicState != null) {

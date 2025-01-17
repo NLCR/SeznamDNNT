@@ -376,34 +376,35 @@ public class IndexerServlet extends HttpServlet {
         IMPORT_KOSMAS {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
-                    try {
-                        JSONObject json = new JSONObject();
-                        XMLImporterKosmas imp = new XMLImporterKosmas();
-                        // https://www.kosmas.cz/atl_shop/nkp.xml
-                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
-                    } catch (Exception ex) {
-                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-                    }
-                } else {
-                    return errorJson(response, SC_FORBIDDEN, "not allowed");
-                }
+//                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+//                    try {
+//                        JSONObject json = new JSONObject();
+//                        XMLImporterKosmas imp = new XMLImporterKosmas();
+//                        // https://www.kosmas.cz/atl_shop/nkp.xml
+//                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
+//                    } catch (Exception ex) {
+//                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+//                    }
+//                } else {
+//                }
+                return errorJson(response, SC_FORBIDDEN, "not allowed");
             }
         },
         // import zaznamu z distri.cz - uzivatelske api
         IMPORT_DISTRI {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
-                    try {
-                        XMLImporterDistri imp = new XMLImporterDistri();
-                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
-                    } catch (Exception ex) {
-                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-                    }
-                } else {
-                    return errorJson(response, SC_FORBIDDEN, "not allowed");
-                }
+//                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+//                    try {
+//                        XMLImporterDistri imp = new XMLImporterDistri();
+//                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
+//                    } catch (Exception ex) {
+//                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+//                    }
+//                } else {
+//                    return errorJson(response, SC_FORBIDDEN, "not allowed");
+//                }
+              return errorJson(response, SC_FORBIDDEN, "not allowed");
             }
         },
         // import zaznamu z palmknihy.cz - uzivatelske api
@@ -413,21 +414,22 @@ public class IndexerServlet extends HttpServlet {
         IMPORT_HEUREKA {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
-                    try {
-                        JSONObject json = new JSONObject();
-                        XMLImporterHeureka imp = new XMLImporterHeureka();
-                        // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
-                        // https://www.palmknihy.cz/heureka.xml
-
-                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
-
-                    } catch (Exception ex) {
-                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
-                    }
-                } else {
-                    return errorJson(response, SC_FORBIDDEN, "not allowed");
-                }
+//                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+//                    try {
+//                        JSONObject json = new JSONObject();
+//                        XMLImporterHeureka imp = new XMLImporterHeureka();
+//                        // json = imp.fromFile("C:/Users/alberto/Projects/SDNNT/Docs/heureka.xml", "palmknihy", "SHOPITEM");
+//                        // https://www.palmknihy.cz/heureka.xml
+//
+//                        return imp.doImport(req.getParameter("url"), req.getParameter("from_id"), Boolean.parseBoolean(req.getParameter("resume")));
+//
+//                    } catch (Exception ex) {
+//                        return errorJson(response, SC_INTERNAL_SERVER_ERROR, ex.getMessage());
+//                    }
+//                } else {
+//                    return errorJson(response, SC_FORBIDDEN, "not allowed");
+//                }
+                return errorJson(response, SC_FORBIDDEN, "not allowed");
             }
         },
         // pro interni ucely  - porovnani dvou zaznamu

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -171,6 +174,8 @@ public class Import {
   public static JSONObject setControlled(String id, String note, String user) {
     try (SolrClient solr = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()) {
       
+        // documents
+        
       SolrInputDocument idoc = new SolrInputDocument();
       idoc.setField("id", id);
       
@@ -190,7 +195,7 @@ public class Import {
 
       solr.add("imports_documents", idoc);
       solr.commit("imports_documents");
-      solr.close();
+      //solr.close();
       return new JSONObject().put("saved", true);
     } catch (Exception ex) {
       LOGGER.log(Level.SEVERE, null, ex);
@@ -248,6 +253,7 @@ public class Import {
       return new JSONObject().put("error", ex);
     }
   }
+
   
   public static SolrDocument isControlled(String id) {
     SolrDocument ret = null;

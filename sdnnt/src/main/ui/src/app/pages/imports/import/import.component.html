@@ -88,20 +88,35 @@
                             <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
                               {{ id.dntstav[id.dntstav.length-1] }}
                             </div>
+
+                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav && curatorAndPublicStateAreDifferent(id)" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                              {{ id.kuratorstav[id.kuratorstav.length-1] }}  
+                            </div>
+
+                            <!--
+                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                              {{ id.kuratorstav[id.kuratorstav.length-1] }}   
+                            </div>
+-->                    
                             <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
                               <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
                               {{ 'license.' + id.license + '-badge' | translate }}
                             </div>
+                            <!--
                             <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
                               <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
                                 {{ id.kuratorstav[id.kuratorstav.length-1] }}
                               </div>
                             </ng-container>
+                            -->
                           </div>
                           <div>
+
                             <!-- <ng-container *ngIf="id.approved">
                               {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
                             </ng-container> -->
+
+
                             <a [matMenuTriggerFor]="menuMore">
                               <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
                             </a>

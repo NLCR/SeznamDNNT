@@ -3,12 +3,7 @@ info:
   title: SDNNT API
   description: |-
 
-    API přístupné všem. Umožňuje získávat aktuální seznam děl označených licencí:
-
-      - **DNNTO**
-      - **DNNTT**
-
-    Pro jednotlivé dotazy není potřeba přihlášení.
+    API přístupné všem. Umožňuje získávat aktuální seznam děl.
 
     Endpointy mohou v případech velkého zatížení vracet status 429 - Too many requests.
 
@@ -30,533 +25,533 @@ tags:
 paths:
 
   # Plny seznam del dnnt
-  /lists/added/dnntt:
-    get:
-      tags:
-        - Seznam licencovaných děl / DNNTT
-      summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTT
-      description: Umožňuje iterovat pomocí resumption tokenu
-      operationId: addedDnntt
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů. 
+  # /lists/added/dnntt:
+    # get:
+      # tags:
+        # - Seznam licencovaných děl / DNNTT
+      # summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTT
+      # description: Umožňuje iterovat pomocí resumption tokenu
+      # operationId: addedDnntt
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů. 
                          
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce, která ma dílo ve fondu
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: rows
-          description: Velikost stránky
-          schema:
-            type: integer
-            example: 10
-          required: false
-        - in: query
-          name: resumptionToken
-          description: Resumption token
-          schema:
-            type: string
-            default: "*"
-          required: false
-      responses:
-        '200':
-          description: Výsledky ve formátu JSON
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/lists/ListitemResponse.yaml'
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce, která ma dílo ve fondu
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: rows
+          # description: Velikost stránky
+          # schema:
+            # type: integer
+            # example: 10
+          # required: false
+        # - in: query
+          # name: resumptionToken
+          # description: Resumption token
+          # schema:
+            # type: string
+            # default: "*"
+          # required: false
+      # responses:
+        # '200':
+          # description: Výsledky ve formátu JSON
+          # content:
+            # application/json:
+              # schema:
+                # $ref: './schemas/lists/ListitemResponse.yaml'
 
   # CSV export dnntt
-  /lists/added/dnntt/csvexport:
-    get:
-      tags:
-        - Seznam licencovaných děl / DNNTT
-      summary: CSV export objektů zařazených na seznam DNNTT
-      description: Export dat, licence **DNNTT**
-      operationId: addedDnnttCsvExport
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů
-          schema:
-            type: string
-            example: NKP
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce, ktera ma dilo ve fondu
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: removeduplicatesuuid
-          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: notincludeparent
-          description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: fields
-          description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
-          schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: false
-      responses:
-        '200':
-          description: Export byl vytvořen
-          content:
-            application/csv:
-              schema:
-                type: string
-        '429':
-          description: Server je plně vytížen, opakujte dotaz později
+  # /lists/added/dnntt/csvexport:
+    # get:
+      # tags:
+        # - Seznam licencovaných děl / DNNTT
+      # summary: CSV export objektů zařazených na seznam DNNTT
+      # description: Export dat, licence **DNNTT**
+      # operationId: addedDnnttCsvExport
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizován. Možno využít zkratky a sigly uvedené v registru krameriů
+          # schema:
+            # type: string
+            # example: NKP
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce, ktera ma dilo ve fondu
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: removeduplicatesuuid
+          # description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: notincludeparent
+          # description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: fields
+          # description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
+          # schema:
+            # type: array
+            # items:
+              # type: string
+          # style: form
+          # explode: false
+      # responses:
+        # '200':
+          # description: Export byl vytvořen
+          # content:
+            # application/csv:
+              # schema:
+                # type: string
+        # '429':
+          # description: Server je plně vytížen, opakujte dotaz později
 
   # Plny seznam del dnnto
-  /lists/added/dnnto:
-    get:
-      tags:
-        - Seznam licencovaných děl / DNNTO
-      summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
-      description: Umožňuje iterovat pomocí resumption tokenu
-      operationId: addedDnnto
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce, ktera ma dilo ve fondu
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: rows
-          description: Number of rows
-          schema:
-            type: integer
-            example: 10
-          required: false
-        - in: query
-          name: resumptionToken
-          description: Resumption token
-          schema:
-            type: string
-            default: "*"
-          required: false
+  # /lists/added/dnnto:
+    # get:
+      # tags:
+        # - Seznam licencovaných děl / DNNTO
+      # summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
+      # description: Umožňuje iterovat pomocí resumption tokenu
+      # operationId: addedDnnto
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce, ktera ma dilo ve fondu
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: rows
+          # description: Number of rows
+          # schema:
+            # type: integer
+            # example: 10
+          # required: false
+        # - in: query
+          # name: resumptionToken
+          # description: Resumption token
+          # schema:
+            # type: string
+            # default: "*"
+          # required: false
 
-      responses:
-        '200':
-          description: Výsledky ve formátu json
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/lists/ListitemResponse.yaml'
-        '400':
-          description: Špatný dotaz; Překročen maximální počet záznamů.
+      # responses:
+        # '200':
+          # description: Výsledky ve formátu json
+          # content:
+            # application/json:
+              # schema:
+                # $ref: './schemas/lists/ListitemResponse.yaml'
+        # '400':
+          # description: Špatný dotaz; Překročen maximální počet záznamů.
 
   # CSV export dnnto
-  /lists/added/dnnto/csvexport:
-    get:
-      tags:
-        - Seznam licencovaných děl / DNNTO
-      summary: CSV export objektů zařazených na seznam DNNTO
-      description: Export dat, licence **DNNTO**
-      operationId: addedDnntoCsvExport
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: removeduplicatesuuid
-          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: notincludeparent
-          description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: fields
-          description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
-          schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: false
-      responses:
-        '200':
-          description: Export byl vytvořen
-          content:
-            application/csv:
-              schema:
-                type: string
-        '429':
-          description: Server je plně vytížen, opakujte dotaz později
+  # /lists/added/dnnto/csvexport:
+    # get:
+      # tags:
+        # - Seznam licencovaných děl / DNNTO
+      # summary: CSV export objektů zařazených na seznam DNNTO
+      # description: Export dat, licence **DNNTO**
+      # operationId: addedDnntoCsvExport
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce. (ABA001, ABA007, atd...)
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: removeduplicatesuuid
+          # description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: notincludeparent
+          # description: Nezahrnovat parent pokud je přítomna granularita,  contains-dnnt-labels. Issue 853
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: fields
+          # description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
+          # schema:
+            # type: array
+            # items:
+              # type: string
+          # style: form
+          # explode: false
+      # responses:
+        # '200':
+          # description: Export byl vytvořen
+          # content:
+            # application/csv:
+              # schema:
+                # type: string
+        # '429':
+          # description: Server je plně vytížen, opakujte dotaz později
 
   # Plny seznam stazenych del DNNTT
-  /lists/removed/dnntt:
-    get:
-      tags:
-        - Seznam děl stažených ze seznamu / DNNTT
-      summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
-      description: Umožňuje iterovat pomocí resumption tokenu
-      operationId: removedDnntt
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: rows
-          description: Velikost stránky
-          schema:
-            type: integer
-            example: 10
-          required: false
-        - in: query
-          name: resumptionToken
-          description: Resumption token
-          schema:
-            type: string
-            default: "*"
-          required: false
-      responses:
-        '200':
-          description: Výsledky ve formátu JSON
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/lists/ListitemResponse.yaml'
-        '400':
-          description: Špatný dotaz; Překročen maximální počet záznamů.
+  # /lists/removed/dnntt:
+    # get:
+      # tags:
+        # - Seznam děl stažených ze seznamu / DNNTT
+      # summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
+      # description: Umožňuje iterovat pomocí resumption tokenu
+      # operationId: removedDnntt
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů.
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce. (ABA001, ABA007, atd...)
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: rows
+          # description: Velikost stránky
+          # schema:
+            # type: integer
+            # example: 10
+          # required: false
+        # - in: query
+          # name: resumptionToken
+          # description: Resumption token
+          # schema:
+            # type: string
+            # default: "*"
+          # required: false
+      # responses:
+        # '200':
+          # description: Výsledky ve formátu JSON
+          # content:
+            # application/json:
+              # schema:
+                # $ref: './schemas/lists/ListitemResponse.yaml'
+        # '400':
+          # description: Špatný dotaz; Překročen maximální počet záznamů.
 
   # CSV Export stazenych del
-  /lists/removed/dnntt/csvexport:
-    get:
-      tags:
-        - Seznam děl stažených ze seznamu / DNNTT
-      summary: CSV export objektů stažených ze seznamu DNNTT
-      description: Export dat, zrušená licence **DNNTT**
-      operationId: removedDnnttCsvExport
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: removeduplicatesuuid
-          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: fields
-          description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
-          schema:
-            type: array
-            items:
-              type: string
+  # /lists/removed/dnntt/csvexport:
+    # get:
+      # tags:
+        # - Seznam děl stažených ze seznamu / DNNTT
+      # summary: CSV export objektů stažených ze seznamu DNNTT
+      # description: Export dat, zrušená licence **DNNTT**
+      # operationId: removedDnnttCsvExport
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce. (ABA001, ABA007, atd...)
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: removeduplicatesuuid
+          # description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: fields
+          # description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
+          # schema:
+            # type: array
+            # items:
+              # type: string
 
-          style: form
-          explode: false
+          # style: form
+          # explode: false
 
-      responses:
-        '200':
-          description: Export byl vytvořen
-          content:
-            application/csv:
-              schema:
-                type: string
-        '429':
-          description: Server je plně vytížen, opakujte dotaz později
+      # responses:
+        # '200':
+          # description: Export byl vytvořen
+          # content:
+            # application/csv:
+              # schema:
+                # type: string
+        # '429':
+          # description: Server je plně vytížen, opakujte dotaz později
 
   # Plny seznam stazenych del dntto
-  /lists/removed/dnnto:
-    get:
-      tags:
-        - Seznam děl stažených ze seznamu / DNNTO
-      summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
-      description: Umožňuje iterovat pomocí resumption tokenu
-      operationId: removedDnnto
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan. Možno využít zkratky a sigly uvedené v registru krameriů.
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: rows
-          description: Velikost stránky
-          schema:
-            type: integer
-            example: 10
-          required: false
-        - in: query
-          name: resumptionToken
-          description: Resumption token
-          schema:
-            type: string
-            default: "*"
-          required: false
-      responses:
-        '200':
-          description: Výsledky ve formátu JSON
-          content:
-            application/json:
-              schema:
-                $ref: './schemas/lists/ListitemResponse.yaml'
-        '400':
-          description: Špatný dotaz; Překročen maximální počet záznamů.
+  # /lists/removed/dnnto:
+    # get:
+      # tags:
+        # - Seznam děl stažených ze seznamu / DNNTO
+      # summary: Umožňuje itervat přes seznam děl zařazených na seznam DNNT, Licence DNNTO
+      # description: Umožňuje iterovat pomocí resumption tokenu
+      # operationId: removedDnnto
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan. Možno využít zkratky a sigly uvedené v registru krameriů.
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce. (ABA001, ABA007, atd...)
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záznamu. Vrací pouze ty záznamy, které se změnily v aplikaci (UI nebo API)
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: rows
+          # description: Velikost stránky
+          # schema:
+            # type: integer
+            # example: 10
+          # required: false
+        # - in: query
+          # name: resumptionToken
+          # description: Resumption token
+          # schema:
+            # type: string
+            # default: "*"
+          # required: false
+      # responses:
+        # '200':
+          # description: Výsledky ve formátu JSON
+          # content:
+            # application/json:
+              # schema:
+                # $ref: './schemas/lists/ListitemResponse.yaml'
+        # '400':
+          # description: Špatný dotaz; Překročen maximální počet záznamů.
 
   #CSV export stazenych del dntto
-  /lists/removed/dnnto/csvexport:
-    get:
-      tags:
-        - Seznam děl stažených ze seznamu / DNNTO
-      summary: CSV export objektů stažených ze seznamu DNNTO
-      description: Export dat, zrušená licence **DNNTO**
-      operationId: removedDnntoCsvExport
-      parameters:
-        - in: query
-          name: digital_library
-          description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
-          schema:
-            type: string
-            example: nkp
-          required: false
-        - in: query
-          name: format
-          description: Format 
-          schema:
-            enum: ["BK","SE"]
-            type: string
-            example: BK
-          required: false
-        - in: query
-          name: institution
-          description: Sigla instituce. (ABA001, ABA007, atd...)
-          schema:
-            type: string
-            example: ABA001
-          required: false
-        - in: query
-          name: from
-          description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
-          schema:
-            type: string
-            format: date-time
-            example: "2021-07-27T16:31:05.169Z"
-          required: false
-        - in: query
-          name: removeduplicatesuuid
-          description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
-          schema:
-            type: boolean
-            default: false
-          required: false
-        - in: query
-          name: fields
-          description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
-          schema:
-            type: array
-            items:
-              type: string
-          style: form
-          explode: false
+  # /lists/removed/dnnto/csvexport:
+    # get:
+      # tags:
+        # - Seznam děl stažených ze seznamu / DNNTO
+      # summary: CSV export objektů stažených ze seznamu DNNTO
+      # description: Export dat, zrušená licence **DNNTO**
+      # operationId: removedDnntoCsvExport
+      # parameters:
+        # - in: query
+          # name: digital_library
+          # description: Instituce kde je titul digitalizovan, možno využít siglu nebo zkratku z registru kramériů
+          # schema:
+            # type: string
+            # example: nkp
+          # required: false
+        # - in: query
+          # name: format
+          # description: Format 
+          # schema:
+            # enum: ["BK","SE"]
+            # type: string
+            # example: BK
+          # required: false
+        # - in: query
+          # name: institution
+          # description: Sigla instituce. (ABA001, ABA007, atd...)
+          # schema:
+            # type: string
+            # example: ABA001
+          # required: false
+        # - in: query
+          # name: from
+          # description: Datum změny záhznamu. Vrací pouze ty záznamy, které se změnily.
+          # schema:
+            # type: string
+            # format: date-time
+            # example: "2021-07-27T16:31:05.169Z"
+          # required: false
+        # - in: query
+          # name: removeduplicatesuuid
+          # description: Filtruje stejne uuid. (Objevuje se zejmena pokud je stejny dokument ve dvou ruznych institicich)
+          # schema:
+            # type: boolean
+            # default: false
+          # required: false
+        # - in: query
+          # name: fields
+          # description: Seznam poli, pokud neni specifikovano poskytuje plny seznam
+          # schema:
+            # type: array
+            # items:
+              # type: string
+          # style: form
+          # explode: false
 
-      responses:
-        '200':
-          description: Export byl vytvořen
-          content:
-            application/csv:
-              schema:
-                type: string
-        '429':
-          description: Server je plně vytížen, opakujte dotaz později
+      # responses:
+        # '200':
+          # description: Export byl vytvořen
+          # content:
+            # application/csv:
+              # schema:
+                # type: string
+        # '429':
+          # description: Server je plně vytížen, opakujte dotaz později
 
 
   # List vsech zmen

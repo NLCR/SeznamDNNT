@@ -29,7 +29,7 @@ public class ChangeProcessStatesUtility {
     private ChangeProcessStatesUtility() {}
 
     
-    public static SolrInputDocument changeProcessState(String curState, String license, MarcRecord mr, String message) {
+    public static SolrInputDocument changeProcessState(String curState, String license, MarcRecord mr, String user, String message) {
         List<String> previous = mr.dntstav;
         CuratorItemState kstav = CuratorItemState.valueOf(curState);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
@@ -48,15 +48,15 @@ public class ChangeProcessStatesUtility {
                 mr.license = null;
             }
         }
-        // TODO: 
-        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
+
+        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, user, message, new JSONArray());
 
         // REcalculate granularity
-        calculateGranularity(mr, "scheduler", message, null); 
+        calculateGranularity(mr, user, message, null); 
         return mr.toSolrDoc();
     }
     
-    public static SolrInputDocument changeProcessState(String state, MarcRecord mr, String message) {
+    public static SolrInputDocument changeProcessState(String state, MarcRecord mr, String user, String message) {
         List<String> previous = mr.dntstav;
         CuratorItemState kstav = CuratorItemState.valueOf(state);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
@@ -72,8 +72,10 @@ public class ChangeProcessStatesUtility {
             mr.license = null;
         }
         
-        calculateGranularity(mr, "scheduler", message, null); 
-        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, "scheduler", message, new JSONArray());
+        //String user = "scheduler";
+        
+        calculateGranularity(mr, user, message, null); 
+        mr.setKuratorStav(kstav.name(), pstav.name(), mr.license, user, message, new JSONArray());
         return mr.toSolrDoc();
     }
 
@@ -125,9 +127,13 @@ public class ChangeProcessStatesUtility {
 
     
 
-    public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state, String message) throws JsonProcessingException, SolrServerException, IOException {
+    public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state, String user, String message) throws JsonProcessingException, SolrServerException, IOException {
         MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
-        return changeProcessState(state, mr, message);
+        return changeProcessState(state, mr,user, message);
     }
-
+    public static  SolrInputDocument changeProcessState(SolrClient solrClient, String identifier, String state,  String message) throws JsonProcessingException, SolrServerException, IOException {
+        return changeProcessState(solrClient, identifier, state, "scheduler", message);
+    }
+    
+    
 }

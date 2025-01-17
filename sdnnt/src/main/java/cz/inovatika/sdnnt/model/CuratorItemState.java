@@ -25,6 +25,8 @@ public enum CuratorItemState {
 
     
     
+    
+    
     // Vyrazeno
     N{
         @Override
@@ -32,6 +34,21 @@ public enum CuratorItemState {
             return PublicItemState.N;
         }
     },
+
+    // Pravdepodobne vyrazeno
+    PN {
+
+        @Override
+        public PublicItemState getPublicItemState(WorkflowOwner owner) {
+            PublicItemState currentPublicState = owner.getPublicState();
+            return currentPublicState != null ? currentPublicState :  PublicItemState.N;
+        }
+        
+    },
+    
+    
+    
+    
     
     // vyrazeno/nezarazeno ale ceka na zarazeni  A
     NPA {

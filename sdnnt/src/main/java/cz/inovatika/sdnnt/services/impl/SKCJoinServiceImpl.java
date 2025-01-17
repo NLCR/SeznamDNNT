@@ -186,7 +186,7 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                                 MarcRecord origin = MarcRecord.fromSolrDoc(doc);
                                 origin.followers = pair.getRight();
                                 // zmena stavu - nutno 
-                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
+                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin,"scheduler", "scheduler/"+cs);
                                 solrClient.add(DataCollections.catalog.name(), document);
                                 getLogger().info("Updating id "+origin.identifier+" with followers "+origin.followers);
                             }
@@ -200,7 +200,7 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                                 MarcRecord origin = MarcRecord.fromSolrDoc(doc);
                                 origin.followers = pair.getRight();
                                 // zmena stavu - nutno 
-                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
+                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin,"scheduler", "scheduler/"+cs);
                                 solrClient.add(DataCollections.catalog.name(), document);
                                 getLogger().info("Updating id "+origin.identifier+" with followers "+origin.followers);
                             }
@@ -214,7 +214,7 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                                 MarcRecord origin = MarcRecord.fromSolrDoc(doc);
                                 origin.followers = pair.getRight();
                                 // zmena stavu - nutno 
-                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
+                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin,"scheduler", "scheduler/"+cs);
                                 solrClient.add(DataCollections.catalog.name(), document);
                                 getLogger().info("Updating id "+origin.identifier+" with followers "+origin.followers);
                             }
@@ -228,7 +228,7 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                                 MarcRecord origin = MarcRecord.fromSolrDoc(doc);
                                 origin.followers = pair.getRight();
                                 // zmena stavu - nutno 
-                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
+                                SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin,"scheduler", "scheduler/"+cs);
                                 solrClient.add(DataCollections.catalog.name(), document);
                                 getLogger().info("Updating id "+origin.identifier+" with followers "+origin.followers);
                             }

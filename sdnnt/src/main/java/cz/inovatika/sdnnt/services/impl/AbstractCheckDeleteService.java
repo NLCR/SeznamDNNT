@@ -105,7 +105,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                             DuplicateUtils.moveProperties(depStore, origin, followers, null);
                             
                             origin.followers = pair.getRight();
-                            SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin, "scheduler/"+cs);
+                            SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.D.name(), origin,"scheduler", "scheduler/"+cs);
                             solrClient.add(DataCollections.catalog.name(), document);
                             for (MarcRecord smr : followers) {
                                 solrClient.add(DataCollections.catalog.name(), smr.toSolrDoc());
@@ -126,7 +126,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                         MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
                         origin.followers = pair.getRight();
                         // zmena stavu - nutno 
-                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin, "scheduler/"+cs);
+                        SolrInputDocument document = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.DX.name(), origin,"scheduler", "scheduler/"+cs);
                         solrClient.add(DataCollections.catalog.name(), document);
                     }
                     List<String> identifiers = batch.stream().map(Pair::getKey).collect(Collectors.toList());
