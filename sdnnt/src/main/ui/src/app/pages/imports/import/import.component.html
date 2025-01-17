@@ -83,7 +83,7 @@
                         <div>
                           <ng-container *ngIf="id.nazev">{{ id.nazev }}</ng-container>
                         </div>
-                        <div fxLayout="row" fxLayoutGap="32px" class="app-pt-1 app-pb-1">
+                        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start end" class="app-pt-1 app-pb-1">
                           <div fxFlex>
                             <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
                               {{ id.dntstav[id.dntstav.length-1] }}
@@ -115,11 +115,11 @@
                             <!-- <ng-container *ngIf="id.approved">
                               {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
                             </ng-container> -->
+                            <mat-button-toggle-group>
+                              <mat-button-toggle mat-stroked-button class="app-color-warning"><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
+                              <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
+                            </mat-button-toggle-group>
 
-
-                            <a [matMenuTriggerFor]="menuMore">
-                              <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}
-                            </a>
                             <mat-menu #menuMore="matMenu">
                               <button mat-menu-item *ngIf="id.marc_998a && id.marc_998a[0].startsWith('http')"  (click)="gotoAleph(id.marc_998a[0])">
                                 <mat-icon>link</mat-icon>
