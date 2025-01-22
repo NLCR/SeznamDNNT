@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +33,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +57,7 @@ import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.KrameriusFields;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
+import cz.inovatika.sdnnt.utils.RequestsUtils;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
@@ -99,38 +97,6 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         }
     }
 
-    public  Set<String> usedInRequest(SolrClient solr, List<String> identifiers, String typeOfRequest) {
-        try {
-            Set<String> retval = new HashSet<>();
-            SolrQuery query = new SolrQuery("*")
-                    .setFields("id", "identifiers")
-                    .addFilterQuery("navrh:" + typeOfRequest)
-                    .setRows(3000);
-
-            String collected = identifiers.stream().map(id -> '"' + id + '"').collect(Collectors.joining(" OR "));
-            query.addFilterQuery("identifiers:(" + collected + ")");
-
-            SolrDocumentList zadost = solr.query("zadost", query).getResults();
-            zadost.stream().forEach(solrDoc -> {
-                Collection<Object> identsFromZadost = solrDoc.getFieldValues("identifiers");
-                identsFromZadost.stream().map(Object::toString).forEach(foundInZadost -> {
-                    if (identifiers.contains(foundInZadost)) {
-                        retval.add(foundInZadost);
-                    }
-                });
-            });
-            return retval;
-        } catch (SolrServerException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return new HashSet<>();
-    }
-
-    
-
-    
     public void initialize() {
         JSONObject checkKamerius = getOptions().getJSONObject("check_kramerius");
         this.checkConf = CheckKrameriusConfiguration.initConfiguration(checkKamerius);
@@ -268,7 +234,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                 List<String> batch = keys.subList(startIndex, Math.min(endIndex, keys.size()));
                 if (this.typeOfRequest != null) {
                     // used in reuqest; must not be in case of context information
-                    Set<String> used = usedInRequest(solr, batch, this.typeOfRequest);
+                    Set<String> used = RequestsUtils.usedInRequest(this.logger, solr, batch, this.typeOfRequest);
                     used.stream().forEach(identifiers2Links::remove);
                     used.stream().forEach(identifiers2MasterLinks::remove);
                     //used.stream().forEach(identifiers2FlagInDl::remove);
