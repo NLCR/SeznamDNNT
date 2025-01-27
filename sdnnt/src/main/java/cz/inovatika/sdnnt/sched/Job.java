@@ -8,6 +8,7 @@ package cz.inovatika.sdnnt.sched;
 import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
+import cz.inovatika.sdnnt.index.AbstractXMLImport;
 import cz.inovatika.sdnnt.index.OAIHarvester;
 import cz.inovatika.sdnnt.index.XMLImporterDistri;
 import cz.inovatika.sdnnt.index.XMLImporterHeureka;
@@ -43,8 +44,10 @@ import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.services.locks.LocksSupport;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -685,28 +688,52 @@ public class Job implements InterruptableJob {
             void doPerform(JSONObject jobData) {
                 try {
                     LocksSupport.SERVICES_LOCK.lock();
+                    long start = System.currentTimeMillis();
+
+                    long groupId = System.currentTimeMillis();
+                    String hexGroupId = Long.toHexString(groupId);
                     
                     LinkedHashSet<String> processingSet = new LinkedHashSet<>();
                     
-                    JSONObject distriConf = jobData.optJSONObject("distri.cz");
+                    JSONObject checkPn = jobData.optJSONObject("checkPN");
+                    int value = checkPn != null ? checkPn.optInt("value",6) : 6;
+                    String unit = checkPn != null ? checkPn.optString("unit","month") : "month";
+                    
+                    JSONObject distriConf = jobData.optJSONObject("districz");
                     String distriUrl = distriConf != null ? distriConf.optString("url") : null;
                     JSONObject kosmasConf = jobData.optJSONObject("kosmas");
                     String kosmasUrl = kosmasConf != null ? kosmasConf.optString("url") : null;
                     JSONObject heurekaConf = jobData.optJSONObject("heureka");
                     String heurekaUrl = heurekaConf != null ? heurekaConf.optString("url"):null;
 
+                    
                     String logger = jobData.optString("logger");
+                    AbstractXMLImport lastImport = null;
                     try {
-                        XMLImporterKosmas kosmas = new XMLImporterKosmas(logger,kosmasUrl);
-                        processingSet =  kosmas.doImport(null, false, processingSet);
-
-                        XMLImporterDistri distri = new XMLImporterDistri(logger,distriUrl);
-                        processingSet = distri.doImport(null, false, processingSet);
+                        if (StringUtils.isAnyString(kosmasUrl)) {
+                            AbstractXMLImport kosmas = new XMLImporterKosmas(logger, hexGroupId, kosmasUrl, value, unit);
+                            processingSet =  kosmas.doImport(null, false, processingSet);
+                            lastImport = kosmas;
+                        }
                         
-                        XMLImporterHeureka heureka = new XMLImporterHeureka(logger,heurekaUrl);
-                        processingSet = heureka.doImport(null, false,processingSet );
+                        if (StringUtils.isAnyString(distriUrl)) {
+                            AbstractXMLImport distri = new XMLImporterDistri(logger, hexGroupId, distriUrl, value, unit);
+                            processingSet = distri.doImport(null, false, processingSet);
+                            lastImport = distri;
+                        }
+
+                        if (StringUtils.isAnyString(heurekaUrl)) { 
+                            XMLImporterHeureka heureka = new XMLImporterHeureka(logger, hexGroupId, heurekaUrl, value, unit);
+                            processingSet = heureka.doImport(null, false,processingSet );
+                            lastImport = heureka;
+                        }
+                        
                     } catch (Exception e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        if (lastImport != null) {
+                            QuartzUtils.printDuration(lastImport.getLogger(), start);
+                        }
                     }
                 } finally {
                     LocksSupport.SERVICES_LOCK.unlock();
@@ -714,6 +741,84 @@ public class Job implements InterruptableJob {
             }
         },
 
+        PNREQ {
+
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    long start = System.currentTimeMillis();
+
+
+                    List<Pair<String,String>> processors = new ArrayList<>();
+                    
+                    JSONObject checkPn = jobData.optJSONObject("checkPN");
+                    int value = checkPn != null ? checkPn.optInt("value",6) : 6;
+                    String unit = checkPn != null ? checkPn.optString("unit","month") : "month";
+                    
+                    
+                    JSONObject distriConf = jobData.optJSONObject("districz");
+                    String distriUrl = distriConf != null ? distriConf.optString("url") : null;
+                    if (distriUrl != null) {
+                        processors.add(Pair.of("districz", distriUrl));
+                    }
+                    
+                    JSONObject kosmasConf = jobData.optJSONObject("kosmas");
+                    String kosmasUrl = kosmasConf != null ? kosmasConf.optString("url") : null;
+                    if (kosmasUrl != null) {
+                        processors.add(Pair.of("kosmas", kosmasUrl));
+                    }
+
+                    JSONObject heurekaConf = jobData.optJSONObject("heureka");
+                    String heurekaUrl = heurekaConf != null ? heurekaConf.optString("url"):null;
+                    if (heurekaUrl != null) {
+                        processors.add(Pair.of("heureka", heurekaUrl));
+                    }
+
+                    
+                    String logger = jobData.optString("logger");
+                    PNCheckStatesService pnCheckStateService = null;
+                    try {
+                        
+                        pnCheckStateService = new PNCheckStatesServiceImpl(logger, processors, value, unit);
+                        List<Pair<String, String>> found = pnCheckStateService.check();
+                        
+                        
+                        int maximum = 100;
+                        int numberOfBatch = found.size() / maximum;
+                        if (found.size() % maximum > 0) {
+                            numberOfBatch = numberOfBatch + 1;
+                        }
+                        for (int i = 0; i < numberOfBatch; i++) {
+                            int startIndex = i * maximum;
+                            int endIndex = Math.min((i + 1) * maximum, found.size());
+                            
+                            List<Pair<String, String>> sublist = found.subList(startIndex, endIndex);
+                            List<String> sublistIdentifiers = sublist.stream().map(Pair::getKey).collect(Collectors.toList());
+                            
+                            
+                            pnCheckStateService.getLogger().info("Creating request for sublist "+sublistIdentifiers);
+                            pnCheckStateService.request(sublistIdentifiers);
+
+                        }
+                        
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        if (pnCheckStateService != null) {
+                            QuartzUtils.printDuration(pnCheckStateService.getLogger(), start);
+                        }
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+                
+            }
+            
+        },
+        
+        
+        
         WORKFLOW {
             @Override
             void doPerform(JSONObject jobData) {

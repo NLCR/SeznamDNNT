@@ -12,13 +12,16 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -45,10 +48,33 @@ import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public abstract class AbstractXMLImport implements LoggerAware {
 
+    public static final String DEFAULT_CHRONO_UNIT = "month";
+    public static final int DEFAULT_VALUE = 6;
+    protected static final int DEFAULT_NUMBER_HITS_BY_TITLE = 100;
     protected Logger logger = Logger.getLogger(XMLImporterDistri.class.getName());
     protected String url;
     protected int fromId = -1;
+ 
+    protected int checkPNStates = AbstractXMLImport.DEFAULT_VALUE;
+    protected String chronoUnit = AbstractXMLImport.DEFAULT_CHRONO_UNIT;
 
+    
+    public AbstractXMLImport(String strLogger,  String url, int checkPNStates, String chronoUnit) {
+        if (strLogger != null) {
+            this.logger = Logger.getLogger(strLogger);
+        }
+        if (url != null) {
+            this.url = url;
+        }
+        if (checkPNStates > -1) {
+            this.checkPNStates = checkPNStates;
+            this.chronoUnit = chronoUnit;
+        }
+        
+    }
+
+    
+    
     protected SolrDocument isControlled(String id, SolrClient solr) throws SolrServerException, IOException {
         int days = Options.getInstance().getInt("importControlledExpireationDays", 30);
         SolrQuery q = new SolrQuery("*").addFilterQuery("item_id:" + id)
@@ -60,20 +86,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
         return null;
     }
 
-    protected List<String> findCatalogItem(Map<String, Object> item, SolrClient solrClient, String title, String ean, LinkedHashSet<String> itemsToSkip)
-            throws SolrServerException, IOException {
-        String q = "ean:\"" + ean + "\"^10.0 OR (" + title + ")";
-
-        int diff = 1;// Options.getInstance().getInt("importControlledExpireationDays", 1);
-
-        String timeCondition = String.format("[* TO NOW-%dMINUTE]", diff);
-        // long start = System.currentTimeMillis();
-        
-        // nastavit pouze identifier a dotahnout potupne 
-        SolrQuery query = new SolrQuery(q).setRows(100).setParam("q.op", "AND").addFilterQuery("kuratorstav:*")
-                // skeleton fields
-                .setFields(
-                        "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,datum_kurator_stav,granularity:[json],marc_998a");
+    protected List<String> findCatalogItem(Map<String, Object> item, SolrClient solrClient, SolrQuery query, String ean, LinkedHashSet<String> itemsToSkip) throws SolrServerException, IOException {
 
         QueryRequest qreq = new QueryRequest(query);
         NoOpResponseParser rParser = new NoOpResponseParser();
@@ -83,68 +96,103 @@ public abstract class AbstractXMLImport implements LoggerAware {
         JSONObject jresp = (new JSONObject((String) qresp.get("response"))).getJSONObject("response");
 
         JSONArray docs = jresp.getJSONArray("docs");
-
+        
+        /** all identifiers */
         List<String> identifiers = new ArrayList<>();
-        List<String> na_vyrazeni = new ArrayList<>();
+        /** pn identifiers */
+        List<String> pnIdetifiers = new ArrayList<>();
+        /** na vyrazeni */
+        List<String> naVyrazeni = new ArrayList<>();
+
         boolean isEAN = false;
         if (docs.length() == 0) {
             return new ArrayList<>();
         }
-
+        
+        List<String> states = new ArrayList<>();
         for (Object o : docs) {
             JSONObject doc = (JSONObject) o;
+            String identifier = doc.getString("identifier");
+
             if (doc.has("dntstav")) {
+                states.addAll(doc.getJSONArray("dntstav").toList().stream().map(Object::toString).collect(Collectors.toList()));
+
                 List<Object> publicstate = doc.getJSONArray(MarcRecordFields.DNTSTAV_FIELD).toList();
                 List<Object> kuratorstate = doc.getJSONArray(MarcRecordFields.KURATORSTAV_FIELD).toList();
                 String datumKuratorStav = doc.optString(MarcRecordFields.DATUM_KURATOR_STAV_FIELD);
-                item.put("dntstav", doc.getJSONArray("dntstav").toList());
+
                 if (publicstate.contains("A") || publicstate.contains("PA") || publicstate.contains("NL")) {
                     if (!kuratorstate.contains(CuratorItemState.PN.name())) {
-                        String identifier = doc.getString("identifier");
                         if (!itemsToSkip.contains(identifier)) {
                             getImportDesc().incrementInSdnnt();
-                            na_vyrazeni.add(identifier);
+                            naVyrazeni.add(identifier);
+                        } else {
+                            getImportDesc().incrementSkipped();
                         }
                         
                     } else {
                         if (datumKuratorStav != null) {
                             Instant parsedInstant = Instant.parse(datumKuratorStav);
-                            Duration duration = Duration.between(parsedInstant, Instant.now());
-                            if (duration.toDays() > 2) {
-                                String identifier = doc.getString("identifier");
+                            ChronoUnit selected = ChronoUnit.DAYS;
+                            ChronoUnit[] values = ChronoUnit.values();
+                            for (ChronoUnit chUnit : values) {
+                                if (chUnit.name().toLowerCase().equals(this.chronoUnit)) {
+                                    selected = chUnit;
+                                    break;
+                                }
+                            }
+                            
+                            if (ImporterUtils.calculateInterval(parsedInstant, parsedInstant, selected) > this.checkPNStates) {
                                 if (!itemsToSkip.contains(identifier)) {
                                     getImportDesc().incrementInSdnnt();
-                                    na_vyrazeni.add(identifier);
-                                
+                                    naVyrazeni.add(identifier);
+                                } else {
+                                    getImportDesc().incrementSkipped();
+                                    logger.info(String.format("Skipping PN state %s", identifier));
+                                    pnIdetifiers.add(identifier);
                                 }
                             } else {
-                                getLogger().info("New PN state, skipping");
+                                getImportDesc().incrementSkipped();
+                                logger.info(String.format("Skipping PN state %s", identifier));
+                                pnIdetifiers.add(identifier);
+                                getLogger().info(String.format("New PN state %s, skipping",  doc.getString("identifier")));
                             }
                         } else {
+                            pnIdetifiers.add(identifier);
                             getLogger().info("No " + MarcRecordFields.DATUM_KURATOR_STAV_FIELD + " field");
-
                         }
                     }
 
                 }
             }
-            identifiers.add(doc.toString());
+            
+            if (!pnIdetifiers.contains(identifier) && !itemsToSkip.contains(identifier)) {
+                doc.remove("granularity");
+                doc.remove("raw");
+                identifiers.add(doc.toString());
+            }
 
             if (doc.has("ean")) {
                 List<Object> eans = doc.getJSONArray("ean").toList();
-                if (eans.contains(ean)) {
+                if (ean!= null &&  eans.contains(ean)) {
                     isEAN = true;
                 }
             }
         }
+
+        
+        JSONArray dntStavArray = new JSONArray();
+        states.stream().filter(state -> Arrays.asList("A", "PA", "NL").contains(state)).forEach(dntStavArray::put);
+        if (naVyrazeni.size() > 0)  item.put("dntstav",dntStavArray);
+
         item.put("found", true);
         item.put("hit_type", isEAN ? "ean" : "noean");
         item.put("num_hits", isEAN ? identifiers.size() : jresp.getInt("numFound"));
         item.put("identifiers", identifiers);
-        item.put("na_vyrazeni", na_vyrazeni);
-        item.put("hits_na_vyrazeni", na_vyrazeni.size());
+        item.put("na_vyrazeni", naVyrazeni);
+        item.put("hits_na_vyrazeni", naVyrazeni.size());
 
-        return na_vyrazeni;
+        return naVyrazeni;
     }
 
 
@@ -177,7 +225,19 @@ public abstract class AbstractXMLImport implements LoggerAware {
     
     public abstract XMLImportDesc getImportDesc();
     public abstract String getImportIdentifier();
-    public abstract LinkedHashSet<String> processFromStream(String uri, InputStream is, String fromId, SolrClient solrClient, LinkedHashSet<String> identifiers) throws XMLStreamException, SolrServerException, IOException;
+
+    // Process stream
+    // change PN states
+    public abstract LinkedHashSet<String> processFromStream(
+            String uri, 
+            InputStream is, 
+            String fromId, 
+            SolrClient solrClient, 
+            LinkedHashSet<String> identifiers) throws XMLStreamException, SolrServerException, IOException;
+    
+    
+    
+    
     
     protected SolrClient buildClient() {
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
@@ -187,6 +247,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
         return Options.getInstance();
     }
 
+    
     public LinkedHashSet<String> doImport(String fromId, boolean resume, LinkedHashSet<String> skipIdentifiers) {
         try (final SolrClient solrClient = buildClient()) {
             JSONObject ret = new JSONObject();
@@ -237,6 +298,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
     }
 
     public static class XMLImportDesc {
+
         private String importOrigin;
         private String importId;
         private String importDate;
@@ -249,9 +311,13 @@ public abstract class AbstractXMLImport implements LoggerAware {
         private int skipped = 0;
         private int indexed = 0;
 
-        public XMLImportDesc(String importOrigin) {
+        private String group;
+        
+        
+        public XMLImportDesc(String importOrigin, String group) {
             super();
             this.importOrigin = importOrigin;
+            this.group = group;
         }
 
         public String getImportOrigin() {
@@ -350,6 +416,21 @@ public abstract class AbstractXMLImport implements LoggerAware {
             this.importOrigin = importOrigin;
         }
 
+        public String getGroup() {
+            return group;
+        }
+        
+        
+        
+
+        @Override
+        public String toString() {
+            return "XMLImportDesc [importOrigin=" + importOrigin + ", importId=" + importId + ", importDate="
+                    + importDate + ", importUrl=" + importUrl + ", inSdnnt=" + inSdnnt + ", firstId=" + firstId
+                    + ", lastId=" + lastId + ", total=" + total + ", skipped=" + skipped + ", indexed=" + indexed
+                    + ", group=" + group + "]";
+        }
+
         public SolrInputDocument toSolrInputDocument() {
             SolrInputDocument idoc = new SolrInputDocument();
             idoc.setField(ImporterUtils.IMPORT_ID_KEY, importId);
@@ -363,6 +444,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
             idoc.setField(ImporterUtils.IMPORT_NUMDOCS_KEY, indexed);
             idoc.setField(ImporterUtils.IMPORT_SKIPPED_KEY, skipped);
             idoc.setField(ImporterUtils.IMPORT_NUMINSDNNT_KEY, inSdnnt);
+            idoc.setField(ImporterUtils.IMPORT_GROUP_KEY, this.group);
             return idoc;
         }
     }

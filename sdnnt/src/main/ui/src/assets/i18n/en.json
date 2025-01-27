@@ -43,6 +43,7 @@
     "N": "Discarded",
     "X": "Free",
     "PX": "Probably free work",
+    "PN": "Probably discarded work",
     "NL":"Scheduled release of the work",
     "NLX":"On-site terminal license, internal state",
 
@@ -71,6 +72,7 @@
       "N": "Discarded - the work is not included in the List, it is freely available for proposal for inclusion",
       "X": "Free",
       "PX": "Probably free work",
+      "PN": "Probably discarded work",
       "NL":"Scheduled release of the worke",
       "NZ": "On-site terminal license",
       "A,NZ": "On-site terminal license",
@@ -98,6 +100,8 @@
     "edition":"Edition",
     "no_followers": "No followers",
     "identifier":"Identifier",
+    "ean":"EAN",
+
 
     "m": "Monographs",
     "s": "Serial",
@@ -125,6 +129,8 @@
     "N": "Discared",
     "X": "Free",
     "PX": "Probably free work",
+    "PN": "Probably discarded work",
+
     "NZ": "On-site terminal",
     "NZN": "NZN: proposal for inclusion",
     "VNL": "Call for on on-site terminal license",

@@ -73,28 +73,22 @@ public class XMLImporterKosmas extends AbstractXMLImport {
     private static final String DEFAULT_IMPORT_URL = "https://www.kosmas.cz/atl_shop/nkp.xml";
     private static final String IMPORT_IDENTIFIER = "kosmas";
 
-    private XMLImportDesc importDescription = new XMLImportDesc(IMPORT_IDENTIFIER);
+    private XMLImportDesc importDescription = null;//new XMLImportDesc(IMPORT_IDENTIFIER);
     private Logger logger = Logger.getLogger(XMLImporterKosmas.class.getName());
     private String url = DEFAULT_IMPORT_URL;
-    
 
-    public XMLImporterKosmas(String strLogger, String url) {
-        if (strLogger != null) {
-            this.logger = Logger.getLogger(strLogger);
+    public XMLImporterKosmas(String strLogger, String groupId, String url, int checkPNStates, String chronoUnit) {
+        super(strLogger, url, checkPNStates, chronoUnit);
+        if (this.url == null) {
+            this.url = DEFAULT_IMPORT_URL;
         }
-        if (url != null) {
-            this.url = url;
-        } else {
-            this.url = IMPORT_IDENTIFIER;
-        }
+        this.importDescription = new XMLImportDesc(IMPORT_IDENTIFIER, groupId);
     }
     
     @Override
     public String getImportIdentifier() {
         return IMPORT_IDENTIFIER;
     }
-
-    //public LinkedHashSet<String> processFromStream(String uri, InputStream is, String from_id, SolrClient solrClient, LinkedHashSet<String> itemsToSkip)
 
      public LinkedHashSet<String> processFromStream(String uri, InputStream is, String fromId, SolrClient solrClient,LinkedHashSet<String> itemsToSkip)
             throws SolrServerException, IOException, XMLStreamException {
@@ -103,7 +97,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
         allIdentifiersToPN = readXML(is, "ARTICLE", solrClient, itemsToSkip);
         solrClient.commit(DataCollections.imports_documents.name());
         ImporterUtils.changePNState(getLogger(), solrClient, allIdentifiersToPN, IMPORT_IDENTIFIER);
-        ImporterUtils.changeImportDocs(getLogger(), solrClient, importDescription);
+        //ImporterUtils.changeImportDocs(getLogger(), solrClient, importDescription);
         indexImportSummary(solrClient);
         return new LinkedHashSet<>(allIdentifiersToPN);
     }
@@ -118,7 +112,6 @@ public class XMLImporterKosmas extends AbstractXMLImport {
             NodeList nodes = doc.getElementsByTagName(itemName);
             getLogger().info("Number of items " + nodes.getLength());
             // UpdateRequest req = null;
-            int batchSize = 100;
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node node = nodes.item(i);
                 Map<String, String> item = new HashMap<>();
@@ -193,7 +186,10 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("controlled_date", isControlled.get("controlled_date"));
                 idoc.setField("controlled_user", isControlled.get("controlled_user"));
             }
-            List<String> foundIdentifiers = findInCatalog(item, solrClient, itemsToSkip);
+            List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
+//            if (!item.containsKey("found")) {
+//                foundIdentifiers = findInCatalogByTitle(item, solrClient, itemsToSkip);
+//            }
             if (item.containsKey("found")) {
                 idoc.setField("identifiers", item.get("identifiers"));
                 idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
@@ -233,21 +229,45 @@ public class XMLImporterKosmas extends AbstractXMLImport {
         item.put("frbr", MD5.normalize(frbr));
     }
 
-    public List<String> findInCatalog(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+//    public List<String> findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+//        try {
+//
+//            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
+//            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
+//              title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
+//            }
+//
+//            SolrQuery query = new SolrQuery(title)
+//                    .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
+//                    .setParam("q.op", "AND")
+//                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,datum_kurator_stav");
+//            
+//            return findCatalogItem(item, solrClient, query,  item.get("EAN").toString(), itemsToSkip);
+//        } catch (SolrServerException | IOException ex) {
+//            getLogger().log(Level.SEVERE, null, ex);
+//            return new ArrayList<>();
+//        }
+//    }
+    
+    public List<String> findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
 
-            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
-            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
-                title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
-            }
-            String ean = item.get("EAN").toString();
-            return findCatalogItem(item, solrClient, URLEncoder.encode(title, Charset.forName("UTF-8")), ean, itemsToSkip);
+
+            String q = "ean:\"" + item.get("EAN")+"\"";
+
+            SolrQuery query = new SolrQuery(q)
+                    .setRows(100)
+                    .setParam("q.op", "AND")
+                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,datum_kurator_stav");
+            
+            return findCatalogItem(item, solrClient, query,  item.get("EAN").toString(), itemsToSkip);
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
             return new ArrayList<>();
         }
-    }
 
+    }
+    
     @Override
     public XMLImportDesc getImportDesc() {
         return this.importDescription;
@@ -266,17 +286,28 @@ public class XMLImporterKosmas extends AbstractXMLImport {
     }
     
     public static void main(String[] args) {
+        
+        AbstractXMLImport kosmas = new XMLImporterKosmas("logger", "gcd", 
+                "c:\\Users\\happy\\Projects\\SeznamDNNT\\nkp.xml", 
+                10, 
+                "days");
+        
+        LinkedHashSet<String> doImport = kosmas.doImport(null, false, new LinkedHashSet<>());
+        
+        
+        
+        //lastImport = kosmas;
         //XMLImporterKosmas kosmas = new XMLImporterKosmas("test", DEFAULT_IMPORT_URL);
         //kosmas.doImport(null, false);
-        HttpSolrClient build = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
-        try(build) {
-            XMLImportDesc desc = new XMLImportDesc("kosmas");
-            desc.setImportId("1736973060");
-            ImporterUtils.changeImportDocs(Logger.getLogger("test"), build, desc);
-
-        } catch(Exception ex) {
-            ex.printStackTrace();  
-        }
+//        HttpSolrClient build = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build();
+//        try(build) {
+//            XMLImportDesc desc = new XMLImportDesc("kosmas");
+//            desc.setImportId("1736973060");
+//            ImporterUtils.changeImportDocs(Logger.getLogger("test"), build, desc);
+//
+//        } catch(Exception ex) {
+//            ex.printStackTrace();  
+//        }
     }
 
 }

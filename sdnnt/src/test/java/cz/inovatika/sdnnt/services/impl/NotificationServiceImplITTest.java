@@ -141,8 +141,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
         MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
-        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka");
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.add(Calendar.DAY_OF_WEEK, -2);
@@ -270,8 +270,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         
-        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "poznamka");
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         //calendar1.add(Calendar.DAY_OF_WEEK, -1);
@@ -402,8 +402,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         
-        solrMarc1.setKuratorStav("D", "D", null, "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("D", "D", null, "testuser", "poznamka");
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         //calendar1.add(Calendar.DAY_OF_WEEK, -1);
@@ -539,8 +539,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         
-        solrMarc1.setKuratorStav("PX", "A", License.dnnto.name(), "testuser", "poznamka", null);
-        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("PX", "A", License.dnnto.name(), "testuser", "poznamka");
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         //calendar1.add(Calendar.DAY_OF_WEEK, -1);
@@ -675,8 +675,8 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc2 = MarcRecord.fromDocDep(catalog.getResults().get(1));
         
         
-        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "SKC_1", null);
-        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "SKC_1");
+        solrMarc2.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         //calendar1.add(Calendar.DAY_OF_WEEK, -1);
@@ -801,7 +801,7 @@ public class NotificationServiceImplITTest {
         MarcRecord solrMarc1 = MarcRecord.fromDocDep(catalog.getResults().get(0));
         
         
-        solrMarc1.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka", null);
+        solrMarc1.setKuratorStav("A", "A", License.dnntt.name(), "testuser", "poznamka");
 
         Calendar calendar1 = Calendar.getInstance();
         calendar1.add(Calendar.DAY_OF_WEEK, -1);

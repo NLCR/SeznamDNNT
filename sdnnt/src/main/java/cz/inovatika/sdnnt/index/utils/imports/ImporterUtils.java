@@ -33,6 +33,10 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -95,7 +99,8 @@ public class ImporterUtils {
     public static final String IMPORT_URL_KEY = "url";
     public static final String IMPORT_DATE_KEY = "date";
     public static final String IMPORT_ID_KEY = "id";
-
+    public static final String IMPORT_GROUP_KEY = "group";
+    
     private ImporterUtils() {}
 
 
@@ -137,11 +142,14 @@ public class ImporterUtils {
             int stop = Math.min((i + 1) * BATCHS_SIZE, allIdentifiersToPN.size());
             List<String> sublist = allIdentifiersToPN.subList(start, stop);
             for (String identifier : sublist) {
-                SolrInputDocument idoc = ChangeProcessStatesUtility.changeProcessState(solrJClient, identifier, CuratorItemState.PN.name(), importIdentification, "import/"+importIdentification);
+                MarcRecord mr = MarcRecord.fromIndex(solrJClient, identifier);
+
+                SolrInputDocument idoc = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.PN.name(), mr, importIdentification, "import/"+importIdentification);
                 if (idoc != null) {
                     solrJClient.add(DataCollections.catalog.name(), idoc);
                 }
             }
+
             SolrJUtilities.quietCommit(solrJClient, DataCollections.catalog.name());
         }
     }
@@ -216,5 +224,16 @@ public class ImporterUtils {
         }
 
     }
+
+
+    public static long calculateInterval(Instant start, Instant end, ChronoUnit unit) {
+
+        LocalDateTime startDate = start.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime endDate = end.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        
+        return unit.between(startDate, endDate);
+    }
+    
+    
     
 }

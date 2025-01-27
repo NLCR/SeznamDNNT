@@ -71,9 +71,9 @@ public class OAIHarvestDeleteServiceTTest {
         try {
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na A");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na N");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA", License.dnnto.name(),"poznamka", new JSONArray(), "zmena na PA");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "zmena na A");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N","N", License.dnnto.name(),"poznamka",  "zmena na N");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA","PA", License.dnnto.name(),"poznamka",  "zmena na PA");
 
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
@@ -145,8 +145,8 @@ public class OAIHarvestDeleteServiceTTest {
         try {
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "D", null,"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","A", "A", License.dnnto.name(),"poznamka",  "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","D" ,"D", null,"poznamka",  "test");
 
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
@@ -278,7 +278,7 @@ public class OAIHarvestDeleteServiceTTest {
                     
             
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka",  "test");
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject(config).getJSONObject("OAIHavest").getJSONObject("results"))
                     .addMockedMethod("getOptions")

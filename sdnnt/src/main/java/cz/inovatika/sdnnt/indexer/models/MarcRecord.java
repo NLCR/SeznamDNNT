@@ -98,6 +98,12 @@ public class MarcRecord {
   // followers
   public List<String> followers = new ArrayList<>();
 
+  // external reference urls 
+  public List<String> externalReferenceUrls = new ArrayList<>();
+
+  // external reference urls 
+  public List<String> externalReferenceNames = new ArrayList<>();
+
   /** EUIPO stuf **/
   // idEuipo
   public List<String> idEuipo = new ArrayList<>();
@@ -182,7 +188,9 @@ public class MarcRecord {
                       ID_EUIPO_EXPORT,
                       ID_EUIPO_EXPORT_ACTIVE,
                       EXPORT,
-                      CURATOR_ACTIONS
+                      CURATOR_ACTIONS,
+                      EXTERNAL_REFERENCE_URL,
+                      EXTERNAL_REFERENCE_NAME
                       );
 
       List<MarcRecord> mrecs = new ArrayList<>();
@@ -314,6 +322,16 @@ public class MarcRecord {
           mr.followers = collected;
       }
       
+      if (doc.containsKey(EXTERNAL_REFERENCE_URL)) {
+          List<String> collected = doc.getFieldValues(EXTERNAL_REFERENCE_URL).stream().map(Object::toString).collect(Collectors.toList());
+          mr.externalReferenceUrls = collected;
+      }
+
+      if (doc.containsKey(EXTERNAL_REFERENCE_URL)) {
+          List<String> collected = doc.getFieldValues(EXTERNAL_REFERENCE_URL).stream().map(Object::toString).collect(Collectors.toList());
+          mr.externalReferenceNames = collected;
+      }
+
       if (doc.containsKey(DIGITAL_LIBRARIES)) {
           List<String> collected = doc.getFieldValues(DIGITAL_LIBRARIES).stream().map(Object::toString).collect(Collectors.toList());
           mr.digitalLibraries = collected;
@@ -753,9 +771,9 @@ public class MarcRecord {
   }
 
 
-  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka, JSONArray granularity) {
+  public void setKuratorStav(String kstav, String pstav, String license, String user, String poznamka) {
     CuratorItemState curatorItemState = CuratorItemState.valueOf(kstav);
-    changedState( user, pstav, curatorItemState.name(), license, poznamka, granularity);
+    changedState( user, pstav, curatorItemState.name(), license, poznamka);
     toSolrDoc();
   }
 
@@ -773,7 +791,7 @@ public class MarcRecord {
   }
 
 
-  private void changedState( String user, String publicState, String kuratorState, String license, String comment, JSONArray granularity) {
+  private void changedState( String user, String publicState, String kuratorState, String license, String comment) {
     toSolrDoc();
     Date now = Calendar.getInstance().getTime();
     if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty())) {
@@ -823,6 +841,8 @@ public class MarcRecord {
           }
         break;
 
+        case PN:
+            // keep license
         case PX:
         // keep license
         break;

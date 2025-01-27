@@ -73,7 +73,7 @@ public class IndexerITTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
         // i granularita musi mit N 
-        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:DNT01-000172209", "N", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:DNT01-000172209", "N", "N", License.dnnto.name(),"poznamka",  "test");
         SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
 
         solrQuery = new SolrQuery();
@@ -130,7 +130,7 @@ public class IndexerITTest {
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
 
-        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000083605", "N", null,"poznamka", new JSONArray(), "test");
+        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000083605","N" , "N", null,"poznamka",  "test");
         SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
 
     }

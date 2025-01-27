@@ -4,8 +4,17 @@ import cz.inovatika.sdnnt.index.CatalogSearcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -16,6 +25,7 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -28,6 +38,7 @@ import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
 import org.apache.solr.client.solrj.request.json.TermsFacetMap;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import static cz.inovatika.sdnnt.rights.Role.*;
@@ -369,57 +380,155 @@ public class SearchServlet extends HttpServlet {
     IMPORT_DOCUMENTS {
       @Override
       JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-        if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-          JSONObject ret = new JSONObject();
-          Options opts = Options.getInstance();
+              if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin))
+                      .permit()) {
+                  JSONObject ret = new JSONObject();
+                  Options opts = Options.getInstance();
 
-          int rows = opts.getClientConf().getInt("rows");
-          if (req.getParameter("rows") != null) {
-            rows = Integer.parseInt(req.getParameter("rows"));
+                  int rows = opts.getClientConf().getInt("rows");
+                  if (req.getParameter("rows") != null) {
+                      rows = Integer.parseInt(req.getParameter("rows"));
+                  }
+                  int start = 0;
+                  if (req.getParameter("page") != null) {
+                      start = Integer.parseInt(req.getParameter("page")) * rows;
+                  }
+                  try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
+                      SolrQuery query = new SolrQuery("*").setRows(rows).setStart(start)
+                              .addSort("hit_type",SolrQuery.ORDER.asc)
+                              .addSort("name", SolrQuery.ORDER.asc)
+                              .addFilterQuery("import_id:" + req.getParameter("id"))
+                              .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL").setFacet(true)
+                              .addFacetField("{!ex=dntstav}dntstav").addFacetField("{!ex=ct}controlled")
+                              .setFacetMinCount(1).setParam("json.nl", "arrntv")
+                              .setFields("*,identifiers:[json],catalog:[json],item:[json]");
+
+                      if (req.getParameter("dntstav") != null) {
+                          query.addFilterQuery("{!tag=dntstav}dntstav:" + req.getParameter("dntstav"));
+                      }
+                      if (req.getParameter("controlled") != null) {
+                          query.addFilterQuery("{!tag=ct}controlled:" + req.getParameter("controlled"));
+                      }
+
+                      QueryRequest qreq = new QueryRequest(query);
+                      NoOpResponseParser rParser = new NoOpResponseParser();
+                      rParser.setWriterType("json");
+                      qreq.setResponseParser(rParser);
+                      NamedList<Object> qresp = solr.request(qreq, "imports_documents");
+                      
+                      final List<String> identsid = new ArrayList<>();
+
+                      JSONObject jsonVal = new JSONObject((String) qresp.get("response"));
+                      JSONArray importDocs = jsonVal.getJSONObject("response").getJSONArray("docs");
+                      for (int i = 0; i < importDocs.length(); i++) {
+                          JSONObject iDoc = importDocs.getJSONObject(i);
+                          iDoc.getJSONArray("identifiers").forEach(obj-> {
+                              JSONObject jsonObj = (JSONObject) obj;
+                              identsid.add(jsonObj.getString("identifier"));
+                          });
+                      }
+
+                      Map<String, JSONObject> map = new HashMap<>();
+                      
+                      int batchSize = 40;
+                      int number = identsid.size() / batchSize;
+                      number =  number + ((identsid.size() % batchSize == 0)  ? 0 : 1);
+                      
+                      for (int j = 0; j < number; j++) {
+                          int startOffset = j*batchSize;
+                          int endOffset = Math.min((j+1)*batchSize, identsid.size());
+                          List<String> sublist = identsid.subList(startOffset, endOffset);
+                          String collect = sublist.stream().map(it->  '"'+it+'"').collect(Collectors.joining(" OR "));
+
+
+                          SolrQuery catalogQuery = new SolrQuery("*")
+                                  .setRows(sublist.size())
+                                  .setStart(0)
+                                  .addFilterQuery("identifier:(" + collect+")")
+                                  .setFields("identifier,"
+                                          + "dntstav,"
+                                          +"license,"
+                                          + "kuratorstav,"
+                                          + "historie_stavu,"
+                                          + "id_euipo,"
+                                          + "historie_kurator_stavu,"
+                                          + "granularity:json");
+
+                          QueryRequest catalogReq = new QueryRequest(catalogQuery);
+                          NoOpResponseParser catalogRParser = new NoOpResponseParser();
+                          catalogRParser.setWriterType("json");
+                          catalogReq.setResponseParser(rParser);
+                          NamedList<Object> catalogResp = solr.request(catalogReq, DataCollections.catalog.name());
+                          JSONObject catalogRespVal = new JSONObject((String) catalogResp.get("response"));
+                          
+                          JSONArray catalogDocs = catalogRespVal.getJSONObject("response").getJSONArray("docs");
+                          for (int i = 0; i < catalogDocs.length(); i++) {
+                              JSONObject cDoc = catalogDocs.getJSONObject(i);
+                              map.put(cDoc.getString("identifier"), cDoc);
+                          }
+                      }
+                      
+                      
+                      List<String> fields = Arrays.asList(
+                          MarcRecordFields.DNTSTAV_FIELD,
+                          MarcRecordFields.LICENSE_FIELD,
+                          MarcRecordFields.KURATORSTAV_FIELD,
+                          MarcRecordFields.HISTORIE_STAVU_FIELD,
+                          MarcRecordFields.ID_EUIPO,
+                          MarcRecordFields.GRANULARITY_FIELD);
+                      
+                      
+                      for (int i = 0; i < importDocs.length(); i++) {
+                          JSONObject iDoc = importDocs.getJSONObject(i);
+                          iDoc.getJSONArray("identifiers").forEach(obj-> {
+
+                              JSONObject jsonObj = (JSONObject) obj;
+                              String identifier = jsonObj.getString("identifier");
+                              JSONObject catalogDoc = map.get(identifier);
+                              if (catalogDoc != null) {
+                                  
+                                  final AtomicBoolean changedInImportFlag = new AtomicBoolean(false);
+                                  fields.forEach(f->{
+                                      if (catalogDoc.has(f) && jsonObj.has(f)) {
+                                          String importStringRepresentation = jsonObj.get(f).toString();
+                                          String catalogStringRepresenation = catalogDoc.get(f).toString();
+                                          if (importStringRepresentation != null && catalogStringRepresenation != null) {
+                                              if (!importStringRepresentation.equals(catalogStringRepresenation)) {
+                                                  jsonObj.put(f, catalogDoc.get(f));
+                                                  changedInImportFlag.set(true);
+                                              }
+                                          } else if (catalogStringRepresenation == null) {
+                                              jsonObj.remove(f);
+                                          }
+                                          
+                                      } else if (!catalogDoc.has(f) && jsonObj.has(f)) {
+                                          jsonObj.remove(f);
+                                      } else if (catalogDoc.has(f) && !jsonObj.has(f)) {
+                                          jsonObj.put(f, catalogDoc.get(f));
+                                      }
+                                  });
+                                  
+                                  if (changedInImportFlag.get()) {
+                                      
+                                      jsonObj.put("changedInImport", true);
+                                  }
+                              } else {
+                                  LOGGER.warning(String.format("Identifier '%s' doesnt exist", identifier));
+                              }
+                          });
+                      }
+
+                      
+                      
+                      return jsonVal;
+                  } catch (SolrServerException | IOException ex) {
+                      LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                      return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+                  }
+              } else {
+                  return errorJson(response, SC_FORBIDDEN, "not allowed");
+              }
           }
-          int start = 0;
-          if (req.getParameter("page") != null) {
-            start = Integer.parseInt(req.getParameter("page")) * rows;
-          }
-          try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
-            SolrQuery query = new SolrQuery("*")
-                    .setRows(rows)
-                    .setStart(start)
-                    .setSort("name", SolrQuery.ORDER.asc)
-                    .addFilterQuery("import_id:" + req.getParameter("id"))
-                    .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
-                    .setFacet(true)
-                    .addFacetField("{!ex=dntstav}dntstav")
-                    .addFacetField("{!ex=ct}controlled")
-                    .setFacetMinCount(1)
-                    .setParam("json.nl", "arrntv")
-                    .setFields("*,identifiers:[json],catalog:[json],item:[json]");
-            
-            if (req.getParameter("dntstav") != null) {
-              query.addFilterQuery("{!tag=dntstav}dntstav:" + req.getParameter("dntstav"));
-            }
-            if (req.getParameter("controlled") != null) {
-              query.addFilterQuery("{!tag=ct}controlled:" + req.getParameter("controlled"));
-            }
-            
-            QueryRequest qreq = new QueryRequest(query);
-            NoOpResponseParser rParser = new NoOpResponseParser();
-            rParser.setWriterType("json");
-            qreq.setResponseParser(rParser);
-            NamedList<Object> qresp = solr.request(qreq, "imports_documents");
-
-            return new JSONObject((String) qresp.get("response"));
-          } catch (SolrServerException | IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
-          }
-        } else {
-          return errorJson(response, SC_FORBIDDEN, "not allowed");
-        }
-
-
-        //return ret;
-      }
     },
     IMPORTS {
       @Override

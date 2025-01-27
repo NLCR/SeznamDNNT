@@ -44,7 +44,7 @@
               <div fxLayout="row" fxLayoutGap="32px">
                 <div fxFlex="calc(100% - 400px)">
                   <ng-container *ngIf="doc.name">
-                    <strong [matTooltip]="doc.name" matTooltipPosition="below">{{ doc.name }}</strong><br />
+                    <strong [matTooltip]="doc.name" matTooltipPosition="below">{{ doc.name  }}</strong><br />
                   </ng-container>
                 </div>
                 <div>
@@ -93,32 +93,18 @@
                               {{ id.kuratorstav[id.kuratorstav.length-1] }}  
                             </div>
 
-                            <!--
-                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
-                              {{ id.kuratorstav[id.kuratorstav.length-1] }}   
-                            </div>
--->                    
                             <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
                               <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
                               {{ 'license.' + id.license + '-badge' | translate }}
                             </div>
-                            <!--
-                            <ng-container *ngIf="state.user && (state.user.role === 'kurator' || state.user.role === 'mainKurator') && curatorAndPublicStateAreDifferent(id)">
-                              <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
-                                {{ id.kuratorstav[id.kuratorstav.length-1] }}
-                              </div>
-                            </ng-container>
-                            -->
                           </div>
                           <div>
-
-                            <!-- <ng-container *ngIf="id.approved">
-                              {{ id.approved ? ('desc.schvaleno' | translate) + ': ' + id.approved_user : '' }}
-                            </ng-container> -->
-                            <mat-button-toggle-group>
-                              <mat-button-toggle mat-stroked-button class="app-color-warning"><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
+                            <mat-button-toggle-group *ngIf="id.dntstav[id.dntstav.length-1] != 'N' &&  id.dntstav[id.dntstav.length-1] != 'X' &&  id.dntstav[id.dntstav.length-1] != 'D' && !doc.controlled" >
+                              <mat-button-toggle mat-stroked-button class="app-color-warning" (click)="changeState(doc,id)" ><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
                               <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
                             </mat-button-toggle-group>
+
+                            <mat-button-toggle  *ngIf="id.dntstav[id.dntstav.length-1] == 'N' || doc.controlled " mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
 
                             <mat-menu #menuMore="matMenu">
                               <button mat-menu-item *ngIf="id.marc_998a && id.marc_998a[0].startsWith('http')"  (click)="gotoAleph(id.marc_998a[0])">
@@ -132,10 +118,6 @@
                               <button mat-menu-item (click)="showHistory(id)">
                                 <mat-icon>update</mat-icon>
                                 <a>{{ 'desc.historie_zmen' | translate }}</a>
-                              </button>
-                              <button mat-menu-item (click)="showStates(doc,id)">
-                                <mat-icon>edit</mat-icon>
-                                <a>{{ 'desc.zmenit_stav'| translate }}</a>
                               </button>
                               <button mat-menu-item *ngIf="id.granularity && id.granularity.length > 1" (click)="showGranularity(id)">
                                 <mat-icon>format_list_numbered</mat-icon>

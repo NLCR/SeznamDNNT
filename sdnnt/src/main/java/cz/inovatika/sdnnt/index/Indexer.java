@@ -6,6 +6,8 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
@@ -501,8 +503,7 @@ public class Indexer {
                         licence = null;
                     }
                 }
-                mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null, licence, user, poznamka,
-                        mr.granularity);
+                mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null, licence, user, poznamka);
                 ChangeProcessStatesUtility.calculateGranularity(mr, user, poznamka, null);
                 req.add(mr.toSolrDoc());
                 new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user,
@@ -517,22 +518,25 @@ public class Indexer {
         }
     }
 
-    
-    
-    // TODO: Move and do Junit tests; TODO:rewrite
-    public static JSONObject changeStavDirect(SolrClient solrClient, String identifier, String newStav, String licence,
-            String poznamka, JSONArray granularityChange, String user) throws IOException, SolrServerException {
+    public static JSONObject changeStavDirect( String identifier, String cStavString, String pStavString, String licence,
+            String poznamka,  String user) throws IOException, SolrServerException {
         JSONObject ret = new JSONObject();
+        try (SolrClient solrClient = new HttpSolrClient.Builder(Options.getInstance().getString("solr.host")).build()){
+            changeStavDirect(solrClient, identifier, cStavString, pStavString, licence, poznamka, user);
+        } catch(Exception ex) {
+            LOGGER.log(Level.SEVERE,ex.getMessage(),ex);
+        }
+        return ret;
+    }
+
+    public static void changeStavDirect(SolrClient solrClient, String identifier, String cStavString, String pStavString,
+            String licence, String poznamka, String user)
+            throws JsonProcessingException, SolrServerException, IOException {
         try {
             MarcRecord mr = MarcRecord.fromIndex(solrClient, identifier);
-            List<String> previous = mr.kuratorstav;
-
             JSONObject before = mr.toJSON();
-            // sync to solr doc
-            SolrInputDocument sdoc = mr.toSolrDoc();
-            CuratorItemState kstav = CuratorItemState.valueOf(newStav);
-            PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
-            
+            CuratorItemState kstav = CuratorItemState.valueOf(cStavString);
+            PublicItemState pstav = PublicItemState.valueOf(pStavString);
             if (licence != null) {
                 if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {
                     mr.license = licence;
@@ -544,26 +548,25 @@ public class Indexer {
                     licence = null;
                 }
             }
-
-            // zapis do historie
-            mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null, licence, user, poznamka,
-                    granularityChange);
-
+            mr.setKuratorStav(kstav.name(), pstav != null ? pstav.name() : null, licence, user, poznamka);
             ChangeProcessStatesUtility.calculateGranularity(mr, user, poznamka, null);
-
             solrClient.add("catalog", mr.toSolrDoc());
             new HistoryImpl(solrClient).log(mr.identifier, before.toString(), mr.toJSON().toString(), user,
                     DataCollections.catalog.name(), null);
         } finally {
             SolrJUtilities.quietCommit(solrClient, "catalog");
         }
-        return ret;
     }
-
-    // TODO: Move and do Junit tests
-    public static JSONObject changeStavDirect(String identifier, String newStav, String licence, String poznamka,
-            JSONArray granularity, String user) throws IOException, SolrServerException {
-        return changeStavDirect(getClient(), identifier, newStav, licence, poznamka, granularity, user);
+    
+    
+    // TODO: Move and do Junit tests; TODO:rewrite
+    public static JSONObject changeStavDirect( String identifier, String newStav, String licence,
+            String poznamka,  String user) throws IOException, SolrServerException {
+        MarcRecord mr = MarcRecord.fromIndex(identifier);
+        CuratorItemState kstav = CuratorItemState.valueOf(newStav);
+        PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
+        return changeStavDirect(identifier, kstav.name(), pstav.name(), licence, poznamka, user);
+        
     }
 
     // TODO: Move and do Junit tests

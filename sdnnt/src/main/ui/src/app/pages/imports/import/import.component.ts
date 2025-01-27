@@ -160,10 +160,11 @@ export class ImportComponent implements OnInit, OnDestroy {
       });
       this.docs.forEach(doc => {
 
+        
+
         const f = doc.identifiers.filter(id => {
-          // if (this.fullCatalog) {
-          //   return true;
-          // }
+
+
           if (id.changedInImport) {
             return true;
           }
@@ -274,8 +275,54 @@ export class ImportComponent implements OnInit, OnDestroy {
     // });
   }
 
-  showStates(doc, id) {
 
+  /*
+      const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+      width: '700px',
+      data: {caption: 'komentar', label: 'komentar'},
+      panelClass: 'app-register-dialog'
+    });
+
+    approveDialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+      if (result !== undefined) {
+        const note = result ? result : '';
+        doc.controlled_note = note;
+        this.service.setImportControlled(doc).subscribe(res => {
+          doc.controlled = true;
+          doc.controlled_user = this.state.user.username;
+        });
+      }
+    });
+  }
+*/
+
+changeState(doc,id) {
+  const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+    width: '700px',
+    data: {caption: 'komentar', label: 'komentar'},
+    panelClass: 'app-register-dialog'
+  });
+
+  approveDialogRef.afterClosed().subscribe(result => {
+    if (result !== undefined) {
+
+      this.service.changeStavDirect(id.identifier, "N", "PN", null, result, null).subscribe(res => {
+        if (res.response.docs.length > 0) {
+          id.dntstav = res.response.docs[0].dntstav;
+          id.kuratorstav = res.response.docs[0].kuratorstav;
+          id.license = res.response.docs[0].license;
+          id.changedInImport = true;
+          this.service.changeStavImport(doc).subscribe(res => {
+
+          });
+        }
+      });
+    }
+  });
+}
+
+  showStates(doc, id) {
     const dialogRef = this.dialog.open(DialogStatesComponent, {
       width: '1150px',
       data: id,
@@ -284,7 +331,9 @@ export class ImportComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.change) {
-        this.service.changeStavDirect(id.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
+
+
+        this.service.changeStavDirect(id.identifier, null, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
           if (res.response.docs.length > 0) {
             id.dntstav = res.response.docs[0].dntstav;
             id.kuratorstav = res.response.docs[0].kuratorstav;

@@ -556,6 +556,14 @@ public class MarcRecordUtilsToRefactor {
     if (doc.containsKey(FOLLOWERS)) {
         mr.followers = new ArrayList(doc.getFieldValues(FOLLOWERS));
     }
+
+    if (doc.containsKey(EXTERNAL_REFERENCE_URL)) {
+        mr.externalReferenceUrls = new ArrayList(doc.getFieldValues(EXTERNAL_REFERENCE_URL));
+    }
+
+    if (doc.containsKey(EXTERNAL_REFERENCE_NAME)) {
+        mr.externalReferenceNames = new ArrayList(doc.getFieldValues(EXTERNAL_REFERENCE_NAME));
+    }
   }
 
   public static void setFMT(SolrInputDocument sdoc, String type_of_resource, String item_type) {

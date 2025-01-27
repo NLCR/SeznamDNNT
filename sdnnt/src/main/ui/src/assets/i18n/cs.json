@@ -43,6 +43,7 @@
     "N": "Vyřazeno",
     "X": "Volné dílo",
     "PX": "Pravděpodobná volné dílo",
+    "PN": "Pravděpodobná vyřazené dílo",
     "NL": "Plánované vydání díla",
     "NLX":"Omezeno na terminál",
 
@@ -71,6 +72,7 @@
       "N": "Vyřazeno",
       "X": "Volné dílo",
       "PX": "Pravděpodobná volné dílo",
+      "PN": "Pravděpodobná vyřazené dílo",
       "NL":"Plánované vydání díla",
       "NZ": "Licence pro terminál na místě samém",
       "A,NZ": "Licence pro terminál na místě samém",
@@ -98,6 +100,7 @@
     "editon":"Vydání",
     "no_followers": "Nejsou žádné naslednické záznamy",
     "identifier":"Identifikátor",
+    "ean":"EAN",
 
     "m": "Monografie",
     "s": "Serial",
@@ -125,6 +128,8 @@
     "N": "Vyřazeno",
     "X": "Volná díla",
     "PX": "Pravděpodobně volná díla",
+    "PN": "Pravděpodobně vyřazená díla",
+
     "NZ": "Zařazeno s omezením",
     "NZN": "Návrh k zařazení",
     "VNL": "Výzva k vyřazení díla jiného nakladatele při získání licence na dílo.",

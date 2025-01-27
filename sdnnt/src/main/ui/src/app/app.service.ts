@@ -260,10 +260,16 @@ export class AppService {
     return this.post(url, raw);
   }
 
-  changeStavDirect(identifier: string, newStav: string, newLicense: string, poznamka: string, granularity: any[]): Observable<any> {
-    console.log(granularity);
+
+
+
+  changeStavDirect(identifier: string, publicNewStav:string , newStav: string, newLicense: string, poznamka: string, granularity: any[]): Observable<any> {
     let url = '/account/change_stav_direct';
-    return this.post(url, {identifier, newStav, newLicense, poznamka, granularity});
+    if (publicNewStav) {
+      return this.post(url, {identifier,publicNewStav, newStav, newLicense, poznamka, granularity});
+    } else {
+      return this.post(url, {identifier, newStav, newLicense, poznamka, granularity});
+    }
   }
 
   saveZadost(zadost: Zadost): Observable<any> {

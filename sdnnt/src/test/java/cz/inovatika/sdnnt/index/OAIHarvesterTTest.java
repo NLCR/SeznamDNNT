@@ -74,7 +74,7 @@ public class OAIHarvesterTTest {
         }
         try {
             alephImport(prepare.getClient(),skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka",  "test");
 
             alephImport(prepare.getClient(),skcAlephStream("skc/update/oai_skc1_changed.xml"),31, true, true);
 
@@ -117,8 +117,8 @@ public class OAIHarvesterTTest {
         try {
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
 
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579047", "N", null,"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","A", "A", License.dnnto.name(),"poznamka", "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579047","N", "N", null,"poznamka", "test");
 
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1_changed_format.xml"),31, true, true);
             

@@ -84,7 +84,7 @@ public class SKCTypeServiceTTest {
         try {
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka", "test");
             
             SKCTypeServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCTypeServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
@@ -139,7 +139,7 @@ public class SKCTypeServiceTTest {
         try {
             alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "test");
             
             SKCTypeServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCTypeServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())

@@ -33,6 +33,7 @@ export class ImportsComponent implements OnInit {
 
   displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_seznamu', 'actions'];
   imports: Import[] = [];
+  
   stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 
   stateFilter: string;
@@ -68,7 +69,8 @@ export class ImportsComponent implements OnInit {
     this.service.searchImports(p as HttpParams).subscribe((resp: any) => {
       if (!resp.error) {
         this.searchResponse = resp;
-        this.imports = resp.response.docs;
+        //this.imports = resp.response.docs;
+        this.imports = this.assignGroupClasses(resp.response.docs);
         this.numFound = resp.response.numFound;
         this.loading = false;
       }
@@ -127,4 +129,28 @@ export class ImportsComponent implements OnInit {
   });
   }
 
+
+  assignGroupClasses(data: any[]): any[] {
+    const groupMap = new Map<string, string>();
+    let isOdd = true;
+
+    return data.map((row) => {
+      if (!row.group) {
+        return {
+          ...row,
+          rowClass: 'default-group'
+        };
+      }
+
+      if (!groupMap.has(row.group)) {
+        groupMap.set(row.group, isOdd ? 'odd-group' : 'even-group');
+        isOdd = !isOdd;
+      }
+
+      return {
+        ...row,
+        rowClass: groupMap.get(row.group)
+      };
+    });
+  }
 }

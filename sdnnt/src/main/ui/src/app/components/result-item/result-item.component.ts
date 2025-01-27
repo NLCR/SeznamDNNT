@@ -338,7 +338,7 @@ export class ResultItemComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.change) {
-        this.service.changeStavDirect(this.doc.identifier, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
+        this.service.changeStavDirect(this.doc.identifier, null, result.newState, result.newLicense, result.poznamka, result.granularity).subscribe(res => {
 
           if (res.response.docs.length > 0) {
             this.doc = res.response.docs[0];

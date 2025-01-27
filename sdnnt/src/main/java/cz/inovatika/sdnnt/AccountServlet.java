@@ -729,14 +729,27 @@ public class AccountServlet extends HttpServlet {
                     try {
                         User user = new UserControlerImpl(req).getUser();
                         JSONObject inputJs = ServletsSupport.readInputJSON(req);
-                        // TODO: transactions (optimistic locking)
-                        Indexer.changeStavDirect(inputJs.getString("identifier"),
-                                inputJs.getString("newStav"),
-                                inputJs.optString("newLicense"),
-                                inputJs.getString("poznamka"),
-                                inputJs.getJSONArray("granularity"),
-                                user.getUsername());
+                        if (inputJs.has("publicNewStav")) {
 
+                            Indexer.changeStavDirect(inputJs.getString("identifier"),
+                                    
+                                    inputJs.getString("newStav"),
+                                    inputJs.getString("publicNewStav"),
+                                    
+                                    inputJs.optString("newLicense"),
+                                    inputJs.getString("poznamka"),
+                                    user.getUsername());
+                            
+                        } else {
+                            // TODO: transactions (optimistic locking)
+                            Indexer.changeStavDirect(inputJs.getString("identifier"),
+                                    
+                                    inputJs.getString("newStav"),
+                                    
+                                    inputJs.optString("newLicense"),
+                                    inputJs.getString("poznamka"),
+                                    user.getUsername());
+                        }
 
                         CatalogSearcher searcher = new CatalogSearcher();
                         return searcher.getById(inputJs.getString("identifier"), user);
@@ -795,7 +808,6 @@ public class AccountServlet extends HttpServlet {
                     try {
                         User user = new UserControlerImpl(req).getUser();
                         JSONObject inputJs = ServletsSupport.readInputJSON(req);
-                        // inputJs.put("controlled", true);
                         return Import.setProcessed(inputJs.getString("id"), user.getUsername());
                     } catch (Exception ex) {
                         LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

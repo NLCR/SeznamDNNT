@@ -59,6 +59,7 @@ public class MarcRecordFields {
 
     public static final String ITEM_TYPE_FIELD = "item_type";
 
+    public static final String EAN_FIELD = "ean";
     
     // context information
     public static final String CTX_FIELD = "ctx";
@@ -156,6 +157,13 @@ public class MarcRecordFields {
     // followers
     public static final String FOLLOWERS = "followers";
     
+
+    public static final String EXTERNAL_REFERENCE_URL = "external_reference_url";
+    
+    public static final String EXTERNAL_REFERENCE_NAME = "external_reference_name";
+    
+    
+ 
     // currators actions 
     public static final String CURATOR_ACTIONS = "c_actions";
     

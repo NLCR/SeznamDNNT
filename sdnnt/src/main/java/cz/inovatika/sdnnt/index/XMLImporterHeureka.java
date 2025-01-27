@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
@@ -34,6 +35,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import cz.inovatika.sdnnt.index.AbstractXMLImport.XMLImportDesc;
 import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
 
@@ -51,17 +53,14 @@ public class XMLImporterHeureka extends AbstractXMLImport {
     private static final String IMPORT_IDENTIFIER = "heureka";
     public static final String DEFAULT_IMPORT_URL = "https://feeds.mergado.com/palmknihy-cz-heureka-cz-cz-6-ed3e5a88767ca249029fda83b9326415.xml";
 
-    private XMLImportDesc importDescription = new XMLImportDesc(IMPORT_IDENTIFIER);
+    private XMLImportDesc importDescription = null;//new XMLImportDesc(IMPORT_IDENTIFIER);
 
-    public XMLImporterHeureka(String strLogger, String url) {
-        if (strLogger != null) {
-            this.logger = Logger.getLogger(strLogger);
-        }
-        if (url != null) {
-            this.url = url;
-        } else {
+    public XMLImporterHeureka(String strLogger,  String groupId, String url,int checkPNStates, String chronoUnit) {
+        super(strLogger, url, checkPNStates, chronoUnit);
+        if (this.url == null) {
             this.url = DEFAULT_IMPORT_URL;
         }
+        this.importDescription = new XMLImportDesc(IMPORT_IDENTIFIER, groupId);
     }
 
     @Override
@@ -74,13 +73,11 @@ public class XMLImporterHeureka extends AbstractXMLImport {
     public LinkedHashSet<String>  processFromStream(String uri, InputStream is, String fromId, SolrClient solrClient,LinkedHashSet<String> itemsToSkip)
             throws XMLStreamException, SolrServerException, IOException {
         getLogger().log(Level.INFO, "Processing {0}", uri);
-        //JSONObject ret = new JSONObject();
         
         List<String> allIdentifiersToPN = new ArrayList<>();
         allIdentifiersToPN = readXML(is, "SHOPITEM", solrClient,itemsToSkip);
         solrClient.commit(DataCollections.imports_documents.name());
         ImporterUtils.changePNState(getLogger(), solrClient, allIdentifiersToPN, IMPORT_IDENTIFIER);
-        ImporterUtils.changeImportDocs(getLogger(), solrClient, importDescription);
         indexImportSummary(solrClient);
         return new LinkedHashSet<>(allIdentifiersToPN);
 
@@ -156,7 +153,12 @@ public class XMLImporterHeureka extends AbstractXMLImport {
 
             addDedup(item);
             addFrbr(item);
-            List<String> foundIdentifiers = findInCatalog(item, solrClient, itemsToSkip);
+            List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
+//            if (!item.containsKey("found")) {
+//                foundIdentifiers = findInCatalogByTitle(item, solrClient, itemsToSkip);
+//            }
+
+            
             SolrDocument isControlled = isControlled(item_id, solrClient);
 
             if (isControlled != null) {
@@ -172,7 +174,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
                 if (item.containsKey(FIELD_MAPPING.get("AUTHOR"))) {
                     idoc.setField("author", item.get(FIELD_MAPPING.get("AUTHOR")));
                 }
-
+                
                 idoc.setField("identifiers", item.get("identifiers"));
                 idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
                 idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
@@ -183,7 +185,6 @@ public class XMLImporterHeureka extends AbstractXMLImport {
 
                 solrClient.add(DataCollections.imports_documents.name(), idoc);
                 this.importDescription.incrementIndexed();
-                // indexed++;
             }
             return foundIdentifiers;
 
@@ -208,30 +209,86 @@ public class XMLImporterHeureka extends AbstractXMLImport {
         item.put("frbr", MD5.normalize(frbr));
     }
 
-    public List<String> findInCatalog(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip ) {
+//    public List<String> findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+//        try {
+//            String name = ((String) item.get(FIELD_MAPPING.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
+//    
+//            String[] parts = name.split(" - ");
+//            String nazev = parts[0].trim();
+//            String title = "";
+//            if (nazev.isEmpty()) {
+//                if (parts.length > 1) {
+//                    title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+//                }
+//            } else {
+//                title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
+//                if (parts.length > 1) {
+//                    title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+//                }
+//            }
+//    
+//            SolrQuery query = new SolrQuery(title)
+//                    .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
+//                    .setParam("q.op", "AND")
+//                    // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
+//                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav");
+//            
+//            return super.findCatalogItem(item, solrClient,  query, item.get("EAN").toString(), itemsToSkip);
+//        } catch (SolrServerException | IOException ex) {
+//            getLogger().log(Level.SEVERE, null, ex);
+//            return new ArrayList<>();
+//        }
+//    }
+    
+    public List<String> findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
-            String name = ((String) item.get(FIELD_MAPPING.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
-
-            String[] parts = name.split(" - ");
-            String nazev = parts[0].trim();
-            String title = "";
-            if (nazev.isEmpty()) {
-                if (parts.length > 1) {
-                    title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
-                }
-            } else {
-                title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
-                if (parts.length > 1) {
-                    title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
-                }
-            }
-            String ean = item.get("EAN").toString();
-            return super.findCatalogItem(item, solrClient, URLEncoder.encode(title, Charset.forName("UTF-8")), ean, itemsToSkip);
+            String q = "ean:\"" + item.get("EAN")+"\"";
+            SolrQuery query = new SolrQuery(q)
+                    .setRows(100)
+                    .setParam("q.op", "AND")
+                    // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
+                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav");
+            
+            return super.findCatalogItem(item, solrClient,  query,item.get("EAN").toString(), itemsToSkip);
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
             return new ArrayList<>();
         }
-    }
+}
+        
+//    public List<String> findInCatalog(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip ) {
+//        try {
+//            String name = ((String) item.get(FIELD_MAPPING.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
+//
+//            String[] parts = name.split(" - ");
+//            String nazev = parts[0].trim();
+//            String title = "";
+//            if (nazev.isEmpty()) {
+//                if (parts.length > 1) {
+//                    title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+//                }
+//            } else {
+//                title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
+//                if (parts.length > 1) {
+//                    title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+//                }
+//            }
+//
+//
+//            String q = "ean:\"" + item.get("EAN") + "\"^10.0 OR (" + title + ")";
+//
+//            SolrQuery query = new SolrQuery(q)
+//                    .setRows(100)
+//                    .setParam("q.op", "AND")
+//                    // .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL")
+//                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav");
+//            
+//            return super.findCatalogItem(item, solrClient,  query,  item.get("EAN").toString(), itemsToSkip);
+//        } catch (SolrServerException | IOException ex) {
+//            getLogger().log(Level.SEVERE, null, ex);
+//            return new ArrayList<>();
+//        }
+//    }
 
     public Logger getLogger() {
         return this.logger;
@@ -241,5 +298,17 @@ public class XMLImporterHeureka extends AbstractXMLImport {
     public XMLImportDesc getImportDesc() {
         return this.importDescription;
     }
+    
+    public static void main(String[] args) {
+        XMLImporterHeureka distri = new XMLImporterHeureka("logger", "grpab",
+                "https://feeds.mergado.com/palmknihy-cz-heureka-cz-cz-6-ed3e5a88767ca249029fda83b9326415.xml", 
+                1, "days");
+        distri.doImport(null, false, new LinkedHashSet<>());
+        
+        XMLImportDesc importDesc = distri.getImportDesc();
+        System.out.println(importDesc.toString());
+        
+    }
+
 
 }
