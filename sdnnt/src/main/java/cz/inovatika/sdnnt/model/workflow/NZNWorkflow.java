@@ -153,6 +153,7 @@ public class NZNWorkflow extends Workflow {
                 case N: return debug? debug_nzn_0_5wd : period_nzn_0_5wd;
                 case NPA: return debug ? debug_nzn_1_12_18 : period_nzn_1_12_18;
                 case PA: return debug ? debug_nzn_2_6m : period_nzn_2_6m;
+                case PN:
                 case PX:
                 case DX:
                     if (publicItemState != null) {

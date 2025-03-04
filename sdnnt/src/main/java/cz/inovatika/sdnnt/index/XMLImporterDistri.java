@@ -203,21 +203,19 @@ public class XMLImporterDistri extends AbstractXMLImport {
 
             addDedup(item);
             addFrbr(item);
+
+            // pokud bylo kontrolovano ve 30 dnech ??  Melo by to byt, kdyz mame PN Stav ?
+            /*
             SolrDocument isControlled = Import.isControlled(item_id);
             if (isControlled != null) {
-                // LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", isControlled);
                 idoc.setField("controlled", true);
                 idoc.setField("controlled_note", isControlled.get("controlled_note"));
                 idoc.setField("controlled_date", isControlled.get("controlled_date"));
                 idoc.setField("controlled_user", isControlled.get("controlled_user"));
-            }
+            }*/
 
             
             List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
-//            if (!item.containsKey("found")) {
-//                foundIdentifiers = findInCatalogByTitle(item, solrClient, itemsToSkip);
-//            }
-            
             if (item.containsKey("found")) {
                 idoc.setField("identifiers", item.get("identifiers"));
                 idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));

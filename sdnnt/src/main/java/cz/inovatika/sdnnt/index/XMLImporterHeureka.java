@@ -154,19 +154,16 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             addDedup(item);
             addFrbr(item);
             List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
-//            if (!item.containsKey("found")) {
-//                foundIdentifiers = findInCatalogByTitle(item, solrClient, itemsToSkip);
-//            }
-
-            
             SolrDocument isControlled = isControlled(item_id, solrClient);
 
+            /*
             if (isControlled != null) {
                 idoc.setField("controlled", true);
                 idoc.setField("controlled_note", isControlled.get("controlled_note"));
                 idoc.setField("controlled_date", isControlled.get("controlled_date"));
                 idoc.setField("controlled_user", isControlled.get("controlled_user"));
-            }
+            }*/
+
 
             if (item.containsKey("found")) {
                 idoc.setField("ean", item.get("EAN"));

@@ -65,9 +65,6 @@ public class WorkflowState {
         this.expectingPublicState = expPublicItemState;
     }
     
-//    public Date getDate() {
-//        return date;
-//    }
 
     public CuratorItemState getCuratorState() {
         return curatorState;

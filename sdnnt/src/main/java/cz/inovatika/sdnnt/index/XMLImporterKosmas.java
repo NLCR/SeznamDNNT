@@ -179,17 +179,16 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("author", item.get("AUTHOR"));
             }
 
+            /*
             SolrDocument isControlled = isControlled(item_id, solrClient);
             if (isControlled != null) {
                 idoc.setField("controlled", true);
                 idoc.setField("controlled_note", isControlled.get("controlled_note"));
                 idoc.setField("controlled_date", isControlled.get("controlled_date"));
                 idoc.setField("controlled_user", isControlled.get("controlled_user"));
-            }
+            }*/
+
             List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
-//            if (!item.containsKey("found")) {
-//                foundIdentifiers = findInCatalogByTitle(item, solrClient, itemsToSkip);
-//            }
             if (item.containsKey("found")) {
                 idoc.setField("identifiers", item.get("identifiers"));
                 idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));

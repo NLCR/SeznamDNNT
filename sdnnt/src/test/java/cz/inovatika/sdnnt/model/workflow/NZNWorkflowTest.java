@@ -27,6 +27,7 @@ public class NZNWorkflowTest {
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.PA));
         
         WorkflowState nextState = nznWorkflow.nextState();
+        Assert.assertNotNull(nextState.getPeriod());
         Assert.assertTrue(nextState.getCuratorState().equals(CuratorItemState.PN));
         Assert.assertTrue(nextState.getLicense().equals(License.dnnto));
     }
@@ -43,11 +44,12 @@ public class NZNWorkflowTest {
         EasyMock.replay(owner);
         
         NZNWorkflow nznWorkflow = new NZNWorkflow(owner);
-        
+
         Assert.assertTrue(nznWorkflow.isSwitchPossible(CuratorItemState.A));
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.PA));
         
         WorkflowState nextState = nznWorkflow.nextState();
+        Assert.assertNotNull(nextState.getPeriod());
         Assert.assertTrue(nextState.getCuratorState().equals(CuratorItemState.PX));
         Assert.assertTrue(nextState.getLicense().equals(License.dnnto));
     }
@@ -68,13 +70,14 @@ public class NZNWorkflowTest {
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.PA));
         
         WorkflowState nextState = nznWorkflow.nextState();
+        Assert.assertNotNull(nextState.getPeriod());
         Assert.assertTrue(nextState.getCuratorState().equals(CuratorItemState.PX));
         Assert.assertTrue(nextState.getLicense().equals(License.dnnto));
     }
 
     @Test
     public void testWorkflow_3() {
-        
+        // NPA -> PA
         WorkflowOwner owner = EasyMock.createMock(WorkflowOwner.class);
         EasyMock.expect(owner.getLicense()).andReturn(null).anyTimes();
         EasyMock.expect(owner.getPublicState()).andReturn(PublicItemState.N).anyTimes();
@@ -87,6 +90,7 @@ public class NZNWorkflowTest {
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.A));
         
         WorkflowState nextState = nznWorkflow.nextState();
+        Assert.assertNotNull(nextState.getPeriod());
         Assert.assertTrue(nextState.getCuratorState().equals(CuratorItemState.PA));
     }
 
@@ -105,6 +109,7 @@ public class NZNWorkflowTest {
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.A));
         
         WorkflowState nextState = nznWorkflow.nextState();
+        Assert.assertNotNull(nextState.getPeriod());
         Assert.assertTrue(nextState.getCuratorState().equals(CuratorItemState.PA));
         
     }
@@ -124,7 +129,8 @@ public class NZNWorkflowTest {
         Assert.assertFalse(nznWorkflow.isSwitchPossible(CuratorItemState.A));
         
         WorkflowState nextState = nznWorkflow.nextState();
-        
+        //Assert.assertTrue(nextState == null);
+
     }
 
 }

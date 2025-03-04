@@ -101,85 +101,16 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
 
     }
 
-//    public void iterationResults(JSONObject results) {
-//        if (results != null) {
-//            String container = results.optString(AbstractEUIPOService.FOLDER_KEY);
-//            if (container != null) {
-//                this.outputFolder = results.optString(AbstractEUIPOService.FOLDER_KEY);
-//            }
-//            
-//            if (results.has(AbstractEUIPOService.MAXROWS_KEY)) {
-//                this.spredsheetLimit = results.getInt(AbstractEUIPOService.MAXROWS_KEY);
-//            }
-//            
-//            if (results.has(AbstractEUIPOService.BATCHROWS_KEY)) {
-//                this.updateBatchLimit = results.getInt(AbstractEUIPOService.BATCHROWS_KEY);
-//            }
-//            
-//        }
-//    }
-//
-//
-//    public void iterationConfig(JSONObject iteration) {
-//        if (iteration != null) {
-//            if (iteration.has(AbstractEUIPOService.STATES_KEY)) {
-//                this.states = new ArrayList<>();
-//                JSONArray iterationOverStates = iteration.optJSONArray(AbstractEUIPOService.STATES_KEY);
-//                if (iterationOverStates != null) {
-//                    iterationOverStates.forEach(it -> {
-//                        states.add(it.toString());
-//                    });
-//                }
-//            }
-//            
-//            if (iteration.has(AbstractEUIPOService.BK_TEMPLATE_KEY)) {
-//                this.bkTemplate = iteration.getString(AbstractEUIPOService.BK_TEMPLATE_KEY);
-//            }
-//            if (iteration.has(AbstractEUIPOService.SE_TEMPLATE_KEY)) {
-//                this.seTemplate = iteration.getString(AbstractEUIPOService.SE_TEMPLATE_KEY);
-//            }
-//            
-//            if (iteration.has(AbstractEUIPOService.FILTERS_KEY)) {
-//                JSONArray filters = iteration.optJSONArray(AbstractEUIPOService.FILTERS_KEY);
-//                List<String> listFilters = new ArrayList<>();
-//                if (filters != null) {
-//                    filters.forEach(f -> {
-//                        listFilters.add(f.toString());
-//                    });
-//                }
-//                if (listFilters != null) {
-//                    this.filters = listFilters;
-//                }
-//            }
-//            if (iteration.has(AbstractEUIPOService.NONPARSABLE_DATES_KEY)) {
-//                JSONArray nonParsble = iteration.optJSONArray(AbstractEUIPOService.NONPARSABLE_DATES_KEY);
-//                List<String> listExpressions = new ArrayList<>();
-//                if (listExpressions != null) {
-//                    nonParsble.forEach(f -> {
-//                        listExpressions.add(f.toString());
-//                    });
-//                }
-//                if (listExpressions != null) {
-//                    this.compiledPatterns = listExpressions.stream().map(Pattern::compile).collect(Collectors.toList());
-//                }
-//            }
-//        }
-//    }
 
     public List<String> check(String formatFilter) {
-
         getLogger().info(String.format(" Config for iteration -> iteration states %s; templates %s, %s; filters %s; nonparsable dates %s ", this.states.toString(), this.bkTemplate, this.seTemplate, this.filters, this.compiledPatterns));
-
         List<String> foundCandidates = new ArrayList<>();
         CatalogIterationSupport support = new CatalogIterationSupport();
         Map<String, String> reqMap = new HashMap<>();
         reqMap.put("rows", "" + AbstractEUIPOService.FETCH_LIMIT);
-
         List<String> plusFilter = new ArrayList<>();
         if (!this.states.isEmpty()) {
-            
             List<String> publicItemStates = Arrays.stream(PublicItemState.values()).map(PublicItemState::name).collect(Collectors.toList());
-           
             String collected = states.stream().map(st-> {
                 if (publicItemStates.contains(st)) {
                     return DNTSTAV_FIELD+":"+st;
@@ -187,7 +118,6 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                     return KURATORSTAV_FIELD+":"+st;
                 }
             }).collect(Collectors.joining(" OR "));
-            
             plusFilter.add("(" + collected + ")");
         }
         // tady filtr pro format 
@@ -222,21 +152,6 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
         } catch (Exception e) {
             this.logger.log(Level.SEVERE, e.getMessage(), e);
         }
-        
-        
-//        List<List<String>> retvals = new ArrayList<>();
-//        
-//        int itemsInBatch = DEFAULT_MAX_EXPORT_ITEMS;
-//        int numberOfBatches =  foundCandidates.size() / itemsInBatch;
-//        numberOfBatches += foundCandidates.size() % itemsInBatch == 0 ? 0 : 1;
-//        for (int i = 0; i < numberOfBatches; i++) {
-//            int start = i*itemsInBatch;
-//            int stop = Math.min((i+1)*itemsInBatch, foundCandidates.size());
-//            retvals.add(foundCandidates.subList(start, stop));
-//
-//        }
-//        
-//        return retvals;
         
         return foundCandidates;
     }

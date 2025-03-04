@@ -4,6 +4,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
+import cz.inovatika.sdnnt.model.PublicItemState;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -26,7 +27,13 @@ public class VNLWorkflow extends Workflow {
     public WorkflowState nextState() {
         CuratorItemState currentState = owner.getWorkflowState();
         Period period = getPeriod(currentState);
-        if ((owner.getWorkflowState() == null || owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() == null || owner.getLicense().equals(License.dnnto.name()))){
+        if ((
+                owner.getWorkflowState() == null ||
+                (owner.getWorkflowState() == PN && owner.getPublicState() == PublicItemState.A) ||
+                (owner.getWorkflowState() == PN && owner.getPublicState() == PublicItemState.PA) ||
+                owner.getWorkflowState() == A ||
+                owner.getWorkflowState() == PA) &&
+                (owner.getLicense() == null || owner.getLicense().equals(License.dnnto.name()))){
             return new WorkflowState(this.owner, NL, License.dnntt, /*owner.getWorkflowDate(),*/ period, true,true,  false);
         } else if (owner.getWorkflowState()== NL) {
             return new WorkflowState(this.owner, NLX, License.dnntt, /*owner.getWorkflowDate(), */period, false, false,false);
@@ -48,7 +55,14 @@ public class VNLWorkflow extends Workflow {
                 return true;
             } else {
                 CuratorItemState cstate = this.getOwner().getWorkflowState();
-                return Arrays.asList(A, PA, PX, X).contains(cstate);
+                boolean flag = Arrays.asList(A, PA, PX, X).contains(cstate);
+                if (flag) return flag;
+                else {
+                    if (cstate == PN) {
+                        return Arrays.asList(PublicItemState.A, PublicItemState.PA).contains(this.getOwner().getPublicState());
+                    }
+                    return false;
+                }
             }
         } else return false;
     }
@@ -68,7 +82,14 @@ public class VNLWorkflow extends Workflow {
                 return true;
             } else {
                 CuratorItemState cstate = this.getOwner().getWorkflowState();
-                return Arrays.asList(A, PA, PX, X).contains(cstate);
+                boolean flag = Arrays.asList(A, PA, PX, X).contains(cstate);
+                if (flag) return flag;
+                else {
+                    if (cstate == PN) {
+                        return Arrays.asList(PublicItemState.A, PublicItemState.PA).contains(this.getOwner().getPublicState());
+                    }
+                    return false;
+                }
             }
         } else return false;
     }

@@ -26,7 +26,7 @@ public class VNZWorkflow extends Workflow {
             if (owner.getWorkflowState() == null) {
                 return new WorkflowState(this.owner, A, License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true, true);
             } else {
-                if (currentState == CuratorItemState.DX || currentState == CuratorItemState.PX) {
+                if (currentState == CuratorItemState.DX || currentState == CuratorItemState.PX ||currentState == CuratorItemState.PN ) {
                     return new WorkflowState(this.owner, currentState, owner.getPublicState(), License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true,  true);
                 } else {
                     return new WorkflowState(this.owner, getOwner().getWorkflowState(), License.dnntt,/*owner.getWorkflowDate(),*/ period, true, true,  true);
@@ -48,11 +48,14 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible() {
-        
-        if ((owner.getWorkflowState() != null) &&  (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
+        if ((owner.getWorkflowState() != null) &&
+                (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) &&
+                (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
             return true;
         } else {
-            if (owner.getWorkflowState() == CuratorItemState.PX || owner.getWorkflowState() == CuratorItemState.DX) {
+            if (owner.getWorkflowState() == CuratorItemState.PX ||
+                    owner.getWorkflowState() == CuratorItemState.DX ||
+                    owner.getWorkflowState() ==  CuratorItemState.PN) {
                 if ((owner.getPublicState() != null) &&  (owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
                     return true;
                 }
@@ -85,7 +88,9 @@ public class VNZWorkflow extends Workflow {
 
     @Override
     public boolean isSwitchPossible(CuratorItemState desiredState) {
-        if ((owner.getWorkflowState() != null) &&  (owner.getWorkflowState() == A || owner.getWorkflowState() == PA) && (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
+        if ((owner.getWorkflowState() != null) &&
+                (owner.getPublicState() == PublicItemState.A || owner.getPublicState() == PublicItemState.PA) &&
+                (owner.getLicense() != null && owner.getLicense().equals(License.dnnto.name()))) {
             return true;
         } else return false;
     }
