@@ -30,6 +30,9 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import cz.inovatika.sdnnt.model.Zadost;
+import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -49,6 +52,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.ZadostTypNavrh;
 import cz.inovatika.sdnnt.services.PNCheckStatesService;
 import cz.inovatika.sdnnt.utils.RequestsUtils;
+import org.json.JSONObject;
 
 public class PNCheckStatesServiceImpl extends AbstractRequestService implements PNCheckStatesService{
 
@@ -86,6 +90,8 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
     @Override
     public List<Pair<String, String>> check() {
 
+        AccountService accountService = new AccountServiceImpl();
+
         CatalogIterationSupport support = new CatalogIterationSupport();
         Map<String, String> reqMap = new HashMap<>();
         reqMap.put("rows", "" + LIMIT);
@@ -120,21 +126,17 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 getLogger().info(String.format( "Testing identifier %s", identifier.toString()));
 
                 Instant parsedInstant = datumKuratorStav.toInstant();
-                ChronoUnit selected = ChronoUnit.DAYS;
-                ChronoUnit[] values = ChronoUnit.values();
-                for (ChronoUnit chUnit : values) {
-                    if (chUnit.name().toLowerCase().equals(this.chronoUnit)) {
-                        selected = chUnit;
-                    }
-                }
-                
-                if (ImporterUtils.calculateInterval(parsedInstant, inst, selected) > this.checkPNStates) {
+                ChronoUnit selected = getChronoUnit();
 
+                // If date of curator state is bigger then configuration value
+                if (ImporterUtils.calculateInterval(parsedInstant, inst, selected) > this.checkPNStates) {
                     SolrQuery q = (new SolrQuery("*"))
                             .addFilterQuery("na_vyrazeni:\""+identifier.toString()+"\"")
                             .addFilterQuery("controlled:true")
                             .addSort(SortClause.desc("indextime"))
                             .setRows(1);
+
+
                     try {
                         QueryResponse resp = solrClient.query(DataCollections.imports_documents.name(), q);
                         SolrDocumentList results = resp.getResults();
@@ -149,34 +151,17 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                     } catch (SolrServerException | IOException e) {
                         getLogger().severe(String.format("No ean %s, skipping",  identifier.toString()));
                     }
-
-//                    if (ean != null) {
-//                        getLogger().info(String.format("Adding %s",  identifier.toString()));
-//                        Pair<String,String> pair = Pair.of(identifier.toString(), ean.toString());
-//                        pairs.add(pair);
-//                    } else {
-//                        
-//                        
-//                    }
                 } else {
                     getLogger().info(String.format("New PN state %s, skipping",  identifier.toString()));
                 }
                 
             }, IDENTIFIER_FIELD);
-            
 
-            int batchSize = 30;
-            int numberOfIteration = allUsedIdentifiers.size() / batchSize;
-            numberOfIteration  = numberOfIteration + (allUsedIdentifiers.size() % batchSize == 0 ? 0 : 1);
-            for (int i = 0; i < numberOfIteration; i++) {
-                int start = i*batchSize;
-                int end = Math.min((i+1)*batchSize, allUsedIdentifiers.size());
-                List<String> sublist = allUsedIdentifiers.subList(start, end);
-                Set<String> usedInRequest = RequestsUtils.usedInRequest(this.getLogger(), solrClient, sublist, ZadostTypNavrh.NZN.name(),Arrays.asList("waiting"));
-                allUsedIdentifiers.addAll(usedInRequest);
-            }
-            
-        } catch(IOException e) {
+            // remove used identifiers - date conndition
+            List<String> pidsToRemove = removeUsedIdentifiersDateCondition(pairs.stream().map(Pair::getLeft).collect(Collectors.toList()), accountService, inst);
+            allUsedIdentifiers.addAll(pidsToRemove);
+
+        } catch(IOException | AccountException | SolrServerException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
@@ -191,7 +176,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 this.getLogger().info(String.format("Identifier '%s' has been used in NZN req", p.getLeft()));
             }
         });
-        
+
         
         for (Pair<String, String> proc : this.processors) {
             String name = proc.getKey();
@@ -225,7 +210,52 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
         return retval;
     }
 
-    
+    private List<String> removeUsedIdentifiersDateCondition(List<String> allUsedIdentifiers, AccountService accountService, Instant inst) throws AccountException, IOException, SolrServerException {
+        List<String> pidsToRemove = new ArrayList<>();
+        int batchSize = 30;
+        int numberOfIteration = allUsedIdentifiers.size() / batchSize;
+        numberOfIteration  = numberOfIteration + (allUsedIdentifiers.size() % batchSize == 0 ? 0 : 1);
+        for (int i = 0; i < numberOfIteration; i++) {
+            int start = i * batchSize;
+            int end = Math.min((i + 1) * batchSize, allUsedIdentifiers.size());
+
+            List<String> sublist = allUsedIdentifiers.subList(start, end);
+
+            List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, Arrays.asList("NZN"), null, sublist);
+            //  Only scheduler requests
+            List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).filter(z->{
+                if (z.getTypeOfRequest() != null && z.getTypeOfRequest().equals("scheduler")) {
+                    return true;
+                } else return false;
+            }).collect(Collectors.toList());
+
+            allRequests.forEach(req-> {
+                Instant datumZadani = req.getDatumZadani().toInstant();
+                // remove all if created date is newer then configuration border date
+                if (ImporterUtils.calculateInterval(datumZadani, inst, getChronoUnit()) <= this.checkPNStates) {
+                    getLogger().info(String.format("New NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
+                    pidsToRemove.addAll(req.getIdentifiers());
+                } else {
+                    getLogger().info(String.format("Old NZN request, %s, %s", req.getId(), req.getIdentifiers().toString()));
+                }
+            });
+
+        }
+        return pidsToRemove;
+    }
+
+    private ChronoUnit getChronoUnit() {
+        ChronoUnit selected = ChronoUnit.DAYS;
+        ChronoUnit[] values = ChronoUnit.values();
+        for (ChronoUnit chUnit : values) {
+            if (chUnit.name().toLowerCase().equals(this.chronoUnit)) {
+                selected = chUnit;
+            }
+        }
+        return selected;
+    }
+
+
     protected Options getOptions() {
         return Options.getInstance();
     }
