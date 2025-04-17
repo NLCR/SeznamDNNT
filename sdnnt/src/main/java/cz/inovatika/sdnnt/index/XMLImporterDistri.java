@@ -2,16 +2,7 @@ package cz.inovatika.sdnnt.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,13 +14,10 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.index.AbstractXMLImport.XMLImportDesc;
 import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
-import cz.inovatika.sdnnt.indexer.models.Import;
 import cz.inovatika.sdnnt.model.DataCollections;
 
 /**
@@ -40,7 +28,7 @@ public class XMLImporterDistri extends AbstractXMLImport {
 
     private static final String IMPORT_IDENTIFIER = "distri.cz";
 
-    public static List<String> ELEMENT_NAMES = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION", "AVAILABILITY");
+    public static List<String> ELEMENT_NAMES = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION", "AVAILABILITY","SUBTITLE");
     public static final Logger LOGGER = Logger.getLogger(XMLImporterDistri.class.getName());
 
     public static final String DEFAULT_IMPORT_URL = "https://www.distri.cz/xml-full/3d44df7d05a24ca09134fb6b4979c786/";
@@ -147,8 +135,6 @@ public class XMLImporterDistri extends AbstractXMLImport {
             case XMLStreamReader.END_ELEMENT:
                 elementName = reader.getLocalName();
                 if (elementName.equals("ITEM")) {
-                    // by ean 
-                    // by title
                     return toIndex(item, solrClient, itemsToSkip);
                 }
             }
@@ -157,9 +143,12 @@ public class XMLImporterDistri extends AbstractXMLImport {
     }
 
     private List<String> toIndex(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
-        // closure 
+
+        String ean = (String) item.get("EAN");
+
         try {
             this.importDescription.incrementTotal();
+            LOGGER.log(Level.INFO, String.format("Total number is %d", this.importDescription.getTotal()));
             if (!item.containsKey("EAN")) {
                 LOGGER.log(Level.INFO, "{0} nema EAN, vynechame", item.get("NAME"));
                 this.importDescription.incrementSkipped();
@@ -185,50 +174,81 @@ public class XMLImporterDistri extends AbstractXMLImport {
                 return new ArrayList<>();
             }
 
-            SolrInputDocument idoc = new SolrInputDocument();
-            String item_id = item.get("EAN") + "_" + this.importDescription.getImportOrigin();
-            idoc.setField("import_id", this.importDescription.getImportId());
-            idoc.setField("import_date", this.importDescription.getImportDate());
-            idoc.setField("item_id", item_id);
+            // ean verze
+            Map<String, Object> eanItem = new HashMap<>(item);
+            ImportResult eanResult = findInCatalogByEan(eanItem, solrClient, itemsToSkip);
 
-            idoc.setField("id", this.importDescription.getImportId() + "_" + item.get("EAN"));
-            idoc.setField("ean", item.get("EAN"));
-            idoc.setField("name", item.get("NAME"));
-            if (item.containsKey("AUTHOR")) {
-                idoc.setField("author", item.get("AUTHOR"));
-            }
-            if (!item.containsKey("URL")) {
-                item.put("URL", "https://www.distri.cz/Search/Result/?Text=" + item.get("EAN"));
-            }
+            Map<String, Object> titlesItem = new HashMap<>(item);
+            ImportResult titleResult = findInCatalogByTitle(titlesItem, solrClient, itemsToSkip);
 
-            addDedup(item);
-            addFrbr(item);
+            if (eanResult.found()) {
+                SolrInputDocument idoc = new SolrInputDocument();
+                String item_id = eanItem.get("EAN") + "_" + this.importDescription.getImportOrigin();
+                idoc.setField("import_id", this.importDescription.getImportId());
+                idoc.setField("import_date", this.importDescription.getImportDate());
+                idoc.setField("item_id", item_id);
 
-            // pokud bylo kontrolovano ve 30 dnech ??  Melo by to byt, kdyz mame PN Stav ?
-            /*
-            SolrDocument isControlled = Import.isControlled(item_id);
-            if (isControlled != null) {
-                idoc.setField("controlled", true);
-                idoc.setField("controlled_note", isControlled.get("controlled_note"));
-                idoc.setField("controlled_date", isControlled.get("controlled_date"));
-                idoc.setField("controlled_user", isControlled.get("controlled_user"));
-            }*/
+                idoc.setField("id", this.importDescription.getImportId() + "_" + eanItem.get("EAN"));
+                idoc.setField("ean", eanItem.get("EAN"));
+                idoc.setField("name", eanItem.get("NAME"));
+                if (eanItem.containsKey("AUTHOR")) {
+                    idoc.setField("author", eanItem.get("AUTHOR"));
+                }
+                if (!eanItem.containsKey("URL")) {
+                    eanItem.put("URL", "https://www.distri.cz/Search/Result/?Text=" + eanItem.get("EAN"));
+                }
 
-            
-            List<String> foundIdentifiers = findInCatalogByEan(item, solrClient, itemsToSkip);
-            if (item.containsKey("found")) {
-                idoc.setField("identifiers", item.get("identifiers"));
-                idoc.setField("na_vyrazeni", item.get("na_vyrazeni"));
-                idoc.setField("hits_na_vyrazeni", item.get("hits_na_vyrazeni"));
-                idoc.setField("num_hits", item.get("num_hits"));
-                idoc.setField("hit_type", item.get("hit_type"));
-                idoc.setField("item", new JSONObject(item).toString());
-                idoc.setField("dntstav", item.get("dntstav"));
+                addDedup(eanItem);
+                addFrbr(eanItem);
+
+                idoc.setField("identifiers", eanItem.get("identifiers"));
+                idoc.setField("na_vyrazeni", eanItem.get("na_vyrazeni"));
+                idoc.setField("hits_na_vyrazeni", eanItem.get("hits_na_vyrazeni"));
+                idoc.setField("num_hits", eanItem.get("num_hits"));
+                idoc.setField("hit_type", eanItem.get("hit_type"));
+                idoc.setField("item", new JSONObject(eanItem).toString());
+                idoc.setField("dntstav", eanItem.get("dntstav"));
 
                 solrClient.add(DataCollections.imports_documents.name(), idoc);
                 this.importDescription.incrementIndexed();
+                return eanResult.getFoundIdentifiers();
+
+            } else if (titleResult.found()) {
+
+                SolrInputDocument idoc = new SolrInputDocument();
+                String item_id = titlesItem.get("EAN") + "_" + this.importDescription.getImportOrigin();
+                idoc.setField("import_id", this.importDescription.getImportId());
+                idoc.setField("import_date", this.importDescription.getImportDate());
+                idoc.setField("item_id", item_id);
+
+                idoc.setField("id", this.importDescription.getImportId() + "_" + eanItem.get("EAN"));
+                idoc.setField("ean", titlesItem.get("EAN"));
+                idoc.setField("name", titlesItem.get("NAME"));
+                if (eanItem.containsKey("AUTHOR")) {
+                    idoc.setField("author", titlesItem.get("AUTHOR"));
+                }
+                if (!titlesItem.containsKey("URL")) {
+                    eanItem.put("URL", "https://www.distri.cz/Search/Result/?Text=" + titlesItem.get("EAN"));
+                }
+
+                addDedup(titlesItem);
+                addFrbr(titlesItem);
+
+                idoc.setField("identifiers", titlesItem.get("identifiers"));
+                idoc.setField("na_vyrazeni", titlesItem.get("na_vyrazeni"));
+                idoc.setField("hits_na_vyrazeni", titlesItem.get("hits_na_vyrazeni"));
+                idoc.setField("num_hits", titlesItem.get("num_hits"));
+                idoc.setField("hit_type", titlesItem.get("hit_type"));
+                idoc.setField("item", new JSONObject(titlesItem).toString());
+                idoc.setField("dntstav", titlesItem.get("dntstav"));
+
+                solrClient.add(DataCollections.imports_documents.name(), idoc);
+                this.importDescription.incrementIndexed();
+                return titleResult.getFoundIdentifiers();
             }
-            return foundIdentifiers;
+
+            return new ArrayList<>();
+
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, null, ex);
             return new ArrayList<>();
@@ -250,55 +270,60 @@ public class XMLImporterDistri extends AbstractXMLImport {
         item.put("frbr", MD5.normalize(frbr));
     }
 
-    
-    
-//    public List<String> findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
-//        try {
-//            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
-//            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
-//                title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
-//            }
-//            String q = "ean:\"" + item.get("EAN") + "\"^10.0 OR (" + title + ")";
-//            SolrQuery query = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
-//                    .setFields(
-//                            "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,datum_kurator_stav");
-//            String ean = item.get("EAN").toString();
-//            return super.findCatalogItem(item, solrClient ,query, URLEncoder.encode(title, Charset.forName("UTF-8")), ean, itemsToSkip);
-//        } catch (SolrServerException | IOException ex) {
-//            getLogger().log(Level.SEVERE, null, ex);
-//            return new ArrayList<>();
-//        }
-//    }
-    
-//    public List<String> findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
-//        try {
-//            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
-//            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
-//                title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
-//            }
-//            SolrQuery query = new SolrQuery(title).setRows(DEFAULT_NUMBER_HITS_BY_TITLE).setParam("q.op", "AND")
-//                    .setFields(
-//                            "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,datum_kurator_stav");
-//            return super.findCatalogItem(item, solrClient ,query, null, itemsToSkip);
-//        } catch (SolrServerException | IOException ex) {
-//            getLogger().log(Level.SEVERE, null, ex);
-//            return new ArrayList<>();
-//        }
-//    
-//    }    
-    
-    
-    public List<String> findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+
+    public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
+            final String distriTitle = (String) item.get("NAME");
+            final String distriSubtitle = (String) item.get("SUBTITLE");
+            final String distriAuthor = item.containsKey("AUTHOR")  ? (String) item.get("AUTHOR") : "";
+            final String distriNakladatel = item.containsKey("PUBLISHING") ? (String)item.get("PUBLISHING") : "";
+
+            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
+            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
+                title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
+            }
+            SolrQuery query = new SolrQuery(title).setRows(DEFAULT_NUMBER_HITS_BY_TITLE).setParam("q.op", "AND")
+                    .setFields(
+                            "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,marc_245a,marc_245b,datum_kurator_stav, author");
+            List<String> catalog =  super.findCatalogItem(item, solrClient ,query, "noean", itemsToSkip, (doc-> {
+
+                // match1 - title, subtitle, author
+                boolean matched = match_1(doc, distriTitle, distriSubtitle, distriAuthor);
+                if (matched)  {
+                    return matched;
+                }
+
+                matched = match_2(doc, distriTitle, distriSubtitle, distriNakladatel);
+                if (matched)  {
+                    return matched;
+                }
+
+                return false;
+            }));
+            return new ImportResult(catalog, item);
+        } catch (SolrServerException | IOException ex) {
+            getLogger().log(Level.SEVERE, null, ex);
+            return new ImportResult(new ArrayList<>(), item);
+        }
+
+    }
+
+
+    public ImportResult findInCatalogByEan(Map<String,Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+        try {
+            String ean = item.get("EAN").toString();
             String q = "ean:\"" + item.get("EAN")+"\"";
             SolrQuery query = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
                     .setFields(
                             "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,datum_kurator_stav");
-            String ean = item.get("EAN").toString();
-            return super.findCatalogItem(item, solrClient ,query,  ean, itemsToSkip);
+            List<String> catalogItem = super.findCatalogItem(item, solrClient, query, "ean", itemsToSkip, doc -> {
+                return true;
+            });
+            return new ImportResult(catalogItem,item);
+
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
-            return new ArrayList<>();
+            return new ImportResult(new ArrayList<>(),item);
         }
     }
 
@@ -316,7 +341,6 @@ public class XMLImporterDistri extends AbstractXMLImport {
         XMLImporterDistri distri = new XMLImporterDistri("logger", hexGroupId, "file:///c:/Users/happy/Projects/SeznamDNNT/distri.cz", 
                 1, "days");
         distri.doImport(null, false, new LinkedHashSet<>());
-        
         XMLImportDesc importDesc = distri.getImportDesc();
         System.out.println(importDesc.toString());
         

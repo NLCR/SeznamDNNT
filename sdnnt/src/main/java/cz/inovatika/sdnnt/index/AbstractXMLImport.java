@@ -4,28 +4,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
+import cz.inovatika.sdnnt.index.utils.imports.AuthorUtils;
+import cz.inovatika.sdnnt.index.utils.imports.PublisherInfoCleaner;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -73,8 +67,26 @@ public abstract class AbstractXMLImport implements LoggerAware {
         
     }
 
-    
-    
+
+    protected static String normalizeObjects(Object ... objs) {
+        StringBuilder valueBuilder = new StringBuilder();
+        Arrays.stream(objs).forEach(obj-> {
+            if (obj != null) {
+                if (obj instanceof  JSONArray) {
+                    JSONArray arr = (JSONArray) obj;
+                    for (int i = 0; i < arr.length(); i++) {
+                        String str = arr.getString(i);
+                        valueBuilder.append(str);
+                    }
+                } else {
+                    valueBuilder.append(obj.toString());
+                }
+            }
+        });
+        return ImporterUtils.normalize(valueBuilder.toString());
+    }
+
+
     protected SolrDocument isControlled(String id, SolrClient solr) throws SolrServerException, IOException {
         int days = Options.getInstance().getInt("importControlledExpireationDays", 30);
         SolrQuery q = new SolrQuery("*").addFilterQuery("item_id:" + id)
@@ -86,17 +98,31 @@ public abstract class AbstractXMLImport implements LoggerAware {
         return null;
     }
 
-    protected List<String> findCatalogItem(Map<String, Object> item, SolrClient solrClient, SolrQuery query, String ean, LinkedHashSet<String> itemsToSkip) throws SolrServerException, IOException {
 
+    private List<JSONObject> fetchDocsFromSolr(SolrClient solrClient, SolrQuery query, Predicate<JSONObject> filter) throws SolrServerException, IOException {
         QueryRequest qreq = new QueryRequest(query);
         NoOpResponseParser rParser = new NoOpResponseParser();
         rParser.setWriterType("json");
         qreq.setResponseParser(rParser);
-        NamedList<Object> qresp = solrClient.request(qreq, "catalog");
-        JSONObject jresp = (new JSONObject((String) qresp.get("response"))).getJSONObject("response");
 
+        NamedList<Object> qresp = solrClient.request(qreq, "catalog");
+        JSONObject jresp = new JSONObject((String) qresp.get("response")).getJSONObject("response");
         JSONArray docs = jresp.getJSONArray("docs");
-        
+
+        List<JSONObject> filteredDocs = new ArrayList<>();
+        for (int i = 0; i < docs.length(); i++) {
+            JSONObject doc = docs.getJSONObject(i);
+            if (filter == null ||  (filter != null && filter.test(doc))) {
+                filteredDocs.add(doc);
+            }
+        }
+
+        return filteredDocs;
+    }
+
+    protected List<String> findCatalogItem(Map<String, Object> item, SolrClient solrClient, SolrQuery query, String hitType, LinkedHashSet<String> itemsToSkip, Predicate<JSONObject> filter) throws SolrServerException, IOException {
+        List<JSONObject>docs = fetchDocsFromSolr(solrClient, query, filter);
+
         /** all identifiers */
         List<String> identifiers = new ArrayList<>();
         /** pn identifiers */
@@ -104,13 +130,13 @@ public abstract class AbstractXMLImport implements LoggerAware {
         /** na vyrazeni */
         List<String> naVyrazeni = new ArrayList<>();
 
-        boolean isEAN = false;
-        if (docs.length() == 0) {
+        if (docs.size() == 0) {
             return new ArrayList<>();
         }
         
         List<String> states = new ArrayList<>();
         for (Object o : docs) {
+            // tady  bereme vsechny ale muze to byt tak, ze bereme jenom nejake
             JSONObject doc = (JSONObject) o;
             String identifier = doc.getString("identifier");
 
@@ -129,7 +155,6 @@ public abstract class AbstractXMLImport implements LoggerAware {
                         } else {
                             getImportDesc().incrementSkipped();
                         }
-                        
                     } else {
                         if (datumKuratorStav != null) {
                             Instant parsedInstant = Instant.parse(datumKuratorStav);
@@ -171,23 +196,25 @@ public abstract class AbstractXMLImport implements LoggerAware {
                 doc.remove("raw");
                 identifiers.add(doc.toString());
             }
-
+            /*
             if (doc.has("ean")) {
                 List<Object> eans = doc.getJSONArray("ean").toList();
                 if (ean!= null &&  eans.contains(ean)) {
                     isEAN = true;
                 }
-            }
+            }*/
         }
 
         
         JSONArray dntStavArray = new JSONArray();
         states.stream().filter(state -> Arrays.asList("A", "PA", "NL").contains(state)).forEach(dntStavArray::put);
         if (naVyrazeni.size() > 0)  item.put("dntstav",dntStavArray);
+        getImportDesc().addToDiscardingHits(naVyrazeni.size());
 
         item.put("found", true);
-        item.put("hit_type", isEAN ? "ean" : "noean");
-        item.put("num_hits", isEAN ? identifiers.size() : jresp.getInt("numFound"));
+        //item.put("hit_type", isEAN ? "ean" : "noean");
+        item.put("hit_type", hitType);
+        item.put("num_hits",identifiers.size());
         item.put("identifiers", identifiers);
         item.put("na_vyrazeni", naVyrazeni);
         item.put("hits_na_vyrazeni", naVyrazeni.size());
@@ -214,6 +241,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
 
     
     protected void indexImportSummary(SolrClient solrClient) throws SolrServerException, IOException {
+        XMLImportDesc importDesc = getImportDesc();
         solrClient.add(DataCollections.imports.name(), getImportDesc().toSolrInputDocument());
         solrClient.commit(DataCollections.imports.name());
     }
@@ -222,7 +250,44 @@ public abstract class AbstractXMLImport implements LoggerAware {
         return this.url;
     }
 
-    
+    /** title + subtitle + author = 90% match */
+    protected static boolean match_1(JSONObject doc, String distriTitle, String distriSubtitle, String distriAuthor) {
+        StringBuilder authorStringBuilder = new StringBuilder();
+        JSONArray authorArray = doc.optJSONArray("author");
+        if (authorArray != null) {
+            for (int i = 0; i < authorArray.length(); i++) {
+                String optString = authorArray.optString(i);
+                authorStringBuilder.append(AuthorUtils.normalizeAndSortAuthorName(optString).stream().collect(Collectors.joining(" ")));
+            }
+        }
+
+        String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"), authorStringBuilder.toString());
+        String distriNormalizedTitle = normalizeObjects(distriTitle, distriSubtitle, AuthorUtils.normalizeAndSortAuthorName(distriAuthor));
+        boolean matched = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, 0.9);
+        return matched;
+    }
+
+    /** title + subtitle  = 100% match, publisher = 50 % match */
+    protected static boolean match_2(JSONObject doc, String distriTitle, String distriSubtitle, String publisher) {
+        String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
+        String distriNormalizedTitle = normalizeObjects(distriTitle, distriSubtitle);
+        boolean matchedTitle = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, 1.0);
+        if (matchedTitle) {
+
+            StringBuilder catalogRAWNakladatel = new StringBuilder();
+            JSONArray catalogNakladatelJSONArray = doc.optJSONArray("nakladatel");
+            if (catalogNakladatelJSONArray != null) {
+                for (int i = 0; i < catalogNakladatelJSONArray.length(); i++) {  catalogRAWNakladatel.append(catalogNakladatelJSONArray.getString(i)); }
+            }
+
+            String catalogNakladatel = normalizeObjects(PublisherInfoCleaner.normalizePublisher( catalogRAWNakladatel.toString() ));
+            String distriNakladatel = normalizeObjects(PublisherInfoCleaner.normalizePublisher( publisher));
+            boolean matchedNakladatel =  ImporterUtils.similartyMatch(catalogNakladatel, distriNakladatel, 0.5);
+            return matchedNakladatel;
+        }
+        return false;
+    }
+
     public abstract XMLImportDesc getImportDesc();
     public abstract String getImportIdentifier();
 
@@ -307,6 +372,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
         private String firstId;
         private String lastId;
 
+        private int discardingHits = 0;
         private int total = 0;
         private int skipped = 0;
         private int indexed = 0;
@@ -416,12 +482,23 @@ public abstract class AbstractXMLImport implements LoggerAware {
             this.importOrigin = importOrigin;
         }
 
+
+        public void addToDiscardingHits(int discardingHits) {
+            this.discardingHits = this.discardingHits + discardingHits;
+        }
+
+        public void removeFromDiscardingHits(int discardingHits) {
+            this.discardingHits = this.discardingHits - discardingHits;
+        }
+
         public String getGroup() {
             return group;
         }
-        
-        
-        
+
+        public boolean indexable() {
+            return this.inSdnnt > 0 || this.indexed > 0;
+        }
+
 
         @Override
         public String toString() {
@@ -444,6 +521,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
             idoc.setField(ImporterUtils.IMPORT_NUMDOCS_KEY, indexed);
             idoc.setField(ImporterUtils.IMPORT_SKIPPED_KEY, skipped);
             idoc.setField(ImporterUtils.IMPORT_NUMINSDNNT_KEY, inSdnnt);
+            //idoc.setField(ImporterUtils.IMPORT_NUM_CANCELING_HITS, this.discardingHits);
             idoc.setField(ImporterUtils.IMPORT_GROUP_KEY, this.group);
             return idoc;
         }

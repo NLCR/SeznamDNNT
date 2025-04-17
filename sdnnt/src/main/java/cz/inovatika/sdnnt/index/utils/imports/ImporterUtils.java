@@ -33,21 +33,18 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -100,7 +97,8 @@ public class ImporterUtils {
     public static final String IMPORT_DATE_KEY = "date";
     public static final String IMPORT_ID_KEY = "id";
     public static final String IMPORT_GROUP_KEY = "group";
-    
+    public static final String IMPORT_NUM_CANCELING_HITS="num_canceling_hits";
+
     private ImporterUtils() {}
 
 
@@ -227,13 +225,28 @@ public class ImporterUtils {
 
 
     public static long calculateInterval(Instant start, Instant end, ChronoUnit unit) {
-
         LocalDateTime startDate = start.atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime endDate = end.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        
         return unit.between(startDate, endDate);
     }
-    
-    
-    
+
+
+    public static String normalize(String input) {
+        if (input == null) return "";
+        String result = input.toLowerCase(Locale.ROOT);
+        result = Normalizer.normalize(result, Normalizer.Form.NFD);
+        result = result.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        result = result.replaceAll("[^a-z0-9]", "");
+        return result;
+    }
+
+    public static boolean similartyMatch(String catalogNormalizedTitle, String distriNormalizedTitle, double shoda) {
+        LevenshteinDistance dist = new LevenshteinDistance();
+        Integer calculatedDistance = dist.apply(catalogNormalizedTitle, distriNormalizedTitle);
+        double maxDistance = Math.round ( (1- shoda)* ((double) distriNormalizedTitle.length()) ) ;
+
+        if (maxDistance >= calculatedDistance) {
+            return true;
+        } else return false;
+    }
 }

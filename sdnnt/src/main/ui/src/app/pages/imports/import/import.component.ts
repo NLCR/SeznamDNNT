@@ -141,14 +141,6 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.docs = resp.response.docs;
       this.facets = resp.facet_counts.facet_fields;
       this.numFound = resp.response.numFound;
-      // this.nejen_na_vyrazeni = resp.stats.stats_fields.na_vyrazeni.count;
-      // this.ean = resp.facet_counts.facet_fields.hit_type.ean;
-      // this.noHits = resp.facet_counts.facet_fields.num_hits['0'];
-      // if (!this.initialized) {
-      //   this.date = this.docs[0].import_date;
-      //   this.uri = this.docs[0].import_uri;
-      //   this.origin = this.docs[0].import_origin;
-      // }
       
       this.docs.forEach(doc => {
         doc.identifiers.forEach(id => {
@@ -159,8 +151,6 @@ export class ImportComponent implements OnInit, OnDestroy {
         });
       });
       this.docs.forEach(doc => {
-
-        
 
         const f = doc.identifiers.filter(id => {
 
