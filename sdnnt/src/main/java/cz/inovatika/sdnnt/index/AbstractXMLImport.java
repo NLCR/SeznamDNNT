@@ -278,7 +278,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
     protected static boolean match_2(JSONObject doc, String distriTitle, String distriSubtitle, String publisher, float match21Prec, float match22Prec) {
         String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
         String distriNormalizedTitle = normalizeObjects(distriTitle, distriSubtitle);
-        boolean matchedTitle = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, 1.0);
+        boolean matchedTitle = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, match21Prec);
         if (matchedTitle) {
 
             StringBuilder catalogRAWNakladatel = new StringBuilder();
@@ -289,7 +289,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
 
             String catalogNakladatel = normalizeObjects(PublisherInfoCleaner.normalizePublisher( catalogRAWNakladatel.toString() ));
             String distriNakladatel = normalizeObjects(PublisherInfoCleaner.normalizePublisher( publisher));
-            boolean matchedNakladatel =  ImporterUtils.similartyMatch(catalogNakladatel, distriNakladatel, 0.5);
+            boolean matchedNakladatel =  ImporterUtils.similartyMatch(catalogNakladatel, distriNakladatel, match22Prec);
             return matchedNakladatel;
         }
         return false;
