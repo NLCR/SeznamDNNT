@@ -31,7 +31,7 @@ public class XMLImporterDistri extends AbstractXMLImport {
 
     private static final String IMPORT_IDENTIFIER = "distri.cz";
 
-    public static List<String> ELEMENT_NAMES = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION", "AVAILABILITY","SUBTITLE");
+    public static List<String> ELEMENT_NAMES = Arrays.asList("NAME", "EAN", "AUTHOR", "EDITION", "AVAILABILITY","SUBTITLE", "PUBLISHING");
     public static final Logger LOGGER = Logger.getLogger(XMLImporterDistri.class.getName());
 
     private XMLImportDesc importDescription = null;
@@ -289,14 +289,13 @@ public class XMLImporterDistri extends AbstractXMLImport {
                 final String distriSubtitle = (String) item.get("SUBTITLE");
                 final String distriAuthor = item.containsKey("AUTHOR")  ? (String) item.get("AUTHOR") : "";
                 final String distriNakladatel = item.containsKey("PUBLISHING") ? (String)item.get("PUBLISHING") : "";
-
                 String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
                 if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
                     title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
                 }
                 SolrQuery query = new SolrQuery(title).setRows(DEFAULT_NUMBER_HITS_BY_TITLE).setParam("q.op", "AND")
                         .setFields(
-                                "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,marc_245a,marc_245b,datum_kurator_stav, author");
+                                "identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a,marc_245a,marc_245b,datum_kurator_stav, author, nakladatel");
                 List<String> catalog =  super.findCatalogItem(item, solrClient ,query, "noean", itemsToSkip, (doc-> {
 
                     // match1 - title, subtitle, author
