@@ -19,14 +19,34 @@ package cz.inovatika.sdnnt.index;
 import java.util.List;
 import java.util.Map;
 
+
 public class ImportResult {
 
+    public static class EANIdent {
+
+        private String eanIdent;
+        public EANIdent(String ean) {
+            this.eanIdent = ean;
+        }
+        public String getEanIdentifier() {
+            return this.eanIdent;
+        }
+    }
+
+
+    // vsechny identifikatory
     private List<String> foundIdentifiers;
+    // item ziskany z importniho xml
     private Map<String, Object> item;
 
-    public ImportResult(List<String> foundIdentifiers, Map<String, Object> item) {
+    private EANIdent eanIdent = null;
+
+    public ImportResult(List<String> foundIdentifiers, Map<String, Object> item, String eanIdent) {
         this.foundIdentifiers = foundIdentifiers;
         this.item = item;
+        if (eanIdent != null) {
+            this.eanIdent = new EANIdent(eanIdent);
+        }
     }
 
     public List<String> getFoundIdentifiers() {
@@ -35,6 +55,10 @@ public class ImportResult {
 
     public Map<String, Object> getItem() {
         return item;
+    }
+
+    public EANIdent getEanIdent() {
+        return eanIdent;
     }
 
     public  boolean found() {

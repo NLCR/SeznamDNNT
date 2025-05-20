@@ -52,8 +52,12 @@ public abstract class AbstractXMLImport implements LoggerAware {
     protected int checkPNStates = AbstractXMLImport.DEFAULT_VALUE;
     protected String chronoUnit = AbstractXMLImport.DEFAULT_CHRONO_UNIT;
 
+    protected float match1 = 1.0f;
+    protected float match21 = 1.0f;
+    protected float match22 = 0.5f;
+
     
-    public AbstractXMLImport(String strLogger,  String url, int checkPNStates, String chronoUnit) {
+    public AbstractXMLImport(String strLogger,  String url, int checkPNStates, String chronoUnit, float match1, float match21, float match22) {
         if (strLogger != null) {
             this.logger = Logger.getLogger(strLogger);
         }
@@ -64,7 +68,9 @@ public abstract class AbstractXMLImport implements LoggerAware {
             this.checkPNStates = checkPNStates;
             this.chronoUnit = chronoUnit;
         }
-        
+        this.match1 = match1;
+        this.match21 = match21;
+        this.match22 = match22;
     }
 
 
@@ -99,7 +105,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
     }
 
 
-    private List<JSONObject> fetchDocsFromSolr(SolrClient solrClient, SolrQuery query, Predicate<JSONObject> filter) throws SolrServerException, IOException {
+    protected List<JSONObject> fetchDocsFromSolr(SolrClient solrClient, SolrQuery query, Predicate<JSONObject> filter) throws SolrServerException, IOException {
         QueryRequest qreq = new QueryRequest(query);
         NoOpResponseParser rParser = new NoOpResponseParser();
         rParser.setWriterType("json");
@@ -251,7 +257,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
     }
 
     /** title + subtitle + author = 90% match */
-    protected static boolean match_1(JSONObject doc, String distriTitle, String distriSubtitle, String distriAuthor) {
+    protected static boolean match_1(JSONObject doc, String distriTitle, String distriSubtitle, String distriAuthor, float match1Prec) {
         StringBuilder authorStringBuilder = new StringBuilder();
         JSONArray authorArray = doc.optJSONArray("author");
         if (authorArray != null) {
@@ -263,12 +269,13 @@ public abstract class AbstractXMLImport implements LoggerAware {
 
         String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"), authorStringBuilder.toString());
         String distriNormalizedTitle = normalizeObjects(distriTitle, distriSubtitle, AuthorUtils.normalizeAndSortAuthorName(distriAuthor));
-        boolean matched = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, 0.9);
+        //Options.getInstance().getFloat()
+        boolean matched = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, match1Prec);
         return matched;
     }
 
     /** title + subtitle  = 100% match, publisher = 50 % match */
-    protected static boolean match_2(JSONObject doc, String distriTitle, String distriSubtitle, String publisher) {
+    protected static boolean match_2(JSONObject doc, String distriTitle, String distriSubtitle, String publisher, float match21Prec, float match22Prec) {
         String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
         String distriNormalizedTitle = normalizeObjects(distriTitle, distriSubtitle);
         boolean matchedTitle = ImporterUtils.similartyMatch(catalogNormalizedTitle, distriNormalizedTitle, 1.0);

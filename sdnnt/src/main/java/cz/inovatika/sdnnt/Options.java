@@ -110,8 +110,13 @@ public class Options {
     return server_conf.optString(key);
   }
 
+
   public int getInt(String key, int defVal) {
     return server_conf.optInt(key, defVal);
+  }
+
+  public float getFloat(String key, float defVal) {
+      return server_conf.optFloat(key, defVal);
   }
 
   public boolean getBoolean(String key, boolean defVal) {

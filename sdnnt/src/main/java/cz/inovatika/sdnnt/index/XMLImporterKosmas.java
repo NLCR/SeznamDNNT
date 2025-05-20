@@ -77,8 +77,8 @@ public class XMLImporterKosmas extends AbstractXMLImport {
     private Logger logger = Logger.getLogger(XMLImporterKosmas.class.getName());
     private String url = DEFAULT_IMPORT_URL;
 
-    public XMLImporterKosmas(String strLogger, String groupId, String url, int checkPNStates, String chronoUnit) {
-        super(strLogger, url, checkPNStates, chronoUnit);
+    public XMLImporterKosmas(String strLogger, String groupId, String url, int checkPNStates, String chronoUnit, float match1, float match21, float match22) {
+        super(strLogger, url, checkPNStates, chronoUnit, match1, match21, match22);
         if (this.url == null) {
             this.url = DEFAULT_IMPORT_URL;
         }
@@ -174,7 +174,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("import_date", this.importDescription.getImportDate());
                 idoc.setField(ImporterUtils.IMPORT_ID_KEY, this.importDescription.getImportId() + "_" + id);
                 idoc.setField("item_id", item_id);
-                item.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + eanItem.get("EAN"));
+                eanItem.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + eanItem.get("EAN"));
 
                 idoc.setField("item", new JSONObject(eanItem).toString());
 
@@ -191,6 +191,10 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("hit_type", eanItem.get("hit_type"));
                 idoc.setField("item", new JSONObject(eanItem).toString());
                 idoc.setField("dntstav", eanItem.get("dntstav"));
+                if (eanResult.getEanIdent() != null) {
+                    idoc.setField("skceanitem", eanResult.getEanIdent().getEanIdentifier());
+                }
+
                 solrClient.add(DataCollections.imports_documents.name(), idoc);
                 this.importDescription.incrementIndexed();
 
@@ -204,7 +208,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("import_date", this.importDescription.getImportDate());
                 idoc.setField(ImporterUtils.IMPORT_ID_KEY, this.importDescription.getImportId() + "_" + id);
                 idoc.setField("item_id", item_id);
-                item.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + titlesItem.get("EAN"));
+                titlesItem.put("URL", "https://www.kosmas.cz/hledej/?Filters.ISBN_EAN=" + titlesItem.get("EAN"));
 
                 idoc.setField("item", new JSONObject(titlesItem).toString());
 
@@ -221,6 +225,11 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 idoc.setField("hit_type", titlesItem.get("hit_type"));
                 idoc.setField("item", new JSONObject(titlesItem).toString());
                 idoc.setField("dntstav", titlesItem.get("dntstav"));
+                if (titleResult.getEanIdent() != null) {
+                    idoc.setField("skceanitem", titleResult.getEanIdent().getEanIdentifier());
+                }
+
+
                 solrClient.add(DataCollections.imports_documents.name(), idoc);
                 this.importDescription.incrementIndexed();
 
@@ -245,39 +254,47 @@ public class XMLImporterKosmas extends AbstractXMLImport {
 
     public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
-            String distribName = (String) item.get("NAME");
-            String authorName = (String) item.get("AUTHOR");
-            String nakladatel = (String) item.get("PUBLISHING");
 
-            String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
-            if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
-                title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
+            String q = "ean:\"" + item.get("EAN")+"\"";
+            SolrQuery eanQuery = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
+                    .setFields("identifier");
+            List<JSONObject>eanItems = fetchDocsFromSolr(solrClient, eanQuery, doc->{return true;});
+
+            if (eanItems.size() > 0) {
+                String distribName = (String) item.get("NAME");
+                String authorName = (String) item.get("AUTHOR");
+                String nakladatel = (String) item.get("PUBLISHING");
+
+                String title = "nazev:(" + ClientUtils.escapeQueryChars(((String) item.get("NAME")).trim()) + ")";
+                if (item.containsKey("AUTHOR") && !((String) item.get("AUTHOR")).isBlank()) {
+                    title += " AND author:(" + ClientUtils.escapeQueryChars((String) item.get("AUTHOR")) + ")";
+                }
+                SolrQuery query = new SolrQuery(title)
+                        .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
+                        .setParam("q.op", "AND")
+                        .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
+
+                List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
+                    String id = doc.optString("identifier");
+
+                    boolean matched = match_1(doc, distribName, "", authorName, this.match1);
+                    if (matched) {
+                        return matched;
+                    }
+                    matched = match_2(doc, distribName, "", nakladatel, this.match21, this.match22);
+                    if (matched) {
+                        return matched;
+                    }
+
+                    return false;
+                }));
+                return new ImportResult(foundItems, item, eanItems.get(0).getString("identifier"));
+            } else {
+                return new ImportResult(new ArrayList<>(), item, null);
             }
-            SolrQuery query = new SolrQuery(title)
-                    .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
-                    .setParam("q.op", "AND")
-                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
-
-            List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
-                String id = doc.optString("identifier");
-
-                boolean matched = match_1(doc, distribName, "", authorName);
-                if (matched) {
-                    return matched;
-                }
-                matched = match_2(doc, distribName, "", nakladatel);
-                if (matched) {
-                    return matched;
-                }
-
-                return false;
-            }));
-
-            return new ImportResult(foundItems, item);
-
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
-            return new ImportResult(new ArrayList<>(), item);
+            return new ImportResult(new ArrayList<>(), item, null);
         }
     }
 
@@ -295,10 +312,10 @@ public class XMLImporterKosmas extends AbstractXMLImport {
             List<String> eanItems =  findCatalogItem(item, solrClient, query,  "ean", itemsToSkip, doc-> {
                 return true;
             });
-            return new ImportResult(eanItems,item);
+            return new ImportResult(eanItems,item, eanItems.size() > 0 ? eanItems.get(0) : null);
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
-            return new ImportResult(new ArrayList<>(),item);
+            return new ImportResult(new ArrayList<>(),item, null);
         }
     }
     
@@ -324,7 +341,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
         AbstractXMLImport kosmas = new XMLImporterKosmas("logger", "gcd", 
                 "c:\\Users\\happy\\Projects\\SeznamDNNT\\nkp.xml", 
                 10, 
-                "days");
+                "days", 1.0f,1.0f,0.5f);
         
         LinkedHashSet<String> doImport = kosmas.doImport(null, false, new LinkedHashSet<>());
     }

@@ -51,8 +51,8 @@ public class XMLImporterHeureka extends AbstractXMLImport {
 
     private XMLImportDesc importDescription = null;//new XMLImportDesc(IMPORT_IDENTIFIER);
 
-    public XMLImporterHeureka(String strLogger,  String groupId, String url,int checkPNStates, String chronoUnit) {
-        super(strLogger, url, checkPNStates, chronoUnit);
+    public XMLImporterHeureka(String strLogger,  String groupId, String url,int checkPNStates, String chronoUnit, float match1, float match21, float match22) {
+        super(strLogger, url, checkPNStates, chronoUnit, match1, match21, match22);
         if (this.url == null) {
             this.url = DEFAULT_IMPORT_URL;
         }
@@ -139,6 +139,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             }
 
             Map<String, Object> eanItem = new HashMap<>(item);
+            // tady je pouze dle eanu
             ImportResult eanResult = findInCatalogByEan(eanItem, solrClient, itemsToSkip);
 
             Map<String, Object> titlesItem = new HashMap<>(item);
@@ -231,50 +232,63 @@ public class XMLImporterHeureka extends AbstractXMLImport {
 
     public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
-            String name = ((String) item.get(FIELD_MAPPING.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
-            String nakladatel = (String) item.get("MANUFACTURER");
-            String[] parts = name.split(" - ");
-            String nazev = parts[0].trim();
-            String title = "";
-            if (nazev.isEmpty()) {
-                if (parts.length > 1) {
-                    title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+            String q = "ean:\"" + item.get("EAN")+"\"";
+            SolrQuery eanQuery = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
+                    .setFields("identifier");
+            List<JSONObject>eanItems = fetchDocsFromSolr(solrClient, eanQuery, doc->{return true;});
+
+            if (!eanItems.isEmpty()) {
+                String name = ((String) item.get(FIELD_MAPPING.get("NAME"))).replaceAll("\\s*\\[[^\\]]*\\]\\s*", "");
+                String nakladatel = (String) item.get("MANUFACTURER");
+                String[] parts = name.split(" - ");
+                String nazev = parts[0].trim();
+                String title = "";
+                if (nazev.isEmpty()) {
+                    if (parts.length > 1) {
+                        title = " nazev:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+                    }
+                } else {
+                    title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
+                    if (parts.length > 1) {
+                        title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
+                    }
                 }
+
+                String fq = "ean:\"" + item.get("EAN")+"\"";
+
+                SolrQuery query = new SolrQuery(title)
+                        .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
+                        .setParam("q.op", "AND")
+                        .addFilterQuery(fq)
+                        .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
+
+                List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
+                    String id = doc.optString("identifier");
+
+                    boolean matched = match_1(doc, nazev, "", parts.length > 1 ? parts[1] : "", match1);
+
+                    String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
+                    String distriNormalizedTitle = normalizeObjects(nazev, "");
+                    if (matched) {
+                        return matched;
+                    }
+
+                    matched = match_2(doc, nazev, "", nakladatel, match21, match22);
+                    if (matched) {
+                        return matched;
+                    }
+                    return false;
+                }));
+                return new ImportResult(foundItems, item, eanItems.get(0).getString("identifier"));
             } else {
-                title = "nazev:(" + ClientUtils.escapeQueryChars(nazev) + ")";
-                if (parts.length > 1) {
-                    title += " AND author:(" + ClientUtils.escapeQueryChars(parts[1].trim()) + ")";
-                }
+                return new ImportResult(new ArrayList<>(), item, null);
             }
 
-            SolrQuery query = new SolrQuery(title)
-                    .setRows(DEFAULT_NUMBER_HITS_BY_TITLE)
-                    .setParam("q.op", "AND")
-                    .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
 
-            List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
-                String id = doc.optString("identifier");
-
-                boolean matched = match_1(doc, nazev, "", parts.length > 1 ? parts[1] : "");
-
-                String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
-                String distriNormalizedTitle = normalizeObjects(nazev, "");
-                if (matched) {
-                    return matched;
-                }
-
-                matched = match_2(doc, nazev, "", nakladatel);
-                if (matched) {
-                    return matched;
-                }
-                return false;
-            }));
-
-            return new ImportResult(foundItems, item);
 
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
-            return new ImportResult(new ArrayList<>(), item);
+            return new ImportResult(new ArrayList<>(), item, null);
         }
     }
     
@@ -289,11 +303,11 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             List<String> eanItems =  super.findCatalogItem(item, solrClient,  query,"ean", itemsToSkip, doc-> {
                 return true;
             });
-            return new ImportResult(eanItems,item);
+            return new ImportResult(eanItems,item, eanItems.size() > 0 ? eanItems.get(0) : null);
 
         } catch (SolrServerException | IOException ex) {
             getLogger().log(Level.SEVERE, null, ex);
-            return new ImportResult(new ArrayList<>(),item);
+            return new ImportResult(new ArrayList<>(),item, null);
         }
     }
         
@@ -310,7 +324,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
     public static void main(String[] args) {
         XMLImporterHeureka distri = new XMLImporterHeureka("logger", "grpab",
                 "https://feeds.mergado.com/palmknihy-cz-heureka-cz-cz-6-ed3e5a88767ca249029fda83b9326415.xml",
-                1, "days");
+                1, "days", 1.0f, 1.0f, 0.5f);
         distri.doImport(null, false, new LinkedHashSet<>());
 
         XMLImportDesc importDesc = distri.getImportDesc();

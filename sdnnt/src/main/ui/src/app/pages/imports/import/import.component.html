@@ -61,7 +61,7 @@
                   <ng-container *ngIf="doc.item.URL">
                     <a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span>
                   </ng-container>
-                  <ng-container *ngIf="doc.eanAlephLink && doc.hit_type === 'ean'">
+                  <ng-container *ngIf="doc.eanAlephLink">
                     <a [href]="sanitize(doc.eanAlephLink)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate">SKC</a><span class="app-pipe"></span>
                   </ng-container>
                   <ng-container *ngIf="doc.ean">

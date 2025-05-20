@@ -141,15 +141,20 @@ export class ImportComponent implements OnInit, OnDestroy {
       this.docs = resp.response.docs;
       this.facets = resp.facet_counts.facet_fields;
       this.numFound = resp.response.numFound;
-      
+
       this.docs.forEach(doc => {
-        doc.identifiers.forEach(id => {
-          if (doc.ean && id.ean && id.ean.includes(doc.ean)) {
-            doc.eanAlephLink = 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.identifier.substr(id.identifier.lastIndexOf('-') + 1);
-            return;
+          if (doc.skceanitem) {
+            doc.eanAlephLink = 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + doc.skceanitem.slice(doc.skceanitem.lastIndexOf('-') + 1);
+          } else {
+            doc.identifiers.forEach(id => {
+              if (doc.ean && id.ean && id.ean.includes(doc.ean)) {
+                doc.eanAlephLink = 'http://aleph.nkp.cz/F/?func=direct&local_base=SKC&doc_number=' + id.identifier.substr(id.identifier.lastIndexOf('-') + 1);
+                return;
+              }
+            });
           }
-        });
       });
+
       this.docs.forEach(doc => {
 
         const f = doc.identifiers.filter(id => {

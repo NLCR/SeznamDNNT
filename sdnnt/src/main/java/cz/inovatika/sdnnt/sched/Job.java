@@ -706,28 +706,30 @@ public class Job implements InterruptableJob {
                     JSONObject heurekaConf = jobData.optJSONObject("heureka");
                     String heurekaUrl = heurekaConf != null ? heurekaConf.optString("url"):null;
 
-                    
+                    float match1 = jobData != null ? jobData.optFloat("match_1",1.0f) : 1.0f;
+                    float match21 = jobData != null ? jobData.optFloat("match_21",1.0f) : 1.0f;
+                    float match22 = jobData != null ? jobData.optFloat("match_22",0.5f) : 0.5f;
+
                     String logger = jobData.optString("logger");
                     AbstractXMLImport lastImport = null;
                     try {
                         if (StringUtils.isAnyString(kosmasUrl)) {
-                            AbstractXMLImport kosmas = new XMLImporterKosmas(logger, hexGroupId, kosmasUrl, value, unit);
+                            AbstractXMLImport kosmas = new XMLImporterKosmas(logger, hexGroupId, kosmasUrl, value, unit, match1, match21, match22);
                             processingSet =  kosmas.doImport(null, false, processingSet);
                             lastImport = kosmas;
                         }
                         
                         if (StringUtils.isAnyString(distriUrl)) {
-                            AbstractXMLImport distri = new XMLImporterDistri(logger, hexGroupId, distriUrl, value, unit);
+                            AbstractXMLImport distri = new XMLImporterDistri(logger, hexGroupId, distriUrl, value, unit, match1, match21, match22);
                             processingSet = distri.doImport(null, false, processingSet);
                             lastImport = distri;
                         }
 
                         if (StringUtils.isAnyString(heurekaUrl)) { 
-                            XMLImporterHeureka heureka = new XMLImporterHeureka(logger, hexGroupId, heurekaUrl, value, unit);
+                            XMLImporterHeureka heureka = new XMLImporterHeureka(logger, hexGroupId, heurekaUrl, value, unit, match1, match21, match22);
                             processingSet = heureka.doImport(null, false,processingSet );
                             lastImport = heureka;
                         }
-                        
                     } catch (Exception e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(), e);
                     } finally {
