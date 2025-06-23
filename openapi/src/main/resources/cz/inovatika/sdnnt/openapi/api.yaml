@@ -140,7 +140,7 @@ paths:
       description: |
         Řeší návrh k zařazení na seznam.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
-          - Dílo je identifikováno identifikátorem ze souborného katalogu.
+          - Dílo je identifikováno identifikátorem ze souborného katalogu případně kombinací polí SIGLA+Pole 001
           - Dílo musí být ve stavu **N** nebo mimo seznam.
       operationId: requestBatchNzn
       requestBody:
@@ -187,7 +187,7 @@ paths:
       description: |
         Řeší hromadnou výzvu k vyřazení ze seznamu.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
-          - Dílo je identifikováno identifikátorem ze souborného katalogu.
+          - Dílo je identifikováno identifikátorem ze souborného katalogu případně kombinací polí SIGLA+Pole 001
           - Dílo musí být ve stavu **A** případně **PA**
       operationId: requestBatchVN
       requestBody:
@@ -220,7 +220,7 @@ paths:
       description: |
         Řeší hromadnou hromadný požadavek .
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
-          - Dílo je identifikováno identifikátorem ze souborného katalogu.
+          - Dílo je identifikováno identifikátorem ze souborného katalogu případně kombinací polí SIGLA+Pole 001.
           - Dílo musí být ve stavu **A** případně **PA**
 
       operationId: requestBatchVnl
@@ -253,7 +253,7 @@ paths:
       description: |
         Řeší hromadnou hromadný požadavek o vyřazení z návrhu ze seznamu.
           - Může obsahovat jednu nebo více dávek a v každé dávce musí být minimálně obsaženo jedno dílo.
-          - Dílo je identifikováno identifikátorem ze souborného katalogu.
+          - Dílo je identifikováno identifikátorem ze souborného katalogu případně kombinací polí SIGLA+Pole 001.
           - Dílo musí být ve stavu **A** případně **PA**
 
       operationId: requestBatchVnz
