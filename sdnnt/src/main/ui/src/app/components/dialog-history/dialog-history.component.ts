@@ -5,6 +5,12 @@ import { AppState } from 'src/app/app.state';
 import { HistoryItem } from 'src/app/shared/history-item';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
+export enum KuratorStavColumns {
+  DEFAULT_COLUMNS,
+  ADDITOIONAL_PN_COLUMN
+};
+
+
 @Component({
   selector: 'app-dialog-history',
   templateUrl: './dialog-history.component.html',
@@ -12,14 +18,26 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class DialogHistoryComponent implements OnInit {
 
+
+  // plna historie
   history: HistoryItem[] = [];
+  // verejne stavy 
   stavy: HistoryItem[] = [];
+  // kuratorske stavy
   kuratorskestavy: HistoryItem[] = [];
+
+  // zpristupneni v sablone ??  Divne 
+  KuratorStavColumns = KuratorStavColumns;
+
+  kuratorColumns:KuratorStavColumns = KuratorStavColumns.DEFAULT_COLUMNS;
+
+  pnDeadline:Date;
+  pnDeadlineConfig:string;
 
   kategorieGranulovanychStavu=[];
   granulovaneStavyAggregated={};
 
-
+  // pokud ma granulovane stavy
   granularity: boolean = false;
 
 
@@ -30,8 +48,6 @@ export class DialogHistoryComponent implements OnInit {
     private service: AppService) { }
 
   ngOnInit(): void {
-    //console.log(this.kategorieGranulovanychStavu);
-    //this.stavy = this.data.historie_stavu;
 
 
     this.stavy = this.data.historie_stavu;
@@ -57,10 +73,18 @@ export class DialogHistoryComponent implements OnInit {
       }
     });
 
-    this.granularity = (this.data.fmt === 'SE' || this.data.fmt === 'BK') && this.data.granularity;
-    
+    if (this.kuratorskestavy[this.kuratorskestavy.length-1] && this.kuratorskestavy[this.kuratorskestavy.length-1].stav =='PN') {
+      this.kuratorColumns = KuratorStavColumns.ADDITOIONAL_PN_COLUMN;
+      this.service.pnDeadlineInfo(this.data.identifier).subscribe((data)=> {
+        if (data.deadline) {
+          this.pnDeadline = new Date(data.deadline);
+          this.pnDeadlineConfig = "("+data.value +" "+data.unit+")";
+        }
+      });
+    }
 
-    //this.granulaovaneStavy = this.data.historie_granulovaneho_stavu;
+
+    this.granularity = (this.data.fmt === 'SE' || this.data.fmt === 'BK') && this.data.granularity;
 
     this.data.historie_granulovaneho_stavu.forEach(hiist=> {
       let stringRep = JSON.stringify(hiist);

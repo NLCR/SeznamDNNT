@@ -201,7 +201,11 @@ export class AppService {
     return this.get(url, params);
   }
 
-  
+  pnDeadlineInfo(id:string): Observable<any> {
+    let url = '/search/pn_deadline';
+    const params: HttpParams = new HttpParams().set('identifier', id);
+    return this.get(url, params);
+  } 
 
   searchImports(params: HttpParams): Observable<any> {
     let url = 'search/imports';
@@ -229,6 +233,7 @@ export class AppService {
     let url = 'info/git';
     return this.get(url);
   }
+
 
   approveNavrhInImport(identifier: string, importId: string): Observable<any> {
     let url = '/account/approve_navrh_in_import';
