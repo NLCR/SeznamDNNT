@@ -203,14 +203,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
                 doc.remove("raw");
                 identifiers.add(doc.toString());
             }
-            /*
-            if (doc.has("ean")) {
-                List<Object> eans = doc.getJSONArray("ean").toList();
-                if (ean!= null &&  eans.contains(ean)) {
-                    isEAN = true;
-                }
-            }*/
-        }
+       }
 
         
         JSONArray dntStavArray = new JSONArray();

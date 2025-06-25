@@ -743,6 +743,16 @@ public class Job implements InterruptableJob {
             }
         },
 
+        UPDATE_IMPORT_STATES {
+            @Override
+            void doPerform(JSONObject jobData) {
+                String logger = jobData.optString("logger");
+                UpdateStatesForImports updateStatesForImports = new UpdateStatesForImportsImpl(logger);
+                updateStatesForImports.updateImports();
+            }
+        },
+
+
         PNREQ {
 
             @Override

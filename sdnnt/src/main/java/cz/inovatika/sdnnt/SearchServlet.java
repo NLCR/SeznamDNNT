@@ -481,7 +481,8 @@ public class SearchServlet extends HttpServlet {
                                 .addSort("hit_type", SolrQuery.ORDER.asc)
                                 .addSort("name", SolrQuery.ORDER.asc)
                                 .addFilterQuery("import_id:" + req.getParameter("id"))
-                                .addFilterQuery("dntstav:A OR dntstav:PA OR dntstav:NL").setFacet(true)
+                                .addFilterQuery("hits_na_vyrazeni:[1 TO *]")
+                                .setFacet(true)
                                 .addFacetField("{!ex=dntstav}dntstav").addFacetField("{!ex=ct}controlled")
                                 .setFacetMinCount(1).setParam("json.nl", "arrntv")
                                 .setFields("*,identifiers:[json],catalog:[json],item:[json]");
@@ -512,7 +513,6 @@ public class SearchServlet extends HttpServlet {
                         }
 
                         Map<String, JSONObject> map = new HashMap<>();
-
                         int batchSize = 40;
                         int number = identsid.size() / batchSize;
                         number = number + ((identsid.size() % batchSize == 0) ? 0 : 1);

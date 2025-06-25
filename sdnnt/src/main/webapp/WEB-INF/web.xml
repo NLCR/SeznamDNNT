@@ -112,13 +112,13 @@
         <url-pattern>/search</url-pattern>
         <url-pattern>/admin/*</url-pattern>
         <url-pattern>/imports</url-pattern>
+        <url-pattern>/imports/*</url-pattern>
         <url-pattern>/import/*</url-pattern>
         <url-pattern>/zadost/*</url-pattern>
         <url-pattern>/resetedpwd</url-pattern>
         <url-pattern>/resetedpwd/*</url-pattern>
         <url-pattern>/pswd</url-pattern>
         <url-pattern>/pswd/*</url-pattern>
-        <url-pattern>/imports/*</url-pattern>
 
         <url-pattern>/exports</url-pattern>
         <url-pattern>/exports/*</url-pattern>
