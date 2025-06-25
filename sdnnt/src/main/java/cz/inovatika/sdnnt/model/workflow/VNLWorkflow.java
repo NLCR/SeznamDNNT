@@ -121,6 +121,7 @@ public class VNLWorkflow extends Workflow {
             switch(state) {
                 case NPA: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
                 case PA: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
+                case PN: return debug ? debug_vnl_0_5wd : period_vln_0_5wd;
                 case NLX: return debug ? debug_vnl_3_5wd : period_vln_3_5wd;
                 case NL: return debug ? debug_vnl_2_18m : period_vln_2_18m;
                 default: return null;

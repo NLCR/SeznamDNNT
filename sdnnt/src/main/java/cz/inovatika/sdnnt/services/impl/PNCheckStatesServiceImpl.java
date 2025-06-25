@@ -165,7 +165,6 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
 
-        
         Map<String,List<Pair<String,String>>> processingMap = new HashMap<>();
         pairs.forEach(p ->{
             String ean = p.getRight();

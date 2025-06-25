@@ -153,7 +153,8 @@ public abstract class AbstractXMLImport implements LoggerAware {
                 List<Object> kuratorstate = doc.getJSONArray(MarcRecordFields.KURATORSTAV_FIELD).toList();
                 String datumKuratorStav = doc.optString(MarcRecordFields.DATUM_KURATOR_STAV_FIELD);
 
-                if (publicstate.contains("A") || publicstate.contains("PA") || publicstate.contains("NL")) {
+                // Nebude fungovat NL -> Musim vyradit
+                if (publicstate.contains("A") || publicstate.contains("PA") /*|| publicstate.contains("NL")*/) {
                     if (!kuratorstate.contains(CuratorItemState.PN.name())) {
                         if (!itemsToSkip.contains(identifier)) {
                             getImportDesc().incrementInSdnnt();
@@ -172,8 +173,8 @@ public abstract class AbstractXMLImport implements LoggerAware {
                                     break;
                                 }
                             }
-                            
-                            if (ImporterUtils.calculateInterval(parsedInstant, parsedInstant, selected) > this.checkPNStates) {
+
+                            if (ImporterUtils.calculateInterval(parsedInstant, Instant.now(), selected) > this.checkPNStates) {
                                 if (!itemsToSkip.contains(identifier)) {
                                     getImportDesc().incrementInSdnnt();
                                     naVyrazeni.add(identifier);

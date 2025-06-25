@@ -139,6 +139,7 @@ public class DocumentWorkflowFactory {
         return  kuratorstav.contains(CuratorItemState.NL.name()) ||
                 kuratorstav.contains(CuratorItemState.NLX.name()) ||
                 kuratorstav.contains(CuratorItemState.A.name()) ||
+                kuratorstav.contains(CuratorItemState.PN.name()) ||
                 kuratorstav.contains(CuratorItemState.PA.name());
     }
 

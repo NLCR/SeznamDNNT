@@ -60,7 +60,7 @@ import org.json.JSONObject;
  *
  * @author alberto
  */
-//TOD: Prepsat 
+//TODO: Prepsat
 public class Indexer {
 
     public static final Logger LOGGER = Logger.getLogger(Indexer.class.getName());
