@@ -39,12 +39,13 @@
             <th>{{ 'desc.komentar' | translate }}</th>           
             <th>{{ 'desc.cislo_zadosti' | translate }}</th>
 
-            <th *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_PN_COLUMN">{{ 'desc.pnreq' }}</th>
+            <th *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">{{ 'desc.pnreq' | translate }}</th>
+            <th *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">{{ 'desc.pnimport' | translate }}</th>
 
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of kuratorskestavy">
+          <tr *ngFor="let item of kuratorskestavy ; let isLast = last">
 
             <td>{{ item.date | date : 'dd.MM.yyyy' }}</td>
             <td>{{ item.user }}</td>
@@ -58,8 +59,21 @@
              {{ item.zadost?.substring(item.zadost.length -8) }}</td>
 
 
-            <td *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_PN_COLUMN">
-               {{ item.stav == 'PN' ? (pnDeadline | date:'dd.MM.yyyy HH:mm') + " " + pnDeadlineConfig : ' - ' }}             
+            <td *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">
+              <ng-container *ngIf="item.stav == 'PN' && isLast; else noData">
+                  {{ pnDeadlineReq | date:'dd.MM.yyyy HH:mm' }}
+                  <span class="pn-deadline-info">{{ pnDeadlineConfigReq }}</span>
+                </ng-container>
+                <ng-template #noData> - </ng-template>
+            </td>
+
+            <td *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">
+              <ng-container *ngIf="item.stav == 'PN' && isLast; else noData">
+                {{ pnDeadlineImport | date:'dd.MM.yyyy HH:mm' }}
+                <span class="pn-deadline-info">{{ pnDeadlineConfigImport }}</span>
+              </ng-container>
+              <ng-template #noData> - </ng-template>
+
             </td>
           </tr>
         </tbody>

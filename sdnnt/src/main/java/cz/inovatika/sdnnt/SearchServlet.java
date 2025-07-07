@@ -267,12 +267,12 @@ public class SearchServlet extends HttpServlet {
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         String identifier = req.getParameter("identifier");
                         // jobs
-                        // konfigurace -- ??
-                        String jobConfig = req.getParameter("job") != null ? req.getParameter("job") : "PNREQ";
 
-                        String unit = "month";
+                        // konfigurace -- ??
+                        String pnreq = req.getParameter("job") != null ? req.getParameter("job") : "PNREQ";
+                        String unit = "months";
                         long value = 10;
-                        JSONObject configObject = Options.getInstance().getJSONObject("jobs").optJSONObject(jobConfig);
+                        JSONObject configObject = Options.getInstance().getJSONObject("jobs").optJSONObject(pnreq);
                         if (configObject != null) {
                             JSONObject configPN = configObject.optJSONObject("checkPN");
                             unit = configPN.optString("unit","months");
@@ -305,7 +305,6 @@ public class SearchServlet extends HttpServlet {
                                 }
                             }
 
-                            //LocalDateTime deadlineDateTime = LocalDateTime.ofInstant(parsedInstant, ZoneId.systemDefault());
 
                             ZonedDateTime deadlineDateTime = parsedInstant.atZone(ZoneId.systemDefault());
 
@@ -315,10 +314,12 @@ public class SearchServlet extends HttpServlet {
                             String formattedDeadline = deadlineDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
                             JSONObject object = new JSONObject();
-                            object.put("job",jobConfig);
+                            object.put("job",pnreq);
                             object.put("deadline",formattedDeadline);
                             object.put("unit",selected.name());
                             object.put("value",value);
+
+
                             return object;
                         } else {
                             return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, "no record");

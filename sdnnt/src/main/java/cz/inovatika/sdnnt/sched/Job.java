@@ -746,9 +746,16 @@ public class Job implements InterruptableJob {
         UPDATE_IMPORT_STATES {
             @Override
             void doPerform(JSONObject jobData) {
-                String logger = jobData.optString("logger");
-                UpdateStatesForImports updateStatesForImports = new UpdateStatesForImportsImpl(logger);
-                updateStatesForImports.updateImports();
+                LocksSupport.SERVICES_LOCK.lock();
+                try {
+                    String logger = jobData.optString("logger");
+                    UpdateStatesForImports updateStatesForImports = new UpdateStatesForImportsImpl(logger);
+                    updateStatesForImports.updateImports();
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
             }
         },
 

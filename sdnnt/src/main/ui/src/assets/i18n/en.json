@@ -987,7 +987,8 @@
     "show_all": "Show all",
     "all_publishers": "All publishers",
 	  "prefixsearch": "Prefix search",
-    "pnreq":"New request"
+    "pnreq":"New request",
+    "pnimport":"Will be scheduled for re-check"
 
   },
 

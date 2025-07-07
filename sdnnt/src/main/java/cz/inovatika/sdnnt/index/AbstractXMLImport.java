@@ -42,6 +42,9 @@ import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public abstract class AbstractXMLImport implements LoggerAware {
 
+    public static Logger LOGGER = Logger.getLogger(AbstractXMLImport.class.getName());
+
+
     public static final String DEFAULT_CHRONO_UNIT = "month";
     public static final int DEFAULT_VALUE = 6;
     protected static final int DEFAULT_NUMBER_HITS_BY_TITLE = 100;

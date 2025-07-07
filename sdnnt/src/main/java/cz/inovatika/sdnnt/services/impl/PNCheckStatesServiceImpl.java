@@ -222,20 +222,23 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
 
             List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, Arrays.asList("NZN"), null, sublist);
             //  Only scheduler requests
-            List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).filter(z->{
-                if (z.getTypeOfRequest() != null && z.getTypeOfRequest().equals("scheduler")) {
-                    return true;
-                } else return false;
-            }).collect(Collectors.toList());
+            List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
+
 
             allRequests.forEach(req-> {
                 Instant datumZadani = req.getDatumZadani().toInstant();
-                // remove all if created date is newer then configuration border date
-                if (ImporterUtils.calculateInterval(datumZadani, inst, getChronoUnit()) <= this.checkPNStates) {
-                    getLogger().info(String.format("New NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
-                    pidsToRemove.addAll(req.getIdentifiers());
+
+                if (req.getState().equals("processed")) {
+                 // remove all if created date is newer then configuration border date
+                    if (ImporterUtils.calculateInterval(datumZadani, inst, getChronoUnit()) <= this.checkPNStates) {
+                        getLogger().info(String.format("New NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
+                        pidsToRemove.addAll(req.getIdentifiers());
+                    } else {
+                        getLogger().info(String.format("Old NZN request, %s, %s", req.getId(), req.getIdentifiers().toString()));
+                    }
                 } else {
-                    getLogger().info(String.format("Old NZN request, %s, %s", req.getId(), req.getIdentifiers().toString()));
+                    getLogger().info(String.format("Open NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
+                    pidsToRemove.addAll(req.getIdentifiers());
                 }
             });
 

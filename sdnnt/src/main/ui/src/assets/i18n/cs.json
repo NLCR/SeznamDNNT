@@ -16,8 +16,8 @@
   },
   "home": {
     "news": "Aktuality",
-    "about": "O SDNNT",
-    "readers": "Čtenářům",
+    "about": "O SDNNT", 
+    "readers": "Čtenářům", 
     "authors": "Nositelům práv",
     "publishers": "Nakladatelům",
     "libraries": "Knihovnám",
@@ -528,7 +528,7 @@
     "BOA001":"Moravská zemská knihovna v Brně",
     "BOA002":"Moravská zemská knihovna - Pedagogická knihovna",
     "BOB007":"Historický ústav AV ČR",
-    "BOD004": "Masarykova univerzita - Přírodovědecká fakulta - Ústřední knihovna",
+    "BOD004": "Masarykova univerzita - Přírodovědecká fakulta - Ústřední knihovna",    
     "BOD006":"Mendelova univerzita v Brně",
     "BOD022":"Masarykova univerzita - Ekonomicko-správní fakulta",
     "BOD034": "Masarykova univerzita - Knihovna univerzitního kampusu",
@@ -705,8 +705,8 @@
 
   "desc": {
     "fonds": "Ve fondu",
-    "scheduler_type_request":"Systémem generované žádosti",
-    "user_type_request":"Uživatelské žádosti",
+    "scheduler_type_request":"Systémem generované žádosti", 
+    "user_type_request":"Uživatelské žádosti", 
     "institution": "Instituce",
     "notifikace_interval": "Interval notifikace",
     "none": "Nenastaveno",
@@ -914,12 +914,12 @@
 
     "period_nzn_0_5wd":"5 pracovních dnů",
     "period_nzn_1_12_18": "1. den následujícího měsíce",
-    "period_nzn_2_6m": "6 měsíců",
-    "period_vn_0_28d": "15 dnů",
-    "period_vln_0_5wd": "5 pracovních dnů",
+    "period_nzn_2_6m": "6 měsíců",  
+    "period_vn_0_28d": "15 dnů",  
+    "period_vln_0_5wd": "5 pracovních dnů",  
     "period_vnl_1_10d":"10 kalendářních dnů",
     "period_vln_2_18m": "18 měsíců",
-    "period_vln_3_5wd":"5 pracovních dnů",
+    "period_vln_3_5wd":"5 pracovních dnů",    
     "period_px_0_5wd":"5 pracovních dnů",
 
     "desiredstate" : "Budoucí stav/licence",
@@ -987,7 +987,8 @@
     "show_all": "Zobrazit vše",
     "all_publishers": "Všichni nakladatelé",
 	  "prefixsearch": "Vyhledávání dle prefixu",
-    "pnreq":"Nový požadavek"
+    "pnreq":"Znovu zařazení",
+    "pnimport":"Bude znovu zařazeno do importu"
   },
 
   "tooltip": {

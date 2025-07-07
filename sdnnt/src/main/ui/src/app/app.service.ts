@@ -201,9 +201,12 @@ export class AppService {
     return this.get(url, params);
   }
 
-  pnDeadlineInfo(id:string): Observable<any> {
+  pnDeadlineInfo(id:string, job:string): Observable<any> {
     let url = '/search/pn_deadline';
-    const params: HttpParams = new HttpParams().set('identifier', id);
+    let params: HttpParams = new HttpParams().set('identifier', id);
+    if (job) {
+      params = params.set("job", job);  
+    }
     return this.get(url, params);
   } 
 

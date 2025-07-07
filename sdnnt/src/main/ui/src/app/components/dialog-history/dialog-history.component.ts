@@ -7,7 +7,8 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 
 export enum KuratorStavColumns {
   DEFAULT_COLUMNS,
-  ADDITOIONAL_PN_COLUMN
+  ADDITOIONAL_A_PN_COLUMN,
+  ADDITOIONAL_N_PN_COLUMN
 };
 
 
@@ -31,8 +32,11 @@ export class DialogHistoryComponent implements OnInit {
 
   kuratorColumns:KuratorStavColumns = KuratorStavColumns.DEFAULT_COLUMNS;
 
-  pnDeadline:Date;
-  pnDeadlineConfig:string;
+  pnDeadlineReq:Date;
+  pnDeadlineConfigReq:string;
+
+  pnDeadlineImport:Date;
+  pnDeadlineConfigImport:string;
 
   kategorieGranulovanychStavu=[];
   granulovaneStavyAggregated={};
@@ -74,13 +78,30 @@ export class DialogHistoryComponent implements OnInit {
     });
 
     if (this.kuratorskestavy[this.kuratorskestavy.length-1] && this.kuratorskestavy[this.kuratorskestavy.length-1].stav =='PN') {
-      this.kuratorColumns = KuratorStavColumns.ADDITOIONAL_PN_COLUMN;
-      this.service.pnDeadlineInfo(this.data.identifier).subscribe((data)=> {
-        if (data.deadline) {
-          this.pnDeadline = new Date(data.deadline);
-          this.pnDeadlineConfig = "("+data.value +" "+data.unit+")";
-        }
-      });
+      if (this.stavy[this.stavy.length-1] && this.stavy[this.stavy.length-1].stav =='N') {
+        
+              this.kuratorColumns = KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN;
+
+              this.service.pnDeadlineInfo(this.data.identifier, "PNREQ").subscribe((data)=> {
+                if (data.deadline) {
+                  this.pnDeadlineReq = new Date(data.deadline);
+                  this.pnDeadlineConfigReq = "("+data.value +" "+data.unit+")";
+                }
+              });
+
+      } else {
+
+              this.kuratorColumns = KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN;
+
+              this.service.pnDeadlineInfo(this.data.identifier, "import").subscribe((data)=> {
+                if (data.deadline) {
+                  this.pnDeadlineImport = new Date(data.deadline);
+                  this.pnDeadlineConfigImport = "("+data.value +" "+data.unit+")";
+                }
+              });
+
+      }
+
     }
 
 
