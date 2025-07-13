@@ -479,7 +479,7 @@ public class SearchServlet extends HttpServlet {
                     }
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         SolrQuery query = new SolrQuery("*").setRows(rows).setStart(start)
-                                .addSort("hit_type", SolrQuery.ORDER.asc)
+                                //.addSort("hit_type", SolrQuery.ORDER.asc)
                                 .addSort("name", SolrQuery.ORDER.asc)
                                 .addFilterQuery("import_id:" + req.getParameter("id"))
                                 .addFilterQuery("hits_na_vyrazeni:[1 TO *]")
