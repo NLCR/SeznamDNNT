@@ -30,7 +30,10 @@ export class SearchBarComponent implements OnInit {
     const p: any = {};
     p.q = this.state.q ? (this.state.q !== '' ? this.state.q : null) : null;
     p.page = 0;
-    this.router.navigate(['/search'], { queryParams: p, queryParamsHandling: 'merge' });
+    this.router.navigate(['/search'], { 
+        queryParams:  { ...p, controlled: null },
+        queryParamsHandling: 'merge' 
+      });
   }
 
   clearQuery() {
