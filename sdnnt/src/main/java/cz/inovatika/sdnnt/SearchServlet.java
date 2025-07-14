@@ -266,15 +266,33 @@ public class SearchServlet extends HttpServlet {
 
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         String identifier = req.getParameter("identifier");
-                        // jobs
 
-                        // konfigurace -- ??
-                        String pnreq = req.getParameter("job") != null ? req.getParameter("job") : "PNREQ";
+
+                        String jobParam = req.getParameter("job");
+                        String selectedJobName = "-";
+                        JSONObject jobs = Options.getInstance().getJSONObject("jobs");
+                        JSONObject selectedJob = null;
+
+                        if (jobParam != null && !jobParam.isEmpty()) {
+                            selectedJob = jobs.optJSONObject(jobParam);
+
+                            if (selectedJob == null) {
+                                for (String key : jobs.keySet()) {
+                                    JSONObject job = jobs.optJSONObject(key);
+                                    if (jobParam.equalsIgnoreCase(job.optString("type"))) {
+                                        selectedJob = job;
+                                        selectedJobName = key;
+                                        break;
+                                    }
+                                }
+                            } else {
+                                selectedJobName = jobParam;
+                            }
+                        }
                         String unit = "months";
                         long value = 10;
-                        JSONObject configObject = Options.getInstance().getJSONObject("jobs").optJSONObject(pnreq);
-                        if (configObject != null) {
-                            JSONObject configPN = configObject.optJSONObject("checkPN");
+                        if (selectedJob != null) {
+                            JSONObject configPN = selectedJob.optJSONObject("checkPN");
                             unit = configPN.optString("unit","months");
                             value = configPN.optLong("value",10);
                         }
@@ -314,7 +332,7 @@ public class SearchServlet extends HttpServlet {
                             String formattedDeadline = deadlineDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
                             JSONObject object = new JSONObject();
-                            object.put("job",pnreq);
+                            object.put("job",selectedJobName);
                             object.put("deadline",formattedDeadline);
                             object.put("unit",selected.name());
                             object.put("value",value);

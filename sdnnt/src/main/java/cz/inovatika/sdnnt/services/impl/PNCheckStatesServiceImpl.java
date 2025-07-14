@@ -121,7 +121,6 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
                 Date datumKuratorStav = (Date) rsp.getFieldValue(DATUM_KURATOR_STAV_FIELD);
-                Object ean = rsp.getFieldValue(EAN_FIELD);
 
                 getLogger().info(String.format( "Testing identifier %s", identifier.toString()));
 
@@ -443,7 +442,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
             if (foundEan && foundAvailability) {
                 if (map.containsKey(ean)) {
                     List<Pair<String, String>> list = map.get(ean);
-                    logger.info(String.format("Removing %s", list.toString()));
+                    logger.info(String.format("Removing %s, available in the market %b, %s", list.toString(), foundAvailability, ean));
                     map.remove(ean);
                    
                 }
