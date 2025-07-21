@@ -28,10 +28,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
+import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
+import cz.inovatika.sdnnt.services.AccountService;
+import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
@@ -261,17 +265,17 @@ public class SearchServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-                    // string identifier
+                    AccountService acService = new AccountServiceImpl();
                     Options opts = Options.getInstance();
-
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         String identifier = req.getParameter("identifier");
-
 
                         String jobParam = req.getParameter("job");
                         String selectedJobName = "-";
                         JSONObject jobs = Options.getInstance().getJSONObject("jobs");
                         JSONObject selectedJob = null;
+
+                        String deadlineType = "record";
 
                         if (jobParam != null && !jobParam.isEmpty()) {
                             selectedJob = jobs.optJSONObject(jobParam);
@@ -311,6 +315,7 @@ public class SearchServlet extends HttpServlet {
                         JSONArray docs = jresp.getJSONArray("docs");
                         if (docs.length() > 0) {
                             JSONObject doc = docs.getJSONObject(0);
+
                             String datumKuratorStav = doc.getString(MarcRecordFields.DATUM_KURATOR_STAV_FIELD);
 
                             Instant parsedInstant = Instant.parse(datumKuratorStav);
@@ -323,12 +328,27 @@ public class SearchServlet extends HttpServlet {
                                 }
                             }
 
+                            if (selectedJob != null && selectedJob.optString("type","").equals("pnreq")) {
+
+                                List<JSONObject> foundRequests = acService.findAllRequestForGivenIds(null, Arrays.asList("NZN"), null, Arrays.asList(identifier));
+                                List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
+                                for (Zadost zadost: allRequests) {
+                                    if (zadost.getTypeOfRequest().equals("scheduler") && zadost.getState().equals("processed")) {
+                                        if (zadost.getDatumVyrizeni() != null) {
+                                            Instant datumZadani = zadost.getDatumVyrizeni().toInstant();
+                                            if (datumZadani.isAfter(parsedInstant)) {
+                                                parsedInstant = datumZadani;
+                                                deadlineType = "account";
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                           }
 
                             ZonedDateTime deadlineDateTime = parsedInstant.atZone(ZoneId.systemDefault());
-
                             deadlineDateTime  = deadlineDateTime.plus(value, selected);
 
-                            //ZonedDateTime deadlineZonedDateTime = deadlineInstant.atZone(ZoneId.systemDefault());
                             String formattedDeadline = deadlineDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
                             JSONObject object = new JSONObject();
@@ -336,7 +356,7 @@ public class SearchServlet extends HttpServlet {
                             object.put("deadline",formattedDeadline);
                             object.put("unit",selected.name());
                             object.put("value",value);
-
+                            object.put("type",deadlineType);
 
                             return object;
                         } else {

@@ -122,13 +122,16 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
                 Date datumKuratorStav = (Date) rsp.getFieldValue(DATUM_KURATOR_STAV_FIELD);
 
-                getLogger().info(String.format( "Testing identifier %s", identifier.toString()));
+                getLogger().info(String.format("Checking identifier: %s", identifier));
 
                 Instant parsedInstant = datumKuratorStav.toInstant();
                 ChronoUnit selected = getChronoUnit();
 
                 // If date of curator state is bigger then configuration value
                 if (ImporterUtils.calculateInterval(parsedInstant, inst, selected) > this.checkPNStates) {
+
+                    getLogger().info(String.format("\t Deadline exceeded for identifier: %s", identifier));
+
                     SolrQuery q = (new SolrQuery("*"))
                             .addFilterQuery("na_vyrazeni:\""+identifier.toString()+"\"")
                             .addFilterQuery("controlled:true")
@@ -142,16 +145,22 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                         if (results.size() > 0) {
                             String foundEan = (String) results.get(0).getFieldValue("ean");
                             if (foundEan != null) {
-                                getLogger().info(String.format("Adding %s",  identifier.toString()));
                                 Pair<String,String> pair = Pair.of(identifier.toString(), foundEan);
+
+                                getLogger().info(String.format("\t Added: [identifier: %s, ean: %s]", identifier, foundEan));
+
                                 pairs.add(pair);
                             }
+                        } else {
+                            getLogger().warning(String.format("\t Not added: identifier %s - no matching import found, cannot derive EAN", identifier));
+
                         }
                     } catch (SolrServerException | IOException e) {
-                        getLogger().severe(String.format("No ean %s, skipping",  identifier.toString()));
+                        getLogger().log(Level.SEVERE, e.getMessage(), e);
+                        getLogger().severe(String.format("\t Not added: no ean %s, skipping",  identifier.toString()));
                     }
                 } else {
-                    getLogger().info(String.format("New PN state %s, skipping",  identifier.toString()));
+                    getLogger().info(String.format("\t Not added: new PN state %s, skipping",  identifier.toString()));
                 }
                 
             }, IDENTIFIER_FIELD);
@@ -171,7 +180,8 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 if (!processingMap.containsKey(ean)) { processingMap.put(ean, new ArrayList<>());}
                 processingMap.get(ean).add(p);
             } else {
-                this.getLogger().info(String.format("Identifier '%s' has been used in NZN req", p.getLeft()));
+                //http://localhost:18080/sdnnt/zadost/43c190d2-0f98-4c19-ab4c-72dddaec85e8
+                //this.getLogger().info(String.format("Identifier '%s' has been used in NZN req ", p.getLeft()));
             }
         });
 
@@ -220,23 +230,24 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
             List<String> sublist = allUsedIdentifiers.subList(start, end);
 
             List<JSONObject> foundRequests = accountService.findAllRequestForGivenIds(null, Arrays.asList("NZN"), null, sublist);
-            //  Only scheduler requests
             List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
 
 
             allRequests.forEach(req-> {
                 Instant datumZadani = req.getDatumZadani().toInstant();
 
+                String sdnntHost = Options.getInstance().getString("sdnnt.host", "http://localhost:8080/sdnnt/");
+
                 if (req.getState().equals("processed")) {
-                 // remove all if created date is newer then configuration border date
+                    // remove all if created date is newer then configuration border date
                     if (ImporterUtils.calculateInterval(datumZadani, inst, getChronoUnit()) <= this.checkPNStates) {
-                        getLogger().info(String.format("New NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
+                        getLogger().info(String.format("New NZN request, %s,  %s (%s), skipping",   req.getIdentifiers().toString(), req.getId(), sdnntHost +"zadost/"+ req.getId()));
                         pidsToRemove.addAll(req.getIdentifiers());
                     } else {
                         getLogger().info(String.format("Old NZN request, %s, %s", req.getId(), req.getIdentifiers().toString()));
                     }
                 } else {
-                    getLogger().info(String.format("Open NZN request, %s,  %s, skipping", req.getId(),  req.getIdentifiers().toString()));
+                    getLogger().info(String.format("Open NZN request, %s,  %s (%s), skipping",   req.getIdentifiers().toString(),req.getId(),sdnntHost +"zadost/"+ req.getId()));
                     pidsToRemove.addAll(req.getIdentifiers());
                 }
             });
@@ -315,7 +326,8 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
 
                         case XMLStreamConstants.END_ELEMENT:
                             if ("ITEM".equals(reader.getLocalName())) {
-                                removeEanIfFound(logger,map, ean, foundEan, foundAvailability);
+                                boolean availability = foundAvailability && availibiltiy > 0;
+                                removeEanIfFound(logger,map, ean, foundEan, availability,"distri.cz");
                                 insideItem = false; 
                             }
                             break;
@@ -375,7 +387,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
 
                         case XMLStreamConstants.END_ELEMENT:
                             if ("ARTICLE".equals(reader.getLocalName())) {
-                                removeEanIfFound(logger,map, ean, foundEan, foundAvailability);
+                                removeEanIfFound(logger,map, ean, foundEan, foundAvailability,"kosmas.cz");
                                 insideArticle = false; 
                             }
                             break;
@@ -426,7 +438,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
 
                         case XMLStreamConstants.END_ELEMENT:
                             if ("SHOPITEM".equals(reader.getLocalName())) {
-                                removeEanIfFound(logger, map, ean, foundEan, true);
+                                removeEanIfFound(logger, map, ean, foundEan, true, "heureka.cz");
                                 insideShopItem = false; 
                             }
                             break;
@@ -438,13 +450,15 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
             }
         };
         private static void removeEanIfFound(Logger logger, Map<String, List<Pair<String, String>>> map, String ean, boolean foundEan,
-                boolean foundAvailability) {
+                boolean foundAvailability,  String marketIdentication) {
             if (foundEan && foundAvailability) {
+
+                //boolean checkedAvailability = marketIdentication.equals("distri.cz") && availability > 0;
+
                 if (map.containsKey(ean)) {
                     List<Pair<String, String>> list = map.get(ean);
-                    logger.info(String.format("Removing %s, available in the market %b, %s", list.toString(), foundAvailability, ean));
+                    logger.info(String.format("Removing %s, available in the market %b (%s), Ean: '%s' ", list.toString(), foundAvailability, marketIdentication, ean));
                     map.remove(ean);
-                   
                 }
             }
         }

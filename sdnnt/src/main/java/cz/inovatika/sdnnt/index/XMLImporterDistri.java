@@ -152,11 +152,13 @@ public class XMLImporterDistri extends AbstractXMLImport {
                 this.importDescription.incrementSkipped();
                 return new ArrayList<>();
             }
+
             if (item.containsKey("AVAILABILITY") && "0".equals(item.get("AVAILABILITY"))) {
-                LOGGER.log(Level.INFO, "{0} neni dostupny (AVAILABILITY=0), vynechame", item.get("NAME"));
+                LOGGER.log(Level.INFO, String.format("%s, %s neni dostupny (AVAILABILITY=0), vynechame", item.get("NAME").toString(), item.get("EAN").toString()));
                 this.importDescription.incrementSkipped();
                 return new ArrayList<>();
             }
+
             if (this.importDescription.getFirstId() == null) {
                 importDescription.setFirstId((String)item.get("EAN"));
             }
@@ -279,7 +281,9 @@ public class XMLImporterDistri extends AbstractXMLImport {
     public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip, float match1Prec, float match21Prec, float match22Prec) {
         try {
             // EAN - Musi mit ean
-            String q = "ean:\"" + item.get("EAN")+"\"";
+            Object ean = item.get("EAN");
+
+            String q = "ean:\"" + ean +"\"";
             SolrQuery eanQuery = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
                     .setFields("identifier");
 

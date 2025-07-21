@@ -1214,6 +1214,8 @@ public class AccountServiceImpl implements AccountService {
                 
                 addFilter(query, user, navrhy, requestState);
 
+                query.addSort(SolrQuery.SortClause.desc("indextime"));
+
                 QueryRequest qreq = new QueryRequest(query);
                 NoOpResponseParser rParser = new NoOpResponseParser();
                 rParser.setWriterType("json");
