@@ -22,6 +22,7 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.utils.DetectYear;
 import cz.inovatika.sdnnt.utils.DetectYear.Bound;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.utils.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
@@ -794,9 +795,12 @@ public class MarcRecord {
   private void changedState( String user, String publicState, String kuratorState, String license, String comment) {
     toSolrDoc();
     Date now = Calendar.getInstance().getTime();
-    if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty())) {
+    if (this.dntstav == null || (publicState != null && !this.dntstav.isEmpty() && ( !StringUtils.match(publicState, this.dntstav.get(0)) || !StringUtils.match(license, this.license))) ) {
+
+
       this.dntstav = Arrays.asList(publicState);
       this.datum_stavu = now;
+
       JSONObject h = new JSONObject().put("stav", publicState).
               put("date", FORMAT.format(datum_stavu)).
               put("user", user).
@@ -804,7 +808,6 @@ public class MarcRecord {
 
       if (license != null) {  h.put("license", license); }
       this.historie_stavu.put(h);
-
     }
     this.kuratorstav = Arrays.asList(kuratorState);
     this.datum_krator_stavu = now;
