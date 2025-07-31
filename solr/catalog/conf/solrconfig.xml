@@ -775,6 +775,9 @@
     <lst name="defaults">
       <str name="echoParams">explicit</str>
       <int name="rows">10</int>
+	  <!--
+	  <int name="facet.limit">5</int>
+	  -->
       <!-- Default search field
          <str name="df">text</str> 
         -->

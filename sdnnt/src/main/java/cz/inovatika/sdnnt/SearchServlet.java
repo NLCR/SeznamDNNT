@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt;
 
+import cz.inovatika.sdnnt.index.AccountIterationSupport;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -28,15 +30,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import cz.inovatika.sdnnt.index.ImportDocsIterationSupport;
 import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
+import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
+import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
+import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -329,7 +335,6 @@ public class SearchServlet extends HttpServlet {
                             }
 
                             if (selectedJob != null && selectedJob.optString("type","").equals("pnreq")) {
-
                                 List<JSONObject> foundRequests = acService.findAllRequestForGivenIds(null, Arrays.asList("NZN"), null, Arrays.asList(identifier));
                                 List<Zadost> allRequests =  foundRequests.stream().map(Object::toString).map(Zadost::fromJSON).collect(Collectors.toList());
                                 for (Zadost zadost: allRequests) {
@@ -518,7 +523,8 @@ public class SearchServlet extends HttpServlet {
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         SolrQuery query = new SolrQuery("*").setRows(rows).setStart(start)
                                 //.addSort("hit_type", SolrQuery.ORDER.asc)
-                                .addSort("name", SolrQuery.ORDER.asc)
+                                //.addSort("name", SolrQuery.ORDER.asc)
+                                .addSort("name_cs_sort", SolrQuery.ORDER.asc)
                                 .addFilterQuery("import_id:" + req.getParameter("id"))
                                 .addFilterQuery("hits_na_vyrazeni:[1 TO *]")
                                 .setFacet(true)
@@ -688,6 +694,60 @@ public class SearchServlet extends HttpServlet {
                 }
             }
         },
+
+        TOUCH_IMPORT_DOCS{
+
+            private static final int LIMIT = 1000;
+
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    long start = System.currentTimeMillis();
+                    final ImportDocsIterationSupport support = new ImportDocsIterationSupport();
+                    try {
+                        JSONArray jsonArray = new JSONArray();
+                        AtomicInteger number = new AtomicInteger(0);
+                        Map<String, String> reqMap = new HashMap<>();
+                        reqMap.put("rows", "" + LIMIT);
+
+                        List<String> bulk = new ArrayList<>();
+                        support.iterate(reqMap, null, new ArrayList<String>(), new ArrayList<String>(), Arrays.asList("id"), (rsp) -> {
+                            Object identifier = rsp.getFieldValue("id");
+
+                            bulk.add(identifier.toString());
+                            if (bulk.size() >= LIMIT) {
+                                number.addAndGet(bulk.size());
+                                LOGGER.info(String.format("Bulk update %d", number.get()));
+                                JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                                jsonArray.put(returnFromPost);
+                                bulk.clear();
+                            }
+                        }, "id");
+                        if (!bulk.isEmpty()) {
+                            number.addAndGet(bulk.size());
+                            JSONObject returnFromPost = PureHTTPSolrUtils.touchBulk(bulk,"id", support.getCollection());
+                            bulk.clear();
+                            jsonArray.put(returnFromPost);
+                        }
+
+                        JSONObject object = new JSONObject();
+                        object.put("numberOfObjects", number.get());
+                        object.put("bulkResults", jsonArray);
+                        return object;
+
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
+                        return errorJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.toString());
+                    } finally {
+                        QuartzUtils.printDuration(LOGGER, start);
+                        PureHTTPSolrUtils.commit(support.getCollection());
+                    }
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "notallowed", "not allowed");
+                }
+            }
+        },
+
         GOOGLEBOOKS {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {

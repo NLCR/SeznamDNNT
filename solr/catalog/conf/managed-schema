@@ -197,10 +197,17 @@
 
    <!-- identifiers of following records -->
    <field name="followers" type="string"  indexed="true" stored="true" multiValued="true"  />
+   
+   <!-- reference na kosmas;distri.cz;heureka -->
+   <field name="external_reference_url" type="string"  indexed="true" stored="true" multiValued="true"  />
+	<!-- jmeno z importu kosmas;distri.cz;heureka -->
+   <field name="external_reference_name" type="string"  indexed="true" stored="true" multiValued="true"  />
+	
 	
    <!-- Priznaky -->
    <!-- priznak; bylo ztotozneno z volnym dilem v krameriovi -->
    <field name="flag_public_in_dl" type="boolean" indexed="true" stored="true" multiValued="false"  />
+
    
 
 

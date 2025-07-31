@@ -57,7 +57,11 @@
     <field name="item_id" type="string" indexed="true" stored="true"  />
     <field name="import_date" type="date" indexed="true" stored="true" />
     <field name="ean" type="string" indexed="true" stored="true"  />
+
     <field name="name" type="string" indexed="true" stored="true"  />
+	
+	<field name="name_cs_sort" type="cs_sort" indexed="false" stored="false" docValues="true" />
+	
     <field name="author" type="string" indexed="true" stored="true"  />
     <field name="identifiers" type="string" indexed="true" stored="true" multiValued="true"  />
     <field name="hit_type" type="string" indexed="true" stored="true"  />
@@ -81,7 +85,9 @@
     
     <field name="vyrazeno" type="string" indexed="true" stored="true" multiValued="true"  />
     
-	  <field name="skceanitem" type="string" docValues="true" indexed="true" stored="true"/>
+	<field name="skceanitem" type="string" docValues="true" indexed="true" stored="true"/>
+	<field name="touch" type="boolean" docValues="true" indexed="true" stored="true"/>
+
 
     <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
@@ -105,6 +111,10 @@
          Class names starting with "solr" refer to java classes in a
        standard package such as org.apache.solr.analysis
     -->
+
+	<fieldType name="cs_sort" class="solr.ICUCollationField" 
+           locale="cs" strength="primary" />
+
 
     <!-- The StrField type is not analyzed, but indexed/stored verbatim.
        It supports doc values but in that case the field needs to be
@@ -251,6 +261,7 @@
       <analyzer class="org.apache.lucene.analysis.el.GreekAnalyzer"/>
     </fieldType>
     -->
+	
 
     <!-- A text field that only splits on whitespace for exact matching of words -->
     <dynamicField name="*_ws" type="text_ws"  indexed="true"  stored="true"/>
@@ -491,15 +502,8 @@
     </fieldType>
     
 
-    <!-- Similarity is the scoring routine for each document vs. a query.
-       A custom Similarity or SimilarityFactory may be specified here, but 
-       the default is fine for most applications.  
-       For more info: http://wiki.apache.org/solr/SchemaXml#Similarity
-    -->
-    <!--
-     <similarity class="com.example.solr.CustomSimilarityFactory">
-       <str name="paramkey">param value</str>
-     </similarity>
-    -->
+	<copyField source="name" dest="name_cs_sort"/>
+
+
 
 </schema>

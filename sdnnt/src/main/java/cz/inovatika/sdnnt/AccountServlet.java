@@ -255,7 +255,6 @@ public class AccountServlet extends HttpServlet {
             }
         },
 
-        // vyhledava zadosti
         TOUCH {
 
             private static final int LIMIT = 1000;
