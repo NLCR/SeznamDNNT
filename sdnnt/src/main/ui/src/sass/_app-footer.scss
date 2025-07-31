@@ -9,6 +9,7 @@ app-footer {
   .app-left {
     a {
       @extend .app-ml-1;
+      color: $app-color-lightnes;
       
       img {
         @extend .app-mr-2;
