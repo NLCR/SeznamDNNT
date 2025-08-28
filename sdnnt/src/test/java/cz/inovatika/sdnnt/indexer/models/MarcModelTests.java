@@ -90,7 +90,7 @@ public class MarcModelTests {
 
         SolrQuery q = new SolrQuery("*").setRows(1)
                 .addFilterQuery(IDENTIFIER_FIELD+":\"" + "oai:aleph-nkp.cz:DNT01-000157317" + "\"")
-                .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD+" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD);
+                .setFields(RAW_FIELD+" "+ DNTSTAV_FIELD+" "+ HISTORIE_STAVU_FIELD +" "+ DATUM_STAVU_FIELD+" "+ LICENSE_FIELD +" "+LICENSE_HISTORY_FIELD);
 
 
         EasyMock.expect(mockResponse.getResults()).andReturn(prepareResultList("oai:aleph-nkp.cz:DNT01-000157317".replaceAll("\\:","_"))).anyTimes();

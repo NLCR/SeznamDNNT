@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.index.Indexer;
-import cz.inovatika.sdnnt.index.MD5;
 
 import java.io.IOException;
 import java.util.*;
@@ -18,10 +17,8 @@ import cz.inovatika.sdnnt.indexer.models.utils.MarcRecordUtils;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.utils.DetectYear;
 import cz.inovatika.sdnnt.utils.DetectYear.Bound;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.StringUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -165,7 +162,7 @@ public class MarcRecord {
 
       String qident = identifiers.stream().map(it-> {
           return "\""+it+"\"";
-      }).collect(Collectors.joining(" OR "));
+      }).collect(Collectors.joining(" "));
       
       SolrQuery q = new SolrQuery("*").setRows(identifiers.size())
               .addFilterQuery(IDENTIFIER_FIELD+":(" + qident + ")")
@@ -173,7 +170,7 @@ public class MarcRecord {
                       DNTSTAV_FIELD+" "+
                       FMT_FIELD+" "+
                       KURATORSTAV_FIELD+" "+
-                      HISTORIE_STAVU_FIELD+" " +
+                              HISTORIE_STAVU_FIELD +" " +
                       HISTORIE_KURATORSTAVU_FIELD+" " +
                       HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                       DATUM_STAVU_FIELD+" "+
@@ -219,7 +216,7 @@ public class MarcRecord {
                     DNTSTAV_FIELD+" "+
                     FMT_FIELD+" "+
                     KURATORSTAV_FIELD+" "+
-                    HISTORIE_STAVU_FIELD+" " +
+                            HISTORIE_STAVU_FIELD +" " +
                     HISTORIE_KURATORSTAVU_FIELD+" " +
                     HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
                     DATUM_STAVU_FIELD+" "+

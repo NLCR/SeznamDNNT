@@ -1,7 +1,5 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ALTERNATIVE_ALEPH_LINK;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.FOLLOWERS;
@@ -16,23 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
-import org.apache.commons.configuration2.DatabaseConfiguration;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
@@ -42,10 +33,8 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
-import cz.inovatika.sdnnt.services.impl.AbstractCheckDeleteService.Process;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SKCDeleteService {

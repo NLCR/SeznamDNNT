@@ -8,7 +8,6 @@ import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.indexer.models.SubField;
 import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.common.SolrDocumentBase;
 import org.apache.solr.common.SolrInputDocument;
@@ -22,7 +21,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
 

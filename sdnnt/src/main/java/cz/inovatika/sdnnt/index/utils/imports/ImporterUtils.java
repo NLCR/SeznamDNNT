@@ -1,30 +1,5 @@
 package cz.inovatika.sdnnt.index.utils.imports;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.CURATOR_ACTIONS;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DATUM_KURATOR_STAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DATUM_STAVU_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DIGITAL_LIBRARIES;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.EXPORT;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.FLAG_PUBLIC_IN_DL;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.FOLLOWERS;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_STAVU_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_CANCELED;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT_ACTIVE;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_LASTACTIVE;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_HISTORY_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_DISABLED_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.MASTERLINKS_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.RAW_FIELD;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -32,7 +7,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.text.Normalizer;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,7 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -67,8 +40,6 @@ import cz.inovatika.sdnnt.index.AbstractXMLImport.XMLImportDesc;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
@@ -179,7 +150,7 @@ public class ImporterUtils {
                 
                 String qident = identifiers.stream().map(it-> {
                     return "\""+it+"\"";
-                }).collect(Collectors.joining(" OR "));
+                }).collect(Collectors.joining("  "));
 
                 SolrQuery query = new SolrQuery("identifier:("+qident+")")
                         .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,datum_kurator_stav,granularity:[json],marc_998a,id_euipo,c_actions");

@@ -1,13 +1,11 @@
 package cz.inovatika.sdnnt;
 
-import cz.inovatika.sdnnt.index.AccountIterationSupport;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +13,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import cz.inovatika.sdnnt.index.ImportDocsIterationSupport;
-import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
@@ -43,7 +39,6 @@ import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
 import cz.inovatika.sdnnt.utils.QuartzUtils;
-import cz.inovatika.sdnnt.utils.StringUtils;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -52,8 +47,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.request.json.JsonQueryRequest;
-import org.apache.solr.client.solrj.request.json.TermsFacetMap;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -601,7 +594,7 @@ public class SearchServlet extends HttpServlet {
                                 MarcRecordFields.DNTSTAV_FIELD,
                                 MarcRecordFields.LICENSE_FIELD,
                                 MarcRecordFields.KURATORSTAV_FIELD,
-                                MarcRecordFields.HISTORIE_STAVU_FIELD,
+                                MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD,
                                 MarcRecordFields.ID_EUIPO,
                                 MarcRecordFields.GRANULARITY_FIELD);
 

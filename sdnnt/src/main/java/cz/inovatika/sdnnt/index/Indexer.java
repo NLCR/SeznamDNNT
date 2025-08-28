@@ -12,8 +12,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
 import com.flipkart.zjsonpatch.JsonPatch;
-import cz.inovatika.sdnnt.index.utils.GranularityUtils;
-import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.index.utils.SurviveFieldUtils;
 import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.Import;
@@ -46,7 +44,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.client.solrj.request.schema.SchemaRequest.Update;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -123,7 +120,7 @@ public class Indexer {
                             if (PublicItemState.D.name().equals(state)) {
                                 deletedDocument = true;
                                 Object historieStavu = solrDocument
-                                        .getFieldValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
+                                        .getFieldValue(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD);
                                 boolean case4a = historyCase(historieStavu, Case.SKC_4a);
                                 // nesmi byt case4a
                                 deletedDocument = !case4a;

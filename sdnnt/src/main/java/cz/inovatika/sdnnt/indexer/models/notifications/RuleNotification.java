@@ -13,8 +13,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
@@ -224,7 +222,7 @@ public class RuleNotification extends AbstractNotification {
     
     public boolean accept(Map<String,String> doc) {
         if (this.filters.containsKey(MarcRecordFields.DNTSTAV_FIELD) || this.filters.containsKey(MarcRecordFields.LICENSE_FIELD)) {
-            String string = doc.get(MarcRecordFields.HISTORIE_STAVU_FIELD);
+            String string = doc.get(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD);
             JSONArray jsonArray = new JSONArray(string);
             // check previous state
             if (jsonArray.length() >=2) {

@@ -11,53 +11,27 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.SIGLA_FIELD;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import javax.mail.search.ReceivedDateTerm;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;import org.apache.commons.math3.ode.SecondOrderIntegrator;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.LBHttpSolrClient.Rsp;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.search.function.EqualFunction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 import cz.inovatika.sdnnt.services.GranularityService;
 import cz.inovatika.sdnnt.services.GranularitySetStateService;
 import cz.inovatika.sdnnt.services.impl.granularities.SolrDocChange;
-import cz.inovatika.sdnnt.services.impl.utils.MarcUtils;
-import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
-import cz.inovatika.sdnnt.utils.JSONUtils;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public class GranularitySetStateServiceImpl extends AbstractGranularityService implements GranularitySetStateService{
@@ -128,6 +102,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
                             MARC_856_U, 
                             GRANULARITY_FIELD,
                             MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD,
+                            MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD,
                             MarcRecordFields.HISTORIE_STAVU_FIELD,
                             
                             MarcRecordFields.DNTSTAV_FIELD,

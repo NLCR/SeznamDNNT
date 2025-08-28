@@ -22,7 +22,6 @@ import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.utils.*;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -53,7 +52,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_STAVU_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.LICENSE_HISTORY_FIELD;
@@ -68,7 +66,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_LASTACTIVE;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_EUIPO_EXPORT;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.EXPORT;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -85,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
     private static final String BATCH_FIELDS =   RAW_FIELD+" "+
             DNTSTAV_FIELD+" "+
             KURATORSTAV_FIELD+" "+
-            HISTORIE_STAVU_FIELD+" " +
+            HISTORIE_STAVU_FIELD +" " +
             HISTORIE_KURATORSTAVU_FIELD+" " +
             HISTORIE_GRANULOVANEHOSTAVU_FIELD+" " +
             DATUM_STAVU_FIELD+" "+

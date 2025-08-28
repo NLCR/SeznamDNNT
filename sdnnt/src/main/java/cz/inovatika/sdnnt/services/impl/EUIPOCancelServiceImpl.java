@@ -5,7 +5,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,9 +20,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -44,17 +41,14 @@ import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.indexer.models.utils.MarcRecordUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.EUIPOCancelService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.utils.ISO693Converter;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
-import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIPOCancelService {
 
@@ -197,7 +191,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                    
                     ModifiableSolrParams params = new ModifiableSolrParams();
                     params.set("fl",
-                            "identifier, raw, date1, date2, date1_int, date2_int, controlfield_008, leader, fmt, type_of_date, historie_stavu, dntstav, id_euipo, id_euipo_export, id_euipo_export_canceled, ");
+                            "identifier, raw, date1, date2, date1_int, date2_int, controlfield_008, leader, fmt, type_of_date, historie_stavu, historie_kurator_stavu, dntstav, id_euipo, id_euipo_export, id_euipo_export_canceled, ");
 
                     SolrDocumentList byids = solrClient.getById(DataCollections.catalog.name(), subList, params);
                     for (int j = 0; j < byids.size(); j++) {
@@ -209,7 +203,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                         
                         Object export = doc.getFieldValue(MarcRecordFields.ID_EUIPO_EXPORT);
 
-                        Object historieStavu = doc.getFirstValue(MarcRecordFields.HISTORIE_STAVU_FIELD);
+                        Object historieKuratorStavu = doc.getFirstValue(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD);
                         Object dntStav = doc.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
                         
                         
@@ -226,7 +220,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                         Object dntstav = doc.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
 
 
-                        if (accept(dntStav, historieStavu)) {
+                        if (accept(dntStav, historieKuratorStavu)) {
                             
                             Map<String,List<String>> oneRecordValues = prepareDataRecordForExcel(raw, date1, date2, fmt, typeOfDate, controlField008);
                             
@@ -241,7 +235,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                             oneRecordValues.put("euipo_export", exports);
                             oneRecordValues.put("dntstav", Arrays.asList(dntstav.toString()));
                             oneRecordValues.put("identifier", Arrays.asList(ident.toString()));
-                            oneRecordValues.put("historie_stavu", Arrays.asList(historieStavu.toString()));
+                            oneRecordValues.put("historie_stavu", Arrays.asList(historieKuratorStavu.toString()));
                             
                             List<String> ccnb = generatecCCNB(new JSONObject(raw.toString()));
                             if (ccnb != null && !ccnb.isEmpty()) {
@@ -505,5 +499,20 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
         }
     }
 
-    
+
+    public static void main(String[] args) {
+        EUIPOCancelService impl = new EUIPOCancelServiceImpl("test", null, null);
+        List<String> checkBK = impl.check();
+        List<String> pds = Arrays.asList("oai:aleph-nkp.cz:SKC01-002124309","oai:aleph-nkp.cz:SKC01-002566056","oai:aleph-nkp.cz:SKC01-005775667","oai:aleph-nkp.cz:SKC01-002542067");
+        for (String pd : pds) {
+            if (checkBK.contains(pd)) {
+                System.out.println("Found " + pd);
+            } else {
+                System.out.println("Not found " + pd);
+            }
+        }
+
+        //System.out.println(checkBK);
+    }
+
 }

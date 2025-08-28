@@ -570,7 +570,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
-                }).collect(Collectors.joining(" OR "));
+                }).collect(Collectors.joining(" "));
 
                 if (!baseUrl.endsWith("/")) {
                     baseUrl = baseUrl + "/";
