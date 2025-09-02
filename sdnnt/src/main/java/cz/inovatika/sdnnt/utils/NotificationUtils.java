@@ -70,7 +70,7 @@ public class NotificationUtils {
                 if (!notificationFilters.isEmpty()) {
                     SolrClient solr = Indexer.getClient();
                     String q = "("+identifiers.stream().collect(Collectors.joining(" "))+")";
-                    String orQuery = notificationFilters.stream().map(it->"("+it+")").collect(Collectors.joining("  "));
+                    String orQuery = notificationFilters.stream().map(it->"("+it+")").collect(Collectors.joining(" OR  "));
                     
                     SolrQuery query = new SolrQuery("identifier:" + q)
                             //.addFilterQuery(q)

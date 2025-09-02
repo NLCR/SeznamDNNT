@@ -798,7 +798,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
-                }).collect(Collectors.joining(" OR "));
+                }).collect(Collectors.joining(" "));
 
                 if (!baseUrl.endsWith("/")) {
                     baseUrl = baseUrl + "/";
@@ -807,7 +807,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 if (configuration.getVersion().equals(KramVersion.V5)) {
                     // Vsechny deti // K5
                     String encodedCondition = URLEncoder.encode(
-                            "root_pid:(" + condition + ") AND fedora.model:(monographunit OR periodicalvolume)",
+                            "root_pid:(" + condition + ") AND fedora.model:(monographunit periodicalvolume)",
                             "UTF-8");
                     // K5
                     String encodedFieldList = URLEncoder.encode(
@@ -922,7 +922,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     
                     // Vsechny deti // K7
                     String encodedCondition = URLEncoder.encode(
-                            "root.pid:(" + condition + ") AND model:(monographunit OR periodicalvolume)",
+                            "root.pid:(" + condition + ") AND model:(monographunit  periodicalvolume)",
                             "UTF-8");
                     
                     String encodedFieldList = URLEncoder.encode(
