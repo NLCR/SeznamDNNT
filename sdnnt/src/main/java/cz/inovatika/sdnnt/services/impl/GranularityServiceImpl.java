@@ -14,18 +14,7 @@ import java.net.URLEncoder;
 import java.security.acl.Owner;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,7 +74,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     public static Logger LOGGER = Logger.getLogger(GranularityServiceImpl.class.getName());
 
     private static final int MAX_FETCHED_DOCS = 1000;
-    public static final int CHECK_SIZE = 120;
+    public static final int CHECK_SIZE = 81;
 
     public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -170,7 +159,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     DNTSTAV_FIELD + ":*"
             );
 
-            
+
             List<String> minusFilter = Arrays.asList(KURATORSTAV_FIELD + ":D", KURATORSTAV_FIELD + ":DX");
 
             AtomicInteger count = new AtomicInteger();
@@ -187,7 +176,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         }
 
                         Object identifier = rsp.getFieldValue("identifier");
-                        
+
                         Object fmt = rsp.getFieldValue(MarcRecordFields.FMT_FIELD);
                         Object leader = rsp.getFieldValue(MarcRecordFields.LEADER_FIELD);
 
@@ -355,7 +344,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         Map<String, List<Pair<String, String>>> buffer = new HashMap<>();
         // SOLR changes
         List<SolrInputDocument> changes = new ArrayList<>();
-        for (String key : this.linksOwner.keySet()) {
+
+        List<String> sortedKeySet = new ArrayList<>(this.linksOwner.keySet());
+        for (String key : sortedKeySet) { //this.linksOwner.keySet()) {
 
             int counter = iteration.incrementAndGet();
             if ((counter % 10000) == 0) {
@@ -551,7 +542,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 if (baseUrl == null) {
                     continue;
                 }
-                
+
 
                 InstanceConfiguration configuration = this.checkConf.match(baseUrl);
                 if (configuration == null || configuration.isShouldSkip()) {
@@ -570,7 +561,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
-                }).collect(Collectors.joining(" "));
+                }).collect(Collectors.joining(" OR "));
 
                 if (!baseUrl.endsWith("/")) {
                     baseUrl = baseUrl + "/";
