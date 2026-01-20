@@ -455,7 +455,8 @@ public abstract class AbstractXMLImport implements LoggerAware {
         }
 
         public int incrementTotal() {
-            return ++this.total;
+            this.total = this.total + 1;
+            return this.total;
         }
 
         public int getSkipped() {
@@ -467,7 +468,8 @@ public abstract class AbstractXMLImport implements LoggerAware {
         }
 
         public int incrementSkipped() {
-            return ++this.skipped;
+            this.skipped = this.skipped + 1;
+            return this.skipped;
         }
 
         public int getIndexed() {

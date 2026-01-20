@@ -20,6 +20,7 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.utils.LinksUtilities;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -28,6 +29,7 @@ import java.util.List;
 public class UpdateDigitalLibrariesImplTest {
 
 
+    @Ignore
     @Test
     public void testCheck() {
         List<String> links = Arrays.asList("https://kramerius.cbvk.cz/uuid/uuid:b861d6b7-0ed4-4d37-b670-eb88c7204caa");

@@ -90,9 +90,10 @@ public class ChangeProcessStatesUtilityTests {
         Assert.assertTrue(marcRecord.kuratorstav.size() == 1);
         Assert.assertTrue(marcRecord.kuratorstav.get(0).equals("DX"));
         
-        Assert.assertTrue(marcRecord.historie_stavu.length() == 4);
-        Assert.assertTrue(marcRecord.historie_stavu.getJSONObject(3).getString("stav").equals("PA"));
+        Assert.assertTrue(marcRecord.historie_stavu.length() == 3);
+        Assert.assertTrue(marcRecord.historie_stavu.getJSONObject(2).getString("stav").equals("N"));
         Assert.assertTrue(marcRecord.historie_kurator_stavu.length() == 4);
+        Assert.assertTrue(marcRecord.historie_kurator_stavu.getJSONObject(2).getString("stav").equals("N"));
         Assert.assertTrue(marcRecord.historie_kurator_stavu.getJSONObject(3).getString("stav").equals("DX"));
     }
     

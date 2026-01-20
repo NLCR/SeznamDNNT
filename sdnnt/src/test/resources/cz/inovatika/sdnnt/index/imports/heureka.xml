@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SHOP>
+    <SHOPITEM>
+        <product_type>physicalgood</product_type>
+        <id>f1ef4e51-906a-4b98-a257-e298e0deb7ce</id>
+        <id>65252315-ae5d-4961-8458-379f275fd473</id>
+        <id>61741671-b7b4-46aa-93d0-2a21252319b5</id>
+        <id>e9e8bffd-4bb1-42fb-b609-7d01350094dd</id>
+        <language>cs</language>
+        <binding_type>vázaná s laminovaným potahem</binding_type>
+        <stock_availability>true</stock_availability>
+        <price>599.0000</price>
+        <price>431.0000</price>
+        <valid_from>2024-10-24T15:44:11.6733333</valid_from>
+        <valid_to>2025-12-31T23:59:00</valid_to>
+        <ITEM_ID>343987</ITEM_ID>
+        <URL>https://www.palmknihy.cz/kniha/bila-voda-343987?utm_source=heureka&amp;utm_medium=cpc&amp;utm_campaign=print&amp;utm_id=heureka_cpc</URL>
+        <EAN>9788027510573</EAN>
+        <DESCRIPTION>Dlouho očekávaný přelomový román o ženách, víře a zlu. Bílá Voda. Pustá vesnice skrytá ve stínu pohraničních hor, kam kdysi přicházely zástupy poutníků vyprosit si pomoc u zázračné sošky Panny Marie. Dnes sem přijíždí Lena Lagnerová, aby se tu skryla před svou minulostí. Namísto kláštera s početnou řeholní komunitou tu však najde pouze několik řádových sester, vedených svéráznou řeholnicí Evaristou. Ta přišla do Bílé Vody o poslední zářijové noci roku 1950, kdy komunistický režim odvlekl v rámci Akce R všechny řádové sestry do sběrných klášterů. Mladičká Evarista tehdy odmítla návrat do civilního života. Stejně jako všechny řeholnice byla nasazena na nucené práce a k tomu vystavena i ponižování v komunistickém kriminálu. Evaristini věznitelé však její vírou ani věrností řeholi neotřásli. Naopak. Pouze v ní upevnili odhodlání se jim postavit. S tím však přišla nutnost postavit se i režimu zaprodané církvi… Lena, probírající se písemnostmi bělovodského kláštera, však brzy zjišťuje, že tím Evaristin dramatický příběh pouze začíná, a záhy také pochopí, že démoni obcházející minulost místních řeholnic nezmizeli, a navíc jsou součástí i jejího vlastního osudu. Od autorky bestselleru Žítkovské bohyně</DESCRIPTION>
+        <PARAM>
+            <PARAM_NAME>ISBN</PARAM_NAME>
+            <VAL>9788027510573</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Nakladatelství</PARAM_NAME>
+            <VAL>Host</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Originální název</PARAM_NAME>
+            <VAL>Bílá Voda</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Jazyk</PARAM_NAME>
+            <VAL>cs</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Vazba</PARAM_NAME>
+            <VAL>vázaná s laminovaným potahem</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Rok vydání</PARAM_NAME>
+            <VAL>2022-01-01T00:00:00</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Počet stran</PARAM_NAME>
+            <VAL>688</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Autor</PARAM_NAME>
+            <VAL>Kateřina Tučková</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Žánr</PARAM_NAME>
+            <VAL>Historické romány</VAL>
+        </PARAM>
+        <ISBN>9788027510573</ISBN>
+        <DELIVERY>
+            <DELIVERY_ID>ZASILKOVNA</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>BALIKOVNA_DEPOTAPI</DELIVERY_ID>
+            <DELIVERY_PRICE>49</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>49</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>DPD_PICKUP</DELIVERY_ID>
+            <DELIVERY_PRICE>50</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>50</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>CESKA_POSTA_NAPOSTU</DELIVERY_ID>
+            <DELIVERY_PRICE>49</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>49</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>CESKA_POSTA</DELIVERY_ID>
+            <DELIVERY_PRICE>75</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>75</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>DPD</DELIVERY_ID>
+            <DELIVERY_PRICE>79</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>79</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>PPL_PARCELSHOP</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>PPL_NA_ADRESU</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <PRODUCTNAME>Bílá Voda -  Kateřina Tučková</PRODUCTNAME>
+        <PRODUCT>Bílá Voda</PRODUCT>
+        <CATEGORYTEXT>Filmy, knihy, hry | Knihy</CATEGORYTEXT>
+        <MANUFACTURER>Host</MANUFACTURER>
+        <PRICE_VAT>431</PRICE_VAT>
+        <IMGURL>https://images.cdi.albatrosmedia.cz/8e06b938-52f7-4f52-9e40-3f205b8d97ef?preset=detail-product-gallery</IMGURL>
+        <HEUREKA_CPC>1</HEUREKA_CPC>
+        <DELIVERY_DATE>0</DELIVERY_DATE>
+        <publish_date>2022-04-01T00:00:00</publish_date>
+    </SHOPITEM>
+    <SHOPITEM>
+        <product_type>ebook</product_type>
+        <id>d19209e0-9ec3-4738-86dd-db8d12bb0c27</id>
+        <id>2ab7fa02-c4e8-4025-aad7-125ae29f9c9f</id>
+        <id>2900227d-39c1-48cf-8f52-08b8383946d8</id>
+        <id>84500024-d579-4c5a-bdf4-e35ab8633ef6</id>
+        <language>cs</language>
+        <stock_availability>true</stock_availability>
+        <price>382.0000</price>
+        <price>382.0000</price>
+        <ITEM_ID>338593</ITEM_ID>
+        <URL>https://www.palmknihy.cz/ekniha/propast-smrti-338593?utm_source=heureka&amp;utm_medium=cpc&amp;utm_campaign=ebook&amp;utm_id=heureka_cpc</URL>
+        <EAN>9788027146130</EAN>
+        <DESCRIPTION>Soukromá detektivní kancelář Kate Marshallové a Tristana Harpera má svůj první velký případ. Před dvanácti lety odhalila novinářka Joanna Duncanová politický skandál a poté záhadně zmizela. Většina lidí už zapomněla, jen Joannina matka stále po své dceři pátrá. Kate a Tristan vycházejí při svém vyšetřování z&amp;nbsp;Joanniných složek a poznámek a jdou krok za krokem po jejích stopách. Mezi jejími osobními věcmi odhalí Kate jména dvou mladých mužů, kteří také zmizeli. Když pospojuje poslední dny těchto tří pohřešovaných lidí, Kate si uvědomí, že Joanna pravděpodobně narazila na něco mnohem zlověstnějšího, než by kohokoliv napadlo: sériového vraha...Nový thriller Roberta Bryndzy vám ukáže, jak hluboká může být PROPAST SMRTI.</DESCRIPTION>
+        <PARAM>
+            <PARAM_NAME>Jazyk</PARAM_NAME>
+            <VAL>cs</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Vydavatel</PARAM_NAME>
+            <VAL>Grada</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Autor</PARAM_NAME>
+            <VAL>Robert  Bryndza</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Žánr</PARAM_NAME>
+            <VAL>Thrillery</VAL>
+        </PARAM>
+        <ISBN>978-80-271-4613-0</ISBN>
+        <PRODUCTNAME>Propast smrti -  Robert  Bryndza</PRODUCTNAME>
+        <PRODUCT>Propast smrti</PRODUCT>
+        <CATEGORYTEXT>Filmy, knihy, hry | E-book elektronické knihy</CATEGORYTEXT>
+        <MANUFACTURER>Grada</MANUFACTURER>
+        <PRICE_VAT>382</PRICE_VAT>
+        <IMGURL>https://images.cdi.albatrosmedia.cz/13ffaa38-e9b8-4399-867d-ba9b07a3ab33?preset=detail-product-gallery</IMGURL>
+        <HEUREKA_CPC>1</HEUREKA_CPC>
+        <DELIVERY_DATE>0</DELIVERY_DATE>
+        <publish_date>2021-11-09T00:00:00</publish_date>
+    </SHOPITEM>
+    <SHOPITEM>
+        <product_type>physicalgood</product_type>
+        <id>5431318c-998c-4ac2-a87c-8a55f1f389eb</id>
+        <id>3a89cd69-717d-49e9-84b8-25ad247e494d</id>
+        <id>77cc4191-3fd3-46a7-9d70-9a61bd8476fb</id>
+        <id>6015578b-429c-4937-b813-65c25304853b</id>
+        <id>dc0a4269-3bd9-463e-9567-878a2073854e</id>
+        <language>cs</language>
+        <binding_type>brožovaná lepená</binding_type>
+        <stock_availability>true</stock_availability>
+        <price>469.0000</price>
+        <price>375.0000</price>
+        <valid_from>2024-07-31T00:01:50</valid_from>
+        <valid_to>2025-12-31T23:59:00</valid_to>
+        <ITEM_ID>351669</ITEM_ID>
+        <URL>https://www.palmknihy.cz/kniha/srdcem-proti-zdi-351669?utm_source=heureka&amp;utm_medium=cpc&amp;utm_campaign=print&amp;utm_id=heureka_cpc</URL>
+        <EAN>9788025357996</EAN>
+        <DESCRIPTION>Vanessa Mazur ví, že dělá správnou věc. Necítí se špatně proto, že dává výpověď. Svou pozici asistentky, hospodyně a podržtašky předního obránce národního fotbalového týmu vždycky považovala za dočasnou. Teď má svoje plány, a ty už nezahrnují praní extra velkých spodků. Když ji ale Aiden Graves nazývaný Hradba z Winnipegu osobně požádá, aby se vrátila, je v šoku. Dva roky si jí ani nevšiml. Co má teď odpovědět muži, který je zvyklý dostat všechno, co chce?</DESCRIPTION>
+        <PARAM>
+            <PARAM_NAME>ISBN</PARAM_NAME>
+            <VAL>978-80-253-5799-6</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Nakladatelství</PARAM_NAME>
+            <VAL>Albatros Media a.s.</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Originální název</PARAM_NAME>
+            <VAL>The Wall of Winnipeg and Me</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Jazyk</PARAM_NAME>
+            <VAL>cs</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Vazba</PARAM_NAME>
+            <VAL>brožovaná lepená</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Rok vydání</PARAM_NAME>
+            <VAL>2016-01-01T00:00:00</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Počet stran</PARAM_NAME>
+            <VAL>496</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Autor</PARAM_NAME>
+            <VAL>Mariana Zapata</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Vhodné pro</PARAM_NAME>
+            <VAL>18</VAL>
+        </PARAM>
+        <PARAM>
+            <PARAM_NAME>Žánr</PARAM_NAME>
+            <VAL>Romantika, erotika</VAL>
+        </PARAM>
+        <ISBN>978-80-253-5799-6</ISBN>
+        <DELIVERY>
+            <DELIVERY_ID>ZASILKOVNA</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>BALIKOVNA_DEPOTAPI</DELIVERY_ID>
+            <DELIVERY_PRICE>49</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>49</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>DPD_PICKUP</DELIVERY_ID>
+            <DELIVERY_PRICE>50</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>50</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>CESKA_POSTA_NAPOSTU</DELIVERY_ID>
+            <DELIVERY_PRICE>49</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>49</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>CESKA_POSTA</DELIVERY_ID>
+            <DELIVERY_PRICE>75</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>75</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>DPD</DELIVERY_ID>
+            <DELIVERY_PRICE>79</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>79</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>PPL_PARCELSHOP</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <DELIVERY>
+            <DELIVERY_ID>PPL_NA_ADRESU</DELIVERY_ID>
+            <DELIVERY_PRICE>45</DELIVERY_PRICE>
+            <DELIVERY_PRICE_COD>45</DELIVERY_PRICE_COD>
+        </DELIVERY>
+        <PRODUCTNAME>Srdcem proti zdi -  Mariana Zapata</PRODUCTNAME>
+        <PRODUCT>Srdcem proti zdi</PRODUCT>
+        <CATEGORYTEXT>Filmy, knihy, hry | Knihy</CATEGORYTEXT>
+        <MANUFACTURER>Albatros Media a.s.</MANUFACTURER>
+        <PRICE_VAT>375</PRICE_VAT>
+        <IMGURL>https://images.cdi.albatrosmedia.cz/3d9f1dda-f091-4884-a437-0864b77dabca?preset=detail-product-gallery</IMGURL>
+        <HEUREKA_CPC>1</HEUREKA_CPC>
+        <publish_date>2022-05-26T00:00:00</publish_date>
+        <expedition_date>2025-01-01T13:00:00</expedition_date>
+    </SHOPITEM>
+</SHOP>

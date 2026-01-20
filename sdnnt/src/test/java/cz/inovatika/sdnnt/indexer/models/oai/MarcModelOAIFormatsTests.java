@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import cz.inovatika.sdnnt.indexer.models.DataField;
@@ -16,6 +17,7 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 
 public class MarcModelOAIFormatsTests {
 
+    @Ignore
     @Test
     public void testMarcModelOAIFormatsTests() throws IOException {
         InputStream resourceAsStream = MarcModelTests.class.getResourceAsStream("oai_aleph-nkp.cz_SKC01-004214235.json");

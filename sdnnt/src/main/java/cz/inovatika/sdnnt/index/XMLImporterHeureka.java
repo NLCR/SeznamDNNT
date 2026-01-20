@@ -1,6 +1,7 @@
 
 package cz.inovatika.sdnnt.index;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
@@ -18,8 +19,12 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
+import cz.inovatika.sdnnt.index.imports.XMLReadSupport;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -70,40 +75,18 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             throws XMLStreamException, SolrServerException, IOException {
         getLogger().log(Level.INFO, "Processing {0}", uri);
         
-        List<String> allIdentifiersToPN = new ArrayList<>();
-        allIdentifiersToPN = readXML(is, "SHOPITEM", solrClient,itemsToSkip);
-        solrClient.commit(DataCollections.imports_documents.name());
-        ImporterUtils.changePNState(getLogger(), solrClient, allIdentifiersToPN, IMPORT_IDENTIFIER);
-        indexImportSummary(solrClient);
-        return new LinkedHashSet<>(allIdentifiersToPN);
+        LinkedHashSet<String> allIdentifiers = new LinkedHashSet<>();
 
+        XMLReadSupport support = new XMLReadSupport(is,"SHOPITEM", itemsToSkip);
+        support.parse((item)-> {
+                allIdentifiers.addAll(toIndex(item, solrClient,itemsToSkip));
+        });
+        solrClient.commit(DataCollections.imports_documents.name());
+        ImporterUtils.changePNState(getLogger(), solrClient, new ArrayList<>(allIdentifiers), IMPORT_IDENTIFIER);
+        indexImportSummary(solrClient);
+        return allIdentifiers;
    }
 
-    private List<String> readXML(InputStream is, String itemName, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) throws XMLStreamException {
-        try {
-            Set<String> allIdentifiers = new HashSet<>();
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(is);
-            NodeList nodes = doc.getElementsByTagName(itemName);
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Node node = nodes.item(i);
-                Map<String, String> item = new HashMap<>();
-                NodeList fields = node.getChildNodes();
-                for (int j = 0; j < fields.getLength(); j++) {
-                    Node field = fields.item(j);
-                    if (field.getNodeType() == Node.ELEMENT_NODE) {
-                        item.put(field.getNodeName(), field.getTextContent());
-                    }
-                }
-                allIdentifiers.addAll(toIndex(item, solrClient,itemsToSkip));
-            }
-            return new ArrayList<>(allIdentifiers);
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-            return new ArrayList<>();
-        }
-    }
 
     private List<String> toIndex(Map<String, String> item, SolrClient solrClient,LinkedHashSet<String> itemsToSkip) {
         try {
@@ -117,7 +100,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             }
 
             if (item.containsKey(FIELD_MAPPING.get("NAME"))
-                    && item.get(FIELD_MAPPING.get("NAME")).toLowerCase().contains("[audiokniha]")) {
+                    && item.get(FIELD_MAPPING.get("NAME")).toString().toLowerCase().contains("[audiokniha]")) {
                 LOGGER.log(Level.INFO, "{0} ma format audioknihy, vynechame", this.importDescription.getLastId());
                 this.importDescription.incrementSkipped();
                 return new ArrayList<>();
@@ -126,7 +109,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
             String ean;
             if (item.containsKey("ISBN")) {
                 ISBNValidator isbn = ISBNValidator.getInstance();
-                ean = item.get("ISBN");
+                ean = item.get("ISBN").toString();
                 ean = isbn.validate(ean);
                 if (ean != null) {
                     item.put("EAN", ean);
@@ -320,14 +303,20 @@ public class XMLImporterHeureka extends AbstractXMLImport {
     public XMLImportDesc getImportDesc() {
         return this.importDescription;
     }
-    
+
+    @Override
+    public LinkedHashSet<String> doImport(String fromId, boolean resume, LinkedHashSet<String> skipIdentifiers) {
+        return super.doImport(fromId, resume, skipIdentifiers);
+    }
+
     public static void main(String[] args) {
         XMLImporterHeureka distri = new XMLImporterHeureka("logger", "grpab",
-                "https://feeds.mergado.com/palmknihy-cz-heureka-cz-cz-6-ed3e5a88767ca249029fda83b9326415.xml",
+                "file:///c:/Users/pavel/Projects/SeznamDNNT/download/download16771702498594120891.xml",
                 1, "days", 1.0f, 1.0f, 0.5f);
         distri.doImport(null, false, new LinkedHashSet<>());
 
         XMLImportDesc importDesc = distri.getImportDesc();
         System.out.println(importDesc.toString());
+
     }
 }
