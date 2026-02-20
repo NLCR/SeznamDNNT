@@ -31,15 +31,7 @@ public class MasterLinkItem extends LinkitemField {
         
         object.put(LinkitemField.PID_KEY, this.getPid());
         
-        /*
-        if (this.getRootPid() != null) {
-            object.put(ROOT_PID_KEY, getRootPid());
-        }
-        
-        if (this.getDetails() != null) {
-            object.put(DETAILS_KEY, this.getDetails());
-        }*/
-        
+
         if (this.getBaseUrl() != null) {
             object.put(LinkitemField.BASEURL_KEY, this.getBaseUrl());
         }

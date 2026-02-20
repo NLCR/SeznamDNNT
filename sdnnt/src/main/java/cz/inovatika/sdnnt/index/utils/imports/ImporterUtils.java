@@ -150,7 +150,7 @@ public class ImporterUtils {
                 
                 String qident = identifiers.stream().map(it-> {
                     return "\""+it+"\"";
-                }).collect(Collectors.joining("  "));
+                }).collect(Collectors.joining("  OR "));
 
                 SolrQuery query = new SolrQuery("identifier:("+qident+")")
                         .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,datum_kurator_stav,granularity:[json],marc_998a,id_euipo,c_actions");

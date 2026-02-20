@@ -11,7 +11,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.security.acl.Owner;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -157,6 +156,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             
             List<String> plusFilter = Arrays.asList("(marc_911u:* OR marc_856u:* OR granularity:*)", KURATORSTAV_FIELD + ":*",
                     DNTSTAV_FIELD + ":*"
+
             );
 
 
@@ -789,7 +789,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
-                }).collect(Collectors.joining(" "));
+                }).collect(Collectors.joining(" OR  "));
 
                 if (!baseUrl.endsWith("/")) {
                     baseUrl = baseUrl + "/";
@@ -798,7 +798,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 if (configuration.getVersion().equals(KramVersion.V5)) {
                     // Vsechny deti // K5
                     String encodedCondition = URLEncoder.encode(
-                            "root_pid:(" + condition + ") AND fedora.model:(monographunit periodicalvolume)",
+                            "root_pid:(" + condition + ") AND fedora.model:(monographunit OR periodicalvolume)",
                             "UTF-8");
                     // K5
                     String encodedFieldList = URLEncoder.encode(
