@@ -156,7 +156,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             
             List<String> plusFilter = Arrays.asList("(marc_911u:* OR marc_856u:* OR granularity:*)", KURATORSTAV_FIELD + ":*",
                     DNTSTAV_FIELD + ":*"
-
             );
 
 
@@ -374,6 +373,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                         checkBuffer(buffer);
                     } else {
+                        if (configuration == null) {
+                            getLogger().warning("No configuration for  '" + baseUrl + "'");
+                        }
                         getLogger().info("Skipping instance '" + configuration + "'");
                     }
                 }

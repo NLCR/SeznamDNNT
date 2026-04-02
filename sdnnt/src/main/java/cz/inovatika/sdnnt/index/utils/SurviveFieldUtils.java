@@ -12,6 +12,9 @@ public class SurviveFieldUtils {
     
     /** Pole, ktera musi zustat po update zaznamu */
     public static void surviveFields(SolrDocument doc, SolrInputDocument cDoc) {
+        /**
+         *  doc = source -> cDoc = dest
+         */
         ensureAndSetField(doc, cDoc, MarcRecordFields.DNTSTAV_FIELD);
         ensureAndSetField(doc, cDoc, MarcRecordFields.KURATORSTAV_FIELD);
         ensureAndSetField(doc, cDoc, MarcRecordFields.HISTORIE_GRANULOVANEHOSTAVU_FIELD);
@@ -41,8 +44,10 @@ public class SurviveFieldUtils {
         MarcRecordUtils.derivedIdentifiers(doc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD).toString(), cDoc);
     }
 
-    
-    
+
+    /**
+     *  doc = source -> cDoc = dest
+     */
     private static void ensureAndSetField(SolrDocument doc, SolrInputDocument cDoc, String field) {
         if (doc.containsKey(field)) {
             cDoc.setField(field, doc.getFieldValue(field));

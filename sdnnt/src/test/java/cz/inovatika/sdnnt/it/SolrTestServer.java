@@ -59,6 +59,12 @@ public class SolrTestServer {
         }
     }
 
+    public static SolrClient getClient(String collection) {
+        String url = String.format("%s%s/", TEST_URL, collection);
+        return new HttpSolrClient.Builder(url).build();
+    }
+
+
     //
     public static SolrClient getClient() {
         return new HttpSolrClient.Builder(TEST_URL).build();

@@ -104,16 +104,16 @@ public class Indexer {
         JSONObject ret = new JSONObject();
         try {
             if (update) {
-                for (SolrInputDocument rec : recs) {
-                    SolrDocumentList docs = findById((String) rec.getFieldValue("identifier"), client);
-                    if (docs.getNumFound() == 0) {
+                for (SolrInputDocument harvestingRec : recs) {
+                    SolrDocumentList existingDocs = findById((String) harvestingRec.getFieldValue("identifier"), client);
+                    if (existingDocs.getNumFound() == 0) {
                         LOGGER.log(Level.INFO,
-                                "Record " + rec.getFieldValue("identifier") + " not found in catalog. It is new");
-                        client.add("catalog", rec);
+                                "Record " + harvestingRec.getFieldValue("identifier") + " not found in catalog. It is new");
+                        client.add("catalog", harvestingRec);
                     } else {
 
                         boolean deletedDocument = false;
-                        SolrDocument solrDocument = docs.get(0);
+                        SolrDocument solrDocument = existingDocs.get(0);
                         if (solrDocument.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
                             Object state = solrDocument.getFirstValue(MarcRecordFields.DNTSTAV_FIELD);
                             // neni d, je dx ??
@@ -125,91 +125,86 @@ public class Indexer {
                                 // nesmi byt case4a
                                 deletedDocument = !case4a;
                                 LOGGER.log(Level.INFO,
-                                        "Record " + rec.getFieldValue("identifier") + " is in state D and case "
+                                        "Record " + harvestingRec.getFieldValue("identifier") + " is in state D and case "
                                                 + (case4a ? " is " : "is not ") + "SKC_4a. Deleted document flag is "
                                                 + deletedDocument);
                             }
                         }
                         if (!deletedDocument) {
                             LOGGER.log(Level.INFO,
-                                    "Record " + rec.getFieldValue("identifier") + " found in catalog. Updating");
-                            String rawJSON = (String) rec.getFieldValue("raw");
-                            SolrInputDocument hDoc = new SolrInputDocument();
-                            SolrInputDocument cDoc = mergeWithHistory((String) rec.getFieldValue("raw"), docs.get(0),
-                                    hDoc, user, update, ret);
-                            if (cDoc != null) {
-                                SurviveFieldUtils.surviveFields(docs.get(0), cDoc);
-                                client.add("catalog", cDoc);
-                                client.add("history", hDoc);
+                                    "Record " + harvestingRec.getFieldValue("identifier") + " found in catalog. Updating");
+                            String rawJSON = (String) harvestingRec.getFieldValue("raw");
 
-                                MarcRecord origJSON = MarcRecord.fromRAWJSON(rawJSON);
-                                MarcRecordUtilsToRefactor.marcFields(cDoc, origJSON.dataFields, MarcRecord.tagsToIndex);
-                            }
+                            SolrInputDocument historyDoc = new SolrInputDocument();
+                            makeHistoryDoc((String) harvestingRec.getFieldValue("raw"), existingDocs.get(0),
+                                    historyDoc, user, update, ret);
 
-                            if (updatesupportService != null && cDoc != null) {
-                                Object identifier = cDoc.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
-                                if (cDoc.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
+                            SurviveFieldUtils.surviveFields(existingDocs.get(0), harvestingRec);
+                            client.add("catalog", harvestingRec);
+                            client.add("history", historyDoc);
+
+                            MarcRecord origJSON = MarcRecord.fromRAWJSON(rawJSON);
+                            MarcRecordUtilsToRefactor.marcFields(harvestingRec, origJSON.dataFields, MarcRecord.tagsToIndex);
+
+                            if (updatesupportService != null && harvestingRec != null) {
+                                Object identifier = harvestingRec.getFieldValue(MarcRecordFields.IDENTIFIER_FIELD);
+                                if (harvestingRec.containsKey(MarcRecordFields.DNTSTAV_FIELD)) {
                                     // check format and place
-                                    Object fieldValue = cDoc.getFieldValue(MarcRecordFields.FMT_FIELD);
+                                    Object fieldValue = harvestingRec.getFieldValue(MarcRecordFields.FMT_FIELD);
                                     if (fieldValue == null || !Arrays.asList("BK", "SE")
                                             .contains(fieldValue.toString().trim().toUpperCase())) {
                                         LOGGER.log(Level.INFO,
-                                                "Record " + rec.getFieldValue("identifier") + " not BK or SE !");
+                                                "Record " + harvestingRec.getFieldValue("identifier") + " not BK or SE !");
                                         updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
                                     }
 
-                                    Object placeOfPub = cDoc.getFieldValue("place_of_pub");
+                                    Object placeOfPub = harvestingRec.getFieldValue("place_of_pub");
                                     if (placeOfPub == null
                                             || !placeOfPub.toString().trim().toLowerCase().equals("xr")) {
                                         LOGGER.log(Level.INFO,
-                                                "Record " + rec.getFieldValue("identifier") + " not xr !");
+                                                "Record " + harvestingRec.getFieldValue("identifier") + " not xr !");
                                         updatesupportService.updateDeleteInfo(Arrays.asList(identifier.toString()));
                                     }
                                 }
                             }
                         } else {
-                            LOGGER.log(Level.INFO, "Record " + rec.getFieldValue("identifier")
+                            LOGGER.log(Level.INFO, "Record " + harvestingRec.getFieldValue("identifier")
                                     + " found in catalog but state D. It is new");
-                            client.add("catalog", rec);
+                            client.add("catalog", harvestingRec);
 
                         }
                     }
                 }
             } else if (merge) {
-                for (SolrInputDocument rec : recs) {
-                    SolrDocumentList docs = find((String) rec.getFieldValue("raw"), client);
-                    if (docs == null) {
-
-                    } else if (docs.getNumFound() == 0) {
+                for (SolrInputDocument harvestedDoc : recs) {
+                    SolrDocumentList catalogDocs = find((String) harvestedDoc.getFieldValue("raw"), client);
+                    if (catalogDocs == null) {
+                        // no no catalog docs
+                    } else if (catalogDocs.getNumFound() == 0) {
                         LOGGER.log(Level.WARNING,
-                                "Record " + rec.getFieldValue("identifier") + " not found in catalog");
-                        ret.append("errors", "Record " + rec.getFieldValue("identifier") + " not found in catalog");
-                    } else if (docs.getNumFound() > 1) {
+                                "Record " + harvestedDoc.getFieldValue("identifier") + " not found in catalog");
+                        ret.append("errors", "Record " + harvestedDoc.getFieldValue("identifier") + " not found in catalog");
+                    } else if (catalogDocs.getNumFound() > 1) {
                         LOGGER.log(Level.WARNING,
-                                "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: "
-                                        + docs.stream().map(d -> (String) d.getFirstValue("identifier"))
+                                "For" + harvestedDoc.getFieldValue("identifier") + " found more than one record in catalog: "
+                                        + catalogDocs.stream().map(d -> (String) d.getFirstValue("identifier"))
                                                 .collect(Collectors.joining()));
                         ret.append("errors",
-                                "For" + rec.getFieldValue("identifier") + " found more than one record in catalog: "
-                                        + docs.stream().map(d -> (String) d.getFirstValue("identifier"))
+                                "For" + harvestedDoc.getFieldValue("identifier") + " found more than one record in catalog: "
+                                        + catalogDocs.stream().map(d -> (String) d.getFirstValue("identifier"))
                                                 .collect(Collectors.joining()));
                     }
 
                     List<SolrInputDocument> hDocs = new ArrayList();
                     List<SolrInputDocument> cDocs = new ArrayList();
-                    for (SolrDocument doc : docs) {
+                    for (SolrDocument catalogDoc : catalogDocs) {
                         SolrInputDocument hDoc = new SolrInputDocument();
 
-                        SolrInputDocument cDoc = mergeWithHistory((String) rec.getFieldValue("raw"), doc, hDoc, user,
-                                update, ret);
+                        makeHistoryDoc((String) harvestedDoc.getFieldValue("raw"), catalogDoc, hDoc, user, update, ret);
+                        SurviveFieldUtils.surviveFields(catalogDoc, harvestedDoc);
 
-                        // Nechame puvodni hodnoty "DNT" poli
-                        SurviveFieldUtils.surviveFields(doc, cDoc);
-
-                        if (cDoc != null) {
-                            hDocs.add(hDoc);
-                            cDocs.add(cDoc);
-                        }
+                        hDocs.add(hDoc);
+                        cDocs.add(harvestedDoc);
                     }
 
                     if (!cDocs.isEmpty()) {
@@ -290,9 +285,8 @@ public class Indexer {
 
     // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
     // keepDNTFields = false => zmena pouze DNT (990, 992) poli
-    static SolrInputDocument mergeWithHistory(String jsTarget, SolrDocument docCat, SolrInputDocument historyDoc,
-            String user, boolean keepDNTFields, JSONObject ret) {
-
+    static void makeHistoryDoc(String jsTarget, SolrDocument docCat, SolrInputDocument historyDoc,
+                               String user, boolean keepDNTFields, JSONObject ret) {
         try {
             String jsCat = (String) docCat.getFirstValue("raw");
 
@@ -315,19 +309,13 @@ public class Indexer {
                         .put("backward_patch", new JSONArray(bwPatch.toString()));
                 historyDoc.setField("changes", changes.toString());
 
-                // Create record in catalog
-                MarcRecord mr = MarcRecord.fromRAWJSON(JsonPatch.apply(fwPatch, source).toString());
-
-                return mr.toSolrDoc();
             } else {
                 LOGGER.log(Level.FINE, "No changes detected in {0}", target.at("/identifier").asText());
-                return null;
             }
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "error merging {0}", docCat.getFirstValue("identifier"));
             LOGGER.log(Level.SEVERE, null, ex);
             ret.append("errors", "error merging " + docCat.getFirstValue("identifier"));
-            return null;
         }
     }
 

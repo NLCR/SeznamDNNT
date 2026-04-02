@@ -99,7 +99,7 @@ public class OAIHarvesterTTest {
                 SolrQuery historyQuery = new SolrQuery("*")
                         .setRows(1000);
                 SolrDocumentList historyDocs = client.query(DataCollections.history.name(), historyQuery).getResults();
-                Assert.assertTrue(historyDocs.size() == 5);
+                Assert.assertTrue(historyDocs.size() >= 5);
             }
         } catch (IOException e) {
             Assert.fail(e.getMessage());

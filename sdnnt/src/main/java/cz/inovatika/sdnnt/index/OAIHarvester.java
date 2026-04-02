@@ -51,29 +51,31 @@ public class OAIHarvester {
 
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
   
-  JSONObject ret = new JSONObject();
-  String collection = "catalog";
-  boolean merge;
-  boolean update;
-  boolean allFields;
-  List<SolrInputDocument> recs = new ArrayList();
-  List<String> toDelete = new ArrayList();
-  int indexed = 0;
-  int deleted = 0;
-  int batchSize = 100;
+    JSONObject ret = new JSONObject();
+    String collection = "catalog";
+    boolean merge;
+    boolean update;
+    boolean allFields;
+    List<SolrInputDocument> recs = new ArrayList();
+    List<String> toDelete = new ArrayList();
+    int indexed = 0;
+    int deleted = 0;
+    int batchSize = 100;
 
-  long reqTime = 0;
-  long procTime = 0;
-  long solrTime = 0;
+    long reqTime = 0;
+    long procTime = 0;
+    long solrTime = 0;
 
-  private boolean debug = false;
+    private boolean debug = false;
 
-      
-  private JSONObject skcDeleteConfig;
-  public OAIHarvester(JSONObject config) {
-      super();
-      this.skcDeleteConfig = config;
-  }
+    private String configuredFrom = null;
+    private JSONObject skcDeleteConfig;
+
+    public OAIHarvester(JSONObject config) {
+        super();
+        this.configuredFrom = config.getString("configuredFrom");
+        this.skcDeleteConfig = config;
+    }
   
   public OAIHarvester() {
     super();
@@ -129,34 +131,34 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
     return last;
   }
 
-  public JSONObject update(String set, String core, boolean merge, boolean update, boolean allFields) {
+    public JSONObject update(String set, String core, boolean merge, boolean update, boolean allFields) {
+        collection = core;
+        this.merge = merge;
+        this.update = update;
+        this.allFields = allFields;
+        Options opts = Options.getInstance();
+        long start = new Date().getTime();
 
-      collection = core;
-    this.merge = merge;
-    this.update = update;
-    this.allFields = allFields;
-    Options opts = Options.getInstance();
-    long start = new Date().getTime();
-    String from = lastIndexDate(set);// "2021-03-14T00:00:00Z";
-    if (from == null) {
-      return full(set, core, merge, update, allFields);
-    }
-    TimeZone tz = TimeZone.getTimeZone("UTC");
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
-    df.setTimeZone(tz);
-    String until = df.format(new Date());
-    String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
-            opts.getJSONObject("OAIHavest").getString("url"),
-            from,
-            until,
-            set);
-    getRecords("update", url);
-    ret.put("indexed", indexed);
-    String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
-    ret.put("ellapsed", ellapsed);
-    LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}", new Object[]{ellapsed, indexed});
-    return ret;
-  }
+        String from = lastIndexDate(set);
+        from = configuredFrom != null ? configuredFrom : from;
+        if (from == null) { return full(set, core, merge, update, allFields);}
+
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        String until = df.format(new Date());
+        String url = String.format("%s?verb=ListRecords&metadataPrefix=marc21&from=%s&until=%s&set=%s",
+                opts.getJSONObject("OAIHavest").getString("url"),
+                from,
+                until,
+                set);
+        getRecords("update", url);
+        ret.put("indexed", indexed);
+        String ellapsed = DurationFormatUtils.formatDurationHMS(new Date().getTime() - start);
+        ret.put("ellapsed", ellapsed);
+        LOGGER.log(Level.INFO, "update FINISHED. Indexed {0} in {1}", new Object[]{ellapsed, indexed});
+        return ret;
+      }
 
   public JSONObject updateFrom(String set, String core, String from, boolean merge, boolean update, boolean allFields) {
     collection = core;
@@ -559,7 +561,5 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
     }
 //    throw new XMLStreamException("Premature end of file");
   }
-  
-  
 
 }

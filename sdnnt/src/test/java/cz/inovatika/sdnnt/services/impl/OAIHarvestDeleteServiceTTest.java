@@ -4,7 +4,9 @@ import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -75,8 +77,10 @@ public class OAIHarvestDeleteServiceTTest {
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N","N", License.dnnto.name(),"poznamka",  "zmena na N");
             Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA","PA", License.dnnto.name(),"poznamka",  "zmena na PA");
 
+                    //public SKCDeleteServiceImpl(String loggerName, JSONObject results, List<String> deletedInfo) {
+            //String loggerName, JSONObject results, List<String> deletedInfo
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
-                    .withConstructor("test-logger",new JSONObject())
+                    .withConstructor("test-logger", new JSONObject(), new ArrayList<>())
                     .addMockedMethod("getOptions")
                     .addMockedMethod("buildClient")
                     .addMockedMethod("buildAccountService")
@@ -86,8 +90,8 @@ public class OAIHarvestDeleteServiceTTest {
             EasyMock.expect(skcDeleteService.buildClient()).andDelegateTo(
                     new BuildSolrClientSupport()
             ).anyTimes();
-            EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
 
+            EasyMock.expect(skcDeleteService.getOptions()).andReturn(options).anyTimes();
 
             User user = testUser();
             UserController controler  = EasyMock.createMock(UserController.class);
@@ -349,11 +353,7 @@ public class OAIHarvestDeleteServiceTTest {
     }
     
     
-//    /** Smazano a nema stav*/
-//    @Test
-//    public void testDeleteHasStateAndSameCCNB() throws FactoryConfigurationError, XMLStreamException, SolrServerException {
-//    }
-    
+
     protected User testUser() {
         User user = new User();
         user.setInstitution("NKP");
