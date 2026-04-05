@@ -20,13 +20,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -34,6 +28,8 @@ import java.util.stream.Collectors;
 import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.services.*;
 import cz.inovatika.sdnnt.services.PXKrameriusService.CheckResults;
+import cz.inovatika.sdnnt.services.compare.DifferencesResult;
+import cz.inovatika.sdnnt.services.compare.RecordFingerprint;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
@@ -759,6 +755,32 @@ public class Job implements InterruptableJob {
             }
         },
 
+
+        DIFF {
+            @Override
+            void doPerform(JSONObject jobData) {
+                LocksSupport.SERVICES_LOCK.lock();
+                try {
+                    String logger = jobData.optString("logger");
+                    String comparingSolr = jobData.optString("comparingSolr");
+                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ingoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl", "kuratorstav","license","stav")));
+                    JSONArray ignoreMasterLinksFields =  jobData.optJSONArray("ignoreMaterLinksFields", new JSONArray(Set.of("fetched","link","baseUrl")));
+                    CompareServiceImpl service = new CompareServiceImpl(logger, comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
+                    DifferencesResult check = service.check();
+                    Map<String, Pair<RecordFingerprint, RecordFingerprint>> diff1 = check.getDifferences();
+                    System.out.println(check.getDifferences());
+                    diff1.keySet().forEach(key -> {
+                        Pair<RecordFingerprint, RecordFingerprint> pair = diff1.get(key);
+                        String diffReport = pair.getLeft().getDiffReport(pair.getRight());
+                        service.getLogger().info("Difference report for " + key + ": " + diffReport+"\n");
+                    });
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+        },
 
         PNREQ {
 
