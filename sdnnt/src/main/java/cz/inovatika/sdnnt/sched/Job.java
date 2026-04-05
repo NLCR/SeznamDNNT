@@ -210,7 +210,7 @@ public class Job implements InterruptableJob {
             void doPerform(JSONObject jobData) {
                 JSONObject json = new JSONObject();
                 JSONObject results = jobData.optJSONObject("results");
-                OAIHarvester oai = new OAIHarvester(results);
+                OAIHarvester oai = new OAIHarvester(jobData.optString("from"), results);
                 String set = "SKC";
                 String core = "catalog";
                 boolean merge = true;

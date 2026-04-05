@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import cz.inovatika.sdnnt.utils.StringUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import javax.xml.stream.XMLInputFactory;
@@ -50,7 +51,8 @@ import org.apache.solr.common.SolrInputDocument;
 public class OAIHarvester {
 
   public static final Logger LOGGER = Logger.getLogger(OAIHarvester.class.getName());
-  
+    public static final String FROM_VALUE = "from";
+
     JSONObject ret = new JSONObject();
     String collection = "catalog";
     boolean merge;
@@ -71,9 +73,9 @@ public class OAIHarvester {
     private String configuredFrom = null;
     private JSONObject skcDeleteConfig;
 
-    public OAIHarvester(JSONObject config) {
+    public OAIHarvester(String configuredFrom, JSONObject config) {
         super();
-        this.configuredFrom = config.getString("configuredFrom");
+        this.configuredFrom = configuredFrom;
         this.skcDeleteConfig = config;
     }
   
@@ -140,8 +142,12 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         long start = new Date().getTime();
 
         String from = lastIndexDate(set);
-        from = configuredFrom != null ? configuredFrom : from;
-        if (from == null) { return full(set, core, merge, update, allFields);}
+        from = StringUtils.isAnyString(configuredFrom)  ? configuredFrom : from;
+        if (from == null) {
+            return full(set, core, merge, update, allFields);
+        } else {
+            LOGGER.log(Level.INFO, String.format("Starting from '%s'", from));
+        }
 
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
