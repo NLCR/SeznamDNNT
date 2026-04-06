@@ -307,7 +307,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
         LOGGER.log(Level.SEVERE, exc.getMessage(), exc);
         ret.put("error", exc);
       }
-      
+
       solr.close();
       
       // update support service
@@ -328,6 +328,9 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           SolrJUtilities.quietCommit(client, DataCollections.catalog.name());
           LOGGER.info(String.format("Starting process for deleting records ", delete.toString()));
           skcDeleteService.updateDeleteInfo(delete);
+
+
+
           skcDeleteService.update();
       }
     }

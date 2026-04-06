@@ -36,6 +36,60 @@ public final class RecordFingerprint {
     public Set<Pair<String,String>> getMasterlinks() { return masterlinks; }
     public Set<String> getIdentifiers() { return identifiers; }
 
+
+    public String getDiffReportHtml(RecordFingerprint oldFp) {
+        if (oldFp == null) {
+            return "<p class='new-record'><strong>NOVÝ ZÁZNAM</strong> (v prvním Solru neexistoval)</p>";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<table class='diff-table'>");
+        sb.append("<thead><tr><th>Pole</th><th>Původní hodnota</th><th>Nová hodnota</th></tr></thead>");
+        sb.append("<tbody>");
+
+        if (!Objects.equals(this.basicFieldsHash, oldFp.basicFieldsHash)) {
+            String[] oldParts = oldFp.rawBasicFields.split("\\|", -1);
+            String[] newParts = this.rawBasicFields.split("\\|", -1);
+            String[] labels = {"dntstav", "kuratorstav", "id_ccnb", "followers",  "ean"};
+
+            for (int i = 0; i < Math.min(oldParts.length, newParts.length); i++) {
+                if (!Objects.equals(oldParts[i], newParts[i])) {
+                    addTableRow(sb, "[ZÁKLADNÍ] " + labels[i], oldParts[i], newParts[i]);
+                }
+            }
+        }
+
+        renderSetDiff(sb, "Granularity", oldFp.granularity, this.granularity);
+        renderSetDiff(sb, "Masterlinks", oldFp.masterlinks, this.masterlinks);
+        sb.append("</tbody></table>");
+
+        return sb.length() > 100 ? sb.toString() : "<p>Žádné změny v polích.</p>";
+    }
+
+    private void addTableRow(StringBuilder sb, String label, String oldVal, String newVal) {
+        sb.append("<tr>");
+        sb.append("<td>").append(label).append("</td>");
+        sb.append("<td class='old-val'>").append(oldVal == null ? "<i>null</i>" : oldVal).append("</td>");
+        sb.append("<td class='new-val'>").append(newVal == null ? "<i>null</i>" : newVal).append("</td>");
+        sb.append("</tr>");
+    }
+
+    // Pomocná metoda pro porovnání Setů (pro granularity/masterlinks)
+    private void renderSetDiff(StringBuilder sb, String category, Set<Pair<String,String>> oldSet, Set<Pair<String,String>> newSet) {
+        if (Objects.equals(oldSet, newSet)) return;
+
+        // Najdeme co přibylo a co ubylo
+        for (Pair<String, String> p : oldSet) {
+            if (!newSet.contains(p)) {
+                addTableRow(sb, category, p.toString(), "--- CHYBÍ ---");
+            }
+        }
+        for (Pair<String, String> p : newSet) {
+            if (!oldSet.contains(p)) {
+                addTableRow(sb, category, "--- NOVÉ ---", p.toString());
+            }
+        }
+    }
     public String getDiffReport(RecordFingerprint oldFp) {
         if (oldFp == null) return "NOVÝ ZÁZNAM (v prvním Solru neexistoval)";
         StringBuilder sb = new StringBuilder();
@@ -75,6 +129,8 @@ public final class RecordFingerprint {
 
         return sb.toString();
     }
+
+
 
     private Set<Pair<String, String>> diff(Set<Pair<String,String>> set1, Set<Pair<String,String>> set2) {
         Set<Pair<String,String>> bigger;
@@ -122,11 +178,13 @@ public final class RecordFingerprint {
     private static final Set<String> IGNORED_MASTERLINKS = Set.of("fetched","link","baseUrl");
 
     public static RecordFingerprint loadFromSolrDocument(SolrDocument doc, Set<String> ignoredGranularity, Set<String> ignoredMasterlinks) {
-        String basicFieldsRaw = String.format("%s|%s|%s",
+        String basicFieldsRaw = String.format("%s|%s|%s|%s|%s",
                 doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD),
                 doc.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD),
-                doc.getFieldValue(MarcRecordFields.ID_CCNB_FIELD)
-        );
+                doc.getFieldValue(MarcRecordFields.ID_CCNB_FIELD),
+                doc.getFieldValue(MarcRecordFields.FOLLOWERS),
+                doc.getFieldValue(MarcRecordFields.EAN_FIELD)
+            );
 
         String basicHash = DigestUtils.sha1Hex(basicFieldsRaw);
         Set<Pair<String,String>> granularityHashes = parseAndHashJsonField(

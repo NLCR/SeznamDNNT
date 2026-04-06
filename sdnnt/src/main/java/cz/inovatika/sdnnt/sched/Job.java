@@ -19,6 +19,8 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
@@ -204,16 +206,22 @@ public class Job implements InterruptableJob {
         SKC_UPDATE {
             @Override
             void doPerform(JSONObject jobData) {
-                JSONObject json = new JSONObject();
-                JSONObject results = jobData.optJSONObject("results");
-                OAIHarvester oai = new OAIHarvester(jobData.optString("from"), results);
-                String set = "SKC";
-                String core = "catalog";
-                boolean merge = true;
-                json.put("indexed", oai.update(set, core,
-                        merge,
-                        true,
-                        false));
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                        JSONObject json = new JSONObject();
+                    JSONObject results = jobData.optJSONObject("results");
+                    OAIHarvester oai = new OAIHarvester(jobData.optString("from"), results);
+                    String set = "SKC";
+                    String core = "catalog";
+                    boolean merge = true;
+                    json.put("indexed", oai.update(set, core,
+                            merge,
+                            true,
+                            false));
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+
             }
         },
         
@@ -774,6 +782,65 @@ public class Job implements InterruptableJob {
                         String diffReport = pair.getLeft().getDiffReport(pair.getRight());
                         service.getLogger().info("Difference report for " + key + ": " + diffReport+"\n");
                     });
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
+                }
+            }
+        },
+
+        DIFFHTML {
+            @Override
+            void doPerform(JSONObject jobData) {
+                LocksSupport.SERVICES_LOCK.lock();
+                try {
+                    String logger = jobData.optString("logger");
+                    String comparingSolr = jobData.optString("comparingSolr");
+                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ingoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl", "kuratorstav","license","stav")));
+                    JSONArray ignoreMasterLinksFields =  jobData.optJSONArray("ignoreMaterLinksFields", new JSONArray(Set.of("fetched","link","baseUrl")));
+                    CompareServiceImpl service = new CompareServiceImpl(logger, comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
+                    DifferencesResult check = service.check();
+                    Map<String, Pair<RecordFingerprint, RecordFingerprint>> diffs = check.getDifferences();
+
+                    StringBuilder html = new StringBuilder();
+                    html.append("<html><head><meta charset='UTF-8'><style>")
+                            .append(".diff-table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }")
+                            .append(".diff-table td, .diff-table th { border: 1px solid #ddd; padding: 8px; }")
+                            .append(".old-val { background-color: #ffdce0; } .new-val { background-color: #cdffd8; }")
+                            .append("h2 { font-family: sans-serif; background: #eee; padding: 5px; }")
+                            .append("</style></head><body>");
+
+                    html.append("<h1>Report rozdílů ze dne: ").append(new Date()).append("</h1>");
+
+                    diffs.forEach((key, pair) -> {
+                        String  sdnntHost = Options.getInstance().getString("sdnnt.host");
+                        String baseUrl = sdnntHost != null ? sdnntHost.trim() : "";
+                        if (!baseUrl.isEmpty() && !baseUrl.endsWith("/")) {
+                            baseUrl += "/";
+                        }
+                        if (StringUtils.isAnyString(sdnntHost)) {
+                            String fullUrl = baseUrl + "search?q=" + key + "&page=0";
+                            html.append("<h2>ID Záznamu: <a href='").append(fullUrl)
+                                    .append("' target='_blank' style='text-decoration: none; color: #0366d6;'>")
+                                    .append(key).append(" 🔗</a></h2>");
+                        } else {
+                            html.append("<h2>ID Záznamu: ").append(key).append("</h2>");
+                        }
+                        html.append(pair.getLeft().getDiffReportHtml(pair.getRight()));
+                    });
+
+                    html.append("</body></html>");
+
+                    String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/diff";
+                    File dir = new File(DEFAULT_OUTPUT_FOLDER);
+                    if (!dir.exists()) dir.mkdirs();
+
+                    String filename = "diff_" + System.currentTimeMillis() + ".html";
+                    Files.writeString(Path.of(dir.getAbsolutePath(), filename), html.toString());
+
+                    service.getLogger().info("HTML report uložen jako: " + filename);
+
                 } catch (Exception e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 } finally {

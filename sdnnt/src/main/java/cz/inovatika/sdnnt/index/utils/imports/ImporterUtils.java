@@ -102,7 +102,7 @@ public class ImporterUtils {
     
     /** Change all given documents to PN curator state */
     public static void changePNState(Logger logger, SolrClient solrJClient, List<String> allIdentifiersToPN, String importIdentification)
-            throws JsonProcessingException, SolrServerException, IOException {
+            throws  SolrServerException, IOException {
         int numberOfIterations = allIdentifiersToPN.size() / BATCHS_SIZE
                 + (allIdentifiersToPN.size() % BATCHS_SIZE == 0 ? 0 : 1);
         for (int i = 0; i < numberOfIterations; i++) {
@@ -112,10 +112,38 @@ public class ImporterUtils {
             List<String> sublist = allIdentifiersToPN.subList(start, stop);
             for (String identifier : sublist) {
                 MarcRecord mr = MarcRecord.fromIndex(solrJClient, identifier);
+                List<String> kuratorstav = mr.kuratorstav;
+                boolean changeFromHistory = false;
+                JSONObject lastItem = null;
 
+                if (kuratorstav != null && !kuratorstav.isEmpty()) {
+                    String kStav = kuratorstav.get(0);
+                    switch (CuratorItemState.valueOf(kStav)) {
+                        case PX:
+                        case DX:
+                            JSONArray history = mr.historie_kurator_stavu;
+                            lastItem = history.getJSONObject(history.length() - 1);
+                            changeFromHistory = true;
+                            break;
+                        default:
+                            //do nothing
+                        break;
+                    }
+                }
                 SolrInputDocument idoc = ChangeProcessStatesUtility.changeProcessState(CuratorItemState.PN.name(), mr, importIdentification, "import/"+importIdentification);
                 if (idoc != null) {
                     solrJClient.add(DataCollections.catalog.name(), idoc);
+                    if (changeFromHistory && lastItem != null) {
+                        String stav = null;
+                        String comment = lastItem.optString("comment");
+                        if (lastItem.get("stav") instanceof JSONArray) {
+                            stav = ((JSONArray)lastItem.get("stav")).getString(0);
+                        } else {
+                            stav = (String) lastItem.get("stav");
+                        }
+                        idoc = ChangeProcessStatesUtility.changeProcessState(stav, mr, importIdentification, comment);
+                        solrJClient.add(DataCollections.catalog.name(), idoc);
+                    }
                 }
             }
 

@@ -58,6 +58,7 @@ public enum CuratorItemState {
             else return null;
         }
     },
+
     // ceka na zarazeni  PA
     PA {
         @Override
