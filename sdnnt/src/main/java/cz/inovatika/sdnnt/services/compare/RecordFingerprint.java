@@ -5,12 +5,15 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class RecordFingerprint {
 
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RecordFingerprint.class);
     private final String rawBasicFields;
 
     private final String basicFieldsHash;
@@ -74,11 +77,8 @@ public final class RecordFingerprint {
         sb.append("</tr>");
     }
 
-    // Pomocná metoda pro porovnání Setů (pro granularity/masterlinks)
     private void renderSetDiff(StringBuilder sb, String category, Set<Pair<String,String>> oldSet, Set<Pair<String,String>> newSet) {
         if (Objects.equals(oldSet, newSet)) return;
-
-        // Najdeme co přibylo a co ubylo
         for (Pair<String, String> p : oldSet) {
             if (!newSet.contains(p)) {
                 addTableRow(sb, category, p.toString(), "--- CHYBÍ ---");
@@ -174,10 +174,7 @@ public final class RecordFingerprint {
                 '}';
     }
 
-    private static final Set<String> IGNORED_GRANULARITY = Set.of("datestamp", "indextime","fetched", "link", "baseUrl");
-    private static final Set<String> IGNORED_MASTERLINKS = Set.of("fetched","link","baseUrl");
-
-    public static RecordFingerprint loadFromSolrDocument(SolrDocument doc, Set<String> ignoredGranularity, Set<String> ignoredMasterlinks) {
+    public static RecordFingerprint loadFromSolrDocument(Logger logger, SolrDocument doc, Set<String> ignoredGranularity, Set<String> ignoredMasterlinks) {
         String basicFieldsRaw = String.format("%s|%s|%s|%s|%s",
                 doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD),
                 doc.getFieldValue(MarcRecordFields.KURATORSTAV_FIELD),
@@ -187,13 +184,13 @@ public final class RecordFingerprint {
             );
 
         String basicHash = DigestUtils.sha1Hex(basicFieldsRaw);
-        Set<Pair<String,String>> granularityHashes = parseAndHashJsonField(
+        Set<Pair<String,String>> granularityHashes = parseAndHashJsonField(logger,
                 doc.getFieldValues("granularity"),
-                ignoredGranularity != null && !ignoredGranularity.isEmpty() ? ignoredGranularity :  IGNORED_GRANULARITY
+                ignoredGranularity
         );
-        Set<Pair<String,String>> masterlinksHashes = parseAndHashJsonField(
+        Set<Pair<String,String>> masterlinksHashes = parseAndHashJsonField(logger,
                 doc.getFieldValues("masterlinks"),
-                ignoredMasterlinks != null && !ignoredMasterlinks.isEmpty() ? ignoredMasterlinks :  IGNORED_MASTERLINKS
+                ignoredMasterlinks
         );
         Collection<Object> idValues = doc.getFieldValues("id_all_identifiers");
         Set<String> identifiers = (idValues == null) ? Collections.emptySet() :
@@ -203,7 +200,7 @@ public final class RecordFingerprint {
         return new RecordFingerprint(basicFieldsRaw, basicHash, granularityHashes, masterlinksHashes, identifiers);
     }
 
-    private static Set<Pair<String, String>> parseAndHashJsonField(Collection<Object> jsonStrings, Set<String> keysToIgnore) {
+    private static Set<Pair<String, String>> parseAndHashJsonField(Logger logger, Collection<Object> jsonStrings, Set<String> keysToIgnore) {
         if (jsonStrings == null || jsonStrings.isEmpty()) {
             return Collections.emptySet();
         }
@@ -214,12 +211,13 @@ public final class RecordFingerprint {
             try {
                 JSONObject json = new JSONObject(obj.toString());
                 for (String key : keysToIgnore) {
+                    logger.fine(String.format("\tIgnoring key: %s", key));
                     json.remove(key);
                 }
                 String stableString = getStableString(json);
                 hashes.add(Pair.of(stableString, DigestUtils.md5Hex(stableString)));
             } catch (Exception e) {
-                System.err.println("Chyba při zpracování JSON: " + e.getMessage());
+                logger.warning(e.getMessage());
             }
         }
         return hashes;

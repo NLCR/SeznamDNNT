@@ -12,6 +12,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.json.JSONArray;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -33,6 +34,7 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 public class CompareServiceImpl implements CompareService {
 
 
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CompareServiceImpl.class);
     private Logger logger = Logger.getLogger(CompareServiceImpl.class.getName());
 
     public static final int LIMIT = 1000;
@@ -50,6 +52,8 @@ public class CompareServiceImpl implements CompareService {
         this.comparingSolr = comparingSolr;
         this.ignoredGranularity = ignoredGranularity;
         this.ignoredMasterlinks = ignoredMasterlinks;
+        getLogger().log(Level.INFO,"Ignored granularity fields "+this.ignoredGranularity);
+        getLogger().log(Level.INFO,"Ignored master links fields "+this.ignoredMasterlinks);
     }
 
     public CompareServiceImpl(String logger, String comparingSolr, JSONArray ignoredGranularity, JSONArray ignoredMasterlinks) {
@@ -89,7 +93,7 @@ public class CompareServiceImpl implements CompareService {
             ), (rsp) -> {
 
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
-                RecordFingerprint recordFingerprint = RecordFingerprint.loadFromSolrDocument(rsp, this.ignoredGranularity, this.ignoredMasterlinks);
+                RecordFingerprint recordFingerprint = RecordFingerprint.loadFromSolrDocument(getLogger(), rsp, this.ignoredGranularity, this.ignoredMasterlinks);
                 processingFingerPrints.put(identifier.toString(), recordFingerprint);
                 sourceCounter.incrementAndGet();
                 if (sourceCounter.get() % 1000 == 0) {
@@ -108,7 +112,7 @@ public class CompareServiceImpl implements CompareService {
                     "*"
             ), (rsp) -> {
                 Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
-                RecordFingerprint recordFingerprint = RecordFingerprint.loadFromSolrDocument(rsp, this.ignoredGranularity, this.ignoredMasterlinks);
+                RecordFingerprint recordFingerprint = RecordFingerprint.loadFromSolrDocument(getLogger(),rsp, this.ignoredGranularity, this.ignoredMasterlinks);
                 RecordFingerprint comparingFingerPrint = processingFingerPrints.get(identifier.toString());
                 if (comparingFingerPrint == null) {
                     missing.put(identifier.toString(), recordFingerprint);
@@ -145,18 +149,5 @@ public class CompareServiceImpl implements CompareService {
     }
 
 
-    public static void main(String[] args) {
-        CompareServiceImpl service = new CompareServiceImpl("test", "http://localhost:8984/solr/",Set.of("datestamp", "indextime","fetched", "link", "baseUrl", "kuratorstav","license","stav"),Set.of("fetched","link","baseUrl"));
-        DifferencesResult check = service.check();
-        Map<String, Pair<RecordFingerprint, RecordFingerprint>> diff1 = check.getDifferences();
-        System.out.println(check.getDifferences());
-        diff1.keySet().forEach(key -> {
-            Pair<RecordFingerprint, RecordFingerprint> pair = diff1.get(key);
-            String diffReport = pair.getLeft().getDiffReport(pair.getRight());
-            System.out.println("Difference report for " + key + ": " + diffReport);
-        });
-
-
-    }
 
 }

@@ -207,10 +207,15 @@ public class Job implements InterruptableJob {
             @Override
             void doPerform(JSONObject jobData) {
                 try {
+
                     LocksSupport.SERVICES_LOCK.lock();
-                        JSONObject json = new JSONObject();
+                    JSONObject json = new JSONObject();
                     JSONObject results = jobData.optJSONObject("results");
+
+                    boolean debug = jobData.optBoolean("debug", false);
                     OAIHarvester oai = new OAIHarvester(jobData.optString("from"), results);
+                    oai.setDebug(debug);
+
                     String set = "SKC";
                     String core = "catalog";
                     boolean merge = true;
@@ -771,7 +776,8 @@ public class Job implements InterruptableJob {
                 try {
                     String logger = jobData.optString("logger");
                     String comparingSolr = jobData.optString("comparingSolr");
-                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ingoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl", "kuratorstav","license","stav")));
+
+                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ignoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl","details", "rocnik")));
                     JSONArray ignoreMasterLinksFields =  jobData.optJSONArray("ignoreMaterLinksFields", new JSONArray(Set.of("fetched","link","baseUrl")));
                     CompareServiceImpl service = new CompareServiceImpl(logger, comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
                     DifferencesResult check = service.check();
@@ -797,7 +803,7 @@ public class Job implements InterruptableJob {
                 try {
                     String logger = jobData.optString("logger");
                     String comparingSolr = jobData.optString("comparingSolr");
-                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ingoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl", "kuratorstav","license","stav")));
+                    JSONArray ignoreGranularityFields =  jobData.optJSONArray("ignoreGranularityFields", new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl","details", "rocnik")));
                     JSONArray ignoreMasterLinksFields =  jobData.optJSONArray("ignoreMaterLinksFields", new JSONArray(Set.of("fetched","link","baseUrl")));
                     CompareServiceImpl service = new CompareServiceImpl(logger, comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
                     DifferencesResult check = service.check();

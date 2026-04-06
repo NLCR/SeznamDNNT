@@ -110,7 +110,15 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
     return ret;
   }
 
-  private String lastIndexDate(String set) {
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    private String lastIndexDate(String set) {
     String last = null;
     Options opts = Options.getInstance();
     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
