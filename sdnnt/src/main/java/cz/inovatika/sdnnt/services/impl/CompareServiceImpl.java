@@ -149,5 +149,28 @@ public class CompareServiceImpl implements CompareService {
     }
 
 
+    public static void main(String[] args) {
+        //String logger = jobData.optString("logger");
+        String comparingSolr = "http://localhost:8984/solr/";
+
+        JSONArray ignoreGranularityFields =   new JSONArray(Set.of("datestamp", "indextime","fetched", "link", "baseUrl","details", "rocnik"));
+        JSONArray ignoreMasterLinksFields =  new JSONArray(Set.of("fetched","link","baseUrl"));
+
+        CompareServiceImpl service = new CompareServiceImpl("logger", comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
+
+        DifferencesResult check = service.check();
+        Map<String, Pair<RecordFingerprint, RecordFingerprint>> diff1 = check.getDifferences();
+
+        service.getLogger().info("Differences "+diff1);
+        //System.out.println(check.getDifferences());
+        diff1.keySet().forEach(key -> {
+            Pair<RecordFingerprint, RecordFingerprint> pair = diff1.get(key);
+            String diffReport = pair.getLeft().getDiffReport(pair.getRight());
+            service.getLogger().info("Difference report for " + key + ": " + diffReport+"\n");
+        });
+
+
+    }
+
 
 }

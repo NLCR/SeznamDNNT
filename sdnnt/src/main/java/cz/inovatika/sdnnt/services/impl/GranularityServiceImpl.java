@@ -156,6 +156,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             
             List<String> plusFilter = Arrays.asList("(marc_911u:* OR marc_856u:* OR granularity:*)", KURATORSTAV_FIELD + ":*",
                     DNTSTAV_FIELD + ":*"
+                    //, "identifier:\"oai:aleph-nkp.cz:SKC01-000453038\""
             );
 
 
@@ -415,6 +416,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 SolrInputDocument granularitySolrDoc = granularity.toSolrDocument();
                 if (granularitySolrDoc != null) {
                     changes.add(granularitySolrDoc);
+//                } else {
+                    changes.add(granularity.toRomeSolrDocument());
                 }
                 
                 MasterLinks mlinks = this.linksOwner.get(key).getMasterLinks();
@@ -425,6 +428,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     }
                 }
             } else {
+                LinksOnwer linksOnwer = this.linksOwner.get(key);
+
                 // pokud nema granularitu, zapiseme alespon masterlinks
                 MasterLinks mlinks = this.linksOwner.get(key).getMasterLinks();
                 if (mlinks != null) {
@@ -433,7 +438,13 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         sDocs.forEach(changes::add);
                     }
                 }
-                
+                // delete granularity
+                SolrInputDocument idoc = new SolrInputDocument();
+                idoc.setField(IDENTIFIER_FIELD,linksOnwer.getCatalogId());
+                SolrJUtilities.atomicSetNull(idoc,  MarcRecordFields.GRANULARITY_FIELD);
+                changes.add(idoc);
+
+
             }
         });
 
@@ -530,6 +541,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             getLogger().info(String.format("non-existent link %s->%s", owner.getCatalogId(),
                                     titleUrls.toString()));
                         }
+
+                    } else {
+                        owner.setGranularity(null);
 
                     }
                 }
@@ -980,7 +994,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 if (linksOwner.containsKey(ident)) {
                                     Granularity granularity = linksOwner.get(ident).getGranularity();
                                     // 911r
-                                    boolean acceptField = granularity.acceptByRule(gf, getLogger());
+                                    boolean acceptField = granularity != null && granularity.acceptByRule(gf, getLogger());
                                     if (acceptField) {
                                         granularity.addGranularityField(gf);
                                     }

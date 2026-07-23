@@ -17,7 +17,9 @@ public final class RecordFingerprint {
     private final String rawBasicFields;
 
     private final String basicFieldsHash;
+    private final boolean hasGranularity;
     private final Set<Pair<String,String>> granularity;
+    private final boolean hasMasterlinks;
     private final Set<Pair<String,String>> masterlinks;
     private final Set<String> identifiers;
 
@@ -25,9 +27,23 @@ public final class RecordFingerprint {
                              Set<Pair<String,String>> granularity,
                              Set<Pair<String,String>> masterlinks,
                              Set<String> identifiers) {
+        this(rawBasicFields, basicFieldsHash,
+                granularity != null && !granularity.isEmpty(), granularity,
+                masterlinks != null && !masterlinks.isEmpty(), masterlinks,
+                identifiers);
+    }
+
+    public RecordFingerprint(String rawBasicFields, String basicFieldsHash,
+                             boolean hasGranularity,
+                             Set<Pair<String,String>> granularity,
+                             boolean hasMasterlinks,
+                             Set<Pair<String,String>> masterlinks,
+                             Set<String> identifiers) {
         this.rawBasicFields = rawBasicFields;
         this.basicFieldsHash = basicFieldsHash;
+        this.hasGranularity = hasGranularity;
         this.granularity = granularity != null ? Collections.unmodifiableSet(granularity) : Collections.emptySet();
+        this.hasMasterlinks = hasMasterlinks;
         this.masterlinks = masterlinks != null ? Collections.unmodifiableSet(masterlinks) : Collections.emptySet();
         this.identifiers = identifiers != null ? Collections.unmodifiableSet(identifiers) : Collections.emptySet();
     }
@@ -35,7 +51,9 @@ public final class RecordFingerprint {
     public String getRawBasicFields() { return rawBasicFields; }
 
     public String getBasicFieldsHash() { return basicFieldsHash; }
+    public boolean hasGranularity() { return hasGranularity; }
     public Set<Pair<String,String>> getGranularity() { return granularity; }
+    public boolean hasMasterlinks() { return hasMasterlinks; }
     public Set<Pair<String,String>> getMasterlinks() { return masterlinks; }
     public Set<String> getIdentifiers() { return identifiers; }
 
@@ -62,7 +80,9 @@ public final class RecordFingerprint {
             }
         }
 
+        renderFieldPresenceDiff(sb, "Granularity", oldFp.hasGranularity, this.hasGranularity);
         renderSetDiff(sb, "Granularity", oldFp.granularity, this.granularity);
+        renderFieldPresenceDiff(sb, "Masterlinks", oldFp.hasMasterlinks, this.hasMasterlinks);
         renderSetDiff(sb, "Masterlinks", oldFp.masterlinks, this.masterlinks);
         sb.append("</tbody></table>");
 
@@ -75,6 +95,12 @@ public final class RecordFingerprint {
         sb.append("<td class='old-val'>").append(oldVal == null ? "<i>null</i>" : oldVal).append("</td>");
         sb.append("<td class='new-val'>").append(newVal == null ? "<i>null</i>" : newVal).append("</td>");
         sb.append("</tr>");
+    }
+
+    private void renderFieldPresenceDiff(StringBuilder sb, String category, boolean oldPresent, boolean newPresent) {
+        if (oldPresent == newPresent) return;
+        addTableRow(sb, category, oldPresent ? "pole existuje" : "pole chybi",
+                newPresent ? "pole existuje" : "pole chybi");
     }
 
     private void renderSetDiff(StringBuilder sb, String category, Set<Pair<String,String>> oldSet, Set<Pair<String,String>> newSet) {

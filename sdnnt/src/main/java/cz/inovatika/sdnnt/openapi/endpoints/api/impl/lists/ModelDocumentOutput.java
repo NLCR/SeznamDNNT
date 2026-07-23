@@ -32,7 +32,6 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
 
 
     protected ListitemGranularity granularity(Pair<String,String> digitalLibraryFilter, String strJson, String parentPid) {
-
         JSONObject jsonObject = new JSONObject(strJson);
         JSONArray stav = jsonObject.optJSONArray("stav");
         String license = jsonObject.optString("license");
@@ -48,7 +47,9 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
             pidpaths = false;
             for (int i = 0; i < pidPathsJSON.length(); i++) {
                 String path = pidPathsJSON.getString(i);
-                if (path.contains(parentPid)) { pidpaths = true; }
+                if (parentPid != null && path.contains(parentPid)) {
+                    pidpaths = true;
+                }
             }
         }
         
@@ -92,6 +93,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                 pidOutput(digitalLibraryFilter, outputDocument, endpointLicense, pid);
             });
         } else {
+            // no pids; what to do ??
             pidOutput(digitalLibraryFilter, outputDocument, endpointLicense, null);
         }
     }

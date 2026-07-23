@@ -782,7 +782,8 @@ public class Job implements InterruptableJob {
                     CompareServiceImpl service = new CompareServiceImpl(logger, comparingSolr,ignoreGranularityFields,ignoreMasterLinksFields);
                     DifferencesResult check = service.check();
                     Map<String, Pair<RecordFingerprint, RecordFingerprint>> diff1 = check.getDifferences();
-                    System.out.println(check.getDifferences());
+                    service.getLogger().info("Differences "+diff1);
+                    //System.out.println(check.getDifferences());
                     diff1.keySet().forEach(key -> {
                         Pair<RecordFingerprint, RecordFingerprint> pair = diff1.get(key);
                         String diffReport = pair.getLeft().getDiffReport(pair.getRight());
