@@ -111,6 +111,23 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         return new HttpSolrClient.Builder(getOptions().getString("solr.host")).build();
     }
 
+    private static boolean hasMarcLinks(Collection<Object> links911, Collection<Object> links856) {
+        return (links911 != null && !links911.isEmpty()) || (links856 != null && !links856.isEmpty());
+    }
+
+    private static boolean hasMasterLinksInfo(SolrDocument doc) {
+        return doc.containsKey(MarcRecordFields.MASTERLINKS_FIELD)
+                || doc.containsKey(MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+    }
+
+    private static SolrInputDocument masterLinksCleanupDocument(String identifier) {
+        SolrInputDocument idoc = new SolrInputDocument();
+        idoc.setField(IDENTIFIER_FIELD, identifier);
+        SolrJUtilities.atomicSetNull(idoc, MarcRecordFields.MASTERLINKS_FIELD);
+        SolrJUtilities.atomicSetNull(idoc, MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+        return idoc;
+    }
+
     public void initialize() {
         JSONObject checkKamerius = getOptions().getJSONObject("check_kramerius");
         this.checkConf = CheckKrameriusConfiguration.initConfiguration(checkKamerius);
@@ -145,18 +162,19 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
     @Override
     public void refershGranularity() throws IOException {
+        final List<SolrInputDocument> masterLinksCleanup = new ArrayList<>();
 
         try (final SolrClient solrClient = buildClient()) {
             Map<String, String> reqMap = new HashMap<>();
             reqMap.put("rows", "10000");
 
             AtomicInteger counter = new AtomicInteger();
-
             CatalogIterationSupport support = new CatalogIterationSupport();
             
-            List<String> plusFilter = Arrays.asList("(marc_911u:* OR marc_856u:* OR granularity:*)", KURATORSTAV_FIELD + ":*",
+            List<String> plusFilter = Arrays.asList("(marc_911u:* OR marc_856u:* OR granularity:* OR masterlinks:* OR masterlinks_disabled:*)", KURATORSTAV_FIELD + ":*",
                     DNTSTAV_FIELD + ":*"
-                    //, "identifier:\"oai:aleph-nkp.cz:SKC01-000453038\""
+//                    ,
+//                    "identifier:\"oai:aleph-nkp.cz:SKC01-000966509\""
             );
 
 
@@ -166,7 +184,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
                     Arrays.asList(IDENTIFIER_FIELD, DNTSTAV_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U,
                             GRANULARITY_FIELD, "marc_911r", MarcRecordFields.FMT_FIELD, "controlfield_008",
-                            MarcRecordFields.LEADER_FIELD, MarcRecordFields.RAW_FIELD
+                            MarcRecordFields.LEADER_FIELD, MarcRecordFields.RAW_FIELD,
+                            MarcRecordFields.MASTERLINKS_FIELD, MarcRecordFields.MASTERLINKS_DISABLED_FIELD
 
                     ), (rsp) -> {
 
@@ -185,6 +204,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         List dntstav = (List) rsp.getFieldValue(DNTSTAV_FIELD);
                         Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
                         Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
+                        if (!hasMarcLinks(links1, links3) && hasMasterLinksInfo(rsp)) {
+                            masterLinksCleanup.add(masterLinksCleanupDocument(identifier.toString()));
+                        }
 
                         List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
 
@@ -345,6 +367,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         // SOLR changes
         List<SolrInputDocument> changes = new ArrayList<>();
 
+                        //masterLinksCleanup
+        changes.addAll(masterLinksCleanup);
+
         List<String> sortedKeySet = new ArrayList<>(this.linksOwner.keySet());
         for (String key : sortedKeySet) { //this.linksOwner.keySet()) {
 
@@ -416,8 +441,6 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 SolrInputDocument granularitySolrDoc = granularity.toSolrDocument();
                 if (granularitySolrDoc != null) {
                     changes.add(granularitySolrDoc);
-//                } else {
-                    changes.add(granularity.toRomeSolrDocument());
                 }
                 
                 MasterLinks mlinks = this.linksOwner.get(key).getMasterLinks();
@@ -542,10 +565,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                     titleUrls.toString()));
                         }
 
-                    } else {
-                        owner.setGranularity(null);
-
                     }
+                    //else { owner.setGranularity(null); }
                 }
             }
 

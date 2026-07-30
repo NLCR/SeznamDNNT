@@ -27,8 +27,10 @@ public class SurviveFieldUtils {
         ensureAndSetField(doc, cDoc, MarcRecordFields.GRANULARITY_FIELD);
         ensureAndSetField(doc, cDoc, MarcRecordFields.FLAG_PUBLIC_IN_DL);
         ensureAndSetField(doc, cDoc, MarcRecordFields.ALTERNATIVE_ALEPH_LINK);
-        ensureAndSetField(doc, cDoc, MarcRecordFields.MASTERLINKS_FIELD);
-        ensureAndSetField(doc, cDoc, MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+        if (hasCurrentLinks(cDoc)) {
+            ensureAndSetField(doc, cDoc, MarcRecordFields.MASTERLINKS_FIELD);
+            ensureAndSetField(doc, cDoc, MarcRecordFields.MASTERLINKS_DISABLED_FIELD);
+        }
         
         // musi zustat vlastnosti pro export euipo
         ensureAndSetField(doc, cDoc,MarcRecordFields.ID_EUIPO);
@@ -52,5 +54,11 @@ public class SurviveFieldUtils {
         if (doc.containsKey(field)) {
             cDoc.setField(field, doc.getFieldValue(field));
         }
+    }
+
+    private static boolean hasCurrentLinks(SolrInputDocument cDoc) {
+        return cDoc.containsKey(MarcRecordFields.MARC_911_U)
+                || cDoc.containsKey(MarcRecordFields.MARC_856_U)
+                || cDoc.containsKey(MarcRecordFields.MARC_956_U);
     }
 }
