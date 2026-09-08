@@ -1,0 +1,9 @@
+**/node_modules
+**/target
+**/dist
+**/*.log
+.vscode
+.idea
+docker/data
+docker/local-config
+# The Git metadata is intentionally included for git-commit-id-plugin.
