@@ -13,6 +13,8 @@ COPY openapi/ openapi/
 COPY sdnnt/ sdnnt/
 # The Maven git-commit-id plugin reads the checkout metadata.
 COPY .git/ .git/
+# Windows checkouts may contain CRLF, while Spotless runs in this Linux stage.
+RUN find openapi sdnnt -type f -name '*.java' -exec sed -i 's/\r$//' {} +
 RUN --mount=type=cache,target=/root/.m2 mvn -B clean install --file pom.xml
 
 FROM tomcat:9.0.63-jdk11-temurin
