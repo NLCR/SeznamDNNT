@@ -6,8 +6,6 @@ import static cz.inovatika.sdnnt.index.DntAlephTestUtils.dntAlephStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -22,7 +20,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.util.ContentStreamBase;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;

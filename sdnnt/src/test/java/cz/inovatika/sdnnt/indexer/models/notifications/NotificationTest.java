@@ -5,15 +5,10 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
-import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
-import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class NotificationTest {
 

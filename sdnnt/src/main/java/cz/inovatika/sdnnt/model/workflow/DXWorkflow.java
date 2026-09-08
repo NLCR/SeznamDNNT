@@ -6,7 +6,6 @@ import static cz.inovatika.sdnnt.model.Period.period_px_0_5wd;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 
 public class DXWorkflow extends Workflow {

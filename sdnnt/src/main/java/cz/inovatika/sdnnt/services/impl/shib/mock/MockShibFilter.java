@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.services.impl.shib.mock;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 

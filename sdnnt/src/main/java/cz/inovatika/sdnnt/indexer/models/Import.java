@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -25,7 +22,6 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.joda.time.LocalDate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -75,7 +71,7 @@ public class Import {
   public int num_hits;
   
   @Field
-  public List<Map> identifiers;
+  public List<Map<String, Object>> identifiers;
   
 //  @Field
 //  public String catalog;
@@ -235,7 +231,7 @@ public class Import {
       idoc.setField("id", input.getString("id"));
       
       Map<String,Object> fieldModifier = new HashMap<>(1);
-      List<String> l = new ArrayList();
+      List<String> l = new ArrayList<>();
       JSONArray ids = input.getJSONArray("identifiers");
       for (int i = 0; i < ids.length(); i++) {
         l.add(ids.getJSONObject(i).toString());

@@ -1,21 +1,8 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.model.DataCollections;
 
 public class SiglaControlField001 {
     

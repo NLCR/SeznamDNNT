@@ -6,29 +6,12 @@
 package cz.inovatika.sdnnt.index;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.AbstractXMLImport.XMLImportDesc;
 import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 
-import static cz.inovatika.sdnnt.index.Indexer.getClient;
-import cz.inovatika.sdnnt.indexer.models.Import;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.services.LoggerAware;
-import cz.inovatika.sdnnt.services.PXKrameriusService;
-import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -41,22 +24,12 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
-import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -252,7 +225,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
     
 
 
-    public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+    public ImportResult findInCatalogByTitle(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
 
             String q = "ean:\"" + item.get("EAN")+"\"";
@@ -275,18 +248,10 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                         .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
 
                 List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
-                    String id = doc.optString("identifier");
-
-                    boolean matched = match_1(doc, distribName, "", authorName, this.match1);
-                    if (matched) {
-                        return matched;
-                    }
-                    matched = match_2(doc, distribName, "", nakladatel, this.match21, this.match22);
-                    if (matched) {
-                        return matched;
-                    }
-
-                    return false;
+                    return (
+                        match_1(doc, distribName, "", authorName, this.match1) 
+                        ||
+                        match_2(doc, distribName, "", nakladatel, this.match21, this.match22));
                 }));
                 return new ImportResult(foundItems, item, eanItems.get(0).getString("identifier"));
             } else {
@@ -299,7 +264,7 @@ public class XMLImporterKosmas extends AbstractXMLImport {
     }
 
 
-    public ImportResult findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+    public ImportResult findInCatalogByEan(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
 
             String q = "ean:\"" + item.get("EAN")+"\"";
@@ -343,7 +308,8 @@ public class XMLImporterKosmas extends AbstractXMLImport {
                 10, 
                 "days", 1.0f,1.0f,0.5f);
         
-        LinkedHashSet<String> doImport = kosmas.doImport(null, false, new LinkedHashSet<>());
+        //LinkedHashSet<String> doImport
+        kosmas.doImport(null, false, new LinkedHashSet<>());
     }
 
 }

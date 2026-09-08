@@ -5,7 +5,6 @@ import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.PublicItemState;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 /**

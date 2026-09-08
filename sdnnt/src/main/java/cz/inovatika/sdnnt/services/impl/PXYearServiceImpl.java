@@ -4,14 +4,11 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.PXYearService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -26,7 +23,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.*;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
 /**
  * Sluzba, ktera umoznuje vyrazeni dila na zaklade datumu
@@ -124,10 +120,11 @@ public class PXYearServiceImpl extends AbstractPXService implements PXYearServic
         if (!identifiers.isEmpty()) {
             this.logger.info("Updating identifiers :"+identifiers);
             CuratorItemState cState = null;
-            PublicItemState pState = null;
+            //PublicItemState pState = null;
             if (this.destinationState != null) {
                 cState = CuratorItemState.valueOf(this.destinationState);
-                pState = cState.getPublicItemState(null);
+                //pState = 
+                cState.getPublicItemState(null);
             }
 
             try (final SolrClient solr = buildClient()) {

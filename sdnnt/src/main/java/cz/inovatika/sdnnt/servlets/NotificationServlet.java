@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.servlets;
 
 import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
-import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 
 import java.io.IOException;
@@ -26,9 +25,7 @@ import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.NotificationFactory;
 import cz.inovatika.sdnnt.indexer.models.notifications.RuleNotification;
 import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.rights.RightsResolver;
-import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;

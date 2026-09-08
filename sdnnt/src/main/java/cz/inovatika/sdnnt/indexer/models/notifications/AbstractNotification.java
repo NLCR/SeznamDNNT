@@ -1,13 +1,10 @@
 package cz.inovatika.sdnnt.indexer.models.notifications;
 
-import java.util.Date;
 import java.util.UUID;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
-
-import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;
 
 public abstract class AbstractNotification {
     

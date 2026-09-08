@@ -9,7 +9,6 @@ import cz.inovatika.sdnnt.model.PublicItemState;
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;
 import static cz.inovatika.sdnnt.model.Period.*;
 
-import java.util.Date;
 
 /**
  * Pokryva scenar navrhu na zarazeni dila, kontroluje lhuty a prepina stav

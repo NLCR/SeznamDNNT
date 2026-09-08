@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.utils;
 
 import cz.inovatika.sdnnt.index.OAIHarvester;
-import org.json.JSONObject;
 
 // vytvorit utilitu
 public class IndexerFULLTest {

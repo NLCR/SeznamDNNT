@@ -1,18 +1,10 @@
 package cz.inovatika.sdnnt.indexer.models.notifications;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import cz.inovatika.sdnnt.model.User;
-import org.apache.solr.client.solrj.beans.Field;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.*;
 
 /**
  * Simple notification

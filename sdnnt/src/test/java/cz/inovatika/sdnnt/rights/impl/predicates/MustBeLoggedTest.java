@@ -2,7 +2,6 @@ package cz.inovatika.sdnnt.rights.impl.predicates;
 
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
-import cz.inovatika.sdnnt.services.UserController;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;

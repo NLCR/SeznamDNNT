@@ -1,5 +1,6 @@
 package cz.inovatika.sdnnt.services.impl;
 
+import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
@@ -7,13 +8,21 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_856_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_911_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_956_U;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.SIGLA_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,31 +31,20 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.common.collect.Streams;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
-import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.GranularityService;
-import cz.inovatika.sdnnt.services.PXKrameriusService;
 import cz.inovatika.sdnnt.services.impl.kramerius.LinksOnwer;
 import cz.inovatika.sdnnt.services.impl.kramerius.granularities.Granularity;
 import cz.inovatika.sdnnt.services.impl.kramerius.granularities.GranularityField;
@@ -54,9 +52,6 @@ import cz.inovatika.sdnnt.services.impl.kramerius.granularities.GranularityField
 import cz.inovatika.sdnnt.services.impl.kramerius.granularities.rules.Marc911Rule;
 import cz.inovatika.sdnnt.services.impl.kramerius.infos.MasterLinkItem;
 import cz.inovatika.sdnnt.services.impl.kramerius.infos.MasterLinks;
-import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
-import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
-import cz.inovatika.sdnnt.services.impl.zahorikutils.ZahorikUtils;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
@@ -160,6 +155,20 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         }
     }
 
+    private static List<String> asStringList(Object value) {
+        if (!(value instanceof List<?>)) {
+            return null;
+        }
+        List<String> result = new ArrayList<>();
+        for (Object item : (List<?>) value) {
+            if (item != null && !(item instanceof String)) {
+                return null;
+            }
+            result.add((String) item);
+        }
+        return result;
+    }
+
     @Override
     public void refershGranularity() throws IOException {
         final List<SolrInputDocument> masterLinksCleanup = new ArrayList<>();
@@ -180,7 +189,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
             List<String> minusFilter = Arrays.asList(KURATORSTAV_FIELD + ":D", KURATORSTAV_FIELD + ":DX");
 
-            AtomicInteger count = new AtomicInteger();
+            //AtomicInteger count = new AtomicInteger();
             support.iterate(solrClient, reqMap, null, plusFilter, minusFilter,
                     Arrays.asList(IDENTIFIER_FIELD, DNTSTAV_FIELD, SIGLA_FIELD, MARC_911_U, MARC_956_U, MARC_856_U,
                             GRANULARITY_FIELD, "marc_911r", MarcRecordFields.FMT_FIELD, "controlfield_008",
@@ -196,24 +205,24 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                         Object identifier = rsp.getFieldValue("identifier");
 
-                        Object fmt = rsp.getFieldValue(MarcRecordFields.FMT_FIELD);
-                        Object leader = rsp.getFieldValue(MarcRecordFields.LEADER_FIELD);
+                        String fmt = rsp.getFieldValue(MarcRecordFields.FMT_FIELD).toString();
+                        String leader = rsp.getFieldValue(MarcRecordFields.LEADER_FIELD).toString();
 
-                        Collection controlFields = (Collection) rsp.getFieldValue("controlfield_008");
+                        Collection<?> controlFields = (Collection<?>) rsp.getFieldValue("controlfield_008");
 
-                        List dntstav = (List) rsp.getFieldValue(DNTSTAV_FIELD);
+                        List<String> dntstav = asStringList(rsp.getFieldValue(DNTSTAV_FIELD));
                         Collection<Object> links1 = rsp.getFieldValues(MARC_911_U);
                         Collection<Object> links3 = rsp.getFieldValues(MARC_856_U);
                         if (!hasMarcLinks(links1, links3) && hasMasterLinksInfo(rsp)) {
                             masterLinksCleanup.add(masterLinksCleanupDocument(identifier.toString()));
                         }
 
-                        List<String> granularity = (List<String>) rsp.getFieldValue(GRANULARITY_FIELD);
+                        List<String> granularity = asStringList(rsp.getFieldValue(GRANULARITY_FIELD));
 
                         List<String> granularityLinks = new ArrayList<>();
                         if (granularity != null) {
                             Granularity granObject = new Granularity(identifier.toString(),
-                                    dntstav != null ? PublicItemState.valueOf(dntstav.get(0).toString()) : null);
+                                    dntstav != null && !dntstav.isEmpty() ? PublicItemState.valueOf(dntstav.get(0)) : null);
                             granularity.stream().forEach(it -> {
                                 JSONObject jObj = new JSONObject(it);
                                 GranularityField gf = GranularityField.initFromSDNNTSolrJson(jObj, this.checkConf);
@@ -229,8 +238,8 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                             LinksOnwer onwer = new LinksOnwer(identifier.toString());
                             onwer.setGranularity(granObject);
-                            onwer.setFmt(fmt.toString());
-                            onwer.setLeader(leader.toString());
+                            onwer.setFmt(fmt);
+                            onwer.setLeader(leader);
                             onwer.setControl008(
                                     controlFields.size() > 0 ? controlFields.iterator().next().toString() : null);
 
@@ -239,10 +248,10 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                         } else {
                             if (links1 != null || links3 != null) {
                                 Granularity granObject = new Granularity(identifier.toString(),
-                                        dntstav != null ? PublicItemState.valueOf(dntstav.get(0).toString()) : null);
+                                        dntstav != null && !dntstav.isEmpty() ? PublicItemState.valueOf(dntstav.get(0)) : null);
                                 LinksOnwer onwer = new LinksOnwer(identifier.toString());
-                                onwer.setFmt(fmt.toString());
-                                onwer.setLeader(leader.toString());
+                                onwer.setFmt(fmt);
+                                onwer.setLeader(leader);
                                 onwer.setControl008(
                                         controlFields.size() > 0 ? controlFields.iterator().next().toString() : null);
 

@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.indexer.models;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.solr.client.solrj.beans.Field;
 import org.json.JSONObject;
 
 /**
@@ -16,7 +15,7 @@ public class DataField {
   public String ind1;
   public String ind2;
   public int index;
-  public Map<String, List<SubField>> subFields = new HashMap();
+  public Map<String, List<SubField>> subFields = new HashMap<>();
 
   public DataField() {
     this.tag = "error";

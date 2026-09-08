@@ -11,7 +11,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.services.impl.kramerius.granularities.GranularityField;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 

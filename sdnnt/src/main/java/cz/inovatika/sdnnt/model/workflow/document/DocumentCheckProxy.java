@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.model.workflow.document;
 
 import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;

@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.index.imports;
 
-import io.netty.util.internal.StringUtil;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -74,9 +73,8 @@ public class XMLReadSupport {
                                 Object val = currentItem.get(key);
                                 if (val instanceof String) {
                                     processingItm.put(key, (String) val);
-                                } else if (val instanceof List) {
-                                    List<String> lVal = (List<String>) val;
-                                    String strVal = lVal.stream().collect(Collectors.joining(","));
+                                } else if (val instanceof List<?>) {
+                                    String strVal = ((List<String>) val).stream().collect(Collectors.joining(","));
                                     processingItm.put(key, strVal);
                                 }
                             }

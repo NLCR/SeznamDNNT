@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.indexer.models.notifications;
 
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.indexer.models.notifications.AbstractNotification.TYPE;

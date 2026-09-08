@@ -1,16 +1,10 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -21,9 +15,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
@@ -35,7 +26,6 @@ import cz.inovatika.sdnnt.services.LoggerAware;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public abstract class AbstractCheckDeleteService extends AbstractRequestService implements LoggerAware {

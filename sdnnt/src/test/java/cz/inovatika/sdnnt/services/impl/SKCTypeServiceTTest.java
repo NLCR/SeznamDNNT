@@ -2,31 +2,19 @@ package cz.inovatika.sdnnt.services.impl;
 
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.easymock.EasyMock;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -36,18 +24,15 @@ import org.junit.Test;
 import org.xml.sax.SAXException;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImplITTest.BuildSolrClientSupport;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class SKCTypeServiceTTest {
     

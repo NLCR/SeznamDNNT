@@ -123,9 +123,9 @@ public class MarcRecord {
   // digital librarires
   public List<String> digitalLibraries = new ArrayList<>();
   
-  public Map<String, String> controlFields = new HashMap();
+  public Map<String, String> controlFields = new HashMap<>();
 
-  public Map<String, List<DataField>> dataFields = new HashMap();
+  public Map<String, List<DataField>> dataFields = new HashMap<>();
   //public SolrInputDocument sdoc = new SolrInputDocument();
 
   final public static List<String> tagsToIndex
@@ -141,6 +141,19 @@ public class MarcRecord {
     MarcRecord mr = objectMapper.readValue(json, MarcRecord.class);
     return mr;
   }
+   private static List<String> asStringList(Object value) {
+        if (!(value instanceof List<?>)) {
+            return null;
+        }
+        List<String> result = new ArrayList<>();
+        for (Object item : (List<?>) value) {
+            if (item != null && !(item instanceof String)) {
+                return null;
+            }
+            result.add((String) item);
+        }
+        return result;
+    }
   
   // do not use it; delete 
   public static MarcRecord fromDocDep(SolrDocument doc) throws JsonProcessingException {
@@ -349,23 +362,23 @@ public class MarcRecord {
       
       /** euipo stuff */
       if (doc.containsKey(ID_EUIPO)) {
-          mr.idEuipo = (List<String>) doc.getFieldValue(ID_EUIPO);
+          mr.idEuipo = asStringList(doc.getFieldValue(ID_EUIPO));
       }
 
 
       /** euipo stuff */
       if (doc.containsKey(ID_EUIPO_CANCELED)) {
-          mr.idEuipoCanceled = (List<String>) doc.getFieldValue(ID_EUIPO_CANCELED);
+          mr.idEuipoCanceled = asStringList(doc.getFieldValue(ID_EUIPO_CANCELED));
       }
 
       
       /** euipo stuff */
       if (doc.containsKey(ID_EUIPO_LASTACTIVE)) {
-          mr.idEuipoLastactive = (List<String>) doc.getFieldValue(ID_EUIPO_LASTACTIVE);
+          mr.idEuipoLastactive = asStringList(doc.getFieldValue(ID_EUIPO_LASTACTIVE));
       }
       
       if (doc.containsKey(ID_EUIPO_EXPORT)) {
-          mr.idEuipoExport = (List<String>) doc.getFieldValue(ID_EUIPO_EXPORT);
+          mr.idEuipoExport = asStringList(doc.getFieldValue(ID_EUIPO_EXPORT));
       }
 
       if (doc.containsKey(ID_EUIPO_EXPORT_ACTIVE)) {
@@ -373,12 +386,11 @@ public class MarcRecord {
       }
 
       if (doc.containsKey(EXPORT)) {
-          mr.exportsFacets = (List<String>) doc.getFieldValue(EXPORT);
+          mr.exportsFacets = asStringList(doc.getFieldValue(EXPORT));
       }
       
       if (doc.containsKey(CURATOR_ACTIONS)) {
-          List<String> cActions =  (List<String>) doc.getFieldValue(CURATOR_ACTIONS);
-          mr.curatorsFacets = cActions;
+          mr.curatorsFacets = asStringList(doc.getFieldValue(CURATOR_ACTIONS));
       }
 
       return mr;
@@ -758,7 +770,7 @@ public class MarcRecord {
   public static String nakladatelFormat(String val) {
     if (val != null) {
       String trimmed = val.trim();
-      AtomicReference<String> retVal = new AtomicReference(trimmed);
+      AtomicReference<String> retVal = new AtomicReference<>(trimmed);
       Arrays.asList(";", ",", ":").forEach(postfix-> {
         if (trimmed.endsWith(postfix)) {
           retVal.set(trimmed.substring(0, trimmed.length()-1));

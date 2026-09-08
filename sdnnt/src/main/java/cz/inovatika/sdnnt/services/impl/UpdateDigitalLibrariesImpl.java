@@ -1,29 +1,19 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.ALTERNATIVE_ALEPH_LINK;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.ID_CCNB_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.SET_SPEC_FIELD;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
@@ -83,25 +73,27 @@ public class UpdateDigitalLibrariesImpl implements UpdateDigitalLibraries {
                     ID_CCNB_FIELD,
                     MarcRecordFields.GRANULARITY_FIELD,
                     "marc_911u","marc_856u", "marc_956u"
-            ), (rsp) -> {
+            ), (final SolrDocument rsp) -> {
 
-                Object identifier = rsp.getFieldValue(IDENTIFIER_FIELD);
-                List<String> links = LinksUtilities.krameriusMergedLinksFromDocument(rsp);
-                List<String> digitalizedKeys = LinksUtilities.digitalizedKeys(checkKram, links);
-                //List<String> granularityPids = new ArrayList<>();
+                String identifier = rsp.getFieldValue(IDENTIFIER_FIELD).toString();
+                List<String> digitalizedKeys = LinksUtilities.digitalizedKeys(checkKram, LinksUtilities.krameriusMergedLinksFromDocument(rsp));
+                List<String> granularityPids = new ArrayList<>();
                 if (!digitalizedKeys.isEmpty()) {
-                    idLibs.put(identifier.toString(), digitalizedKeys);
+                    idLibs.put(identifier, digitalizedKeys);
                 }
-                
-                List<String> granularities =  (List<String>) rsp.getFieldValue(MarcRecordFields.GRANULARITY_FIELD);
-                if (granularities != null) {
-                    
-                    List<String> granularityPids =  granularities.stream().map(JSONObject::new).map(it-> {
-                        String pid = it.optString("pid");
-                        return pid;
-                    }).filter(Objects::nonNull).collect(Collectors.toList());
-                    
-                    granPids.put(identifier.toString(), granularityPids);
+                List<?> granularities = rsp.getFieldValue(MarcRecordFields.GRANULARITY_FIELD) instanceof List<?> ? (List<?>) rsp.getFieldValue(MarcRecordFields.GRANULARITY_FIELD) : null;
+                if (granularities != null){
+                    for (Object item : granularities) {
+                        if (item == null || !(item instanceof String)) {
+                            granularityPids = new ArrayList<>();
+                            break;
+                        }
+                        final String pid = (new JSONObject(((String) item))).optString("pid");
+                        if (pid != null && !pid.isEmpty()) {
+                            granularityPids.add(pid);
+                        }
+                    }
+                    granPids.put(identifier, granularityPids);
                 }
                 
                 

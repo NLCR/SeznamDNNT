@@ -1,17 +1,13 @@
 package cz.inovatika.sdnnt.services.utils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 
 import static cz.inovatika.sdnnt.indexer.models.MarcModelTests.*;

@@ -15,8 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
@@ -34,29 +32,18 @@ import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.common.collect.Streams;
-
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.services.AccountServiceInform;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
-import cz.inovatika.sdnnt.services.EUIPOImportService;
 import cz.inovatika.sdnnt.services.ExportService;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.exceptions.AccountException;
-import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exports.ExportType;
-import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SearchResultsUtils;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import cz.inovatika.sdnnt.utils.StringUtils;
-import cz.inovatika.sdnnt.utils.VersionStringCast;
-import cz.inovatika.sdnnt.utils.ZadostUtils;
 
 public class ExportServiceImpl implements ExportService {
 
@@ -65,11 +52,8 @@ public class ExportServiceImpl implements ExportService {
     private static final int DEFAULT_SEARCH_RESULT_SIZE = 20;
 
     private ApplicationUserLoginSupport loginSupport;
-    private ResourceServiceService resourceServiceService;
-    
     public ExportServiceImpl( ApplicationUserLoginSupport loginSupport, ResourceServiceService res) {
         this.loginSupport = loginSupport;
-        this.resourceServiceService = res;
     }
 
 
@@ -199,6 +183,7 @@ public class ExportServiceImpl implements ExportService {
                 SolrJUtilities.atomicSet(idoc, true, "export_processed");
 
                 uReq.add(idoc);
+                @SuppressWarnings("unused")
                 UpdateResponse response = uReq.process(solr, DataCollections.exports.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
             }
@@ -246,6 +231,7 @@ public class ExportServiceImpl implements ExportService {
                 
 
                 recordItem.add(idoc);
+                @SuppressWarnings("unused")
                 UpdateResponse cResponse = recordItem.process(solr, DataCollections.catalog.name());
                 
                 /** Export; exported identifiers */
@@ -266,6 +252,7 @@ public class ExportServiceImpl implements ExportService {
                 
                 exportReq.add(exportDoc);
                 
+                @SuppressWarnings("unused")
                 UpdateResponse eResponse = exportReq.process(solr, DataCollections.exports.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
@@ -313,6 +300,7 @@ public class ExportServiceImpl implements ExportService {
                 
 
                 recordItem.add(idoc);
+                @SuppressWarnings("unused")
                 UpdateResponse cResponse = recordItem.process(solr, DataCollections.catalog.name());
                 
                 /** Export; exported identifiers */
@@ -334,6 +322,7 @@ public class ExportServiceImpl implements ExportService {
                 
                 exportReq.add(exportDoc);
                 
+                @SuppressWarnings("unused")
                 UpdateResponse eResponse = exportReq.process(solr, DataCollections.exports.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
@@ -381,6 +370,7 @@ public class ExportServiceImpl implements ExportService {
                     uReq.add(idoc);
                 }
             
+                @SuppressWarnings("unused")
                 UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
             }
@@ -397,6 +387,7 @@ public class ExportServiceImpl implements ExportService {
             SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
             
             exportReq.add(exportDoc);
+            @SuppressWarnings("unused")
             UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
             SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
         }
@@ -438,6 +429,7 @@ public class ExportServiceImpl implements ExportService {
                     uReq.add(idoc);
                 }
             
+                @SuppressWarnings("unused")
                 UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());
             }
@@ -453,6 +445,7 @@ public class ExportServiceImpl implements ExportService {
             SolrJUtilities.atomicSet(exportDoc, true, "all_exported_identifiers_flag");
             
             exportReq.add(exportDoc);
+            @SuppressWarnings("unused")
             UpdateResponse response = exportReq.process(solr, DataCollections.exports.name());
             SolrJUtilities.quietCommit(solr, DataCollections.exports.name());
         }
@@ -632,6 +625,7 @@ public class ExportServiceImpl implements ExportService {
             updateRequest.add(idoc);
             updateRequest.setCommitWithin(200);
 
+            @SuppressWarnings("unused")
             UpdateResponse uResponse = updateRequest.process(solr, DataCollections.exports.name());
             SolrJUtilities.quietCommit(solr, "zadost");
             return new JSONObject();

@@ -56,7 +56,7 @@ public class MarcRecordUtilsToRefactor {
                   if (df.getSubFields() != null) {
                       for (String code : df.getSubFields().keySet()) {
                           
-                          List<SubField> list = df.getSubFields().get(code);
+                          //List<SubField> list = df.getSubFields().get(code);
                           
                           if (df.getSubFields().get(code) != null && 
                                   df.getSubFields().get(code).get(0) != null && 
@@ -83,7 +83,7 @@ public class MarcRecordUtilsToRefactor {
             for (DataField df : dataFields.get("992")) {
               JSONObject h = new JSONObject();
               String stav = df.getSubFields().get("s").get(0).getValue();
-              List<String> states = df.getSubFields().get("s").stream().map(SubField::getValue).collect(Collectors.toList());
+              //List<String> states = df.getSubFields().get("s").stream().map(SubField::getValue).collect(Collectors.toList());
               if (df.getSubFields().containsKey("s")) {
                 h.put("stav", stav);
               }
@@ -489,9 +489,9 @@ public class MarcRecordUtilsToRefactor {
     }
 
   // TODO: Rewrite it !! big hack
-  public static void syncFromDoc(SolrDocumentBase doc, MarcRecord mr) {
+  public static void syncFromDoc(SolrDocumentBase<?, ?> doc, MarcRecord mr) {
     if (doc.getFieldValues(DNTSTAV_FIELD) != null) {
-      mr.dntstav = new ArrayList<>((Collection)doc.getFieldValues(DNTSTAV_FIELD));
+      mr.dntstav = new ArrayList<>((Collection<String>)doc.getFieldValues(DNTSTAV_FIELD));
     } else {
       mr.dntstav = new ArrayList<>();
     }
@@ -504,7 +504,7 @@ public class MarcRecordUtilsToRefactor {
 
 
     if (doc.containsKey(KURATORSTAV_FIELD)) {
-      mr.kuratorstav = new ArrayList<>((Collection)doc.getFieldValues(KURATORSTAV_FIELD));
+      mr.kuratorstav = new ArrayList<>((Collection<String>)doc.getFieldValues(KURATORSTAV_FIELD));
       mr.datum_krator_stavu = (Date) doc.getFieldValue(DATUM_KURATOR_STAV_FIELD);
       mr.historie_kurator_stavu =    new JSONArray((String) doc.getFieldValue(HISTORIE_KURATORSTAVU_FIELD));
     } else {
@@ -521,11 +521,11 @@ public class MarcRecordUtilsToRefactor {
 
     // license
     Object fieldValue = doc.getFieldValue(LICENSE_FIELD);
-    mr.license = (fieldValue instanceof  List  && !((List)fieldValue).isEmpty()) ? ((List) fieldValue).get(0).toString() : (String) fieldValue;
+    mr.license = (fieldValue instanceof  List  && !((List<?>)fieldValue).isEmpty()) ? ((List<?>) fieldValue).get(0).toString() : (String) fieldValue;
     mr.licenseHistory = (List<String>) doc.getFieldValues(LICENSE_HISTORY_FIELD);
 
     if (doc.containsKey(GRANULARITY_FIELD)) {
-      Collection fieldValues = doc.getFieldValues(GRANULARITY_FIELD);
+      Collection<?> fieldValues = doc.getFieldValues(GRANULARITY_FIELD);
       JSONArray jsonArray = new JSONArray();
       fieldValues.stream().map(o-> {
         return new JSONObject(o.toString());
@@ -534,7 +534,7 @@ public class MarcRecordUtilsToRefactor {
     }
     
     if (doc.containsKey(MASTERLINKS_FIELD)) {
-        Collection fieldValues = doc.getFieldValues(MASTERLINKS_FIELD);
+        Collection<?> fieldValues = doc.getFieldValues(MASTERLINKS_FIELD);
         JSONArray jsonArray = new JSONArray();
         fieldValues.stream().map(o-> {
           return new JSONObject(o.toString());
@@ -552,15 +552,15 @@ public class MarcRecordUtilsToRefactor {
     }
     
     if (doc.containsKey(FOLLOWERS)) {
-        mr.followers = new ArrayList(doc.getFieldValues(FOLLOWERS));
+        mr.followers = new ArrayList<>(doc.getFieldValues(FOLLOWERS));
     }
 
     if (doc.containsKey(EXTERNAL_REFERENCE_URL)) {
-        mr.externalReferenceUrls = new ArrayList(doc.getFieldValues(EXTERNAL_REFERENCE_URL));
+        mr.externalReferenceUrls = new ArrayList<>(doc.getFieldValues(EXTERNAL_REFERENCE_URL));
     }
 
     if (doc.containsKey(EXTERNAL_REFERENCE_NAME)) {
-        mr.externalReferenceNames = new ArrayList(doc.getFieldValues(EXTERNAL_REFERENCE_NAME));
+        mr.externalReferenceNames = new ArrayList<>(doc.getFieldValues(EXTERNAL_REFERENCE_NAME));
     }
   }
 

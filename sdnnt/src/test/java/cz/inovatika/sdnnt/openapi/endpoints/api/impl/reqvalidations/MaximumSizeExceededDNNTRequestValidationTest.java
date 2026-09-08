@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.openapi.endpoints.api.impl.reqvalidations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;

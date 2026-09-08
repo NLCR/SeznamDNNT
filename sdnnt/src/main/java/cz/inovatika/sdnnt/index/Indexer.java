@@ -195,8 +195,8 @@ public class Indexer {
                                                 .collect(Collectors.joining()));
                     }
 
-                    List<SolrInputDocument> hDocs = new ArrayList();
-                    List<SolrInputDocument> cDocs = new ArrayList();
+                    List<SolrInputDocument> hDocs = new ArrayList<>();
+                    List<SolrInputDocument> cDocs = new ArrayList<>();
                     for (SolrDocument catalogDoc : catalogDocs) {
                         SolrInputDocument hDoc = new SolrInputDocument();
 
@@ -401,7 +401,7 @@ public class Indexer {
             e.printStackTrace();
         }
 
-        JSONObject ret = new JSONObject();
+        //JSONObject ret = new JSONObject();
 
         String fqCatalog;
         String fqJoin = "{!join fromIndex=notifications from=identifier to=identifier} user:*";
@@ -474,7 +474,7 @@ public class Indexer {
             UpdateRequest req = new UpdateRequest();
             for (MarcRecord mr : marcRecords) {
                 JSONObject before = mr.toJSON();
-                SolrInputDocument sdoc = mr.toSolrDoc();
+                //SolrInputDocument sdoc = mr.toSolrDoc();
                 CuratorItemState kstav = CuratorItemState.valueOf(newStav);
                 PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
                 if (licence != null) {
@@ -575,7 +575,7 @@ public class Indexer {
         try {
             // sync to solr doc
             mr.toSolrDoc();
-            String oldRaw = mr.toJSON().toString();
+            //String oldRaw = mr.toJSON().toString();
 
 //      // workflow
 //      DocumentWorkflow.valueOf(navrh).change(mr, user,(changedRecord, ident, oldstates, newstates)->{
@@ -869,8 +869,8 @@ public class Indexer {
         long start = new Date().getTime();
         Options opts = Options.getInstance();
         JSONObject ret = new JSONObject();
-        List<SolrInputDocument> hDocs = new ArrayList();
-        List<SolrInputDocument> cDocs = new ArrayList();
+        //List<SolrInputDocument> hDocs = new ArrayList();
+        //List<SolrInputDocument> cDocs = new ArrayList();
         try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host", "http://localhost:8983/solr/"))
                 .build()) {
             int indexed = 0;
@@ -953,7 +953,7 @@ public class Indexer {
      * @param historyDoc
      * @param ret
      * @return doc for catalog
-     */
+     *//*
     private static SolrInputDocument mergeRaw2(String jsDnt, String identifier, String sysno, String sigla,
             String controlfield_008, String dedup, String user, SolrInputDocument historyDoc, JSONObject ret) {
         try {
@@ -1011,10 +1011,10 @@ public class Indexer {
             return null;
         }
     }
-
+*/
     // keepDNTFields = true => zmena vsech poli krome DNT (990, 992)
     // keepDNTFields = false => zmena pouze DNT (990, 992) poli
-    private static void removeOpsForDNTFields(Iterable jsonPatch, boolean keep) {
+    private static void removeOpsForDNTFields(Iterable<JsonNode> jsonPatch, boolean keep) {
         Iterator<JsonNode> patchIterator = jsonPatch.iterator();
         while (patchIterator.hasNext()) {
             JsonNode patchOperation = patchIterator.next();
@@ -1030,11 +1030,11 @@ public class Indexer {
         }
     }
 
-    private static void removeOpsForIdenfiersFields(Iterable jsonPatch) {
+    private static void removeOpsForIdenfiersFields(Iterable<JsonNode> jsonPatch) {
         Iterator<JsonNode> patchIterator = jsonPatch.iterator();
         while (patchIterator.hasNext()) {
             JsonNode patchOperation = patchIterator.next();
-            JsonNode operationType = patchOperation.get("op");
+            //JsonNode operationType = patchOperation.get("op");
             JsonNode pathName = patchOperation.get("path");
             // if (operationType.asText().equals("replace") &&
             // ignoredFields.contains(pathName.asText())) {

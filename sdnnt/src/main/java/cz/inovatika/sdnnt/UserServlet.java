@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.UsersIterationSupport;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.RightsResolver;
@@ -27,7 +26,6 @@ import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeLogged;
 import cz.inovatika.sdnnt.rights.impl.predicates.UserMustBeInRole;
-import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
@@ -35,11 +33,9 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenExcept
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
-import cz.inovatika.sdnnt.services.impl.users.UserValidation;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmptyFieldsValidation;
-import cz.inovatika.sdnnt.services.impl.users.validations.UserValidationResult;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.PureHTTPSolrUtils;
@@ -498,7 +494,8 @@ public class UserServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(admin)).permit()) {
-                    User user = new UserControlerImpl(req, new MailServiceImpl()).resetPwd(readInputJSON(req));
+                    //User user = 
+                    new UserControlerImpl(req, new MailServiceImpl()).resetPwd(readInputJSON(req));
                     return new JSONObject();
                 } else {
                     return errorJson(response, SC_FORBIDDEN, "not allowed");

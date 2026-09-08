@@ -4,14 +4,8 @@ import cz.inovatika.sdnnt.Options;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.swing.text.html.Option;
-import java.time.LocalDateTime;
-import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Represents different type of periods described in issue 66

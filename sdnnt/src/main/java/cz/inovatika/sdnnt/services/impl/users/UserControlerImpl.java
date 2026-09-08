@@ -8,14 +8,12 @@ import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.MailService;
-import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
@@ -29,7 +27,6 @@ import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
@@ -47,10 +44,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
-
-public class UserControlerImpl  extends AbstractUserController implements UserController, ApplicationUserLoginSupport {
+public class UserControlerImpl  extends AbstractUserController implements ApplicationUserLoginSupport {
 
 
 
@@ -402,6 +396,7 @@ public class UserControlerImpl  extends AbstractUserController implements UserCo
                     SolrInputDocument idoc = new SolrInputDocument();
                     idoc.setField("name", inst);
                     recordItem.add(idoc);
+                    @SuppressWarnings("unused")
                     UpdateResponse cResponse = recordItem.process(solr, DataCollections.institutions.name());
                     SolrJUtilities.quietCommit(solr, DataCollections.institutions.name());
                 } catch (IOException | SolrServerException ex) {

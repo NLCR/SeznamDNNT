@@ -5,7 +5,6 @@
  */
 package cz.inovatika.sdnnt.sched;
 
-import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.InitServlet;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.AbstractXMLImport;
@@ -14,14 +13,11 @@ import cz.inovatika.sdnnt.index.XMLImporterDistri;
 import cz.inovatika.sdnnt.index.XMLImporterHeureka;
 import cz.inovatika.sdnnt.index.XMLImporterKosmas;
 
-import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;

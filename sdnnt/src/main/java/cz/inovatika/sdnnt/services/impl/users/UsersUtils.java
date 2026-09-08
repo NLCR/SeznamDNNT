@@ -10,7 +10,6 @@ import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmptyFieldsValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.RegularExpressionValidation;
@@ -25,10 +24,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
-
-import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 
 /**
  * User utilities

@@ -1,7 +1,5 @@
 package cz.inovatika.sdnnt.services;
 
-import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -9,8 +7,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.io.IOException;

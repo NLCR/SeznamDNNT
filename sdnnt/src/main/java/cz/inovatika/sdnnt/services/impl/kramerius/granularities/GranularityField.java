@@ -1,22 +1,13 @@
 package cz.inovatika.sdnnt.services.impl.kramerius.granularities;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.services.impl.kramerius.LinkitemField;
-import cz.inovatika.sdnnt.services.impl.kramerius.granularities.rules.Marc911Rule;
-import cz.inovatika.sdnnt.services.impl.utils.SKCYearsUtils;
-import cz.inovatika.sdnnt.services.impl.utils.SolrYearsUtils;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.utils.StringUtils;

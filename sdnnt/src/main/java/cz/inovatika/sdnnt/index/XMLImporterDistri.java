@@ -143,7 +143,7 @@ public class XMLImporterDistri extends AbstractXMLImport {
     }
 
     private List<String> toIndex(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
-        String ean = (String) item.get("EAN");
+        //String ean = (String) item.get("EAN");
         try {
             this.importDescription.incrementTotal();
             LOGGER.log(Level.INFO, String.format("Total number is %d", this.importDescription.getTotal()));
@@ -278,7 +278,7 @@ public class XMLImporterDistri extends AbstractXMLImport {
 
 
     //float match1Prec
-    public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip, float match1Prec, float match21Prec, float match22Prec) {
+    public ImportResult findInCatalogByTitle(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip, float match1Prec, float match21Prec, float match22Prec) {
         try {
             // EAN - Musi mit ean
             Object ean = item.get("EAN");

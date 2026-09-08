@@ -1,9 +1,6 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,17 +18,13 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.CuratorActionsSet;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
@@ -247,6 +240,7 @@ public class CuratorActionsSetImpl implements CuratorActionsSet {
                         uReq.add(idoc);
                     }
                     if (!uReq.getDocuments().isEmpty()) {
+                        @SuppressWarnings("unused")
                         UpdateResponse response = uReq.process(solrClient, DataCollections.catalog.name());
                         retVal.addAndGet(subList.size());
                     }

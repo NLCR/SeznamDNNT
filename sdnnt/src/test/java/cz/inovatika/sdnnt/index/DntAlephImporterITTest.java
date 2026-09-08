@@ -28,7 +28,6 @@ import org.junit.Test;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.services.impl.NotificationServiceImplITTest;
 
 public class DntAlephImporterITTest {
 

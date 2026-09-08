@@ -331,7 +331,7 @@ public class Zadost implements NotNullAwareObject {
     public static JSONObject approve(SolrClient client, String identifier, String js, String komentar, String username, String approvestate, String transition) {
         try {
             Zadost zadost = Zadost.fromJSON(js);
-            String oldProcess = new JSONObject().put("process", zadost.process).toString();
+            //String oldProcess = new JSONObject().put("process", zadost.process).toString();
 
             ZadostProcess zprocess = new ZadostProcess();
             zprocess.setState(approvestate != null ? approvestate : "approved");
@@ -371,7 +371,7 @@ public class Zadost implements NotNullAwareObject {
         if (zadost.process == null) {
             zadost.process = new HashMap<>();
         }
-        String oldProcess = new JSONObject().put("process", zadost.process).toString();
+        //String oldProcess = new JSONObject().put("process", zadost.process).toString();
         ZadostProcess zprocess = new ZadostProcess();
         zprocess.setState("rejected");
         zprocess.setUser(username);
@@ -393,7 +393,7 @@ public class Zadost implements NotNullAwareObject {
             if (zadost.process == null) {
                 zadost.process = new HashMap<>();
             }
-            String oldProcess = new JSONObject().put("process", zadost.process).toString();
+            //String oldProcess = new JSONObject().put("process", zadost.process).toString();
             ZadostProcess zprocess = new ZadostProcess();
             zprocess.setState("rejected");
             zprocess.setUser(username);

@@ -1,45 +1,29 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.FMT_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.GRANULARITY_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_911_U;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.MARC_956_U;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.SIGLA_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_1;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_2;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileSystemUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -56,13 +40,11 @@ import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.EUIPOImportService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.services.utils.ISO693Converter;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -216,7 +198,7 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                         Object date1 = doc.getFieldValue("date1");
                         Object date2 = doc.getFieldValue("date2");
                         
-                        Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
+                        //Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
                         Object fmt = doc.getFieldValue(MarcRecordFields.FMT_FIELD);
                         Object typeOfDate = doc.getFieldValue(MarcRecordFields.TYPE_OF_DATE);
 
@@ -235,7 +217,7 @@ public class EUIPOImportServiceImpl extends AbstractEUIPOService implements EUIP
                     }
                 }
                 
-                long start = System.currentTimeMillis();
+                //long start = System.currentTimeMillis();
                 docs.removeAll(toRemove);
                 //getLogger().info("Removing all items took "+(System.currentTimeMillis() - start)+" ms ");
                 

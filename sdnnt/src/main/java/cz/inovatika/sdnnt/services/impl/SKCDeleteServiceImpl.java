@@ -1,15 +1,10 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.DNTSTAV_FIELD;
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
-
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -22,11 +17,9 @@ import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
-import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateDNTUtils;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;

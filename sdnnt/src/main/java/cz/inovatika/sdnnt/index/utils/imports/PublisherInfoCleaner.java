@@ -10,12 +10,12 @@ public class PublisherInfoCleaner {
     );
 
     public static String normalizePublisher(String text) {
-        StringBuilder builder = new StringBuilder();
+        //StringBuilder builder = new StringBuilder();
         if (text == null || text.trim().isEmpty()) {
             return "";
         }
-        List<String> found = new ArrayList<>();
-        String lowerText = text.toLowerCase();
+        //List<String> found = new ArrayList<>();
+        //String lowerText = text.toLowerCase();
         String[] words = text.split("\\s+");
         String collected = Arrays.stream(words)
                 .map(ImporterUtils::normalize)

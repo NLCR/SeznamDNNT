@@ -184,7 +184,7 @@ public class SearchServlet extends HttpServlet {
         CATALOG_DOC {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
+                //JSONObject ret = new JSONObject();
                 Options opts = Options.getInstance();
                 try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                     SolrQuery query = new SolrQuery("*")
@@ -206,7 +206,7 @@ public class SearchServlet extends HttpServlet {
         HISTORY {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
+                //JSONObject ret = new JSONObject();
                 Options opts = Options.getInstance();
                 try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                     SolrQuery query = new SolrQuery("*")
@@ -232,7 +232,7 @@ public class SearchServlet extends HttpServlet {
 
                 //facet.range={!tag=r1}datum_stavu&facet.range.gap=+1MONTH&facet.range.start=NOW-1YEAR
                 //&facet.range.end=NOW&facet.pivot={!range=r1}dntstav
-                JSONObject ret = new JSONObject();
+                //JSONObject ret = new JSONObject();
                 Options opts = Options.getInstance();
                 String interval = req.getParameter("interval");
                 try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
@@ -375,7 +375,7 @@ public class SearchServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
 
-                    JSONObject ret = new JSONObject();
+                    //JSONObject ret = new JSONObject();
                     Options opts = Options.getInstance();
 
                     int rows = opts.getClientConf().getInt("rows");
@@ -421,7 +421,7 @@ public class SearchServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-                    JSONObject ret = new JSONObject();
+                    //JSONObject ret = new JSONObject();
                     Options opts = Options.getInstance();
 
                     int rows = opts.getClientConf().getInt("rows");
@@ -468,7 +468,7 @@ public class SearchServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
-                    JSONObject ret = new JSONObject();
+                    //JSONObject ret = new JSONObject();
                     Options opts = Options.getInstance();
                     try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                         SolrQuery query = new SolrQuery("*")
@@ -502,7 +502,7 @@ public class SearchServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeLogged(), new UserMustBeInRole(mainKurator, kurator, admin))
                         .permit()) {
-                    JSONObject ret = new JSONObject();
+                    //JSONObject ret = new JSONObject();
                     Options opts = Options.getInstance();
 
                     int rows = opts.getClientConf().getInt("rows");
@@ -744,7 +744,7 @@ public class SearchServlet extends HttpServlet {
         GOOGLEBOOKS {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
-                JSONObject ret = new JSONObject();
+                //JSONObject ret = new JSONObject();
                 try {
                     String url = "https://books.google.com/books?jscmd=viewapi&callback=display_google&bibkeys=" + req.getParameter("id");
                     String jsonp = org.apache.commons.io.IOUtils.toString(new URL(url), "UTF-8");

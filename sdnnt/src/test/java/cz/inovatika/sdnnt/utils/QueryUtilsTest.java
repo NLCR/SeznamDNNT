@@ -7,9 +7,6 @@ import org.junit.Test;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
-import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 
 public class QueryUtilsTest {
         

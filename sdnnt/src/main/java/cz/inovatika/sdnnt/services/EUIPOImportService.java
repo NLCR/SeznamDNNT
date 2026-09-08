@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.services;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONObject;
 

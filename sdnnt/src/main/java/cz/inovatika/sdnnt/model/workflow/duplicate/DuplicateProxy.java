@@ -17,12 +17,9 @@ import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.Period;
-import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
-import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 
 public class DuplicateProxy extends DocumentProxy {

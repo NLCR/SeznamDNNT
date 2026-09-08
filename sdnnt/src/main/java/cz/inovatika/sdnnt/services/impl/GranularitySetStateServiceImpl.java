@@ -36,7 +36,7 @@ import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public class GranularitySetStateServiceImpl extends AbstractGranularityService implements GranularitySetStateService{
 
-    private static final int MAX_FETCHED_DOCS = 1000;
+    //private static final int MAX_FETCHED_DOCS = 1000;
 
     public static final int CHECK_SIZE = 70;
 
@@ -44,7 +44,7 @@ public class GranularitySetStateServiceImpl extends AbstractGranularityService i
 
     
     private Set<String> changedIdentifiers = new LinkedHashSet<>();
-    private Set<String> duplicatesdentifiers = new LinkedHashSet<>();
+    //private Set<String> duplicatesdentifiers = new LinkedHashSet<>();
     
     public GranularitySetStateServiceImpl(String logger) {
         if (logger != null) {

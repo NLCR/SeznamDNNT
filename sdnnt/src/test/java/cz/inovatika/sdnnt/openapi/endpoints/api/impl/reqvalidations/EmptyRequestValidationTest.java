@@ -10,7 +10,6 @@ import org.junit.Test;
 import cz.inovatika.sdnnt.index.CatalogSearcher;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.DNNTRequestApiServiceImpl.BadRequestEmptyIdentifiersException;
 import cz.inovatika.sdnnt.services.AccountService;
 
 public class EmptyRequestValidationTest {

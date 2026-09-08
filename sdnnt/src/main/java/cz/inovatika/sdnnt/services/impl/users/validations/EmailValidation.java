@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.services.impl.users.validations;
 
-import cz.inovatika.sdnnt.services.impl.users.UserValidation;
 import org.json.JSONObject;
 
 import java.util.regex.Pattern;

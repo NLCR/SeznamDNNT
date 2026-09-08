@@ -1,9 +1,7 @@
 package cz.inovatika.sdnnt.utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -11,7 +9,6 @@ import org.apache.solr.common.SolrDocumentList;
 
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 
 public class TestFind4a {
     

@@ -4,39 +4,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.logging.Level;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.json.JSONObject;
-import org.junit.Assert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.TransitionType;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.workflow.NZNWorkflow;
 import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowState;
-import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxyException;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
-import cz.inovatika.sdnnt.services.impl.CatalogSupport;
-import cz.inovatika.sdnnt.services.impl.HistoryImpl;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class AccountTest {
     

@@ -2,8 +2,6 @@ package cz.inovatika.sdnnt.services.utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -14,15 +12,12 @@ import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import cz.inovatika.sdnnt.index.utils.GranularityUtils;
-import cz.inovatika.sdnnt.index.utils.HistoryObjectUtils;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxy;
 import cz.inovatika.sdnnt.services.impl.granularities.MarcRecordDocChange;
-import cz.inovatika.sdnnt.utils.JSONUtils;
 
 public class ChangeProcessStatesUtility {
 

@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.rights;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;

@@ -34,7 +34,6 @@ import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import cz.inovatika.sdnnt.index.AbstractXMLImport.XMLImportDesc;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;

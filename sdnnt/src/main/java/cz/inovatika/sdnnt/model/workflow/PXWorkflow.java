@@ -2,7 +2,6 @@ package cz.inovatika.sdnnt.model.workflow;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.CuratorItemState;
-import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.Period;
 
 import static cz.inovatika.sdnnt.model.CuratorItemState.*;

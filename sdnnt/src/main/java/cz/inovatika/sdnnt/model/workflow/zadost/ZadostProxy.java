@@ -3,13 +3,10 @@ package cz.inovatika.sdnnt.model.workflow.zadost;
 import cz.inovatika.sdnnt.model.*;
 import cz.inovatika.sdnnt.model.workflow.MarcRecordDependencyStore;
 import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
-import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.WorkflowOwner;
-import cz.inovatika.sdnnt.services.impl.HistoryImpl;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Date;

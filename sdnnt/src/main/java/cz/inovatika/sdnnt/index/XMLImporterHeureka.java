@@ -1,29 +1,19 @@
 
 package cz.inovatika.sdnnt.index;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import cz.inovatika.sdnnt.index.imports.XMLReadSupport;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.apache.solr.client.solrj.SolrClient;
@@ -32,11 +22,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.model.DataCollections;
 
@@ -198,11 +183,11 @@ public class XMLImporterHeureka extends AbstractXMLImport {
         }
     }
 
-    private void addDedup(Map item) {
+    private void addDedup(Map<String, Object> item) {
         item.put("dedup_fields", "");
     }
 
-    private void addFrbr(Map item) {
+    private void addFrbr(Map<String, Object> item) {
         String frbr = "";
         if (item.containsKey(FIELD_MAPPING.get("AUTHOR"))) {
             frbr += item.get(FIELD_MAPPING.get("AUTHOR"));
@@ -213,7 +198,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
         item.put("frbr", MD5.normalize(frbr));
     }
 
-    public ImportResult findInCatalogByTitle(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+    public ImportResult findInCatalogByTitle(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
             String q = "ean:\"" + item.get("EAN")+"\"";
             SolrQuery eanQuery = new SolrQuery(q).setRows(100).setParam("q.op", "AND")
@@ -246,21 +231,13 @@ public class XMLImporterHeureka extends AbstractXMLImport {
                         .setFields("identifier,nazev,score,ean,dntstav,rokvydani,license,kuratorstav,granularity:[json],marc_998a, datum_kurator_stav, marc_245a, marc_245b, author, nakladatel");
 
                 List<String> foundItems = super.findCatalogItem(item, solrClient, query,"noean", itemsToSkip, (doc -> {
-                    String id = doc.optString("identifier");
+                    //String id = doc.optString("identifier");
 
-                    boolean matched = match_1(doc, nazev, "", parts.length > 1 ? parts[1] : "", match1);
+                   
+                    //String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
+                    //String distriNormalizedTitle = normalizeObjects(nazev, "");
 
-                    String catalogNormalizedTitle = normalizeObjects(doc.optJSONArray("marc_245a"), doc.optJSONArray("marc_245b"));
-                    String distriNormalizedTitle = normalizeObjects(nazev, "");
-                    if (matched) {
-                        return matched;
-                    }
-
-                    matched = match_2(doc, nazev, "", nakladatel, match21, match22);
-                    if (matched) {
-                        return matched;
-                    }
-                    return false;
+                    return match_1(doc, nazev, "", parts.length > 1 ? parts[1] : "", match1) || match_2(doc, nazev, "", nakladatel, match21, match22);
                 }));
                 return new ImportResult(foundItems, item, eanItems.get(0).getString("identifier"));
             } else {
@@ -275,7 +252,7 @@ public class XMLImporterHeureka extends AbstractXMLImport {
         }
     }
     
-    public ImportResult  findInCatalogByEan(Map item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
+    public ImportResult  findInCatalogByEan(Map<String, Object> item, SolrClient solrClient, LinkedHashSet<String> itemsToSkip) {
         try {
             String q = "ean:\"" + item.get("EAN")+"\"";
             SolrQuery query = new SolrQuery(q)

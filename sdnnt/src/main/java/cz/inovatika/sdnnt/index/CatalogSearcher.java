@@ -39,9 +39,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.NoOpResponseParser;
 import org.apache.solr.client.solrj.request.QueryRequest;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.NamedList;
 import org.json.JSONArray;
@@ -320,7 +317,7 @@ public class CatalogSearcher {
         return search(resmap, new ArrayList<>(), user);
     }
 
-   
+   /* 
 
     private JSONObject getByStav(Map<String, String> req, User user, List<String> stavy, List<String> notStavy) {
         JSONObject ret = new JSONObject();
@@ -360,7 +357,7 @@ public class CatalogSearcher {
         return ret;
     }
 
-    
+    */
     
     private JSONArray findZadosti(User user, List<String> identifiers, String... additionalFilters) {
         try {
@@ -393,7 +390,7 @@ public class CatalogSearcher {
     }
 
     //  "filterFields": ["dntstav", "item_type", "language", "marc_910a", "marc_856a", "nakladatel", "rokvydani"],
-    private SolrQuery doQuery(HttpServletRequest req, User user, FacetFieldConfigObject facetConfig) {
+ /*   private SolrQuery doQuery(HttpServletRequest req, User user, FacetFieldConfigObject facetConfig) {
         Map<String, List<String>> map = new HashMap<>();
         Enumeration<String> parameterNames = req.getParameterNames();
         while (parameterNames.hasMoreElements()) {
@@ -403,7 +400,7 @@ public class CatalogSearcher {
         }
         return doQuery(map, new ArrayList<>(), user, facetConfig);
     }
-
+*/
     // dat to jinam
     public List<Pair<String, List<String>>> existingCatalogIdentifiersAndStates(List<String> identifiers) {
         try {

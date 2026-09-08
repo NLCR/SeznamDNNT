@@ -2,15 +2,9 @@ package cz.inovatika.sdnnt.services.impl.shib;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
-import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
-import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,7 +15,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class ShibbolethFilter implements Filter {
 

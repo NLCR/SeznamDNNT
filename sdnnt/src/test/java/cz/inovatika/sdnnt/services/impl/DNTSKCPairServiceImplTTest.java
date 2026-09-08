@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.services.impl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,7 +28,6 @@ import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateUtilsTTest;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.utils.SimplePOST;
 
 public class DNTSKCPairServiceImplTTest {

@@ -15,12 +15,10 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.openapi.endpoints.api.StringUtil;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class DuplicateSKCUtils {

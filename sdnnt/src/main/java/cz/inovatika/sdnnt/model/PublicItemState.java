@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.model;
 
-import java.util.List;
 
 /**
  * Stavy z indexu

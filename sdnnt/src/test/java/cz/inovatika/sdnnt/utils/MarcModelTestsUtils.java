@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.utils;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import cz.inovatika.sdnnt.indexer.models.MarcModelTests;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.common.SolrDocument;

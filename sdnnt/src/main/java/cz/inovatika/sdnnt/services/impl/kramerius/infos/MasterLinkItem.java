@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.services.impl.kramerius.infos;
 
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

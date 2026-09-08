@@ -57,7 +57,7 @@ public class DNTSKCPairServiceImpl extends AbstractCheckDeleteService implements
                     MarcRecord fromIndex = MarcRecord.fromIndex(solrClient,  identifier.toString());
                     Pair<Case,List<String>> follower = DuplicateDNTUtils.findDNTFollowers(solrClient, fromIndex);
                     if (!retvals.containsKey(follower.getKey())) {
-                        retvals.put(follower.getKey(), new  ArrayList());
+                        retvals.put(follower.getKey(), new ArrayList<>());
                     }
                     retvals.get(follower.getKey()).add(Pair.of(fromIndex.identifier, follower.getRight()));
                     int number = counter.incrementAndGet();

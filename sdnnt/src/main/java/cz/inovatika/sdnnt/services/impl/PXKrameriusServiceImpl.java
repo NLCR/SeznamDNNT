@@ -45,18 +45,15 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.services.PXKrameriusService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.impl.hackcerts.HttpsTrustManager;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.KrameriusFields;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import cz.inovatika.sdnnt.utils.QuartzUtils;
 import cz.inovatika.sdnnt.utils.RequestsUtils;
 import cz.inovatika.sdnnt.utils.SimpleGET;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
@@ -488,10 +485,9 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
         if (!identifiers.isEmpty()) {
 
             CuratorItemState cState = null;
-            PublicItemState pState = null;
             if (this.destinationState != null && StringUtils.isAnyString(this.destinationState)) {
                 cState = CuratorItemState.valueOf(this.destinationState);
-                pState = cState.getPublicItemState(null);
+                cState.getPublicItemState(null);
             }
             try (final SolrClient solr = buildClient()) {
                 // diff documents - use to have field
@@ -534,6 +530,7 @@ public class PXKrameriusServiceImpl extends AbstractPXService implements PXKrame
                     uReq.add(idoc);
                 }
                 if (!uReq.getDocuments().isEmpty()) {
+                    @SuppressWarnings("unused")
                     UpdateResponse response = uReq.process(solr, DataCollections.catalog.name());
                 }
                 SolrJUtilities.quietCommit(solr, DataCollections.catalog.name());

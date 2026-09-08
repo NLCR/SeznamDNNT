@@ -1,19 +1,13 @@
 package cz.inovatika.sdnnt.utils;
 
 import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.DntAlephImporter;
-import cz.inovatika.sdnnt.index.Indexer;
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static cz.inovatika.sdnnt.utils.ServletsSupport.errorJson;
 
 // vytvorit utilitu
 public class DNTSetTest {

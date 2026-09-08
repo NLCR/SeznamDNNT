@@ -13,13 +13,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -40,7 +37,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 import cz.inovatika.sdnnt.Options;
@@ -51,7 +47,6 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.workflow.ZadostTypNavrh;
 import cz.inovatika.sdnnt.services.PNCheckStatesService;
-import cz.inovatika.sdnnt.utils.RequestsUtils;
 import org.json.JSONObject;
 
 public class PNCheckStatesServiceImpl extends AbstractRequestService implements PNCheckStatesService{
@@ -352,7 +347,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                 boolean foundEan = false;
                 boolean foundAvailability = false;
 
-                int availability = -1;
+                //int availability = -1;
 
                 while (reader.hasNext()) {
                     int event = reader.next();
@@ -366,7 +361,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
                                 insideArticle = true;
                                 foundEan = false;
                                 foundAvailability = false; 
-                                availability = -1;
+                                //availability = -1;
                             }
 
                             if (insideArticle) {
@@ -379,7 +374,7 @@ public class PNCheckStatesServiceImpl extends AbstractRequestService implements 
 
                                 if ("AVAILABILITY".equals(elementName)) {
                                     foundAvailability = true;
-                                    availability = Integer.parseInt(reader.getElementText());
+                                    //availability = Integer.parseInt(reader.getElementText());
                                 }
 
                             }

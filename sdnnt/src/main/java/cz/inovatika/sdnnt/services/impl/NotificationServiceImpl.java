@@ -11,8 +11,6 @@ import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.PublicItemState;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
-import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.NotificationsService;
 import cz.inovatika.sdnnt.services.UserController;
@@ -29,7 +27,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CursorMarkParams;
@@ -597,7 +594,8 @@ public class NotificationServiceImpl implements NotificationsService {
     
     
     public static void main(String[] args) {
-        NotificationServiceImpl service = new NotificationServiceImpl(null, null);
+        //NotificationServiceImpl service = 
+        new NotificationServiceImpl(null, null);
     }
     
 }

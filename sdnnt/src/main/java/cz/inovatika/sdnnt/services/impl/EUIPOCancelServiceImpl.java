@@ -197,7 +197,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                     for (int j = 0; j < byids.size(); j++) {
                         SolrDocument doc = byids.get(j);
                         
-                        Object date1int = doc.getFieldValue("date1_int");
+                        //Object date1int = doc.getFieldValue("date1_int");
                         Object ident = doc.getFieldValue("identifier");
                         Object euipo = doc.getFieldValue(MarcRecordFields.ID_EUIPO);
                         
@@ -211,7 +211,7 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                         Object date1 = doc.getFieldValue("date1");
                         Object date2 = doc.getFieldValue("date2");
                         
-                        Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
+                        //Object leader = doc.getFieldValue(MarcRecordFields.LEADER_FIELD);
                         Object fmt = doc.getFieldValue(MarcRecordFields.FMT_FIELD);
                         Object typeOfDate = doc.getFieldValue(MarcRecordFields.TYPE_OF_DATE);
 
@@ -225,11 +225,11 @@ public class EUIPOCancelServiceImpl extends AbstractEUIPOService implements EUIP
                             Map<String,List<String>> oneRecordValues = prepareDataRecordForExcel(raw, date1, date2, fmt, typeOfDate, controlField008);
                             
                             List<String> euipoids = new ArrayList<>();
-                            ((Collection)euipo).forEach(id-> { euipoids.add(id.toString()); });
+                            ((Collection<?>)euipo).forEach(id-> { euipoids.add(id.toString()); });
 
 
                             List<String> exports = new ArrayList<>();
-                            ((Collection)export).forEach(id-> { exports.add(id.toString()); });
+                            ((Collection<?>)export).forEach(id-> { exports.add(id.toString()); });
 
                             oneRecordValues.put("euipo", euipoids);
                             oneRecordValues.put("euipo_export", exports);

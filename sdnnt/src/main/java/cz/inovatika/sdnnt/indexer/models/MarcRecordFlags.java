@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.indexer.models;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 
-import java.util.Date;
 
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.FLAG_PUBLIC_IN_DL;
 

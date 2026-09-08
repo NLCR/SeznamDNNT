@@ -5,16 +5,12 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -22,20 +18,16 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.services.ChangeStateFromCurratorAction;
-import cz.inovatika.sdnnt.services.impl.CuratorActionsSetImpl.Action;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
-import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class ChangeStateFromCurratorActionImpl implements ChangeStateFromCurratorAction{
 
@@ -154,7 +146,7 @@ public class ChangeStateFromCurratorActionImpl implements ChangeStateFromCurrato
                         SolrInputDocument uDoc = ChangeProcessStatesUtility.changeProcessState(this.curState, this.license, mr,"scheduler", this.action);
                         
                         // change.. remove action
-                        List fieldValues = (List) uDoc.getFieldValues(MarcRecordFields.CURATOR_ACTIONS);
+                        List<?> fieldValues = (List<?>) uDoc.getFieldValues(MarcRecordFields.CURATOR_ACTIONS);
                         if (fieldValues.contains(this.action)) {
                             fieldValues.remove(this.action);
                         }
@@ -172,6 +164,7 @@ public class ChangeStateFromCurratorActionImpl implements ChangeStateFromCurrato
 
                     long reqProcessStart = System.currentTimeMillis();
                     if (!stateReq.getDocuments().isEmpty()) {
+                        @SuppressWarnings("unused")
                         UpdateResponse response = stateReq.process(solrClient, DataCollections.catalog.name());
                         retVal.addAndGet(subList.size());
                     }

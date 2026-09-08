@@ -29,16 +29,11 @@ import org.apache.solr.client.solrj.request.UpdateRequest;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import static cz.inovatika.sdnnt.utils.MarcRecordFields.KURATORSTAV_FIELD;
 
 public class UpdateStatesForImportsImpl implements UpdateStatesForImports {
 
@@ -56,6 +51,20 @@ public class UpdateStatesForImportsImpl implements UpdateStatesForImports {
     }
 
 
+    private static List<String> asStringList(Object value) {
+        if (!(value instanceof List<?>)) {
+            return null;
+        }
+        List<String> result = new ArrayList<>();
+        for (Object item : (List<?>) value) {
+            if (item != null && !(item instanceof String)) {
+                return null;
+            }
+            result.add((String) item);
+        }
+        return result;
+    }
+
     @Override
     public void updateImports() {
         long start = System.currentTimeMillis();
@@ -70,8 +79,8 @@ public class UpdateStatesForImportsImpl implements UpdateStatesForImports {
                 Object docsId = rsp.getFieldValue("id");
 
                 //Object ids = rsp.getFieldValue("identifiers");
-                List<String> importStates = (List<String>) rsp.getFieldValue("dntstav");
-                List<String> naVyrazeni = (List<String>) rsp.getFieldValue("na_vyrazeni");
+                List<String> importStates = asStringList(rsp.getFieldValue("dntstav"));
+                List<String> naVyrazeni = asStringList(rsp.getFieldValue("na_vyrazeni"));
                 List<String> realStates = new ArrayList<>();
                 List<String> identifiers = new ArrayList<>();
 
@@ -102,7 +111,7 @@ public class UpdateStatesForImportsImpl implements UpdateStatesForImports {
                         long numFound = catalogResp.getResults().getNumFound();
                         for (int i = 0; i < numFound; i++) {
                             SolrDocument doc = catalogResp.getResults().get(i);
-                            List<String> rStav = (List<String>) doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD);
+                            List<String> rStav = asStringList(doc.getFieldValue(MarcRecordFields.DNTSTAV_FIELD));
                             if (rStav != null && !rStav.isEmpty()) {
                                 realStates.addAll(rStav);
                             }

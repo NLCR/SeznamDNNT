@@ -5,7 +5,6 @@
  */
 package cz.inovatika.sdnnt.sched;
 
-import cz.inovatika.sdnnt.IndexerServlet;
 import cz.inovatika.sdnnt.Options;
 import java.io.IOException;
 import java.io.PrintWriter;

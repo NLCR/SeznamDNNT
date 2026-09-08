@@ -7,7 +7,6 @@ import org.junit.Test;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 
 public class NZNWorkflowTest {
 

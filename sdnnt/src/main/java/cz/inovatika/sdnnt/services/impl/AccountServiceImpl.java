@@ -262,6 +262,7 @@ public class AccountServiceImpl implements AccountService {
                 updateRequest.setParam("_version_", "" + zadost.getVersion());
             }
 
+            @SuppressWarnings("unused")
             UpdateResponse uResponse = updateRequest.process(solr, "zadost");
             if (inform != null) {
                 // inform saved
@@ -424,6 +425,7 @@ public class AccountServiceImpl implements AccountService {
             if (zadost.getVersion() != null) {
                 updateRequest.setParam("_version_", "" + zadost.getVersion());
             }
+            @SuppressWarnings("unused")
             UpdateResponse uResponse = updateRequest.process(solr, "zadost");
             SolrJUtilities.quietCommit(solr, "zadost");
         }
@@ -873,7 +875,7 @@ public class AccountServiceImpl implements AccountService {
             
             Zadost zadost = Zadost.fromJSON(request.toString());
             
-            String desiredItemState = zadost.getDesiredItemState();
+            //String desiredItemState = zadost.getDesiredItemState();
             List<SolrDocument> docsFromResult = new ArrayList<>();
             try (SolrClient solr = buildClient()) {
 
@@ -1170,8 +1172,6 @@ public class AccountServiceImpl implements AccountService {
         try (SolrClient solr = buildClient()) {
             SolrQuery query = new SolrQuery("*")
                     .setRows(3000);
-            String q = "*";
-            
             addFilter(query, user, navrhy, requestState);
 
             QueryRequest qreq = new QueryRequest(query);

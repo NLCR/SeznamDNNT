@@ -38,8 +38,8 @@ public class HistoryImpl implements History {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
-            String oldChanged = changeObject(new JSONObject(oldRaw)).toString();
-            String newChanged = changeObject( new JSONObject(newRaw)).toString();
+            //String oldChanged = changeObject(new JSONObject(oldRaw)).toString();
+            //String newChanged = changeObject( new JSONObject(newRaw)).toString();
 
             JsonNode source = mapper.readTree(changeObject( new JSONObject(oldRaw)).toString());
             JsonNode target = mapper.readTree(changeObject( new JSONObject(newRaw)).toString());

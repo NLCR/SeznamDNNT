@@ -1,17 +1,12 @@
 package cz.inovatika.sdnnt.model.workflow.duplicate;
 
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.alephImport;
-import static cz.inovatika.sdnnt.index.DntAlephTestUtils.dntAlephStream;
 import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
-import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -21,27 +16,19 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.DntAlephImporterITTest;
-import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.utils.SimplePOST;
-import cz.inovatika.sdnnt.utils.XMLUtils;
 
 public class DuplicateUtilsTTest {
 

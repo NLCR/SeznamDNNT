@@ -1,9 +1,5 @@
 package cz.inovatika.sdnnt;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,8 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -58,7 +52,7 @@ public class DiffServlet extends HttpServlet {
         LATEST {
             @Override
             public void doPerform(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-                String fileName = req.getParameter("file");
+                //String fileName = req.getParameter("file");
                 String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/diff";
 
                 File dir = new File(DEFAULT_OUTPUT_FOLDER);
@@ -110,7 +104,7 @@ public class DiffServlet extends HttpServlet {
             @Override
             public void doPerform(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
-                String fileName = req.getParameter("file");
+                //String fileName = req.getParameter("file");
                 String DEFAULT_OUTPUT_FOLDER = System.getProperty("user.home") + File.separator + ".sdnnt/diff";
                 File dir = new File(DEFAULT_OUTPUT_FOLDER);
 

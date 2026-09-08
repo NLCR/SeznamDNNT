@@ -20,8 +20,8 @@ public class OAIXMLRecordsReader {
     public static final Logger LOGGER = Logger.getLogger(OAIXMLRecordsReader.class.getName());
     
     private InputStream input;
-    private List<MarcRecord> records = new ArrayList();
-    private List<String> toDelete = new ArrayList();
+    private List<MarcRecord> records = new ArrayList<>();
+    private List<String> toDelete = new ArrayList<>();
     
     public OAIXMLRecordsReader(InputStream input) {
         super();
@@ -194,7 +194,7 @@ public class OAIXMLRecordsReader {
     private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr, int index) throws XMLStreamException {
         String tag = reader.getAttributeValue(null, "tag");
         if (!mr.dataFields.containsKey(tag)) {
-            mr.dataFields.put(tag, new ArrayList());
+            mr.dataFields.put(tag, new ArrayList<>());
         }
         List<DataField> dfs = mr.dataFields.get(tag);
         int subFieldIndex = 0;
@@ -211,7 +211,7 @@ public class OAIXMLRecordsReader {
 
                         String code = reader.getAttributeValue(null, "code");
                         if (!df.subFields.containsKey(code)) {
-                            df.getSubFields().put(code, new ArrayList());
+                            df.getSubFields().put(code, new ArrayList<>());
                         }
                         List<SubField> sfs = df.getSubFields().get(code);
                         String val = reader.getElementText();

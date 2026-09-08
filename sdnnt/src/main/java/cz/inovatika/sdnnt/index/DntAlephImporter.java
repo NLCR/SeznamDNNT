@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -30,14 +29,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import cz.inovatika.sdnnt.utils.LinksUtilities;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrClient;
@@ -66,8 +61,8 @@ public class DntAlephImporter {
 
     JSONObject ret = new JSONObject();
     String collection = "catalog";
-    List<MarcRecord> recs = new ArrayList();
-    List<String> toDelete = new ArrayList();
+    List<MarcRecord> recs = new ArrayList<>();
+    List<String> toDelete = new ArrayList<>();
     int indexed = 0;
     int deleted = 0;
     int batchSize = 100;
@@ -94,7 +89,7 @@ public class DntAlephImporter {
     static SolrInputDocument toSolrDoc(MarcRecord rec) {
         SolrInputDocument sdoc = new SolrInputDocument();
         if (sdoc.isEmpty()) {
-            MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, rec.tagsToIndex);
+            MarcRecordUtilsToRefactor.fillSolrDoc(sdoc, rec.dataFields, MarcRecord.tagsToIndex);
         }
         sdoc.setField(IDENTIFIER_FIELD, rec.identifier);
         MarcRecordUtils.derivedIdentifiers(rec.identifier, sdoc);
@@ -690,7 +685,7 @@ public class DntAlephImporter {
     private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr, int index) throws XMLStreamException {
         String tag = reader.getAttributeValue(null, "tag");
         if (!mr.dataFields.containsKey(tag)) {
-            mr.dataFields.put(tag, new ArrayList());
+            mr.dataFields.put(tag, new ArrayList<DataField>());
         }
         List<DataField> dfs = mr.dataFields.get(tag);
         int subFieldIndex = 0;
@@ -707,7 +702,7 @@ public class DntAlephImporter {
 
                         String code = reader.getAttributeValue(null, "code");
                         if (!df.subFields.containsKey(code)) {
-                            df.getSubFields().put(code, new ArrayList());
+                            df.getSubFields().put(code, new ArrayList<SubField>());
                         }
                         List<SubField> sfs = df.getSubFields().get(code);
                         String val = reader.getElementText();

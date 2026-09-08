@@ -2,7 +2,6 @@ package cz.inovatika.sdnnt.utils;
 
 import cz.inovatika.sdnnt.Options;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.logging.Log;
 import org.json.JSONObject;
 
 import java.io.IOException;

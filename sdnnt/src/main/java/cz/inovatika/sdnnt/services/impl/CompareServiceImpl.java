@@ -2,44 +2,28 @@ package cz.inovatika.sdnnt.services.impl;
 
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
-import cz.inovatika.sdnnt.index.utils.imports.ImporterUtils;
 import cz.inovatika.sdnnt.services.CompareService;
 import cz.inovatika.sdnnt.services.compare.DifferencesResult;
 import cz.inovatika.sdnnt.services.compare.RecordFingerprint;
-import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.json.JSONArray;
-import org.slf4j.LoggerFactory;
 
-import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.IDENTIFIER_FIELD;
 
 public class CompareServiceImpl implements CompareService {
 
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CompareServiceImpl.class);
     private Logger logger = Logger.getLogger(CompareServiceImpl.class.getName());
 
     public static final int LIMIT = 1000;
 
-    private List<Pair<String,String>> differences = null;
     private Set<String> ignoredGranularity;
     private Set<String> ignoredMasterlinks;
 
@@ -118,7 +102,6 @@ public class CompareServiceImpl implements CompareService {
                     missing.put(identifier.toString(), recordFingerprint);
                 } else {
                     if (!recordFingerprint.equals(comparingFingerPrint)) {
-                        boolean eq = recordFingerprint.equals(comparingFingerPrint);
                         differences.put(identifier.toString(), Pair.of(comparingFingerPrint, recordFingerprint));
                     }
                 }

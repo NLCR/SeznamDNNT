@@ -36,9 +36,6 @@ import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.index.DntAlephImporter;
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.index.OAIHarvester;
-import cz.inovatika.sdnnt.index.XMLImporterDistri;
-import cz.inovatika.sdnnt.index.XMLImporterHeureka;
-import cz.inovatika.sdnnt.index.XMLImporterKosmas;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.RightsResolver;
 import cz.inovatika.sdnnt.rights.impl.predicates.MustBeCalledFromLocalhost;
@@ -438,7 +435,7 @@ public class IndexerServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
                     try {
-                        JSONObject json = new JSONObject();
+                        //JSONObject json = new JSONObject();
                         Indexer indexer = new Indexer();
                         return indexer.compare(req.getParameter("id"));
                     } catch (Exception ex) {
@@ -535,7 +532,7 @@ public class IndexerServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
-                    JSONObject json = new JSONObject();
+                    //JSONObject json = new JSONObject();
                     try {
                         Indexer indexer = new Indexer();
                         return indexer.mergeCore("sdnnt", "testUser", req.getParameter("from"));

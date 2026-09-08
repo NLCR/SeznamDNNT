@@ -6,23 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
@@ -31,8 +26,6 @@ import cz.inovatika.sdnnt.index.exceptions.MaximumIterationExceedException;
 import cz.inovatika.sdnnt.index.utils.HarvestUtils;
 import cz.inovatika.sdnnt.index.utils.OAIXMLHeadersReader;
 import cz.inovatika.sdnnt.index.utils.OAIXMLRecordsReader;
-import cz.inovatika.sdnnt.indexer.models.MarcRecord;
-import cz.inovatika.sdnnt.utils.SolrJUtilities;
 
 public class OAICheckSKC {
     
@@ -59,8 +52,8 @@ public class OAICheckSKC {
         Set<String> records = new HashSet<>();
         List<String> deleted = new ArrayList<>();
         
-        int recCounter = 0;
-        int delCounter = 0;
+        //int recCounter = 0;
+        //int delCounter = 0;
         int indexCount = 0;
         try(CloseableHttpClient client = buildOAIClient()) {
             String resumptionToken = firstCheck(client);

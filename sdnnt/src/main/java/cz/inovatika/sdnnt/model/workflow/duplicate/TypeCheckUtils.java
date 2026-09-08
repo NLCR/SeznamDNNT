@@ -1,12 +1,7 @@
 package cz.inovatika.sdnnt.model.workflow.duplicate;
 
-import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.solr.common.SolrDocument;
 
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class TypeCheckUtils {
     

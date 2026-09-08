@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.model.User;

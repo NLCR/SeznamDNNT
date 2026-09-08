@@ -7,10 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
 import cz.inovatika.sdnnt.services.kraminstances.CheckKrameriusConfiguration;
 import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration;
 

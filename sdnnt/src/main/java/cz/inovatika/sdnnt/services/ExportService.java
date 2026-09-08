@@ -1,14 +1,12 @@
 package cz.inovatika.sdnnt.services;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
-import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exports.ExportType;
 
 public interface ExportService {

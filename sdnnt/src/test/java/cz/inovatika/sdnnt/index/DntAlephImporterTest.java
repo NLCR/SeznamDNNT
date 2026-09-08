@@ -4,9 +4,7 @@ import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.DataField;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrInputDocument;
-import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
 

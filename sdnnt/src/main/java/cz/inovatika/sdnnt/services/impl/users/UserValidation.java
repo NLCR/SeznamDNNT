@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.services.impl.users;
 import cz.inovatika.sdnnt.services.impl.users.validations.UserValidationResult;
 import org.json.JSONObject;
 
-import java.util.List;
 
 public abstract class UserValidation {
 

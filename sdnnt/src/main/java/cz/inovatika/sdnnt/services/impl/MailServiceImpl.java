@@ -63,7 +63,7 @@ public class MailServiceImpl implements MailService  {
         if (recepient != null) {
             String path = InitServlet.CONFIG_DIR + File.separator + Options.getInstance().getString("textsDir")+File.separator+"mail_notification";
 
-            Map scope = new HashMap();
+            Map<String, Object> scope = new HashMap<>();
             scope.put("user", recepient.getRight());
             scope.put("notifications", data);
 

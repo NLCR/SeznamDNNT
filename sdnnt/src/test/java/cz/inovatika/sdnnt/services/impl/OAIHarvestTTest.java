@@ -1,39 +1,28 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import cz.inovatika.sdnnt.Options;
-import cz.inovatika.sdnnt.index.Indexer;
-import cz.inovatika.sdnnt.index.OAIHarvesterTTest;
-import cz.inovatika.sdnnt.it.SolrTestServer;
-import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.model.License;
-import cz.inovatika.sdnnt.model.PublicItemState;
-import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
-import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.UserController;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import org.apache.commons.io.IOUtils;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.util.ContentStreamBase;
-import org.easymock.EasyMock;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.*;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
+import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.logging.Logger;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.logging.Logger;
 
-import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.alephImport;
-import static cz.inovatika.sdnnt.index.SKCAlephTestUtils.skcAlephStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.request.ContentStreamUpdateRequest;
+import org.apache.solr.common.util.ContentStreamBase;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import cz.inovatika.sdnnt.index.OAIHarvesterTTest;
+import cz.inovatika.sdnnt.it.SolrTestServer;
 
 public class OAIHarvestTTest {
 

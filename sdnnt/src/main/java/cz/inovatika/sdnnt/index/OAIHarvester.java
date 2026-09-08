@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import cz.inovatika.sdnnt.utils.StringUtils;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -58,8 +57,8 @@ public class OAIHarvester {
     boolean merge;
     boolean update;
     boolean allFields;
-    List<SolrInputDocument> recs = new ArrayList();
-    List<String> toDelete = new ArrayList();
+    List<SolrInputDocument> recs = new ArrayList<>();
+    List<String> toDelete = new ArrayList<>();
     int indexed = 0;
     int deleted = 0;
     int batchSize = 100;
@@ -71,12 +70,9 @@ public class OAIHarvester {
     private boolean debug = false;
 
     private String configuredFrom = null;
-    private JSONObject skcDeleteConfig;
-
     public OAIHarvester(String configuredFrom, JSONObject config) {
         super();
         this.configuredFrom = configuredFrom;
-        this.skcDeleteConfig = config;
     }
   
   public OAIHarvester() {
@@ -234,22 +230,19 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
               }
           });
           
-          InputStream dStream = new FileInputStream(dFile);
-          reqTime += new Date().getTime() - start;
-          start = new Date().getTime();
-          resumptionToken = readFromXML(dStream);
-          procTime += new Date().getTime() - start;
-          start = new Date().getTime();
-          if (!recs.isEmpty()) {
-            Indexer.add(collection, recs, merge, update, "harvester",skcUpdateSupportServiceImpl);
-            indexed += recs.size();
-            recs.clear();
-          }
+          try (InputStream dStream = new FileInputStream(dFile)) {
+            reqTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            resumptionToken = readFromXML(dStream);
+            procTime += new Date().getTime() - start;
+            start = new Date().getTime();
+            if (!recs.isEmpty()) {
+              Indexer.add(collection, recs, merge, update, "harvester",skcUpdateSupportServiceImpl);
+              indexed += recs.size();
+              recs.clear();
+            }
 
-         
-          solrTime += new Date().getTime() - start;
-          if (dStream != null ) {
-            IOUtils.closeQuietly(dStream);
+            solrTime += new Date().getTime() - start;
           }
           deletePaths(dFile);
 
@@ -265,28 +258,24 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
           try {
             start = new Date().getTime();
             File dFile = HarvestUtils.throttle(client, type, url);
-            InputStream dStream = new FileInputStream(dFile);
-            reqTime += new Date().getTime() - start;
-            start = new Date().getTime();
-            resumptionToken = readFromXML(dStream);
-            procTime += new Date().getTime() - start;
-            start = new Date().getTime();
-            if (recs.size() > batchSize) {
-              Indexer.add(collection, recs, merge, update, "harvester", skcUpdateSupportServiceImpl);
-              indexed += recs.size();
-              solrTime += new Date().getTime() - start;
-              LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
-                      indexed,
-                      DurationFormatUtils.formatDurationHMS(reqTime),
-                      DurationFormatUtils.formatDurationHMS(procTime),
-                      DurationFormatUtils.formatDurationHMS(solrTime)});
-              recs.clear();
+            try (InputStream dStream = new FileInputStream(dFile)) {
+              reqTime += new Date().getTime() - start;
+              start = new Date().getTime();
+              resumptionToken = readFromXML(dStream);
+              procTime += new Date().getTime() - start;
+              start = new Date().getTime();
+              if (recs.size() > batchSize) {
+                Indexer.add(collection, recs, merge, update, "harvester", skcUpdateSupportServiceImpl);
+                indexed += recs.size();
+                solrTime += new Date().getTime() - start;
+                LOGGER.log(Level.INFO, "Current indexed: {0}. reqTime: {1}. procTime: {2}. solrTime: {3}", new Object[]{
+                        indexed,
+                        DurationFormatUtils.formatDurationHMS(reqTime),
+                        DurationFormatUtils.formatDurationHMS(procTime),
+                        DurationFormatUtils.formatDurationHMS(solrTime)});
+                recs.clear();
+              }
             }
-
-            if (dStream != null ) {
-              IOUtils.closeQuietly(dStream);
-            }
-
             deletePaths(dFile);
           } catch (MaximumIterationExceedException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);
@@ -526,7 +515,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
   private MarcRecord readDatafields(XMLStreamReader reader, MarcRecord mr, int index) throws XMLStreamException {
     String tag = reader.getAttributeValue(null, "tag");
     if (!mr.dataFields.containsKey(tag)) {
-      mr.dataFields.put(tag, new ArrayList());
+      mr.dataFields.put(tag, new ArrayList<DataField>());
     }
     List<DataField> dfs = mr.dataFields.get(tag);
     int subFieldIndex = 0;
@@ -542,7 +531,7 @@ public JSONObject full(String set, String core, boolean merge, boolean update, b
 
             String code = reader.getAttributeValue(null, "code");
             if (!df.subFields.containsKey(code)) {
-              df.getSubFields().put(code, new ArrayList());
+              df.getSubFields().put(code, new ArrayList<SubField>());
             }
             List<SubField> sfs = df.getSubFields().get(code);
             String val = reader.getElementText();

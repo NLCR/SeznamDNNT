@@ -5,11 +5,9 @@ import org.json.JSONArray;
 
 import cz.inovatika.sdnnt.Options;
 
-import java.text.BreakIterator;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -31,14 +29,15 @@ public class QueryUtils {
             return "\""+ inputQuery +"\"";
         } else {
             List<String> words = new ArrayList<>();
-            Scanner scanner = new Scanner(inputQuery);
-            while(scanner.hasNext()) {
-                String word = scanner.next();
-                if (word != null && !word.trim().equals("")) {
-                    if (word !=null && word.startsWith("\"")&&  word.endsWith("\"")) {
-                        words.add(word);
-                    } else {
-                        words.add(ClientUtils.escapeQueryChars(word));
+            try (Scanner scanner = new Scanner(inputQuery)) {
+                while(scanner.hasNext()) {
+                    String word = scanner.next();
+                    if (word != null && !word.trim().equals("")) {
+                        if (word !=null && word.startsWith("\"")&&  word.endsWith("\"")) {
+                            words.add(word);
+                        } else {
+                            words.add(ClientUtils.escapeQueryChars(word));
+                        }
                     }
                 }
             }

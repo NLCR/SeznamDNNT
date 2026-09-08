@@ -9,7 +9,6 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_1;
 import static cz.inovatika.sdnnt.utils.MarcRecordFields.YEAR_OF_PUBLICATION_2;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -19,7 +18,6 @@ import org.junit.Assert;
 
 import cz.inovatika.sdnnt.index.Indexer;
 import cz.inovatika.sdnnt.model.DataCollections;
-import cz.inovatika.sdnnt.utils.MarcRecordFields;
 
 public class PXYearServiceImplTest {
     

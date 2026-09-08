@@ -8,8 +8,6 @@ import cz.inovatika.sdnnt.indexer.models.NotificationInterval;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.Zadost;
-import cz.inovatika.sdnnt.model.workflow.SwitchStateOptions;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -315,7 +313,7 @@ public class AccountServlet extends HttpServlet {
                 if (new RightsResolver(req, new MustBeLogged()).permit()) {
 
 
-                    User user = new UserControlerImpl(req).getUser();
+                    //User user = new UserControlerImpl(req).getUser();
                     String q = req.getParameter("q");
                     String state = req.getParameter("state");
                     String navrh = req.getParameter("navrh");
@@ -412,14 +410,14 @@ public class AccountServlet extends HttpServlet {
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
 
                 if (new RightsResolver(req, new MustBeLogged()).permit()) {
-                    Options opts = Options.getInstance();
-                    int rows = opts.getClientConf().getInt("rows");
+                    //Options opts = Options.getInstance();
+                    //int rows = opts.getClientConf().getInt("rows");
                     if (req.getParameter("rows") != null) {
-                        rows = Integer.parseInt(req.getParameter("rows"));
+                        //rows = Integer.parseInt(req.getParameter("rows"));
                     }
-                    int start = 0;
+                    //int start = 0;
                     if (req.getParameter("page") != null) {
-                        start = Integer.parseInt(req.getParameter("page")) * rows;
+                        //start = Integer.parseInt(req.getParameter("page")) * rows;
                     }
                     try {
                         UserControlerImpl uc = new UserControlerImpl(req);
@@ -656,7 +654,7 @@ public class AccountServlet extends HttpServlet {
                     JSONObject zadostJSON = inputJs.getJSONObject("zadost");
                     Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
                     List<String> identifiers = Actions.identifiers(inputJs);
-                    JSONObject retObject = null;
+                    //JSONObject retObject = null;
                     zadostJSON = service.curatorRejectStateBatch(zadostJSON, identifiers, inputJs.getString("reason"), (а)->{});
                     service.commit(DataCollections.catalog.name(),DataCollections.zadost.name(),DataCollections.history.name());
                     return VersionStringCast.cast(service.getRequest(zadost.getId()));
@@ -677,7 +675,7 @@ public class AccountServlet extends HttpServlet {
                     JSONObject zadostJSON = inputJs.getJSONObject("zadost");
                     Zadost zadost = Zadost.fromJSON(zadostJSON.toString());
                     List<String> identifiers = Actions.identifiers(inputJs);
-                    JSONObject retObject = null;
+                    //JSONObject retObject = null;
                     for (String identifier : identifiers) {
                         zadostJSON = service.curatorRejectSwitchState(zadostJSON, identifier, inputJs.getString("reason"));
                     }
@@ -859,7 +857,7 @@ public class AccountServlet extends HttpServlet {
                 if (new RightsResolver(req, new MustBeLogged()).permit()) {
                     try {
                         User user = new UserControlerImpl(req).getUser();
-                        return Indexer.followRecord(req.getParameter("identifier"), user.getUsername(), NotificationInterval.mesic.valueOf(user.getNotifikaceInterval()), "true".equals(req.getParameter("follow")));
+                        return Indexer.followRecord(req.getParameter("identifier"), user.getUsername(), NotificationInterval.valueOf(user.getNotifikaceInterval()), "true".equals(req.getParameter("follow")));
                     } catch (Exception e) {
                         return errorJson(response, SC_INTERNAL_SERVER_ERROR, e.getMessage());
                     }

@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.model.workflow.zadost;
 
-import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.model.workflow.*;
 

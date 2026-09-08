@@ -1,7 +1,5 @@
 package cz.inovatika.sdnnt.services.impl;
 
-import java.util.Iterator;
-
 public class SpreadSheetIndexMapper {
         
     // spreadsheet cells
@@ -108,12 +106,12 @@ public class SpreadSheetIndexMapper {
         }
     }
     
-    
+    /* 
     private static void generateMapping() {
         for (int i = 0; i < 3*26; i++) {
             String address = toColumnAddress(i);
             String statement = String.format("public static final int %s = %d;", address, i);
             System.out.println(statement);
         }
-    }
+    }*/
 }

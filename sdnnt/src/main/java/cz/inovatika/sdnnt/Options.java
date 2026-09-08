@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -70,9 +69,9 @@ public class Options {
       String json = FileUtils.readFileToString(f, "UTF-8");
       JSONObject customClientConf = new JSONObject(json).getJSONObject("client");
       if (customClientConf != null) {
-        Iterator keys = customClientConf.keys();
+        Iterator<String> keys = customClientConf.keys();
         while (keys.hasNext()) {
-          String key = (String) keys.next();
+          String key = keys.next();
           LOGGER.log(Level.FINE, "key {0} will be overrided", key);
           client_conf.put(key, customClientConf.get(key));
         }
@@ -82,9 +81,9 @@ public class Options {
 
       JSONObject customServerConf = new JSONObject(json).getJSONObject("server");
       if (customServerConf != null) {
-        Iterator keys2 = customServerConf.keys();
+        Iterator<String> keys2 = customServerConf.keys();
         while (keys2.hasNext()) {
-          String key = (String) keys2.next();
+          String key = keys2.next();
           LOGGER.log(Level.FINE, "key {0} will be overrided", key);
           server_conf.put(key, customServerConf.get(key));
         }
@@ -183,9 +182,9 @@ public class Options {
   
   
   
-  private void process(String keys, Consumer consumer) {
+  private void process(String keys, Consumer<Object> consumer) {
       String[] split = keys.split("\\.");
-      List<String> stack = new ArrayList(Arrays.asList(split));
+      List<String> stack = new ArrayList<>(Arrays.asList(split));
       JSONObject topOpject = null;
       while(!stack.isEmpty()) {
           String pop = stack.remove(0);

@@ -1,8 +1,6 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;

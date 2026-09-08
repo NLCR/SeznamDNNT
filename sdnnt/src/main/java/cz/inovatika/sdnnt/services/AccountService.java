@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.services;
 
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.model.Zadost;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import org.apache.solr.client.solrj.SolrServerException;

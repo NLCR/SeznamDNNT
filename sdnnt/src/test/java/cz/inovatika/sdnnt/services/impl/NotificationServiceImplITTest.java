@@ -9,7 +9,6 @@ import cz.inovatika.sdnnt.indexer.models.notifications.SimpleNotification;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.License;
 import cz.inovatika.sdnnt.model.User;
-import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
@@ -26,10 +25,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.json.JSONArray;
 import org.junit.*;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.alephImport;
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.dntAlephStream;

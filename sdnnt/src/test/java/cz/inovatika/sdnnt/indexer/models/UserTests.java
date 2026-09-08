@@ -3,7 +3,6 @@ package cz.inovatika.sdnnt.indexer.models;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Role;
-import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONObject;

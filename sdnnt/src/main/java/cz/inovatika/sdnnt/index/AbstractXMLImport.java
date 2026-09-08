@@ -244,7 +244,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
 
     
     protected void indexImportSummary(SolrClient solrClient) throws SolrServerException, IOException {
-        XMLImportDesc importDesc = getImportDesc();
+        //XMLImportDesc importDesc = getImportDesc();
         solrClient.add(DataCollections.imports.name(), getImportDesc().toSolrInputDocument());
         solrClient.commit(DataCollections.imports.name());
     }
@@ -321,7 +321,7 @@ public abstract class AbstractXMLImport implements LoggerAware {
         try (final SolrClient solrClient = buildClient()) {
             JSONObject ret = new JSONObject();
             LinkedHashSet<String> skipped = new LinkedHashSet<>();
-            long start = new Date().getTime();
+            //long start = new Date().getTime();
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
             getImportDesc().setImportDate(now.format(DateTimeFormatter.ISO_INSTANT));
             getImportDesc().setImportUrl(getUrl());

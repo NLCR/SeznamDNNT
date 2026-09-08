@@ -18,7 +18,6 @@ import cz.inovatika.sdnnt.model.workflow.Workflow;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentProxyException;
 import cz.inovatika.sdnnt.model.workflow.document.DocumentWorkflowFactory;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail;
-import cz.inovatika.sdnnt.openapi.endpoints.model.DetailMarc;
 import cz.inovatika.sdnnt.openapi.endpoints.model.Detail.StateEnum;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.utils.StringUtils;

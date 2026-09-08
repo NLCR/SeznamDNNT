@@ -10,7 +10,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.easymock.EasyMock;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 

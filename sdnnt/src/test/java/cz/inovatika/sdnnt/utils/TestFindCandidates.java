@@ -5,20 +5,13 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
-import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.Indexer;
-import cz.inovatika.sdnnt.index.utils.torefactor.MarcRecordUtilsToRefactor;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;

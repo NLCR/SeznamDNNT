@@ -12,7 +12,6 @@ import cz.inovatika.sdnnt.indexer.models.oai.OAIMetadataFormat;
 
 import static cz.inovatika.sdnnt.oai.OAIServlet.LOGGER;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -37,7 +36,6 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.params.CursorMarkParams;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**

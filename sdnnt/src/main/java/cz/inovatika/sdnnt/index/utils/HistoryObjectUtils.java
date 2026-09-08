@@ -1,6 +1,5 @@
 package cz.inovatika.sdnnt.index.utils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

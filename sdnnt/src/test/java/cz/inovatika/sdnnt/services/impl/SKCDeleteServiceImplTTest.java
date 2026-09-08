@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,7 +27,6 @@ import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateUtilsTTest;
 import cz.inovatika.sdnnt.services.ApplicationUserLoginSupport;
 import cz.inovatika.sdnnt.services.ResourceServiceService;
-import cz.inovatika.sdnnt.services.impl.DNTSKCPairServiceImplTTest.BuildSolrClientSupport;
 import cz.inovatika.sdnnt.utils.SimplePOST;
 
 public class SKCDeleteServiceImplTTest {

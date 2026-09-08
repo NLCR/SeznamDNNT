@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.solr.security.AuditEvent.Level;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
