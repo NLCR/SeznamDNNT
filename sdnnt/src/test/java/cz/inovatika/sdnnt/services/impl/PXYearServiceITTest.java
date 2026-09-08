@@ -1,5 +1,24 @@
 package cz.inovatika.sdnnt.services.impl;
 
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.apache.commons.mail.EmailException;
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
+import org.easymock.EasyMock;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.DataCollections;
@@ -12,22 +31,6 @@ import cz.inovatika.sdnnt.services.exceptions.ConflictException;
 import cz.inovatika.sdnnt.services.exceptions.NotificationsException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.mail.EmailException;
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
-import org.easymock.EasyMock;
-import org.json.JSONObject;
-import org.junit.*;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Logger;
 
 public class PXYearServiceITTest {
 
@@ -76,8 +79,7 @@ public class PXYearServiceITTest {
         ).anyTimes();
         EasyMock.expect(pxService.getOptions()).andReturn(options).anyTimes();
 
-        InputStream resStream = this.getClass().getResourceAsStream("pxservice_kramerius.json");
-        String s = IOUtils.toString(resStream, "UTF-8");
+        //String s = IOUtils.toString(this.getClass().getResourceAsStream("pxservice_kramerius.json"), "UTF-8");
 
         EasyMock.replay(pxService, options);
 
