@@ -148,6 +148,10 @@
    <field name="id_issn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ismn" type="string" indexed="true" stored="false" multiValued="true"  />
    <field name="id_ean" type="string" indexed="true" stored="false" multiValued="true"  />
+   <!-- Required by the current catalog search facets; matches solr/catalog/conf/managed-schema. -->
+   <field name="id_euipo_export" type="string" indexed="true" stored="false" multiValued="true" />
+   <field name="export" type="string" indexed="true" stored="false" multiValued="true" docValues="true" />
+   <field name="c_actions" type="string" indexed="true" stored="false" multiValued="true" docValues="true" />
    <!-- identifikator derivovany z oai -->
    <field name="id_oaiident" type="string" indexed="true" stored="false" multiValued="true"  />
    <!-- iterni sdnnt identifikator -->
