@@ -1,21 +1,36 @@
-version: "2"
 services:
   sdnnt-tomcat:
     image: sdnnt:latest-test
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: sdnnt
     ports:
-        - '127.0.0.1:8080:8080'
+      - "127.0.0.1:8080:8080"
     volumes:
-        - ./data/config:/opt/app-root/src/.sdnnt
-        - ./data/logs:/usr/local/tomcat/logs
-        - ./data/scripts:/opt/app-root/src/bin
+      - ./data/config:/opt/app-root/src/.sdnnt
+      - ../installation/texts/mail_notification:/opt/app-root/src/.sdnnt/texts/mail_notification:ro
+      - ../installation/texts/mail_registration:/opt/app-root/src/.sdnnt/texts/mail_registration:ro
+      - ../installation/texts/mail_reset_link:/opt/app-root/src/.sdnnt/texts/mail_reset_link:ro
+      - ../installation/texts/page_pwdtoken_fail_cs:/opt/app-root/src/.sdnnt/texts/page_pwdtoken_fail_cs:ro
+      - ../installation/texts/page_pwdtoken_fail_en:/opt/app-root/src/.sdnnt/texts/page_pwdtoken_fail_en:ro
+      - ./data/logs:/usr/local/tomcat/logs
+      - ./data/scripts:/opt/app-root/src/bin
+    depends_on:
+      sdnnt-solr:
+        condition: service_healthy
 
   sdnnt-solr:
     container_name: solr
-    image: bitnami/solr:8.11.1
+    # Bitnami moved the original versioned image to its legacy repository.
+    image: bitnamilegacy/solr:8.11.1
     volumes:
-        - ./data/solr-persistence:/bitnami
+      - ./data/solr-persistence:/bitnami
     ports:
-        - '127.0.0.1:8983:8983'
-
-
+      - "127.0.0.1:8983:8983"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8983/solr/admin/cores?action=STATUS"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
