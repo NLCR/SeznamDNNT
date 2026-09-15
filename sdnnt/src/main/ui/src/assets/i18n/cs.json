@@ -1,6 +1,8 @@
 {
   "q" : {
-    "placeholder": "Procházet dokumenty ..."
+    "placeholder": "Procházet dokumenty ...",
+    "clear_tooltip": "Vymazat dotaz",
+    "search_tooltip": "Hledat"
   },
   "app_title": "Seznam děl nedostupných na trhu",
   "consent": {

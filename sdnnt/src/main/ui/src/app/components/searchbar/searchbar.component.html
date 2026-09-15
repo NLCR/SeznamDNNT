@@ -1,10 +1,10 @@
 <div class="app-searchbar-wrapper">
   <input type="text" [placeholder]="'q.placeholder' | translate" name="q" id="q" (keyup.enter)="search()" [(ngModel)]="state.q" />
-  <span class="app-clear" *ngIf="state.q" matTooltip="Vymazat dotaz">
+  <span class="app-clear" *ngIf="state.q" [matTooltip]="'q.clear_tooltip' | translate">
     <mat-icon class="app-cursor-pointer" (click)="clearQuery()">clear</mat-icon>
   </span>
   <span class="app-search">
-    <a (click)="search()" matTooltip="Hledat">
+    <a (click)="search()" [matTooltip]="'q.search_tooltip' | translate">
       <mat-icon>search</mat-icon>
     </a>
   </span>
