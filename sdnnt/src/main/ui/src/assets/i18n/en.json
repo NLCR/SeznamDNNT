@@ -1,6 +1,8 @@
 {
   "q" : {
-    "placeholder": "Browse documents ..."
+    "placeholder": "Browse documents ...",
+    "clear_tooltip": "Clear query",
+    "search_tooltip": "Search"
   },
   "app_title": "List of works not available on the market",
   "consent": {
@@ -981,7 +983,7 @@
     "vyrizeni_exportu": "Processing of export",
     "select_or_add_an_institution": "Select or add an institution",
     "search": "Search",
-    "in_the_list": "Im the list",
+    "in_the_list": "In the list",
     "off_the_list": "Off the list",
     "all": "All",
     "show_all": "Show all",
