@@ -635,7 +635,7 @@ public class Indexer {
         try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(dest).build()) {
             String cursorMark = CursorMarkParams.CURSOR_MARK_START;
             SolrQuery q = new SolrQuery("*").setRows(1000).setSort("identifier", SolrQuery.ORDER.desc)
-                    .addFilterQuery(filter).setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu");
+                    .addFilterQuery(filter).setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
             List<SolrInputDocument> idocs = new ArrayList<>();
             boolean done = false;
             while (!done) {
@@ -649,12 +649,12 @@ public class Indexer {
                     MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
                     SolrInputDocument idoc = mr.toSolrDoc();
                     if (!cleanStav) {
-                        idoc.addField("dntstav", doc.getFieldValue("dntstav"));
-                        idoc.addField("datum_stavu", doc.getFieldValue("datum_stavu"));
-                        idoc.addField("historie_stavu", doc.getFieldValue("historie_stavu"));
-                        idoc.addField("license", doc.getFieldValue("license"));
-                        idoc.addField("license_history", doc.getFieldValue("license_history"));
-                        idoc.addField("granularity", doc.getFieldValue("granularity"));
+                        preserveField(doc, idoc, "dntstav");
+                        preserveField(doc, idoc, "datum_stavu");
+                        preserveField(doc, idoc, "historie_stavu");
+                        preserveField(doc, idoc, "license");
+                        preserveField(doc, idoc, "license_history");
+                        preserveField(doc, idoc, "granularity");
                     } else {
                         idoc.removeField("dntstav");
                         idoc.removeField("datum_stavu");
@@ -688,6 +688,13 @@ public class Indexer {
             ret.put("error", ex);
         }
         return ret;
+    }
+
+    private static void preserveField(SolrDocument source, SolrInputDocument destination, String fieldName) {
+        Object value = source.getFieldValue(fieldName);
+        if (value != null) {
+            destination.setField(fieldName, value);
+        }
     }
 
     public static JSONObject reindexId(String id) {
