@@ -22,10 +22,12 @@ services:
 
   sdnnt-solr:
     container_name: solr
-    # Bitnami moved the original versioned image to its legacy repository.
-    image: bitnamilegacy/solr:8.11.1
+    image: solr:9.9.0
+    environment:
+      SOLR_JAVA_MEM: "-Xms2g -Xmx16g"
+    command: ["solr-foreground", "-Dsolr.modules=analysis-extras"]
     volumes:
-      - ./data/solr-persistence:/bitnami
+      - ../solr:/var/solr/data
     ports:
       - "127.0.0.1:8983:8983"
     healthcheck:
