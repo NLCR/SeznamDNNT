@@ -63,7 +63,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
             MARC_015_A,
             MARC_020_A,
             MARC_902_A,
-            MARC_908_A,
             LICENSE_FIELD,
             FMT_FIELD,
             DIGITAL_LIBRARIES,
@@ -823,4 +822,3 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
     }
 }
-

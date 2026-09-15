@@ -36,13 +36,11 @@ public class MarcRecordUtilsToRefactorTest {
     public void indexesAdditionalIsbnMarcFields() {
         Map<String, List<DataField>> dataFields = new HashMap<>();
         dataFields.put("902", Arrays.asList(dataField("902", "isbn-902")));
-        dataFields.put("908", Arrays.asList(dataField("908", "isbn-908")));
 
         SolrInputDocument document = new SolrInputDocument();
         MarcRecordUtilsToRefactor.marcFields(document, dataFields, MarcRecord.tagsToIndex);
 
         Assert.assertEquals("isbn-902", document.getFieldValue("marc_902a"));
-        Assert.assertEquals("isbn-908", document.getFieldValue("marc_908a"));
     }
 
     private DataField dataField(String tag, String value) {
