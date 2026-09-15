@@ -361,10 +361,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
         }
 
         // identifiers
-        if (doc.has(MARC_015_A) || doc.has(MARC_020_A) || doc.has(MARC_022_A) || doc.has(MARC_902_A)) {
+        if (doc.has(MARC_015_A) || doc.has(MARC_020_A) || doc.has(MARC_022_A) || doc.has(MARC_902_A) || doc.has(MARC_908_A)) {
             JSONArray ccnb = doc.optJSONArray(MARC_015_A);
             JSONArray isbn = doc.optJSONArray(MARC_020_A);
             JSONArray isbn2 = doc.optJSONArray(MARC_902_A);
+            JSONArray isbn3 = doc.optJSONArray(MARC_908_A);
             JSONArray issn = doc.optJSONArray(MARC_022_A);
             CatalogItemBaseOtherIdentifiers otherIdentifiers = new CatalogItemBaseOtherIdentifiers();
             if (ccnb != null && ccnb.length() > 0) {
@@ -383,6 +384,11 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                     otherIdentifiers.addIsbnItem(oneIsbn.toString());
                 });
 
+            }
+            if (isbn3 != null && isbn3.length() > 0) {
+                isbn3.forEach(oneIsbn -> {
+                    otherIdentifiers.addIsbnItem(oneIsbn.toString());
+                });
             }
             if (issn != null && issn.length() > 0)  {
                 issn.forEach(oneIssn -> {

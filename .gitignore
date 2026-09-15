@@ -8,13 +8,6 @@ sdnnt/src/main/.DS_Store
 /solr/**/data
 /openapi/target/
 
-# Disposable local Docker test deployment
-/docker/compose.local.yml
-/docker/local-config/
-/docker/seed-solr.sh
-/docker/README.local.md
-/docker/.gitattributes
-
 docker/data/solr-persistence/solr/server/solr/
 docker/data/logs/
 debug.log

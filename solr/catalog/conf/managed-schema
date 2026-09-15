@@ -285,8 +285,14 @@
 
 	<!-- isbn -->
 	<copyField source="marc_020a" dest="id_isbn" />
+	<copyField source="marc_902a" dest="id_isbn" />
+	<copyField source="marc_908a" dest="id_isbn" />
 	<copyField source="marc_020a" dest="id_all_identifiers" />
+	<copyField source="marc_902a" dest="id_all_identifiers" />
+	<copyField source="marc_908a" dest="id_all_identifiers" />
 	<copyField source="marc_020a" dest="id_all_identifiers_cuts" />
+	<copyField source="marc_902a" dest="id_all_identifiers_cuts" />
+	<copyField source="marc_908a" dest="id_all_identifiers_cuts" />
 		
 	<!-- license information from granularity field -->	
 	<copyField source="granularity" dest="granularity_license_cut" />

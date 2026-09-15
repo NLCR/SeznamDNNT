@@ -92,6 +92,7 @@ public class MarcRecordFields {
     //isbn
     public static final String MARC_020_A = "marc_020a";
     public static final String MARC_902_A = "marc_902a";
+    public static final String MARC_908_A = "marc_908a";
 
     public static final String MARC_035_A = "marc_035a";
     
