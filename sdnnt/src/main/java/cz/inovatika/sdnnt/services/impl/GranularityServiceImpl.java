@@ -597,10 +597,10 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 }
 
                 List<Pair<String, String>> pairs = buffer.get(baseUrl);
-                Map<String, List<String>> pidsMapping = new HashMap<>();
+                Map<String, Set<String>> pidsMapping = new HashMap<>();
                 pairs.stream().forEach(p -> {
                     if (!pidsMapping.containsKey(p.getRight())) {
-                        pidsMapping.put(p.getRight(), new ArrayList<>());
+                        pidsMapping.put(p.getRight(), new LinkedHashSet<>());
                     }
                     pidsMapping.get(p.getRight()).add(p.getLeft());
                 });
@@ -639,7 +639,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 String rootPid = doc.optString(KrameriusFields.ROOT_PID_V5);
                                 String pid = doc.optString(KrameriusFields.PID_V5);
 
-                                List<String> identifiers = pidsMapping.get(rootPid);
+                                Set<String> identifiers = pidsMapping.get(rootPid);
                                 if (identifiers == null) {
                                     identifiers = pidsMapping.get(pid);
                                 }
@@ -725,7 +725,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 String rootPid = doc.optString(KrameriusFields.ROOT_PID_V7);
                                 String pid = doc.optString(KrameriusFields.PID_V7);
 
-                                List<String> identifiers = pidsMapping.get(rootPid);
+                                Set<String> identifiers = pidsMapping.get(rootPid);
                                 if (identifiers == null) {
                                     identifiers = pidsMapping.get(pid);
                                 }
@@ -825,10 +825,10 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
                 List<Pair<String, String>> pairs = buffer.get(baseUrl);
 
-                Map<String, List<String>> pidsMapping = new HashMap<>();
+                Map<String, Set<String>> pidsMapping = new HashMap<>();
                 pairs.stream().forEach(p -> {
                     if (!pidsMapping.containsKey(p.getRight())) {
-                        pidsMapping.put(p.getRight(), new ArrayList<>());
+                        pidsMapping.put(p.getRight(), new LinkedHashSet<>());
                     }
                     pidsMapping.get(p.getRight()).add(p.getLeft());
                 });
@@ -866,7 +866,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                                 JSONObject doc = docs.getJSONObject(i);
                                 String rootPid = doc.optString(KrameriusFields.ROOT_PID_V5);
 
-                                List<String> identifiers = pidsMapping.get(rootPid);
+                                Set<String> identifiers = pidsMapping.get(rootPid);
 
                                 GranularityField gf = new GranularityField();
                                 gf.setModel(doc.optString(KrameriusFields.FEDORA_MODEL_V5));
@@ -983,7 +983,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                             JSONObject doc = docs.getJSONObject(i);
                             String rootPid = doc.optString(KrameriusFields.ROOT_PID_V7);
 
-                            List<String> identifiers = pidsMapping.get(rootPid);
+                            Set<String> identifiers = pidsMapping.get(rootPid);
 
                             GranularityField gf = new GranularityField();
                             gf.setModel(doc.optString(KrameriusFields.MODEL_V7));
