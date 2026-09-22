@@ -1,5 +1,6 @@
 /harvester/target/
 /indexer/target/
+/target
 
 /sdnnt/target/
 /sdnnt/nb-configuration.xml
@@ -12,3 +13,4 @@ docker/data/solr-persistence/solr/server/solr/
 docker/data/logs/
 debug.log
 docker/data/config/texts/
+
