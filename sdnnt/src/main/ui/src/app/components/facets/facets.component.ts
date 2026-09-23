@@ -138,6 +138,29 @@ export class FacetsComponent implements OnInit {
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
 
+  digitalLibraryState(name: string): string {
+    const library = this.config.getKrameriusLibrary(name);
+    if (library) {
+      return library.skip ? 'skipped' : 'connected';
+    }
+    if (this.config.isEnabledKrameriusLibrary(name)) {
+      return 'connected';
+    }
+    return 'unknown';
+  }
+
+  digitalLibraryTooltip(name: string): string {
+    const library = this.config.getKrameriusLibrary(name);
+    const label = library?.description || library?.sigla || library?.acronym || name;
+    if (!library && this.config.isEnabledKrameriusLibrary(name)) {
+      return `${label} - zapojena digitalni knihovna`;
+    }
+    if (!library) {
+      return `${label} - stav zapojení není v konfiguraci`;
+    }
+    return library.skip ? `${label} - nezapojená digitální knihovna` : `${label} - zapojená digitální knihovna`;
+  }
+
   chosenYearHandler(normalizedYear: Date, datepicker: any, field: string) {
     console.log(normalizedYear)
     if (field === 'from') {

@@ -2,6 +2,13 @@ import { User } from "./user";
 
 export interface Sort { field: string; dir: string};
 
+export interface KrameriusLibrary {
+  description?: string;
+  acronym?: string;
+  sigla?: string;
+  skip?: boolean;
+}
+
 export interface Configuration {
 
   context: string;
@@ -48,6 +55,9 @@ export interface Configuration {
   // ping interval
   pinginterval: number;
 
+  // Public Kramerius instance info keyed by sigla or acronym fallback.
+  kramerius_libraries?: {[key: string]: KrameriusLibrary};
+  enabled_kramerius_libraries?: string[];
 
 
 }

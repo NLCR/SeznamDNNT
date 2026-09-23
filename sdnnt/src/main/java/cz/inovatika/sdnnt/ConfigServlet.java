@@ -4,6 +4,7 @@ package cz.inovatika.sdnnt;
 import cz.inovatika.sdnnt.model.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -21,6 +22,7 @@ import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 
 import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -50,7 +52,11 @@ public class ConfigServlet extends HttpServlet {
         Options.resetInstance();
       }
       PrintWriter out = response.getWriter();
-      JSONObject js = new JSONObject(Options.getInstance().getClientConf().toString());
+      Options options = Options.getInstance();
+      JSONObject js = new JSONObject(options.getClientConf().toString());
+      JSONObject krameriusConfig = publicKrameriusConfig(options.getJSONObject("check_kramerius"));
+      js.put("kramerius_libraries", krameriusConfig.getJSONObject("libraries"));
+      js.put("enabled_kramerius_libraries", krameriusConfig.getJSONArray("enabled"));
       
       ApplicationUserLoginSupport appLoginController = new DefaultApplicationUserLoginSupport(request);
       //UserControler userController = new UserControlerImpl(request);
@@ -72,6 +78,94 @@ public class ConfigServlet extends HttpServlet {
     } catch (IOException | JSONException ex) {
       LOGGER.log(Level.SEVERE, null, ex);
     } 
+  }
+
+  private JSONObject publicKrameriusConfig(JSONObject checkKramerius) {
+    JSONObject result = new JSONObject();
+    JSONObject libraries = new JSONObject();
+    JSONArray enabled = new JSONArray();
+
+    if (checkKramerius == null) {
+      result.put("libraries", libraries);
+      result.put("enabled", enabled);
+      return result;
+    }
+
+    JSONObject urls = checkKramerius.optJSONObject("urls");
+    JSONObject instances = urls != null ? urls : checkKramerius;
+    Iterator<String> keys = instances.keys();
+    while (keys.hasNext()) {
+      JSONObject item = instances.optJSONObject(keys.next());
+      if (item == null) {
+        continue;
+      }
+
+      JSONArray facetKeys = facetKeys(item);
+      for (int i = 0; i < facetKeys.length(); i++) {
+        String facetKey = facetKeys.optString(i, "");
+        if (!isAnyString(facetKey)) {
+          continue;
+        }
+
+        boolean skip = item.optBoolean("skip", false);
+        JSONObject existing = libraries.optJSONObject(facetKey);
+        if (existing != null && (!existing.optBoolean("skip", false) || skip)) {
+          continue;
+        }
+
+        JSONObject library = new JSONObject();
+        library.put("description", item.optString("description", ""));
+        library.put("acronym", item.optString("acronym", ""));
+        library.put("sigla", item.optString("sigla", ""));
+        library.put("skip", skip);
+        libraries.put(facetKey, library);
+
+        if (!skip && !contains(enabled, facetKey)) {
+          enabled.put(facetKey);
+        }
+      }
+    }
+
+    result.put("libraries", libraries);
+    result.put("enabled", enabled);
+    return result;
+  }
+
+  private JSONArray facetKeys(JSONObject item) {
+    JSONArray facetKeys = new JSONArray();
+    String sigla = item.optString("sigla", "");
+    if (isAnyString(sigla)) {
+      facetKeys.put(sigla);
+    }
+
+    JSONArray additionalSigla = item.optJSONArray("additional_sigla");
+    if (additionalSigla != null) {
+      for (int i = 0; i < additionalSigla.length(); i++) {
+        String siglaItem = additionalSigla.optString(i, "");
+        if (isAnyString(siglaItem)) {
+          facetKeys.put(siglaItem);
+        }
+      }
+    }
+
+    String acronym = item.optString("acronym", "");
+    if (facetKeys.length() == 0 && isAnyString(acronym)) {
+      facetKeys.put(acronym.toUpperCase());
+    }
+    return facetKeys;
+  }
+
+  private boolean isAnyString(String value) {
+    return value != null && value.trim().length() > 0;
+  }
+
+  private boolean contains(JSONArray array, String value) {
+    for (int i = 0; i < array.length(); i++) {
+      if (value.equals(array.optString(i, ""))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

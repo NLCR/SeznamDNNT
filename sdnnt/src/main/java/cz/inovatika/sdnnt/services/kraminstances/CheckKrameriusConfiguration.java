@@ -27,7 +27,7 @@ public class CheckKrameriusConfiguration {
     public void add(String key, InstanceConfiguration conf) {
         this.matchingNames.add(key);
         this.matchNameConfigurations.put(key, conf);
-        this.apiConfiguration.put(conf.getApiPoint(), conf);
+        this.apiConfiguration.put(normalizeValue(conf.getApiPoint()), conf);
     }
     
     public InstanceConfiguration match(String key) {
@@ -44,7 +44,7 @@ public class CheckKrameriusConfiguration {
     public void remove(String key) {
         InstanceConfiguration configuration = this.matchNameConfigurations.get(key);
         if (configuration != null) {
-            this.apiConfiguration.remove(configuration.getApiPoint());
+            this.apiConfiguration.remove(normalizeValue(configuration.getApiPoint()));
             this.matchNameConfigurations.remove(key);
             this.matchingNames.remove(key);
         }
@@ -84,26 +84,49 @@ public class CheckKrameriusConfiguration {
         return null;
     }
     
+    /**
+     * Resolve the API endpoint used for Kramerius checks from a record link.
+     */
+    public String resolveApiPoint(String surl) {
+        String apiCandidate = apiCandidate(surl);
+        if (apiCandidate == null) {
+            return null;
+        }
+
+        String configuredApiPoint = findValueByPrefix(apiCandidate);
+        if (configuredApiPoint != null) {
+            return normalizeValue(configuredApiPoint);
+        }
+
+        return fallbackApiPoint(apiCandidate);
+    }
+
     // supports method
     // find baseUrl
     public String baseUrl(String surl) {
+        return resolveApiPoint(surl);
+    }
+
+    private String apiCandidate(String surl) {
         if (surl.contains("/search/")) {
-            String val = surl.substring(0, surl.indexOf("/search") + "/search".length());
-            String foundByPrefix = findValueByPrefix(val);
-            return foundByPrefix != null ? normalizeValue(foundByPrefix) : val;
-        } else {
-            List<String> prefixes = Arrays.asList("view", "uuid","periodical");
-            for (String pref : prefixes) {
-                if (surl.contains(pref)) {
-                    String remapping = normalizeValue(surl.substring(0, surl.indexOf(pref)));
-                    
-                    String foundByPrefix = findValueByPrefix(remapping);
-                    return foundByPrefix != null ? normalizeValue(foundByPrefix)
-                            : (remapping + (remapping.endsWith("/") ? "" : "/") + "search");
-                }
-            }
-            return null;
+            return normalizeValue(surl.substring(0, surl.indexOf("/search") + "/search".length()));
         }
+
+        List<String> prefixes = Arrays.asList("view", "uuid","periodical");
+        for (String pref : prefixes) {
+            if (surl.contains(pref)) {
+                return normalizeValue(surl.substring(0, surl.indexOf(pref)));
+            }
+        }
+
+        return null;
+    }
+
+    private String fallbackApiPoint(String apiCandidate) {
+        if (apiCandidate.endsWith("/search")) {
+            return apiCandidate;
+        }
+        return apiCandidate + (apiCandidate.endsWith("/") ? "" : "/") + "search";
     }
 
     private String normalizeValue(String foundByPrefix) {
@@ -114,8 +137,25 @@ public class CheckKrameriusConfiguration {
     }
     
     public String findValueByPrefix( String val) {
-        InstanceConfiguration conf = match(val);
+        InstanceConfiguration conf = matchWithOptionalSlash(val);
         return conf != null ? conf.getApiPoint() : null;
+    }
+
+    public InstanceConfiguration findByApiPoint(String apiPoint) {
+        String normalizedApiPoint = normalizeValue(apiPoint);
+        InstanceConfiguration conf = this.apiConfiguration.get(normalizedApiPoint);
+        if (conf == null && normalizedApiPoint != null && !normalizedApiPoint.endsWith("/")) {
+            conf = this.apiConfiguration.get(normalizedApiPoint + "/");
+        }
+        return conf;
+    }
+
+    private InstanceConfiguration matchWithOptionalSlash(String val) {
+        InstanceConfiguration conf = match(val);
+        if (conf == null && val != null && !val.endsWith("/")) {
+            conf = match(val + "/");
+        }
+        return conf;
     }
 
     public static CheckKrameriusConfiguration initConfiguration(JSONObject checkObject) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { Configuration } from './shared/configuration';
+import { Configuration, KrameriusLibrary } from './shared/configuration';
 import { AppState } from './app.state';
 import { User } from './shared/user';
 
@@ -63,6 +63,30 @@ import { User } from './shared/user';
 
     public get filterFields() {
         return this.config.filterFields;
+    }
+
+    public get krameriusLibraries() {
+        return this.config.kramerius_libraries || {};
+    }
+
+    public get enabledKrameriusLibraries() {
+        return this.config.enabled_kramerius_libraries || [];
+    }
+
+    public getKrameriusLibrary(value: string): KrameriusLibrary {
+        if (!value) {
+            return null;
+        }
+        const libraries = this.krameriusLibraries;
+        return libraries[value] || libraries[value.toUpperCase()] || libraries[value.toLowerCase()] || null;
+    }
+
+    public isEnabledKrameriusLibrary(value: string): boolean {
+        if (!value) {
+            return false;
+        }
+        const values = this.enabledKrameriusLibraries;
+        return values.includes(value) || values.includes(value.toUpperCase()) || values.includes(value.toLowerCase());
     }
 
 

@@ -28,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -372,7 +371,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         logger.info("Found all checking pids : " + allPids.size());
 
         AtomicInteger iteration = new AtomicInteger();
-        Map<String, List<Pair<String, String>>> buffer = new HashMap<>();
+        Map<String, List<Triple<String, String, String>>> buffer = new HashMap<>();
         // SOLR changes
         List<SolrInputDocument> changes = new ArrayList<>();
 
@@ -394,26 +393,36 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
             List<String> links = linksOnwer.getTitleUrls();
             boolean fullSkip = true;
             for (String link : links) {
-                String pid = PIDUtils.pid(link);
-                if (pid != null) {
-                    String baseUrl = checkConf.baseUrl(link);
-                    InstanceConfiguration configuration = checkConf.match(baseUrl);
-                    if (configuration != null && !configuration.isShouldSkip()) {
-                        fullSkip = false;
-                        if (!buffer.containsKey(baseUrl)) {
-                            buffer.put(baseUrl, new ArrayList<>());
-                        }
-                        getLogger().fine("baseurl " + baseUrl + " pair " + Pair.of(key, pid));
-                        buffer.get(baseUrl).add(Pair.of(key, pid));
-
-                        checkBuffer(buffer);
-                    } else {
-                        if (configuration == null) {
-                            getLogger().warning("No configuration for  '" + baseUrl + "'");
-                        }
-                        getLogger().info("Skipping instance '" + configuration + "'");
+                String baseUrl = checkConf.baseUrl(link);
+                InstanceConfiguration configuration = checkConf.findByApiPoint(baseUrl);
+                if (configuration == null || configuration.isShouldSkip()) {
+                    if (configuration == null) {
+                        getLogger().warning("No configuration for  '" + baseUrl + "'");
                     }
+                    getLogger().info("Skipping instance '" + configuration + "'");
+                    continue;
                 }
+
+                fullSkip = false;
+                if (linksOnwer.getMasterLinks() == null) {
+                    linksOnwer.setMasterLinks(new MasterLinks(linksOnwer.getCatalogId()));
+                }
+
+                String pid = PIDUtils.pid(link);
+                if (pid == null) {
+                    getLogger().warning(String.format("Unable to extract pid from configured Kramerius link %s", link));
+                    continue;
+                }
+
+                if (!buffer.containsKey(baseUrl)) {
+                    buffer.put(baseUrl, new ArrayList<>());
+                }
+                getLogger().fine(String.format("Resolved Kramerius link for %s: %s -> %s (%s)",
+                        key, link, baseUrl, configuration));
+                getLogger().fine("baseurl " + baseUrl + " pair " + Triple.of(key, pid, link));
+                buffer.get(baseUrl).add(Triple.of(key, pid, link));
+
+                checkBuffer(buffer);
             }
 
             if (fullSkip) {
@@ -422,11 +431,14 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     changes.add(romeSolrDocument);
                     linksOnwer.setGranularity(null);
                 }
-                if (masterLinks != null) {
-                    SolrInputDocument romeSolrDocument = masterLinks.toRomeSolrDocument();
-                    changes.add(romeSolrDocument);
-                    linksOnwer.setMasterLinks(null);
+                if (masterLinks == null) {
+                    masterLinks = new MasterLinks(linksOnwer.getCatalogId());
                 }
+                List<SolrInputDocument> sDocs = masterLinks.toSolrDocument();
+                if (sDocs != null) {
+                    sDocs.forEach(changes::add);
+                }
+                linksOnwer.setMasterLinks(null);
             }
         }
 
@@ -511,7 +523,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         logger.info("Refreshing finished. Updated identifiers " + this.changedIdentifiers);
     }
 
-    protected void checkBuffer(Map<String, List<Pair<String, String>>> buffer) {
+    protected void checkBuffer(Map<String, List<Triple<String, String, String>>> buffer) {
         Integer sum = buffer.values().stream().map(List::size).reduce(0, Integer::sum);
         if (sum > CHECK_SIZE) {
             long start = System.currentTimeMillis();
@@ -524,12 +536,12 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         }
     }
 
-    private void detectGranularityItems(Map<String, List<Pair<String, String>>> buffer) {
+    private void detectGranularityItems(Map<String, List<Triple<String, String, String>>> buffer) {
         buffer.keySet().forEach(key -> {
-            List<Pair<String, String>> list = buffer.get(key);
+            List<Triple<String, String, String>> list = buffer.get(key);
             for (int i = 0, ll = list.size(); i < ll; i++) {
-                Pair<String, String> pair = list.get(i);
-                LinksOnwer owner = this.linksOwner.get(pair.getKey());
+                Triple<String, String, String> pair = list.get(i);
+                LinksOnwer owner = this.linksOwner.get(pair.getLeft());
                 if (owner.getFmt().equals("SE")) {
                     Granularity granularity = owner.getGranularity();
                     MasterLinks masterLinks = owner.getMasterLinks();
@@ -582,7 +594,7 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
         });
     }
     // master polozky 
-    protected void clearBufferItem(Map<String, List<Pair<String, String>>> buffer) {
+    protected void clearBufferItem(Map<String, List<Triple<String, String, String>>> buffer) {
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null) {
@@ -590,22 +602,22 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                 }
 
 
-                InstanceConfiguration configuration = this.checkConf.match(baseUrl);
+                InstanceConfiguration configuration = this.checkConf.findByApiPoint(baseUrl);
                 if (configuration == null || configuration.isShouldSkip()) {
                     getLogger().warning("Skipping url " + baseUrl + "'");
                     continue;
                 }
 
-                List<Pair<String, String>> pairs = buffer.get(baseUrl);
+                List<Triple<String, String, String>> pairs = buffer.get(baseUrl);
                 Map<String, Set<String>> pidsMapping = new HashMap<>();
                 pairs.stream().forEach(p -> {
-                    if (!pidsMapping.containsKey(p.getRight())) {
-                        pidsMapping.put(p.getRight(), new LinkedHashSet<>());
+                    if (!pidsMapping.containsKey(p.getMiddle())) {
+                        pidsMapping.put(p.getMiddle(), new LinkedHashSet<>());
                     }
-                    pidsMapping.get(p.getRight()).add(p.getLeft());
+                    pidsMapping.get(p.getMiddle()).add(p.getLeft());
                 });
 
-                String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
+                String condition = pairs.stream().map(Triple::getMiddle).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
                 }).collect(Collectors.joining(" OR "));
 
@@ -623,8 +635,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     String url = baseUrl + "api/v5.0/search?q=" + encodedCondition + "&wt=json&rows=" + MAX_FETCHED_DOCS
                             + "&fl=" + encodedFieldList;
 
+                    logSearchRequest(url, baseUrl, configuration, pairs);
                     logger.fine(String.format("Kramerius url is %s and list of identifiers are %s", url, pairs.stream()
-                            .map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
+                            .map(Triple::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
 
                     try {
                         String result = simpleGET(url);
@@ -709,8 +722,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     String url = baseUrl + "api/client/v7.0/search?q=" + encodedCondition + "&wt=json&rows="
                             + MAX_FETCHED_DOCS + "&fl=" + encodedFieldList;
 
+                    logSearchRequest(url, baseUrl, configuration, pairs);
                     logger.fine(String.format("Kramerius url is %s and list of identifiers are %s", url, pairs.stream()
-                            .map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
+                            .map(Triple::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
 
                     try {
                         String result = simpleGET(url);
@@ -810,30 +824,30 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
 
 
     // polozky granularity
-    protected void clearBufferChildren(Map<String, List<Pair<String, String>>> buffer) {
+    protected void clearBufferChildren(Map<String, List<Triple<String, String, String>>> buffer) {
         try {
             for (String baseUrl : buffer.keySet()) {
                 if (baseUrl == null) {
                     continue;
                 }
 
-                InstanceConfiguration configuration = this.checkConf.match(baseUrl);
+                InstanceConfiguration configuration = this.checkConf.findByApiPoint(baseUrl);
                 if (configuration == null || configuration.isShouldSkip()) {
                     getLogger().warning("Skipping url " + baseUrl + "'");
                     continue;
                 }
 
-                List<Pair<String, String>> pairs = buffer.get(baseUrl);
+                List<Triple<String, String, String>> pairs = buffer.get(baseUrl);
 
                 Map<String, Set<String>> pidsMapping = new HashMap<>();
                 pairs.stream().forEach(p -> {
-                    if (!pidsMapping.containsKey(p.getRight())) {
-                        pidsMapping.put(p.getRight(), new LinkedHashSet<>());
+                    if (!pidsMapping.containsKey(p.getMiddle())) {
+                        pidsMapping.put(p.getMiddle(), new LinkedHashSet<>());
                     }
-                    pidsMapping.get(p.getRight()).add(p.getLeft());
+                    pidsMapping.get(p.getMiddle()).add(p.getLeft());
                 });
 
-                String condition = pairs.stream().map(Pair::getRight).filter(Objects::nonNull).map(p -> {
+                String condition = pairs.stream().map(Triple::getMiddle).filter(Objects::nonNull).map(p -> {
                     return p.replace(":", "\\:");
                 }).collect(Collectors.joining(" OR  "));
 
@@ -853,8 +867,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     String url = baseUrl + "api/v5.0/search?q=" + encodedCondition + "&wt=json&rows=" + MAX_FETCHED_DOCS
                             + "&fl=" + encodedFieldList;
 
+                    logSearchRequest(url, baseUrl, configuration, pairs);
                     logger.fine(String.format("Kramerius url is %s and list of identifiers are %s", url, pairs.stream()
-                            .map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
+                            .map(Triple::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
                     try {
                         String result = simpleGET(url);
                         JSONObject resultJSON = new JSONObject(result);
@@ -969,8 +984,9 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
                     String url = baseUrl + "api/client/v7.0/search?q=" + encodedCondition + "&wt=json&rows="
                             + MAX_FETCHED_DOCS + "&fl=" + encodedFieldList;
 
+                    logSearchRequest(url, baseUrl, configuration, pairs);
                     logger.fine(String.format("Kramerius url is %s and list of identifiers are %s", url, pairs.stream()
-                            .map(Pair::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
+                            .map(Triple::getLeft).filter(Objects::nonNull).collect(Collectors.toList()).toString()));
 
                     String result = simpleGET(url);
                     JSONObject resultJSON = new JSONObject(result);
@@ -1047,8 +1063,40 @@ public class GranularityServiceImpl extends AbstractGranularityService implement
     }
 
 
+    private void logSearchRequest(
+            String url,
+            String apiPoint,
+            InstanceConfiguration configuration,
+            List<Triple<String, String, String>> pairs) {
+        long identifierCount = pairs.stream().map(Triple::getLeft).filter(Objects::nonNull).distinct().count();
+        long pidCount = pairs.stream().map(Triple::getMiddle).filter(Objects::nonNull).distinct().count();
+        String sampleIdentifiers = pairs.stream()
+                .map(Triple::getLeft)
+                .filter(Objects::nonNull)
+                .distinct()
+                .limit(10)
+                .collect(Collectors.joining(","));
+        String sampleSourceLinks = pairs.stream()
+                .map(Triple::getRight)
+                .filter(Objects::nonNull)
+                .distinct()
+                .limit(5)
+                .collect(Collectors.joining(","));
+
+        logger.info(String.format(
+                "Querying Kramerius %s search endpoint %s (sourceLinks=%s -> apiPoint=%s, acronym=%s, identifiers=%d, pids=%d, sampleIdentifiers=%s)",
+                configuration != null ? configuration.getVersion() : "",
+                url,
+                sampleSourceLinks,
+                apiPoint,
+                configuration != null ? configuration.getAcronym() : "",
+                identifierCount,
+                pidCount,
+                sampleIdentifiers));
+    }
+
     private String renderLink(String baseUrl, String pid) {
-        InstanceConfiguration configuration = this.checkConf.match(baseUrl);
+        InstanceConfiguration configuration = this.checkConf.findByApiPoint(baseUrl);
         // InstanceConfiguration configuration = this.checkConf.get(baseUrl);
         if (configuration != null && StringUtils.isAnyString(configuration.getClientAddress())) {
             return MessageFormat.format(configuration.getClientAddress(), pid);
