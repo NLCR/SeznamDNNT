@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -20,7 +19,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
 import cz.inovatika.sdnnt.it.SolrTestServer;
 import cz.inovatika.sdnnt.model.User;
@@ -364,30 +362,30 @@ public class SKCJoinServiceImplITTest {
 
     @Test
     public void testSendRealSKCJoinNotificationEmailFromOptions() throws Exception {
-//        Assume.assumeTrue("Manual SMTP test. Run with -Dsdnnt.test.sendMail=true",
-//                Boolean.getBoolean("sdnnt.test.sendMail"));
+        Assume.assumeTrue("Manual SMTP test. Run with -Dsdnnt.test.sendMail=true",
+                Boolean.getBoolean("sdnnt.test.sendMail"));
 
         UserController users = EasyMock.createMock(UserController.class);
         UserController shibUsers = EasyMock.createMock(UserController.class);
         EasyMock.expect(users.findUsersByRole(Role.kurator))
-                .andReturn(Collections.<User>emptyList())
-                .anyTimes();
+                .andReturn(Collections.singletonList(
+                        user("pavel.stastny", "pavel.stastny@gmail.com", "Pavel", "Stastny", true)))
+                .once();
         EasyMock.expect(shibUsers.findUsersByRole(Role.kurator))
                 .andReturn(Collections.<User>emptyList())
-                .anyTimes();
+                .once();
         EasyMock.expect(users.findUsersByRole(Role.mainKurator))
                 .andReturn(Collections.<User>emptyList())
-                .anyTimes();
+                .once();
         EasyMock.expect(shibUsers.findUsersByRole(Role.mainKurator))
                 .andReturn(Collections.<User>emptyList())
-                .anyTimes();
+                .once();
 
         SKCJoinServiceImpl service = EasyMock.createMockBuilder(SKCJoinServiceImpl.class)
                 .withConstructor("test", new JSONObject())
                 .addMockedMethod("notificationAdminEmailDelivery")
                 .addMockedMethod("buildUserController")
                 .addMockedMethod("buildShibUsersController")
-                .addMockedMethod("skcJoinRecipients")
                 .createMock();
 
         EasyMock.expect(service.notificationAdminEmailDelivery())
@@ -398,9 +396,6 @@ public class SKCJoinServiceImplITTest {
                 .anyTimes();
         EasyMock.expect(service.buildShibUsersController())
                 .andReturn(shibUsers)
-                .anyTimes();
-        EasyMock.expect(service.skcJoinRecipients())
-                .andDelegateTo(new RealMailRecipientSKCJoinService())
                 .anyTimes();
 
         EasyMock.replay(users, shibUsers, service);
@@ -434,43 +429,5 @@ public class SKCJoinServiceImplITTest {
         user.setPrijmeni(lastName);
         user.setAdministratorskeNotifikace(administratorskeNotifikace);
         return user;
-    }
-
-    private static class RealMailRecipientSKCJoinService extends SKCJoinServiceImpl {
-
-        private RealMailRecipientSKCJoinService() {
-            super("test", new JSONObject());
-        }
-
-        @Override
-        protected List<Pair<String, String>> skcJoinRecipients() {
-            String recipient = System.getProperty("sdnnt.test.mail.recipient");
-            String recipientName = System.getProperty("sdnnt.test.mail.recipientName", "SDNNT test");
-            if (recipient != null && !recipient.trim().isEmpty()) {
-                return Collections.singletonList(Pair.of(recipient.trim(), recipientName));
-            }
-            return super.skcJoinRecipients();
-        }
-
-        @Override
-        protected Pair<String, String> mailFrom() throws EmailException {
-            JSONObject mail = Options.getInstance().getJSONObject("mail");
-            if (mail == null) {
-                throw new EmailException("mail configuration is missing");
-            }
-            String fromEmail = mail.getString("from.user");
-            String fromName = mail.has("from.name") ? mail.getString("from.name") : fromEmail;
-            return Pair.of(fromEmail, fromName);
-        }
-
-        @Override
-        protected UserController buildUserController() {
-            return null;
-        }
-
-        @Override
-        protected UserController buildShibUsersController() {
-            return null;
-        }
     }
 }

@@ -309,18 +309,14 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
 
         List<Pair<String, String>> recipients = new ArrayList<>();
         String recipient = getOptions().stringKey("notificationemail.skc_join_recipient", null);
-        if (recipient == null || recipient.trim().isEmpty()) {
-            recipient = getOptions().stringKey("OAI.adminEmail", null);
-        }
-        if (recipient == null || recipient.trim().isEmpty()) {
-            return recipients;
-        }
 
         String recipientName = getOptions().stringKey("notificationemail.skc_join_recipient_name", "SDNNT");
-        for (String email : recipient.split("[,;]")) {
-            String trimmed = email.trim();
-            if (!trimmed.isEmpty()) {
-                recipients.add(Pair.of(trimmed, recipientName));
+        if (recipient !=  null) {
+            for (String email : recipient.split("[,;]")) {
+                String trimmed = email.trim();
+                if (!trimmed.isEmpty()) {
+                    recipients.add(Pair.of(trimmed, recipientName));
+                }
             }
         }
         return recipients;
