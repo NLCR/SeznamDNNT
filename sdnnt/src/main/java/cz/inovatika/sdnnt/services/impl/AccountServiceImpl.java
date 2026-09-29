@@ -246,12 +246,14 @@ public class AccountServiceImpl implements AccountService {
     // moved from Zadost
     public JSONObject saveRequest(Zadost zadost,AccountServiceInform inform) throws ConflictException {
         //SolrClient solr = null;
+        if (maximumItemsExceeded(zadost, maximumItemsInRequest())) {
+            AccountException exception = new AccountException(
+                    "account.maximum_items_exceed", "Maximalni pocet polozek prekrocen");
+            LOGGER.log(Level.WARNING, exception.getMessage());
+            return new JSONObject().put("error", exception);
+        }
+
         try (SolrClient solr = buildClient()) {
-
-
-            if (zadost.getIdentifiers().size() > MAXIMUM_ITEMS_IN_ZADOST) {
-                throw new AccountException("account.maximum_items_exceed", "Maximalni pocet polozek prekrocen");
-            }
 
             SolrInputDocument idoc = zadost.toSolrInputDocument();
 
@@ -286,6 +288,16 @@ public class AccountServiceImpl implements AccountService {
             LOGGER.log(Level.SEVERE, null, ex);
             return new JSONObject().put("error", ex);
         }
+    }
+
+    protected int maximumItemsInRequest() {
+        return Options.getInstance().intKey("api.maximumItemInRequest", 3000);
+    }
+
+    static boolean maximumItemsExceeded(Zadost zadost, int maximum) {
+        return maximum >= 0
+                && zadost.getIdentifiers() != null
+                && zadost.getIdentifiers().size() > maximum;
     }
 
 

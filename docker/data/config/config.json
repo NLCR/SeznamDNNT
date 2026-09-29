@@ -8,7 +8,7 @@
 	
 	"server": {
 		"api": {
-			"maximumItemInRequest": -1
+			"maximumItemInRequest": 3000
 		},
 
 		"solr.host":"http://sdnnt-solr:8983/solr/",

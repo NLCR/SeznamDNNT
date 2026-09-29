@@ -1,7 +1,7 @@
 {
   "solr.host": "http://localhost:8983/solr/",
   "api": {
-    "maximumItemInRequest": -1
+    "maximumItemInRequest": 3000
   },
   "OAIHavest": {
     "url": "http://aleph.nkp.cz/OAI"
