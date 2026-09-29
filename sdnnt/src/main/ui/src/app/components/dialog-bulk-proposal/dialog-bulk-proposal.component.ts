@@ -102,7 +102,7 @@ export class DialogBulkProposalComponent implements OnInit {
         if (selectedAction === 'VNZ' || selectedAction === 'VNL') {
           this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
             let resNumberOfItems:number = res.identifiers?.length | 0;
-            if ((identiefiers.length+ resNumberOfItems) < this.config.maximumItemInRequest) {
+            if ((identiefiers.length+ resNumberOfItems) <= this.config.maximumItemInRequest) {
               this.state.currentZadost['VNX']= res;
               this.saveZadost(selectedAction, identiefiers, null, null);
             }  else {
@@ -116,7 +116,7 @@ export class DialogBulkProposalComponent implements OnInit {
         } else {
           this.service.prepareZadost([selectedAction]).subscribe((res: Zadost) => {
             let resNumberOfItems:number = res.identifiers?.length | 0;
-            if ((identiefiers.length+ resNumberOfItems) < this.config.maximumItemInRequest) {
+            if ((identiefiers.length+ resNumberOfItems) <= this.config.maximumItemInRequest) {
               this.state.currentZadost[selectedAction]= res;
               this.saveZadost(selectedAction, identiefiers,null, null);
             } else {

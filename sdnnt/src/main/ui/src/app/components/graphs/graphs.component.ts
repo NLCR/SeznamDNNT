@@ -79,6 +79,8 @@ export class GraphsComponent implements OnInit {
               return '#757575'
             } else if (paramsExt?.data?.name1 === 'NL') {
               return '#039BE5'
+            } else if (paramsExt?.data?.name1 === 'D') {
+              return '#4e342e'
             } else {
               return params.color
             }

@@ -152,38 +152,18 @@ import { User } from './shared/user';
     }
 
     private login() {
+        // Remove credentials stored by older releases. Authentication is now cookie-based.
+        localStorage.removeItem('user');
         if (this.config.user) {
             this.state.setLogged(this.config.user);
-            const user: any = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                localStorage.setItem('user', JSON.stringify({ username: this.config.user.username, pwd: this.config.user.pwd, timeStamp: Date.now() }));
-            }
             return;
         }
-        const url = 'api/user/login';
-        const user: any = JSON.parse(localStorage.getItem('user'));
-        if (user) {
-            const now = Date.now();
-            const lastLogged = new Date(user.timeStamp).getTime();
-
-            return this.http.post(url, { user: user.username, pwd: user.pwd })
-                .toPromise()
-                .then((res: any) => {
-                    this.state.setLogged(res);
-                    if (res.error) {
-                        localStorage.removeItem('user');
-                    } else {
-                        localStorage.setItem('user', JSON.stringify({ username: user.username, pwd: user.pwd, timeStamp: Date.now() }));
-                    }
-                    
-                })
-                .catch(res => {
-                    console.log(res);
-                    localStorage.removeItem('user');
-                });
-        } else {
-            return;
-        }
+        return this.http.get('api/user/remember_login', { withCredentials: true })
+            .toPromise()
+            .then((res: any) => {
+                if (res && res.username) this.state.setLogged(res);
+            })
+            .catch(res => console.log(res));
     }
 
 }

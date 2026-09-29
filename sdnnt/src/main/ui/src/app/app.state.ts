@@ -115,6 +115,10 @@ export class AppState {
         if (navigationKey) {
           this.navigationstore.setRows(navigationKey, this.rows);
         }
+      } else if (p === 'importRows') {
+        if (navigationKey) {
+          this.navigationstore.setRows(navigationKey, parseInt(param));
+        }
       } else if (p === 'page') {
         this.page = parseInt(param);
         if (navigationKey) {

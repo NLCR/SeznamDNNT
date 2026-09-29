@@ -55,11 +55,12 @@ export class AppComponent {
       if (this.state.user != null) {
         this.service.ping().subscribe((res)=>{
 
-          if(res.pinginguser && res.remainingtime) {
-            console.log("Remaining time "+res.remainingtime);
+          if(res.pinginguser) {
+            if (res.remainingtime) {
+              console.log("Remaining time "+res.remainingtime);
 
-            if (res.remainingtime < 20) {
-              if (!this.state.expirationDialog) {
+              if (res.remainingtime < 20) {
+                if (!this.state.expirationDialog) {
                 // dialog session expiration
                 this.sessionDialogRef = this.sesionDialog.open(DialogSessionExpirationComponent, {
                   width: '300px',
@@ -71,8 +72,9 @@ export class AppComponent {
                   this.state.expirationDialog = false;
                 });
                 
-                this.state.expirationDialog = true;
-              }                
+                  this.state.expirationDialog = true;
+                }
+              }
             }
           } else {
 
@@ -82,21 +84,19 @@ export class AppComponent {
               this.sessionDialogRef.close();
             }
 
-            this.service.logout().subscribe(res => {
-              this.state.setLogged(res);
-              this.state.logged = false;
-              this.state.user = null;
-              
-              this.state.facetsstore.reinit();
-
-        
-              this.state.sort['sort'] = this.config.sorts.sort[0];
-              this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
-              this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
-        
-              localStorage.removeItem('user');
-              this.router.navigate(['/home'], {});
-
+            // A persistent login cookie can transparently create a fresh short-lived session.
+            this.service.rememberLogin().subscribe((remembered: any) => {
+              if (remembered && remembered.username) {
+                this.state.setLogged(remembered);
+              } else {
+                this.state.logged = false;
+                this.state.user = null;
+                this.state.facetsstore.reinit();
+                this.state.sort['sort'] = this.config.sorts.sort[0];
+                this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
+                this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+                this.router.navigate(['/home'], {});
+              }
             });
           }
         });

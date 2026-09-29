@@ -46,6 +46,9 @@
 -->
 
 <schema name="users" version="1.6">
+  <field name="rememberTokenHash" type="string" indexed="true" stored="true"/>
+  <field name="rememberTokenExpiration" type="pdate" indexed="true" stored="true"/>
+  <field name="rememberKeepLoggedIn" type="boolean" indexed="false" stored="true"/>
   
     <field name="username" type="string" indexed="true" stored="true" docValues="true" />
     
