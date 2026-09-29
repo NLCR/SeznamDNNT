@@ -24,6 +24,7 @@ public class UserTests {
         user.setCislo("C1234");
         user.setApikey("API-KEY-123456");
         user.setNotifikaceInterval( NotificationInterval.mesic.name());
+        user.setAdministratorskeNotifikace(false);
 
 
         JSONObject userJSON = user.toJSONObject();
@@ -37,6 +38,7 @@ public class UserTests {
         Assert.assertTrue(userJSON.getString("adresa").equals("Testovaci adresa, 123"));
         Assert.assertTrue(userJSON.getString("apikey").equals("API-KEY-123456"));
         Assert.assertTrue(userJSON.getString("notifikace_interval").equals(NotificationInterval.mesic.name()));
+        Assert.assertFalse(userJSON.getBoolean("administratorske_notifikace"));
 
         User readFromJSON = User.fromJSON(userJSON.toString());
 
@@ -46,6 +48,7 @@ public class UserTests {
         Assert.assertTrue(readFromJSON.getJmeno().equals(user.getJmeno()));
         Assert.assertTrue(readFromJSON.getPrijmeni().equals(user.getPrijmeni()));
         Assert.assertTrue(readFromJSON.getNotifikaceInterval().equals(user.getNotifikaceInterval()));
+        Assert.assertEquals(user.isAdministratorskeNotifikace(), readFromJSON.isAdministratorskeNotifikace());
 
     }
 
@@ -71,8 +74,10 @@ public class UserTests {
         document.setField("adresa", "Testovaci adresa, 123");
         document.setField("apikey", "apikey");
         document.setField("notifikace_interval", "den");
+        document.setField("administratorske_notifikace", false);
 
         SolrInputDocument solrInputFields = user.toSolrInputDocument();
+        User fromSolr = User.fromSolrDocument(document);
 
         Assert.assertNotNull(solrInputFields.getFieldValue("role"));
         Assert.assertNotNull(solrInputFields.getFieldValue("username"));
@@ -82,6 +87,20 @@ public class UserTests {
         Assert.assertNotNull(solrInputFields.getFieldValue("adresa"));
         Assert.assertNotNull(solrInputFields.getFieldValue("apikey"));
         Assert.assertNotNull(solrInputFields.getFieldValue("notifikace_interval"));
+        Assert.assertNotNull(solrInputFields.getFieldValue("administratorske_notifikace"));
+        Assert.assertFalse(fromSolr.isAdministratorskeNotifikace());
+    }
+
+    @Test
+    public void testAdministratorskeNotifikaceDefaultsToEnabled() {
+        User fromJson = User.fromJSON(new JSONObject().put("username", "testusername").toString());
+
+        SolrDocument document = new SolrDocument();
+        document.setField("username", "testusername");
+        User fromSolr = User.fromSolrDocument(document);
+
+        Assert.assertTrue(fromJson.isAdministratorskeNotifikace());
+        Assert.assertTrue(fromSolr.isAdministratorskeNotifikace());
     }
 
 }

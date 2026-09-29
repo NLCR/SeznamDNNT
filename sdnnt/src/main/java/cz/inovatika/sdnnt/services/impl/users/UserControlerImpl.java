@@ -352,6 +352,12 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
     }
 
     @Override
+    public User changeAdministratorskeNotifikaceForUser(String username, boolean enabled)
+            throws UserControlerException {
+        return changeAdministratorskeNotifikaceImpl(username, enabled, DataCollections.users.name());
+    }
+
+    @Override
     public List<String> getAllInstitutions() throws UserControlerException {
         int max = Options.getInstance().getInt("max.institutions", 1000);
         List<String> institutions = new ArrayList<>();

@@ -13,6 +13,14 @@
           <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
         </mat-radio-group>
       </div>  
+
+      <mat-divider class="app-my-3" *ngIf="administratorNotificationSettingsEnabled()"></mat-divider>
+
+      <div *ngIf="administratorNotificationSettingsEnabled()" class="app-mb-3">
+        <mat-checkbox [(ngModel)]="this.state.user.administratorske_notifikace">
+          {{ 'desc.administratorske_notifikace' | translate }}
+        </mat-checkbox>
+      </div>
     </mat-tab>
     <mat-tab [label]="'desc.hromadne_notifikace' | translate">
       <div class="app-mb-4">

@@ -76,6 +76,23 @@ public class Job implements InterruptableJob {
         actionToDo.doPerform(jobData);
     }
 
+    static void processNotificationQueueJob(JSONObject jobData, NotificationQueueServiceImpl queueService) {
+        try {
+            LocksSupport.SERVICES_LOCK.lock();
+            LOGGER.fine(Actions.NOTIFICATION_QUEUE.name()+":configuration is "+jobData);
+            long start = System.currentTimeMillis();
+            try {
+                queueService.processQueue(jobData.optInt("limit", 100));
+            } catch (IOException | SolrServerException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            } finally {
+                QuartzUtils.printDuration(NotificationQueueServiceImpl.LOGGER, start);
+            }
+        } finally {
+            LocksSupport.SERVICES_LOCK.unlock();
+        }
+    }
+
     @Override
     public void interrupt() throws UnableToInterruptJobException {
         //
@@ -978,21 +995,7 @@ public class Job implements InterruptableJob {
         NOTIFICATION_QUEUE {
             @Override
             void doPerform(JSONObject jobData) {
-                try {
-                    LocksSupport.SERVICES_LOCK.lock();
-                    LOGGER.fine(name()+":configuration is "+jobData);
-                    long start = System.currentTimeMillis();
-                    NotificationQueueServiceImpl queueService = new NotificationQueueServiceImpl();
-                    try {
-                        queueService.processQueue(jobData.optInt("limit", 100));
-                    } catch (IOException | SolrServerException e) {
-                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                    } finally {
-                        QuartzUtils.printDuration(NotificationQueueServiceImpl.LOGGER, start);
-                    }
-                } finally {
-                    LocksSupport.SERVICES_LOCK.unlock();
-                }
+                processNotificationQueueJob(jobData, new NotificationQueueServiceImpl());
             }
         };
 

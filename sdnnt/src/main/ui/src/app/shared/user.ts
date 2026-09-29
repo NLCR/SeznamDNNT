@@ -10,6 +10,7 @@ export class User {
   role: string;
   isActive: boolean;
   notifikace_interval:string;
+  administratorske_notifikace: boolean = true;
   
   typ: string = 'fyzicka_osoba'; //pravnicka/fyzicka osoba
 

@@ -75,6 +75,7 @@ public class UsersUtils {
             toObject.setResetPwdExpiration(  user.getResetPwdExpiration());
             toObject.setEmail( user.getEmail()) ;
             toObject.setNotifikaceInterval(user.getNotifikaceInterval());
+            toObject.setAdministratorskeNotifikace(user.isAdministratorskeNotifikace());
             toObject.setNositel(user.getNositel());
             toObject.setRole(user.getRole());
             toObject.setInstitution( user.getInstitution());

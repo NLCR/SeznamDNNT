@@ -29,6 +29,10 @@ export class DialogNotificationsSettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.state.user && this.state.user.administratorske_notifikace === undefined) {
+      this.state.user.administratorske_notifikace = true;
+    }
+
     this.service.getRuleNotifications().subscribe((res:any)=>{
       this.notifications = res.docs;
       this.notifications.forEach(notif => {
@@ -56,6 +60,11 @@ export class DialogNotificationsSettingsComponent implements OnInit {
       }
     );
 
+  }
+
+  administratorNotificationSettingsEnabled(): boolean {
+    return this.state.user &&
+      (this.state.user.role === 'admin' || this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator');
   }
 
   deleteNotification(notification) {
@@ -89,6 +98,7 @@ export class DialogNotificationsSettingsComponent implements OnInit {
 
     let request =  {
       "notification_interval":this.state.user.notifikace_interval,
+      "administratorske_notifikace":this.state.user.administratorske_notifikace,
       "notifications":savedNotications
     };
     let user = this.state.user;

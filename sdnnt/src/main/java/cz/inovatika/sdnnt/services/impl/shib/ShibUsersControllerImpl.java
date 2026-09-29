@@ -110,6 +110,12 @@ public class ShibUsersControllerImpl extends AbstractUserController implements U
     }
 
     @Override
+    public User changeAdministratorskeNotifikaceForUser(String username, boolean enabled)
+            throws UserControlerException {
+        return changeAdministratorskeNotifikaceImpl(username, enabled, DataCollections.shibusers.name());
+    }
+
+    @Override
     public List<User> getAll() throws UserControlerException {
         String collection = DataCollections.shibusers.name();
         return getUsersImpl(collection);

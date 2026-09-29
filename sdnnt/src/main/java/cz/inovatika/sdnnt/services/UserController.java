@@ -161,6 +161,15 @@ public interface UserController {
      */
     public User changeIntervalForUser(String username, NotificationInterval interval) throws UserControlerException;
 
+    /**
+     * Change administrator notification opt-in property.
+     * @param username
+     * @param enabled
+     * @return
+     * @throws UserControlerException
+     */
+    public User changeAdministratorskeNotifikaceForUser(String username, boolean enabled) throws UserControlerException;
+
     
     
     public List<String> getAllInstitutions() throws UserControlerException;

@@ -162,7 +162,9 @@ public class NotificationQueueServiceImplITTest {
         UserController users = EasyMock.createMock(UserController.class);
         UserController shibUsers = EasyMock.createMock(UserController.class);
         EasyMock.expect(users.findUsersByRole(Role.kurator))
-                .andReturn(Arrays.asList(user("kurator1", "kurator@testovic.cz", "Karel", "Kurator")))
+                .andReturn(Arrays.asList(
+                        user("kurator1", "kurator@testovic.cz", "Karel", "Kurator"),
+                        user("kurator2", "vypnuty@testovic.cz", "Vypnuty", "Kurator", false)))
                 .once();
         EasyMock.expect(shibUsers.findUsersByRole(Role.kurator))
                 .andReturn(Arrays.asList(user("shibkurator", "kurator@testovic.cz", "Karel", "Kurator")))
@@ -377,11 +379,16 @@ public class NotificationQueueServiceImplITTest {
     }
 
     private User user(String username, String email, String firstName, String lastName) {
+        return user(username, email, firstName, lastName, true);
+    }
+
+    private User user(String username, String email, String firstName, String lastName, boolean administratorskeNotifikace) {
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
         user.setJmeno(firstName);
         user.setPrijmeni(lastName);
+        user.setAdministratorskeNotifikace(administratorskeNotifikace);
         return user;
     }
 

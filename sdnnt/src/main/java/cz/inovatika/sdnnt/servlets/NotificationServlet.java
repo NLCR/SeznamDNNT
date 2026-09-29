@@ -128,6 +128,11 @@ public class NotificationServlet extends HttpServlet {
                         String notificationInterval = inputJs.getString("notification_interval");
                         controller.changeIntervalForUser(login.getUser().getUsername(), NotificationInterval.valueOf(notificationInterval));
                     }
+
+                    if (inputJs.has("administratorske_notifikace")) {
+                        boolean administratorskeNotifikace = inputJs.getBoolean("administratorske_notifikace");
+                        controller.changeAdministratorskeNotifikaceForUser(login.getUser().getUsername(), administratorskeNotifikace);
+                    }
                         
                     NotificationsService service = new NotificationServiceImpl(controller, mailService);
 

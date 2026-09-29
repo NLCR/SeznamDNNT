@@ -40,6 +40,7 @@ public class User {
   public static final String STATE_KEY  = "state";
   public static final String TYP_KEY  = "typ";
   public static final String NOTIFIKACE_INTERVAL_KEY  = "notifikace_interval";
+  public static final String ADMINISTRATORSKE_NOTIFIKACE_KEY  = "administratorske_notifikace";
 
   public static final String JMENO_KEY  = "jmeno";
   public static final String PRIJMENI_KEY  = "prijmeni";
@@ -97,6 +98,7 @@ public class User {
   private Date resetPwdExpiration;
   private String institution;
   private String notifikace_interval = NotificationInterval.none.name();
+  private boolean administratorske_notifikace = true;
 
   private boolean thirdPartyUser = false;
 
@@ -294,6 +296,14 @@ public class User {
     this.notifikace_interval = notifikace_interval;
   }
 
+  public boolean isAdministratorskeNotifikace() {
+    return administratorske_notifikace;
+  }
+
+  public void setAdministratorskeNotifikace(boolean administratorske_notifikace) {
+    this.administratorske_notifikace = administratorske_notifikace;
+  }
+
   public String getNazevSpolecnosti() {
     return nazevSpolecnosti;
   }
@@ -342,6 +352,7 @@ public class User {
     if (this.resetPwdToken !=null) jsonObject.put(RESET_PWD_KEY, this.resetPwdToken);
     if (this.resetPwdExpiration !=null) jsonObject.put(RESET_PWD_EXPIRATION_KEY, this.resetPwdExpiration);
     if (this.notifikace_interval != null) jsonObject.put(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
+    jsonObject.put(ADMINISTRATORSKE_NOTIFIKACE_KEY, this.administratorske_notifikace);
     if (this.institution != null) jsonObject.put(INSTITUTION_KEY, this.institution);
     if (this.thirdPartyUser) jsonObject.put(THIRD_PARTY_USER_KEY, this.thirdPartyUser);
     if (nazevSpolecnosti != null) jsonObject.put(NAZEV_SPOLECNOSTI_KEY, this.nazevSpolecnosti);
@@ -433,6 +444,10 @@ public class User {
     if(jsonObject.has(NOTIFIKACE_INTERVAL_KEY)) {
       String string = jsonObject.getString(NOTIFIKACE_INTERVAL_KEY);
       user.setNotifikaceInterval(string);
+    }
+
+    if(jsonObject.has(ADMINISTRATORSKE_NOTIFIKACE_KEY)) {
+      user.setAdministratorskeNotifikace(jsonObject.getBoolean(ADMINISTRATORSKE_NOTIFIKACE_KEY));
     }
 
     if (jsonObject.has(INSTITUTION_KEY)) {
@@ -536,6 +551,11 @@ public class User {
       user.setNotifikaceInterval(string);
     }
 
+    if(doc.containsKey(ADMINISTRATORSKE_NOTIFIKACE_KEY)) {
+      Object value = doc.getFieldValue(ADMINISTRATORSKE_NOTIFIKACE_KEY);
+      user.setAdministratorskeNotifikace(Boolean.parseBoolean(value.toString()));
+    }
+
     if (doc.containsKey(INSTITUTION_KEY)) {
       String string = (String) doc.getFieldValue(INSTITUTION_KEY);
       user.setInstitution(string);
@@ -626,6 +646,7 @@ public class User {
     if (this.notifikace_interval != null) {
       sinput.addField(NOTIFIKACE_INTERVAL_KEY, this.notifikace_interval);
     }
+    sinput.addField(ADMINISTRATORSKE_NOTIFIKACE_KEY, this.administratorske_notifikace);
     if (this.institution != null) {
       sinput.addField(INSTITUTION_KEY, this.institution);
     }

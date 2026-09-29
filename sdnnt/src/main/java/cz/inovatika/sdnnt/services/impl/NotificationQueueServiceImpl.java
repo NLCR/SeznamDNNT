@@ -146,10 +146,7 @@ public class NotificationQueueServiceImpl {
         for (SolrDocument event : events) {
             JSONObject payload = payload(event);
             if (payload.has("recipient_target")) {
-                List<Pair<String, String>> recipients = recipients(payload.getJSONObject("recipient_target"));
-                if (!recipients.isEmpty()) {
-                    return recipients;
-                }
+                return recipients(payload.getJSONObject("recipient_target"));
             }
         }
         return skcJoinRecipients();
@@ -202,7 +199,7 @@ public class NotificationQueueServiceImpl {
     }
 
     private void addRecipient(Map<String, Pair<String, String>> recipients, User user) {
-        if (user == null || !StringUtils.isAnyString(user.getEmail())) {
+        if (user == null || !user.isAdministratorskeNotifikace() || !StringUtils.isAnyString(user.getEmail())) {
             return;
         }
         String email = user.getEmail().trim();

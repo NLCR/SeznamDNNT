@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,15 +35,22 @@ import org.json.JSONObject;
 import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.CatalogIterationSupport;
 import cz.inovatika.sdnnt.indexer.models.MarcRecord;
+import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
+import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
+import cz.inovatika.sdnnt.services.UserController;
+import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
+import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
+import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
+import cz.inovatika.sdnnt.utils.StringUtils;
 
 public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SKCDeleteService {
 
@@ -71,6 +79,14 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
 
     protected MailService buildMailService() {
         return new MailServiceImpl();
+    }
+
+    protected UserController buildUserController() {
+        return new UserControlerImpl(null);
+    }
+
+    protected UserController buildShibUsersController() {
+        return new ShibUsersControllerImpl();
     }
 
 
@@ -172,7 +188,7 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
         if (skcJoinSuccessorNotifications.isEmpty()) {
             return;
         }
-        if ("queue".equalsIgnoreCase(notificationEmailDelivery())) {
+        if ("queue".equalsIgnoreCase(notificationAdminEmailDelivery())) {
             for (SKCJoinSuccessorNotification notification : skcJoinSuccessorNotifications) {
                 queueSKC4SuccessorNotification(solrClient, notification);
             }
@@ -181,22 +197,11 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
         }
     }
 
-    protected String notificationEmailDelivery() {
-        return getOptions().stringKey("notificationemail.delivery", "direct");
+    protected String notificationAdminEmailDelivery() {
+        return getOptions().stringKey("notificationadminemail.delivery", "direct");
     }
 
-//    protected void queueSKC4SuccessorNotification(SolrClient solrClient, MarcRecord record, Case detectedCase,
-//            List<String> followers, String previousComment) throws SolrServerException, IOException {
-//        String eventKey = "skc_join_successor|" + detectedCase.name() + "|" + record.identifier + "|"
-//                + String.join(",", followers);
-//        if (hasOpenSKC4SuccessorNotification(solrClient, eventKey)) {
-//            getLogger().log(Level.INFO, String.format("SKC_4 successor notification already queued for %s", record.identifier));
-//            return;
-//        }
-//        SolrInputDocument document = skc4SuccessorNotificationEvent(record, detectedCase, followers, previousComment,
-//                eventKey);
-//        solrClient.add("notification_events", document);
-//    }
+
 
     private boolean hasOpenSKC4SuccessorNotification(SolrClient solrClient, String eventKey)
             throws SolrServerException, IOException {
@@ -273,7 +278,11 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
 
         try {
             MailService mailService = buildMailService();
-            mailService.sendMail(mailFrom(), recipients, skcJoinSubject(), skcJoinEmailBody(notifications));
+            Pair<String, String> mailFrom = mailFrom();
+            String mailSubject = skcJoinSubject();
+            String mailBody = skcJoinEmailBody(notifications);
+
+            mailService.sendMail(mailFrom, recipients, mailSubject, mailBody);
             getLogger().info(String.format("Sent SKCJoin successor notification email with %d records",
                     notifications.size()));
         } catch (IOException | EmailException e) {
@@ -293,6 +302,11 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
     }
 
     protected List<Pair<String, String>> skcJoinRecipients() {
+        AdministratorRecipients administratorRecipients = administratorRecipients();
+        if (administratorRecipients.roleUsersFound) {
+            return administratorRecipients.recipients;
+        }
+
         List<Pair<String, String>> recipients = new ArrayList<>();
         String recipient = getOptions().stringKey("notificationemail.skc_join_recipient", null);
         if (recipient == null || recipient.trim().isEmpty()) {
@@ -310,6 +324,62 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
             }
         }
         return recipients;
+    }
+
+    private AdministratorRecipients administratorRecipients() {
+        Map<String, Pair<String, String>> recipients = new LinkedHashMap<>();
+        boolean roleUsersFound = false;
+
+        for (Role role : Arrays.asList(Role.kurator, Role.mainKurator)) {
+            roleUsersFound = addAdministratorRecipients(recipients, buildUserController(), role) || roleUsersFound;
+            roleUsersFound = addAdministratorRecipients(recipients, buildShibUsersController(), role) || roleUsersFound;
+        }
+
+        return new AdministratorRecipients(new ArrayList<>(recipients.values()), roleUsersFound);
+    }
+
+    private boolean addAdministratorRecipients(Map<String, Pair<String, String>> recipients, UserController controller,
+            Role role) {
+        if (controller == null) {
+            return false;
+        }
+        try {
+            List<User> users = controller.findUsersByRole(role);
+            for (User user : users) {
+                addAdministratorRecipient(recipients, user);
+            }
+            return !users.isEmpty();
+        } catch (UserControlerException e) {
+            getLogger().log(Level.WARNING,
+                    String.format("Cannot resolve SKCJoin recipients for role '%s': %s", role.name(), e.getMessage()),
+                    e);
+            return false;
+        }
+    }
+
+    private void addAdministratorRecipient(Map<String, Pair<String, String>> recipients, User user) {
+        if (user == null || !user.isAdministratorskeNotifikace() || !StringUtils.isAnyString(user.getEmail())) {
+            return;
+        }
+        String email = user.getEmail().trim();
+        recipients.put(email.toLowerCase(), Pair.of(email, recipientName(user)));
+    }
+
+    private String recipientName(User user) {
+        StringBuilder name = new StringBuilder();
+        if (StringUtils.isAnyString(user.getJmeno())) {
+            name.append(user.getJmeno().trim());
+        }
+        if (StringUtils.isAnyString(user.getPrijmeni())) {
+            if (name.length() > 0) {
+                name.append(" ");
+            }
+            name.append(user.getPrijmeni().trim());
+        }
+        if (name.length() > 0) {
+            return name.toString();
+        }
+        return user.getEmail();
     }
 
     protected String skcJoinSubject() {
@@ -331,12 +401,13 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
             builder.append("Detekovany pripad: ").append(notification.detectedCase.name()).append("\n");
             builder.append("Predchozi komentar: ").append(notification.previousComment).append("\n");
             builder.append("Followers: ").append(String.join(", ", notification.followers)).append("\n");
+            /*
             if (notification.record.fmt != null) {
                 builder.append("FMT: ").append(notification.record.fmt).append("\n");
             }
             if (notification.record.license != null) {
                 builder.append("License: ").append(notification.record.license).append("\n");
-            }
+            }*/
             builder.append("\n");
         }
 
@@ -464,6 +535,16 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
             this.followers = new ArrayList<>(followers);
             this.previousComment = previousComment;
             this.eventKey = eventKey;
+        }
+    }
+
+    private static class AdministratorRecipients {
+        private final List<Pair<String, String>> recipients;
+        private final boolean roleUsersFound;
+
+        private AdministratorRecipients(List<Pair<String, String>> recipients, boolean roleUsersFound) {
+            this.recipients = recipients;
+            this.roleUsersFound = roleUsersFound;
         }
     }
     
