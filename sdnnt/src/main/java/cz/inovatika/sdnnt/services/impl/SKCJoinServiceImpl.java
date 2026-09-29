@@ -9,17 +9,23 @@ import static cz.inovatika.sdnnt.utils.MarcRecordFields.HISTORIE_STAVU_FIELD;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.mail.EmailException;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.json.JSONArray;
@@ -32,6 +38,7 @@ import cz.inovatika.sdnnt.model.CuratorItemState;
 import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.workflow.duplicate.Case;
 import cz.inovatika.sdnnt.model.workflow.duplicate.DuplicateSKCUtils;
+import cz.inovatika.sdnnt.services.MailService;
 import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
@@ -40,6 +47,7 @@ import cz.inovatika.sdnnt.utils.SolrJUtilities;
 public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SKCDeleteService {
 
     protected Logger logger = Logger.getLogger(SKCTypeServiceImpl.class.getName());
+    private final List<SKCJoinSuccessorNotification> skcJoinSuccessorNotifications = new ArrayList<>();
 
     public SKCJoinServiceImpl(String loggerName, JSONObject results) {
         super(loggerName, results);
@@ -61,10 +69,15 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
         return Options.getInstance();
     }
 
+    protected MailService buildMailService() {
+        return new MailServiceImpl();
+    }
+
 
     @Override
     protected Map<Case, List<Pair<String, List<String>>>> checkUpdate() throws IOException, SolrServerException {
         Map<Case, List<Pair<String, List<String>>>> retvals = new HashMap<>();
+        skcJoinSuccessorNotifications.clear();
         try {
             CatalogIterationSupport support = new CatalogIterationSupport();
             Map<String, String> reqMap = new HashMap<>();
@@ -127,6 +140,8 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
                             retvals.put(followers.getKey(),new ArrayList<>());
                         }
                         retvals.get(followers.getKey()).add(Pair.of(fromIndex.identifier, followers.getRight()));
+                        collectSKC4SuccessorNotification(fromIndex, followers.getKey(), followers.getRight(),
+                                lastComment(comments));
                     } else {
                         getLogger().log(Level.INFO, String.format(" SKC_4 again %s", identifier));
                     }
@@ -142,6 +157,190 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
 
     private String lastComment(List<String> comments) {
         return comments.get(comments.size() -1);
+    }
+
+    protected void collectSKC4SuccessorNotification(MarcRecord record, Case detectedCase, List<String> followers,
+            String previousComment) {
+        String eventKey = "skc_join_successor|" + detectedCase.name() + "|" + record.identifier + "|"
+                + String.join(",", followers);
+        skcJoinSuccessorNotifications.add(new SKCJoinSuccessorNotification(record, detectedCase, followers,
+                previousComment, eventKey));
+    }
+
+    protected void deliverSKC4SuccessorNotifications(SolrClient solrClient)
+            throws SolrServerException, IOException {
+        if (skcJoinSuccessorNotifications.isEmpty()) {
+            return;
+        }
+        if ("queue".equalsIgnoreCase(notificationEmailDelivery())) {
+            for (SKCJoinSuccessorNotification notification : skcJoinSuccessorNotifications) {
+                queueSKC4SuccessorNotification(solrClient, notification);
+            }
+        } else {
+            sendSKC4SuccessorNotificationEmail(skcJoinSuccessorNotifications);
+        }
+    }
+
+    protected String notificationEmailDelivery() {
+        return getOptions().stringKey("notificationemail.delivery", "direct");
+    }
+
+//    protected void queueSKC4SuccessorNotification(SolrClient solrClient, MarcRecord record, Case detectedCase,
+//            List<String> followers, String previousComment) throws SolrServerException, IOException {
+//        String eventKey = "skc_join_successor|" + detectedCase.name() + "|" + record.identifier + "|"
+//                + String.join(",", followers);
+//        if (hasOpenSKC4SuccessorNotification(solrClient, eventKey)) {
+//            getLogger().log(Level.INFO, String.format("SKC_4 successor notification already queued for %s", record.identifier));
+//            return;
+//        }
+//        SolrInputDocument document = skc4SuccessorNotificationEvent(record, detectedCase, followers, previousComment,
+//                eventKey);
+//        solrClient.add("notification_events", document);
+//    }
+
+    private boolean hasOpenSKC4SuccessorNotification(SolrClient solrClient, String eventKey)
+            throws SolrServerException, IOException {
+        SolrQuery query = new SolrQuery("*:*")
+                .addFilterQuery("event_type:skc_join_successor_found")
+                .addFilterQuery("event_key:\"" + eventKey + "\"")
+                .addFilterQuery("status:ready")
+                .setRows(0);
+        QueryResponse response = solrClient.query("notification_events", query);
+        SolrDocumentList results = response.getResults();
+        return results != null && results.getNumFound() > 0;
+    }
+
+    private SolrInputDocument skc4SuccessorNotificationEvent(MarcRecord record, Case detectedCase,
+            List<String> followers, String previousComment, String eventKey) {
+        Date now = new Date();
+        JSONObject payload = new JSONObject();
+        payload.put("identifier", record.identifier);
+        payload.put("detected_case", detectedCase.name());
+        payload.put("followers", new JSONArray(followers));
+        payload.put("previous_comment", previousComment);
+        payload.put("fmt", record.fmt);
+        payload.put("dntstav", record.dntstav != null ? record.dntstav.get(0) : "");
+        payload.put("kuratorstav", record.kuratorstav != null ? record.kuratorstav.get(0) : "");
+        payload.put("license", record.license);
+        if (record.historie_kurator_stavu != null) {
+            payload.put("historie_kurator_stavu", record.historie_kurator_stavu);
+        }
+        payload.put("recipient_target", new JSONObject()
+                .put("type", "roles")
+                .put("roles", new JSONArray()
+                        .put("kurator")
+                        .put("mainKurator")));
+
+        SolrInputDocument document = new SolrInputDocument();
+        document.setField("id", "skc_join_" + UUID.randomUUID().toString());
+        document.setField("channel", "curator");
+        document.setField("event_type", "skc_join_successor_found");
+        document.setField("event_key", eventKey);
+        document.setField("event_hash", eventKey);
+        document.setField("source", "SKCJoinServiceImpl");
+        document.setField("status", "ready");
+        document.setField("created_at", now);
+        document.setField("updated_at", now);
+        document.setField("subject_type", DataCollections.catalog.name());
+        document.setField("subject_id", record.identifier);
+        document.setField("origin_identifier", record.identifier);
+        document.setField("title", "SKCJoin: nalezen následník");
+        document.setField("summary", String.format("Záznam %s měl stav %s a nyní byl nalezen následník: %s.",
+                record.identifier, previousComment, String.join(", ", followers)));
+        document.setField("payload", payload.toString());
+        return document;
+    }
+
+    private void queueSKC4SuccessorNotification(SolrClient solrClient, SKCJoinSuccessorNotification notification)
+            throws SolrServerException, IOException {
+        if (hasOpenSKC4SuccessorNotification(solrClient, notification.eventKey)) {
+            getLogger().log(Level.INFO,
+                    String.format("SKC_4 successor notification already queued for %s",
+                            notification.record.identifier));
+            return;
+        }
+        SolrInputDocument document = skc4SuccessorNotificationEvent(notification.record, notification.detectedCase,
+                notification.followers, notification.previousComment, notification.eventKey);
+        solrClient.add("notification_events", document);
+    }
+
+    private void sendSKC4SuccessorNotificationEmail(List<SKCJoinSuccessorNotification> notifications) {
+        List<Pair<String, String>> recipients = skcJoinRecipients();
+        if (recipients.isEmpty()) {
+            getLogger().warning("Cannot send SKCJoin notification email. Missing recipient configuration.");
+            return;
+        }
+
+        try {
+            MailService mailService = buildMailService();
+            mailService.sendMail(mailFrom(), recipients, skcJoinSubject(), skcJoinEmailBody(notifications));
+            getLogger().info(String.format("Sent SKCJoin successor notification email with %d records",
+                    notifications.size()));
+        } catch (IOException | EmailException e) {
+            getLogger().log(Level.WARNING,
+                    String.format("Problem with sending SKCJoin notification email due %s", e.getMessage()), e);
+        }
+    }
+
+    protected Pair<String, String> mailFrom() throws EmailException {
+        JSONObject mail = getOptions().getJSONObject("mail");
+        if (mail == null) {
+            throw new EmailException("mail configuration is missing");
+        }
+        String fromEmail = mail.getString("from.user");
+        String fromName = mail.has("from.name") ? mail.getString("from.name") : fromEmail;
+        return Pair.of(fromEmail, fromName);
+    }
+
+    protected List<Pair<String, String>> skcJoinRecipients() {
+        List<Pair<String, String>> recipients = new ArrayList<>();
+        String recipient = getOptions().stringKey("notificationemail.skc_join_recipient", null);
+        if (recipient == null || recipient.trim().isEmpty()) {
+            recipient = getOptions().stringKey("OAI.adminEmail", null);
+        }
+        if (recipient == null || recipient.trim().isEmpty()) {
+            return recipients;
+        }
+
+        String recipientName = getOptions().stringKey("notificationemail.skc_join_recipient_name", "SDNNT");
+        for (String email : recipient.split("[,;]")) {
+            String trimmed = email.trim();
+            if (!trimmed.isEmpty()) {
+                recipients.add(Pair.of(trimmed, recipientName));
+            }
+        }
+        return recipients;
+    }
+
+    protected String skcJoinSubject() {
+        JSONObject notificationEmail = getOptions().jsonObjKey("notificationemail");
+        if (notificationEmail != null) {
+            return notificationEmail.optString("skc_join_subject",
+                    notificationEmail.optString("subject", "SKCJoin: nalezen naslednik"));
+        }
+        return "SKCJoin: nalezen naslednik";
+    }
+
+    private String skcJoinEmailBody(List<SKCJoinSuccessorNotification> notifications) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("SKCJoin nasel nasledniky pro zaznamy ve stavu SKC_4/SKC_4b.\n\n");
+        builder.append("Pocet zaznamu: ").append(notifications.size()).append("\n\n");
+
+        for (SKCJoinSuccessorNotification notification : notifications) {
+            builder.append("Identifier: ").append(notification.record.identifier).append("\n");
+            builder.append("Detekovany pripad: ").append(notification.detectedCase.name()).append("\n");
+            builder.append("Predchozi komentar: ").append(notification.previousComment).append("\n");
+            builder.append("Followers: ").append(String.join(", ", notification.followers)).append("\n");
+            if (notification.record.fmt != null) {
+                builder.append("FMT: ").append(notification.record.fmt).append("\n");
+            }
+            if (notification.record.license != null) {
+                builder.append("License: ").append(notification.record.license).append("\n");
+            }
+            builder.append("\n");
+        }
+
+        return builder.toString();
     }
 
     @Override
@@ -234,8 +433,14 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
             getLogger().log(Level.SEVERE,e.getMessage(),e);
         } finally {
             try (SolrClient solrClient = buildClient()) {
+                try {
+                    deliverSKC4SuccessorNotifications(solrClient);
+                } catch (SolrServerException e) {
+                    getLogger().log(Level.WARNING, e.getMessage(), e);
+                }
                 SolrJUtilities.quietCommit(solrClient, DataCollections.catalog.name());
                 SolrJUtilities.quietCommit(solrClient, DataCollections.zadost.name());
+                SolrJUtilities.quietCommit(solrClient, "notification_events");
             }
         }
     }
@@ -243,6 +448,23 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
     public static void main(String[] args) throws IOException {
         SKCJoinServiceImpl joinService = new SKCJoinServiceImpl("tt", null);
         joinService.updateFollowers();
+    }
+
+    private static class SKCJoinSuccessorNotification {
+        private final MarcRecord record;
+        private final Case detectedCase;
+        private final List<String> followers;
+        private final String previousComment;
+        private final String eventKey;
+
+        private SKCJoinSuccessorNotification(MarcRecord record, Case detectedCase, List<String> followers,
+                String previousComment, String eventKey) {
+            this.record = record;
+            this.detectedCase = detectedCase;
+            this.followers = new ArrayList<>(followers);
+            this.previousComment = previousComment;
+            this.eventKey = eventKey;
+        }
     }
     
     

@@ -57,6 +57,11 @@ export class NavigationStore {
 
 
     public findKeyFromUrl(url: string) {
+        const importDetailMatch = url.match(/\/imports\/import\/([^\/\?]+)/);
+        if (importDetailMatch) {
+            return importDetailMatch[1];
+        }
+
         let found = Array.from(this._navigationUIStore.keys()).find(fragment => url.indexOf(fragment) > 0);
         return found;
     }

@@ -25,6 +25,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.json.JSONObject;
 import org.junit.*;
 
 import static cz.inovatika.sdnnt.index.DntAlephTestUtils.alephImport;
@@ -58,7 +59,7 @@ public class NotificationServiceImplITTest {
 
     @Before
     public void setUpTest() throws Exception {
-        prepare.deleteCores("notifications","catalog");
+        prepare.deleteCores("notifications","catalog", "notification_events");
     }
 
 
@@ -863,6 +864,258 @@ public class NotificationServiceImplITTest {
         Assert.assertTrue(notificationsByInterval.size() == 1);
         
         service.processNotifications(NotificationInterval.den);
+    }
+
+    @Test
+    public void testSendNotifications_RULE_PREVIOUS_CURATOR_HISTORY() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
+        Assert.assertNotNull(marcRecord);
+
+        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        Assert.assertEquals(1, catalog.getResults().getNumFound());
+
+        MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
+
+        solrMarc.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "puvodni stav");
+        solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
+        solrMarc.datum_stavu = Calendar.getInstance().getTime();
+
+        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
+                .addMockedMethod("sendNotificationEmail")
+                .createMock();
+
+        UserController controler = EasyMock.createMock(UserController.class);
+
+        EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+        EasyMock.expect(controler.findUser("test1"))
+                .andReturn(testUser())
+                .anyTimes();
+        EasyMock.expect(controler.getAll())
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+
+        NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
+                .withConstructor(controler, mailService)
+                .addMockedMethod("buildClient").createMock();
+
+        mailService.sendNotificationEmail(
+                EasyMock.isA(Pair.class),
+                EasyMock.isA(List.class)
+        );
+
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                Pair<String,String> pair = (Pair<String, String>) EasyMock.getCurrentArguments()[0];
+                List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[1];
+                Assert.assertEquals("test@testovic.cz", pair.getLeft());
+                Assert.assertEquals(1, documents.size());
+                Assert.assertEquals("N", documents.get(0).get("dntstav"));
+                Assert.assertEquals(solrMarc.identifier, documents.get(0).get("identifier"));
+                Assert.assertTrue(documents.get(0).containsKey("historie_kurator_stavu"));
+                return null;
+            }
+        }).times(1);
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.replay(mailService, controler, service);
+
+        service.saveNotificationRule(ruleNotification("test1", "notification_rule_previous_state_and_license.json"));
+
+        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
+        Assert.assertEquals(1, notificationsByInterval.size());
+
+        service.processNotifications(NotificationInterval.den);
+    }
+
+    @Test
+    public void testSendNotifications_QUEUE_DELIVERY() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
+        Assert.assertNotNull(marcRecord);
+
+        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        Assert.assertEquals(1, catalog.getResults().getNumFound());
+
+        MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
+        solrMarc.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "puvodni stav");
+        solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
+        solrMarc.datum_stavu = Calendar.getInstance().getTime();
+
+        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
+                .addMockedMethod("sendNotificationEmail")
+                .createMock();
+
+        UserController controler = EasyMock.createMock(UserController.class);
+
+        EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
+                .andReturn(Collections.emptyList())
+                .anyTimes();
+        EasyMock.expect(controler.findUser("test1"))
+                .andReturn(testUser())
+                .anyTimes();
+        EasyMock.expect(controler.getAll())
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+
+        NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
+                .withConstructor(controler, mailService)
+                .addMockedMethod("buildClient")
+                .addMockedMethod("notificationEmailDelivery")
+                .addMockedMethod("queueNotificationEmail")
+                .createMock();
+
+        EasyMock.expect(service.notificationEmailDelivery())
+                .andReturn("queue")
+                .anyTimes();
+
+        service.queueNotificationEmail(
+                EasyMock.eq(NotificationInterval.den),
+                EasyMock.isA(User.class),
+                EasyMock.isA(List.class)
+        );
+
+        EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
+
+            @Override
+            public Object answer() throws Throwable {
+                User user = (User) EasyMock.getCurrentArguments()[1];
+                List<Map<String,String>> documents = (List<Map<String, String>>) EasyMock.getCurrentArguments()[2];
+                Assert.assertEquals("test1", user.getUsername());
+                Assert.assertEquals(1, documents.size());
+                Assert.assertEquals(solrMarc.identifier, documents.get(0).get("identifier"));
+                return null;
+            }
+        }).times(1);
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.replay(mailService, controler, service);
+
+        service.saveNotificationRule(ruleNotification("test1", "notification_rule_previous_state_and_license.json"));
+
+        List<AbstractNotification> notificationsByInterval = service.findNotificationsByInterval(NotificationInterval.den);
+        Assert.assertEquals(1, notificationsByInterval.size());
+
+        service.processNotifications(NotificationInterval.den);
+    }
+
+    @Test
+    public void testSendNotifications_QUEUE_DELIVERY_STORES_EVENT() throws IOException, SolrServerException, NotificationsException, UserControlerException, EmailException {
+
+        if (!SolrTestServer.TEST_SERVER_IS_RUNNING) {
+            LOGGER.warning(String.format("%s is skipping", this.getClass().getSimpleName()));
+            return;
+        }
+
+        MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
+        Assert.assertNotNull(marcRecord);
+
+        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        Assert.assertEquals(1, catalog.getResults().getNumFound());
+
+        MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
+        solrMarc.setKuratorStav("A", "A", License.dnnto.name(), "testuser", "puvodni stav");
+        solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
+        solrMarc.datum_stavu = Calendar.getInstance().getTime();
+
+        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+
+        MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
+                .addMockedMethod("sendNotificationEmail")
+                .createMock();
+
+        UserController controler = EasyMock.createMock(UserController.class);
+
+        EasyMock.expect(controler.findUsersByNotificationInterval(NotificationInterval.den.name()))
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+        EasyMock.expect(controler.findUser("test1"))
+                .andReturn(testUser())
+                .anyTimes();
+        EasyMock.expect(controler.getAll())
+                .andReturn(createNotificationSimpleUsers())
+                .anyTimes();
+
+        NotificationServiceImpl service = EasyMock.createMockBuilder(NotificationServiceImpl.class)
+                .withConstructor(controler, mailService)
+                .addMockedMethod("buildClient")
+                .addMockedMethod("notificationEmailDelivery")
+                .createMock();
+
+        EasyMock.expect(service.notificationEmailDelivery())
+                .andReturn("queue")
+                .anyTimes();
+
+        EasyMock.expect(service.buildClient()).andDelegateTo(
+                new BuildSolrClientSupport()
+        ).anyTimes();
+
+        EasyMock.replay(mailService, controler, service);
+
+        service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
+        service.processNotifications(NotificationInterval.den);
+
+        QueryResponse response = prepare.getClient().query("notification_events",
+                new SolrQuery("*:*")
+                        .addFilterQuery("event_type:user_notification_email")
+                        .addFilterQuery("status:ready"));
+
+        Assert.assertEquals(1, response.getResults().getNumFound());
+        SolrDocument event = response.getResults().get(0);
+        Assert.assertEquals("email", event.getFieldValue("channel"));
+        Assert.assertEquals("NotificationServiceImpl", event.getFieldValue("source"));
+        Assert.assertEquals("test1", event.getFieldValue("subject_id"));
+
+        JSONObject payload = new JSONObject(event.getFieldValue("payload").toString());
+        Assert.assertEquals("test@testovic.cz", payload.getString("recipient"));
+        Assert.assertEquals("test1", payload.getString("username"));
+        Assert.assertEquals("den", payload.getString("interval"));
+        Assert.assertEquals(1, payload.getJSONArray("documents").length());
+        Assert.assertEquals(solrMarc.identifier, payload.getJSONArray("documents").getJSONObject(0).getString("identifier"));
+
+        EasyMock.verify(mailService, controler, service);
     }
 
     

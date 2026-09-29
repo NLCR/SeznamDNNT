@@ -29,8 +29,14 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.CursorMarkParams;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
@@ -353,7 +359,7 @@ public class NotificationServiceImpl implements NotificationsService {
                     }
                     if (user != null) {
                         List<Map<String, String>> documents =docsMapping.get(username);
-                        sendEmail(interval, user, new ArrayList<>(documents));
+                        deliverNotification(interval, user, new ArrayList<>(documents));
                     } else {
                         LOGGER.log(Level.WARNING, String.format("Cannot find user %s", username));
                     }
@@ -404,6 +410,10 @@ public class NotificationServiceImpl implements NotificationsService {
                             map.put("identifier", doc.getFieldValue("identifier").toString());
                             if (historieStavu != null) {
                                 map.put("historie_stavu", historieStavu);
+                            }
+                            if (doc.containsKey(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD)) {
+                                map.put(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD,
+                                        (String) doc.getFieldValue(MarcRecordFields.HISTORIE_KURATORSTAVU_FIELD));
                             }
                             if (ruleNotification.accept(map)) {
                                 if (dntStavStr.equals(PublicItemState.D.name()) || 
@@ -517,6 +527,98 @@ public class NotificationServiceImpl implements NotificationsService {
             fqCatalog = "datum_stavu:[NOW/MONTH-1MONTH TO *]";
         }
         return fqCatalog;
+    }
+
+    private void deliverNotification(NotificationInterval interval, User user, final List<Map<String, String>> documents) {
+        if ("queue".equalsIgnoreCase(notificationEmailDelivery())) {
+            queueNotificationEmail(interval, user, documents);
+        } else {
+            sendEmail(interval, user, documents);
+        }
+    }
+
+    protected String notificationEmailDelivery() {
+        return Options.getInstance().stringKey("notificationemail.delivery", "direct");
+    }
+
+    protected void queueNotificationEmail(NotificationInterval interval, User user, final List<Map<String, String>> documents) {
+        if (!documents.isEmpty()) {
+            LOGGER.info(String.format(
+                    "Queueing notification '%s', for user '%s' with email '%s'. Number of documents %d",
+                    interval.name(), user.getJmeno() + " " + user.getPrijmeni(), user.getEmail(),
+                    documents.size()));
+            try (SolrClient client = buildClient()) {
+                SolrInputDocument event = notificationEventDocument(interval, user, documents);
+                client.add("notification_events", event);
+                SolrJUtilities.quietCommit(client, "notification_events");
+            } catch (IOException | SolrServerException e) {
+                LOGGER.log(Level.WARNING, String.format("Problem with queueing email to %s due %s",
+                        user.getEmail(), e.getMessage()), e);
+            }
+        } else {
+            LOGGER.info(String.format("No changed documents for user  %s and interval %s", user.getUsername(), interval));
+        }
+    }
+
+    private SolrInputDocument notificationEventDocument(NotificationInterval interval, User user,
+            List<Map<String, String>> documents) {
+        Date now = new Date();
+        String userName = user.getJmeno() + " " + user.getPrijmeni();
+        String eventKey = notificationEventKey(interval, user, documents);
+        JSONObject payload = new JSONObject();
+        payload.put("recipient", user.getEmail());
+        payload.put("recipient_name", userName);
+        payload.put("username", user.getUsername());
+        payload.put("interval", interval.name());
+        payload.put("documents", new JSONArray(documents));
+
+        String eventHash = sha256(payload.toString());
+
+        SolrInputDocument document = new SolrInputDocument();
+        document.setField("id", "email_" + UUID.randomUUID().toString());
+        document.setField("channel", "email");
+        document.setField("event_type", "user_notification_email");
+        document.setField("event_key", eventKey);
+        document.setField("event_hash", eventHash);
+        document.setField("source", "NotificationServiceImpl");
+        document.setField("status", "ready");
+        document.setField("created_at", now);
+        document.setField("updated_at", now);
+        document.setField("subject_type", "user");
+        document.setField("subject_id", user.getUsername());
+        document.setField("title", Options.getInstance().jsonObjKey("notificationemail") != null
+                ? Options.getInstance().jsonObjKey("notificationemail").optString("subject", "Notifikace o zmene stavu")
+                : "Notifikace o zmene stavu");
+        document.setField("summary", String.format("Email notification for %s with %d documents", user.getUsername(),
+                documents.size()));
+        document.setField("payload", payload.toString());
+        return document;
+    }
+
+    private String notificationEventKey(NotificationInterval interval, User user, List<Map<String, String>> documents) {
+        List<String> identifiers = new ArrayList<>();
+        for (Map<String, String> document : documents) {
+            String identifier = document.get(MarcRecordFields.IDENTIFIER_FIELD);
+            if (identifier != null) {
+                identifiers.add(identifier);
+            }
+        }
+        Collections.sort(identifiers);
+        return user.getUsername() + "|" + interval.name() + "|" + String.join(",", identifiers);
+    }
+
+    private String sha256(String value) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+            StringBuilder builder = new StringBuilder();
+            for (byte b : bytes) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void sendEmail(NotificationInterval interval, User user, final List<Map<String, String>> documents) {

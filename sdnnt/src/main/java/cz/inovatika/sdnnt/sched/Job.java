@@ -960,9 +960,38 @@ public class Job implements InterruptableJob {
                     UserController controler = new UserControlerImpl(/* no reqest */ null);
                     ShibUsersControllerImpl shibUserController = new ShibUsersControllerImpl();
                     NotificationsService notificationsService = new NotificationServiceImpl(controler,shibUserController, mailService);
+                    // muzeme notifikat do fronty - pak to prebere samotny server
                     notificationsService.processNotifications(NotificationInterval.valueOf(jobData.getString("interval")));
-                } catch (UserControlerException | NotificationsException e) {
+                    // pokud mame notifikace pres frontu, pak druha sluzba
+                    if ("queue".equalsIgnoreCase(Options.getInstance().stringKey("notificationemail.delivery", "direct"))) {
+                        NotificationQueueServiceImpl queueService = new NotificationQueueServiceImpl();
+                        queueService.processQueue(jobData.optInt("queue_limit", 100));
+                    }
+
+                } catch (UserControlerException | NotificationsException | IOException | SolrServerException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        },
+
+        // Posila emaily ulozene ve fronte notification_events
+        NOTIFICATION_QUEUE {
+            @Override
+            void doPerform(JSONObject jobData) {
+                try {
+                    LocksSupport.SERVICES_LOCK.lock();
+                    LOGGER.fine(name()+":configuration is "+jobData);
+                    long start = System.currentTimeMillis();
+                    NotificationQueueServiceImpl queueService = new NotificationQueueServiceImpl();
+                    try {
+                        queueService.processQueue(jobData.optInt("limit", 100));
+                    } catch (IOException | SolrServerException e) {
+                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                    } finally {
+                        QuartzUtils.printDuration(NotificationQueueServiceImpl.LOGGER, start);
+                    }
+                } finally {
+                    LocksSupport.SERVICES_LOCK.unlock();
                 }
             }
         };

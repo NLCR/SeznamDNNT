@@ -2,6 +2,7 @@ package cz.inovatika.sdnnt;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -56,8 +57,11 @@ public class Options {
     
     String path = config();
 
+    //URL resource = Options.class.getResource("config.json");
+
     File fserver = FileUtils.toFile(Options.class.getResource("config.json"));
     String sjson = FileUtils.readFileToString(fserver, "UTF-8");
+
     server_conf = new JSONObject(sjson);
 
 
