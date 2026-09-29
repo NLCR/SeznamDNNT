@@ -441,9 +441,13 @@ export class AppService {
   }
 
 
-  login(user: string, pwd: string): Observable<User> {
+  login(user: string, pwd: string, rememberMe: boolean = false, keepLoggedIn: boolean = false): Observable<User> {
     const url = '/user/login';
-    return this.post(url, { user, pwd });
+    return this.post(url, { user, pwd, rememberMe, keepLoggedIn });
+  }
+
+  rememberLogin(): Observable<User> {
+    return this.get('user/remember_login', new HttpParams(), false);
   }
 
   logout() {

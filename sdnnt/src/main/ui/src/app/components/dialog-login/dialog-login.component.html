@@ -12,7 +12,8 @@
         <input matInput [placeholder]="'desc.heslo' | translate" #loginpwd [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="pwd" (keyup.enter)="login()">
         <mat-icon (click)="hidePassword = !hidePassword" matSuffix>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
       </mat-form-field> 
-      <mat-checkbox name="keep" [(ngModel)]="keepLogged">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
+      <mat-checkbox name="remember" [(ngModel)]="rememberMe">{{ 'desc.zapamatovat_si_me' | translate}}</mat-checkbox>
+      <mat-checkbox name="keep" [(ngModel)]="keepLoggedIn">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
     </div> 
     <div class="app-color-warning" *ngIf="loginError">
       {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.

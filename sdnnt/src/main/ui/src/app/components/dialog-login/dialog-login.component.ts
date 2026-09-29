@@ -17,7 +17,8 @@ export class DialogLoginComponent implements OnInit {
   pwd: string;
   loginError: boolean;
   loading: boolean;
-  keepLogged: boolean;
+  rememberMe: boolean;
+  keepLoggedIn: boolean;
 
   hidePassword:boolean = true;
 
@@ -37,15 +38,12 @@ export class DialogLoginComponent implements OnInit {
 
   login() {
     this.loading = true;
-    this.service.login(this.user.trim(), this.pwd).subscribe(res => {
+    this.service.login(this.user.trim(), this.pwd, this.rememberMe, this.keepLoggedIn).subscribe(res => {
       this.state.setLogged(res);
       if (res.error) {
         this.loginError = true;
       } else {
         this.loginError = false;
-        if (this.keepLogged) {
-          localStorage.setItem('user', JSON.stringify({username: this.user, pwd: this.pwd, timeStamp: Date.now()}));
-        }
         this.user = '';
         this.pwd = '';
         this.loading = false;
@@ -75,7 +73,6 @@ export class DialogLoginComponent implements OnInit {
       this.state.sort['sort'] = this.config.sorts.sort[0];
       this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
       this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
-      localStorage.removeItem('user');
       
 
       this.dialogRef.close({"user":null, "logged":false});

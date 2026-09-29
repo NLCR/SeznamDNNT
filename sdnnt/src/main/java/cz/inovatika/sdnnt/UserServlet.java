@@ -33,6 +33,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenExcept
 import cz.inovatika.sdnnt.services.impl.MailServiceImpl;
 import cz.inovatika.sdnnt.services.impl.NotificationServiceImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+import cz.inovatika.sdnnt.services.impl.users.RememberMeService;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmailValidation;
 import cz.inovatika.sdnnt.services.impl.users.validations.EmptyFieldsValidation;
@@ -219,6 +220,12 @@ public class UserServlet extends HttpServlet {
                     NotificationsService service = new NotificationServiceImpl(controler, null);
                     User login = controler.login();
                     if (login != null) {
+                        if (controler.isRememberMe()) {
+                            new RememberMeService().issue(req, response, login.getUsername(),
+                                    Boolean.TRUE.equals(req.getSession().getAttribute(TrackingFilter.KEEP_LOGGED_IN)));
+                        } else {
+                            new RememberMeService().revoke(req, response);
+                        }
                         return UsersUtils.prepareUserLoggedObject(controler, service, login);
                     } else {
                         return new JSONObject();
@@ -226,6 +233,22 @@ public class UserServlet extends HttpServlet {
                 } catch (UserControlerException e) {
                     return errorJson(e.getMessage());
                 }
+            }
+        },
+
+        /** Restores a session from the HttpOnly persistent-login cookie. */
+        REMEMBER_LOGIN {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                User alreadyLogged = new UserControlerImpl(req).getUser();
+                User user = alreadyLogged != null ? alreadyLogged : new RememberMeService().consume(req, response);
+                if (user == null) return new JSONObject();
+                if (alreadyLogged == null) {
+                    req.getSession(true).setAttribute(AUTHENTICATED_USER, user);
+                    TrackSessionUtils.touchSession(req.getSession());
+                }
+                UserControlerImpl controller = new UserControlerImpl(req);
+                return UsersUtils.prepareUserLoggedObject(controller, new NotificationServiceImpl(controller, null), user);
             }
         },
 
@@ -239,6 +262,7 @@ public class UserServlet extends HttpServlet {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
                 try {
+                    new RememberMeService().revoke(req, response);
                     String redirectEndpoint = null;
                     if (new UserControlerImpl(req).getUser() != null && new UserControlerImpl(req).getUser().isThirdPartyUser()) {
                         redirectEndpoint = Options.getInstance().getString("shiblogoutlink");

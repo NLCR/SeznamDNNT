@@ -30,6 +30,7 @@ public class TrackingFilter implements javax.servlet.Filter {
     public static final int DEFAULT_MAX_INACTIVE_INTERVAL = 30;
     public static final String KEY = "SESSION_UPDATED_DATE";
     public static final String REMAINING_TIME = "SESSION_REMAINING_TIME";
+    public static final String KEEP_LOGGED_IN = "SESSION_KEEP_LOGGED_IN";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -41,6 +42,13 @@ public class TrackingFilter implements javax.servlet.Filter {
         HttpServletRequest httpReq = (HttpServletRequest) servletRequest;
         HttpSession session = httpReq.getSession();
         if (session != null && session.getAttribute(ApplicationUserLoginSupport.AUTHENTICATED_USER) != null) {
+
+            if (Boolean.TRUE.equals(session.getAttribute(KEEP_LOGGED_IN))) {
+                session.setMaxInactiveInterval(-1);
+                session.removeAttribute(REMAINING_TIME);
+                filterChain.doFilter(servletRequest, servletResponse);
+                return;
+            }
 
             int maxInactiveInterval = DEFAULT_MAX_INACTIVE_INTERVAL;
             JSONObject sessionConfiguration = Options.getInstance().getJSONObject("session");

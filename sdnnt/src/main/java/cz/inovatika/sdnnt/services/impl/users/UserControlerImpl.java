@@ -13,6 +13,7 @@ import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.tracking.TrackSessionUtils;
+import cz.inovatika.sdnnt.tracking.TrackingFilter;
 import cz.inovatika.sdnnt.utils.GeneratePSWDUtility;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -50,6 +51,8 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
 
     private HttpServletRequest request;
     private MailService mailService;
+    private boolean rememberMe;
+    private boolean keepLoggedIn;
 
     public UserControlerImpl(HttpServletRequest request) {
         this.request = request;
@@ -72,10 +75,13 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
             try {
                 JSONObject json = new JSONObject(IOUtils.toString(this.request.getInputStream(), "UTF-8"));
                 String username = json.getString("user");
+                this.rememberMe = json.optBoolean("rememberMe", false);
+                this.keepLoggedIn = json.optBoolean("keepLoggedIn", false);
                 String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"));
                 ret.put("username", username);
                 User user = UsersUtils.findOneUser(client, "username:\"" + username + "\"");
                 if (user != null && user.getPwd() != null && user.getPwd().equals(pwdHashed)) {
+                    this.request.getSession(true).setAttribute(TrackingFilter.KEEP_LOGGED_IN, keepLoggedIn);
                     setSessionObject(this.request, user);
                     return UsersUtils.toTOObject(user);
                 } else throw new UserControlerException("Cannot find user or invalid password");
@@ -85,6 +91,10 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
         } catch (IOException ex) {
             throw new UserControlerException(ex);
         }
+    }
+
+    public boolean isRememberMe() {
+        return rememberMe;
     }
 
     @Override

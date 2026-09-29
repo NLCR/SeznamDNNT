@@ -8,7 +8,11 @@ public class TrackSessionUtils {
     private TrackSessionUtils() {}
 
     public static void touchSession(HttpSession session) {
-        session.setMaxInactiveInterval(TrackingFilter.DEFAULT_MAX_INACTIVE_INTERVAL);
+        if (Boolean.TRUE.equals(session.getAttribute(TrackingFilter.KEEP_LOGGED_IN))) {
+            session.setMaxInactiveInterval(-1);
+        } else {
+            session.setMaxInactiveInterval(TrackingFilter.DEFAULT_MAX_INACTIVE_INTERVAL);
+        }
         session.setAttribute(TrackingFilter.KEY, new Date());
     }
 }
