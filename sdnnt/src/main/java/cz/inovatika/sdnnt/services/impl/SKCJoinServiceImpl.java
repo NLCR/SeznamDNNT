@@ -85,10 +85,6 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
         return new UserControlerImpl(null);
     }
 
-    protected UserController buildShibUsersController() {
-        return new ShibUsersControllerImpl();
-    }
-
 
     @Override
     protected Map<Case, List<Pair<String, List<String>>>> checkUpdate() throws IOException, SolrServerException {
@@ -328,7 +324,6 @@ public class SKCJoinServiceImpl extends AbstractCheckDeleteService implements SK
 
         for (Role role : Arrays.asList(Role.kurator, Role.mainKurator)) {
             roleUsersFound = addAdministratorRecipients(recipients, buildUserController(), role) || roleUsersFound;
-            roleUsersFound = addAdministratorRecipients(recipients, buildShibUsersController(), role) || roleUsersFound;
         }
 
         return new AdministratorRecipients(new ArrayList<>(recipients.values()), roleUsersFound);
