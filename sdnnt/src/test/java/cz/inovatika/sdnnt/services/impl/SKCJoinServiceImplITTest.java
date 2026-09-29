@@ -341,9 +341,6 @@ public class SKCJoinServiceImplITTest {
         EasyMock.expect(service.buildUserController())
                 .andReturn(users)
                 .anyTimes();
-        EasyMock.expect(service.buildShibUsersController())
-                .andReturn(shibUsers)
-                .anyTimes();
 
         EasyMock.replay(mailService, users, shibUsers, service);
 
@@ -393,9 +390,6 @@ public class SKCJoinServiceImplITTest {
                 .anyTimes();
         EasyMock.expect(service.buildUserController())
                 .andReturn(users)
-                .anyTimes();
-        EasyMock.expect(service.buildShibUsersController())
-                .andReturn(shibUsers)
                 .anyTimes();
 
         EasyMock.replay(users, shibUsers, service);
