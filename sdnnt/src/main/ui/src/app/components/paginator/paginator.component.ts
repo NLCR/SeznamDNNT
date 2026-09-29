@@ -16,6 +16,7 @@ export class PaginatorComponent implements OnInit {
   @Input() showSort: boolean ;
   @Input() sortType: string = 'sort'; // sort vs sort_account
   @Input() storeStateKey: string;
+  @Input() rowsParam: string = 'rows';
   
   pageIndex: number;
   rows: number;
@@ -50,13 +51,16 @@ export class PaginatorComponent implements OnInit {
 
   pageChanged(e: PageEvent) {
     const params: any = {};
-    params.rows = e.pageSize;
+    params[this.rowsParam] = e.pageSize;
+    if (this.rowsParam !== 'rows') {
+      params.rows = null;
+    }
     params.page = e.pageIndex;
     this.pageIndex = e.pageIndex + 1;
 
     if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
       this.state.navigationstore.setPage(this.storeStateKey, params.page);
-      this.state.navigationstore.setRows(this.storeStateKey, params.rows);
+      this.state.navigationstore.setRows(this.storeStateKey, e.pageSize);
     }
 
     // document.getElementById('scroll-wrapper').scrollTop = 0;
@@ -70,7 +74,6 @@ export class PaginatorComponent implements OnInit {
 
     if (this.storeStateKey && this.state.navigationstore.contains(this.storeStateKey)) {
       this.state.navigationstore.setPage(this.storeStateKey, params.page);
-      this.state.navigationstore.setRows(this.storeStateKey, params.rows);
     }
     // document.getElementById('scroll-wrapper').scrollTop = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });

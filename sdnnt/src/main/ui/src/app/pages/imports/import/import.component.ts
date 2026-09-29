@@ -136,6 +136,10 @@ export class ImportComponent implements OnInit, OnDestroy {
     this.docs = [];
     this.filteredIds = {};
     const p = Object.assign({}, params);
+    if (p.importRows) {
+      p.rows = p.importRows;
+      delete p.importRows;
+    }
     p.id = this.importId;
     this.service.getImportDocuments(p as HttpParams).subscribe((resp: any) => {
       this.docs = resp.response.docs;
