@@ -10,6 +10,7 @@
     
     <field name="indextime" type="date" indexed="true" stored="true" multiValued="false" default="NOW" />
     <field name="notifikace_interval" type="string" indexed="true" stored="true"  />
+    <field name="administratorske_notifikace" type="boolean" indexed="true" stored="true"  />
 	<!-- jmeno;prijmeni -->
     <field name="jmeno" type="string" indexed="true" stored="true"  />
     <field name="prijmeni" type="string" indexed="false" stored="true"  />

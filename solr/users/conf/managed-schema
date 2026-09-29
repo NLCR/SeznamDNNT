@@ -63,6 +63,7 @@
     <field name="isActive" type="boolean" indexed="true" stored="true"  />
     <field name="typ" type="string" indexed="true" stored="true"  />
     <field name="notifikace_interval" type="string" indexed="true" stored="true"  />
+    <field name="administratorske_notifikace" type="boolean" indexed="true" stored="true"  />
     
     <field name="jmeno" type="string" indexed="true" stored="true"  />
     <field name="prijmeni" type="string" indexed="false" stored="true"  />
