@@ -57,6 +57,25 @@ public abstract class AbstractUserController implements UserController {
         }
         return findUser(username);
     }
+
+    protected User changeAdministratorskeNotifikaceImpl(String username, boolean enabled, String dataCollection)
+            throws UserControlerException {
+        try (SolrClient solr = buildClient()) {
+            try {
+                SolrInputDocument idoc = new SolrInputDocument();
+                idoc.setField("username", username);
+                atomicUpdate(idoc, enabled, User.ADMINISTRATORSKE_NOTIFIKACE_KEY);
+                solr.add(dataCollection, idoc);
+            } catch (SolrServerException e) {
+                throw new UserControlerException(e);
+            } finally {
+                SolrJUtilities.quietCommit(solr, dataCollection);
+            }
+        } catch ( IOException ex) {
+            throw new UserControlerException(ex);
+        }
+        return findUser(username);
+    }
     
     
     protected List<User> getUsersImpl(String collection) throws UserControlerException {
