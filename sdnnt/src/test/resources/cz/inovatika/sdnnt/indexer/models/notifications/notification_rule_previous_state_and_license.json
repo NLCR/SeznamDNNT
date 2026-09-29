@@ -1,0 +1,6 @@
+{
+  "name": "Predchozi stav a licence",
+  "periodicity": "den",
+  "type": "rule",
+  "filters": "{\"dntstav\":\"A\",\"license\":\"dnnto\"}"
+}
