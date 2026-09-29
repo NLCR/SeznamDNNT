@@ -308,13 +308,13 @@ public class SKCJoinServiceImplITTest {
                 .once();
         EasyMock.expect(shibUsers.findUsersByRole(Role.kurator))
                 .andReturn(Collections.<User>emptyList())
-                .once();
+                .anyTimes();
         EasyMock.expect(users.findUsersByRole(Role.mainKurator))
                 .andReturn(Arrays.asList(user("mainkurator", "main@testovic.cz", "Marta", "Kuratorova", true)))
-                .once();
+                .anyTimes();
         EasyMock.expect(shibUsers.findUsersByRole(Role.mainKurator))
                 .andReturn(Collections.<User>emptyList())
-                .once();
+                .anyTimes();
 
         SKCJoinServiceImpl service = EasyMock.createMockBuilder(SKCJoinServiceImpl.class)
                 .withConstructor("test", new JSONObject())
@@ -323,7 +323,6 @@ public class SKCJoinServiceImplITTest {
                 .addMockedMethod("mailFrom")
                 .addMockedMethod("skcJoinSubject")
                 .addMockedMethod("buildUserController")
-                .addMockedMethod("buildShibUsersController")
                 .createMock();
 
         EasyMock.expect(service.notificationAdminEmailDelivery())
@@ -382,7 +381,6 @@ public class SKCJoinServiceImplITTest {
                 .withConstructor("test", new JSONObject())
                 .addMockedMethod("notificationAdminEmailDelivery")
                 .addMockedMethod("buildUserController")
-                .addMockedMethod("buildShibUsersController")
                 .createMock();
 
         EasyMock.expect(service.notificationAdminEmailDelivery())

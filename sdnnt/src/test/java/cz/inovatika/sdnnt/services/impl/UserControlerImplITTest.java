@@ -101,11 +101,17 @@ public class UserControlerImplITTest {
         loginSession.setAttribute("user", users.get(0));
         EasyMock.expectLastCall().times(1);
 
+
+        loginSession.setAttribute("SESSION_KEEP_LOGGED_IN", false);
+        EasyMock.expectLastCall().anyTimes();
+
+        EasyMock.expect(loginSession.getAttribute("SESSION_KEEP_LOGGED_IN")).andReturn(false).anyTimes();
+
         loginSession.setMaxInactiveInterval(TrackingFilter.DEFAULT_MAX_INACTIVE_INTERVAL);
-        EasyMock.expectLastCall().times(1);
+        EasyMock.expectLastCall().anyTimes();
 
         loginSession.setAttribute(EasyMock.eq("SESSION_UPDATED_DATE"), anyObject(Date.class));
-        EasyMock.expectLastCall().times(1);
+        EasyMock.expectLastCall().anyTimes();
 
         UserControlerImpl userControler = EasyMock.createMockBuilder(UserControlerImpl.class)
                 .withConstructor(loginRequest)

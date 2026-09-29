@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -81,7 +82,8 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
                 ret.put("username", username);
                 User user = UsersUtils.findOneUser(client, "username:\"" + username + "\"");
                 if (user != null && user.getPwd() != null && user.getPwd().equals(pwdHashed)) {
-                    this.request.getSession(true).setAttribute(TrackingFilter.KEEP_LOGGED_IN, keepLoggedIn);
+                    HttpSession session = this.request.getSession(true);
+                    session.setAttribute(TrackingFilter.KEEP_LOGGED_IN, keepLoggedIn);
                     setSessionObject(this.request, user);
                     return UsersUtils.toTOObject(user);
                 } else throw new UserControlerException("Cannot find user or invalid password");
