@@ -4,6 +4,7 @@
     [pageSize]="rows"
     [pageIndex]="page"
     [pageSizeOptions]="[5, 10, 25, 50, 100]"
+    [showFirstLastButtons]="true"
     (page)="pageChanged($event)"
     class="app-clean-bg">
   </mat-paginator>
