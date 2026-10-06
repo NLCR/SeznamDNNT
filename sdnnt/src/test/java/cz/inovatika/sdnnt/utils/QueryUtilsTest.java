@@ -9,6 +9,30 @@ import cz.inovatika.sdnnt.Options;
 import cz.inovatika.sdnnt.index.utils.QueryUtils;
 
 public class QueryUtilsTest {
+
+    @Test
+    public void queryPreservesAndRoutesQuotedPhrases() {
+        Assert.assertEquals("museum", QueryUtils.query("museum"));
+        Assert.assertEquals("\"narodni museum\"", QueryUtils.query("\"narodni museum\""));
+        Assert.assertEquals(
+                "dejiny fullText_exact:\"narodni museum\" praha",
+                QueryUtils.query("dejiny \"narodni museum\" praha", QueryUtils.IDENTIFIER_PREFIX, "fullText_exact"));
+        Assert.assertEquals(
+                "fullText_exact:\"museum\"",
+                QueryUtils.query("\"museum\"", QueryUtils.IDENTIFIER_PREFIX, "fullText_exact"));
+    }
+
+    @Test
+    public void queryEscapesSpecialCharactersAndHandlesUnclosedQuote() {
+        Assert.assertEquals("foo\\+bar", QueryUtils.query("foo+bar"));
+        Assert.assertEquals("\\\"museum", QueryUtils.query("\"museum"));
+    }
+
+    @Test
+    public void identifierQueryRemainsAnExactPhrase() {
+        String identifier = "oai:aleph-nkp.cz:SKC01-123";
+        Assert.assertEquals("\"" + identifier + "\"", QueryUtils.query(identifier));
+    }
         
     @Test
     public void bookQueryFilter() {

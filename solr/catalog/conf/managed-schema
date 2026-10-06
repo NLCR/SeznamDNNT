@@ -132,6 +132,7 @@
    <dynamicField name="marc_*" type="string" indexed="true" stored="true" multiValued="true" />
  	
    <field name="fullText" type="text_cs" indexed="true" stored="false" multiValued="true"  />
+   <field name="fullText_exact" type="text_exact" indexed="true" stored="false" multiValued="true" />
 
 
    <!-- sjednocovani dle ccnb -->
@@ -260,6 +261,29 @@
     <copyField source="ean" dest="fullText"/>
 	-->
     <copyField source="identifier" dest="fullText"/>
+
+    <copyField source="marc_03*" dest="fullText_exact"/>
+    <copyField source="marc_040*" dest="fullText_exact"/>
+    <copyField source="marc_1*" dest="fullText_exact"/>
+    <copyField source="marc_2*" dest="fullText_exact"/>
+    <copyField source="marc_3*" dest="fullText_exact"/>
+    <copyField source="marc_7*" dest="fullText_exact"/>
+    <copyField source="marc_8563" dest="fullText_exact"/>
+    <copyField source="marc_8564" dest="fullText_exact"/>
+    <copyField source="marc_856q" dest="fullText_exact"/>
+    <copyField source="marc_856y" dest="fullText_exact"/>
+    <copyField source="marc_856z" dest="fullText_exact"/>
+    <copyField source="marc_910*" dest="fullText_exact"/>
+    <copyField source="marc_911a" dest="fullText_exact"/>
+    <copyField source="marc_911d" dest="fullText_exact"/>
+    <copyField source="marc_911p" dest="fullText_exact"/>
+    <copyField source="marc_911r" dest="fullText_exact"/>
+    <copyField source="marc_911s" dest="fullText_exact"/>
+    <copyField source="marc_9569" dest="fullText_exact"/>
+    <copyField source="marc_956y" dest="fullText_exact"/>
+    <copyField source="marc_99*" dest="fullText_exact"/>
+    <copyField source="controlfield_*" dest="fullText_exact"/>
+    <copyField source="identifier" dest="fullText_exact"/>
 	
 	<!-- ccnb -->
 	<copyField source="marc_015a" dest="id_ccnb"/>
@@ -685,6 +709,14 @@
         <filter class="solr.LowerCaseFilterFactory"/>
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_cz.txt"  />
         <filter class="solr.ASCIIFoldingFilterFactory"/>       
+      </analyzer>
+    </fieldType>
+
+    <!-- Literal spelling search used for user input enclosed in quotes. -->
+    <fieldType name="text_exact" class="solr.TextField" positionIncrementGap="100">
+      <analyzer>
+        <tokenizer class="solr.StandardTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
     

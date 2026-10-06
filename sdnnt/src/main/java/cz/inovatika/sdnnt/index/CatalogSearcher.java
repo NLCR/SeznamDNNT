@@ -452,7 +452,7 @@ public class CatalogSearcher {
         if (qlist == null || qlist.size() == 0) {
             q = "*";
         } else {
-            q = QueryUtils.query(qlist.get(0));
+            q = QueryUtils.query(qlist.get(0), QueryUtils.IDENTIFIER_PREFIX, "fullText_exact");
         }
         Options opts = Options.getInstance();
         int rows = opts.getClientConf().getInt("rows");

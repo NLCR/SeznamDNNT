@@ -8,7 +8,6 @@ import cz.inovatika.sdnnt.Options;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class QueryUtils {
@@ -23,26 +22,57 @@ public class QueryUtils {
     
     public static String query(String inputQuery) {
         return query(inputQuery, IDENTIFIER_PREFIX);
-    }    
+    }
+
     public static String query(String inputQuery, String identifierPrefix) {
+        return query(inputQuery, identifierPrefix, null);
+    }
+
+    /**
+     * Escapes a user query while preserving quoted phrases. When exactField is
+     * supplied, quoted phrases are explicitly routed to that field so its
+     * analyzer can omit stemming and synonym expansion.
+     */
+    public static String query(String inputQuery, String identifierPrefix, String exactField) {
         if (inputQuery != null && inputQuery.startsWith(identifierPrefix)) {
             return "\""+ inputQuery +"\"";
-        } else {
-            List<String> words = new ArrayList<>();
-            try (Scanner scanner = new Scanner(inputQuery)) {
-                while(scanner.hasNext()) {
-                    String word = scanner.next();
-                    if (word != null && !word.trim().equals("")) {
-                        if (word !=null && word.startsWith("\"")&&  word.endsWith("\"")) {
-                            words.add(word);
-                        } else {
-                            words.add(ClientUtils.escapeQueryChars(word));
-                        }
+        }
+
+        List<String> clauses = new ArrayList<>();
+        int offset = 0;
+        while (offset < inputQuery.length()) {
+            while (offset < inputQuery.length() && Character.isWhitespace(inputQuery.charAt(offset))) {
+                offset++;
+            }
+            if (offset >= inputQuery.length()) {
+                break;
+            }
+
+            if (inputQuery.charAt(offset) == '"') {
+                int closingQuote = inputQuery.indexOf('"', offset + 1);
+                if (closingQuote >= 0) {
+                    String phrase = inputQuery.substring(offset + 1, closingQuote).trim();
+                    if (!phrase.isEmpty()) {
+                        String escapedPhrase = Arrays.stream(phrase.split("\\s+"))
+                                .map(ClientUtils::escapeQueryChars)
+                                .collect(Collectors.joining(" "));
+                        String quotedPhrase = "\"" + escapedPhrase + "\"";
+                        clauses.add(exactField == null ? quotedPhrase : exactField + ":" + quotedPhrase);
                     }
+                    offset = closingQuote + 1;
+                    continue;
                 }
             }
-            return words.stream().collect(Collectors.joining(" "));
+
+            int tokenEnd = offset + 1;
+            while (tokenEnd < inputQuery.length() && !Character.isWhitespace(inputQuery.charAt(tokenEnd))) {
+                tokenEnd++;
+            }
+            clauses.add(ClientUtils.escapeQueryChars(inputQuery.substring(offset, tokenEnd)));
+            offset = tokenEnd;
         }
+
+        return clauses.stream().collect(Collectors.joining(" "));
     }
 
 
@@ -144,4 +174,3 @@ public class QueryUtils {
     }
     
 }
-
