@@ -396,7 +396,6 @@ public class SearchServlet extends HttpServlet {
                                 .setParam("json.nl", "arrntv")
                                 .setFields("*");
 
-
                         QueryRequest qreq = new QueryRequest(query);
                         NoOpResponseParser rParser = new NoOpResponseParser();
                         rParser.setWriterType("json");
@@ -665,8 +664,19 @@ public class SearchServlet extends HttpServlet {
                         String rows = req.getParameter("rows");
                         rows = rows != null ? rows : "20";
 
+                        String query = req.getParameter("q");
+                        if (query == null || query.trim().isEmpty()) {
+                            query = "*:*";
+                        } else {
+                            String escapedQuery = org.apache.solr.client.solrj.util.ClientUtils
+                                    .escapeQueryChars(query.trim());
+                            query = String.format(
+                                    "(id:*%1$s* OR url:*%1$s* OR origin:*%1$s*)",
+                                    escapedQuery);
+                        }
+
                         JsonQueryRequest request = new JsonQueryRequest()
-                                .setQuery("*:*")
+                                .setQuery(query)
                                 .setLimit(Integer.parseInt(rows))
                                 .setOffset(Integer.parseInt(page) * Integer.parseInt(rows))
                                 .setSort("indextime desc")

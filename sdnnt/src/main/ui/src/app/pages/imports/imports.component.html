@@ -7,6 +7,13 @@
       <app-paginator [storeStateKey]="'imports'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
+  <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline">
+    <mat-label>{{ 'desc.vyhledavani_v_importech' | translate }}</mat-label>
+    <input type="text" matInput (keyup)="onFilterImportsKeyUp($event.target)" [ngModel]="state.prefixsearch['import']">
+    <button *ngIf="state.prefixsearch['import']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterImports()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+      <mat-icon class="app-color-warning">close</mat-icon>
+    </button>
+  </mat-form-field>
   <div class="app-results-wrapper app-overflow-x-auto">
     <table mat-table [dataSource]="imports" class="mat-elevation-z0 app-table-responsive">
       <ng-container matColumnDef="import_date">

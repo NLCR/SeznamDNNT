@@ -8,6 +8,8 @@ import { Import } from 'src/app/shared/import';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-imports',
@@ -15,6 +17,8 @@ import { Zadost } from 'src/app/shared/zadost';
   styleUrls: ['./imports.component.scss']
 })
 export class ImportsComponent implements OnInit {
+  private subject: Subject<string> = new Subject();
+
   filterState = [
     { id: "open", val: "neodeslano" },
     { id: "waiting", val: "ceka_na_posouzeni" },
@@ -33,6 +37,7 @@ export class ImportsComponent implements OnInit {
 
   displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_seznamu', 'actions'];
   imports: Import[] = [];
+  query: string;
   
   stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
 
@@ -53,15 +58,31 @@ export class ImportsComponent implements OnInit {
     }
     this.state.activePage = 'Imports';
     this.route.queryParams.subscribe(val => {
+      this.query = this.route.snapshot.queryParamMap.get('importq');
+      this.state.prefixsearch['import'] = this.query;
       this.search(val);
       this.newStavFilter = val.navrh;
       this.stateFilter = val.state;
+    });
+
+    this.subject.pipe(
+      debounceTime(400)
+    ).subscribe(searchTextValue => {
+      this.state.navigationstore.setPage('imports', 0);
+      this.router.navigate([], {
+        queryParams: { importq: searchTextValue || null, page: null },
+        queryParamsHandling: 'merge'
+      });
     });
   }
 
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
+    if (this.query) {
+      p.q = this.query;
+    }
+    delete p.importq;
 
     this.imports = [];
     this.searchResponse = null;
@@ -77,6 +98,15 @@ export class ImportsComponent implements OnInit {
     });
 
   }
+
+  onFilterImportsKeyUp(target) {
+    this.subject.next(target.value);
+  }
+
+  cleanFilterImports() {
+    this.subject.next('');
+  }
+
   setStav(navrh: string) {
     const q: any = {};
     if (this.newStavFilter === navrh) {
