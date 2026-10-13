@@ -37,6 +37,7 @@
     "state": "stav"
   },
   "state": {
+    "D": "Smazané dílo",
     "undefined": "Nezařazeno",
     "PA": "Dílo publikováno jako návrh",
     "NPA": "Dílo bude bude publikováno jako návrh",
@@ -1039,6 +1040,12 @@
       "import": "Import"
     },
     "desc": {
+      "range": "Časové rozmezí",
+      "from": "Od",
+      "to": "Do",
+      "group_by": "Seskupit podle",
+      "show": "Zobrazit",
+      "export_csv": "Exportovat CSV",
       "interval": "Rozmezí",
       "select_interval": "Vyber rozmezí",
       "year": "Rok",
@@ -1046,6 +1053,11 @@
       "month": "Měsíc",
       "week": "Týden",
       "day": "Den"
+    },
+    "export": {
+      "period": "Období",
+      "name": "Název",
+      "count": "Počet"
     }
   }
 }

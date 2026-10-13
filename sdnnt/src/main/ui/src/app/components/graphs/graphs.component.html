@@ -16,17 +16,30 @@
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <h4>{{ 'graph.desc.interval' | translate }}</h4>
+      <h4>{{ 'graph.desc.range' | translate }}</h4>
       <mat-form-field appearance="fill">
-        <mat-label>{{ 'graph.desc.select_interval' | translate }}</mat-label>
-        <mat-select matNativeControl required [(value)]="interval" (valueChange)="getStatsHistory()">
+        <mat-label>{{ 'graph.desc.from' | translate }}</mat-label>
+        <input matInput type="date" [(ngModel)]="from">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'graph.desc.to' | translate }}</mat-label>
+        <input matInput type="date" [(ngModel)]="to">
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ 'graph.desc.group_by' | translate }}</mat-label>
+        <mat-select matNativeControl required [(value)]="interval">
           <mat-option value="1YEAR">{{ 'graph.desc.year' | translate }}</mat-option>
-          <mat-option value="3MONTHS">{{ 'graph.desc.quarter' | translate }}</mat-option>
           <mat-option value="1MONTH">{{ 'graph.desc.month' | translate }}</mat-option>
-          <mat-option value="7DAYS">{{ 'graph.desc.week' | translate }}</mat-option>
-          <mat-option value="1DAY">{{ 'graph.desc.day' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
+      <button mat-raised-button color="primary" [disabled]="!from || !to || from > to"
+        (click)="getStatsHistory()">
+        {{ 'graph.desc.show' | translate }}
+      </button>
+      <button mat-stroked-button [disabled]="!historyStats" (click)="exportCsv()">
+        <mat-icon>download</mat-icon>
+        {{ 'graph.desc.export_csv' | translate }}
+      </button>
       <div *ngIf="historyUserOpts.series" class="app-graph"  style="height: 350px;"
         echarts #userChart [options]="historyUserOpts" 
         (chartLegendSelectChanged)="selectUserLegent($event)" 

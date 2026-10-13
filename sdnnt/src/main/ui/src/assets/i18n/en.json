@@ -37,6 +37,7 @@
     "state": "status"
   },
   "state": {
+    "D": "Deleted work",
     "undefined": "Unclassified",
     "PA": "Work published as draft",
     "NPA": "Work is going to be published as draft",
@@ -1040,6 +1041,12 @@
       "import": "Import"
     },
     "desc": {
+      "range": "Date range",
+      "from": "From",
+      "to": "To",
+      "group_by": "Group by",
+      "show": "Show",
+      "export_csv": "Export CSV",
       "interval": "Interval",
       "select_interval": "Select interval",
       "year": "Year",
@@ -1047,6 +1054,11 @@
       "month": "Month",
       "week": "Week",
       "day": "Day"
+    },
+    "export": {
+      "period": "Period",
+      "name": "Name",
+      "count": "Count"
     }
   }
 }

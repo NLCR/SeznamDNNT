@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -229,21 +230,51 @@ public class SearchServlet extends HttpServlet {
         STATS_HISTORY {
             @Override
             JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (!new RightsResolver(req, new MustBeLogged(),
+                        new UserMustBeInRole(mainKurator, kurator, admin)).permit()) {
+                    return errorJson(response, SC_FORBIDDEN, "not allowed");
+                }
 
-                //facet.range={!tag=r1}datum_stavu&facet.range.gap=+1MONTH&facet.range.start=NOW-1YEAR
-                //&facet.range.end=NOW&facet.pivot={!range=r1}dntstav
-                //JSONObject ret = new JSONObject();
                 Options opts = Options.getInstance();
                 String interval = req.getParameter("interval");
+                if (!Arrays.asList("1MONTH", "1YEAR").contains(interval)) {
+                    return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid interval");
+                }
+
+                LocalDate from;
+                LocalDate to;
+                try {
+                    from = LocalDate.parse(req.getParameter("from"));
+                    to = LocalDate.parse(req.getParameter("to"));
+                } catch (Exception ex) {
+                    return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid date range");
+                }
+                if (from.isAfter(to)) {
+                    return errorJson(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid date range");
+                }
+
+                ZoneId zone = ZoneId.of("Europe/Prague");
+                String rangeStart = from.atStartOfDay(zone).toInstant().toString();
+                String rangeEnd = to.plusDays(1).atStartOfDay(zone).toInstant().toString();
+                LocalDate firstBucket = "1YEAR".equals(interval)
+                        ? from.withDayOfYear(1)
+                        : from.withDayOfMonth(1);
+                LocalDate bucketEnd = "1YEAR".equals(interval)
+                        ? to.plusYears(1).withDayOfYear(1)
+                        : to.plusMonths(1).withDayOfMonth(1);
+                String facetStart = firstBucket.atStartOfDay(zone).toInstant().toString();
+                String facetEnd = bucketEnd.atStartOfDay(zone).toInstant().toString();
                 try (SolrClient solr = new HttpSolrClient.Builder(opts.getString("solr.host")).build()) {
                     SolrQuery query = new SolrQuery("*")
                             .setRows(0)
+                            // The end is exclusive, making the selected `to` day inclusive.
+                            .addFilterQuery("indextime:[" + rangeStart + " TO " + rangeEnd + "}")
                             .setFacet(true).setParam("json.nl", "arrntv")
                             .addFacetField("user")
                             .setParam("facet.range", "{!tag=r1}indextime")
                             .setParam("facet.range.gap", "+" + interval)
-                            .setParam("facet.range.start", "NOW-1YEAR")
-                            .setParam("facet.range.end", "NOW")
+                            .setParam("facet.range.start", facetStart)
+                            .setParam("facet.range.end", facetEnd)
                             .setParam("facet.range.other", "all")
                             .setParam("facet.pivot", "{!range=r1}type", "{!range=r1}user");
                     QueryRequest qreq = new QueryRequest(query);

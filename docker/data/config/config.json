@@ -2,7 +2,7 @@
 	"client": {
 		"simplelogin": false,
 		"homeTabs": ["about", "news", "readers", "authors", "libraries", "api", "test"],
-		"maximumItemInRequest": 60,
+		"maximumItemInRequest": 60
 	},	
 	
 	
@@ -92,7 +92,7 @@
 				"type":"kramerius_px_check",
 				"cron": "0 0 18 ? * THU *",
 				"iteration": {
-					"date_range": "[* TO 2020]",
+					"date_range": "[* TO 2020]"
 				},
 				"results": {
 					"ctx": true
@@ -191,7 +191,7 @@
 			{
 				"acronym":"Koalice učebnic",
 				"name":"koalice učebnic"
-			},
+			}
 		],
 		
 		"OAIHavest": {
