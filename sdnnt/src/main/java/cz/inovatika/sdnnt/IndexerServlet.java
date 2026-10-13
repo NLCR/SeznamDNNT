@@ -236,6 +236,25 @@ public class IndexerServlet extends HttpServlet {
                 }
             }
         },
+        // One-time local backfill of MARC 902$a from the raw records already in Solr.
+        REINDEX_902 {
+            @Override
+            JSONObject doPerform(HttpServletRequest req, HttpServletResponse response) throws Exception {
+                if (new RightsResolver(req, new MustBeCalledFromLocalhost()).permit()) {
+                    String dest = Options.getInstance().getString("solr.host");
+                    String collection = "catalog";
+                    if (req.getParameter("dest") != null) {
+                        dest = req.getParameter("dest");
+                    }
+                    if (req.getParameter("collection") != null) {
+                        collection = req.getParameter("collection");
+                    }
+                    return Indexer.reindexMarc902(dest, collection);
+                } else {
+                    return errorJson(response, SC_FORBIDDEN, "not allowed");
+                }
+            }
+        },
         // plny harvest  skc katalogu - api operace - dostupne pouze pro admin
         FULL {
             @Override

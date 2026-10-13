@@ -690,6 +690,88 @@ public class Indexer {
         return ret;
     }
 
+    /**
+     * Backfills MARC 902$a from the locally stored raw record.  The raw field is
+     * not indexed, so finding affected legacy records requires one cursor scan.
+     * Documents which already have marc_902a are excluded by Solr and documents
+     * whose raw record has no non-empty 902$a are read but not rewritten.
+     */
+    public static JSONObject reindexMarc902(String dest, String collection) {
+        JSONObject ret = new JSONObject();
+        int scanned = 0;
+        int matched = 0;
+        int indexed = 0;
+        try (SolrClient solr = new ConcurrentUpdateSolrClient.Builder(dest).build()) {
+            String cursorMark = CursorMarkParams.CURSOR_MARK_START;
+            SolrQuery q = new SolrQuery("*:*").setRows(1000)
+                    .setSort("identifier", SolrQuery.ORDER.desc)
+                    .addFilterQuery("-marc_902a:[* TO *]")
+                    .setFields("raw,dntstav,datum_stavu,license,license_history,historie_stavu,granularity");
+            List<SolrInputDocument> idocs = new ArrayList<>();
+            boolean done = false;
+            while (!done) {
+                q.setParam(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+                QueryResponse qr = getClient().query(collection, q);
+                String nextCursorMark = qr.getNextCursorMark();
+
+                for (SolrDocument doc : qr.getResults()) {
+                    scanned++;
+                    String oldRaw = (String) doc.getFirstValue("raw");
+                    MarcRecord mr = MarcRecord.fromRAWJSON(oldRaw);
+                    if (!hasNonEmptyMarcSubfield(mr, "902", "a")) {
+                        continue;
+                    }
+
+                    matched++;
+                    SolrInputDocument idoc = mr.toSolrDoc();
+                    preserveField(doc, idoc, "dntstav");
+                    preserveField(doc, idoc, "datum_stavu");
+                    preserveField(doc, idoc, "historie_stavu");
+                    preserveField(doc, idoc, "license");
+                    preserveField(doc, idoc, "license_history");
+                    preserveField(doc, idoc, "granularity");
+                    idocs.add(idoc);
+                }
+
+                if (!idocs.isEmpty()) {
+                    solr.add(collection, idocs);
+                    solr.commit(collection);
+                    indexed += idocs.size();
+                    idocs.clear();
+                    LOGGER.log(Level.INFO, "MARC 902 backfill: scanned {0}, indexed {1}",
+                            new Object[]{scanned, indexed});
+                }
+
+                done = cursorMark.equals(nextCursorMark);
+                cursorMark = nextCursorMark;
+            }
+
+            ret.put("scanned", scanned);
+            ret.put("matched", matched);
+            ret.put("indexed", indexed);
+        } catch (SolrServerException | IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            ret.put("error", ex.toString());
+            ret.put("scanned", scanned);
+            ret.put("matched", matched);
+            ret.put("indexed", indexed);
+        }
+        return ret;
+    }
+
+    static boolean hasNonEmptyMarcSubfield(MarcRecord record, String tag, String code) {
+        if (record == null || record.dataFields == null || record.dataFields.get(tag) == null) {
+            return false;
+        }
+        return record.dataFields.get(tag).stream()
+                .filter(field -> field != null && field.getSubFields() != null)
+                .map(field -> field.getSubFields().get(code))
+                .filter(values -> values != null)
+                .flatMap(List::stream)
+                .anyMatch(value -> value != null && value.getValue() != null
+                        && !value.getValue().trim().isEmpty());
+    }
+
     private static void preserveField(SolrDocument source, SolrInputDocument destination, String fieldName) {
         Object value = source.getFieldValue(fieldName);
         if (value != null) {
