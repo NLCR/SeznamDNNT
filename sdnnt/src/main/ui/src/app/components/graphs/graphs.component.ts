@@ -24,6 +24,7 @@ export class GraphsComponent implements OnInit {
   historyStats: any;
   userEchart: ECharts;
   selectedUsers: {[user: string]: boolean} = {};
+  selectedStates: {[state: string]: boolean} = {};
 
   constructor(
     private datePipe: DatePipe,
@@ -66,13 +67,7 @@ export class GraphsComponent implements OnInit {
             fontWeight: 'bold'
           }
         },
-        data: this.facets.dntstav.map(e => {
-          return {
-            value: e.value,
-            name: e.name + ' ' + this.service.getTranslation('state.' + e.name),
-            name1: e.name
-          }
-        }),
+        data: this.getSelectedStateData(),
         itemStyle: {
           color: (params) => {
             const paramsExt: any = params;
@@ -164,8 +159,41 @@ export class GraphsComponent implements OnInit {
     const p = Object.assign({}, {});
     this.service.search(p as HttpParams).subscribe((res) => {
       this.facets = res.facet_counts.facet_fields;
+      this.facets.dntstav.forEach(state => {
+        if (this.selectedStates[state.name] === undefined) {
+          this.selectedStates[state.name] = true;
+        }
+      });
       this.setSeries();
     });
+  }
+
+  onStateSelectionChange() {
+    const options: any = this.stavOpts;
+    this.stavOpts = {
+      ...options,
+      series: {
+        ...options.series,
+        data: this.getSelectedStateData()
+      }
+    };
+  }
+
+  formatCount(value: number): string {
+    return value.toLocaleString('cs');
+  }
+
+  private getSelectedStateData(): any[] {
+    if (!this.facets || !this.facets.dntstav) {
+      return [];
+    }
+    return this.facets.dntstav
+      .filter(state => this.selectedStates[state.name] !== false)
+      .map(state => ({
+        value: state.value,
+        name: state.name + ' ' + this.service.getTranslation('state.' + state.name),
+        name1: state.name
+      }));
   }
 
   getStatsHistory() {

@@ -2,6 +2,13 @@
   <div class="app-graph-wrapper app-fx-50">
     <div>
       <div *ngIf="stavOpts.series" class="app-graph" echarts [options]="stavOpts" style="height: 350px;" ></div>
+      <div *ngIf="facets?.dntstav" class="app-state-selectors">
+        <mat-checkbox *ngFor="let state of facets.dntstav"
+          [(ngModel)]="selectedStates[state.name]"
+          (change)="onStateSelectionChange()">
+          {{ state.name }} {{ ('state.' + state.name) | translate }} ({{ formatCount(state.value) }})
+        </mat-checkbox>
+      </div>
     </div>
   </div>
   <div class="app-graph-wrapper app-fx-50">
