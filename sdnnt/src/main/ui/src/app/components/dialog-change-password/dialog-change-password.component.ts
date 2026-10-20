@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 
 @Component({
-  selector: 'dialog-change-password',
+  selector: 'app-dialog-change-password',
   templateUrl: './dialog-change-password.component.html',
   styleUrls: ['./dialog-change-password.component.scss']
 })
