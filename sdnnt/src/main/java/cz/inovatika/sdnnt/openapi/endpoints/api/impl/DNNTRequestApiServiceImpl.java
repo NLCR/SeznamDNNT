@@ -248,7 +248,12 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                         .collect(Collectors.toList());
 
                                 
-                                throw new BadRequestException(new ArrayList<>());
+                                String reason = hardValidations.stream()
+                                        .filter(MaximumSizeExceededDNNTRequestValidation.class::isInstance)
+                                        .map(DNNTRequestApiServiceValidation::getErrorMessage)
+                                        .findFirst()
+                                        .orElse("Nothing to save !");
+                                throw new BadRequestException(new ArrayList<>(), reason);
 
                             } else {
                                 //new identifiers;
@@ -309,7 +314,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                             e.getFailingValidationDetails().forEach(aDetails::add);
                             ns.setDetails(aDetails);
                             
-                            response.getNotsaved().add(ns.reason("Nothing to save !"));
+                            response.getNotsaved().add(ns.reason(e.getReason()));
                         } catch (SolrServerException e) {
                             FailedRequestNotSaved ns = new FailedRequestNotSaved();
                             ns.identifiers(req.getIdentifiers())
@@ -495,16 +500,26 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     
     public static class BadRequestException extends Exception {
         List<Detail> failingValidationDetails;
+        private final String reason;
         //List<DNNTRequestApiServiceValidation> failingValidations;
 
 
         public BadRequestException(List<Detail> failingValidationDetails) {
-            super();
+            this(failingValidationDetails, "Nothing to save !");
+        }
+
+        public BadRequestException(List<Detail> failingValidationDetails, String reason) {
+            super(reason);
             this.failingValidationDetails = failingValidationDetails;
+            this.reason = reason;
         }
         
         public List<Detail> getFailingValidationDetails() {
             return failingValidationDetails;
+        }
+
+        public String getReason() {
+            return reason;
         }
 
         
