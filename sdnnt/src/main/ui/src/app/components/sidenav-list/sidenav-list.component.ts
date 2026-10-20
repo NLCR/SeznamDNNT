@@ -4,7 +4,6 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SUPER_EXPR } from '@angular/compiler/src/output/output_ast';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';

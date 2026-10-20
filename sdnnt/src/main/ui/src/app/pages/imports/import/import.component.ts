@@ -1,5 +1,4 @@
 import { HttpParams } from '@angular/common/http';
-import { identifierModuleUrl } from '@angular/compiler';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';

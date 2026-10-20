@@ -6,7 +6,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { analyzeAndValidateNgModules } from '@angular/compiler';
 
 
 @Component({

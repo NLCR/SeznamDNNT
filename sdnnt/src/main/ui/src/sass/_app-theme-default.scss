@@ -1,7 +1,5 @@
 // --- DEFAULT THEME ---
-@use '~@angular/material' as mat;
-
-@import '~@angular/material/theming';
+@use '@angular/material' as mat;
 @include mat.core();
 
 $app-brand: "blue";
@@ -18,8 +16,14 @@ $app-brand: "blue";
 
 $nkp: (
   50: setBrandColor(),
+  100: setBrandColor(),
+  600: setBrandColor(),
+  700: setBrandColor(),
   contrast: (
-    50: white
+    50: white,
+    100: white,
+    600: white,
+    700: white
   )
 );
 
