@@ -20,7 +20,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
 
   //autocompleteForm: FormGroup;
 
-  myControl = new FormControl();
+  myControl = new FormControl<string>('', { nonNullable: true });
   //options: string[] = ['One', 'Two', 'Three'];
   filteredOptions: Observable<string[]>;
 

@@ -32,9 +32,9 @@ export class FacetsComponent implements OnInit {
 
   facets: string[];
 
-  rokoddate = new FormControl(new Date());
+  rokoddate = new FormControl<Date>(new Date(), { nonNullable: true });
   rokod: number;
-  rokdodate = new FormControl(new Date());
+  rokdodate = new FormControl<Date>(new Date(), { nonNullable: true });
   rokdo: number;
 
   showRoky: boolean;

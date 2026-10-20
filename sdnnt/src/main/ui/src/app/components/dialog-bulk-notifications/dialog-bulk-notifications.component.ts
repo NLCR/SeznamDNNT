@@ -15,7 +15,7 @@ export class DialogBulkNotificationsComponent implements OnInit {
   periodicity = 'den';
   name = '';
 
-  notificationNameControl = new FormControl('', [Validators.required, Validators.nullValidator]);
+  notificationNameControl = new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.nullValidator] });
 
 
   constructor(

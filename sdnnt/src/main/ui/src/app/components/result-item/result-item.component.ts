@@ -46,7 +46,7 @@ export class ResultItemComponent implements OnInit {
   @Output() processExportEvent = new EventEmitter<{ type: string; identifier: string}>();
 
 
-  newState = new FormControl();
+  newState = new FormControl<string>('', { nonNullable: true });
   isZarazeno: boolean;
   hasNavhr: boolean;
   hasGranularity: boolean;
@@ -91,7 +91,7 @@ export class ResultItemComponent implements OnInit {
         this.alternativeAlephLink = this.doc.alternative_aleph_link;
       }
     }
-    this.newState.setValue(this.doc.dntstav);
+    this.newState.setValue(this.doc.dntstav ?? '');
 
     // TODO: Prepsat, neprehledne
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
