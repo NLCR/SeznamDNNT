@@ -1,0 +1,76 @@
+.app-mobile-filters-button,
+.app-mobile-filters-header,
+.app-filters-backdrop {
+  display: none;
+}
+
+@media only screen and (max-width: 1040px) {
+  .app-mobile-filters-button {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .app-toolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px 12px !important;
+    align-items: center;
+    margin-bottom: 16px;
+
+    > .app-left {
+      display: none;
+    }
+
+    > .app-right {
+      display: contents;
+    }
+
+    .app-mobile-filters-button {
+      grid-column: 1;
+      grid-row: 1;
+      justify-self: start;
+      margin: 0;
+      min-width: 0;
+      padding: 0 8px;
+    }
+  }
+
+  .app-filters-backdrop.app-open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, .45);
+  }
+
+  .app-search-wrapper .app-fx-facets {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1001;
+    box-sizing: border-box;
+    width: min(360px, 90vw);
+    max-width: 90vw;
+    overflow-y: auto;
+    padding: 16px;
+    background: white;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, .2);
+    transform: translateX(-110%);
+    visibility: hidden;
+    transition: transform .2s ease, visibility .2s ease;
+
+    &.app-open {
+      transform: translateX(0);
+      visibility: visible;
+    }
+  }
+
+  .app-mobile-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+}
