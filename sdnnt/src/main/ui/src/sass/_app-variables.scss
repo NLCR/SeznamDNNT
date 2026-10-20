@@ -1,48 +1,49 @@
 // --- VARIABLES ---
+@use '~@angular/material' as mat;
 
 // gray colors
-$app-gray-0: mat-color($mat-gray, 50) !default;
-$app-gray-1: mat-color($mat-gray, 100) !default;
-$app-gray-2: mat-color($mat-gray, 200) !default;
-$app-gray-3: mat-color($mat-gray, 300) !default;
-$app-gray-4: mat-color($mat-gray, 400) !default;
-$app-gray-5: mat-color($mat-gray, 500) !default;
-$app-gray-6: mat-color($mat-gray, 600) !default;
-$app-gray-7: mat-color($mat-gray, 700) !default;
-$app-gray-8: mat-color($mat-gray, 800) !default;
-$app-gray-9: mat-color($mat-gray, 900) !default;
+$app-gray-0: mat.get-color-from-palette(mat.$gray-palette, 50) !default;
+$app-gray-1: mat.get-color-from-palette(mat.$gray-palette, 100) !default;
+$app-gray-2: mat.get-color-from-palette(mat.$gray-palette, 200) !default;
+$app-gray-3: mat.get-color-from-palette(mat.$gray-palette, 300) !default;
+$app-gray-4: mat.get-color-from-palette(mat.$gray-palette, 400) !default;
+$app-gray-5: mat.get-color-from-palette(mat.$gray-palette, 500) !default;
+$app-gray-6: mat.get-color-from-palette(mat.$gray-palette, 600) !default;
+$app-gray-7: mat.get-color-from-palette(mat.$gray-palette, 700) !default;
+$app-gray-8: mat.get-color-from-palette(mat.$gray-palette, 800) !default;
+$app-gray-9: mat.get-color-from-palette(mat.$gray-palette, 900) !default;
 
 // state colors
 $state_shade: 600 !default;
 $states: (
-  "undefined": mat-color($mat-pink, $state_shade),
-  "PA": mat-color($mat-purple, $state_shade),
-  "A": mat-color($mat-indigo, $state_shade),
-  "VS": mat-color($mat-cyan, $state_shade),
-  "VN": mat-color($mat-teal, $state_shade),
-  "VNL": mat-color($mat-cyan, $state_shade),
-  "VNZ": mat-color($mat-teal, $state_shade),
-  "N": mat-color($mat-green, $state_shade),
-  "X": mat-color($mat-gray, $state_shade),
-  "NZN": mat-color($mat-blue-gray, $state_shade),
-  "NZ": mat-color($mat-blue-gray, $state_shade),
-  "NNN": mat-color($mat-yellow, 800),
-  "VVN": mat-color($mat-orange, $state_shade),
-  "VVS": mat-color($mat-brown, $state_shade),
-  "NL": mat-color($mat-light-blue, $state_shade),
-  "D": mat-color($mat-brown, 800),
-  "dnnto": mat-color($mat-deep-purple, $state_shade),
-  "dnntt": mat-color($mat-deep-orange, $state_shade),
-  "open": mat-color($mat-blue, $state_shade),
-  "waiting": mat-color($mat-orange, $state_shade),
-  "processed": mat-color($mat-light-green, $state_shade),
-  "rejected": mat-color($mat-red, $state_shade),
-  "approvedlib": mat-color($mat-amber, $state_shade),
-  "approved": mat-color($mat-lime, 800),
-  "waiting_for_automatic_process": mat-color($mat-blue, 800),
-  "escalated": mat-color($mat-yellow, 800),
-  "expired": mat-color($mat-red, 900),
-  "state-change": mat-color($mat-light-blue, A700)
+  "undefined": mat.get-color-from-palette(mat.$pink-palette, $state_shade),
+  "PA": mat.get-color-from-palette(mat.$purple-palette, $state_shade),
+  "A": mat.get-color-from-palette(mat.$indigo-palette, $state_shade),
+  "VS": mat.get-color-from-palette(mat.$cyan-palette, $state_shade),
+  "VN": mat.get-color-from-palette(mat.$teal-palette, $state_shade),
+  "VNL": mat.get-color-from-palette(mat.$cyan-palette, $state_shade),
+  "VNZ": mat.get-color-from-palette(mat.$teal-palette, $state_shade),
+  "N": mat.get-color-from-palette(mat.$green-palette, $state_shade),
+  "X": mat.get-color-from-palette(mat.$gray-palette, $state_shade),
+  "NZN": mat.get-color-from-palette(mat.$blue-gray-palette, $state_shade),
+  "NZ": mat.get-color-from-palette(mat.$blue-gray-palette, $state_shade),
+  "NNN": mat.get-color-from-palette(mat.$yellow-palette, 800),
+  "VVN": mat.get-color-from-palette(mat.$orange-palette, $state_shade),
+  "VVS": mat.get-color-from-palette(mat.$brown-palette, $state_shade),
+  "NL": mat.get-color-from-palette(mat.$light-blue-palette, $state_shade),
+  "D": mat.get-color-from-palette(mat.$brown-palette, 800),
+  "dnnto": mat.get-color-from-palette(mat.$deep-purple-palette, $state_shade),
+  "dnntt": mat.get-color-from-palette(mat.$deep-orange-palette, $state_shade),
+  "open": mat.get-color-from-palette(mat.$blue-palette, $state_shade),
+  "waiting": mat.get-color-from-palette(mat.$orange-palette, $state_shade),
+  "processed": mat.get-color-from-palette(mat.$light-green-palette, $state_shade),
+  "rejected": mat.get-color-from-palette(mat.$red-palette, $state_shade),
+  "approvedlib": mat.get-color-from-palette(mat.$amber-palette, $state_shade),
+  "approved": mat.get-color-from-palette(mat.$lime-palette, 800),
+  "waiting_for_automatic_process": mat.get-color-from-palette(mat.$blue-palette, 800),
+  "escalated": mat.get-color-from-palette(mat.$yellow-palette, 800),
+  "expired": mat.get-color-from-palette(mat.$red-palette, 900),
+  "state-change": mat.get-color-from-palette(mat.$light-blue-palette, A700)
 );
 
 // gaps
