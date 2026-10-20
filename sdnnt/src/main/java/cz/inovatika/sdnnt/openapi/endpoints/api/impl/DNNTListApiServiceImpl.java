@@ -540,6 +540,10 @@ public class DNNTListApiServiceImpl extends ListsApiService {
      * @param documentOutput DocumentOutput implementation
      */
     private void emitDocument(Pair<String,String> digitalLibraryFilter, Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense, Boolean doNotEmit) {
+        emitDocument(digitalLibraryFilter, onlyUniqPids, uniqe, doc, documentOutput, outputFields, requestedLicense, doNotEmit, false);
+    }
+
+    private void emitDocument(Pair<String,String> digitalLibraryFilter, Boolean onlyUniqPids, Set<String> uniqe, SolrDocument doc, SolrDocumentOutput documentOutput, List<String> outputFields, String requestedLicense, Boolean doNotEmit, boolean includeUnlinked) {
         Collection<Object> nazev = doc.getFieldValues("nazev");
         String identifier = (String) doc.getFieldValue("identifier");
         
@@ -559,7 +563,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 
         // 911u a 856u 
         final List<String> links = LinksUtilities.krameriusMergedLinksFromDocument(doc);
-        if (!links.isEmpty()) {
+        if (!links.isEmpty() || includeUnlinked) {
             
             /**
              * pidy z granularity / 
@@ -781,7 +785,6 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 SolrQuery q = (new SolrQuery("*")).setRows(maxRowsInCaseOfIdent).setSort(SolrQuery.SortClause.asc("identifier"));
                 q.addFilterQuery("NOT dntstav:D");
                 q.addFilterQuery("dntstav:*");
-                q.addFilterQuery("id_pid:uuid");
                 
                 Pair<String,String> digitalLibraryPair = null;
                 
@@ -812,7 +815,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
                 QueryResponse rsp = solr.query(DataCollections.catalog.name(),q);
                 SolrDocumentOutput solrDocumentOutput = new ModelDocumentOutput(arrayOfListitem, MapUtils.invertMap(dlMap));
                 for (SolrDocument resultDoc: rsp.getResults()) {
-                    emitDocument(digitalLibraryPair,  false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false);
+                    emitDocument(digitalLibraryPair, false, new HashSet<String>(), resultDoc, solrDocumentOutput, new ArrayList<>(), null, false, true);
                 }
                 response.setNumFound((int) rsp.getResults().getNumFound());
                 return Response.ok().entity(response).build();
