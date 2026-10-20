@@ -31,7 +31,7 @@
                -->
            </div>
             <div>
-              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role == 'user' || state.user.role == 'knihovna' || state.user.role == 'kurator' || state.user.role == 'mainKurator'))">
+              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role === 'user' || state.user.role === 'knihovna' || state.user.role === 'kurator' || state.user.role === 'mainKurator'))">
                 <mat-button-toggle [matMenuTriggerFor]="menuFilter">
                   <mat-icon class="material-icons-outlined app-mr-1">notifications</mat-icon>
                   {{ this.state.notificationSettings.selected ? (this.state.notificationSettings.selected.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : this.state.notificationSettings.selected.name) : 'desc.zobrazit_zaznamy_s_notifikaci' | translate }}
@@ -52,7 +52,7 @@
               </mat-menu>
 
               <mat-menu #menuMassAction="matMenu">
-                <button mat-menu-item *ngIf="hromadnaZadostEnabled() &&  (state.user.role == 'user' || state.user.role == 'knihovna'  )  " (click)="openBulkProposal()">
+                <button mat-menu-item *ngIf="hromadnaZadostEnabled() &&  (state.user.role === 'user' || state.user.role === 'knihovna'  )  " (click)="openBulkProposal()">
                   <mat-icon class="material-icons-outlined">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
                 </button>
                 <span [matTooltip]="( state.notificationSettings.selected !=null  ||  numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications) ? ('tooltip.hromadne_notifikace_disabled' | translate) : null">

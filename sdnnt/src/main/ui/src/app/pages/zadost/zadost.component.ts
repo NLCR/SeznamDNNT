@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
@@ -17,15 +17,15 @@ import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-p
   templateUrl: './zadost.component.html',
   styleUrls: ['./zadost.component.scss']
 })
-export class ZadostComponent implements OnInit {
+export class ZadostComponent implements OnInit, OnDestroy {
 
   subs: Subscription[] = [];
   zadost: Zadost;
   numFound: number;
   docs: SolrDocument[];
   hideProcessed: boolean;
-  
-  invalidrecs:string[];
+
+  invalidrecs: string[];
 
   kurators: User[];
 
@@ -43,7 +43,7 @@ export class ZadostComponent implements OnInit {
       return;
     }
 
-    if (this.state.user.role == 'mainKurator') {
+    if (this.state.user.role === 'mainKurator') {
       this.service.getUsersByRole('kurator').subscribe(res => {
         this.kurators = res.docs;
       });
@@ -54,7 +54,7 @@ export class ZadostComponent implements OnInit {
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.service.getZadost(id).subscribe((resp: any) => {
         this.zadost = resp.response ?   resp.response.docs[0] : resp;
-        
+
         this.getDocs(val);
       });
     }));
@@ -65,32 +65,32 @@ export class ZadostComponent implements OnInit {
   linkToAccount() {
     const p: any = {};
     if (this.state.user?.role === 'kurator' || this.state.user?.role === 'mainKurator') {
-      p.sort_account = this.state.sort.sort_account.field + " " + this.state.sort.sort_account.dir;
+      p.sort_account = this.state.sort.sort_account.field + ' ' + this.state.sort.sort_account.dir;
     } else {
-      p.user_sort_account = this.state.sort.user_sort_account.field + " " + this.state.sort.user_sort_account.dir;
+      p.user_sort_account = this.state.sort.user_sort_account.field + ' ' + this.state.sort.user_sort_account.dir;
     }
 
     if (this.state.navigationstore.contains('account')) {
-      p.page = this.state.navigationstore.getPage('account')
+      p.page = this.state.navigationstore.getPage('account');
       p.rows= this.state.navigationstore.getRows('account');
     }
 
-    let navrh = this.state.facetsstore.getFacet('account','newStavFilter');
-    let state = this.state.facetsstore.getFacet('account','stateFilter');
-    let institution = this.state.facetsstore.getFacet('account','institutionFilter');
-    let delegated = this.state.facetsstore.getFacet('account','delegatedFilter');
-    let type_of_request = this.state.facetsstore.getFacet('account','typeOfRequestFilter');
-    let priority = this.state.facetsstore.getFacet('account','priorityFilter');
+    const navrh = this.state.facetsstore.getFacet('account','newStavFilter');
+    const state = this.state.facetsstore.getFacet('account','stateFilter');
+    const institution = this.state.facetsstore.getFacet('account','institutionFilter');
+    const delegated = this.state.facetsstore.getFacet('account','delegatedFilter');
+    const type_of_request = this.state.facetsstore.getFacet('account','typeOfRequestFilter');
+    const priority = this.state.facetsstore.getFacet('account','priorityFilter');
 
-    if (navrh) p.navrh = navrh;
-    if (state) p.state = state;
-    if (institution) p.institution = institution;
-    if (delegated) p.delegated = delegated;
-    if (type_of_request) p.type_of_request = type_of_request;
-    if (priority) p.priority = priority;
+    if (navrh) {p.navrh = navrh;}
+    if (state) {p.state = state;}
+    if (institution) {p.institution = institution;}
+    if (delegated) {p.delegated = delegated;}
+    if (type_of_request) {p.type_of_request = type_of_request;}
+    if (priority) {p.priority = priority;}
 
-    if (this.state.prefixsearch['account']?.length) {
-      p.prefix = this.state.prefixsearch['account'];
+    if (this.state.prefixsearch.account?.length) {
+      p.prefix = this.state.prefixsearch.account;
     }
 
     this.router.navigate(['/account'], { queryParams: p, queryParamsHandling: 'merge' });
@@ -113,7 +113,7 @@ export class ZadostComponent implements OnInit {
       this.docs = resp.response.docs;
       const process = this.zadost.process;
       this.numFound = resp.response.numFound;
-      
+
       if (!this.state.isNavigationStoreKeyInitialized(this.zadost.id)) {
         this.state.initDefaultNavitionStoreKey(this.zadost.id);
       }
@@ -121,17 +121,17 @@ export class ZadostComponent implements OnInit {
 
 
       const notifications = resp.notifications;
-      // TODO: Should not be dependent on type 
-      if (this.zadost.navrh=='VNL') {
+      // TODO: Should not be dependent on type
+      if (this.zadost.navrh === 'VNL') {
 
-        let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
-        let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
-        let allProcessed: boolean = true;
+        const stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : '_');
+        const licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : '_');
+        const allProcessed = true;
         if (this.zadost && this.zadost.process) {
           this.docs.forEach(doc=> {
-            let id = doc.identifier;
-            let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
-            let noworkflowkey =id+"_noworkflow";
+            const id = doc.identifier;
+            const tablekey = id + '_(' + stateKey + ',' + licenseKey + ')';
+            const noworkflowkey =id+'_noworkflow';
             doc.isProcessed = this.zadost.process[tablekey] || this.zadost.process[noworkflowkey];
           });
         }
@@ -143,19 +143,19 @@ export class ZadostComponent implements OnInit {
 
       this.docs.forEach(doc=> {
         const docId = doc.identifier;
-        const flag:boolean = notifications.some(n=> docId === n.identifier);
+        const flag: boolean = notifications.some(n=> docId === n.identifier);
         if (flag) {
           doc.hasNotifications = true;
         }
       });
-  
-      this.service.getZadostInvalidRecords(p as HttpParams).subscribe((res:any)=> {
+
+      this.service.getZadostInvalidRecords(p as HttpParams).subscribe((res: any)=> {
         if (res.error) {
         } else {
-          this.invalidrecs =  res["missing"];
+          this.invalidrecs =  res.missing;
         }
       });
-  
+
 
     });
   }
@@ -180,8 +180,8 @@ export class ZadostComponent implements OnInit {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-        this.service.getZadost(this.zadost.id).subscribe((res: Zadost) => {
-            this.zadost = res;
+        this.service.getZadost(this.zadost.id).subscribe((updatedZadost: Zadost) => {
+            this.zadost = updatedZadost;
             this.getDocs(this.route.snapshot.queryParams);
         });
       }
@@ -208,7 +208,7 @@ export class ZadostComponent implements OnInit {
 
   process() {
 
-    let allP: boolean = this.allProcessed();
+    const allP: boolean = this.allProcessed();
 
     if (!allP) {
       this.service.showSnackBar('alert.oznaceni_jako_zpracovane_error', 'desc.ne_vsechny_zaznamy_jsou_zpracovane', true);
@@ -225,17 +225,17 @@ export class ZadostComponent implements OnInit {
     });
   }
 
-  
+
 
   allProcessed(): boolean {
-    
-    let stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : "_");
-    let licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : "_");
-    let allProcessed: boolean = true;
+
+    const stateKey = (this.zadost.desired_item_state ? this.zadost.desired_item_state : '_');
+    const licenseKey = (this.zadost.desired_license ? this.zadost.desired_license : '_');
+    let allProcessed = true;
     if (this.zadost && this.zadost.process) {
       this.zadost.identifiers?.forEach(id => {
-        let tablekey = id + "_(" + stateKey + "," + licenseKey + ")";
-        let noworkflowkey =id+"_noworkflow";
+        const tablekey = id + '_(' + stateKey + ',' + licenseKey + ')';
+        const noworkflowkey =id+'_noworkflow';
         if (!this.zadost.process[tablekey] && !this.zadost.process[noworkflowkey]) {
           if (this.invalidrecs) {
             if (!this.invalidrecs.includes(id)) {
@@ -262,14 +262,14 @@ export class ZadostComponent implements OnInit {
         this.service.showSnackBar('alert.odstraneni_zadosti_success', '', false);
         this.getDocs(this.route.snapshot.queryParams);
 
-        this.service.getZadost(this.zadost.id).subscribe((res:any) => {
-          this.zadost = res;
+        this.service.getZadost(this.zadost.id).subscribe((updatedZadost: any) => {
+          this.zadost = updatedZadost;
         });
 
       }
     },
     (error) => {
-          if (error.status == 409)  {
+          if (error.status === 409)  {
             this.service.showSnackBar('alert.ulozeni_zadosti_error', this.service.getTranslation('alert.users_conflict'), true);
           } else {
             this.service.showSnackBar('alert.ulozeni_zadosti_error', error.message, true);
@@ -279,8 +279,8 @@ export class ZadostComponent implements OnInit {
   }
 
 
-  processNavrh(data: { type: string, identifier: string, komentar: string, options:string }) {
-    if (!data.komentar && data.type != 'reject') {
+  processNavrh(data: { type: string; identifier: string; komentar: string; options: string }) {
+    if (!data.komentar && data.type !== 'reject') {
       this.service.showSnackBar('alert.ulozeni_zadosti_error', 'alert.komentar_chybi', true);
       return;
     } else if (!data.komentar && data.type === 'reject') {
@@ -288,8 +288,8 @@ export class ZadostComponent implements OnInit {
       return;
     }
     switch (data.type) {
-      case 'approve': 
-       // approve navrh 
+      case 'approve':
+       // approve navrh
 
       //  this.service.approveNavrh(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
         this.service.approveItem(data.identifier, this.zadost, data.komentar, null, data.options).subscribe((res: any) => {
@@ -302,7 +302,7 @@ export class ZadostComponent implements OnInit {
           }
         });
         break;
-      case 'approveLib': 
+      case 'approveLib':
         this.service.approveItem(data.identifier, this.zadost, data.komentar, 'dnntt', data.options).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
@@ -313,7 +313,7 @@ export class ZadostComponent implements OnInit {
           }
         });
         break;
-      case 'releasedProved': 
+      case 'releasedProved':
         this.service.approveItem(data.identifier, this.zadost, data.komentar, 'title_released', data.options).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
@@ -324,7 +324,7 @@ export class ZadostComponent implements OnInit {
           }
         });
         break;
-      case 'reject': 
+      case 'reject':
         this.service.rejectItem(data.identifier, this.zadost, data.komentar).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
@@ -339,12 +339,12 @@ export class ZadostComponent implements OnInit {
     }
   }
 
-  isItemProcessed(id:string): boolean {
-    let stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : "_");
-    let licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : "_");
-    let tablekey = id +"_("+stateKey+","+licenseKey+")";
-    if (this.zadost.process) return this.zadost.process[tablekey];
-    else return false;
+  isItemProcessed(id: string): boolean {
+    const stateKey = (this.zadost.desired_item_state ?  this.zadost.desired_item_state : '_');
+    const licenseKey = (this.zadost.desired_license ?  this.zadost.desired_license : '_');
+    const tablekey = id +'_('+stateKey+','+licenseKey+')';
+    if (this.zadost.process) {return this.zadost.process[tablekey];}
+    else {return false;}
   }
 
 
@@ -356,8 +356,8 @@ export class ZadostComponent implements OnInit {
     });
     approveDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
-        
+        const items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
+
         this.service.approveItemsBatch(items, this.zadost,result, null, 'all').subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.schvaleni_navrhu_error', res.error, true);
@@ -404,7 +404,7 @@ export class ZadostComponent implements OnInit {
 
     rejectDialogRef.afterClosed().subscribe(result => {
       if (result) {
-        let items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
+        const items = this.zadost.identifiers.filter(it => !this.isItemProcessed(it));
         this.service.rejectItemsBatch(items, this.zadost,result).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('alert.zamitnuti_navrhu_error', res.error, true);
@@ -434,11 +434,11 @@ export class ZadostComponent implements OnInit {
 
   /** Pokud je navrh vnl, respektujeme pouze prvni prechod - cilovy stav NL*/
   enBlockActionEnabled() {
-    let allprocessed = this.allProcessed();
-    if (this.zadost.navrh == 'VNL'){
-      if (this.zadost.desired_item_state == 'NL') {
+    const allprocessed = this.allProcessed();
+    if (this.zadost.navrh === 'VNL'){
+      if (this.zadost.desired_item_state === 'NL') {
         return !allprocessed;
-      } else return false;
+      } else {return false;}
     } else {
       return !allprocessed;
     }
@@ -457,16 +457,16 @@ export class ZadostComponent implements OnInit {
         if (res?.result) {
             this.zadost.email = res.result;
 
-            this.service.saveKuratorZadost(this.zadost).subscribe((res: any) => {
-              if (res.error) {
-                this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
+            this.service.saveKuratorZadost(this.zadost).subscribe((savedZadost: any) => {
+              if (savedZadost.error) {
+                this.service.showSnackBar('alert.ulozeni_zadosti_error', savedZadost.error, true);
               } else {
                 this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
-                this.zadost = res;
+                this.zadost = savedZadost;
                 this.getDocs(this.route.snapshot.queryParams);
               }
             });
-      
+
         }
     });
   }

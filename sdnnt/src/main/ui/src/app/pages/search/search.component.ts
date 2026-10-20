@@ -25,7 +25,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   // all actions
   actions: string[] = [];
   // ident x actions mapping
-  identifiersAndActionsMapping = new Map<string, string[]>(); 
+  identifiersAndActionsMapping = new Map<string, string[]>();
 
 
 
@@ -40,7 +40,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   closeFilters(): void {
     this.filtersOpen = false;
   }
-  
+
 
   constructor(
     private route: ActivatedRoute,
@@ -48,7 +48,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private service: AppService,
     public state: AppState,
     public dialog: MatDialog,
-    public configuration:AppConfiguration
+    public configuration: AppConfiguration
   ) { }
 
   ngOnInit(): void {
@@ -66,7 +66,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   search(params: Params) {
-    let utils:SearchResultsUtils = new SearchResultsUtils();
+    const utils: SearchResultsUtils = new SearchResultsUtils();
 
     this.loading = true;
     // this.service.showLoading();
@@ -84,15 +84,15 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       // global actions
       this.actions = [];
-      this.identifiersAndActionsMapping = new Map<string, string[]>(); 
+      this.identifiersAndActionsMapping = new Map<string, string[]>();
       if (resp.actions) {
-        for (let key in resp.actions) {
-          let object = resp.actions[key];
+        for (const key of Object.keys(resp.actions)) {
+          const object = resp.actions[key];
           if (object.workflows) {
-            let workflows: string[] = object.workflows;
+            const workflows: string[] = object.workflows;
             this.identifiersAndActionsMapping.set(key, workflows);
             object.workflows.forEach(workflow=> {
-              let acts: string[] = this.actions;
+              const acts: string[] = this.actions;
               if (acts.indexOf(workflow) < 0 ) {
                 this.actions.push(workflow);
               }
@@ -107,13 +107,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       if (resp.rnotifications) {
         utils.enhanceByRulebasedNotifications(this.docs,resp.rnotifications);
       }
- 
+
       this.numFound = resp.response.numFound;
       this.facets = resp.facet_counts.facet_fields;
 
       Object.keys(this.facets).forEach(key => {
         if (this.configuration.sortedFacets.includes(key)) {
-            let values = this.facets[key];
+            const values = this.facets[key];
             values.sort(function(a, b){
               if(a.name < b.name) { return -1; }
               if(a.name > b.name) { return 1; }
@@ -126,14 +126,14 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   hromadnaZadostEnabled() {
-    let flag =  this.identifiersAndActionsMapping.size  > 0 && this.actions.length > 0;
+    const flag =  this.identifiersAndActionsMapping.size  > 0 && this.actions.length > 0;
     return flag;
-  } 
+  }
 
 
   viewFullCatalog() {
     const q: any = {};
-    q['fullCatalog'] = this.state.fullCatalog;
+    q.fullCatalog = this.state.fullCatalog;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
@@ -147,15 +147,15 @@ export class SearchComponent implements OnInit, OnDestroy {
 
 
   openBulkProposal() {
-    const data = {};
+    const data: { [action: string]: any; docs?: SolrDocument[]; actions?: string[]; identifiersAndActionsMapping?: Map<string, string[]> } = {};
     this.actions.forEach(action => {
       data[action] = true;
     });
-    
-    data["docs"] = this.docs;
-    data["actions"] = this.actions;
-    data["identifiersAndActionsMapping"] = this.identifiersAndActionsMapping; 
-    
+
+    data.docs = this.docs;
+    data.actions = this.actions;
+    data.identifiersAndActionsMapping = this.identifiersAndActionsMapping;
+
     const dialogRef = this.dialog.open(DialogBulkProposalComponent, {
       width: '450px',
       data,
@@ -170,7 +170,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   }
 
-  
+
 
   selectNofiticationFitler(f) {
     const q: any = {};

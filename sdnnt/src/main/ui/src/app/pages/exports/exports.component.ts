@@ -24,7 +24,7 @@ export class ExportsComponent implements OnInit {
   displayedColumns = ['indextime', 'id','export_type','stav','export_num_docs','actions'];
 
   exports: Export[] = [];
-  query:string;
+  query: string;
 
 
   constructor(
@@ -44,7 +44,7 @@ export class ExportsComponent implements OnInit {
 
     this.route.queryParams.subscribe(val => {
       this.query = this.route.snapshot.queryParamMap.get('exportq') ;
-      this.state.prefixsearch['export'] = this.query;
+      this.state.prefixsearch.export = this.query;
       this.search(val);
     });
 
@@ -52,12 +52,12 @@ export class ExportsComponent implements OnInit {
       debounceTime(400)
     ).subscribe(searchTextValue => {
 
-      this.state.navigationstore.setPage("exports", 0);
+      this.state.navigationstore.setPage('exports', 0);
 
       const req: any = {};
       req.exportq = searchTextValue;
 
-      
+
       this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
     });
 
@@ -91,12 +91,12 @@ export class ExportsComponent implements OnInit {
     let queryParams = {};
     if (this.query) {
       if (this.query.match(/^\s*euipo_/)) {
-        queryParams = {sort: "title_sort asc"}; 
+        queryParams = {sort: 'title_sort asc'};
       }  else {
          queryParams =  {  exportq: this.query };
-      }     
+      }
     } else {
-      queryParams = {sort: "title_sort asc"}; 
+      queryParams = {sort: 'title_sort asc'};
 
     }
 
@@ -107,10 +107,10 @@ export class ExportsComponent implements OnInit {
 
   approveANDProcess(exp: Export) {
 
-    this.service.processExport(exp.id).subscribe((exp)=> {
+    this.service.processExport(exp.id).subscribe(() => {
       this.route.queryParams.subscribe(val => {
         this.query = this.route.snapshot.queryParamMap.get('exportq') ;
-        this.state.prefixsearch['export'] = this.query;
+        this.state.prefixsearch.export = this.query;
         this.search(val);
       });
   });

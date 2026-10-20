@@ -33,17 +33,17 @@ export class ResultItemComponent implements OnInit {
   //@Input() inZadost: boolean;
 
 
-  // Pouziti komponenty 
-  @Input() view:string;
+  // Pouziti komponenty
+  @Input() view: string;
   @Input() export: Export;
 
   @Input() doc: SolrDocument;
   @Input() zadost: Zadost;
 
   @Output() removeFromZadostEvent = new EventEmitter<string>();
-  @Output() processZadostEvent = new EventEmitter<{ type: string, identifier: string, komentar: string, options:string }>();
+  @Output() processZadostEvent = new EventEmitter<{ type: string; identifier: string; komentar: string; options: string }>();
 
-  @Output() processExportEvent = new EventEmitter<{ type: string, identifier: string}>();
+  @Output() processExportEvent = new EventEmitter<{ type: string; identifier: string}>();
 
 
   newState = new FormControl();
@@ -51,12 +51,12 @@ export class ResultItemComponent implements OnInit {
   hasNavhr: boolean;
   hasGranularity: boolean;
   imgSrc: string;
-  processed: { date: Date, state: string, user: string, reason?: string };
+  processed: { date: Date; state: string; user: string; reason?: string };
   processedTooltip: string;
 
   alephLink: string;
-  alternativeAlephLink:string;
-  showAlephLink : boolean = true;
+  alternativeAlephLink: string;
+  showAlephLink = true;
 
 
   dkLinks: string[] = [];
@@ -75,8 +75,8 @@ export class ResultItemComponent implements OnInit {
 
     if (this.doc.marc_998a) {
 
-      // vypnout 
-      if (this.doc.setSpec && this.doc.setSpec.startsWith("DNT-ALL")) {
+      // vypnout
+      if (this.doc.setSpec && this.doc.setSpec.startsWith('DNT-ALL')) {
           this.showAlephLink = this.config.dntSetAlpehLinks;
       }
 
@@ -93,28 +93,28 @@ export class ResultItemComponent implements OnInit {
     }
     this.newState.setValue(this.doc.dntstav);
 
-    // TODO: Prepsat, neprehledne 
+    // TODO: Prepsat, neprehledne
     this.isZarazeno = this.doc.dntstav?.includes('A') || this.doc.dntstav?.includes('PA') || this.doc.dntstav?.includes('NL');
     const z = this.view === 'zadost' ? this.zadost : this.doc.zadost;
     if (z?.process) {
       //let tablekey = this.doc.identifier;
-      let stateKey = (z.desired_item_state ? z.desired_item_state : "_");
-      let licenseKey = (z.desired_license ? z.desired_license : "_");
+      const stateKey = (z.desired_item_state ? z.desired_item_state : '_');
+      const licenseKey = (z.desired_license ? z.desired_license : '_');
 
-      let fullTableKey = this.doc.identifier + "_(" + stateKey + "," + licenseKey + ")";
+      const fullTableKey = this.doc.identifier + '_(' + stateKey + ',' + licenseKey + ')';
       this.processed = z.process[fullTableKey] ? z.process[fullTableKey] : z.process[this.doc.identifier];
       if (this.processed) {
         this.processedTooltip = `${this.service.getTranslation('desc.uzivatel')} : ${this.processed.user}
           ${this.service.getTranslation('desc.datum')}: ${this.datePipe.transform(this.processed.date, 'dd.MM.yyyy')}`;
 
         if (this.processed.reason) {
-          if (this.processed.state === "rejected") {
+          if (this.processed.state === 'rejected') {
             this.processedTooltip += `
-            ${this.service.getTranslation('desc.duvod')}: ${this.processed.reason}`
+            ${this.service.getTranslation('desc.duvod')}: ${this.processed.reason}`;
 
           } else {
             this.processedTooltip += `
-            ${this.service.getTranslation('desc.komentar')}: ${this.processed.reason}`
+            ${this.service.getTranslation('desc.komentar')}: ${this.processed.reason}`;
           }
         }
       }
@@ -124,7 +124,7 @@ export class ResultItemComponent implements OnInit {
 
     this.hasGranularity = this.doc.granularity && this.doc.granularity.length >= 1;
     this.dkLinks = [];
-    // Masterlinks && granularity     
+    // Masterlinks && granularity
     if (this.doc.masterlinks || this.doc.masterlinks_disabled) {
       this.doc.masterlinks?.forEach((mlink)=>{
         this.dkLinks.push(mlink.link);
@@ -135,16 +135,16 @@ export class ResultItemComponent implements OnInit {
       tags.forEach(t => {
         if (this.doc[t]) {
           this.doc[t].forEach((lorig: string) => {
-            // TODO: Config !! 
+            // TODO: Config !!
             let l = lorig
               .replace('//kramerius5.nkp.cz/uuid/', '//ndk.cz/uuid/')
               .replace('//kramerius5.nkp.cz/search/handle/', '//ndk.cz/uuid/')
               .replace('//krameriusndk.nkp.cz/search/handle/', '//ndk.cz/uuid/')
               .replace('//krameriusndk.mzk.cz/search/handle/', '//digitalniknihovna.cz/mzk/uuid/')
               .split(' ')[0];
-  
+
               if (l.indexOf('uuid') > -1) {
-                l = this.normalizeLink(l);  
+                l = this.normalizeLink(l);
                 if (!this.dkLinks.includes(l)) {
                   this.dkLinks.push(l);
                 }
@@ -169,7 +169,7 @@ export class ResultItemComponent implements OnInit {
     } else if (this.doc.marc_911u) {
       const link: string = this.doc.marc_911u[0];
       /*
-      // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52 
+      // http://krameriusndk.nkp.cz/search/handle/uuid:960bc370-c6c0-11e2-b6da-005056827e52
       if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
         this.imgSrc = link.replace('/handle/', '/api/v5.0/item/').split(' ')[0] + '/thumb';
       }*/
@@ -181,14 +181,14 @@ export class ResultItemComponent implements OnInit {
 
       const regex = /(uuid:[A-Za-z0-9\-]+)/g;
       const found = link.match(regex);
-  
+
       if (found && found.length > 0 ) {
         this.imgSrc = this.thumb(link);
       } else {
         if (this.doc.marc_856u[0].indexOf('books.google') > 0) {
           // google books
-          const link: string = this.doc.marc_856u[0];
-          const id = link.substring(link.indexOf('vid=') + 4, link.indexOf('&'));
+          const googleBookLink: string = this.doc.marc_856u[0];
+          const id = googleBookLink.substring(googleBookLink.indexOf('vid=') + 4, googleBookLink.indexOf('&'));
           this.service.findGoogleBook(id).subscribe((res: any) => {
             if (res[id]) {
               this.imgSrc = res[id].thumbnail_url;
@@ -200,23 +200,23 @@ export class ResultItemComponent implements OnInit {
       }
     }
 
-  
+
   }
 
 
-  normalizeLink(l:string) {
+  normalizeLink(l: string) {
     const regex = /(uuid:[A-Za-z0-9\-]+)/g;
     const found = l.match(regex);
     if (found && found.length > 0) {
-      const t = l.indexOf(found[0])
-      l = l.substring(0,t+found[0].length)
-    }    
+      const t = l.indexOf(found[0]);
+      l = l.substring(0,t+found[0].length);
+    }
     return l;
   }
 
-  thumb(link:string) {
+  thumb(link: string) {
     //http://localhost:18080/sdnnt/image?kramurl=http://krameriusndk.mzk.cz/search/handle/uuid:c683efa0-91f1-11e6-baa5-005056827e51
-    return "api/image?kramurl="+link;    
+    return 'api/image?kramurl='+link;
     /*
     link = this.normalizeLink(link);
     if (link.indexOf('handle') > -1 && link.indexOf('uuid') > -1) {
@@ -240,11 +240,11 @@ export class ResultItemComponent implements OnInit {
 
 
   curatorAndPublicStateAreDifferent(): boolean {
-    // neni nastaveny public stav ale ma kuratorsky stav NPA 
+    // neni nastaveny public stav ale ma kuratorsky stav NPA
     if (this.doc.kuratorstav && !this.doc.dntstav) {
       return true;
       // verejny a kuratorsky stav je rozdilny
-    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] != this.doc.dntstav[this.doc.dntstav.length - 1]) {
+    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] !== this.doc.dntstav[this.doc.dntstav.length - 1]) {
       return true;
     }
     return false;
@@ -252,18 +252,18 @@ export class ResultItemComponent implements OnInit {
 
 
   showIdentifiers() {
-    let ctitle = DocsUtils.title(this.doc);
+    const ctitle = DocsUtils.title(this.doc);
     const data = {
       title:ctitle,
       items: [],
-    }
-    data.items.push({ label: 'Aleph identifier', value: this.doc['identifier'] })
+    };
+    data.items.push({ label: 'Aleph identifier', value: this.doc.identifier });
 
     this.config.identifiers.forEach(f => {
       if (this.doc['marc_' + f]) {
-        data.items.push({ label: 'field.' + f, value: this.doc['marc_' + f] })
+        data.items.push({ label: 'field.' + f, value: this.doc['marc_' + f] });
       } else if (this.doc[f] ){
-        data.items.push({ label: 'field.' + f, value: this.doc[ f] })
+        data.items.push({ label: 'field.' + f, value: this.doc[ f] });
       }
     });
 
@@ -292,31 +292,31 @@ export class ResultItemComponent implements OnInit {
 
   public showGranularity() {
 
-    let itms =  this.doc.granularity.sort((a,b) => {
+    const itms =  this.doc.granularity.sort((a,b) => {
       if (a.rocnik && b.rocnik) {
-        if (a.rocnik == b.rocnik) {
+        if (a.rocnik === b.rocnik) {
 
           if (a.acronym && b.acronym) {
-            return (a.acronym > b.acronym ? 1 : -1); 
+            return (a.acronym > b.acronym ? 1 : -1);
           } else  if (a.acronym && !b.acronym) {
             return 1;
-          } else return -1;
+          } else {return -1;}
 
-        } else  return (a.rocnik > b.rocnik ? 1 : -1); 
+        } else  {return (a.rocnik > b.rocnik ? 1 : -1);}
       } else if (a.rocnik && !b.rocnik) {
         return 1;
-      } else return -1;
+      } else {return -1;}
     });
 
-    const data = { title: this.doc.nazev, 
-      //items: this.doc.granularity 
-      items: itms 
-    
+    const data = { title: this.doc.nazev,
+      //items: this.doc.granularity
+      items: itms
+
     };
 
     const dialogRef = this.dialog.open(GranularityComponent, {
       width: '1150px',
-      data: data,
+      data,
       panelClass: 'app-dialog-states'
     });
   }
@@ -326,7 +326,7 @@ export class ResultItemComponent implements OnInit {
     // posledni zmena je v identifikatoru
     if (this.zadost.process && this.zadost.process[this.doc.identifier]) {
       return this.zadost.process[this.doc.identifier].state === 'rejected';
-    } else return false;
+    } else {return false;}
   }
 
   public showStates() {
@@ -343,12 +343,12 @@ export class ResultItemComponent implements OnInit {
           if (res.response.docs.length > 0) {
             this.doc = res.response.docs[0];
           }
-          let utls:SearchResultsUtils = new SearchResultsUtils();
+          const utls: SearchResultsUtils = new SearchResultsUtils();
           if (res.zadosti) {
-            utls.enhanceByRequest([this.doc], res.zadosti);            
+            utls.enhanceByRequest([this.doc], res.zadosti);
           }
           if (res.notifications) {
-            utls.enhanceByNotifications([this.doc], res.notifications);            
+            utls.enhanceByNotifications([this.doc], res.notifications);
           }
         });
       }
@@ -358,7 +358,7 @@ export class ResultItemComponent implements OnInit {
 
 
   goto(url, event) {
-    window.open(url, "_blank", 'noreferrer');
+    window.open(url, '_blank', 'noreferrer');
     if (event) {event.stopPropagation(); }
     return;
   }
@@ -367,7 +367,7 @@ export class ResultItemComponent implements OnInit {
     // prepare VNX
     //const navrh = this.isZarazeno ? 'VN' : 'NZN';
     this.service.prepareZadost(['VNZ', 'VNL']).subscribe((res: Zadost) => {
-      this.state.currentZadost['VNX'] = res;
+      this.state.currentZadost.VNX = res;
       this.addToZadostInternal(res.navrh);
     });
   }
@@ -382,13 +382,13 @@ export class ResultItemComponent implements OnInit {
 
 
   addToZadostInternal(navrh: string) {
-    let onlyRecord = true;
+    const onlyRecord = true;
     this.service.getExpression(this.doc.frbr).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('', res.error, true);
       } else {
         if (res.response.numFound > 1) {
-          // TODO: tempory disabled 
+          // TODO: tempory disabled
           // More items for one request. To disscuss
           /*
           const dialogRef = this.dialog.open(ExpressionDialogComponent, {
@@ -558,11 +558,11 @@ export class ResultItemComponent implements OnInit {
   }
 
   openSuccessorRecords(flag: boolean) {
-    let followers = this.doc.followers ? this.doc.followers : [];
+    const followers = this.doc.followers ? this.doc.followers : [];
     this.service.details(followers).subscribe((resp: SolrResponse) => {
       const data = {
-        "edit": flag,
-        "docs" : resp.response.docs
+        edit: flag,
+        docs : resp.response.docs
        };
 
       const approveDialogRef = this.dialog.open(DialogSuccessorRecordsComponent, {
@@ -572,14 +572,14 @@ export class ResultItemComponent implements OnInit {
       });
 
       approveDialogRef.afterClosed().subscribe(result => {
-        if (typeof result.options === "string") {
-          const approveDialogRef = this.dialog.open(DialogPromptComponent, {
+        if (typeof result.options === 'string') {
+          const commentDialogRef = this.dialog.open(DialogPromptComponent, {
             width: '700px',
             data: { caption: 'komentar', label: 'komentar' },
             panelClass: 'app-register-dialog'
           });
 
-          approveDialogRef.afterClosed().subscribe(r => {
+          commentDialogRef.afterClosed().subscribe(r => {
             if (r !== null) {
               this.processZadostEvent.emit({ type: 'approve', identifier: this.doc.identifier, komentar: r,options:result.options});
             }

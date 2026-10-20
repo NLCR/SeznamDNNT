@@ -11,7 +11,7 @@ import { AppState } from 'src/app/app.state';
 })
 export class HomeComponent implements OnInit {
 
-  
+
   activeTab: string;
   tabContent: string;
   showStats = false;
@@ -19,11 +19,11 @@ export class HomeComponent implements OnInit {
   facets: any;
 
   cardsFacets: object = {
-    'A':0,
-    'PA':0,
-    'N':0,
-    'dntt':0,
-    'dnto':0,
+    A:0,
+    PA:0,
+    N:0,
+    dntt:0,
+    dnto:0,
   };
 
   constructor(
@@ -44,11 +44,11 @@ export class HomeComponent implements OnInit {
 
       this.facets = res.facet_counts.facet_fields;
 
-      for (let dntstav of res.facet_counts.facet_fields.dntstav) {
-        this.cardsFacets[dntstav.name] = dntstav.value;          
+      for (const dntstav of res.facet_counts.facet_fields.dntstav) {
+        this.cardsFacets[dntstav.name] = dntstav.value;
       }
-      for (let license of res.facet_counts.facet_fields.license) {
-        this.cardsFacets[license.name] = license.value;          
+      for (const license of res.facet_counts.facet_fields.license) {
+        this.cardsFacets[license.name] = license.value;
       }
     });
   }
@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit {
     } else {
       this.showStats = true;
     }
-    
+
   }
-  
+
 }

@@ -33,19 +33,18 @@ export class DialogNotificationsSettingsComponent implements OnInit {
       this.state.user.administratorske_notifikace = true;
     }
 
-    this.service.getRuleNotifications().subscribe((res:any)=>{
+    this.service.getRuleNotifications().subscribe((res: any)=>{
       this.notifications = res.docs;
       this.notifications.forEach(notif => {
-        let filters = [];
+        const filters = [];
         if (notif.filters) {
-          let parsed = JSON.parse(notif.filters);
-          let k: keyof typeof parsed;  // Type is "one" | "two" | "three"
-          for (k in parsed) {
+          const parsed = JSON.parse(notif.filters);
+          for (const k of Object.keys(parsed)) {
             const v = parsed[k];  // OK
             filters.push({
-              "field":k,
-              "value":v
-            });          
+              field:k,
+              value:v
+            });
           }
         }
         notif.filters = filters;
@@ -68,7 +67,7 @@ export class DialogNotificationsSettingsComponent implements OnInit {
   }
 
   deleteNotification(notification) {
-    let index = this.notifications.indexOf(notification);
+    const index = this.notifications.indexOf(notification);
     if (index > -1) {
       this.notifications.splice(index, 1);
     }
@@ -77,31 +76,31 @@ export class DialogNotificationsSettingsComponent implements OnInit {
 
   saveNotificationSettings() {
 
-    let savedNotications = [];
+    const savedNotications = [];
     this.notifications.forEach(notif=> {
-        var notifFilters: {[k: string]: any} = {};
+        const notifFilters: {[k: string]: any} = {};
         notif.filters.forEach(filter=> {
           notifFilters[filter.field] = filter.value;
         });
 
-        let nval = {
-          "name": notif.name,
-          "id": notif.id,
-          "user": notif.user,
-          "query": notif.query,
-          "type": notif.type,
-          "periodicity": notif.periodicity,
-          "filters": JSON.stringify(notifFilters)
+        const nval = {
+          name: notif.name,
+          id: notif.id,
+          user: notif.user,
+          query: notif.query,
+          type: notif.type,
+          periodicity: notif.periodicity,
+          filters: JSON.stringify(notifFilters)
         };
         savedNotications.push(nval);
     });
 
-    let request =  {
-      "notification_interval":this.state.user.notifikace_interval,
-      "administratorske_notifikace":this.state.user.administratorske_notifikace,
-      "notifications":savedNotications
+    const request =  {
+      notification_interval:this.state.user.notifikace_interval,
+      administratorske_notifikace:this.state.user.administratorske_notifikace,
+      notifications:savedNotications
     };
-    let user = this.state.user;
+    const user = this.state.user;
 
     this.service.savetRuleNotificationSettings(request).subscribe((res: any) => {
       if (res.error) {
@@ -111,7 +110,7 @@ export class DialogNotificationsSettingsComponent implements OnInit {
         this.state.notificationSettings.all = res.all;
         this.router.navigate([], {
           queryParams: {
-            'notificationFilter': null
+            notificationFilter: null
           },
           queryParamsHandling: 'merge'
         });

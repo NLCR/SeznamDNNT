@@ -26,19 +26,19 @@ export class AppState {
 
   public currentLang: string;
   public activePage: string;
-  public loading: boolean = true;
+  public loading = true;
 
   public q: string;
-  public page: number = 0;
-  public rows: number = 20;
+  public page = 0;
+  public rows = 20;
 
- 
-  // page,rows  
+
+  // page,rows
   public navigationstore: NavigationStore = new NavigationStore();
   // facets
   public facetsstore: FacetsStore = new FacetsStore();
-  // prefix search 
-  public prefixsearch :{[key: string]: string} = {};
+  // prefix search
+  public prefixsearch: {[key: string]: string} = {};
 
 
   // store for sort
@@ -46,8 +46,8 @@ export class AppState {
 
   //public prefix: {[key: string]: Sort} = {};
 
-  // vyhodit ?? 
-  public rokvydani:string;
+  // vyhodit ??
+  public rokvydani: string;
 
   // Seznam stavu zaznamu pro uzivatel
   public user: User;
@@ -55,7 +55,7 @@ export class AppState {
   public expirationDialog = false;
 
 
-  public consent: boolean = true;
+  public consent = true;
 
   public usedFilters: Filter[] = [];
 
@@ -63,17 +63,17 @@ export class AppState {
   public withNotification: boolean;
 
   // Notifications filter
-  public notificationSettings:NotifSettings = new NotifSettings();
+  public notificationSettings: NotifSettings = new NotifSettings();
 
 
-  
+
   // Aktualni zadost kam se pridavaji navrhy; zmenit
   // NZN, VN, VN_, VNL (VNL a VNZ je typ na omezeni na terminal tedy jeden typ )
-  // uzivatel ma jednu zadost na omezeni na terminal a rozhodne se podle ceho ji posle  
+  // uzivatel ma jednu zadost na omezeni na terminal a rozhodne se podle ceho ji posle
   //currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
-  currentZadost: {NZN: Zadost,VN: Zadost, VNX: Zadost} = {
+  currentZadost: {NZN: Zadost;VN: Zadost; VNX: Zadost} = {
     VN: null,
-    NZN: null, 
+    NZN: null,
     VNX:null
   };
 
@@ -85,20 +85,20 @@ export class AppState {
 
   processParams(searchParams: ParamMap, url: string) {
 
-    let navigationKey = this.navigationstore.findKeyFromUrl(url);
+    const navigationKey = this.navigationstore.findKeyFromUrl(url);
 
     this.usedFilters = [];
 
-    if (!this.sort['sort']) {
-      this.sort['sort'] = this.config.sorts.sort[0];
+    if (!this.sort.sort) {
+      this.sort.sort = this.config.sorts.sort[0];
     }
-    if (!this.sort['sort_account']) {
-      this.sort['sort_account'] = this.config.sorts.sort_account[0];
+    if (!this.sort.sort_account) {
+      this.sort.sort_account = this.config.sorts.sort_account[0];
     }
-    if (!this.sort['user_sort_account']) {
-      this.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+    if (!this.sort.user_sort_account) {
+      this.sort.user_sort_account = this.config.sorts.user_sort_account[0];
     }
- 
+
 
     this.fullCatalog = false;
     this.withNotification = false;
@@ -111,16 +111,16 @@ export class AppState {
       if (p === 'q') {
         this.q = param;
       } else if (p === 'rows') {
-        this.rows = parseInt(param);
+        this.rows = parseInt(param, 10);
         if (navigationKey) {
           this.navigationstore.setRows(navigationKey, this.rows);
         }
       } else if (p === 'importRows') {
         if (navigationKey) {
-          this.navigationstore.setRows(navigationKey, parseInt(param));
+          this.navigationstore.setRows(navigationKey, parseInt(param, 10));
         }
       } else if (p === 'page') {
-        this.page = parseInt(param);
+        this.page = parseInt(param, 10);
         if (navigationKey) {
           this.navigationstore.setPage(navigationKey, this.page);
         }
@@ -130,16 +130,16 @@ export class AppState {
         this.withNotification = param === 'true';
       } else if (p === 'sort') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.sort= this.config.sorts.sort.find(s => param === (s.field + " " + s.dir));
+        this.sort.sort= this.config.sorts.sort.find(s => param === (s.field + ' ' + s.dir));
       } else if (p === 'sort_account') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.sort_account = this.config.sorts.sort_account.find(s => param === (s.field + " " + s.dir));
+        this.sort.sort_account = this.config.sorts.sort_account.find(s => param === (s.field + ' ' + s.dir));
       } else if (p === 'user_sort_account') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + " " + s.dir));
+        this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + ' ' + s.dir));
       } else if (p === 'notificationFilter') {
 
-         let selectedNotification = this.notificationSettings.all.find(n=> n.id === param); 
+         const selectedNotification = this.notificationSettings.all.find(n=> n.id === param);
          this.notificationSettings.selected = selectedNotification;
 
       } else {
@@ -172,7 +172,7 @@ export class AppState {
       this.logged = true;
       this.user = res;
       if (res.zadost) {
-        // res.zadost je Array max 3 elementy. Muze mit navrh=NZN nebo navrh=VVS 
+        // res.zadost je Array max 3 elementy. Muze mit navrh=NZN nebo navrh=VVS
         res.zadost.forEach(z => {
           if (z.navrh === 'NZN') {
             this.currentZadost.NZN = z;
@@ -181,8 +181,8 @@ export class AppState {
           }else if (z.navrh === 'VNZ' || z.navrh === 'VNL') {
             this.currentZadost.VNX = z;
           }
-        }); 
-        
+        });
+
       }
 
       if (res.notificationsettings) {
@@ -193,11 +193,11 @@ export class AppState {
   }
 
 
-  isNavigationStoreKeyInitialized(key:string){ 
-    return this.navigationstore.contains(key);    
+  isNavigationStoreKeyInitialized(key: string){
+    return this.navigationstore.contains(key);
   }
 
-  initDefaultNavitionStoreKey(key:string) {
+  initDefaultNavitionStoreKey(key: string) {
     this.navigationstore.initDefault(key);
   }
 }

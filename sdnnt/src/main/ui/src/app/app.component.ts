@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
@@ -15,8 +15,8 @@ import { DialogSessionExpirationComponent } from './components/dialog-session-ex
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  
+export class AppComponent implements OnInit {
+
 
 
   constructor(
@@ -57,7 +57,7 @@ export class AppComponent {
 
           if(res.pinginguser) {
             if (res.remainingtime) {
-              console.log("Remaining time "+res.remainingtime);
+              console.log('Remaining time '+res.remainingtime);
 
               if (res.remainingtime < 20) {
                 if (!this.state.expirationDialog) {
@@ -71,7 +71,7 @@ export class AppComponent {
                 this.sessionDialogRef.afterClosed().subscribe(() => {
                   this.state.expirationDialog = false;
                 });
-                
+
                   this.state.expirationDialog = true;
                 }
               }
@@ -92,21 +92,21 @@ export class AppComponent {
                 this.state.logged = false;
                 this.state.user = null;
                 this.state.facetsstore.reinit();
-                this.state.sort['sort'] = this.config.sorts.sort[0];
-                this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
-                this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+                this.state.sort.sort = this.config.sorts.sort[0];
+                this.state.sort.sort_account = this.config.sorts.sort_account[0];
+                this.state.sort.user_sort_account = this.config.sorts.user_sort_account[0];
                 this.router.navigate(['/home'], {});
               }
             });
           }
         });
-      }    
+      }
     });
 
   }
 
   isConsentEnabled() {
-    var consent:string = localStorage.getItem("consent");
+    const consent: string = localStorage.getItem('consent');
     return consent != null;
   }
 

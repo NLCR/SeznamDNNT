@@ -1,4 +1,4 @@
 export class Notif {
-    name:string
-    id:string
+    name: string;
+    id: string;
 }

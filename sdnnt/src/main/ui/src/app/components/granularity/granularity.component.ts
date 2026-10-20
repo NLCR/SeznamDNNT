@@ -23,7 +23,7 @@ export class GranularityComponent implements OnInit {
   setSelection(item) {
     console.log(item.selected);
   }
-  
+
   change() {
     this.dialogRef.close({selection: this.data.items.filter(item => item.selected), isWhole: this.isWhole});
   }

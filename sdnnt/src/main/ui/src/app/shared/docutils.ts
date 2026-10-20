@@ -1,11 +1,11 @@
-import { SolrDocument } from "./solr-document";
+import { SolrDocument } from './solr-document';
 
 /** Doc title utils */
 export class DocsUtils {
 
       // move to utils
     static first(arr) {
-        return arr && arr[0] ? arr[0] : "";
+        return arr && arr[0] ? arr[0] : '';
     }
 
     static title(doc: SolrDocument) {
@@ -31,7 +31,7 @@ export class DocsUtils {
         return this.first(doc.marc_250a);
     }
 
-    
+
     static nakladatelskeUdaje(doc: SolrDocument) {
         let str =this.first(doc.marc_260a);
         if(doc.marc_260b) {

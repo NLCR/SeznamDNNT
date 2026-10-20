@@ -14,8 +14,8 @@ export class DialogCorrespondenceComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<DialogCorrespondenceComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Zadost) { 
-    
+    @Inject(MAT_DIALOG_DATA) public data: Zadost) {
+
       this.result = data.email;
   }
 

@@ -98,7 +98,7 @@ export function createCustomMatPaginatorIntl(
 
 const providers: any[] =[
   { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
-  AppState, AppConfiguration, HttpClient, 
+  AppState, AppConfiguration, HttpClient,
   { provide: APP_INITIALIZER, useFactory: (config: AppConfiguration) => () => config.load(), deps: [AppConfiguration], multi: true },
   TranslateService,
   {
@@ -185,15 +185,15 @@ const providers: any[] =[
     BrowserAnimationsModule,
     AngularEditorModule,
     CookieModule.forRoot(),
-    
-    NgxEchartsModule.forRoot({ 
+
+    NgxEchartsModule.forRoot({
       echarts
     }),
 
     //UserIdleModule.forRoot({idle: 600, timeout: 300, ping: 120})
   ],
   providers,
-  
+
   bootstrap: [AppComponent]
 })
 export class AppModule { }

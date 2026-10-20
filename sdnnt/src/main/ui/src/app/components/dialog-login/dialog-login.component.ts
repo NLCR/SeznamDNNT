@@ -20,7 +20,7 @@ export class DialogLoginComponent implements OnInit {
   rememberMe: boolean;
   keepLoggedIn: boolean;
 
-  hidePassword:boolean = true;
+  hidePassword = true;
 
   constructor(
     public dialogRef: MatDialogRef<DialogLoginComponent>,
@@ -48,13 +48,13 @@ export class DialogLoginComponent implements OnInit {
         this.pwd = '';
         this.loading = false;
 
-        this.dialogRef.close({"user":this.user, "logged":true});
+        this.dialogRef.close({user:this.user, logged:true});
       }
     });
   }
 
   resetPwd() {
-    this.dialogRef.close({"user":null, "logged":false});
+    this.dialogRef.close({user:null, logged:false});
     this.router.navigate(['/fgtpswd'], {});
   }
 
@@ -70,12 +70,12 @@ export class DialogLoginComponent implements OnInit {
       this.state.facetsstore.reinit();
 
 
-      this.state.sort['sort'] = this.config.sorts.sort[0];
-      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
-      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
-      
+      this.state.sort.sort = this.config.sorts.sort[0];
+      this.state.sort.sort_account = this.config.sorts.sort_account[0];
+      this.state.sort.user_sort_account = this.config.sorts.user_sort_account[0];
 
-      this.dialogRef.close({"user":null, "logged":false});
+
+      this.dialogRef.close({user:null, logged:false});
 
     });
   }

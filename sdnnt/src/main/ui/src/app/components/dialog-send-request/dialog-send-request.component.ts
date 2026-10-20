@@ -23,7 +23,7 @@ export class DialogSendRequestComponent implements OnInit {
   }
 
   send() {
-    
+
     this.data.pozadavek = this.pozadavek;
     this.data.poznamka = this.poznamka;
 
@@ -36,18 +36,18 @@ export class DialogSendRequestComponent implements OnInit {
 
         }
       } else {
-        this.data = <Zadost>res;
+        this.data = res as Zadost;
         this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
         this.dialogRef.close();
       }
     });
 
-    
+
     /*
     this.data.datum_zadani = new Date();
     this.data.pozadavek = this.pozadavek;
     this.data.poznamka = this.poznamka;
-    // sluzba 
+    // sluzba
     this.data.state = 'waiting';
     this.service.saveZadost(this.data).subscribe((res: any) => {
       if (res.error) {

@@ -10,7 +10,7 @@
             <th>{{ 'desc.stav' | translate }}</th>
             <th>{{ 'desc.licence' | translate }}</th>
             <th>{{ 'desc.komentar' | translate }}</th>           
-            <th *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>
+            <th *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -20,7 +20,7 @@
             <td>{{ item.stav }}</td>
             <td>{{ item.license }}</td>
             <td>{{ item.comment }}</td>
-            <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+            <td *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'"  
                 [matTooltip]=" item.zadost">
              {{ item.zadost?.substring(item.zadost.length -8) }}</td>
           </tr>
@@ -28,7 +28,7 @@
       </table>
     </mat-tab>    
 
-    <mat-tab [label]="'desc.historie_kuratorskeho_stavu' | translate" *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">
+    <mat-tab [label]="'desc.historie_kuratorskeho_stavu' | translate" *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'">
       <table [cellPadding]="0" [cellSpacing]="0" class="app-table app-mt-4">
         <thead>
           <tr>
@@ -39,8 +39,8 @@
             <th>{{ 'desc.komentar' | translate }}</th>           
             <th>{{ 'desc.cislo_zadosti' | translate }}</th>
 
-            <th *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">{{ 'desc.pnreq' | translate }}</th>
-            <th *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">{{ 'desc.pnimport' | translate }}</th>
+            <th *ngIf="kuratorColumns === KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">{{ 'desc.pnreq' | translate }}</th>
+            <th *ngIf="kuratorColumns === KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">{{ 'desc.pnimport' | translate }}</th>
 
           </tr>
         </thead>
@@ -54,21 +54,21 @@
             
             <td>{{ item.comment }}</td>
             
-            <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+            <td *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'"  
                 [matTooltip]=" item.zadost">
              {{ item.zadost?.substring(item.zadost.length -8) }}</td>
 
 
-            <td *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">
-              <ng-container *ngIf="item.stav == 'PN' && isLast; else noData">
+            <td *ngIf="kuratorColumns === KuratorStavColumns.ADDITOIONAL_N_PN_COLUMN">
+              <ng-container *ngIf="item.stav === 'PN' && isLast; else noData">
                   {{ pnDeadlineReq | date:'dd.MM.yyyy HH:mm' }}
                   <span class="pn-deadline-info">{{ pnDeadlineConfigReq }}</span>
                 </ng-container>
                 <ng-template #noData> - </ng-template>
             </td>
 
-            <td *ngIf="kuratorColumns == KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">
-              <ng-container *ngIf="item.stav == 'PN' && isLast; else noData">
+            <td *ngIf="kuratorColumns === KuratorStavColumns.ADDITOIONAL_A_PN_COLUMN">
+              <ng-container *ngIf="item.stav === 'PN' && isLast; else noData">
                 {{ pnDeadlineImport | date:'dd.MM.yyyy HH:mm' }}
                 <span class="pn-deadline-info">{{ pnDeadlineConfigImport }}</span>
               </ng-container>
@@ -80,7 +80,7 @@
       </table>
     </mat-tab>
    
-    <mat-tab  [label]="'desc.historie_rocniku' | translate" *ngIf=" granularity && (state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin')">
+    <mat-tab  [label]="'desc.historie_rocniku' | translate" *ngIf=" granularity && (state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin')">
  
 
       <ng-container *ngFor="let cat of kategorieGranulovanychStavu; let idx = index">
@@ -96,7 +96,7 @@
               <th>{{ 'desc.licence' | translate }}</th>
               <th>{{ 'desc.acronym' | translate }}</th>
               <th>{{ 'desc.komentar' | translate }}</th>           
-              <th *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>           
+              <th *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'">{{ 'desc.cislo_zadosti' | translate }}</th>           
             </tr>
           </thead>
           <tbody>
@@ -111,7 +111,7 @@
               <td>{{ item.license }}</td>
               <td><a href="{{ item.link }}" target="_blank">  {{ item.acronym }}</a></td>
               <td  [matTooltip]=" item.comment">{{ shortText(item.comment)  }}  </td>
-              <td *ngIf="state.user.role=='kurator' || state.user.role=='mainKurator' || state.user.role=='admin'"  
+              <td *ngIf="state.user.role==='kurator' || state.user.role==='mainKurator' || state.user.role==='admin'"  
                   [matTooltip]=" item.zadost">
                {{ item.zadost?.substring(item.zadost.length -8) }}</td>
             </tr>

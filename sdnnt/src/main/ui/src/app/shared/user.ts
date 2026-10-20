@@ -9,10 +9,10 @@ export class User {
   pwd: string;
   role: string;
   isActive: boolean;
-  notifikace_interval:string;
-  administratorske_notifikace: boolean = true;
-  
-  typ: string = 'fyzicka_osoba'; //pravnicka/fyzicka osoba
+  notifikace_interval: string;
+  administratorske_notifikace = true;
+
+  typ = 'fyzicka_osoba'; //pravnicka/fyzicka osoba
 
   titul: string;
   jmeno: string;
@@ -34,15 +34,15 @@ export class User {
   institution: string;
 
 
-  nositel: string[]; // Nositel autorských práv k dílu: 
+  nositel: string[]; // Nositel autorských práv k dílu:
   poznamka: string;
   error?: string;
 
-  nazevspolecnosti:string;
+  nazevspolecnosti: string;
 
   registerOption: UserRegisterOption;
-  
-  thirdpartyuser:boolean = false;
+
+  thirdpartyuser = false;
 
   // notification settings
   notificationsettings?: NotifSettings;

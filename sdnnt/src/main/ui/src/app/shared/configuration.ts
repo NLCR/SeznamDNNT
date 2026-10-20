@@ -1,4 +1,4 @@
-import { User } from "./user";
+import { User } from './user';
 
 export interface Sort { field: string; dir: string};
 
@@ -17,7 +17,7 @@ export interface Configuration {
   logo: string;
   homeTabs: string[];
   homeCards: string[];
-  simplelogin:boolean;
+  simplelogin: boolean;
   maximumItemInRequest: number;
   dntSetAlpehLinks: boolean;
   numberOfRuleBasedNotifications: number;
@@ -25,7 +25,7 @@ export interface Configuration {
 
   // Seznam roli
   role: string[];
-  
+
   // Seznam stavu zaznamu pro role
   dntStates: {[role: string]: string[]};
 
@@ -36,16 +36,16 @@ export interface Configuration {
 
   // Seznam poli, ktere se zpracuju v url jako filter
   filterFields: string[];
-  sortedFacets:string[];
+  sortedFacets: string[];
 
-  
-  // seznam poli 
-  userFilterFields: string[],
 
-  // Sort pro standardni data 
+  // seznam poli
+  userFilterFields: string[];
+
+  // Sort pro standardni data
   sorts: {[key: string]: Sort[]};
 
-  
+
   // // Sort v account
   // sorts_account:  Sort[];
 

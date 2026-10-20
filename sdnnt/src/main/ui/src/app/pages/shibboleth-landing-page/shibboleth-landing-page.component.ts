@@ -17,7 +17,7 @@ export class ShibbolethLandingPageComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.service.thirdPartyUser().subscribe((res:any) => {
+    this.service.thirdPartyUser().subscribe((res: any) => {
       this.state.setLogged(res);
       this.router.navigate(['/home'], {});
     });

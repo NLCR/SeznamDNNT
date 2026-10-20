@@ -27,7 +27,7 @@ export class ResetPasswordComponent implements OnInit {
     private router: Router,
     private service: AppService,
     public state: AppState,
-    public dialog: MatDialog 
+    public dialog: MatDialog
 
   ) { }
 
@@ -36,12 +36,12 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(val => {
-      if (val.has("token")) {
-        const token = val.get("token");
-        this.service.validateToken(token).subscribe((res:any) => {
+      if (val.has('token')) {
+        const token = val.get('token');
+        this.service.validateToken(token).subscribe((res: any) => {
           if(res.valid) {
             this.tokenValidation = Tokenvalidation.VALID;
-            const data = {"token":token};
+            const data = {token};
             const dialogRef = this.dialog.open(DialogChangePasswordComponent, {
               width: '450px',
               data,
@@ -53,16 +53,16 @@ export class ResetPasswordComponent implements OnInit {
           }
         });
 
-      } 
+      }
     });
   }
 
-  
+
   invalidToken(): boolean {
     return this.tokenValidation === Tokenvalidation.INVALID;
   }
 
 
 
-  
+
 }

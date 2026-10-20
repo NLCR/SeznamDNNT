@@ -24,7 +24,7 @@ export class UserResetPasswordComponent implements OnInit {
     private router: Router,
     private service: AppService,
     public state: AppState,
-    public dialog: MatDialog 
+    public dialog: MatDialog
 
   ) { }
 
@@ -33,10 +33,10 @@ export class UserResetPasswordComponent implements OnInit {
   ngOnInit(): void {
 
     //*ngIf="state.user && state.user.role === 'admin'"
-    console.log("State user "+this.state.user);
+    console.log('State user '+this.state.user);
 
     if (this.state.user != null) {
-      console.log("State user "+this.state.user);
+      console.log('State user '+this.state.user);
       const data = {};
       const dialogRef = this.dialog.open(DialogChangePasswordComponent, {
         width: '450px',
@@ -47,7 +47,7 @@ export class UserResetPasswordComponent implements OnInit {
 
   }
 
-  
+
 
 
 

@@ -17,7 +17,7 @@ export class InputLoginNameComponent implements OnInit {
     private router: Router,
     private service: AppService,
     public state: AppState,
-    public dialog: MatDialog 
+    public dialog: MatDialog
   ) {
 
     const data = {};

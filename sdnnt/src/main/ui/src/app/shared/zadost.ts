@@ -1,4 +1,4 @@
-import { logging } from "selenium-webdriver";
+import { logging } from 'selenium-webdriver';
 
 export class Zadost {
 
@@ -24,9 +24,9 @@ export class Zadost {
   deadline: Date;
   desired_item_state: string;
   desired_license: string;
-  
-  escalated: boolean = false;
-  expired: boolean = false;
+
+  escalated = false;
+  expired = false;
 
   email: string;
 

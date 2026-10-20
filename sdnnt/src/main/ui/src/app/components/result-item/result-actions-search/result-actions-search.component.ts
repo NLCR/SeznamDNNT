@@ -8,10 +8,10 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 })
 export class ResultActionsSearchComponent implements OnInit {
 
-  @Input() doc:SolrDocument;
+  @Input() doc: SolrDocument;
 
-  hasNavhr:boolean;
-  view:string;
+  hasNavhr: boolean;
+  view: string;
 
 
   constructor() { }

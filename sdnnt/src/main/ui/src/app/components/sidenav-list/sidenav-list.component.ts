@@ -18,7 +18,7 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
 
   public onSidenavClose = () => {
     this.sidenavClose.emit();
-  }
+  };
 
   // sidenav
   @Output() public sidenavToggle = new EventEmitter();
@@ -30,7 +30,7 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
     service: AppService,
     public state: AppState,
     public config: AppConfiguration
-    ) { 
+    ) {
       super(dialog,router,service,state,config);
     }
 
@@ -40,7 +40,7 @@ export class SidenavListComponent extends NavbarComponent implements OnInit {
   // sidenav fuction
   public onToggleSidenav = () => {
     this.sidenavToggle.emit();
-  }
+  };
 
   openNotificationsSettings() {
     const dialogRef = this.dialogNotification.open(DialogNotificationsSettingsComponent, {

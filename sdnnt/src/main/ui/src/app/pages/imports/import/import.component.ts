@@ -41,7 +41,7 @@ export class ImportComponent implements OnInit, OnDestroy {
   initialized = false;
   filteredIds: { [id: string]: any[] };
 
-  eanAlephLink: string = '';
+  eanAlephLink = '';
 
   import: Import;
 
@@ -61,7 +61,7 @@ export class ImportComponent implements OnInit, OnDestroy {
       return;
     }
 
-    
+
     this.subs.push(this.route.queryParams.subscribe(val => {
       this.importId = this.route.snapshot.paramMap.get('id');
 
@@ -90,7 +90,7 @@ export class ImportComponent implements OnInit, OnDestroy {
     }
     return false;
   }*/
- 
+
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
@@ -208,7 +208,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
 
   gotoAleph(url) {
-    window.open(url, "_blank", 'noreferrer');
+    window.open(url, '_blank', 'noreferrer');
     return;
   }
 
@@ -221,18 +221,18 @@ export class ImportComponent implements OnInit, OnDestroy {
         const data = {
           title: res.response.docs[0].title,
           items: [],
-        }
-        data.items.push({ label: 'Aleph identifier', value: res.response.docs[0]['identifier'] })
+        };
+        data.items.push({ label: 'Aleph identifier', value: res.response.docs[0].identifier });
 
         this.config.identifiers.forEach(f => {
-          let doc = res.response.docs[0];
+          const doc = res.response.docs[0];
           if (doc['marc_' + f]) {
-            data.items.push({ label: 'field.' + f, value: res.response.docs[0]['marc_' + f] })
+            data.items.push({ label: 'field.' + f, value: res.response.docs[0]['marc_' + f] });
           } else if (doc[f] ){
-            data.items.push({ label: 'field.' + f, value: doc[ f] })
+            data.items.push({ label: 'field.' + f, value: doc[ f] });
           }
         });
-    
+
 
         const dialogRef = this.dialog.open(DialogIdentifierComponent, {
           width: '750px',
@@ -266,7 +266,7 @@ export class ImportComponent implements OnInit, OnDestroy {
 
         const dialogRef = this.dialog.open(GranularityComponent, {
           width: '1150px',
-          data: data,
+          data,
           panelClass: 'app-dialog-states'
         });
     //   }
@@ -305,13 +305,13 @@ changeState(doc,id) {
   approveDialogRef.afterClosed().subscribe(result => {
     if (result !== undefined) {
 
-      this.service.changeStavDirect(id.identifier, "N", "PN", null, result, null).subscribe(res => {
+      this.service.changeStavDirect(id.identifier, 'N', 'PN', null, result, null).subscribe(res => {
         if (res.response.docs.length > 0) {
           id.dntstav = res.response.docs[0].dntstav;
           id.kuratorstav = res.response.docs[0].kuratorstav;
           id.license = res.response.docs[0].license;
           id.changedInImport = true;
-          this.service.changeStavImport(doc).subscribe(res => {
+          this.service.changeStavImport(doc).subscribe(() => {
 
           });
         }
@@ -337,7 +337,7 @@ changeState(doc,id) {
             id.kuratorstav = res.response.docs[0].kuratorstav;
             id.license = res.response.docs[0].license;
             id.changedInImport = true;
-            this.service.changeStavImport(doc).subscribe(res => {
+            this.service.changeStavImport(doc).subscribe(() => {
             });
           }
         });
@@ -347,11 +347,11 @@ changeState(doc,id) {
   }
 
   curatorAndPublicStateAreDifferent(doc: any) {
-    // neni nastaveny public stav ale ma kuratorsky stav NPA 
+    // neni nastaveny public stav ale ma kuratorsky stav NPA
     if (doc.kuratorstav && !doc.dntstav) {
       return true;
       // verejny a kuratorsky stav je rozdilny
-    } else if (doc.kuratorstav && doc.dntstav && doc.kuratorstav[doc.kuratorstav.length - 1] != doc.dntstav[doc.dntstav.length - 1]) {
+    } else if (doc.kuratorstav && doc.dntstav && doc.kuratorstav[doc.kuratorstav.length - 1] !== doc.dntstav[doc.dntstav.length - 1]) {
       return true;
     }
     return false;
@@ -366,7 +366,7 @@ changeState(doc,id) {
     });
 
     approveDialogRef.afterClosed().subscribe(result => {
-      console.log(result)
+      console.log(result);
       if (result !== undefined) {
         const note = result ? result : '';
         doc.controlled_note = note;
@@ -381,7 +381,7 @@ changeState(doc,id) {
     });
 
 
-    
+
   }
 
 }

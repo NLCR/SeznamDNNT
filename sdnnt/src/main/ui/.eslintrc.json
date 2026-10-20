@@ -20,7 +20,23 @@
         "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
-      "rules": {}
+      "rules": {
+        "@typescript-eslint/member-ordering": "off",
+        "@typescript-eslint/naming-convention": [
+          "error",
+          { "selector": "default", "format": ["camelCase"] },
+          { "selector": "typeLike", "format": ["PascalCase"] },
+          { "selector": "typeParameter", "format": ["PascalCase"] },
+          { "selector": "variableLike", "format": ["camelCase", "PascalCase", "UPPER_CASE", "snake_case"] },
+          { "selector": "property", "format": ["camelCase", "PascalCase", "UPPER_CASE", "snake_case"], "leadingUnderscore": "allow" },
+          { "selector": "method", "format": ["camelCase"], "leadingUnderscore": "allow" },
+          { "selector": "enumMember", "format": ["camelCase", "PascalCase", "UPPER_CASE"] }
+        ],
+        "no-underscore-dangle": ["error", { "allow": ["_paramsProcessed", "_stateSubject", "_configSubject", "_facetsUIStore", "_navigationUIStore"] }],
+        "max-len": ["error", { "code": 200 }],
+        "eqeqeq": ["error", "always", { "null": "ignore" }],
+        "prefer-arrow/prefer-arrow-functions": "off"
+      }
     },
     {
       "files": [
@@ -29,7 +45,9 @@
       "extends": [
         "plugin:@angular-eslint/template/recommended"
       ],
-      "rules": {}
+      "rules": {
+        "@angular-eslint/template/eqeqeq": ["error", { "allowNullOrUndefined": true }]
+      }
     }
   ]
 }

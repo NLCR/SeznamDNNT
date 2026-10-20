@@ -22,13 +22,13 @@ export class ExportComponent implements OnInit {
 
   docs: SolrDocument[] = [];
 
-  public numFound: number = 30;
-  public imgSrc: boolean = false;
-  public exportname:string;
-  public query:string;
+  public numFound = 30;
+  public imgSrc = false;
+  public exportname: string;
+  public query: string;
 
-  public exportObj:any;
-  public exportFiles:any[];
+  public exportObj: any;
+  public exportFiles: any[];
   facets: any;
 
   loading: boolean;
@@ -50,35 +50,35 @@ export class ExportComponent implements OnInit {
         this.router.navigate(['/']);
         return;
       }
-   
+
       const id = this.route.snapshot.paramMap.get('id');
-      
+
       this.route.queryParams.subscribe(val => {
         this.exportname = id;
         this.query = this.route.snapshot.queryParamMap.get('exportq') ;
 
         this.getDocs(val);
-        this.service.getExport(this.exportname).subscribe((exp)=> {
-          if (exp.response.docs && exp.response.docs.length > 0) {
-            this.exportObj = exp.response.docs[0];
+        this.service.getExport(this.exportname).subscribe((exportResponse)=> {
+          if (exportResponse.response.docs && exportResponse.response.docs.length > 0) {
+            this.exportObj = exportResponse.response.docs[0];
           }
         });
 
         this.service.getExportFiles(this.exportname).subscribe((exp)=> {
           this.exportFiles = exp.files;
         });
-        
-        this.state.prefixsearch['export'] = val.exportq;
+
+        this.state.prefixsearch.export = val.exportq;
       });
 
       this.subject.pipe(
         debounceTime(400)
       ).subscribe(searchTextValue => {
-  
+
         const req: any = {};
-  
+
         req.exportq = searchTextValue;
-  
+
         this.router.navigate([], { queryParams: req, queryParamsHandling: 'merge' });
       });
   }
@@ -109,7 +109,7 @@ export class ExportComponent implements OnInit {
       });
     });
   }
-  
+
 
   approveAll() {
 
@@ -117,26 +117,26 @@ export class ExportComponent implements OnInit {
 
       this.service.approveExportIOCP(this.exportname).subscribe((exp)=> {
         this.getDocs({});
-        
-        this.service.getExport(this.exportname).subscribe((exp)=> {
-          if (exp.response.docs && exp.response.docs.length > 0) {
-            this.exportObj = exp.response.docs[0];
+
+        this.service.getExport(this.exportname).subscribe((exportResponse)=> {
+          if (exportResponse.response.docs && exportResponse.response.docs.length > 0) {
+            this.exportObj = exportResponse.response.docs[0];
           }
         });
       });
-  
+
     } else {
 
       this.service.approveExportUOCP(this.exportname).subscribe((exp)=> {
         this.getDocs({});
-        
-        this.service.getExport(this.exportname).subscribe((exp)=> {
-          if (exp.response.docs && exp.response.docs.length > 0) {
-            this.exportObj = exp.response.docs[0];
+
+        this.service.getExport(this.exportname).subscribe((exportResponse)=> {
+          if (exportResponse.response.docs && exportResponse.response.docs.length > 0) {
+            this.exportObj = exportResponse.response.docs[0];
           }
         });
       });
-  
+
     }
 
   }
@@ -149,11 +149,11 @@ export class ExportComponent implements OnInit {
     const data = {
       exportname: this.exportname,
       files: []
-    }
+    };
     this.exportFiles.forEach((e)=> {
       data.files.push(e);
     });
- 
+
     const dialogRef = this.dialog.open(DialogExportedFilesComponent, {
       data,
       width: '600px',
@@ -172,10 +172,10 @@ export class ExportComponent implements OnInit {
   }
 
 
-  
-  processExport(data: { type: string, identifier: string }) {
+
+  processExport(data: { type: string; identifier: string }) {
     switch (data.type) {
-      case 'exported': 
+      case 'exported':
 
         if (this.exportObj.export_type === 'UOCP') {
           this.service.approveExportItemUOCP(this.exportObj.id, data.identifier).subscribe((res: any) => {

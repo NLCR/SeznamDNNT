@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CookieService } from 'ngx-cookie'
+import { CookieService } from 'ngx-cookie';
 import { AppState } from 'src/app/app.state';
 
 @Component({
@@ -19,7 +19,7 @@ export class ConsentComponent implements OnInit {
   }
 
   close(): void {
-    localStorage.setItem("consent", "true");
+    localStorage.setItem('consent', 'true');
   }
 
 }

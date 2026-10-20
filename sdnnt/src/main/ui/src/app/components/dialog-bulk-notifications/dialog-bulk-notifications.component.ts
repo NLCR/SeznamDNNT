@@ -12,8 +12,8 @@ import { AppState } from 'src/app/app.state';
 })
 export class DialogBulkNotificationsComponent implements OnInit {
 
-  periodicity:string = "den";
-  name: string = "";
+  periodicity = 'den';
+  name = '';
 
   notificationNameControl = new FormControl('', [Validators.required, Validators.nullValidator]);
 
@@ -33,13 +33,13 @@ export class DialogBulkNotificationsComponent implements OnInit {
   }
 
   doBulkNotification() {
-   let bulkNotif = {
-      "query": this.state.q,
-      "user":this.state.user.username,
-      "name":this.name,
-      "type":"rule",
-      "periodicity":this.periodicity,
-      "filters": this.filtersToJSON()
+   const bulkNotif = {
+      query: this.state.q,
+      user:this.state.user.username,
+      name:this.name,
+      type:'rule',
+      periodicity:this.periodicity,
+      filters: this.filtersToJSON()
     };
 
     if (!this.state.q) {
@@ -63,20 +63,20 @@ export class DialogBulkNotificationsComponent implements OnInit {
 
   filtersToJSON() {
 
-    let map:Map<string,string> = new Map();
+    const map: Map<string,string> = new Map();
     // console.log(this.state.usedFilters);
     this.state.usedFilters.forEach(f=> {
-      let key = f.field;
-      let val = f.value;
+      const key = f.field;
+      const val = f.value;
       map.set(key,val);
-    });    
-    let json = JSON.stringify(
+    });
+    const json = JSON.stringify(
       Array.from(
         map.entries()
       )
-      .reduce((o, [key, value]) => { 
-        o[key] = value; 
-        return o; 
+      .reduce((o, [key, value]) => {
+        o[key] = value;
+        return o;
       }, {})
     );
     return json;

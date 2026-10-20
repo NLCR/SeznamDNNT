@@ -10,7 +10,7 @@ export class DialogPromptComponent implements OnInit {
 
   result: string = null;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: {caption: string, label: string}) { }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: {caption: string; label: string}) { }
 
   ngOnInit(): void {
   }

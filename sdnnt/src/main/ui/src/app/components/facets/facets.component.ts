@@ -19,15 +19,15 @@ export class FacetsComponent implements OnInit {
 
 
   public getScreenWidth: any;
-  public facetBreakpoint: number = 1040; 
+  public facetBreakpoint = 1040;
 
-  @Input() facet_fields: {[field: string]: {name: string, type: string, value: number}[]};
-  @Input() stats:{ [field: string]: {min: any, max: any, count: number, from: any, until: any}};
+  @Input() facet_fields: {[field: string]: {name: string; type: string; value: number}[]};
+  @Input() stats: { [field: string]: {min: any; max: any; count: number; from: any; until: any}};
 
-  @Input() view:string="search";
+  @Input() view='search';
 
 
-  queryParams:any;
+  queryParams: any;
 
 
   facets: string[];
@@ -39,32 +39,31 @@ export class FacetsComponent implements OnInit {
 
   showRoky: boolean;
 
-  selectedRadioButton:string = 'in_list';
+  selectedRadioButton = 'in_list';
 
   facetSearchOffset=0;
-  facetFieldsInDialog:{};
 
-  rokvydaniParam:string;
+  rokvydaniParam: string;
 
 
   constructor(
     private router: Router,
-    private route : ActivatedRoute,
+    private route: ActivatedRoute,
     public config: AppConfiguration,
     public state: AppState,
     public dialog: MatDialog,
     private service: AppService
-  ) { 
+  ) {
 
 
     this.route.queryParams.subscribe((params) => {
-      const catalogParam = params['catalog'];
+      const catalogParam = params.catalog;
       this.selectedRadioButton = catalogParam || 'in_list';
       this.queryParams = params;
-      this.rokvydaniParam = params['rokvydani'];
+      this.rokvydaniParam = params.rokvydani;
     });
 
-    
+
 
   }
 
@@ -73,30 +72,30 @@ export class FacetsComponent implements OnInit {
     this.getScreenWidth = window.innerWidth;
 
     this.facets = [];
-    // filter kurator stav for users 
+    // filter kurator stav for users
     this.config.filterFields.forEach(f => {
-      let flag:boolean = true;
-      if (f && f ==="kuratorstav") {
-        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');        
-      } else  if (f && f ==="c_actions") {
-        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');        
+      let flag = true;
+      if (f && f ==='kuratorstav') {
+        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');
+      } else  if (f && f ==='c_actions') {
+        flag = this.state.user && (this.state.user.role === 'kurator' || this.state.user.role === 'mainKurator' || this.state.user.role === 'admin');
       }
       if (flag) {
         if (this.facet_fields[f]) {
           this.facets.push(f);
         }
-      }      
+      }
     });
 
     if (this.stats) {
-      // TODO: zmenit      
+      // TODO: zmenit
       const year = (new Date()).getFullYear();
       // this.rokod = (this.stats['rokvydani'].min ? this.stats['rokvydani'].min : 1915);
       // this.rokdo = Math.min(year, (this.stats['rokvydani'].max ? this.stats['rokvydani'].max : 2008));
 
       if (this.rokvydaniParam) {
 
-        let [start, end]: number[] = this.rokvydaniParam.split(',').map(Number);
+        const [start, end]: number[] = this.rokvydaniParam.split(',').map(Number);
         this.rokod = start;
         this.rokdo = end;
 
@@ -105,14 +104,14 @@ export class FacetsComponent implements OnInit {
         this.showRoky = true;
 
       } else {
-        this.rokod = (this.stats['date1_int'].min ? this.stats['date1_int'].min : 1915);
-        this.rokdo = Math.min(year, (this.stats['date1_int'].max ? this.stats['date1_int'].max : 2008));
-  
-  
+        this.rokod = (this.stats.date1_int.min ? this.stats.date1_int.min : 1915);
+        this.rokdo = Math.min(year, (this.stats.date1_int.max ? this.stats.date1_int.max : 2008));
+
+
         this.rokoddate.setValue(new Date(this.rokoddate.value.setFullYear(this.rokod)));
         this.rokdodate.setValue(new Date(this.rokdodate.value.setFullYear(this.rokdo)));
         this.showRoky = true;
-  
+
       }
     }
   }
@@ -125,13 +124,13 @@ export class FacetsComponent implements OnInit {
 
   onRadioButtonChange() {
       const q: any = {};
-      q['catalog'] =  this.selectedRadioButton;
+      q.catalog =  this.selectedRadioButton;
       q.page = null;
       this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
   }
-  
 
-  addFilter(field: string, f:{name: string, type: string, value: number}) {
+
+  addFilter(field: string, f: {name: string; type: string; value: number}) {
     const q: any = {};
     q[field] = f.name;
     q.page = null;
@@ -162,7 +161,7 @@ export class FacetsComponent implements OnInit {
   }
 
   chosenYearHandler(normalizedYear: Date, datepicker: any, field: string) {
-    console.log(normalizedYear)
+    console.log(normalizedYear);
     if (field === 'from') {
       this.rokod = normalizedYear.getFullYear();
     } else {
@@ -176,7 +175,7 @@ export class FacetsComponent implements OnInit {
 
   clickRokFacet() {
     const params: any = {};
-    params['rokvydani'] = this.rokod + ',' + this.rokdo;
+    params.rokvydani = this.rokod + ',' + this.rokdo;
     params.page = 0;
     this.router.navigate([], { queryParams: params, queryParamsHandling: 'merge' });
   }
@@ -197,20 +196,19 @@ export class FacetsComponent implements OnInit {
 
 
   usedFacet(facet) {
-    let retval = this.state.usedFilters.filter(filter => filter.field === facet);
+    const retval = this.state.usedFilters.filter(filter => filter.field === facet);
     return retval;
   }
 
 
   showAllPublishers() {
-    const data = {};
-    data['queryParams'] =   this.queryParams;
+    const data = { queryParams: this.queryParams };
 
 
    const dialogRef = this.dialog.open(DialogAllPublishersComponent, {
      width: '750px',
-     data:data,
-     panelClass: 'app-dialog-all-publishers' 
+     data,
+     panelClass: 'app-dialog-all-publishers'
    });
 
    dialogRef.afterClosed().subscribe(result => {
@@ -218,12 +216,12 @@ export class FacetsComponent implements OnInit {
     if (result.selectedFacets) {
 
       const q: any = {};
-  
+
       result.selectedFacets.forEach(facet => {
-        if (!q['nakladatel']) {
-          q['nakladatel'] = [];
+        if (!q.nakladatel) {
+          q.nakladatel = [];
         }
-        q['nakladatel'].push(facet.name);
+        q.nakladatel.push(facet.name);
       });
       q.page = null;
 
@@ -231,7 +229,7 @@ export class FacetsComponent implements OnInit {
     }
 
   });
- 
+
 
   }
 

@@ -10,7 +10,7 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap app-mb-4" *ngIf="newState == 'PA' || newState == 'A' || newState == 'NL' ">
+  <mat-form-field appearance="outline" class="app-w-100 app-clean-bottom-gap app-mb-4" *ngIf="newState === 'PA' || newState === 'A' || newState === 'NL' ">
     <mat-label>{{ 'desc.licence' | translate }}</mat-label>
     <mat-select name="newState" [(ngModel)]="newLicense" [disabled]="changeLicensePossible()">
       <mat-option *ngFor="let l of ['dnntt', 'dnnto']" [value]="l" >
@@ -48,7 +48,7 @@
             </td>
   
             <td class="app-col-licence">
-              <mat-select  disabled="true" name="newState" [(ngModel)]="itm.license"  *ngIf="itm.kuratorstav == 'A' || itm.kuratorstav == 'PA'">
+              <mat-select  disabled="true" name="newState" [(ngModel)]="itm.license"  *ngIf="itm.kuratorstav === 'A' || itm.kuratorstav === 'PA'">
                 <mat-option *ngFor="let license of ['dnnto','dnntt']"  [value]="license">
                   {{ license }}
                 </mat-option>

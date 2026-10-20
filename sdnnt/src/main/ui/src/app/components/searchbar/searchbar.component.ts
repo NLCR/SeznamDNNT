@@ -18,7 +18,7 @@ export class SearchBarComponent implements OnInit {
     public state: AppState,
     public config: AppConfiguration,
     private route: ActivatedRoute
-    ) { 
+    ) {
 
 
     }
@@ -30,9 +30,9 @@ export class SearchBarComponent implements OnInit {
     const p: any = {};
     p.q = this.state.q ? (this.state.q !== '' ? this.state.q : null) : null;
     p.page = 0;
-    this.router.navigate(['/search'], { 
+    this.router.navigate(['/search'], {
         queryParams:  { ...p, controlled: null },
-        queryParamsHandling: 'merge' 
+        queryParamsHandling: 'merge'
       });
   }
 
@@ -42,8 +42,8 @@ export class SearchBarComponent implements OnInit {
 
   onLoginSuccess() {
 
-    
-    let currentUrl = this.router.url;
+
+    const currentUrl = this.router.url;
     // reload is necessary of if we are on the search page
     if (currentUrl.startsWith('/search')) {
       const p: any = {};

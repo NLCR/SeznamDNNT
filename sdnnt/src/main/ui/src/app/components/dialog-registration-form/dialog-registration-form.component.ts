@@ -18,7 +18,7 @@ import { map, startWith } from 'rxjs/operators';
 export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   // institution autocomplete
 
-  //autocompleteForm: FormGroup; 
+  //autocompleteForm: FormGroup;
 
   myControl = new FormControl();
   //options: string[] = ['One', 'Two', 'Three'];
@@ -47,11 +47,11 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   @ViewChild('conditionTwo') conditionTwoCheck: MatCheckbox;
   @ViewChild('conditionThree') conditionThreeCheck: MatCheckbox;
 
-  @ViewChild('condition') conditionsElement: ElementRef; 
+  @ViewChild('condition') conditionsElement: ElementRef;
 
 
-  inputFocusables: {[key: string] : MatInput};
-  checkboxFocusables: {[key: string] : MatCheckbox};
+  inputFocusables: {[key: string]: MatInput};
+  checkboxFocusables: {[key: string]: MatCheckbox};
 
   //formTypeSelected: number = 1;
   isApiEnabled: boolean;
@@ -71,10 +71,10 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
     private service: AppService) {
 
   }
-  
-  
+
+
   ngOnChanges(changes: SimpleChanges): void {
-    this.isApiEnabled = this.user && this.user.apikey && this.user.apikey != null && this.user.apikey !== ""; 
+    this.isApiEnabled = this.user && this.user.apikey && this.user.apikey != null && this.user.apikey !== '';
     if (this.user) {
       this.autor = this.user.nositel?.includes('autor');
       this.dedic = this.user.nositel?.includes('dedic');
@@ -82,7 +82,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       this.nakladatel = this.user.nositel?.includes('nakladatel');
     }
 
-  
+
     this.inputFocusables = {
       username: this.username,
       email: this.email,
@@ -93,26 +93,26 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
       psc: this.psc,
       kontaktniOsobaJmeno: this.kontaktniOsobaJmeno,
       kontaktniOsobaPrijmeni: this.kontaktniOsobaPrijmeni
-    }
+    };
 
     this.checkboxFocusables = {
       condition1: this.conditionOneCheck,
       condition2: this.conditionTwoCheck,
       condition3: this.conditionThreeCheck
-    }
+    };
 
 
-    
+
 
     if (changes.focus && changes.focus.currentValue) {
 
       if (this.inputFocusables[changes.focus.currentValue]) {
         this.inputFocusables[changes.focus.currentValue].focus();
-      } 
+      }
 
       if (this.checkboxFocusables[changes.focus.currentValue]) {
         this.checkboxFocusables[changes.focus.currentValue].focus();
-        this.conditionsElement.nativeElement.scrollIntoView({ behavior: "smooth", block: "start" });
+        this.conditionsElement.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }
@@ -140,7 +140,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
     return this.institutions.filter(inst => inst.toLowerCase().startsWith(filterValue));
   }
 
-  nonExistentInstitution() :boolean {
+  nonExistentInstitution(): boolean {
     return this.user?.institution &&  (this.institutions && this.institutions.indexOf(this.user.institution) < 0);
   }
 
@@ -150,7 +150,7 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
     this.service.registerInstitutions(this.user.institution).subscribe(res => {
       this.service.showSnackBar('alert.addNewInstitution.success');
       this.institutions = res.institutions;
-      
+
 
       this.filteredOptions = this.myControl.valueChanges
       .pipe(
@@ -168,40 +168,41 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   }
 
   changeTypOfOsobyDisabled(): boolean {
-    const retval:boolean = !this.isRegister;
+    const retval = !this.isRegister;
     return retval;
   }
 
-  
+
   setNositel() {
     this.user.nositel = [];
     if (this.autor) {
       this.user.nositel.push('autor');
     }
-    if (this.dedic) this.user.nositel.push('dedic');
-    if (this.jiny) this.user.nositel.push('jiny');
-    if (this.nakladatel) this.user.nositel.push('nakladatel');
+    if (this.dedic) {this.user.nositel.push('dedic');}
+    if (this.jiny) {this.user.nositel.push('jiny');}
+    if (this.nakladatel) {this.user.nositel.push('nakladatel');}
   }
 
   switchEnableApi() {
     if (this.isApiEnabled) {
       this.user.apikey = Guid.newGuid().toString();
-      console.log("Generated api key "+this.user.apikey);
+      console.log('Generated api key '+this.user.apikey);
 
     } else {
 
       this.user.apikey = null;
-      console.log("Deleted api key "+this.user.apikey);
+      console.log('Deleted api key '+this.user.apikey);
     }
   }
 
-  
+
 }
 
 class Guid {
   static newGuid() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          const r = Math.random() * 16 | 0, v = c === 'x' ? r : ( r & 0x3 | 0x8 );
+          const r = Math.floor(Math.random() * 16);
+          const v = c === 'x' ? r : (r % 4 + 8);
           return v.toString(16);
       });
   }

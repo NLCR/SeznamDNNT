@@ -8,17 +8,17 @@ import { SolrDocument } from 'src/app/shared/solr-document';
   styleUrls: ['./result-actions-export.component.scss']
 })
 export class ResultActionsExportComponent implements OnInit {
- 
+
   @Input() export: Export;
-  @Input() doc:SolrDocument;
-  @Input() processExportEvent: EventEmitter<{ type:string, identifier: string }>;
- 
+  @Input() doc: SolrDocument;
+  @Input() processExportEvent: EventEmitter<{ type: string; identifier: string }>;
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  
+
   exported() {
     this.processExportEvent.emit({ type: 'exported', identifier: this.doc.identifier});
   }

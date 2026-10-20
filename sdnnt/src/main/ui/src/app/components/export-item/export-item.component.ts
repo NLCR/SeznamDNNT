@@ -14,9 +14,9 @@ export class ExportItemComponent implements OnInit {
   @Input() doc: SolrDocument;
 
   alephLink: string;
-  alternativeAlephLink:string;
-  showAlephLink : boolean = true;
-  public imgSrc: boolean = false;
+  alternativeAlephLink: string;
+  showAlephLink = true;
+  public imgSrc = false;
 
   constructor(
     public state: AppState,
@@ -30,11 +30,11 @@ export class ExportItemComponent implements OnInit {
   }
 
   curatorAndPublicStateAreDifferent(): boolean {
-    // neni nastaveny public stav ale ma kuratorsky stav NPA 
+    // neni nastaveny public stav ale ma kuratorsky stav NPA
     if (this.doc.kuratorstav && !this.doc.dntstav) {
       return true;
       // verejny a kuratorsky stav je rozdilny
-    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] != this.doc.dntstav[this.doc.dntstav.length - 1]) {
+    } else if (this.doc.kuratorstav && this.doc.dntstav && this.doc.kuratorstav[this.doc.kuratorstav.length - 1] !== this.doc.dntstav[this.doc.dntstav.length - 1]) {
       return true;
     }
     return false;

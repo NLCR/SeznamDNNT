@@ -99,12 +99,12 @@
                             </div>
                           </div>
                           <div>
-                            <mat-button-toggle-group *ngIf="id.dntstav[id.dntstav.length-1] != 'N' &&  id.dntstav[id.dntstav.length-1] != 'X' &&  id.dntstav[id.dntstav.length-1] != 'D' && !doc.controlled" >
+                            <mat-button-toggle-group *ngIf="id.dntstav[id.dntstav.length-1] !== 'N' &&  id.dntstav[id.dntstav.length-1] !== 'X' &&  id.dntstav[id.dntstav.length-1] !== 'D' && !doc.controlled" >
                               <mat-button-toggle mat-stroked-button class="app-color-warning" (click)="changeState(doc,id)" ><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
                               <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
                             </mat-button-toggle-group>
 
-                            <mat-button-toggle  *ngIf="id.dntstav[id.dntstav.length-1] == 'N' || doc.controlled " mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
+                            <mat-button-toggle  *ngIf="id.dntstav[id.dntstav.length-1] === 'N' || doc.controlled " mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
 
                             <mat-menu #menuMore="matMenu">
                               <button mat-menu-item *ngIf="id.marc_998a && id.marc_998a[0].startsWith('http')"  (click)="gotoAleph(id.marc_998a[0])">

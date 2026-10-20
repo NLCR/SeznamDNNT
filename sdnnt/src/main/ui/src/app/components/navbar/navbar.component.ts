@@ -18,15 +18,15 @@ import { SearchBarComponent } from '../searchbar/searchbar.component';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  
-  @ViewChild(SearchBarComponent) searchBarComponent: SearchBarComponent; 
+
+  @ViewChild(SearchBarComponent) searchBarComponent: SearchBarComponent;
 
   // sidenav
   @Output() public sidenavToggle = new EventEmitter();
 
   now = new Date();
 
-  public isSearchBar: boolean = false;
+  public isSearchBar = false;
 
   //simpleLogin: boolean = false;
 
@@ -76,21 +76,22 @@ export class NavbarComponent implements OnInit {
 
       this.state.currentZadost={
         VN: null,
-        NZN: null, 
+        NZN: null,
         VNX:null
       };
 
       this.state.facetsstore.reinit();
 
-      this.state.sort['sort'] = this.config.sorts.sort[0];
-      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
-      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+      this.state.sort.sort = this.config.sorts.sort[0];
+      this.state.sort.sort_account = this.config.sorts.sort_account[0];
+      this.state.sort.user_sort_account = this.config.sorts.user_sort_account[0];
 
       localStorage.removeItem('user');
       sessionStorage.clear();
-      
-      if (res["redirectEndpoint"]) {
-        window.location.href = res["redirectEndpoint"];
+
+      const redirectEndpoint = (res as { redirectEndpoint?: string }).redirectEndpoint;
+      if (redirectEndpoint) {
+        window.location.href = redirectEndpoint;
       } else {
         this.router.navigate(['/']);
       }
@@ -100,12 +101,12 @@ export class NavbarComponent implements OnInit {
   linkToAccount() {
     const p: any = {};
 
-    
+
     this.router.navigate(['/account'], { queryParams: p, queryParamsHandling: 'merge' });
   }
 
   register() {
-    
+
     const d = this.dialog.open(DialogRegistrationComponent, {
       width: '600px',
       panelClass: 'app-register-dialog',
@@ -118,29 +119,29 @@ export class NavbarComponent implements OnInit {
 
   wayfLink() {
     // configuration is on the server its redirect to identity provider or wayflink
-    window.location.href = "/api/user/shib_login_redirect";
+    window.location.href = '/api/user/shib_login_redirect';
   }
 
   profileEnabled(): boolean {
-    if (this.state.user && this.state.user.thirdpartyuser) return false;
-    else return true;
+    if (this.state.user && this.state.user.thirdpartyuser) {return false;}
+    else {return true;}
   }
 
   settingsMenuEnabled(): boolean {
-    if (this.state.user)  return true;
-    else return false;
+    if (this.state.user)  {return true;}
+    else {return false;}
   }
- 
+
   changePassEnabled(): boolean {
-    if (this.state.user && this.state.user.thirdpartyuser) return false;
-    else return true;
-  } 
+    if (this.state.user && this.state.user.thirdpartyuser) {return false;}
+    else {return true;}
+  }
 
   // sidenav fuction
   public onToggleSidenav = () => {
     this.sidenavToggle.emit();
-  }
-  
+  };
+
   resetPasswd() {
     if (!this.state.user.thirdpartyuser) {
       this.router.navigate(['/userpswd'], {});

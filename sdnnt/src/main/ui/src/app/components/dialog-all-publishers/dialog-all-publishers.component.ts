@@ -2,7 +2,6 @@ import { HttpParams } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { AppService } from 'src/app/app.service';
 import { SolrResponse } from 'src/app/shared/solr-response';
-import { DataDialogData } from '../dialog-identifier/dialog-identifier.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { AppState } from 'src/app/app.state';
 import { Subject } from 'rxjs';
@@ -18,47 +17,47 @@ export class DialogAllPublishersComponent implements OnInit {
   private subject: Subject<string> = new Subject();
 
 
-  visibleShowMoreButton:boolean = true;
+  visibleShowMoreButton = true;
 
   facetSearchOffset=0;
-  facetFieldsInDialog:any;
+  facetFieldsInDialog: any;
   selectedFacets: any[] = [];
 
-  searchTerm:string;
+  searchTerm: string;
 
   constructor(
     public dialogRef: MatDialogRef<DialogAllPublishersComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DataDialogData,
+    @Inject(MAT_DIALOG_DATA) public data: { queryParams: HttpParams },
     private service: AppService
     ) { }
 
 
   ngOnInit(): void {
 
-    let p = Object.assign({}, this.data['queryParams'], {
+    const p = Object.assign({}, this.data.queryParams, {
       facetSearchField: 'nakladatel',
       facetSearchOffset: this.facetSearchOffset,
       ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
     });
 
     this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
-      this.facetFieldsInDialog = resp.facet_counts.facet_fields['nakladatel'];
+      this.facetFieldsInDialog = resp.facet_counts.facet_fields.nakladatel;
     });
-  
+
     this.subject.pipe(
       debounceTime(600)
     ).subscribe(searchTextValue => {
 
       this.searchTerm = searchTextValue;
 
-      const p = Object.assign({}, this.data['queryParams'], {
+      const searchParams = Object.assign({}, this.data.queryParams, {
         facetSearchField: 'nakladatel',
         facetSearchOffset: this.facetSearchOffset,
         ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
       });
 
-      this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
-        this.facetFieldsInDialog = resp.facet_counts.facet_fields['nakladatel'];
+      this.service.facetSearch(searchParams as HttpParams).subscribe((resp: SolrResponse) => {
+        this.facetFieldsInDialog = resp.facet_counts.facet_fields.nakladatel;
       });
     });
 
@@ -90,15 +89,15 @@ export class DialogAllPublishersComponent implements OnInit {
   showMore() {
     this.facetSearchOffset+=100;
 
-    const p = Object.assign({}, this.data['queryParams'], {
+    const p = Object.assign({}, this.data.queryParams, {
       facetSearchField: 'nakladatel',
       facetSearchOffset: this.facetSearchOffset,
       ...(this.searchTerm && { facetSearchPrefix: this.searchTerm })
     });
 
     this.service.facetSearch(p as HttpParams).subscribe((resp: SolrResponse) => {
-      if (resp.facet_counts.facet_fields['nakladatel'].length>0) {
-        resp.facet_counts.facet_fields['nakladatel'].forEach((f)=>{
+      if (resp.facet_counts.facet_fields.nakladatel.length>0) {
+        resp.facet_counts.facet_fields.nakladatel.forEach((f)=>{
 
           this.facetFieldsInDialog.push(f);
         });

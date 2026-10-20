@@ -1,4 +1,4 @@
-import { SolrDocument } from "./solr-document";
+import { SolrDocument } from './solr-document';
 
 /** Doc title utils */
 export class SearchResultsUtils {
@@ -11,7 +11,7 @@ export class SearchResultsUtils {
                     if (z.identifiers.includes(identifier)) {
                         doc.zadost = z;
                     }
-                }  
+                }
             });
         });
     }

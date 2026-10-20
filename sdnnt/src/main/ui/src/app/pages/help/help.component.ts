@@ -22,7 +22,7 @@ export class HelpComponent implements OnInit {
 
     this.service.langChanged.subscribe(() => {
         this.helpContent();
-    })
+    });
   }
 
   helpContent() {

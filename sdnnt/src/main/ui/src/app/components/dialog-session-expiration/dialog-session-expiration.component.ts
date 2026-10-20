@@ -24,8 +24,8 @@ export class DialogSessionExpirationComponent implements OnInit {
 
   ) { }
 
-   timer:number = 0;
-   counter: number = 20;
+   timer = 0;
+   counter = 20;
    //playing = new BehaviorSubject(false);
 
 
@@ -56,9 +56,9 @@ export class DialogSessionExpirationComponent implements OnInit {
 
       this.state.facetsstore.reinit();
 
-      this.state.sort['sort'] = this.config.sorts.sort[0];
-      this.state.sort['sort_account'] = this.config.sorts.sort_account[0];
-      this.state.sort['user_sort_account'] = this.config.sorts.user_sort_account[0];
+      this.state.sort.sort = this.config.sorts.sort[0];
+      this.state.sort.sort_account = this.config.sorts.sort_account[0];
+      this.state.sort.user_sort_account = this.config.sorts.user_sort_account[0];
 
       localStorage.removeItem('user');
       this.dialogRef.close();

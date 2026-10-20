@@ -23,16 +23,16 @@ export class DialogStatesComponent implements OnInit {
   public dntStatesItem: string[] = [ 'A', 'PA', 'NPA', 'N',  'X', 'PX'];
 
   granularity: any[] = [];
-  
+
   //ngranularity: any[] = [];
-  
+
 
   rocnik: string;
   cislo: string;
   link: string;
   stav: string[];
   fmt: string;
-  
+
   constructor(
     public dialogRef: MatDialogRef<DialogStatesComponent>,
     @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
@@ -45,7 +45,7 @@ export class DialogStatesComponent implements OnInit {
     this.newLicense = this.data.license ? this.data.license[0] : null  ;
     this.granularity = this.data.granularity ? this.data.granularity : [];
     this.fmt = this.data.fmt ? this.data.fmt : null;
-    // why ?? 
+    // why ??
     this.granularity = this.granularity.map(function(itm) {
 
       let kramlics;
@@ -55,18 +55,18 @@ export class DialogStatesComponent implements OnInit {
 
       }
 
-      let retval=  DialogStatesComponent.flat(itm);
+      const retval=  DialogStatesComponent.flat(itm);
       retval.kram_licenses = kramlics;
       return retval;
 
     });
 
-    let itms =  this.granularity.sort((a,b) => {
+    const itms =  this.granularity.sort((a,b) => {
       if (a.rocnik && b.rocnik) {
-        return (a.rocnik > b.rocnik ? 1 : -1); 
+        return (a.rocnik > b.rocnik ? 1 : -1);
       } else if (a.rocnik && !b.rocnik) {
         return 1;
-      } else return -1;
+      } else {return -1;}
     });
 
 
@@ -74,40 +74,40 @@ export class DialogStatesComponent implements OnInit {
   }
 
   /** TODO: Do it on the server side */
-  static flat(obj:any) {
-    let retval:any = new Object();
-    for (let p in obj) {
+  static flat(obj: any) {
+    const retval: any = new Object();
+    for (const p of Object.keys(obj)) {
         retval[p] =  Array.isArray(obj[p]) ? obj[p][0] : obj[p];
     }
     return retval;
   }
 
-  static array(obj:any) {
+  static array(obj: any) {
 
     if (obj.kuratorstav && obj.kuratorstav !== 'PA' && obj.kuratorstav !== 'A') {
       delete obj.license;
     }
 
     switch(obj.kuratorstav) {
-      case "A":
+      case 'A':
         obj.stav = 'A';
       break;
-      case "PA":
+      case 'PA':
         obj.stav = 'PA';
       break;
-      case "NPA":
+      case 'NPA':
         obj.stav = 'N';
       break;
-      case "N":
+      case 'N':
         obj.stav = 'N';
       break;
-      case "NL":
+      case 'NL':
         obj.stav = 'NL';
       break;
-      case "X":
+      case 'X':
         obj.stav = 'X';
       break;
-      case "PX":
+      case 'PX':
         obj.stav = 'N';
       break;
     }
@@ -117,26 +117,26 @@ export class DialogStatesComponent implements OnInit {
       obj.stav = [obj.stav];
     }
     if (obj.kuratorstav &&  !Array.isArray(obj.kuratorstav)) {
-      obj.kuratorstav   = [obj.kuratorstav];    
+      obj.kuratorstav   = [obj.kuratorstav];
     }
 
     if (obj.kuratorstav &&  !Array.isArray(obj.kuratorstav)) {
-      obj.kuratorstav   = [obj.kuratorstav];    
+      obj.kuratorstav   = [obj.kuratorstav];
     }
 
 
     if (obj.pidpaths &&  !Array.isArray(obj.pidpaths)) {
-      obj.pidpaths   = [obj.pidpaths];    
+      obj.pidpaths   = [obj.pidpaths];
     }
 
     if (obj.kram_licenses &&  !Array.isArray(obj.kram_licenses)) {
-      obj.kram_licenses   = obj.kram_licenses.split(',');    
+      obj.kram_licenses   = obj.kram_licenses.split(',');
     }
 
     return obj;
   }
   /**  */
-  
+
   change() {
     if (!this.poznamka || this.poznamka === '') {
       this.service.showSnackBar('poznamka_povinna', 'poznamka_povinna', true);
@@ -152,7 +152,7 @@ export class DialogStatesComponent implements OnInit {
     this.cislo = '';
     this.link = '';
     this.stav = [];
-  
+
   }
 
   removeGranularitu(idx: number) {
@@ -167,7 +167,7 @@ export class DialogStatesComponent implements OnInit {
     if ((this.newState === 'PA' || this.newState === 'A') && (!this.newLicense)) {
       this.newLicense = 'dnnto';
     } else if (this.newState === 'NL')  {
-      this.newLicense = 'dnntt'
+      this.newLicense = 'dnntt';
     }
   }
 
@@ -176,7 +176,7 @@ export class DialogStatesComponent implements OnInit {
   }
 
   setProperty(evt: any) {
-    console.log("Test "+evt);
+    console.log('Test '+evt);
   }
 
   kuratStavChange() {

@@ -32,11 +32,11 @@ export class DialogRegistrationComponent implements OnInit {
   ngOnInit(): void {
     if (this.data.isRegister) {
       this.user = new User();
-      this.user.registerOption = new UserRegisterOption();      
+      this.user.registerOption = new UserRegisterOption();
     } else {
       this.user = JSON.parse(JSON.stringify(this.state.user));
     }
-    
+
   }
 
 
@@ -46,8 +46,8 @@ export class DialogRegistrationComponent implements OnInit {
       // basic fields validation
 
 
-      let basicFieldsValidators:UserValidators = new UserValidators();
-      let result =  basicFieldsValidators.basicFieldsValidation(this.user);
+      const basicFieldsValidators: UserValidators = new UserValidators();
+      const result =  basicFieldsValidators.basicFieldsValidation(this.user);
       if (result) {
         this.service.showSnackBar(result.errorTitle, result.errorMessag, true);
         this.focus = result.focus;
@@ -91,14 +91,14 @@ export class DialogRegistrationComponent implements OnInit {
 
     } else {
 
-      let basicFieldsValidators:UserValidators = new UserValidators();
-      let result =  basicFieldsValidators.basicFieldsValidation(this.user);
+      const basicFieldsValidators: UserValidators = new UserValidators();
+      const result =  basicFieldsValidators.basicFieldsValidation(this.user);
       if (result) {
         this.service.showSnackBar(result.errorTitle, result.errorMessag, true);
         this.focus = result.focus;
         return;
       }
-      
+
       this.service.saveUser(this.user).subscribe((res: User) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_uzivatele_error', res.error, true);
@@ -109,6 +109,6 @@ export class DialogRegistrationComponent implements OnInit {
       }
     });
     }
-    
+
   }
 }

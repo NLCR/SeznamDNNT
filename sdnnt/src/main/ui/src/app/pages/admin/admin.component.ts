@@ -21,7 +21,7 @@ export class AdminComponent implements OnInit {
   private subject: Subject<string> = new Subject();
 
   public htmlContent: string;
-  public selected: string = 'news';
+  public selected = 'news';
 
   editorConfig: AngularEditorConfig = {
     editable: true,
@@ -82,12 +82,12 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.activePage = 'Admin';
-    this.service.getUsersByPrefix("").subscribe(res => {
+    this.service.getUsersByPrefix('').subscribe(res => {
       this.users = res.docs;
       this.selUser = this.users[0];
     });
-    this.service.langChanged.subscribe(l => { 
-      this.getText(); 
+    this.service.langChanged.subscribe(l => {
+      this.getText();
     });
     this.getText();
 
@@ -105,7 +105,7 @@ export class AdminComponent implements OnInit {
   }
 
   editorTabs(): string[] {
-    let helpFiles: string[] = ['help', 'help_user', 'help_admin', 'help_knihovna', 'help_kurator', 'help_mainKurator'];
+    const helpFiles: string[] = ['help', 'help_user', 'help_admin', 'help_knihovna', 'help_kurator', 'help_mainKurator'];
     return this.config.homeTabs.concat(helpFiles);
     //return this.config.homeTabs;
   }
@@ -138,8 +138,8 @@ export class AdminComponent implements OnInit {
 
   saveUser() {
 
-    let basicFieldsValidators: UserValidators = new UserValidators();
-    let result = basicFieldsValidators.basicFieldsValidation(this.selUser);
+    const basicFieldsValidators: UserValidators = new UserValidators();
+    const result = basicFieldsValidators.basicFieldsValidation(this.selUser);
     if (result) {
       this.service.showSnackBar(result.errorTitle, result.errorMessag, true);
       this.focus = result.focus;

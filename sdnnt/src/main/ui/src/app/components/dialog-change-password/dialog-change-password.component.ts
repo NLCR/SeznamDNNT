@@ -15,7 +15,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class DialogChangePasswordComponent implements OnInit {
 
-  
+
   @ViewChild('passwordComponentWithConfirmation', {static: true})
   passwordComponentWithConfirmation: MatPasswordStrengthComponent;
 
@@ -25,13 +25,13 @@ export class DialogChangePasswordComponent implements OnInit {
     private router: Router,
     private service: AppService,
     public state: AppState,
-    @Inject(MAT_DIALOG_DATA) public data: any) { 
+    @Inject(MAT_DIALOG_DATA) public data: any) {
       if (data.token) {
         this.token = data.token;
       }
     }
 
-  token:string;
+  token: string;
 
   ngOnInit(): void {}
 
@@ -45,7 +45,7 @@ export class DialogChangePasswordComponent implements OnInit {
       //console.log("New password "+pswdComponent.value);
 
       if (this.token != null) {
-        this.service.changePasswordByToken(this.token, pswdComponent.value).subscribe((res:any) => {
+        this.service.changePasswordByToken(this.token, pswdComponent.value).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('desc.password_changed_error', res.error, true);
             this.router.navigate(['/home'], {});
@@ -55,7 +55,7 @@ export class DialogChangePasswordComponent implements OnInit {
           }
         });
       } else {
-        this.service.changePasswordByUser( pswdComponent.value).subscribe((res:any) => {
+        this.service.changePasswordByUser( pswdComponent.value).subscribe((res: any) => {
           if (res.error) {
             this.service.showSnackBar('desc.password_changed_error', res.error, true);
             this.router.navigate(['/home'], {});
@@ -68,4 +68,4 @@ export class DialogChangePasswordComponent implements OnInit {
     }
   }
 
-} 
+}

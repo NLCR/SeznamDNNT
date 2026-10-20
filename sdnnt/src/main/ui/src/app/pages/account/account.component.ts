@@ -22,43 +22,43 @@ import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // auto
 export class AccountComponent implements OnInit {
 
   filterState = [
-    {id: "open", val: "neodeslano"},
-    {id: "waiting", val: "ceka_na_posouzeni"},
-    {id: "waiting_for_automatic_process", val: "ceka_na_automaticke_zpracovani"},
-    {id: "processed", val: "zpracovano"}
+    {id: 'open', val: 'neodeslano'},
+    {id: 'waiting', val: 'ceka_na_posouzeni'},
+    {id: 'waiting_for_automatic_process', val: 'ceka_na_automaticke_zpracovani'},
+    {id: 'processed', val: 'zpracovano'}
   ];
 
   filterType = [
-    {id: "NZN", val: "navrzeno_na_zarazeni"},
-    {id: "VN", val: "navrzeno_na_vyrazeni"},
-    {id: "VNZ", val: "navrzeno_na_omezeni_vnz"},
-    {id: "VNL", val: "navrzeno_na_omezeni_vnl"}
+    {id: 'NZN', val: 'navrzeno_na_zarazeni'},
+    {id: 'VN', val: 'navrzeno_na_vyrazeni'},
+    {id: 'VNZ', val: 'navrzeno_na_omezeni_vnz'},
+    {id: 'VNL', val: 'navrzeno_na_omezeni_vnl'}
   ];
 
 
   // subject for deboucning
   private subject: Subject<string> = new Subject();
 
-  
+
   loading: boolean;
   items: SolrDocument[];
   searchResponse: SolrResponse;
   facets;
   numFound: number;
-  escalated: boolean = false;
-  expired: boolean = false;
+  escalated = false;
+  expired = false;
 
   displayedColumns =[];
 
   zadosti: Zadost[] = [];
 
 
-  
 
-  allResultInstitutions:string[] = [];
-  allPriorities:string[] = [];
-  allDelegated:string[] = [];
-  allTypes:string[] = [];
+
+  allResultInstitutions: string[] = [];
+  allPriorities: string[] = [];
+  allDelegated: string[] = [];
+  allTypes: string[] = [];
 
 
   constructor(
@@ -76,31 +76,31 @@ export class AccountComponent implements OnInit {
       return;
     }
 
-    if (this.state.user.role == 'kurator' || this.state.user.role==='mainKurator' || this.state.user.role === 'admin') {
+    if (this.state.user.role === 'kurator' || this.state.user.role==='mainKurator' || this.state.user.role === 'admin') {
       this.displayedColumns = [
         'id',
         'datum_zadani',
-        'user', 
-        'state', 
+        'user',
+        'state',
         'navrh',
         'datum_vyrizeni',
-        'count', 
+        'count',
         'deadline',
         'desiredstate',
         'period',
         'actions'
       ];
-    
+
     } else {
       this.displayedColumns = [
         'id',
         'datum_zadani',
-        'user', 
-        //'institution', 
-        'state', 
+        'user',
+        //'institution',
+        'state',
         'navrh',
         'datum_vyrizeni',
-        'count', 
+        'count',
         'pozadavek',
         'poznamka',
         'actions'
@@ -111,11 +111,11 @@ export class AccountComponent implements OnInit {
     this.state.activePage = 'Account';
     this.route.queryParams.subscribe(val => {
       this.search(val);
-      
+
       this.state.facetsstore.setFacet('account','newStavFilter', val.navrh);
 
-      
-      this.state.prefixsearch['account'] = val.prefix;
+
+      this.state.prefixsearch.account = val.prefix;
 
     });
 
@@ -142,22 +142,22 @@ export class AccountComponent implements OnInit {
   }
 
 
-  
+
   search(params: Params) {
     this.loading = true;
     const p = Object.assign({}, params);
 
     if (this.state.user?.role === 'kurator' || this.state.user?.role === 'mainKurator') {
-      p.sort_account = this.state.sort.sort_account.field + " " + this.state.sort.sort_account.dir;
+      p.sort_account = this.state.sort.sort_account.field + ' ' + this.state.sort.sort_account.dir;
     } else {
-      p.user_sort_account = this.state.sort.user_sort_account.field + " " + this.state.sort.user_sort_account.dir;
+      p.user_sort_account = this.state.sort.user_sort_account.field + ' ' + this.state.sort.user_sort_account.dir;
     }
 
     if (this.state.navigationstore.contains('account')) {
-      p.page = this.state.navigationstore.getPage('account')
+      p.page = this.state.navigationstore.getPage('account');
       p.rows= this.state.navigationstore.getRows('account');
     }
-    
+
     this.items = [];
     this.searchResponse = null;
     this.facets = null;
@@ -191,21 +191,21 @@ export class AccountComponent implements OnInit {
   }
 
 
-  isEscalated(z:Zadost): boolean {
-    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.escalated
+  isEscalated(z: Zadost): boolean {
+    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.escalated;
   }
 
-  isExpired(z:Zadost): boolean {
-    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.expired
+  isExpired(z: Zadost): boolean {
+    return this.state.user && (this.state.user.role==='kurator' || this.state.user.role==='mainKurator' || this.state.user.role==='admin') && z.state === 'waiting' && z.expired;
   }
 
   setStav(navrh: string) {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','newStavFilter',navrh);
-    let filter =this.state.facetsstore.getFacet('account','newStavFilter');
+    const filter =this.state.facetsstore.getFacet('account','newStavFilter');
 
-    
+
     q.navrh = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
@@ -216,7 +216,7 @@ export class AccountComponent implements OnInit {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','stateFilter',state);
-    let filter =this.state.facetsstore.getFacet('account','stateFilter');
+    const filter =this.state.facetsstore.getFacet('account','stateFilter');
 
     q.state = filter;
     q.page = null;
@@ -260,7 +260,7 @@ export class AccountComponent implements OnInit {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','institutionFilter',institution);
-    let filter =this.state.facetsstore.getFacet('account','institutionFilter');
+    const filter =this.state.facetsstore.getFacet('account','institutionFilter');
 
     q.institution = filter;
     q.page = null;
@@ -272,8 +272,8 @@ export class AccountComponent implements OnInit {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','delegatedFilter',delegated);
-    let filter =this.state.facetsstore.getFacet('account','delegatedFilter');
-    
+    const filter =this.state.facetsstore.getFacet('account','delegatedFilter');
+
     q.delegated = filter;
     q.page = null;
     this.router.navigate([], { queryParams: q, queryParamsHandling: 'merge' });
@@ -283,7 +283,7 @@ export class AccountComponent implements OnInit {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','typeOfRequestFilter',typeOfReq);
-    let filter =this.state.facetsstore.getFacet('account','typeOfRequestFilter');
+    const filter =this.state.facetsstore.getFacet('account','typeOfRequestFilter');
 
     q.type_of_request = filter;
     q.page = null;
@@ -295,9 +295,9 @@ export class AccountComponent implements OnInit {
     const q: any = {};
 
     this.state.facetsstore.checkTheSameAndSet('account','priorityFilter',priority);
-    let filter =this.state.facetsstore.getFacet('account','priorityFilter');
+    const filter =this.state.facetsstore.getFacet('account','priorityFilter');
 
-   
+
 
     q.priority = filter;
     q.page = null;
@@ -340,46 +340,46 @@ export class AccountComponent implements OnInit {
       dialogRef.afterClosed().subscribe(result => {
         this.route.queryParams.subscribe(val => {
           this.search(val);
-          
+
           this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
           this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
 
-          
+
         });
       });
-      
+
     }
   }
 
   countProcessed(zadost: Zadost) {
     if (zadost.process) {
-      let count: number = 0;
-      let stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : "_");
-      let licenseKey = (zadost.desired_license ?  zadost.desired_license : "_");
+      let count = 0;
+      const stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : '_');
+      const licenseKey = (zadost.desired_license ?  zadost.desired_license : '_');
       zadost.identifiers?.forEach(id => {
-        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        const tablekey = id +'_('+stateKey+','+licenseKey+')';
         if ( !zadost.process[tablekey]) {
           count  += 1;
         }
-      });    
+      });
       return count;
-    } else return 0;
+    } else {return 0;}
     //return zadost.process ?  Object.keys(zadost.process).length : 0;
   }
 
   process(zadost: Zadost) {
 
-    let stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : "_");
-    let licenseKey = (zadost.desired_license ?  zadost.desired_license : "_");
-    let allProcessed: boolean = true;
+    const stateKey = (zadost.desired_item_state ?  zadost.desired_item_state : '_');
+    const licenseKey = (zadost.desired_license ?  zadost.desired_license : '_');
+    let allProcessed = true;
 
     if (zadost && zadost.process) {
       zadost.identifiers.forEach(id => {
-        let tablekey = id +"_("+stateKey+","+licenseKey+")";
+        const tablekey = id +'_('+stateKey+','+licenseKey+')';
         if ( !zadost.process[tablekey]) {
           allProcessed = false;
         }
-      });    
+      });
     } else {
       allProcessed = false;
     }
@@ -401,7 +401,7 @@ export class AccountComponent implements OnInit {
         // deadline: Date;
         // desired_item_state: string;
         // desired_license: string;
-      
+
         zadost.desired_license = res.desired_license;
         zadost.desired_item_state = res.desired_item_state;
         zadost.deadline = res.deadline;
@@ -427,19 +427,19 @@ export class AccountComponent implements OnInit {
 
         this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
         this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
-      
+
       });
     });
 
   }
 
   public refresh() {
-    
+
     this.route.queryParams.subscribe(val => {
       this.search(val);
       this.state.facetsstore.setFacet('account', 'newStavFilter',val.navrh);
       this.state.facetsstore.setFacet('account', 'stateFilter',val.state);
-      
+
     });
 
   }

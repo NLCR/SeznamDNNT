@@ -18,7 +18,7 @@ export class GraphsComponent implements OnInit {
   historyUserOpts: EChartsOption = {};
   historyUserActivityOpts: EChartsOption = {};
 
-  interval: string = '1MONTH';
+  interval = '1MONTH';
   userEchart: ECharts;
   selectedUsers: {[user: string]: boolean} = {};
 
@@ -30,13 +30,13 @@ export class GraphsComponent implements OnInit {
     this.getFacets();
     this.service.langChanged.subscribe(res => {
       this.getFacets();
-    })
+    });
   }
 
   setSeries() {
     this.stavOpts = {
       title: {
-        text: this.service.getTranslation("graph.title.States")
+        text: this.service.getTranslation('graph.title.States')
       },
       tooltip: {
         trigger: 'item',
@@ -44,7 +44,7 @@ export class GraphsComponent implements OnInit {
         valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       series: {
-        name: this.service.getTranslation("graph.title.States"),
+        name: this.service.getTranslation('graph.title.States'),
         type: 'pie',
         radius: ['40%', '70%'],
         // center: ['40%', '50%'],
@@ -57,32 +57,30 @@ export class GraphsComponent implements OnInit {
             fontWeight: 'bold'
           }
         },
-        data: this.facets.dntstav.map(e => {
-          return {
+        data: this.facets.dntstav.map(e => ({
             value: e.value,
             name: e.name + ' ' + this.service.getTranslation('state.' + e.name),
             name1: e.name
-          }
-        }),
+          })),
         itemStyle: {
           color: (params) => {
             const paramsExt: any = params;
             if (paramsExt?.data?.name1 === 'A') {
               return '#3949ab';
             } else if (paramsExt?.data?.name1 === 'NZ') {
-              return '#546e7a'
+              return '#546e7a';
             } else if (paramsExt?.data?.name1 === 'N') {
-              return '#43a047'
+              return '#43a047';
             } else if (paramsExt?.data?.name1 === 'PA') {
-              return '#8e24aa'
+              return '#8e24aa';
             } else if (paramsExt?.data?.name1 === 'X') {
-              return '#757575'
+              return '#757575';
             } else if (paramsExt?.data?.name1 === 'NL') {
-              return '#039BE5'
+              return '#039BE5';
             } else if (paramsExt?.data?.name1 === 'D') {
-              return '#4e342e'
+              return '#4e342e';
             } else {
-              return params.color
+              return params.color;
             }
 
           }
@@ -99,14 +97,14 @@ export class GraphsComponent implements OnInit {
 
     this.licenseOpts = {
       title: {
-        text: this.service.getTranslation("graph.title.Licenses")
+        text: this.service.getTranslation('graph.title.Licenses')
       },
       tooltip: {
         trigger: 'item',
         valueFormatter: (value) => '' + value.toLocaleString('cs')
       },
       series: {
-        name: this.service.getTranslation("graph.title.Licenses"),
+        name: this.service.getTranslation('graph.title.Licenses'),
         type: 'pie',
         radius: ['40%', '70%'],
 
@@ -119,22 +117,20 @@ export class GraphsComponent implements OnInit {
             fontWeight: 'bold'
           }
         },
-        data: this.facets.license.map(e => {
-          return {
+        data: this.facets.license.map(e => ({
             value: e.value,
             name: e.name + ' ' + this.service.getTranslation('license.' + e.name),
             name1: e.name
-          }
-        }),
+          })),
         itemStyle: {
           color: (params) => {
             const paramsExt: any = params;
             if (paramsExt?.data?.name1 === 'dnnto') {
               return '#5e35b1';
             } else if (paramsExt?.data?.name1 === 'dnntt') {
-              return '#f4511e'
+              return '#f4511e';
             } else {
-              return params.color
+              return params.color;
             }
 
           }
@@ -164,7 +160,7 @@ export class GraphsComponent implements OnInit {
       const stats = res.facet_counts.facet_pivot.type;
       this.historyStavOpts = this.setHistoryStats(stats, 'History by type', false);
       this.historyUserOpts = this.setHistoryStats(res.facet_counts.facet_pivot.user, 'History by user', true);
-      this.historyUserActivityOpts = this.setUserActivity(res.facet_counts.facet_fields.user.filter(e => e.name !== 'harvester'), "User activity");
+      this.historyUserActivityOpts = this.setUserActivity(res.facet_counts.facet_fields.user.filter(e => e.name !== 'harvester'), 'User activity');
     });
   }
 
@@ -196,13 +192,13 @@ export class GraphsComponent implements OnInit {
         type: 'category',
         data: stats[0].ranges.indextime.counts.map(e => {
           if (this.interval === '1YEAR') {
-            return this.datePipe.transform(new Date(e.name), 'yyyy')
+            return this.datePipe.transform(new Date(e.name), 'yyyy');
           } else if (this.interval === '7DAYS') {
-            return this.datePipe.transform(new Date(e.name), 'ww (MM.yyyy)')
+            return this.datePipe.transform(new Date(e.name), 'ww (MM.yyyy)');
           } else if (this.interval === '1DAY') {
-            return this.datePipe.transform(new Date(e.name), 'dd.MM.yyyy')
+            return this.datePipe.transform(new Date(e.name), 'dd.MM.yyyy');
           } else {
-            return this.datePipe.transform(new Date(e.name), 'MM.yyyy')
+            return this.datePipe.transform(new Date(e.name), 'MM.yyyy');
           }
 
         }),
@@ -210,7 +206,7 @@ export class GraphsComponent implements OnInit {
       yAxis: {
         type: 'value',
       },
-      series: series,
+      series,
       legend: {
         data: legend,
         bottom: 0,
@@ -254,11 +250,11 @@ export class GraphsComponent implements OnInit {
   selectUserLegent(e) {
     if (this.selectedUsers[e.name]) {
       // select all
-      for (const legend in e.selected) {
+      for (const legend of Object.keys(e.selected)) {
         this.userEchart.dispatchAction({
           type: 'legendSelect',
           name: legend,
-        })
+        });
         this.selectedUsers[legend] = true;
       }
     } else {
@@ -273,7 +269,7 @@ export class GraphsComponent implements OnInit {
           this.userEchart.dispatchAction({
             type: 'legendSelect',
             name: e.name,
-          })
+          });
           this.selectedUsers[legend] = true;
         }
       }

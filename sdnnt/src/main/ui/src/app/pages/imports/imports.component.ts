@@ -20,14 +20,14 @@ export class ImportsComponent implements OnInit {
   private subject: Subject<string> = new Subject();
 
   filterState = [
-    { id: "open", val: "neodeslano" },
-    { id: "waiting", val: "ceka_na_posouzeni" },
-    { id: "processed", val: "zpracovano" }
+    { id: 'open', val: 'neodeslano' },
+    { id: 'waiting', val: 'ceka_na_posouzeni' },
+    { id: 'processed', val: 'zpracovano' }
   ];
 
   filterType = [
-    { id: "NZN", val: "navrzeno_na_zarazeni" },
-    { id: "VVS", val: "navrzeno_na_vyrazeni" }
+    { id: 'NZN', val: 'navrzeno_na_zarazeni' },
+    { id: 'VVS', val: 'navrzeno_na_vyrazeni' }
   ];
 
   loading: boolean;
@@ -38,8 +38,8 @@ export class ImportsComponent implements OnInit {
   displayedColumns = ['import_date', 'import_url', 'import_origin', 'stav', 'total', 'na_seznamu', 'actions'];
   imports: Import[] = [];
   query: string;
-  
-  stats: {[import_id: string]: {total: number, na_vyrazeni: number}} = {};
+
+  stats: {[import_id: string]: {total: number; na_vyrazeni: number}} = {};
 
   stateFilter: string;
   newStavFilter: string;
@@ -59,7 +59,7 @@ export class ImportsComponent implements OnInit {
     this.state.activePage = 'Imports';
     this.route.queryParams.subscribe(val => {
       this.query = this.route.snapshot.queryParamMap.get('importq');
-      this.state.prefixsearch['import'] = this.query;
+      this.state.prefixsearch.import = this.query;
       this.search(val);
       this.newStavFilter = val.navrh;
       this.stateFilter = val.state;
@@ -146,7 +146,7 @@ export class ImportsComponent implements OnInit {
   }
 
   process(imp: Import) {
-    
+
     this.service.getImportNotControlled(imp.id).subscribe(resp => {
 
       if (resp.response.numFound > 0) {

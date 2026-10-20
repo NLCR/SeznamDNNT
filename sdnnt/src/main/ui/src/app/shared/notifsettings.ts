@@ -1,8 +1,8 @@
-import { Notif } from "./notif"
+import { Notif } from './notif';
 
 export class NotifSettings {
 
-    selected:Notif
-    all:Notif[]
+    selected: Notif;
+    all: Notif[];
 
 }

@@ -7,5 +7,5 @@ export class Export {
     exported_identifiers: string[];
     all_exported_identifiers_flag: boolean;
   }
-  
+
 

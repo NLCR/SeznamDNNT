@@ -1,4 +1,4 @@
-import { Subject, Observable } from "rxjs";
+import { Subject, Observable } from 'rxjs';
 
 export class NavigationStore {
 
@@ -9,24 +9,24 @@ export class NavigationStore {
 
     constructor() {
         this.initDefault('imports');
-        this.initDefault('account');   
-        this.initDefault('search');  
-        this.initDefault('zadost');    
-        this.initDefault('exports');    
-        this.initDefault('export');    
+        this.initDefault('account');
+        this.initDefault('search');
+        this.initDefault('zadost');
+        this.initDefault('exports');
+        this.initDefault('export');
 
     }
 
-    public contains(key:string) : boolean {
+    public contains(key: string): boolean {
         return this._navigationUIStore.has(key);
     }
 
-    public setRows(key:string, rows:number) : void {
+    public setRows(key: string, rows: number): void {
         if (!this._navigationUIStore.has(key)) {
             this.initDefault(key);
         }
         this._navigationUIStore.get(key).rows = rows;
-        this.paginatorSubject.next()
+        this.paginatorSubject.next();
     }
 
     public getRows(key: string): number {
@@ -35,12 +35,12 @@ export class NavigationStore {
         }
     }
 
-    public setPage(key: string, page:number) {
+    public setPage(key: string, page: number) {
         if (!this._navigationUIStore.has(key)) {
             this.initDefault(key);
         }
         this._navigationUIStore.get(key).page = page;
-        this.paginatorSubject.next()
+        this.paginatorSubject.next();
     }
 
     public getPage(key: string): number {
@@ -51,7 +51,7 @@ export class NavigationStore {
     }
 
     public initDefault(key: string): void {
-        let obj =  {'page':0,'rows':20};
+        const obj =  {page:0,rows:20};
         this._navigationUIStore.set(key, obj);
     }
 
@@ -62,7 +62,7 @@ export class NavigationStore {
             return importDetailMatch[1];
         }
 
-        let found = Array.from(this._navigationUIStore.keys()).find(fragment => url.indexOf(fragment) > 0);
+        const found = Array.from(this._navigationUIStore.keys()).find(fragment => url.indexOf(fragment) > 0);
         return found;
     }
 }

@@ -18,7 +18,7 @@ export class DialogSuccessorRecordsComponent implements OnInit {
 
   documents = [];
 
-  edit: boolean = false;
+  edit = false;
 
   constructor(
     public dialogRef: MatDialogRef<DialogSuccessorRecordsComponent>,
@@ -38,13 +38,13 @@ export class DialogSuccessorRecordsComponent implements OnInit {
           selected: true,
           marcview: this.filterView(dd.raw)
         });
-      });      
+      });
     }
 
   ngOnInit(): void {
   }
 
-  title(doc:SolrDocument) {
+  title(doc: SolrDocument) {
     return DocsUtils.title(doc);
   }
 
@@ -70,22 +70,22 @@ export class DialogSuccessorRecordsComponent implements OnInit {
     }
   }
 
-  fondy(doc:SolrDocument) {
-    let fondy = [];
+  fondy(doc: SolrDocument) {
+    const fondy = [];
     if (doc.marc_910a) {
       doc.marc_910a.forEach(i=> {
-        let t = `${i} (${this.service.getTranslation('sigla.'+i)})`; 
+        const t = `${i} (${this.service.getTranslation('sigla.'+i)})`;
         fondy.push(t);
       });
     }
     return fondy.join(', ');
   }
 
-  digitallibraries(doc:SolrDocument) {
-    let fondy = [];
+  digitallibraries(doc: SolrDocument) {
+    const fondy = [];
     if (doc.digital_libraries) {
       doc.digital_libraries.forEach(i=> {
-        let t = `${i} (${this.service.getTranslation('sigla.'+i)})`; 
+        const t = `${i} (${this.service.getTranslation('sigla.'+i)})`;
         fondy.push(t);
       });
       return fondy.join(', ');
@@ -93,8 +93,7 @@ export class DialogSuccessorRecordsComponent implements OnInit {
   }
 
   filterView(strDoc) {
-    let retval = {};
-    let parsed = JSON.parse(strDoc);
+    const parsed = JSON.parse(strDoc);
     /*
     Object.keys(parsed).forEach(key => {
       if (forbiddenKeys.indexOf(key) < 0) {
@@ -102,21 +101,23 @@ export class DialogSuccessorRecordsComponent implements OnInit {
       }
     });
     */
-    retval["FMT"] = parsed.fmt;
-    retval["identifier"] = parsed.identifier;
-    retval["datestamp"] = parsed.datestamp;
-    retval["leader"] = parsed.leader;
-    retval["controlFields"] = parsed.controlFields;
-    
-    let transformedDataFields = [];
+    const retval = {
+      FMT: parsed.fmt,
+      identifier: parsed.identifier,
+      datestamp: parsed.datestamp,
+      leader: parsed.leader,
+      controlFields: parsed.controlFields,
+      dataFields: [] as { key: number; value: string }[]
+    };
 
-    for (let key in parsed.dataFields) {
-      let marcFieldAr = parsed.dataFields[key];
-      
+    const transformedDataFields = [];
+
+    for (const key of Object.keys(parsed.dataFields)) {
+      const marcFieldAr = parsed.dataFields[key];
+
       marcFieldAr.forEach(i=> {
-        let itemObj = {};
         //let tag = i.tag;
-        let str = ''; 
+        let str = '';
         //let numbers = [];
         //let chars = [];
 
@@ -129,29 +130,25 @@ export class DialogSuccessorRecordsComponent implements OnInit {
             if (a[0].index > b[0].index) { return 1; }
             if (a[0].index < b[0].index) {return -1; }
           }
-          return 0;       
+          return 0;
         });
 
 
-        for(let j=0;j<subFieldsArr.length;j++) {
-          let sfi = subFieldsArr[j];
-          str  = str + '|'+subFieldsArr[j][0].code+"  "+subFieldsArr[j][0].value;
+        for (const subField of subFieldsArr) {
+          str = str + '|' + subField[0].code + '  ' + subField[0].value;
         }
 
-        itemObj['key'] = i.tag; 
-        itemObj['value'] = str; 
-
-        transformedDataFields.push(itemObj);
+        transformedDataFields.push({ key: i.tag, value: str });
       });
-      
+
     }
 
     transformedDataFields.sort(function(a, b){
-      return a.key - b.key; 
+      return a.key - b.key;
     });
-  
 
-    retval["dataFields"] = transformedDataFields;
+
+    retval.dataFields = transformedDataFields;
 
     return retval;
   }
@@ -161,18 +158,18 @@ export class DialogSuccessorRecordsComponent implements OnInit {
   }*/
 
   accept() {
-    let selected = [];
+    const selected = [];
     this.documents.forEach(d=> {
       if (d.selected) {
         selected.push(d.doc.identifier);
       }
     });
 
-    this.dialogRef.close({options: selected.length > 0 ? selected.join(",")  : ""});
+    this.dialogRef.close({options: selected.length > 0 ? selected.join(',')  : ''});
   }
 
   goto(url, event) {
-    window.open(url, "_blank", 'noreferrer');
+    window.open(url, '_blank', 'noreferrer');
     if (event) {event.stopPropagation(); }
     return;
   }

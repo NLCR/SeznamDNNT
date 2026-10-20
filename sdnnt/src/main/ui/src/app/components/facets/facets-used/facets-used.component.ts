@@ -15,7 +15,7 @@ export class FacetsUsedComponent implements OnInit {
     public state: AppState) { }
 
   ngOnInit(): void {
-  
+
   }
 
   removeFilter(filter: Filter) {

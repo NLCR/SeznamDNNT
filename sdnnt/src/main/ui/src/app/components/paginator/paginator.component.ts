@@ -14,10 +14,10 @@ export class PaginatorComponent implements OnInit {
 
   @Input() numFound;
   @Input() showSort: boolean ;
-  @Input() sortType: string = 'sort'; // sort vs sort_account
+  @Input() sortType = 'sort'; // sort vs sort_account
   @Input() storeStateKey: string;
-  @Input() rowsParam: string = 'rows';
-  
+  @Input() rowsParam = 'rows';
+
   pageIndex: number;
   rows: number;
   page: number;
@@ -81,16 +81,16 @@ export class PaginatorComponent implements OnInit {
 
   sortBy(sort: Sort) {
     this.state.sort[this.sortType]= sort;
-    const queryParams:any = {};
+    const queryParams: any = {};
     queryParams[this.sortType] = sort.field + ' ' + sort.dir;
     this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });
   }
 
 
-  
+
   configSorts() {
     return this.config.sorts[this.sortType];
   }
- 
+
 
 }

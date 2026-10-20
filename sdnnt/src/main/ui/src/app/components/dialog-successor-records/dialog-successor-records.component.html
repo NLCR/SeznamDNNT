@@ -2,7 +2,7 @@
 <mat-dialog-content>
   <div>
 
-    <div *ngIf="documents.length == 0"> 
+    <div *ngIf="documents.length === 0"> 
       <mat-card class="app-alert app-info">
         <mat-card-content>
           <mat-icon class="material-icons-outlined">info</mat-icon>{{ 'field.no_followers' | translate }}

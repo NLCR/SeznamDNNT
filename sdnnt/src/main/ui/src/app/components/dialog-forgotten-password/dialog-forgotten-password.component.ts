@@ -29,7 +29,7 @@ export class DialogForgottenPasswordComponent implements OnInit {
   resetPwd(): void {
     this.dialogRef.close();
 
-    this.service.forgotPwd(this.user).subscribe((res:any) => {
+    this.service.forgotPwd(this.user).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.forgot_password_error', res.error, true);
       } else {

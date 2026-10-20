@@ -9,7 +9,7 @@ import { User } from './shared/user';
     providedIn: 'root'
 }) export class AppConfiguration {
 
-    // version 
+    // version
     static sdnntClientVersion = 'v1.0.9.7';
 
 
@@ -110,19 +110,19 @@ import { User } from './shared/user';
 
     public get maximumItemInRequest() {
         return this.config.maximumItemInRequest || 60;
-    }    
+    }
 
     public get dntSetAlpehLinks() {
         return this.config.dntSetAlpehLinks;
-    }    
+    }
 
     public get numberOfRuleBasedNotifications() {
         return this.config.numberOfRuleBasedNotifications;
-    }    
+    }
 
     public get numberOfItemsInRulenotification() {
         return this.config.numberOfItemsInRulenotification;
-    }    
+    }
 
     /**
      * List the files holding section configuration in assets/configs folder
@@ -145,9 +145,7 @@ import { User } from './shared/user';
             .then(cfg => {
                 this.config = cfg as Configuration;
                 this.state.setConfig(this.config);
-            }).then(() => {
-                return this.login();
-            });
+            }).then(() => this.login());
         return promise;
     }
 
@@ -161,7 +159,7 @@ import { User } from './shared/user';
         return this.http.get('api/user/remember_login', { withCredentials: true })
             .toPromise()
             .then((res: any) => {
-                if (res && res.username) this.state.setLogged(res);
+                if (res && res.username) {this.state.setLogged(res);}
             })
             .catch(res => console.log(res));
     }

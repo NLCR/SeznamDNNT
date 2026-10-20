@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface ExportedFilesData {
   exportname: string;
-  files : {
+  files: {
     name: string;
     path: string;
   }[];
@@ -21,11 +21,11 @@ export class DialogExportedFilesComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ExportedFilesData
-  ) { 
+  ) {
   }
 
   ngOnInit(): void {
-    
+
   }
 
   encodePath(path) {
