@@ -80,7 +80,7 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
                 this.keepLoggedIn = json.optBoolean("keepLoggedIn", false);
                 String pwdHashed =  DigestUtils.sha256Hex(json.getString("pwd"));
                 ret.put("username", username);
-                User user = UsersUtils.findOneUser(client, "username:\"" + username + "\"");
+                User user = UsersUtils.findUserIgnoreCase(client, username);
                 if (user != null && user.getPwd() != null && user.getPwd().equals(pwdHashed)) {
                     HttpSession session = this.request.getSession(true);
                     session.setAttribute(TrackingFilter.KEEP_LOGGED_IN, keepLoggedIn);
@@ -150,7 +150,7 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
     @Override
     public User findUser(String username) throws UserControlerException{
         try (SolrClient solr = buildClient()) {
-            return UsersUtils.toTOObject(UsersUtils.findOneUser(solr, "username:\"" + username + "\""));
+            return UsersUtils.toTOObject(UsersUtils.findUserIgnoreCase(solr, username));
         } catch (SolrServerException | IOException ex) {
             throw new UserControlerException(ex);
         }
@@ -210,12 +210,14 @@ public class UserControlerImpl  extends AbstractUserController implements Applic
     public String forgotPwd( JSONObject inputJs) throws UserControlerException {
         String input =inputJs.optString("username", "");
         try (SolrClient solr = buildClient()) {
-            SolrQuery query = new SolrQuery("email:\"" + input + "\" OR username:\""+input+"\"")
+            User matchingUsername = UsersUtils.findUserIgnoreCase(solr, input);
+            SolrQuery query = new SolrQuery("email:\"" + input + "\"")
                     .setRows(1);
 
             QueryResponse usersResponse = solr.query("users", query);
             List<User> users = usersResponse.getResults().stream().map(User::fromSolrDocument).map(UsersUtils::toTOObject).collect(Collectors.toList());
             //List<User> users = solr.query("users", query).getBeans(User.class);
+            if (matchingUsername != null) users.add(0, matchingUsername);
             if (users.isEmpty()) {
                 throw new UserControlerException("Cannot find user");
             } else {
