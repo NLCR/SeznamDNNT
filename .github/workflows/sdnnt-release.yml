@@ -49,12 +49,10 @@ jobs:
         run: mvn -B install --file pom.xml
 
       - name: Prepare release files
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
         run: |
           mkdir -p release
-          cp sdnnt/target/*.war "release/sdnnt-${RELEASE_TAG}.war"
-          zip -r "release/solr-${RELEASE_TAG}.zip" solr -x '*/data/*'
+          cp sdnnt/target/*.war release/sdnnt.war
+          zip -r release/solr.zip solr -x '*/data/*'
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
