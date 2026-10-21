@@ -60,6 +60,55 @@ app-home {
 
 app-search {
   @media only screen and (max-width: 1040px)  {
+    .app-toolbar {
+      app-paginator,
+      app-paginator > div,
+      .mat-paginator,
+      .mat-paginator-outer-container,
+      .mat-paginator-container {
+        display: contents !important;
+      }
+
+      .mat-paginator-page-size {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0;
+        min-width: 0;
+      }
+
+      .mat-paginator-page-size-label {
+        white-space: normal;
+      }
+
+      .mat-paginator-range-actions {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        justify-self: end;
+        white-space: nowrap;
+      }
+
+      .mat-paginator-range-label {
+        margin: 0 4px 0 0;
+        font-size: 12px;
+      }
+
+      .mat-paginator-navigation-first,
+      .mat-paginator-navigation-previous,
+      .mat-paginator-navigation-next,
+      .mat-paginator-navigation-last {
+        width: 28px;
+      }
+
+      .app-sorting {
+        display: block;
+        grid-column: 2;
+        grid-row: 2;
+        width: 100%;
+        max-width: 140px;
+        justify-self: end;
+      }
+    }
+
     .app-search-wrapper {
       flex-wrap: wrap;
 

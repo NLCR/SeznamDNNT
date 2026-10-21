@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * User utilities
@@ -57,6 +58,42 @@ public class UsersUtils {
         } else {
             return null;
         }
+    }
+
+    /** Match the stored username without changing its spelling or requiring a reindex. */
+    public static User findUserIgnoreCase(SolrClient solr, String username) throws SolrServerException, IOException {
+        if (username == null || username.isEmpty()) return null;
+        StringBuilder pattern = new StringBuilder("username:/");
+        for (int i = 0; i < username.length(); ) {
+            int codePoint = username.codePointAt(i);
+            String letter = new String(Character.toChars(codePoint));
+            String lower = letter.toLowerCase(Locale.ROOT);
+            String upper = letter.toUpperCase(Locale.ROOT);
+            if (lower.codePointCount(0, lower.length()) == 1
+                    && upper.codePointCount(0, upper.length()) == 1 && !lower.equals(upper)) {
+                pattern.append('[').append(escapeRegexp(lower)).append(escapeRegexp(upper)).append(']');
+            } else {
+                pattern.append(escapeRegexp(letter));
+            }
+            i += Character.charCount(codePoint);
+        }
+        SolrQuery query = new SolrQuery(pattern.append('/').toString()).setRows(100);
+        QueryResponse response = solr.query(DataCollections.users.name(), query);
+        for (SolrDocument document : response.getResults()) {
+            User user = User.fromSolrDocument(document);
+            if (user.getUsername().equalsIgnoreCase(username)) return user;
+        }
+        return null;
+    }
+
+    private static String escapeRegexp(String value) {
+        StringBuilder escaped = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char character = value.charAt(i);
+            if ("\\.?+*|{}[]()\"#@&<>~/".indexOf(character) >= 0) escaped.append('\\');
+            escaped.append(character);
+        }
+        return escaped.toString();
     }
 
     /**

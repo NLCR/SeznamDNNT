@@ -49,7 +49,7 @@ public class MaximumSizeExceededDNNTRequestValidationTest {
         boolean validateFalse = val.validate(user, accounts, zadostMax, identifiers101, searcher);
         Assert.assertFalse(validateFalse);
         Assert.assertFalse(val.isSoftValidation());
-        Assert.assertEquals("The maximum number of identifiers in the request has been exceeded.", val.getErrorMessage());
+        Assert.assertEquals("Exceeded maximum items in one request", val.getErrorMessage());
         
         boolean validateOk  = val.validate(user, accounts, zadostOk, identifiers100, searcher);
         Assert.assertTrue(validateOk);

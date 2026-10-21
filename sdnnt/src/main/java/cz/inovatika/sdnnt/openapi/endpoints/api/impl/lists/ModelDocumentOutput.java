@@ -245,8 +245,8 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
                 collect = collect.stream().filter(g-> g.getLicense() != null && g.getLicense().equals(endpointLicense)).collect(Collectors.toList());
             }
             collect.stream().forEach(item::addGranularityItem);
-            this.arrayOfListitem.add(item);
         }
+        this.arrayOfListitem.add(item);
     }
 
     protected void tagsCode(JSONObject rawJSON, Map<String, List<String>> tagCodeMapping, String tag, String code) {

@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDatepickerContent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -34,6 +34,12 @@ export class SearchComponent implements OnInit, OnDestroy {
   searchResponse: SolrResponse;
   facets;
   numFound: number;
+  filtersOpen = false;
+
+  @HostListener('document:keydown.escape')
+  closeFilters(): void {
+    this.filtersOpen = false;
+  }
   
 
   constructor(

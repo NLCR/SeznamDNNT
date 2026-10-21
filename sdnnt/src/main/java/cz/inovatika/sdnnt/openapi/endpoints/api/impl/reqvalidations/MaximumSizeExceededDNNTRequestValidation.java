@@ -15,7 +15,7 @@ import cz.inovatika.sdnnt.services.AccountService;
 
 public class MaximumSizeExceededDNNTRequestValidation extends DNNTRequestApiServiceValidation{
 
-    public static final String ERR_MESSAGE = "The maximum number of identifiers in the request has been exceeded.";
+    public static final String ERR_MESSAGE = "Exceeded maximum items in one request";
     
     
     
