@@ -67,4 +67,8 @@ jobs:
             release/*.war
             release/*.zip
           generate_release_notes: true
+          body: |
+            ## TODO
+
+            - TODO: doplnit release notes.
           draft: true
