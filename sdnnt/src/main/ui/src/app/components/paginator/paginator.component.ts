@@ -1,15 +1,15 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
-import { AppState } from 'src/app/app.state';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PageEvent, MatPaginator } from '@angular/material/paginator';
-import { Sort } from 'src/app/shared/configuration';
-import { AppConfiguration } from 'src/app/app-configuration';
 import { FlexModule } from '@angular/flex-layout/flex';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AppConfiguration } from 'src/app/app-configuration';
+import { AppState } from 'src/app/app.state';
+import { Sort } from 'src/app/shared/configuration';
 
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatSelect, MatSelectTrigger, MatOption } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
+import { MatOption, MatSelect, MatSelectTrigger } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

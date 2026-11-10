@@ -1,16 +1,16 @@
-import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
-import { Params, ParamMap } from '@angular/router';
+import { ParamMap } from '@angular/router';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { Configuration, Sort } from './shared/configuration';
-import { User } from './shared/user';
+import { FacetsStore } from './shared/facetstore';
 import { Filter } from './shared/filter';
-import { Zadost } from './shared/zadost';
 import { NavigationStore } from './shared/navigationstore';
 import { NotifSettings } from './shared/notifsettings';
-import { FacetsStore } from './shared/facetstore';
+import { User } from './shared/user';
+import { Zadost } from './shared/zadost';
 
 export class AppState {
 
-  config: Configuration;
+  config!: Configuration;
 
   private _paramsProcessed: ReplaySubject<string> = new ReplaySubject(3);
   public paramsProcessed: Observable<any> = this._paramsProcessed.asObservable();
@@ -24,11 +24,11 @@ export class AppState {
   private loggedSubject: Subject<boolean> = new Subject();
   public loggedChanged: Observable<boolean> = this.loggedSubject.asObservable();
 
-  public currentLang: string;
-  public activePage: string;
+  public currentLang = '';
+  public activePage = '';
   public loading = true;
 
-  public q: string;
+  public q = '';
   public page = 0;
   public rows = 20;
 
@@ -47,10 +47,10 @@ export class AppState {
   //public prefix: {[key: string]: Sort} = {};
 
   // vyhodit ??
-  public rokvydani: string;
+  public rokvydani = '';
 
   // Seznam stavu zaznamu pro uzivatel
-  public user: User;
+  public user: User | null = null;
   public logged = false;
   public expirationDialog = false;
 
@@ -59,8 +59,8 @@ export class AppState {
 
   public usedFilters: Filter[] = [];
 
-  public fullCatalog: boolean;
-  public withNotification: boolean;
+  public fullCatalog = false;
+  public withNotification = false;
 
   // Notifications filter
   public notificationSettings: NotifSettings = new NotifSettings();
@@ -71,7 +71,7 @@ export class AppState {
   // NZN, VN, VN_, VNL (VNL a VNZ je typ na omezeni na terminal tedy jeden typ )
   // uzivatel ma jednu zadost na omezeni na terminal a rozhodne se podle ceho ji posle
   //currentZadost: {VVS: Zadost, VVN: Zadost, NZN: Zadost} = {VVS: null, NZN: null, VVN:null};
-  currentZadost: {NZN: Zadost;VN: Zadost; VNX: Zadost} = {
+  currentZadost: Record<'NZN' | 'VN' | 'VNX', Zadost | null> = {
     VN: null,
     NZN: null,
     VNX:null
@@ -107,6 +107,9 @@ export class AppState {
     searchParams.keys.forEach(p => {
       const param = searchParams.get(p);
       const params = searchParams.getAll(p);
+      if (param === null) {
+        return;
+      }
 
       if (p === 'q') {
         this.q = param;
@@ -130,17 +133,17 @@ export class AppState {
         this.withNotification = param === 'true';
       } else if (p === 'sort') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.sort= this.config.sorts.sort.find(s => param === (s.field + ' ' + s.dir));
+        this.sort.sort = this.config.sorts.sort.find(s => param === (s.field + ' ' + s.dir)) ?? this.sort.sort;
       } else if (p === 'sort_account') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.sort_account = this.config.sorts.sort_account.find(s => param === (s.field + ' ' + s.dir));
+        this.sort.sort_account = this.config.sorts.sort_account.find(s => param === (s.field + ' ' + s.dir)) ?? this.sort.sort_account;
       } else if (p === 'user_sort_account') {
         //this.sort = this.config.sorts.find(s => param === (s.field + " " + s.dir));
-        this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + ' ' + s.dir));
+        this.sort.user_sort_account = this.config.sorts.user_sort_account.find(s => param === (s.field + ' ' + s.dir)) ?? this.sort.user_sort_account;
       } else if (p === 'notificationFilter') {
 
          const selectedNotification = this.notificationSettings.all.find(n=> n.id === param);
-         this.notificationSettings.selected = selectedNotification;
+         this.notificationSettings.selected = selectedNotification ?? null;
 
       } else {
         if (this.config.filterFields.includes(p)) {
@@ -173,7 +176,7 @@ export class AppState {
       this.user = res;
       if (res.zadost) {
         // res.zadost je Array max 3 elementy. Muze mit navrh=NZN nebo navrh=VVS
-        res.zadost.forEach(z => {
+        (res.zadost as Zadost[]).forEach((z: Zadost) => {
           if (z.navrh === 'NZN') {
             this.currentZadost.NZN = z;
           }else if (z.navrh === 'VN') {

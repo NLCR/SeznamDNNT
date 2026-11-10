@@ -1,4 +1,3 @@
-import { SolrDocument } from './solr-document';
 
 /** Doc title utils */
 export class SearchResultsUtils {

@@ -1,31 +1,29 @@
+import { NgClass } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
-import { MatDatepickerContent } from '@angular/material/datepicker';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatCard } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/list';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
+import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk-notifications/dialog-bulk-notifications.component';
 import { DialogBulkProposalComponent } from 'src/app/components/dialog-bulk-proposal/dialog-bulk-proposal.component';
+import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
-import { Zadost } from 'src/app/shared/zadost';
-import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
-import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk-notifications/dialog-bulk-notifications.component';
-import { AppConfiguration } from 'src/app/app-configuration';
-import { FlexModule } from '@angular/flex-layout/flex';
-import { MatIconButton, MatButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { NgClass } from '@angular/common';
 import { FacetsComponent } from '../../components/facets/facets.component';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
-import { MatCard } from '@angular/material/card';
-import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatDivider } from '@angular/material/list';
 import { ResultItemComponent } from '../../components/result-item/result-item.component';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-search',

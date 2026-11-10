@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
-import { AppService } from 'src/app/app.service';
-import { Zadost } from 'src/app/shared/zadost';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { TranslateModule } from '@ngx-translate/core';
+import { AppService } from 'src/app/app.service';
+import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
     selector: 'app-dialog-send-request',

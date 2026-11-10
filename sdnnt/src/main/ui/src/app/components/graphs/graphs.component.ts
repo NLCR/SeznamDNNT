@@ -1,13 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
-import { Component, Input, OnInit, inject } from '@angular/core';
-import { ECharts, EChartsCoreOption } from 'echarts/core';
-import { AppService } from 'src/app/app.service';
+import { Component, OnInit, inject } from '@angular/core';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgxEchartsDirective } from 'ngx-echarts';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatSelect, MatOption } from '@angular/material/select';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { TranslateModule } from '@ngx-translate/core';
+import { ECharts, EChartsCoreOption } from 'echarts/core';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { AppService } from 'src/app/app.service';
 
 @Component({
     selector: 'app-graphs',

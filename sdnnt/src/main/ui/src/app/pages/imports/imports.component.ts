@@ -1,27 +1,24 @@
+import { DatePipe, NgClass } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit, inject } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatCell, MatCellDef, MatColumnDef, MatHeaderCell, MatHeaderCellDef, MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef, MatTable } from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { Import } from 'src/app/shared/import';
-import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
-import { Zadost } from 'src/app/shared/zadost';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { FlexModule } from '@angular/flex-layout/flex';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
-import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
-import { NgClass, DatePipe } from '@angular/common';
-import { MatIconButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIcon } from '@angular/material/icon';
-import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
-import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-imports',

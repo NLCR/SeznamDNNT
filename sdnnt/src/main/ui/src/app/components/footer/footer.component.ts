@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { AppService } from 'src/app/app.service';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { TranslateModule } from '@ngx-translate/core';
+import { AppService } from 'src/app/app.service';
 
 @Component({
     selector: 'app-footer',

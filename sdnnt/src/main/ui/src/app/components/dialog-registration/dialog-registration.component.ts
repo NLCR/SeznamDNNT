@@ -1,13 +1,12 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { Component, OnInit, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { Router } from '@angular/router';
-import { DialogRegistrationFormComponent } from '../dialog-registration-form/dialog-registration-form.component';
 import { UserRegisterOption } from 'src/app/shared/user-register-option';
 import { UserValidators } from 'src/app/shared/uservalidators';
-import { error } from 'protractor';
+import { DialogRegistrationFormComponent } from '../dialog-registration-form/dialog-registration-form.component';
 
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatButton } from '@angular/material/button';

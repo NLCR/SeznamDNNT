@@ -1,4 +1,3 @@
-import { SolrDocument } from 'src/app/shared/solr-document';
 import { NotifSettings } from './notifsettings';
 import { UserRegisterOption } from './user-register-option';
 

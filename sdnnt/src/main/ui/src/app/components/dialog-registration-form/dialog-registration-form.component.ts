@@ -1,25 +1,24 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AsyncPipe } from '@angular/common';
+import { Component, ElementRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatButton } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatDivider } from '@angular/material/list';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInput } from '@angular/material/input';
-import { MatCheckbox } from '@angular/material/checkbox';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
-import { FlexModule } from '@angular/flex-layout/flex';
-import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
-import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
-import { MatOption, MatSelect } from '@angular/material/select';
-import { MatButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIcon } from '@angular/material/icon';
-import { MatDivider } from '@angular/material/list';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-dialog-registration-form',

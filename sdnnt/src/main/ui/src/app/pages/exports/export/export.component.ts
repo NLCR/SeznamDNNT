@@ -1,28 +1,28 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
 import { DialogExportedFilesComponent } from 'src/app/components/dialog-exported-files/dialog-exported-files.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
-import { AppState } from 'src/app/app.state';
-import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
-import { FlexModule } from '@angular/flex-layout/flex';
 
-import { FacetsComponent } from '../../../components/facets/facets.component';
-import { PaginatorComponent } from '../../../components/paginator/paginator.component';
-import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatIconButton } from '@angular/material/button';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIcon } from '@angular/material/icon';
-import { MatCard } from '@angular/material/card';
 import { MatButtonToggle } from '@angular/material/button-toggle';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { ResultItemComponent } from '../../../components/result-item/result-item.component';
+import { MatCard } from '@angular/material/card';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core'; // autocomplete
+import { FacetsComponent } from '../../../components/facets/facets.component';
+import { PaginatorComponent } from '../../../components/paginator/paginator.component';
+import { ResultItemComponent } from '../../../components/result-item/result-item.component';
 
 
 @Component({

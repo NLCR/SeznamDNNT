@@ -1,22 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms'; // autocomplete
 import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
+import { Subject } from 'rxjs'; // autocomplete
+import { debounceTime } from 'rxjs/operators'; // autocomplete
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { FormControl, FormsModule } from '@angular/forms'; // autocomplete
-import { Observable, Subject } from 'rxjs'; // autocomplete
-import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
 import { UserValidators } from 'src/app/shared/uservalidators';
 
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { MatList, MatListItem } from '@angular/material/list';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { DialogRegistrationFormComponent } from '../../components/dialog-registration-form/dialog-registration-form.component';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { TranslateModule } from '@ngx-translate/core';
+import { DialogRegistrationFormComponent } from '../../components/dialog-registration-form/dialog-registration-form.component';
 
 
 @Component({

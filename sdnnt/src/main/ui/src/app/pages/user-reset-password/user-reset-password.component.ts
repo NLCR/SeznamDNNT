@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
-import { ActivatedRoute, Router, Params } from '@angular/router';
+import { Component, OnInit, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { Subscription } from 'rxjs';
-import { Title } from '@angular/platform-browser';
-import { MatDialog } from '@angular/material/dialog';
 import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-password/dialog-change-password.component';
 
 

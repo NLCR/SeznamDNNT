@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
-import { FormsModule } from '@angular/forms';
 
-import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

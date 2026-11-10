@@ -1,22 +1,19 @@
-import { Component, Output, EventEmitter, ViewChild, inject } from '@angular/core';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Component, EventEmitter, Output, ViewChild, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatButton } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatToolbar } from '@angular/material/toolbar';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DialogLoginComponent } from '../dialog-login/dialog-login.component';
-import { DialogRegistrationComponent } from '../dialog-registration/dialog-registration.component';
-import { User } from 'src/app/shared/user';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { AppConfiguration } from 'src/app/app-configuration';
 import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
-import { SearchComponent } from 'src/app/pages/search/search.component';
+import { DialogRegistrationComponent } from '../dialog-registration/dialog-registration.component';
 import { SearchBarComponent } from '../searchbar/searchbar.component';
-import { MatToolbar } from '@angular/material/toolbar';
-import { FlexModule } from '@angular/flex-layout/flex';
-import { MatButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
 
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -73,7 +70,7 @@ export class NavbarComponent {
   }
 
   showUser() {
-    if (!this.state.user.thirdpartyuser) {
+    if (this.state.user && !this.state.user.thirdpartyuser) {
       const d = this.dialog.open(DialogRegistrationComponent, {
         width: '600px',
         panelClass: 'app-dialog-login',
@@ -157,7 +154,7 @@ export class NavbarComponent {
   };
 
   resetPasswd() {
-    if (!this.state.user.thirdpartyuser) {
+    if (this.state.user && !this.state.user.thirdpartyuser) {
       this.router.navigate(['/userpswd'], {});
     }
   }

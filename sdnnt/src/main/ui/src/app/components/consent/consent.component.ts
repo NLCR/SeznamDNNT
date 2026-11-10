@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { CookieService } from 'ngx-cookie';
 import { AppState } from 'src/app/app.state';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatIcon } from '@angular/material/icon';

@@ -1,17 +1,17 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, OnInit, inject } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatSelect, MatOption } from '@angular/material/select';
 
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
+import { MatInput } from '@angular/material/input';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

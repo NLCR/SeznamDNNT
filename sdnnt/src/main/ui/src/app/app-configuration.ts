@@ -1,9 +1,7 @@
-import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Configuration, KrameriusLibrary } from './shared/configuration';
+import { Injectable, inject } from '@angular/core';
 import { AppState } from './app.state';
-import { User } from './shared/user';
+import { Configuration, KrameriusLibrary } from './shared/configuration';
 
 @Injectable({
     providedIn: 'root'
@@ -16,8 +14,8 @@ import { User } from './shared/user';
     static sdnntClientVersion = 'v1.0.9.7';
 
 
-    private config: Configuration;
-    public invalidServer: boolean;
+    private config!: Configuration;
+    public invalidServer = false;
 
 
     public get sortedFacets() {
@@ -76,7 +74,7 @@ import { User } from './shared/user';
         return this.config.enabled_kramerius_libraries || [];
     }
 
-    public getKrameriusLibrary(value: string): KrameriusLibrary {
+    public getKrameriusLibrary(value: string): KrameriusLibrary | null {
         if (!value) {
             return null;
         }

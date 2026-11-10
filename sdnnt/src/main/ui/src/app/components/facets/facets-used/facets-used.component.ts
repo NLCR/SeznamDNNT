@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
 
-import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatTooltip } from '@angular/material/tooltip';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

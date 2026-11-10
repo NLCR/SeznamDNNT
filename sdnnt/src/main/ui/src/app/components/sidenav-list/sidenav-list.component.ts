@@ -1,12 +1,11 @@
-import { Component, Output, EventEmitter, inject } from '@angular/core';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { NavbarComponent } from '../navbar/navbar.component';
-import { MatDialog } from '@angular/material/dialog';
-import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
-import { MatNavList, MatListItem, MatDivider } from '@angular/material/list';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FlexModule } from '@angular/flex-layout/flex';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatDivider, MatListItem, MatNavList } from '@angular/material/list';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { MatMenuItem } from '@angular/material/menu';

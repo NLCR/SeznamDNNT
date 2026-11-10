@@ -1,8 +1,16 @@
+import { DatePipe, NgClass } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatCard, MatCardActions, MatCardContent } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
@@ -14,17 +22,8 @@ import { DialogStatesComponent } from 'src/app/components/dialog-states/dialog-s
 import { GranularityComponent } from 'src/app/components/granularity/granularity.component';
 import { Import } from 'src/app/shared/import';
 import { SolrDocument } from 'src/app/shared/solr-document';
-import { SolrResponse } from 'src/app/shared/solr-response';
-import { FlexModule } from '@angular/flex-layout/flex';
-import { NgClass, DatePipe } from '@angular/common';
 import { FacetsComponent } from '../../../components/facets/facets.component';
 import { PaginatorComponent } from '../../../components/paginator/paginator.component';
-import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-import',

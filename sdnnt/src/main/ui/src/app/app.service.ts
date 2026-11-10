@@ -1,19 +1,18 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
-import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, Subject, throwError  } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 
-import { AppState } from './app.state';
-import { TranslateService } from '@ngx-translate/core';
-import { User } from './shared/user';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { AppConfiguration } from './app-configuration';
-import { Zadost } from './shared/zadost';
-import { SolrDocument } from './shared/solr-document';
 import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { MatSpinner } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
+import { AppConfiguration } from './app-configuration';
+import { AppState } from './app.state';
+import { User } from './shared/user';
+import { Zadost } from './shared/zadost';
 
 
 @Injectable()
@@ -32,12 +31,11 @@ export class AppService {
   public langChanged: Observable<boolean> = this.langSubject.asObservable();
 
 
-  private get<T>(url: string, params: HttpParams = new HttpParams(), showingLoading: boolean = true, responseType?): Observable<T> {
-    // const r = re ? re : 'json';
+  private get<T>(url: string, params: HttpParams = new HttpParams(), showingLoading: boolean = true): Observable<T> {
     if (showingLoading) {
       this.showLoading();
     }
-    const options = { params, responseType, withCredentials: true };
+    const options = { params, withCredentials: true };
     return this.http.get<T>(`api/${url}`, options).pipe(
       finalize(() => {
         if (showingLoading) {
@@ -414,7 +412,7 @@ export class AppService {
     const url = '/texts/read';
     const params: HttpParams = new HttpParams()
       .set('id', id).set('lang', this.state.currentLang);
-    return this.get(url, params, false, 'plain/text');
+    return this.http.get(`api/${url}`, { params, responseType: 'text', withCredentials: true });
   }
 
   saveText(id: string, text: string): Observable<string> {
@@ -531,7 +529,7 @@ export class AppService {
     return this.get(url, params, false);
   }
 
-  setImportControlled(doc): Observable<User> {
+  setImportControlled(doc: unknown): Observable<User> {
     const url = '/account/import_document_controlled';
     return this.post(url, doc);
   }
@@ -541,7 +539,7 @@ export class AppService {
     return this.post(url, {id});
   }
 
-  changeStavImport(doc): Observable<User> {
+  changeStavImport(doc: unknown): Observable<User> {
     const url = '/account/import_stav';
     return this.post(url, doc);
   }

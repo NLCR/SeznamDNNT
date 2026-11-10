@@ -1,28 +1,28 @@
+import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { FormsModule } from '@angular/forms';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatCard } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatTooltip } from '@angular/material/tooltip';
 import { ActivatedRoute, Params, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
+import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { User } from 'src/app/shared/user';
 import { Zadost } from 'src/app/shared/zadost';
-import { MatDialog } from '@angular/material/dialog';
-import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
-import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
-import { DatePipe } from '@angular/common';
-import { FlexModule } from '@angular/flex-layout/flex';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
-import { MatCard } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { MatSlideToggle } from '@angular/material/slide-toggle';
-import { FormsModule } from '@angular/forms';
 import { ResultItemComponent } from '../../components/result-item/result-item.component';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-zadost',

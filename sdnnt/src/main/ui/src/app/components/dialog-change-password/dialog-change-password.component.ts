@@ -1,14 +1,14 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatError, MatFormField, MatHint, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatFormField, MatLabel, MatSuffix, MatHint, MatError } from '@angular/material/form-field';
-import { MatIconButton, MatButton } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { MatInput } from '@angular/material/input';
 
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { TranslateModule } from '@ngx-translate/core';
@@ -85,7 +85,7 @@ export class DialogChangePasswordComponent {
       this.passwordControl.valueChanges.subscribe(() => this.confirmationControl.updateValueAndValidity({emitEvent: false}));
     }
 
-  token: string;
+  token: string | null = null;
 
   close(): void {
     this.router.navigate(['/home'], {});

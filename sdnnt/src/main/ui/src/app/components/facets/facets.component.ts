@@ -1,25 +1,22 @@
-import { Component, Input, OnInit, HostListener, inject } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AppConfiguration } from 'src/app/app-configuration';
-import { AppState } from 'src/app/app.state';
-import { Filter } from 'src/app/shared/filter';
-import { DialogAllPublishersComponent } from '../dialog-all-publishers/dialog-all-publishers.component';
-import { HttpParams } from '@angular/common/http';
-import { AppService } from 'src/app/app.service';
-import { SolrResponse } from 'src/app/shared/solr-response';
-import { FacetsUsedComponent } from './facets-used/facets-used.component';
-import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
-import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { Component, HostListener, inject, Input, OnInit } from '@angular/core';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { MatIcon } from '@angular/material/icon';
-import { MatTooltip } from '@angular/material/tooltip';
+import { FormControl, FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatDialog } from '@angular/material/dialog';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { AppConfiguration } from 'src/app/app-configuration';
+import { AppService } from 'src/app/app.service';
+import { AppState } from 'src/app/app.state';
+import { DialogAllPublishersComponent } from '../dialog-all-publishers/dialog-all-publishers.component';
+import { FacetsUsedComponent } from './facets-used/facets-used.component';
 
 @Component({
     selector: 'app-facets',

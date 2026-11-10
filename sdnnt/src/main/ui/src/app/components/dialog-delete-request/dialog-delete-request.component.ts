@@ -1,13 +1,13 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { MatButton } from '@angular/material/button';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppService } from 'src/app/app.service';
 import { Zadost } from 'src/app/shared/zadost';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatCard, MatCardContent } from '@angular/material/card';
-import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-dialog-delete-request',

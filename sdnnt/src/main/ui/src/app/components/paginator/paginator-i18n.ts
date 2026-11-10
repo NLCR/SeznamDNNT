@@ -1,5 +1,5 @@
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { TranslateParser, TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 export class PaginatorI18n extends MatPaginatorIntl {
 

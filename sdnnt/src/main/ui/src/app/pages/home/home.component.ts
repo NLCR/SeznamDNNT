@@ -1,17 +1,17 @@
 import { HttpParams } from '@angular/common/http';
 import { Component, OnInit, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { FlexModule } from '@angular/flex-layout/flex';
 
-import { MatCard, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
-import { RouterLink } from '@angular/router';
-import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { GraphsComponent } from '../../components/graphs/graphs.component';
+import { MatCard, MatCardActions, MatCardAvatar, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { RouterLink } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { GraphsComponent } from '../../components/graphs/graphs.component';
 
 @Component({
     selector: 'app-home',

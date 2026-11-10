@@ -1,18 +1,18 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, OnInit, inject } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-import { FormsModule } from '@angular/forms';
 
-import { MatDivider } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
+import { MatDivider } from '@angular/material/list';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({

@@ -1,15 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { Component, inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { interval } from 'rxjs';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
-import { BehaviorSubject, interval, Subscription } from 'rxjs';
-import { CdkScrollable } from '@angular/cdk/scrolling';
 
 import { FlexModule } from '@angular/flex-layout/flex';
-import { MatLabel } from '@angular/material/form-field';
 import { MatButton } from '@angular/material/button';
+import { MatLabel } from '@angular/material/form-field';
 import { TranslateModule } from '@ngx-translate/core';
 
 

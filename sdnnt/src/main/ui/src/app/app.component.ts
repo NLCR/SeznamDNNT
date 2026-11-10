@@ -1,23 +1,24 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { Component, inject, OnInit } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { CookieService } from 'ngx-cookie';
+import { interval } from 'rxjs';
 import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
 import { AppState } from './app.state';
-import { CookieService } from 'ngx-cookie';
-import { interval, Subscription } from 'rxjs';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogSessionExpirationComponent } from './components/dialog-session-expiration/dialog-session-expiration.component';
-import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
-import { NavbarComponent } from './components/navbar/navbar.component';
-import { FlexModule } from '@angular/flex-layout/flex';
 import { FooterComponent } from './components/footer/footer.component';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { SidenavListComponent } from './components/sidenav-list/sidenav-list.component';
 
 
 
 @Component({
     selector: 'app-root',
+    standalone: true,
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
     imports: [SidenavListComponent, NavbarComponent, FlexModule, RouterOutlet, FooterComponent, MatSidenavModule, MatListModule]
@@ -33,7 +34,7 @@ export class AppComponent implements OnInit {
 
 
 
-  sessionDialogRef;
+  sessionDialogRef: MatDialogRef<DialogSessionExpirationComponent> | null = null;
 
 
   ngOnInit() {
@@ -44,10 +45,12 @@ export class AppComponent implements OnInit {
     this.router.events.subscribe(val => {
       if (val instanceof NavigationEnd) {
         const params = this.route.snapshot.queryParamMap;
-        if (params.has('lang')) {
-          this.service.changeLang(params.get('lang'));
-        } else if (localStorage.getItem('lang')) {
-          this.service.changeLang(localStorage.getItem('lang'));
+        const queryLang = params.get('lang');
+        const storedLang = localStorage.getItem('lang');
+        if (queryLang) {
+          this.service.changeLang(queryLang);
+        } else if (storedLang) {
+          this.service.changeLang(storedLang);
         }
         this.state.processParams(params, this.router.url);
       }
@@ -109,7 +112,7 @@ export class AppComponent implements OnInit {
   }
 
   isConsentEnabled() {
-    const consent: string = localStorage.getItem('consent');
+    const consent = localStorage.getItem('consent');
     return consent != null;
   }
 

@@ -1,14 +1,12 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-import { FormsModule } from '@angular/forms';
 
 import { MatButton } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
@@ -21,8 +19,6 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class DialogBulkProposalComponent {
   dialogRef = inject<MatDialogRef<DialogBulkProposalComponent>>(MatDialogRef);
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private service = inject(AppService);
   private config = inject(AppConfiguration);
   state = inject(AppState);
@@ -36,9 +32,7 @@ export class DialogBulkProposalComponent {
   actions: string[] = [];
   // ident x actions mapping
   identifiersAndActionsMapping = new Map<string, string[]>();
-  navrh: string;
-
-  docs: SolrDocument[];
+  navrh: 'VN' | 'VNZ' | 'NZN' | null = null;
 
   constructor() {
     const data = this.data;
@@ -57,9 +51,6 @@ export class DialogBulkProposalComponent {
     }
 
 
-    if (data.docs) {
-      this.docs = data.docs;
-    }
     if (data.actions) {
       this.actions = data.actions;
     }
@@ -71,16 +62,20 @@ export class DialogBulkProposalComponent {
 
 
   /** Pripravi a ulozi zadost po te reload */
-  saveZadost(navrh: string, identifiers: string[], customSuccess: string, customError: string, forceError: boolean=false) {
-    const key =  navrh === 'VNL' || navrh === 'VNZ' ?  'VNX' : navrh;
-    if  (!this.state.currentZadost[key].identifiers) {
-      this.state.currentZadost[key].identifiers = [];
+  saveZadost(navrh: 'VN' | 'VNZ' | 'NZN', identifiers: string[], customSuccess: string | null, customError: string | null, forceError: boolean=false) {
+    const key = navrh === 'VNZ' ? 'VNX' : navrh;
+    const request = this.state.currentZadost[key];
+    if (!request) {
+      return;
+    }
+    if (!request.identifiers) {
+      request.identifiers = [];
     }
     identifiers.forEach(ident=> {
-      this.state.currentZadost[key].identifiers.push(ident);
+      request.identifiers.push(ident);
     });
 
-    this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
+    this.service.saveZadost(request).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', customError ? customError : res.error , true);
       } else {
@@ -98,8 +93,11 @@ export class DialogBulkProposalComponent {
      * Hromadna zadost
      */
      setBulkProposal() {
-      const identiefiers = [];
+      const identiefiers: string[] = [];
       const selectedAction = this.navrh;
+      if (!selectedAction) {
+        return;
+      }
       this.identifiersAndActionsMapping.forEach((actions: string[], ident: string) => {
           if(actions.indexOf(selectedAction) > -1 ) {
             identiefiers.push(ident);
@@ -107,7 +105,7 @@ export class DialogBulkProposalComponent {
       });
       if (identiefiers && identiefiers.length > 0) {
 
-        if (selectedAction === 'VNZ' || selectedAction === 'VNL') {
+        if (selectedAction === 'VNZ') {
           this.service.prepareZadost(['VNZ','VNL']).subscribe((res: Zadost) => {
             const resNumberOfItems: number = res.identifiers?.length ?? 0;
             if ((identiefiers.length+ resNumberOfItems) <= this.config.maximumItemInRequest) {

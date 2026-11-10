@@ -1,34 +1,30 @@
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { FlexModule } from '@angular/flex-layout/flex';
 import { FormControl } from '@angular/forms';
+import { MatButtonToggle, MatButtonToggleGroup } from '@angular/material/button-toggle';
+import { MatCard, MatCardActions, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { DocsUtils } from 'src/app/shared/docutils';
+import { Export } from 'src/app/shared/exports';
+import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
-import { DialogIdentifierComponent } from '../dialog-identifier/dialog-identifier.component';
-import { ExpressionDialogComponent } from '../expression-dialog/expression-dialog.component';
-import { GranularityComponent } from '../granularity/granularity.component';
 import { DialogHistoryComponent } from '../dialog-history/dialog-history.component';
+import { DialogIdentifierComponent } from '../dialog-identifier/dialog-identifier.component';
 import { DialogPromptComponent } from '../dialog-prompt/dialog-prompt.component';
 import { DialogStatesComponent } from '../dialog-states/dialog-states.component';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Subject, zip } from 'rxjs';
-import { DocsUtils } from 'src/app/shared/docutils';
-import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // goto links
-import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { DialogSuccessorRecordsComponent } from '../dialog-successor-records/dialog-successor-records.component';
-import { SolrResponse } from 'src/app/shared/solr-response';
-import { Export } from 'src/app/shared/exports';
-import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
-import { FlexModule } from '@angular/flex-layout/flex';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatIcon } from '@angular/material/icon';
-import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { GranularityComponent } from '../granularity/granularity.component';
 import { ResultActionsExportComponent } from './result-actions-export/result-actions-export.component';
-import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
-import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
@@ -390,20 +386,20 @@ export class ResultItemComponent implements OnInit {
     //const navrh = this.isZarazeno ? 'VN' : 'NZN';
     this.service.prepareZadost(['VNZ', 'VNL']).subscribe((res: Zadost) => {
       this.state.currentZadost.VNX = res;
-      this.addToZadostInternal(res.navrh);
+      this.addToZadostInternal('VNX');
     });
   }
 
   addToZadost() {
-    const navrh = this.isZarazeno ? ['VN'] : ['NZN'];
-    this.service.prepareZadost(navrh).subscribe((res: Zadost) => {
-      this.state.currentZadost[res.navrh] = res;
-      this.addToZadostInternal(res.navrh);
+    const navrh = this.isZarazeno ? 'VN' : 'NZN';
+    this.service.prepareZadost([navrh]).subscribe((res: Zadost) => {
+      this.state.currentZadost[navrh] = res;
+      this.addToZadostInternal(navrh);
     });
   }
 
 
-  addToZadostInternal(navrh: string) {
+  addToZadostInternal(navrh: 'VN' | 'NZN' | 'VNX') {
     const onlyRecord = true;
     this.service.getExpression(this.doc.frbr).subscribe((res: any) => {
       if (res.error) {
@@ -440,25 +436,28 @@ export class ResultItemComponent implements OnInit {
   }
 
 
-  saveZadost(navrh: string) {
-    const key = navrh === 'VNL' || navrh === 'VNZ' ? 'VNX' : navrh;
-    if (!this.state.currentZadost[key].identifiers) {
-      this.state.currentZadost[key].identifiers = [];
+  saveZadost(navrh: 'VN' | 'NZN' | 'VNX') {
+    const request = this.state.currentZadost[navrh];
+    if (!request) {
+      return;
+    }
+    if (!request.identifiers) {
+      request.identifiers = [];
     }
     // check maxium
-    if (this.state.currentZadost[key].identifiers && this.state.currentZadost[key].identifiers.length >= this.config.maximumItemInRequest) {
+    if (request.identifiers.length >= this.config.maximumItemInRequest) {
       this.service.showSnackBar('alert.maximalni_pocet_polozek_v_zadosti_prekrocen', '', false);
     } else {
-      if (!this.state.currentZadost[key].identifiers.includes(this.doc.identifier)) {
-        this.state.currentZadost[key].identifiers.push(this.doc.identifier);
+      if (!request.identifiers.includes(this.doc.identifier)) {
+        request.identifiers.push(this.doc.identifier);
       }
-      this.service.saveZadost(this.state.currentZadost[key]).subscribe((res: any) => {
+      this.service.saveZadost(request).subscribe((res: any) => {
         if (res.error) {
           this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
         } else {
           this.service.showSnackBar('alert.ulozeni_zadosti_success', '', false);
           if (!this.doc.zadost) {
-            this.doc.zadost = this.state.currentZadost[key];
+            this.doc.zadost = request;
             this.setHasNavrhFlag();
           } else if (this.doc.zadost.identifiers) {
             this.doc.zadost.identifiers.push(this.doc.identifier);;
@@ -470,8 +469,12 @@ export class ResultItemComponent implements OnInit {
     }
   }
 
-  addFRBRToZadost(navrh: string) {
-    this.service.addFRBRToZadost(this.state.currentZadost[navrh], this.doc.frbr).subscribe((res: any) => {
+  addFRBRToZadost(navrh: 'VN' | 'NZN' | 'VNX') {
+    const request = this.state.currentZadost[navrh];
+    if (!request) {
+      return;
+    }
+    this.service.addFRBRToZadost(request, this.doc.frbr).subscribe((res: any) => {
       if (res.error) {
         this.service.showSnackBar('alert.ulozeni_zadosti_error', res.error, true);
       } else {

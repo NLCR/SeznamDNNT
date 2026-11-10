@@ -1,8 +1,6 @@
 package {{package}};
 
-{{#hasModel}}import {{modelPackage}}.*;{{/hasModel}}
-import {{package}}.{{classname}}Service;
-import {{package}}.factories.{{classname}}ServiceFactory;
+import cz.inovatika.sdnnt.openapi.endpoints.factories.api.{{classname}}ServiceFactory;
 
 {{#useOas2}}
 import io.swagger.annotations.ApiParam;
@@ -14,33 +12,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 {{/useOas2}}
 
 {{#imports}}import {{import}};
 {{/imports}}
 
-import java.util.Map;
-import java.util.List;
-import {{package}}.NotFoundException;
-
-import java.io.InputStream;
-
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-
 import javax.servlet.ServletConfig;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.container.*;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.*;
-{{#useBeanValidation}}
-import javax.validation.constraints.*;
-{{/useBeanValidation}}
 
 {{#apiBasePath}}@Path("/{{{apiBasePath}}}"){{/apiBasePath}}
 {{^apiBasePath}}@Path("/{{{baseName}}}"){{/apiBasePath}}
@@ -61,7 +45,7 @@ public class {{classname}}  {
          String implClass = servletContext.getInitParameter("{{classname}}.implementation");
          if (implClass != null && !"".equals(implClass.trim())) {
             try {
-               delegate = ({{classname}}Service) Class.forName(implClass).newInstance();
+               delegate = ({{classname}}Service) Class.forName(implClass).getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                throw new RuntimeException(e);
             }
@@ -96,14 +80,14 @@ public class {{classname}}  {
     {{/useOas2}}
     {{^useOas2}}
     @Operation(summary = "{{{summary}}}", description = "{{{notes}}}"{{#hasAuthMethods}}, security = {
-        {{#authMethods}}@SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {
+        {{#authMethods}}@io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "{{name}}"{{#isOAuth}}, scopes = {
             {{#each scopes}}"{{@key}}"{{^@last}},
             {{/@last}}{{/each}}
         }{{/isOAuth}}){{#hasMore}},
         {{/hasMore}}{{/authMethods}}
     }{{/hasAuthMethods}}, tags={ {{#vendorExtensions.x-tags}}"{{tag}}"{{#hasMore}}, {{/hasMore}}{{/vendorExtensions.x-tags}} })
     @ApiResponses(value = { {{#responses}}
-        @ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{^vendorExtensions.x-java-is-response-void}}, content = @Content({{#schema.extensions.x-content-type}}mediaType = "{{schema.extensions.x-content-type}}", {{/schema.extensions.x-content-type}}{{^containerType}}schema = @Schema(implementation = {{{baseType}}}.class)){{/containerType}}{{#containerType}}array = @ArraySchema(schema = @Schema(implementation = {{{baseType}}}.class))){{/containerType}}{{/vendorExtensions.x-java-is-response-void}}){{#hasMore}},
+        @ApiResponse(responseCode = "{{{code}}}", description = "{{{message}}}"{{^vendorExtensions.x-java-is-response-void}}, content = @Content({{#schema.extensions.x-content-type}}mediaType = "{{schema.extensions.x-content-type}}", {{/schema.extensions.x-content-type}}{{^containerType}}schema = @Schema(implementation = {{{baseType}}}.class)){{/containerType}}{{#containerType}}array = @io.swagger.v3.oas.annotations.media.ArraySchema(schema = @Schema(implementation = {{{baseType}}}.class))){{/containerType}}{{/vendorExtensions.x-java-is-response-void}}){{#hasMore}},
         {{/hasMore}}{{/responses}} })
     {{/useOas2}}
     public Response {{nickname}}({{#parameters}}{{>queryParams}}{{>pathParams}}{{>headerParams}}{{>bodyParams}}{{>formParams}}{{>cookieParams}},{{/parameters}}@Context SecurityContext securityContext,@Context ContainerRequestContext crc)

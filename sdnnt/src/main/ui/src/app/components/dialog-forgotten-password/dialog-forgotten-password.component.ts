@@ -1,15 +1,15 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { Component, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatInput } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
-import { MatButton } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-dialog-forgotten-password',

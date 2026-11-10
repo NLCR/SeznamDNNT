@@ -1,15 +1,15 @@
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { MatButton } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TranslateModule } from '@ngx-translate/core';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { HistoryItem } from 'src/app/shared/history-item';
 import { SolrDocument } from 'src/app/shared/solr-document';
-import { CdkScrollable } from '@angular/cdk/scrolling';
-import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { DatePipe } from '@angular/common';
-import { MatTooltip } from '@angular/material/tooltip';
-import { MatButton } from '@angular/material/button';
-import { TranslateModule } from '@ngx-translate/core';
 
 export enum KuratorStavColumns {
   DEFAULT_COLUMNS,

@@ -1,4 +1,3 @@
-import { logging } from 'selenium-webdriver';
 
 export class Zadost {
 
