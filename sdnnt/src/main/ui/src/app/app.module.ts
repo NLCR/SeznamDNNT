@@ -47,7 +47,6 @@ import { ImportsComponent } from './pages/imports/imports.component';
 import { ImportComponent } from './pages/imports/import/import.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
-import { MatPasswordStrengthModule } from '@angular-material-extensions/password-strength';
 import { GranularityComponent } from './components/granularity/granularity.component';
 import { InputLoginNameComponent } from './pages/input-login-name/input-login-name.component';
 import { DialogForgottenPasswordComponent } from './components/dialog-forgotten-password/dialog-forgotten-password.component';
@@ -181,7 +180,6 @@ const providers: any[] =[
       }
     }),
     AppRoutingModule,
-    MatPasswordStrengthModule.forRoot(),
     BrowserAnimationsModule,
     AngularEditorModule,
     CookieModule.forRoot(),

@@ -3,7 +3,6 @@ import { ActivatedRoute, Router, Params } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { Subscription } from 'rxjs';
-import { MatPasswordStrengthComponent } from '@angular-material-extensions/password-strength';
 import { Title } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-password/dialog-change-password.component';

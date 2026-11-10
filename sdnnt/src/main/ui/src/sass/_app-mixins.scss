@@ -158,11 +158,13 @@
 
 // set flex breakpoing
 @mixin setFlexBreakpointGap($val, $gap: null) {
+  $width: $val * 1%;
   @if ($gap == null) {
-    flex: 0 0 calc(#{$val}% - #{$app-gap-card});
-    max-width: calc(#{$val}% - #{$app-gap-card});
+    flex: 0 0 calc($width - $app-gap-card);
+    max-width: calc($width - $app-gap-card);
   } @else {
-    flex: 0 0 calc(#{$val}% - #{$gap}px);
-    max-width: calc(#{$val}% - #{$gap}px);
+    $gap-size: $gap * 1px;
+    flex: 0 0 calc($width - $gap-size);
+    max-width: calc($width - $gap-size);
   }
 }
