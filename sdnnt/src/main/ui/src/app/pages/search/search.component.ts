@@ -15,6 +15,7 @@ import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk
 import { AppConfiguration } from 'src/app/app-configuration';
 
 @Component({
+  standalone: false,
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss']

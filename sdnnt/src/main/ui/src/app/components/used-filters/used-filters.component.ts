@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
+  standalone: false,
   selector: 'app-used-filters',
   templateUrl: './used-filters.component.html',
   styleUrls: ['./used-filters.component.scss']

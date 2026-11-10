@@ -24,6 +24,7 @@ import { Export } from 'src/app/shared/exports';
 
 
 @Component({
+  standalone: false,
   selector: 'app-result-item',
   templateUrl: './result-item.component.html',
   styleUrls: ['./result-item.component.scss']

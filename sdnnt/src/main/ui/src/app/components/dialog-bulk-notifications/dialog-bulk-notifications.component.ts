@@ -6,6 +6,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-bulk-notifications',
   templateUrl: './dialog-bulk-notifications.component.html',
   styleUrls: ['./dialog-bulk-notifications.component.scss']

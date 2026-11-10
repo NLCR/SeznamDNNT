@@ -6,6 +6,7 @@ import { Sort } from 'src/app/shared/configuration';
 import { AppConfiguration } from 'src/app/app-configuration';
 
 @Component({
+  standalone: false,
   selector: 'app-paginator',
   templateUrl: './paginator.component.html',
   styleUrls: ['./paginator.component.scss']

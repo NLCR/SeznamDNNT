@@ -13,6 +13,7 @@ import { SearchComponent } from 'src/app/pages/search/search.component';
 import { SearchBarComponent } from '../searchbar/searchbar.component';
 
 @Component({
+  standalone: false,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']

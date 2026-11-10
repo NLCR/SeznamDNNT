@@ -1,10 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { ECharts, EChartsOption } from 'echarts';
+import { ECharts, EChartsCoreOption } from 'echarts/core';
 import { AppService } from 'src/app/app.service';
 
 @Component({
+  standalone: false,
   selector: 'app-graphs',
   templateUrl: './graphs.component.html',
   styleUrls: ['./graphs.component.scss']
@@ -12,11 +13,11 @@ import { AppService } from 'src/app/app.service';
 export class GraphsComponent implements OnInit {
 
   facets: any;
-  stavOpts: EChartsOption = {};
-  licenseOpts: EChartsOption = {};
-  historyStavOpts: EChartsOption = {};
-  historyUserOpts: EChartsOption = {};
-  historyUserActivityOpts: EChartsOption = {};
+  stavOpts: EChartsCoreOption = {};
+  licenseOpts: EChartsCoreOption = {};
+  historyStavOpts: EChartsCoreOption = {};
+  historyUserOpts: EChartsCoreOption = {};
+  historyUserActivityOpts: EChartsCoreOption = {};
 
   interval = '1MONTH';
   userEchart: ECharts;

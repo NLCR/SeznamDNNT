@@ -17,6 +17,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
 @Component({
+  standalone: false,
   selector: 'app-import',
   templateUrl: './import.component.html',
   styleUrls: ['./import.component.scss']

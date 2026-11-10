@@ -6,6 +6,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-notifications-settings',
   templateUrl: './dialog-notifications-settings.component.html',
   styleUrls: ['./dialog-notifications-settings.component.scss']

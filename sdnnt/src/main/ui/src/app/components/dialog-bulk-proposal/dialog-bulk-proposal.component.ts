@@ -8,6 +8,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-bulk-proposal',
   templateUrl: './dialog-bulk-proposal.component.html',
   styleUrls: ['./dialog-bulk-proposal.component.scss']

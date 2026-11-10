@@ -7,6 +7,7 @@ import { FormControl, Validators } from '@angular/forms';
 
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-change-password',
   templateUrl: './dialog-change-password.component.html',
   styleUrls: ['./dialog-change-password.component.scss']

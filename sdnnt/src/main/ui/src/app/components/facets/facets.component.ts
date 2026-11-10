@@ -11,6 +11,7 @@ import { AppService } from 'src/app/app.service';
 import { SolrResponse } from 'src/app/shared/solr-response';
 
 @Component({
+  standalone: false,
   selector: 'app-facets',
   templateUrl: './facets.component.html',
   styleUrls: ['./facets.component.scss']

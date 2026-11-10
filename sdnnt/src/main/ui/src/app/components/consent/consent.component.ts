@@ -3,6 +3,7 @@ import { CookieService } from 'ngx-cookie';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-consent',
   templateUrl: './consent.component.html',
   styleUrls: ['./consent.component.scss']

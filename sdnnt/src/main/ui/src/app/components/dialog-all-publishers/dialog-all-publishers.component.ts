@@ -8,6 +8,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-all-publishers',
   templateUrl: './dialog-all-publishers.component.html',
   styleUrls: ['./dialog-all-publishers.component.scss']

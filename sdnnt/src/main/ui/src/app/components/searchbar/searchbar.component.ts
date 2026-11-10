@@ -4,6 +4,7 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-searchbar',
   templateUrl: './searchbar.component.html',
   styleUrls: ['./searchbar.component.scss']

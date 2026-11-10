@@ -11,6 +11,7 @@ import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // auto
 
 
 @Component({
+  standalone: false,
   selector: 'app-export',
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.scss']

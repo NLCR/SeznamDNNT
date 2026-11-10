@@ -9,6 +9,7 @@ import { DocsUtils } from 'src/app/shared/docutils';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-successor-records',
   templateUrl: './dialog-successor-records.component.html',
   styleUrls: ['./dialog-successor-records.component.scss']

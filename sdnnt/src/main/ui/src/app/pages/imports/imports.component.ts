@@ -12,6 +12,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'app-imports',
   templateUrl: './imports.component.html',
   styleUrls: ['./imports.component.scss']

@@ -4,6 +4,7 @@ import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
 
 @Component({
+  standalone: false,
   selector: 'app-facets-used',
   templateUrl: './facets-used.component.html',
   styleUrls: ['./facets-used.component.scss']

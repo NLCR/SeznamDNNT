@@ -11,6 +11,7 @@ import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-registration-form',
   templateUrl: './dialog-registration-form.component.html',
   styleUrls: ['./dialog-registration-form.component.scss']

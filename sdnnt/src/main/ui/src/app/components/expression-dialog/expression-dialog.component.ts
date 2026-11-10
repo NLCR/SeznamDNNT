@@ -2,6 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
+  standalone: false,
   selector: 'app-expression-dialog',
   templateUrl: './expression-dialog.component.html',
   styleUrls: ['./expression-dialog.component.scss']

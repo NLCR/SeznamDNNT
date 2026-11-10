@@ -5,6 +5,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']

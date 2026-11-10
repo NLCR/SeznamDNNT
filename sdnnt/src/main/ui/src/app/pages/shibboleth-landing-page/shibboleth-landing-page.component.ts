@@ -4,6 +4,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-shibboleth-landing-page',
   templateUrl: './shibboleth-landing-page.component.html',
   styleUrls: ['./shibboleth-landing-page.component.scss']

@@ -25,6 +25,7 @@
       "rules": {
         "@typescript-eslint/member-ordering": "off",
         "@angular-eslint/no-empty-lifecycle-method": "off",
+        "@angular-eslint/prefer-standalone": "off",
         "@typescript-eslint/naming-convention": [
           "error",
           {

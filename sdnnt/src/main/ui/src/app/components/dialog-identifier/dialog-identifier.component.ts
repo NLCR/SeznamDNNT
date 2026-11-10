@@ -10,6 +10,7 @@ export interface DataDialogData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-identifier',
   templateUrl: './dialog-identifier.component.html',
   styleUrls: ['./dialog-identifier.component.scss']

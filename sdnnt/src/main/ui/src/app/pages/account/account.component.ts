@@ -15,6 +15,7 @@ import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // auto
 
 
 @Component({
+  standalone: false,
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss']

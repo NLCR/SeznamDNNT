@@ -8,6 +8,7 @@ import { BehaviorSubject, interval, Subscription } from 'rxjs';
 
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-session-expiration',
   templateUrl: './dialog-session-expiration.component.html',
   styleUrls: ['./dialog-session-expiration.component.scss']

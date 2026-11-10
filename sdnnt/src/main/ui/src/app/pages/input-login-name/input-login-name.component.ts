@@ -6,6 +6,7 @@ import { AppState } from 'src/app/app.state';
 import { DialogForgottenPasswordComponent } from 'src/app/components/dialog-forgotten-password/dialog-forgotten-password.component';
 
 @Component({
+  standalone: false,
   selector: 'app-input-login-name',
   templateUrl: './input-login-name.component.html',
   styleUrls: ['./input-login-name.component.scss']

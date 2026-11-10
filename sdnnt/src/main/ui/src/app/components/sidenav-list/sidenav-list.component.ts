@@ -9,6 +9,7 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
 
 @Component({
+  standalone: false,
   selector: 'app-sidenav-list',
   templateUrl: './sidenav-list.component.html',
   styleUrls: ['./sidenav-list.component.scss']

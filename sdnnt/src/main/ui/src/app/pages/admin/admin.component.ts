@@ -11,6 +11,7 @@ import { UserValidators } from 'src/app/shared/uservalidators';
 
 
 @Component({
+  standalone: false,
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']

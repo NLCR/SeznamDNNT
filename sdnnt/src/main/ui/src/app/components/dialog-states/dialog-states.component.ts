@@ -7,6 +7,7 @@ import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-states',
   templateUrl: './dialog-states.component.html',
   styleUrls: ['./dialog-states.component.scss']

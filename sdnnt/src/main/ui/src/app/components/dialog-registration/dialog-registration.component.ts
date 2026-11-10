@@ -11,6 +11,7 @@ import { error } from 'protractor';
 
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-registration',
   templateUrl: './dialog-registration.component.html',
   styleUrls: ['./dialog-registration.component.scss']

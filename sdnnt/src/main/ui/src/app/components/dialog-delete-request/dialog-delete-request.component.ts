@@ -5,6 +5,7 @@ import { AppService } from 'src/app/app.service';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-delete-request',
   templateUrl: './dialog-delete-request.component.html',
   styleUrls: ['./dialog-delete-request.component.scss']

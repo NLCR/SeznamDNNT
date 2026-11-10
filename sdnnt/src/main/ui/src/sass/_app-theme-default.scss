@@ -14,7 +14,8 @@ $app-typography: ();
 }
 
 @include mat.all-component-typographies($app-typography);
-@include mat.core();
+@include mat.elevation-classes();
+@include mat.app-background();
 
 $app-brand: "blue";
 

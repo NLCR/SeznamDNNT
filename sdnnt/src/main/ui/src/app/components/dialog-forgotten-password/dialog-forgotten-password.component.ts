@@ -6,6 +6,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-forgotten-password',
   templateUrl: './dialog-forgotten-password.component.html',
   styleUrls: ['./dialog-forgotten-password.component.scss']

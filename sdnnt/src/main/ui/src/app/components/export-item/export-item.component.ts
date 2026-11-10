@@ -5,6 +5,7 @@ import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
+  standalone: false,
   selector: 'app-export-item',
   templateUrl: './export-item.component.html',
   styleUrls: ['./export-item.component.scss']

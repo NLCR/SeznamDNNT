@@ -11,6 +11,7 @@ import { DialogSessionExpirationComponent } from './components/dialog-session-ex
 
 
 @Component({
+  standalone: false,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']

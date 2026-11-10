@@ -10,6 +10,7 @@ import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-
 
 
 @Component({
+  standalone: false,
   selector: 'app-user-reset-password',
   templateUrl: './user-reset-password.component.html',
   styleUrls: ['./user-reset-password.component.scss']

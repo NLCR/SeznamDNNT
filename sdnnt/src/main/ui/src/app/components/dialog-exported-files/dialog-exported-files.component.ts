@@ -10,6 +10,7 @@ export interface ExportedFilesData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-exported-files',
   templateUrl: './dialog-exported-files.component.html',
   styleUrls: ['./dialog-exported-files.component.scss']

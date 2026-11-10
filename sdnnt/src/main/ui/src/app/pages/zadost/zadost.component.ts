@@ -13,6 +13,7 @@ import { DialogCorrespondenceComponent } from 'src/app/components/dialog-corresp
 import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
 
 @Component({
+  standalone: false,
   selector: 'app-zadost',
   templateUrl: './zadost.component.html',
   styleUrls: ['./zadost.component.scss']

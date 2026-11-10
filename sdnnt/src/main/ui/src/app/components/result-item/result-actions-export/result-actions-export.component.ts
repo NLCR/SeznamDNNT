@@ -3,6 +3,7 @@ import { Export } from 'src/app/shared/exports';
 import { SolrDocument } from 'src/app/shared/solr-document';
 
 @Component({
+  standalone: false,
   selector: 'app-result-actions-export',
   templateUrl: './result-actions-export.component.html',
   styleUrls: ['./result-actions-export.component.scss']

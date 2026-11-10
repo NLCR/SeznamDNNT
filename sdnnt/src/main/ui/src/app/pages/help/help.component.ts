@@ -3,6 +3,7 @@ import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
+  standalone: false,
   selector: 'app-help',
   templateUrl: './help.component.html',
   styleUrls: ['./help.component.scss']

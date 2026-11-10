@@ -3,6 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-correspondence',
   templateUrl: './dialog-correspondence.component.html',
   styleUrls: ['./dialog-correspondence.component.scss']

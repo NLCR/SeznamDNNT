@@ -4,6 +4,7 @@ import { AppService } from 'src/app/app.service';
 import { Zadost } from 'src/app/shared/zadost';
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-send-request',
   templateUrl: './dialog-send-request.component.html',
   styleUrls: ['./dialog-send-request.component.scss']

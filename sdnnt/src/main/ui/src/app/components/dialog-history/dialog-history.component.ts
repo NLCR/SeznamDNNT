@@ -13,6 +13,7 @@ export enum KuratorStavColumns {
 
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-history',
   templateUrl: './dialog-history.component.html',
   styleUrls: ['./dialog-history.component.scss']

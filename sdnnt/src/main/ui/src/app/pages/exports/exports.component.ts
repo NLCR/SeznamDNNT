@@ -10,6 +10,7 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
 
 @Component({
+  standalone: false,
   selector: 'app-exports',
   templateUrl: './exports.component.html',
   styleUrls: ['./exports.component.scss']

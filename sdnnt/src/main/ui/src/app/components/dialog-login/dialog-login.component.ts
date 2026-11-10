@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 
 
 @Component({
+  standalone: false,
   selector: 'app-dialog-login',
   templateUrl: './dialog-login.component.html',
   styleUrls: ['./dialog-login.component.scss']
