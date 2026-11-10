@@ -8,7 +8,7 @@ import { DialogRegistrationFormComponent } from '../dialog-registration-form/dia
 import { UserRegisterOption } from 'src/app/shared/user-register-option';
 import { UserValidators } from 'src/app/shared/uservalidators';
 import { error } from 'protractor';
-import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatButton } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
@@ -18,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-dialog-registration',
     templateUrl: './dialog-registration.component.html',
     styleUrls: ['./dialog-registration.component.scss'],
-    imports: [MatDialogTitle, NgSwitch, NgSwitchCase, NgSwitchDefault, CdkScrollable, MatDialogContent, DialogRegistrationFormComponent, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, DialogRegistrationFormComponent, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class DialogRegistrationComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogRegistrationComponent>>(MatDialogRef);

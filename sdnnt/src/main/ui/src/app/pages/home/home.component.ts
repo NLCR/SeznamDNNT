@@ -4,7 +4,7 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 import { MatCard, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
 import { RouterLink } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -18,26 +18,21 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
     imports: [
-      FlexModule,
-      NgFor,
-      NgIf,
-      MatCard,
-      RouterLink,
-      MatCardHeader,
-      MatCardAvatar,
-      NgSwitch,
-      NgSwitchCase,
-      MatIcon,
-      NgSwitchDefault,
-      MatCardTitle,
-      MatCardSubtitle,
-      MatCardActions,
-      MatButton,
-      MatTabGroup,
-      MatTab,
-      GraphsComponent,
-      TranslateModule
-    ]
+    FlexModule,
+    MatCard,
+    RouterLink,
+    MatCardHeader,
+    MatCardAvatar,
+    MatIcon,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardActions,
+    MatButton,
+    MatTabGroup,
+    MatTab,
+    GraphsComponent,
+    TranslateModule
+]
 })
 export class HomeComponent implements OnInit {
   config = inject(AppConfiguration);

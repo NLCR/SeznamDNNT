@@ -1,8 +1,8 @@
 <h1 mat-dialog-title>
-  <ng-container  *ngIf="data.isNavrh">
+  @if (data.isNavrh) {
     <label for="wholeTitle">{{'desc.na_cely_titul' | translate }}</label>
     <input type="checkbox" (change)="setWhole($event)" [(ngModel)]="isWhole" />
-  </ng-container>
+  }
   {{ 'desc.granularita' | translate }}: <span>{{ data.title }}</span>
 </h1>
 <div mat-dialog-content>
@@ -10,7 +10,9 @@
     <table [cellPadding]="0" [cellSpacing]="0" class="app-table">
       <thead>
         <tr>
-          <th  *ngIf="data.isNavrh"></th>
+          @if (data.isNavrh) {
+            <th ></th>
+          }
           <th>{{ 'desc.rocnik' | translate }}</th>
           <th>{{ 'desc.cislo' | translate }}</th>
           <th>{{ 'desc.odkaz' | translate }}</th>
@@ -20,21 +22,26 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let item of data.items">
-          <tr *ngIf="item.rocnik" >
-            <td *ngIf="data.isNavrh"><input [disabled]="isWhole" type="checkbox" (change)="setSelection(item)" [(ngModel)]="item.selected"  /></td>
-            <td>{{ item.rocnik }}</td>
-            <td>{{ item.cislo }}</td>
-            <td> <a  [href]="item.link" target="_blank" >{{item.link }}</a>   </td>
-            <td><ng-container *ngFor="let s of  item.stav">{{ s }}&#160;</ng-container></td>    
-            <td>{{item.license}}</td>
-
-            <td style="font-style: italic;">{{ item && item.kram_licenses ?  item.kram_licenses.join(',') : ''}}</td>
-            <!--
-            <td style="font-style: italic;">{{ item && item.kram_licenses  ? (typeof item.kram_licenses)  : '' }}</td>
-            -->
-          </tr>
-        </ng-container>
+        @for (item of data.items; track item) {
+          @if (item.rocnik) {
+            <tr >
+              @if (data.isNavrh) {
+                <td><input [disabled]="isWhole" type="checkbox" (change)="setSelection(item)" [(ngModel)]="item.selected"  /></td>
+              }
+              <td>{{ item.rocnik }}</td>
+              <td>{{ item.cislo }}</td>
+              <td> <a  [href]="item.link" target="_blank" >{{item.link }}</a>   </td>
+              <td>@for (s of  item.stav; track s) {
+                {{ s }}&#160;
+              }</td>
+              <td>{{item.license}}</td>
+              <td style="font-style: italic;">{{ item && item.kram_licenses ?  item.kram_licenses.join(',') : ''}}</td>
+              <!--
+              <td style="font-style: italic;">{{ item && item.kram_licenses  ? (typeof item.kram_licenses)  : '' }}</td>
+              -->
+            </tr>
+          }
+        }
       </tbody>
     </table>
   </div>

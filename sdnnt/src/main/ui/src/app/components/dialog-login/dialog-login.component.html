@@ -1,7 +1,9 @@
-<mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+@if (loading) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 <h1 mat-dialog-title>{{ 'desc.prihlaseni_uzivatele' | translate }}</h1>
 <div mat-dialog-content class="mat-dialog-content--scrollbar-fix">
-  <ng-container *ngIf="!state.logged">
+  @if (!state.logged) {
     <div fxLayout="row wrap">
       <mat-form-field fxFlex="100%" appearance="outline">
         <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
@@ -11,27 +13,29 @@
         <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
         <input matInput [placeholder]="'desc.heslo' | translate" #loginpwd [type]="hidePassword ? 'password' : 'text'" [(ngModel)]="pwd" (keyup.enter)="login()">
         <mat-icon (click)="hidePassword = !hidePassword" matSuffix>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-      </mat-form-field> 
+      </mat-form-field>
       <div class="login-options">
         <mat-checkbox name="remember" [(ngModel)]="rememberMe">{{ 'desc.zapamatovat_si_me' | translate}}</mat-checkbox>
         <mat-checkbox name="keep" [(ngModel)]="keepLoggedIn">{{ 'desc.zustat_prihlasen' | translate}}</mat-checkbox>
       </div>
-    </div> 
-    <div class="app-color-warning" *ngIf="loginError">
-      {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.
-    </div>    
-  </ng-container>
-  <ng-container *ngIf="state.logged">
+    </div>
+    @if (loginError) {
+      <div class="app-color-warning">
+        {{ 'desc.spatne_prihlasovaci_udaje' | translate }}.
+      </div>
+    }
+  }
+  @if (state.logged) {
     <span class="app-label">{{ 'desc.prihlaseny_uzivatel' | translate }}:</span>&#160;<strong>{{ state.user.jmeno}} {{state.user.prijmeni }}</strong><br />
-  </ng-container>
+  }
 </div>
 <div mat-dialog-actions>
-  <ng-container *ngIf="!state.logged">
+  @if (!state.logged) {
     <button mat-flat-button color="primary" (click)="login()">{{ 'desc.prihlasit_uzivatele' | translate }}</button>
     <button mat-flat-button color="primary" (click)="resetPwd()">{{ 'desc.zapomeli_jste_heslo' | translate }}</button>
-  </ng-container>
-  <ng-container *ngIf="state.logged">
+  }
+  @if (state.logged) {
     <button mat-button (click)="logout()">{{ 'desc.odhlasit' | translate }}</button>
-  </ng-container>
+  }
   <button mat-button [mat-dialog-close]="false">{{ 'desc.zavrit' | translate }}</button>
 </div>

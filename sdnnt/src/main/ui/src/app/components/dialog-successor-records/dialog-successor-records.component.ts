@@ -8,11 +8,10 @@ import { AppState } from 'src/app/app.state';
 import { DocsUtils } from 'src/app/shared/docutils';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { NgClass, KeyValuePipe } from '@angular/common';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
@@ -23,25 +22,22 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-successor-records.component.html',
     styleUrls: ['./dialog-successor-records.component.scss'],
     imports: [
-      MatDialogTitle,
-      CdkScrollable,
-      MatDialogContent,
-      NgIf,
-      MatCard,
-      MatCardContent,
-      MatIcon,
-      NgFor,
-      MatTooltip,
-      NgClass,
-      ExtendedModule,
-      MatCheckbox,
-      FormsModule,
-      MatDialogActions,
-      MatButton,
-      MatDialogClose,
-      KeyValuePipe,
-      TranslateModule
-    ]
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatCard,
+    MatCardContent,
+    MatIcon,
+    MatTooltip,
+    NgClass,
+    MatCheckbox,
+    FormsModule,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    KeyValuePipe,
+    TranslateModule
+]
 })
 export class DialogSuccessorRecordsComponent {
   dialogRef = inject<MatDialogRef<DialogSuccessorRecordsComponent>>(MatDialogRef);

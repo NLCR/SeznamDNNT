@@ -9,7 +9,7 @@ import { MatFormField, MatLabel, MatSuffix, MatHint, MatError } from '@angular/m
 import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
-import { NgIf, NgFor } from '@angular/common';
+
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -19,27 +19,25 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-change-password.component.html',
     styleUrls: ['./dialog-change-password.component.scss'],
     imports: [
-      MatDialogTitle,
-      CdkScrollable,
-      MatDialogContent,
-      MatFormField,
-      MatLabel,
-      MatIconButton,
-      MatSuffix,
-      MatIcon,
-      MatInput,
-      FormsModule,
-      ReactiveFormsModule,
-      MatHint,
-      NgIf,
-      MatError,
-      MatProgressBar,
-      NgFor,
-      MatDialogActions,
-      MatButton,
-      MatDialogClose,
-      TranslateModule
-    ]
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatFormField,
+    MatLabel,
+    MatIconButton,
+    MatSuffix,
+    MatIcon,
+    MatInput,
+    FormsModule,
+    ReactiveFormsModule,
+    MatHint,
+    MatError,
+    MatProgressBar,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    TranslateModule
+]
 })
 export class DialogChangePasswordComponent {
   dialogRef = inject<MatDialogRef<DialogChangePasswordComponent>>(MatDialogRef);

@@ -8,7 +8,7 @@ import { FormControl, FormsModule } from '@angular/forms'; // autocomplete
 import { Observable, Subject } from 'rxjs'; // autocomplete
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
 import { UserValidators } from 'src/app/shared/uservalidators';
-import { NgIf, NgFor } from '@angular/common';
+
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatList, MatListItem } from '@angular/material/list';
@@ -24,22 +24,20 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './admin.component.html',
     styleUrls: ['./admin.component.scss'],
     imports: [
-      NgIf,
-      MatTabGroup,
-      MatTab,
-      FlexModule,
-      MatList,
-      NgFor,
-      MatListItem,
-      AngularEditorModule,
-      FormsModule,
-      MatButton,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      DialogRegistrationFormComponent,
-      TranslateModule
-    ]
+    MatTabGroup,
+    MatTab,
+    FlexModule,
+    MatList,
+    MatListItem,
+    AngularEditorModule,
+    FormsModule,
+    MatButton,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    DialogRegistrationFormComponent,
+    TranslateModule
+]
 })
 export class AdminComponent implements OnInit {
   config = inject(AppConfiguration);

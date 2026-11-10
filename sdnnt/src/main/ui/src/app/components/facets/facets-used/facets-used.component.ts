@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-facets-used',
     templateUrl: './facets-used.component.html',
     styleUrls: ['./facets-used.component.scss'],
-    imports: [NgIf, MatList, MatListSubheaderCssMatStyler, FlexModule, MatTooltip, MatIcon, NgFor, MatListItem, NgSwitch, NgSwitchCase, NgSwitchDefault, TranslateModule]
+    imports: [MatList, MatListSubheaderCssMatStyler, FlexModule, MatTooltip, MatIcon, MatListItem, TranslateModule]
 })
 export class FacetsUsedComponent {
   private router = inject(Router);

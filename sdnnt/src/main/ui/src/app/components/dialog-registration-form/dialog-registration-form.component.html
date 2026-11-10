@@ -1,73 +1,82 @@
-<ng-container *ngIf="user">
+@if (user) {
   <div fxLayout="row wrap" fxLayoutAlign="start baseline">
     <div fxFlex="100%" class="app-mb-4">
       <!-- typ: string; //pravnicka/fyzicka osoba -->
-      <mat-radio-group [(ngModel)]="user.typ" *ngIf="!changeTypOfOsobyDisabled()">
-        <mat-radio-button [value]="'fyzicka_osoba'">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
-        <mat-radio-button [value]="'pravnicka_osoba'">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
-      </mat-radio-group>
-      <span *ngIf="changeTypOfOsobyDisabled()">{{ 'desc.' + user.typ | translate }}</span>
+      @if (!changeTypOfOsobyDisabled()) {
+        <mat-radio-group [(ngModel)]="user.typ">
+          <mat-radio-button [value]="'fyzicka_osoba'">{{ 'desc.fyzicka_osoba' | translate }}</mat-radio-button>
+          <mat-radio-button [value]="'pravnicka_osoba'">{{ 'desc.pravnicka_osoba' | translate }}</mat-radio-button>
+        </mat-radio-group>
+      }
+      @if (changeTypOfOsobyDisabled()) {
+        <span>{{ 'desc.' + user.typ | translate }}</span>
+      }
     </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ === 'fyzicka_osoba'">
-      <div ngClass.gt-xs="app-mr-4">
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
-          <input matInput #jmeno="matInput" cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
-        </mat-form-field>
+    @if (user.typ === 'fyzicka_osoba') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div class="app-registration-form-margin">
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.jmeno' | translate }}*</mat-label>
+            <input matInput #jmeno="matInput" cdkFocusInitial name="name" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'fyzicka_osoba'">
-      <div>
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.prijmeni' | translate }}*</mat-label>
-          <input matInput #prijmeni="matInput" name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
-        </mat-form-field>
+    }
+    @if (user.typ  === 'fyzicka_osoba') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div>
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.prijmeni' | translate }}*</mat-label>
+            <input matInput #prijmeni="matInput" name="surname" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
-      <div>
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
-          <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.nazevspolecnosti" />
-        </mat-form-field>
+    }
+    @if (user.typ  === 'pravnicka_osoba') {
+      <div fxFlex="100%">
+        <div>
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.nazev_spolecnosti' | translate }}*</mat-label>
+            <input matInput #jmeno="matInput" name="jmeno" [placeholder]="'desc.nazev_spolecnosti' | translate" [(ngModel)]="user.nazevspolecnosti" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
+    }
     <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div ngClass.gt-xs="app-mr-4">
+      <div class="app-registration-form-margin">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}*</mat-label>
-          <input #username="matInput" matInput [(ngModel)]="user.username" 
-          name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate"
-          pattern="^\S+$" [disabled]="!isRegister" />
-        </mat-form-field>
+          <input #username="matInput" matInput [(ngModel)]="user.username"
+            name="login" [placeholder]="'desc.prihlasovaci_jmeno' | translate"
+            pattern="^\S+$" [disabled]="!isRegister" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div>
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>Email*</mat-label>
-          <input matInput #email="matInput" name="email" placeholder="Email" [(ngModel)]="user.email" type="email" email />
-        </mat-form-field>
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div>
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>Email*</mat-label>
+            <input matInput #email="matInput" name="email" placeholder="Email" [(ngModel)]="user.email" type="email" email />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div ngClass.gt-xs="app-mr-4">
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
-          <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" #phonenumber="matInput" />
-        </mat-form-field>
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div class="app-registration-form-margin">
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.telefon' | translate }}</mat-label>
+            <input matInput name="phone" [placeholder]="'desc.telefon' | translate" [(ngModel)]="user.telefon" #phonenumber="matInput" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div>
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>IČO</mat-label>
-          <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico"  #ico="matInput" />
-        </mat-form-field>
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div>
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>IČO</mat-label>
+            <input matInput name="ico" placeholder="IČO" [(ngModel)]="user.ico"  #ico="matInput" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-
-    <!-- <div fxFlex="100%">
+      <!-- <div fxFlex="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.adresa' | translate }}</mat-label>
@@ -75,16 +84,14 @@
         </mat-form-field>
       </div>
     </div> -->
-
     <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div ngClass.gt-xs="app-mr-4">
+      <div class="app-registration-form-margin">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.mesto' | translate }}</mat-label>
           <input matInput name="mesto" [placeholder]="'desc.mesto' | translate" [(ngModel)]="user.mesto" />
         </mat-form-field>
       </div>
     </div>
-
     <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
@@ -93,16 +100,14 @@
         </mat-form-field>
       </div>
     </div>
-
     <div fxFlex="50%" fxFlex.lt-sm="100%">
-      <div ngClass.gt-xs="app-mr-4">
+      <div class="app-registration-form-margin">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.cislo_domu' | translate }}</mat-label>
           <input matInput name="cislo_domu" [placeholder]="'desc.cislo_domu' | translate" [(ngModel)]="user.cislo" />
         </mat-form-field>
       </div>
     </div>
-
     <div fxFlex="50%" fxFlex.lt-sm="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
@@ -117,56 +122,66 @@
           <mat-label>{{ 'desc.select_or_add_an_institution' | translate }}</mat-label>
           <input type="text" matInput  [matAutocomplete]="auto" [(ngModel)]="user.institution" [formControl]="myControl" [disabled]="!intitutionChangeEnabled()">
           <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let inst of filteredOptions | async" [value]="inst">
-              {{ inst | translate }}
-            </mat-option>
+            @for (inst of filteredOptions | async; track inst) {
+              <mat-option [value]="inst">
+                {{ inst | translate }}
+              </mat-option>
+            }
           </mat-autocomplete>
           <button matSuffix mat-button mat-flat-button color="accent" [disabled]="!intitutionChangeEnabled() || !nonExistentInstitution()" [matTooltip]="!intitutionChangeEnabled() || !nonExistentInstitution() && user.institution?.length > 0 ?  ('tooltip.unable_to_add_institution' | translate) : null" (click)="addNewInstitution()"><!--*ngIf="user.institution"-->
             <mat-icon>add</mat-icon>{{ 'desc.pridat_novou_instituci' | translate }}
           </button>
-        </mat-form-field> 
-      </div>
-    </div>
-
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
-      <div ngClass.gt-xs="app-mr-4">
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}*</mat-label>
-          <input matInput #kontaktni_osoba_jmeno="matInput" cdkFocusInitial name="kontaktni_osoba_jmeno" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
         </mat-form-field>
       </div>
     </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="user.typ  === 'pravnicka_osoba'">
-      <div>
-        <mat-form-field appearance="outline" class="app-w-100">
-          <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}*</mat-label>
-          <input matInput #kontaktni_osoba_prijmeni="matInput" name="kontaktni_osoba_prijmeni" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
-        </mat-form-field>
+    @if (user.typ  === 'pravnicka_osoba') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div class="app-registration-form-margin">
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.kontaktni_osoba_jmeno' | translate }}*</mat-label>
+            <input matInput #kontaktni_osoba_jmeno="matInput" cdkFocusInitial name="kontaktni_osoba_jmeno" [placeholder]="'desc.jmeno' | translate" [(ngModel)]="user.jmeno" />
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-    <div fxFlex="100%" *ngIf="state.user?.role === 'admin'">
+    }
+    @if (user.typ  === 'pravnicka_osoba') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div>
+          <mat-form-field appearance="outline" class="app-w-100">
+            <mat-label>{{ 'desc.kontaktni_osoba_prijmeni' | translate }}*</mat-label>
+            <input matInput #kontaktni_osoba_prijmeni="matInput" name="kontaktni_osoba_prijmeni" [placeholder]="'desc.prijmeni' | translate" [(ngModel)]="user.prijmeni" />
+          </mat-form-field>
+        </div>
+      </div>
+    }
+    @if (state.user?.role === 'admin') {
+      <div fxFlex="100%">
         <mat-form-field appearance="outline" class="app-w-100">
           <mat-label>{{ 'desc.role' | translate }}</mat-label>
           <mat-select name="role"  [(ngModel)]="user.role">
-            <mat-option *ngFor="let role of config.role" [value]="role">{{ role | translate }}</mat-option>
+            @for (role of config.role; track role) {
+              <mat-option [value]="role">{{ role | translate }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
-    </div>
-
-
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="state.user?.role === 'admin'">
-      <div ngClass.gt-xs="app-mr-4">
-        <mat-form-field appearance="outline" class="app-w-100">
-          <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey" disabled></textarea>
-        </mat-form-field>
       </div>
-    </div>
-    <div fxFlex="50%" fxFlex.lt-sm="100%" *ngIf="state.user?.role === 'admin'">
-      <div>
-        <mat-checkbox name="apienabled" [(ngModel)]="isApiEnabled" class="app-ml-8" (change)="switchEnableApi()">{{ 'desc.apienabled' | translate }}</mat-checkbox>
+    }
+    @if (state.user?.role === 'admin') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div class="app-registration-form-margin">
+          <mat-form-field appearance="outline" class="app-w-100">
+            <textarea matInput [placeholder]="'desc.apikey' | translate" name="apikey" [(ngModel)]="user.apikey" disabled></textarea>
+          </mat-form-field>
+        </div>
       </div>
-    </div>
-
+    }
+    @if (state.user?.role === 'admin') {
+      <div fxFlex="50%" fxFlex.lt-sm="100%">
+        <div>
+          <mat-checkbox name="apienabled" [(ngModel)]="isApiEnabled" class="app-ml-8" (change)="switchEnableApi()">{{ 'desc.apienabled' | translate }}</mat-checkbox>
+        </div>
+      </div>
+    }
     <div fxFlex="100%">
       <div>
         <mat-form-field appearance="outline" class="app-w-100">
@@ -175,7 +190,6 @@
         </mat-form-field>
       </div>
     </div>
-
   </div>
   <div class="app-mb-4">
     <section>
@@ -186,9 +200,7 @@
       <mat-checkbox name="nakladatel" [(ngModel)]="nakladatel" (change)="setNositel()">{{ 'desc.nakladatel_vydavatel' | translate }}</mat-checkbox>
     </section>
   </div>
-
-  <ng-container *ngIf="isRegister">
-
+  @if (isRegister) {
     <mat-divider class="app-mb-4"></mat-divider>
     <div class="app-mb-4">
       <label id="notifikace_interval_label" class="app-label app-mr-2">{{ 'desc.notifikace_interval' | translate }}:</label>
@@ -199,20 +211,22 @@
         <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
       </mat-radio-group>
     </div>
-    
-  </ng-container>
-
-  <mat-divider class="app-mb-4" *ngIf="isRegister"></mat-divider>
-  <div  #condition class="app-mb-4" *ngIf="isRegister">
-    <div class="app-label">{{ 'desc.podminky' | translate }}</div>
-    <p>
-      <mat-checkbox #conditionOne   [(ngModel)]="user.registerOption.condition1" name="condition1" ><span [innerHTML]="'registracni_podminky.podminka_1' | translate"></span></mat-checkbox>
-    </p>
-    <p>
-      <mat-checkbox #conditionTwo  [(ngModel)]="user.registerOption.condition2" name="condition2"><span [innerHTML]="'registracni_podminky.podminka_2' | translate"></span></mat-checkbox>
-    </p>
-    <p>
-      <mat-checkbox #conditionThree  [(ngModel)]="user.registerOption.condition3" name="condition3"><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
-    </p>
-  </div>
-</ng-container>
+  }
+  @if (isRegister) {
+    <mat-divider class="app-mb-4"></mat-divider>
+  }
+  @if (isRegister) {
+    <div  #condition class="app-mb-4">
+      <div class="app-label">{{ 'desc.podminky' | translate }}</div>
+      <p>
+        <mat-checkbox #conditionOne   [(ngModel)]="user.registerOption.condition1" name="condition1" ><span [innerHTML]="'registracni_podminky.podminka_1' | translate"></span></mat-checkbox>
+      </p>
+      <p>
+        <mat-checkbox #conditionTwo  [(ngModel)]="user.registerOption.condition2" name="condition2"><span [innerHTML]="'registracni_podminky.podminka_2' | translate"></span></mat-checkbox>
+      </p>
+      <p>
+        <mat-checkbox #conditionThree  [(ngModel)]="user.registerOption.condition3" name="condition3"><span [innerHTML]="'registracni_podminky.podminka_3' | translate"></span></mat-checkbox>
+      </p>
+    </div>
+  }
+}

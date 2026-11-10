@@ -8,24 +8,28 @@
     (page)="pageChanged($event)"
     class="app-clean-bg">
   </mat-paginator>
-  
-  <mat-form-field *ngIf="showSort" fxFlex="220px" class="app-sorting fxHide_md fxHide_sm fxHide_xs">
-    <mat-label>{{ 'desc.radit_podle' | translate }}</mat-label>
-    <mat-select [(ngModel)]="state.sort[sortType]" panelClass="app-sort-panel">
-      <mat-select-trigger class="app-sort-trigger">
-        <ng-container *ngIf="state.sort[sortType]">
-          <span class="app-sort-value">
-            <span class="app-sort-label">{{ 'sort.' + state.sort[sortType].field | translate }}</span>
-            <mat-icon class="app-m-0">{{ state.sort[sortType].dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon>
-          </span>
-        </ng-container>
-      </mat-select-trigger>
-      <mat-option *ngFor="let sort of config.sorts[sortType]" (click)="sortBy(sort)" [value]="sort">
-        <span class="app-sort-value">
-          <span class="app-sort-label">{{ 'sort.' + sort.field | translate }}</span>
-          <mat-icon class="app-m-0">{{ sort.dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon>
-        </span>
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+
+  @if (showSort) {
+    <mat-form-field fxFlex="220px" class="app-sorting fxHide_md fxHide_sm fxHide_xs">
+      <mat-label>{{ 'desc.radit_podle' | translate }}</mat-label>
+      <mat-select [(ngModel)]="state.sort[sortType]" panelClass="app-sort-panel">
+        <mat-select-trigger class="app-sort-trigger">
+          @if (state.sort[sortType]) {
+            <span class="app-sort-value">
+              <span class="app-sort-label">{{ 'sort.' + state.sort[sortType].field | translate }}</span>
+              <mat-icon class="app-m-0">{{ state.sort[sortType].dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon>
+            </span>
+          }
+        </mat-select-trigger>
+        @for (sort of config.sorts[sortType]; track sort) {
+          <mat-option (click)="sortBy(sort)" [value]="sort">
+            <span class="app-sort-value">
+              <span class="app-sort-label">{{ 'sort.' + sort.field | translate }}</span>
+              <mat-icon class="app-m-0">{{ sort.dir === 'desc' ? 'expand_more' : 'expand_less' }}</mat-icon>
+            </span>
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  }
 </div>

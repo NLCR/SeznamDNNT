@@ -6,7 +6,9 @@
         <strong>Filtry</strong>
         <button mat-icon-button type="button" (click)="filtersOpen = false" aria-label="Zavřít filtry"><mat-icon>close</mat-icon></button>
       </div>
-      <app-facets *ngIf="facets" [facet_fields]="facets" [stats]="searchResponse.stats.stats_fields" [view]="'search'"></app-facets>
+      @if (facets) {
+        <app-facets [facet_fields]="facets" [stats]="searchResponse.stats.stats_fields" [view]="'search'"></app-facets>
+      }
     </div>
     <div fxFlex class="app-right app-fx-results">
       <div fxLayout="row wrap" fxLayoutAlign="start center" class="app-toolbar">
@@ -20,51 +22,62 @@
           <app-paginator [numFound]="numFound"  [showSort]="true" [storeStateKey]="'search'"></app-paginator>
         </div>
       </div>
-      
+
       <div class="app-results-wrapper" [ngClass]="state.logged ? 'app-role-' + state.user.role : null">
-        <mat-card appearance="outlined" *ngIf="this.state.user">
-          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-
-            <div fxFlex>
-              <!--
-              <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
-               -->
-           </div>
-            <div>
-              <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button *ngIf="(state.user && (state.user.role === 'user' || state.user.role === 'knihovna' || state.user.role === 'kurator' || state.user.role === 'mainKurator'))">
-                <mat-button-toggle [matMenuTriggerFor]="menuFilter">
-                  <mat-icon class="material-icons-outlined app-mr-1">notifications</mat-icon>
-                  {{ this.state.notificationSettings.selected ? (this.state.notificationSettings.selected.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : this.state.notificationSettings.selected.name) : 'desc.zobrazit_zaznamy_s_notifikaci' | translate }}
-                  <mat-icon class="app-color-warning app-cursor-pointer app-ml-2" *ngIf="this.state.notificationSettings.selected" (click)="selectNofiticationFitler(null)" [matTooltip]="'desc.zrusit' | translate">clear</mat-icon>
-                </mat-button-toggle>
-                <mat-button-toggle mat-stroked-button *ngIf="(state.user)" [matMenuTriggerFor]="menuMassAction">
-                  <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.hromadne_akce' | translate }}
-                </mat-button-toggle>
-              </mat-button-toggle-group>
-
-              <mat-menu #menuFilter="matMenu">
-                <ng-container *ngFor="let f of this.state.notificationSettings.all">
-                  <button mat-menu-item (click)="selectNofiticationFitler(f)">
-                    {{ f.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : f.name }}
-                  </button>
-                  <mat-divider *ngIf="f.name === 'simple'"></mat-divider>
-                </ng-container>
-              </mat-menu>
-
-              <mat-menu #menuMassAction="matMenu">
-                <button mat-menu-item *ngIf="hromadnaZadostEnabled() &&  (state.user.role === 'user' || state.user.role === 'knihovna'  )  " (click)="openBulkProposal()">
-                  <mat-icon class="material-icons-outlined">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
-                </button>
-                <span [matTooltip]="( state.notificationSettings.selected !=null  ||  numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications) ? ('tooltip.hromadne_notifikace_disabled' | translate) : null">
-                  <button mat-menu-item (click)="openBulkNotifications()" [disabled]=" state.notificationSettings.selected != null || numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications">
-                    <mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.hromadne_notifikace' | translate }}
-                  </button>
-                </span>
-              </mat-menu>
+        @if (this.state.user) {
+          <mat-card appearance="outlined">
+            <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+              <div fxFlex>
+                <!--
+                <mat-checkbox *ngIf="state.user && state.user.role !== 'user'" class="app-mr-4" (change)="viewFullCatalog()" [(ngModel)]="state.fullCatalog">{{ 'desc.zobrazit_dokumenty_ktere_nejsou_zarazeny_na_seznamu' | translate }}</mat-checkbox>
+                -->
+              </div>
+              <div>
+                @if ((state.user && (state.user.role === 'user' || state.user.role === 'knihovna' || state.user.role === 'kurator' || state.user.role === 'mainKurator'))) {
+                  <mat-button-toggle-group name="fontStyle" aria-label="Font Style" mat-stroked-button>
+                    <mat-button-toggle [matMenuTriggerFor]="menuFilter">
+                      <mat-icon class="material-icons-outlined app-mr-1">notifications</mat-icon>
+                      {{ this.state.notificationSettings.selected ? (this.state.notificationSettings.selected.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : this.state.notificationSettings.selected.name) : 'desc.zobrazit_zaznamy_s_notifikaci' | translate }}
+                      @if (this.state.notificationSettings.selected) {
+                        <mat-icon class="app-color-warning app-cursor-pointer app-ml-2" (click)="selectNofiticationFitler(null)" [matTooltip]="'desc.zrusit' | translate">clear</mat-icon>
+                      }
+                    </mat-button-toggle>
+                    @if ((state.user)) {
+                      <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMassAction">
+                        <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.hromadne_akce' | translate }}
+                      </mat-button-toggle>
+                    }
+                  </mat-button-toggle-group>
+                }
+                <mat-menu #menuFilter="matMenu">
+                  @for (f of this.state.notificationSettings.all; track f) {
+                    <button mat-menu-item (click)="selectNofiticationFitler(f)">
+                      {{ f.name === 'simple' ? ('desc.jednotlive_notifikace' | translate) : f.name }}
+                    </button>
+                    @if (f.name === 'simple') {
+                      <mat-divider></mat-divider>
+                    }
+                  }
+                </mat-menu>
+                <mat-menu #menuMassAction="matMenu">
+                  @if (hromadnaZadostEnabled() &&  (state.user.role === 'user' || state.user.role === 'knihovna'  )  ) {
+                    <button mat-menu-item (click)="openBulkProposal()">
+                      <mat-icon class="material-icons-outlined">check</mat-icon>{{ 'desc.hromadny_navrh' | translate }}
+                    </button>
+                  }
+                  <span [matTooltip]="( state.notificationSettings.selected !=null  ||  numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications) ? ('tooltip.hromadne_notifikace_disabled' | translate) : null">
+                    <button mat-menu-item (click)="openBulkNotifications()" [disabled]=" state.notificationSettings.selected != null || numFound>configuration.numberOfItemsInRulenotification || this.state.notificationSettings.all.length - 1 >  configuration.numberOfRuleBasedNotifications">
+                      <mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.hromadne_notifikace' | translate }}
+                    </button>
+                  </span>
+                </mat-menu>
+              </div>
             </div>
-          </div>
-        </mat-card>
-        <app-result-item *ngFor="let doc of docs" [doc]="doc" [view]="'search'"></app-result-item>
+          </mat-card>
+        }
+        @for (doc of docs; track doc) {
+          <app-result-item [doc]="doc" [view]="'search'"></app-result-item>
+        }
       </div>
       <div class="app-mt-4">
         <app-paginator [numFound]="numFound" [showSort]="true" [storeStateKey]="'search'"></app-paginator>

@@ -3,14 +3,15 @@
   <div class="app-overflow-x-auto">
     <table class="app-table" [cellPadding]="0" [cellSpacing]="0">
       <tbody>
-        <tr *ngFor="let expFile of data.files">
-          <td><a href="api/iexports/exported_file?path={{ encodePath(expFile.path) }}&exportname={{data.exportname}}">{{ expFile.name }}</a>
-
+        @for (expFile of data.files; track expFile) {
+          <tr>
+            <td><a href="api/iexports/exported_file?path={{ encodePath(expFile.path) }}&exportname={{data.exportname}}">{{ expFile.name }}</a>
           </td>
         </tr>
-      </tbody>
-    </table>
-  </div>
+      }
+    </tbody>
+  </table>
+</div>
 </div>
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>

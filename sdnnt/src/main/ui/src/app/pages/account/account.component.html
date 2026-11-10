@@ -3,67 +3,73 @@
 
     <div class="app-left app-fx-facets">
       <div class="app-facets-used">
-        <mat-list *ngIf="state.facetsstore.getFacet('account','stateFilter')?.length       || 
-                        state.facetsstore.getFacet('account','newStavFilter')?.length      || 
-                        state.facetsstore.getFacet('account','institutionFilter')?.length  || 
-                        state.facetsstore.getFacet('account','delegatedFilter')?.length    || 
-                        state.facetsstore.getFacet('account','priorityFilter')?.length     || 
-                        state.facetsstore.getFacet('account','typeOfRequestFilter')?.length">
-          <h3 matSubheader fxLayout="row">
-            <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
-            <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
-          </h3>
-          <div class="app-list-content-wrapper">
-            <ng-container *ngFor="let filter of filterState">
-              <mat-list-item *ngIf="state.facetsstore.getFacet('account','stateFilter') === filter.id">
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStavZadosti(filter.id)"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.stav_zadosti' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
-                </div>
-              </mat-list-item>
-            </ng-container>
-            <ng-container *ngFor="let filter of filterType">
-              <mat-list-item *ngIf="state.facetsstore.getFacet('account','newStavFilter') === filter.id">
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStav(filter.id)"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.typ_navrhu' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
-                </div>
-              </mat-list-item>
-            </ng-container>  
-            <ng-container *ngIf="state.facetsstore.getFacet('account','institutionFilter')?.length">
-              <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearInstitution()"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.institution' | translate }}:</span> {{state.facetsstore.getFacet('account','institutionFilter') }}
-                </div>
-              </mat-list-item>
-            </ng-container>  
-            <ng-container *ngIf="state.facetsstore.getFacet('account','delegatedFilter')?.length">
-              <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearDelegated()"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.delegated_kurator' | translate }}:</span> {{state.facetsstore.getFacet('account','delegatedFilter') }}
-                </div>
-              </mat-list-item>
-            </ng-container>  
-            <ng-container *ngIf="state.facetsstore.getFacet('account','priorityFilter')?.length">
-              <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearPriority()"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.priority' | translate }}:</span> {{state.facetsstore.getFacet('account','priorityFilter') }}
-                </div>
-              </mat-list-item>
-            </ng-container>
-            <ng-container *ngIf="state.facetsstore.getFacet('account','typeOfRequestFilter')?.length">
-              <mat-list-item>
-                <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearTypeOfRequest()"><mat-icon>clear</mat-icon></a>
-                <div>
-                  <span>{{ 'desc.type_of_request' | translate }}:</span> {{ 'desc.'+state.facetsstore.getFacet('account','typeOfRequestFilter')+'_type_request' | translate }}
-                </div>
-              </mat-list-item>
-            </ng-container>  
-          </div>
-        </mat-list>
+        @if (state.facetsstore.getFacet('account','stateFilter')?.length       ||
+          state.facetsstore.getFacet('account','newStavFilter')?.length      ||
+          state.facetsstore.getFacet('account','institutionFilter')?.length  ||
+          state.facetsstore.getFacet('account','delegatedFilter')?.length    ||
+          state.facetsstore.getFacet('account','priorityFilter')?.length     ||
+          state.facetsstore.getFacet('account','typeOfRequestFilter')?.length) {
+          <mat-list>
+            <h3 matSubheader fxLayout="row">
+              <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
+              <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAllFilters()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
+            </h3>
+            <div class="app-list-content-wrapper">
+              @for (filter of filterState; track filter) {
+                @if (state.facetsstore.getFacet('account','stateFilter') === filter.id) {
+                  <mat-list-item>
+                    <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStavZadosti(filter.id)"><mat-icon>clear</mat-icon></a>
+                    <div>
+                      <span>{{ 'desc.stav_zadosti' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
+                    </div>
+                  </mat-list-item>
+                }
+              }
+              @for (filter of filterType; track filter) {
+                @if (state.facetsstore.getFacet('account','newStavFilter') === filter.id) {
+                  <mat-list-item>
+                    <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="setStav(filter.id)"><mat-icon>clear</mat-icon></a>
+                    <div>
+                      <span>{{ 'desc.typ_navrhu' | translate }}:</span> {{ 'desc.' + filter.val | translate }}
+                    </div>
+                  </mat-list-item>
+                }
+              }
+              @if (state.facetsstore.getFacet('account','institutionFilter')?.length) {
+                <mat-list-item>
+                  <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearInstitution()"><mat-icon>clear</mat-icon></a>
+                  <div>
+                    <span>{{ 'desc.institution' | translate }}:</span> {{state.facetsstore.getFacet('account','institutionFilter') }}
+                  </div>
+                </mat-list-item>
+              }
+              @if (state.facetsstore.getFacet('account','delegatedFilter')?.length) {
+                <mat-list-item>
+                  <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearDelegated()"><mat-icon>clear</mat-icon></a>
+                  <div>
+                    <span>{{ 'desc.delegated_kurator' | translate }}:</span> {{state.facetsstore.getFacet('account','delegatedFilter') }}
+                  </div>
+                </mat-list-item>
+              }
+              @if (state.facetsstore.getFacet('account','priorityFilter')?.length) {
+                <mat-list-item>
+                  <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearPriority()"><mat-icon>clear</mat-icon></a>
+                  <div>
+                    <span>{{ 'desc.priority' | translate }}:</span> {{state.facetsstore.getFacet('account','priorityFilter') }}
+                  </div>
+                </mat-list-item>
+              }
+              @if (state.facetsstore.getFacet('account','typeOfRequestFilter')?.length) {
+                <mat-list-item>
+                  <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="clearTypeOfRequest()"><mat-icon>clear</mat-icon></a>
+                  <div>
+                    <span>{{ 'desc.type_of_request' | translate }}:</span> {{ 'desc.'+state.facetsstore.getFacet('account','typeOfRequestFilter')+'_type_request' | translate }}
+                  </div>
+                </mat-list-item>
+              }
+            </div>
+          </mat-list>
+        }
       </div>
 
       <mat-accordion multi>
@@ -73,18 +79,26 @@
               {{ 'desc.stav_zadosti' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'open'">
-            <a (click)="setStavZadosti('open')">{{ 'desc.neodeslano' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'waiting'">
-            <a (click)="setStavZadosti('waiting')">{{ 'desc.ceka_na_posouzeni' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'waiting_for_automatic_process'">
-            <a (click)="setStavZadosti('waiting_for_automatic_process')">{{ 'desc.ceka_na_automaticke_zpracovani' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','stateFilter')  !== 'processed'">
-            <a (click)="setStavZadosti('processed')">{{ 'desc.zpracovano' | translate }}</a>
-          </div>
+          @if (state.facetsstore.getFacet('account','stateFilter')  !== 'open') {
+            <div>
+              <a (click)="setStavZadosti('open')">{{ 'desc.neodeslano' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','stateFilter')  !== 'waiting') {
+            <div>
+              <a (click)="setStavZadosti('waiting')">{{ 'desc.ceka_na_posouzeni' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','stateFilter')  !== 'waiting_for_automatic_process') {
+            <div>
+              <a (click)="setStavZadosti('waiting_for_automatic_process')">{{ 'desc.ceka_na_automaticke_zpracovani' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','stateFilter')  !== 'processed') {
+            <div>
+              <a (click)="setStavZadosti('processed')">{{ 'desc.zpracovano' | translate }}</a>
+            </div>
+          }
         </mat-expansion-panel>
 
         <mat-expansion-panel [expanded]="true">
@@ -93,63 +107,87 @@
               {{ 'desc.typ_navrhu' | translate }}
             </mat-panel-title>
           </mat-expansion-panel-header>
-          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'NZN'">
-            <a (click)="setStav('NZN')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VN'">
-            <a (click)="setStav('VN')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VNL'">
-            <a (click)="setStav('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</a>
-          </div>
-          <div *ngIf="state.facetsstore.getFacet('account','newStavFilter') !== 'VNZ'">
-            <a (click)="setStav('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</a>
-          </div>
+          @if (state.facetsstore.getFacet('account','newStavFilter') !== 'NZN') {
+            <div>
+              <a (click)="setStav('NZN')">{{ 'desc.navrzeno_na_zarazeni' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','newStavFilter') !== 'VN') {
+            <div>
+              <a (click)="setStav('VN')">{{ 'desc.navrzeno_na_vyrazeni' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','newStavFilter') !== 'VNL') {
+            <div>
+              <a (click)="setStav('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</a>
+            </div>
+          }
+          @if (state.facetsstore.getFacet('account','newStavFilter') !== 'VNZ') {
+            <div>
+              <a (click)="setStav('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</a>
+            </div>
+          }
         </mat-expansion-panel>
 
-        <mat-expansion-panel [expanded]="true"  *ngIf="allResultInstitutions.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.institution' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngFor="let inst of allResultInstitutions">
-            <a (click)="setInstitution(inst)">{{ inst }}</a>
-          </div>
-        </mat-expansion-panel>
+        @if (allResultInstitutions.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+          <mat-expansion-panel [expanded]="true" >
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                {{ 'desc.institution' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            @for (inst of allResultInstitutions; track inst) {
+              <div>
+                <a (click)="setInstitution(inst)">{{ inst }}</a>
+              </div>
+            }
+          </mat-expansion-panel>
+        }
 
-        <mat-expansion-panel [expanded]="true" *ngIf="allPriorities.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.priority' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngFor="let p of allPriorities">
-            <a (click)="setPriority(p)">{{ 'field.' + p | translate }}</a>
-          </div>
-        </mat-expansion-panel>
+        @if (allPriorities.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+          <mat-expansion-panel [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                {{ 'desc.priority' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            @for (p of allPriorities; track p) {
+              <div>
+                <a (click)="setPriority(p)">{{ 'field.' + p | translate }}</a>
+              </div>
+            }
+          </mat-expansion-panel>
+        }
 
-        <mat-expansion-panel [expanded]="true"  *ngIf="allDelegated.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.delegated_kurator' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngFor="let d of allDelegated">
-            <a (click)="setDelegated(d)">{{ d }}</a>
-          </div>
-        </mat-expansion-panel>
+        @if (allDelegated.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+          <mat-expansion-panel [expanded]="true" >
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                {{ 'desc.delegated_kurator' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            @for (d of allDelegated; track d) {
+              <div>
+                <a (click)="setDelegated(d)">{{ d }}</a>
+              </div>
+            }
+          </mat-expansion-panel>
+        }
 
-        <mat-expansion-panel [expanded]="true"  *ngIf="allTypes.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')">
-          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-            <mat-panel-title>
-              {{ 'desc.typ_zadosti' | translate }}
-            </mat-panel-title>
-          </mat-expansion-panel-header>
-          <div *ngFor="let d of allTypes">
-            <a (click)="setTypeOfRequest(d)">{{ 'desc.'+d+'_type_request' | translate }}</a>
-          </div>
-        </mat-expansion-panel>
+        @if (allTypes.length > 0 && (state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+          <mat-expansion-panel [expanded]="true" >
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                {{ 'desc.typ_zadosti' | translate }}
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            @for (d of allTypes; track d) {
+              <div>
+                <a (click)="setTypeOfRequest(d)">{{ 'desc.'+d+'_type_request' | translate }}</a>
+              </div>
+            }
+          </mat-expansion-panel>
+        }
 
       </mat-accordion>
     </div>
@@ -165,13 +203,17 @@
         </div>
       </div>
 
-      <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
-        <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
-        <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)" [ngModel]="state.prefixsearch['account']">
-        <button *ngIf="state.prefixsearch['account']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterZadost()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
-          <mat-icon class="app-color-warning">close</mat-icon>
-        </button>
-      </mat-form-field>
+      @if (state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')) {
+        <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline" >
+          <mat-label>{{ 'desc.vyhledavani_zadosti' | translate }}</mat-label>
+          <input type="text" matInput (keyup)="onFilterZadostKeyUp($event.target)" [ngModel]="state.prefixsearch['account']">
+          @if (state.prefixsearch['account']) {
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterZadost()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+              <mat-icon class="app-color-warning">close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+      }
 
       <div class="app-results-wrapper app-overflow-x-auto">
         <table mat-table [dataSource]="zadosti" class="mat-elevation-z0 app-table-responsive">
@@ -204,122 +246,140 @@
             </td>
           </ng-container>
           <!-- <ng-container matColumnDef="institution">
-            <th mat-header-cell *matHeaderCellDef [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ 'desc.institution' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ element.institution }}</td>
-          </ng-container> -->
-          <ng-container matColumnDef="state">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
-            <td mat-cell *matCellDef="let element" class="app-pr-2">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.stav' | translate }}</span>
-              <span class="app-fx-right">
-                <mat-icon class="material-icons-outlined" [class]="element.state" [matTooltip]="'state.' + element.state | translate" matTooltip="above">
-                  <ng-container *ngIf="element.state === 'open'">lock_open</ng-container>
-                  <ng-container *ngIf="element.state === 'waiting'"><!-- schedule_send -->lock_clock</ng-container>
-                  <ng-container *ngIf="element.state === 'processed'">lock</ng-container>
-                  <ng-container *ngIf="element.state === 'waiting_for_automatic_process'">hourglass_bottom</ng-container>
-                </mat-icon>
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="navrh">
-            <th mat-header-cell *matHeaderCellDef><!-- {{ 'desc.navhr_na_stav' | translate }} --></th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.navhr_na_stav' | translate }}</span>
-              <span class="app-fx-right">
-                <span [class]="'app-badge app-mr-1 ' +  element.navrh" [matTooltip]="'state.tooltip.' + element.navrh | translate">{{ element.navrh }}</span>
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="datum_vyrizeni">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_vyrizeni' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [matTooltip]="element.datum_vyrizeni | date : 'dd.MM.yyyy HH:mm'">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.datum_vyrizeni' | translate }}</span>
-              <span class="app-fx-right">{{ element.datum_vyrizeni | date : 'dd.MM.yyyy'  }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="count">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.pocet_zadosti' | translate }}</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.pocet_zadosti' | translate }}</span>
-              <span class="app-fx-right">{{ element.identifiers?.length }} -  ({{ countProcessed(element) }})</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="deadline">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.deadline' | translate }}</th>
-            <td mat-cell *matCellDef="let element" [matTooltip]="element.deadline | date : 'dd.MM.yyyy HH:mm'">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.deadline' | translate }}</span>
-              <span class="app-fx-right">{{ element.deadline | date : 'dd.MM.yyyy' }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="period">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.period' | translate }}</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.period' | translate }}</span>
-              <span class="app-fx-right">{{ element.type_of_period ?  ('desc.'+element.type_of_period | translate) : '' }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="desiredstate">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.desiredstate' | translate }}</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.desiredstate' | translate }}</span>
-              <span class="app-fx-right">{{ element.desired_item_state && element.desired_license ? ""+element.desired_item_state+" - ("+element.desired_license+")" : (element.desired_item_state ? ""+element.desired_item_state : "") }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="pozadavek">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.oduvodneni' | translate }}</span>
-              <span class="app-fx-right">
-                <mat-icon *ngIf="element.pozadavek" [cdkCopyToClipboard]="element.pozadavek" class="app-icon-copy" (click)="showCopyAlert()" [matTooltip]="'desc.zkopirovat_cely_text' | translate" matTooltipPosition="above">content_copy</mat-icon>
-                <div class="app-text-cutter app-d-in-block app-cursor-pointer app-v-text-bottom" [matTooltip]="element.pozadavek" matTooltipPosition="above">
-                  {{ element.pozadavek }}
-                </div>
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="poznamka">
-            <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
-            <td mat-cell *matCellDef="let element">
-              <span class="app-fx-left mat-header-cell">{{ 'desc.poznamka' | translate }}</span>
-              <span class="app-fx-right">
-                <mat-icon *ngIf="element.poznamka" [cdkCopyToClipboard]="element.poznamka" class="app-icon-copy" (click)="showCopyAlert()" [matTooltip]="'desc.zkopirovat_cely_text' | translate" matTooltipPosition="above">content_copy</mat-icon>
-                <div class="app-text-cutter app-d-in-block app-cursor-pointer app-v-text-bottom" [matTooltip]="element.poznamka" matTooltipPosition="above">
-                  {{ element.poznamka }}
-                </div>
-              </span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let element" class="app-text-right">
-              <span class="app-fx-left"></span>
-              <span class="app-fx-right">
-                <mat-button-toggle-group>
-                  <mat-button-toggle (click)="showRecords(element)" [matTooltip]="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && element.state === 'waiting' ? ('desc.zpracovani_zadosti' | translate) : ('desc.prehled_zadosti' | translate)" matTooltipPosition="above">
-                    <mat-icon class="material-icons-outlined">{{ (state.user.role === 'kurator' || state.user.role === 'mainKurator' ) && element.state === 'waiting' ? 'rule' : 'visibility' }}</mat-icon>
-                  </mat-button-toggle>
-                  <mat-button-toggle *ngIf="element.state === 'open'" (click)="send(element)"  [disabled]="!element.identifiers"  [matTooltip]="'desc.poslat_zadost' | translate" matTooltipPosition="above">
+          <th mat-header-cell *matHeaderCellDef [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ 'desc.institution' | translate }}</th>
+          <td mat-cell *matCellDef="let element" [hidden]="(state.user.role !== 'kurator' && state.user.role !== 'mainKurator')">{{ element.institution }}</td>
+        </ng-container> -->
+        <ng-container matColumnDef="state">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.stav' | translate }}</th>
+          <td mat-cell *matCellDef="let element" class="app-pr-2">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.stav' | translate }}</span>
+            <span class="app-fx-right">
+              <mat-icon class="material-icons-outlined" [class]="element.state" [matTooltip]="'state.' + element.state | translate" matTooltip="above">
+                @if (element.state === 'open') {
+                  lock_open
+                }
+                @if (element.state === 'waiting') {
+                  <!-- schedule_send -->lock_clock
+                }
+                @if (element.state === 'processed') {
+                  lock
+                }
+                @if (element.state === 'waiting_for_automatic_process') {
+                  hourglass_bottom
+                }
+              </mat-icon>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="navrh">
+          <th mat-header-cell *matHeaderCellDef><!-- {{ 'desc.navhr_na_stav' | translate }} --></th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.navhr_na_stav' | translate }}</span>
+            <span class="app-fx-right">
+              <span [class]="'app-badge app-mr-1 ' +  element.navrh" [matTooltip]="'state.tooltip.' + element.navrh | translate">{{ element.navrh }}</span>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="datum_vyrizeni">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.datum_vyrizeni' | translate }}</th>
+          <td mat-cell *matCellDef="let element" [matTooltip]="element.datum_vyrizeni | date : 'dd.MM.yyyy HH:mm'">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.datum_vyrizeni' | translate }}</span>
+            <span class="app-fx-right">{{ element.datum_vyrizeni | date : 'dd.MM.yyyy'  }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="count">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.pocet_zadosti' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.pocet_zadosti' | translate }}</span>
+            <span class="app-fx-right">{{ element.identifiers?.length }} -  ({{ countProcessed(element) }})</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="deadline">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.deadline' | translate }}</th>
+          <td mat-cell *matCellDef="let element" [matTooltip]="element.deadline | date : 'dd.MM.yyyy HH:mm'">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.deadline' | translate }}</span>
+            <span class="app-fx-right">{{ element.deadline | date : 'dd.MM.yyyy' }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="period">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.period' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.period' | translate }}</span>
+            <span class="app-fx-right">{{ element.type_of_period ?  ('desc.'+element.type_of_period | translate) : '' }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="desiredstate">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.desiredstate' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.desiredstate' | translate }}</span>
+            <span class="app-fx-right">{{ element.desired_item_state && element.desired_license ? ""+element.desired_item_state+" - ("+element.desired_license+")" : (element.desired_item_state ? ""+element.desired_item_state : "") }}</span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="pozadavek">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.oduvodneni' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.oduvodneni' | translate }}</span>
+            <span class="app-fx-right">
+              @if (element.pozadavek) {
+                <mat-icon [cdkCopyToClipboard]="element.pozadavek" class="app-icon-copy" (click)="showCopyAlert()" [matTooltip]="'desc.zkopirovat_cely_text' | translate" matTooltipPosition="above">content_copy</mat-icon>
+              }
+              <div class="app-text-cutter app-d-in-block app-cursor-pointer app-v-text-bottom" [matTooltip]="element.pozadavek" matTooltipPosition="above">
+                {{ element.pozadavek }}
+              </div>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="poznamka">
+          <th mat-header-cell *matHeaderCellDef>{{ 'desc.poznamka' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="app-fx-left mat-header-cell">{{ 'desc.poznamka' | translate }}</span>
+            <span class="app-fx-right">
+              @if (element.poznamka) {
+                <mat-icon [cdkCopyToClipboard]="element.poznamka" class="app-icon-copy" (click)="showCopyAlert()" [matTooltip]="'desc.zkopirovat_cely_text' | translate" matTooltipPosition="above">content_copy</mat-icon>
+              }
+              <div class="app-text-cutter app-d-in-block app-cursor-pointer app-v-text-bottom" [matTooltip]="element.poznamka" matTooltipPosition="above">
+                {{ element.poznamka }}
+              </div>
+            </span>
+          </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element" class="app-text-right">
+            <span class="app-fx-left"></span>
+            <span class="app-fx-right">
+              <mat-button-toggle-group>
+                <mat-button-toggle (click)="showRecords(element)" [matTooltip]="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && element.state === 'waiting' ? ('desc.zpracovani_zadosti' | translate) : ('desc.prehled_zadosti' | translate)" matTooltipPosition="above">
+                  <mat-icon class="material-icons-outlined">{{ (state.user.role === 'kurator' || state.user.role === 'mainKurator' ) && element.state === 'waiting' ? 'rule' : 'visibility' }}</mat-icon>
+                </mat-button-toggle>
+                @if (element.state === 'open') {
+                  <mat-button-toggle (click)="send(element)"  [disabled]="!element.identifiers"  [matTooltip]="'desc.poslat_zadost' | translate" matTooltipPosition="above">
                     <mat-icon class="material-icons-outlined">send</mat-icon>
                   </mat-button-toggle>
-                  <mat-button-toggle *ngIf="element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
+                }
+                @if (element.state === 'waiting' && (state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+                  <mat-button-toggle (click)="process(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
                     <mat-icon class="material-icons-outlined">done</mat-icon>
                   </mat-button-toggle>
-                  <mat-button-toggle  *ngIf="((state.user.role === 'user' || state.user.role === 'knihovna') && element.state === 'open')" [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest(element)">
+                }
+                @if (((state.user.role === 'user' || state.user.role === 'knihovna') && element.state === 'open')) {
+                  <mat-button-toggle  [matTooltip]="'desc.smazat_zadost' | translate" matTooltipPosition="above" (click)="confirmDeleteRequest(element)">
                     <mat-icon class="material-icons-outlined app-color-warning">clear</mat-icon>
                   </mat-button-toggle>
-                </mat-button-toggle-group>
-              </span>
-            </td>
-          </ng-container>
-      
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.escalated]="escalated" [class.expired]="expired" 
-            [ngClass]="{'escalated': isEscalated(row), 'expired': isExpired(row) }"></tr>
-        </table>
-      </div>
-      <div class="app-mt-4">
-        <app-paginator [storeStateKey]="'account'" [numFound]="numFound" [showSort]="false" ></app-paginator>
-      </div>
+                }
+              </mat-button-toggle-group>
+            </span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.escalated]="escalated" [class.expired]="expired"
+        [ngClass]="{'escalated': isEscalated(row), 'expired': isExpired(row) }"></tr>
+      </table>
+    </div>
+    <div class="app-mt-4">
+      <app-paginator [storeStateKey]="'account'" [numFound]="numFound" [showSort]="false" ></app-paginator>
     </div>
   </div>
+</div>
 </div>

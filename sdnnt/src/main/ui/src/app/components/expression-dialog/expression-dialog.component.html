@@ -1,14 +1,15 @@
 <h1 mat-dialog-title>Existuje vice zaznamu ({{ data.numFound }}) pro toto vyjadreni <br/>
-  {{ data.docs[0].marc_100a }} {{ data.docs[0].marc_245a }} {{ data.docs[0].marc_245d }} {{ data.docs[0].marc_245g }}</h1>
+{{ data.docs[0].marc_100a }} {{ data.docs[0].marc_245a }} {{ data.docs[0].marc_245d }} {{ data.docs[0].marc_245g }}</h1>
 <div mat-dialog-content>
-      <mat-card appearance="outlined" *ngFor="let doc of data.docs">
+  @for (doc of data.docs; track doc) {
+    <mat-card appearance="outlined">
       <span class="app-text-icon">
         <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ doc.identifier }}</a>
       </span>
       <div>{{ doc.marc_260a }} {{ doc.marc_260b }} {{ doc.marc_260c }}</div>
       {{ doc.marc_246a }} {{ doc.marc_245n }} {{ doc.marc_250a }}
-
     </mat-card>
+  }
 </div>
 <div mat-dialog-actions>
   <button mat-button [mat-dialog-close]="'onlyRecord'">{{ 'jenom tenhle zaznam' | translate }}</button>

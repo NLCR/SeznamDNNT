@@ -1,5 +1,5 @@
-<div class="app-container">  
-  <ng-container *ngIf="zadost">
+<div class="app-container">
+  @if (zadost) {
     <ul class="app-breadcrumb">
       <li><a (click)="linkToAccount()">{{ 'desc.moje_pozadavky' | translate }}</a></li>
       <li>{{ 'desc.prehled_zadosti' | translate }}</li>
@@ -20,18 +20,28 @@
             <ng-container >
               <span class="app-pipe"></span>
               <span class="app-metadata">{{ zadost.id }}<span class="app-pipe"></span>
-                <!-- <ng-container *ngIf="zadost.version">{{ zadost.version }}<span class="app-pipe"></span></ng-container>
-                <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
-                <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container> -->
-                <ng-container *ngIf="zadost.state">
-                  <mat-icon class="material-icons-outlined" [class]="zadost.state" [matTooltip]="'state.' + zadost.state | translate" matTooltip="above">
-                    <ng-container *ngIf="zadost.state === 'open'">lock_open</ng-container>
-                    <ng-container *ngIf="zadost.state === 'waiting'">lock_clock</ng-container>
-                    <ng-container *ngIf="zadost.state === 'processed'">lock</ng-container>
-                    <ng-container *ngIf="zadost.state === 'waiting_for_automatic_process'">hourglass_bottom</ng-container>
+              <!-- <ng-container *ngIf="zadost.version">{{ zadost.version }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="zadost.datum_zadani">{{ zadost.datum_zadani | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span></ng-container>
+              <ng-container *ngIf="zadost.user">{{ zadost.user }}<span class="app-pipe"></span></ng-container> -->
+              @if (zadost.state) {
+                <mat-icon class="material-icons-outlined" [class]="zadost.state" [matTooltip]="'state.' + zadost.state | translate" matTooltip="above">
+                  @if (zadost.state === 'open') {
+                    lock_open
+                  }
+                  @if (zadost.state === 'waiting') {
+                    lock_clock
+                  }
+                  @if (zadost.state === 'processed') {
+                    lock
+                  }
+                  @if (zadost.state === 'waiting_for_automatic_process') {
+                    hourglass_bottom
+                  }
                   </mat-icon><span class="app-pipe"></span>
-                </ng-container>
-                <ng-container *ngIf="zadost.navrh"><span [class]="'app-badge ' + zadost.navrh" [matTooltip]="'state.tooltip.' + zadost.navrh | translate">{{ zadost.navrh }}</span><span class="app-pipe"></span></ng-container>
+                }
+                @if (zadost.navrh) {
+                  <span [class]="'app-badge ' + zadost.navrh" [matTooltip]="'state.tooltip.' + zadost.navrh | translate">{{ zadost.navrh }}</span><span class="app-pipe"></span>
+                }
                 <mat-icon class="material-icons-outlined" matTooltipClass="app-separated-line"
                   [matTooltip]="('desc.verze_zadosti' | translate) + ': ' + zadost.version + '
                   ' + ('desc.uzivatel' | translate) + ': ' + zadost.user + '
@@ -40,73 +50,92 @@
                   ' + ('desc.pozadavek' | translate) + ': ' + zadost.pozadavek+' 
                   ' + (zadost.institution ?  ('desc.institution' | translate) + ': '+zadost.institution : '' )
                   ">info</mat-icon><span class="app-pipe"></span>
-
-                  <a  *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" (click)="showCorrespondence()" [matTooltip]="'desc.ukazat_korespondenci' | translate"><mat-icon class="material-icons-outlined">mail</mat-icon></a>
-              </span>
-            </ng-container>
-          </div>
-          <div>
-            <mat-button-toggle-group  name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
-              <mat-button-toggle *ngIf="state.user && state.user.role === 'mainKurator' && kurators && kurators.length > 0 && zadost.state==='waiting'" value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
-                <mat-icon *ngIf="!zadost.delegated?.length" class="material-icons-outlined">manage_accounts</mat-icon>
-                <ng-container *ngIf="zadost.delegated?.length">{{ zadost.delegated }}</ng-container>
-              </mat-button-toggle>
-              <mat-button-toggle *ngIf="state.user.role === 'mainKurator' && zadost.state==='waiting'" value="" [matMenuTriggerFor]="priorityMenu" [matTooltip]="'desc.nastavit_prioritu' | translate">
-                <mat-icon *ngIf="!zadost.priority?.length" class="material-icons-outlined">priority_high</mat-icon>
-                <ng-container *ngIf="zadost.priority?.length">{{ 'field.' + zadost.priority | translate }}</ng-container>
-              </mat-button-toggle>
-
-              <mat-button-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
-                <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_zadosti' | translate }}
-              </mat-button-toggle>
-              <mat-menu #menuVyrizeniZadosti="matMenu">
-                <button mat-menu-item (click)="process()">{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
-                <button mat-menu-item *ngIf="enBlockActionEnabled()" (click)="aproveAll()">{{ 'desc.hromadne_schvalit' | translate }}</button>
-                <button mat-menu-item *ngIf="enBlockActionEnabled()" (click)="rejectAll()">{{ 'desc.hromadne_odmitnout' | translate }}</button>
-              </mat-menu>
-
-              <mat-button-toggle *ngIf="(zadost.navrh === 'VNZ' || zadost.navrh === 'VNL') && zadost.state === 'open'"  value="" [matMenuTriggerFor]="typeVNXMenu" [matTooltip]="'desc.typ_zadosti' | translate">
-                <mat-icon class="material-icons-outlined">{{ 'no_photography' }}</mat-icon>
-                <ng-container *ngIf="zadost.navrh?.length">{{ zadost.navrh }}</ng-container>
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-
-            <mat-menu #delegateMenu="matMenu">
-              <ng-container *ngFor="let d of kurators">
-                <button (click)="setDelegated(d.jmeno +' '+d.prijmeni)" mat-menu-item>{{d.jmeno +' '+d.prijmeni}}</button>
+                  @if ((state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+                    <a  (click)="showCorrespondence()" [matTooltip]="'desc.ukazat_korespondenci' | translate"><mat-icon class="material-icons-outlined">mail</mat-icon></a>
+                  }
+                </span>
               </ng-container>
-            </mat-menu>
-            <mat-menu #priorityMenu="matMenu">
-              <button mat-menu-item (click)="setPriority('Priorita 1')">{{ 'desc.priority' | translate }} 1</button>
-              <button mat-menu-item (click)="setPriority('Priorita 2')">{{ 'desc.priority' | translate }} 2</button>
-              <button mat-menu-item (click)="setPriority('Priorita 3')">{{ 'desc.priority' | translate }} 3</button>
-            </mat-menu>
-            
-            <mat-menu #typeVNXMenu="matMenu">
-              <button mat-menu-item (click)="setTypNavrhu('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</button>
-              <button mat-menu-item (click)="setTypNavrhu('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</button>
-            </mat-menu>
-
-            <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->
-            <mat-slide-toggle *ngIf="(state.user.role === 'kurator' || state.user.role === 'mainKurator')" [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
+            </div>
+            <div>
+              <mat-button-toggle-group  name="buttonsControl" aria-label="buttonsControl" class="app-mr-4">
+                @if (state.user && state.user.role === 'mainKurator' && kurators && kurators.length > 0 && zadost.state==='waiting') {
+                  <mat-button-toggle value="" [matMenuTriggerFor]="delegateMenu" [matTooltip]="'desc.delogovat_na_jineho_uzivatele' | translate">
+                    @if (!zadost.delegated?.length) {
+                      <mat-icon class="material-icons-outlined">manage_accounts</mat-icon>
+                    }
+                    @if (zadost.delegated?.length) {
+                      {{ zadost.delegated }}
+                    }
+                  </mat-button-toggle>
+                }
+                @if (state.user.role === 'mainKurator' && zadost.state==='waiting') {
+                  <mat-button-toggle value="" [matMenuTriggerFor]="priorityMenu" [matTooltip]="'desc.nastavit_prioritu' | translate">
+                    @if (!zadost.priority?.length) {
+                      <mat-icon class="material-icons-outlined">priority_high</mat-icon>
+                    }
+                    @if (zadost.priority?.length) {
+                      {{ 'field.' + zadost.priority | translate }}
+                    }
+                  </mat-button-toggle>
+                }
+                @if ((state.user.role === 'kurator' || state.user.role === 'mainKurator') && zadost.state === 'waiting') {
+                  <mat-button-toggle mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
+                    <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_zadosti' | translate }}
+                  </mat-button-toggle>
+                }
+                <mat-menu #menuVyrizeniZadosti="matMenu">
+                  <button mat-menu-item (click)="process()">{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
+                  @if (enBlockActionEnabled()) {
+                    <button mat-menu-item (click)="aproveAll()">{{ 'desc.hromadne_schvalit' | translate }}</button>
+                  }
+                  @if (enBlockActionEnabled()) {
+                    <button mat-menu-item (click)="rejectAll()">{{ 'desc.hromadne_odmitnout' | translate }}</button>
+                  }
+                </mat-menu>
+                @if ((zadost.navrh === 'VNZ' || zadost.navrh === 'VNL') && zadost.state === 'open') {
+                  <mat-button-toggle  value="" [matMenuTriggerFor]="typeVNXMenu" [matTooltip]="'desc.typ_zadosti' | translate">
+                    <mat-icon class="material-icons-outlined">{{ 'no_photography' }}</mat-icon>
+                    @if (zadost.navrh?.length) {
+                      {{ zadost.navrh }}
+                    }
+                  </mat-button-toggle>
+                }
+              </mat-button-toggle-group>
+              <mat-menu #delegateMenu="matMenu">
+                @for (d of kurators; track d) {
+                  <button (click)="setDelegated(d.jmeno +' '+d.prijmeni)" mat-menu-item>{{d.jmeno +' '+d.prijmeni}}</button>
+                }
+              </mat-menu>
+              <mat-menu #priorityMenu="matMenu">
+                <button mat-menu-item (click)="setPriority('Priorita 1')">{{ 'desc.priority' | translate }} 1</button>
+                <button mat-menu-item (click)="setPriority('Priorita 2')">{{ 'desc.priority' | translate }} 2</button>
+                <button mat-menu-item (click)="setPriority('Priorita 3')">{{ 'desc.priority' | translate }} 3</button>
+              </mat-menu>
+              <mat-menu #typeVNXMenu="matMenu">
+                <button mat-menu-item (click)="setTypNavrhu('VNZ')">{{ 'desc.navrzeno_na_omezeni_vnz' | translate }}</button>
+                <button mat-menu-item (click)="setTypNavrhu('VNL')">{{ 'desc.navrzeno_na_omezeni_vnl' | translate }}</button>
+              </mat-menu>
+              <!-- <button *ngIf="zadost.state === 'waiting' && state.user.role === 'kurator'" mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" (click)="process()">{{'desc.oznacit_jako_zpracovane' | translate}}</button> -->
+              @if ((state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+                <mat-slide-toggle [(ngModel)]="hideProcessed">{{ 'desc.skryt_zpracovane' | translate }}</mat-slide-toggle>
+              }
+            </div>
           </div>
-        </div>
-      </mat-card>
-
-      <ng-container *ngFor="let doc of docs">
-        <app-result-item *ngIf="!hideProcessed || !doc.isProcessed" [doc]="doc" 
-
-        [zadost]="zadost" 
-        [view]="'zadost'"
-        (removeFromZadostEvent)="removeDoc($event)"
-        (processZadostEvent)="processNavrh($event)">
-        </app-result-item>
-      </ng-container>
-
-    </div>
-    <div class="app-mt-2">
-      <app-paginator [storeStateKey]="zadost.id" [numFound]="numFound" [showSort]="false"></app-paginator>
-    </div>
-  </ng-container>
-</div>
+        </mat-card>
+        @for (doc of docs; track doc) {
+          @if (!hideProcessed || !doc.isProcessed) {
+            <app-result-item [doc]="doc"
+              [zadost]="zadost"
+              [view]="'zadost'"
+              (removeFromZadostEvent)="removeDoc($event)"
+              (processZadostEvent)="processNavrh($event)">
+            </app-result-item>
+          }
+        }
+      </div>
+      <div class="app-mt-2">
+        <app-paginator [storeStateKey]="zadost.id" [numFound]="numFound" [showSort]="false"></app-paginator>
+      </div>
+    }
+  </div>
 

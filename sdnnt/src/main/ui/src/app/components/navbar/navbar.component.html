@@ -1,9 +1,9 @@
 <mat-toolbar>
   <div fxLayout="row" fxFlexFill fxLayoutAlign="start center" fxLayoutGap="32px">
     <div class="app-left" [class.app-logo-hide]="isSearchBar">
-        <a routerLink="/" fxFlexAlign="center" [title]="'app_title' | translate">
-          <img [src]="config.logo" [alt]="'app_title' | translate" class="app-logo" />
-        </a>
+      <a routerLink="/" fxFlexAlign="center" [title]="'app_title' | translate">
+        <img [src]="config.logo" [alt]="'app_title' | translate" class="app-logo" />
+      </a>
     </div>
     <div fxFlex class="app-mr-4">
       <app-searchbar [class.app-searchbar-hide]="!isSearchBar"></app-searchbar>
@@ -11,55 +11,85 @@
     <div class="app-right app-nav-mobile">
       <a mat-stroked-button class="app-search" (click)="showingSearchBar()">
         <mat-icon>
-          <ng-container [ngSwitch]="isSearchBar">
-            <ng-container *ngSwitchCase="false">search</ng-container>
-            <ng-container *ngSwitchDefault>search_off</ng-container>
-          </ng-container>
+          @switch (isSearchBar) {
+            @case (false) {
+              search
+            }
+            @default {
+              search_off
+            }
+          }
         </mat-icon>
-      </a>  
+      </a>
       <a mat-stroked-button (click)="onToggleSidenav()" class="app-menu">
         <mat-icon>menu</mat-icon>
-      </a>  
+      </a>
     </div>
     <div class="app-right app-nav-desktop">
       <!-- <a mat-stroked-button routerLink="home" routerLinkActive="app-active" [title]="'Home' | translate">
-        <mat-icon class="material-icons-outlined">home</mat-icon> {{ 'desc.domu' | translate }}
-      </a> -->
-      <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'desc.napoveda' | translate">
-        <mat-icon class="material-icons-outlined">help_outline</mat-icon> {{ 'desc.napoveda' | translate }}
-      </a>
-      <a mat-stroked-button *ngIf="!state.user" (click)="register()" [title]="'desc.registrovat_se' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'desc.registrovat_se' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user"  routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_pozadavky' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_pozadavky' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')" routerLink="exports" routerLinkActive="app-active" [title]="'desc.expors' | translate"><mat-icon class="material-icons-outlined">ios_share</mat-icon> {{ 'desc.exports' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')" routerLink="imports" routerLinkActive="app-active" [title]="'desc.imports' | translate"><mat-icon class="material-icons-outlined">download</mat-icon> {{ 'desc.imports' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.user && state.user.role === 'admin'" routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
- 
-      <a mat-stroked-button *ngIf="state.user" [matMenuTriggerFor]="userMenu" routerLinkActive="app-active" [title]="(state.user.jmeno || state.user.prijmeni) ?  state.user.jmeno + ' - ' + state.user.prijmeni :  state.user.username">
+      <mat-icon class="material-icons-outlined">home</mat-icon> {{ 'desc.domu' | translate }}
+    </a> -->
+    <a mat-stroked-button routerLink="help" routerLinkActive="app-active" [title]="'desc.napoveda' | translate">
+      <mat-icon class="material-icons-outlined">help_outline</mat-icon> {{ 'desc.napoveda' | translate }}
+    </a>
+    @if (!state.user) {
+      <a mat-stroked-button (click)="register()" [title]="'desc.registrovat_se' | translate"><mat-icon class="material-icons-outlined">open_in_new</mat-icon> {{ 'desc.registrovat_se' | translate }}</a>
+    }
+    @if (state.user) {
+      <a mat-stroked-button  routerLink="account" routerLinkActive="app-active" [title]="'desc.moje_pozadavky' | translate"><mat-icon class="material-icons-outlined">manage_accounts</mat-icon> {{ 'desc.moje_pozadavky' | translate }}</a>
+    }
+    @if (state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+      <a mat-stroked-button routerLink="exports" routerLinkActive="app-active" [title]="'desc.expors' | translate"><mat-icon class="material-icons-outlined">ios_share</mat-icon> {{ 'desc.exports' | translate }}</a>
+    }
+    @if (state.user && (state.user.role === 'admin' || state.user.role === 'kurator' || state.user.role === 'mainKurator')) {
+      <a mat-stroked-button routerLink="imports" routerLinkActive="app-active" [title]="'desc.imports' | translate"><mat-icon class="material-icons-outlined">download</mat-icon> {{ 'desc.imports' | translate }}</a>
+    }
+    @if (state.user && state.user.role === 'admin') {
+      <a mat-stroked-button routerLink="admin" routerLinkActive="app-active" [title]="'desc.administrace' | translate"><mat-icon class="material-icons-outlined">admin_panel_settings</mat-icon> {{ 'desc.administrace' | translate }}</a>
+    }
+
+    @if (state.user) {
+      <a mat-stroked-button [matMenuTriggerFor]="userMenu" routerLinkActive="app-active" [title]="(state.user.jmeno || state.user.prijmeni) ?  state.user.jmeno + ' - ' + state.user.prijmeni :  state.user.username">
         <mat-icon class="material-icons-outlined">person</mat-icon>  {{ (state.user.jmeno || state.user.prijmeni) ? state.user.jmeno+ ' ' +state.user.prijmeni :  state.user.username }}
       </a>
- 
-      <mat-menu #userMenu="matMenu">
-        <button mat-menu-item  *ngIf="profileEnabled()"  (click)="showUser()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</button>
-        <button mat-menu-item *ngIf="profileEnabled()" (click)="resetPasswd()"><mat-icon class="material-icons-outlined">vpn_key</mat-icon>{{ 'desc.zmenit_heslo' | translate }}</button>
-        <button mat-menu-item *ngIf="settingsMenuEnabled()" (click)="openNotificationsSettings()"><mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.nastaveni_notifikaci' | translate }}</button>
-        <button mat-menu-item (click)="logout()"><mat-icon class="material-icons-outlined">logout</mat-icon>{{ 'desc.odhlasit' | translate }}</button>
-      </mat-menu>
+    }
 
-      <a mat-stroked-button *ngIf="!state.user && config.simplelogin" (click)="showLogin()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+    <mat-menu #userMenu="matMenu">
+      @if (profileEnabled()) {
+        <button mat-menu-item   (click)="showUser()"><mat-icon class="material-icons-outlined">contact_page</mat-icon>{{ 'desc.zmenit_osobni_udaje' | translate }}</button>
+      }
+      @if (profileEnabled()) {
+        <button mat-menu-item (click)="resetPasswd()"><mat-icon class="material-icons-outlined">vpn_key</mat-icon>{{ 'desc.zmenit_heslo' | translate }}</button>
+      }
+      @if (settingsMenuEnabled()) {
+        <button mat-menu-item (click)="openNotificationsSettings()"><mat-icon class="material-icons-outlined">notifications</mat-icon>{{ 'desc.nastaveni_notifikaci' | translate }}</button>
+      }
+      <button mat-menu-item (click)="logout()"><mat-icon class="material-icons-outlined">logout</mat-icon>{{ 'desc.odhlasit' | translate }}</button>
+    </mat-menu>
 
-      <a mat-stroked-button *ngIf="!state.user && !config.simplelogin" [matMenuTriggerFor]="loginOptions" routerLinkActive="app-active" [title]="'desc.prihlasit' | translate">
+    @if (!state.user && config.simplelogin) {
+      <a mat-stroked-button (click)="showLogin()" [title]="'desc.prihlasit' | translate"><mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}</a>
+    }
+
+    @if (!state.user && !config.simplelogin) {
+      <a mat-stroked-button [matMenuTriggerFor]="loginOptions" routerLinkActive="app-active" [title]="'desc.prihlasit' | translate">
         <mat-icon class="material-icons-outlined">login</mat-icon> {{ 'desc.prihlasit' | translate }}
       </a>
- 
-      <mat-menu #loginOptions="matMenu">
-        <button mat-menu-item (click)="showLogin()"><mat-icon class="material-icons-outlined">password</mat-icon> {{ 'desc.standardni_prihlaseni' | translate }}</button>
-        <button mat-menu-item (click)="wayfLink()"><mat-icon class="material-icons-outlined">school</mat-icon> {{ 'desc.shibboleth_prihlaseni' | translate }}</button>
-      </mat-menu>
+    }
 
-      
-      <!-- <a mat-stroked-button *ngIf="state.user" (click)="logout()" [title]="'desc.odhlasit' | translate"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a> -->
-      <a mat-stroked-button *ngIf="state.currentLang === 'cs'" (click)="changeLang('en')" [title]="'desc.en' | translate">{{ 'EN' | translate }}</a>
-      <a mat-stroked-button *ngIf="state.currentLang === 'en'" (click)="changeLang('cs')" [title]="'desc.cs' | translate">{{ 'CS' | translate }}</a>
-    </div>
+    <mat-menu #loginOptions="matMenu">
+      <button mat-menu-item (click)="showLogin()"><mat-icon class="material-icons-outlined">password</mat-icon> {{ 'desc.standardni_prihlaseni' | translate }}</button>
+      <button mat-menu-item (click)="wayfLink()"><mat-icon class="material-icons-outlined">school</mat-icon> {{ 'desc.shibboleth_prihlaseni' | translate }}</button>
+    </mat-menu>
+
+
+    <!-- <a mat-stroked-button *ngIf="state.user" (click)="logout()" [title]="'desc.odhlasit' | translate"><mat-icon class="material-icons-outlined">logout</mat-icon> {{ 'desc.odhlasit' | translate }}</a> -->
+    @if (state.currentLang === 'cs') {
+      <a mat-stroked-button (click)="changeLang('en')" [title]="'desc.en' | translate">{{ 'EN' | translate }}</a>
+    }
+    @if (state.currentLang === 'en') {
+      <a mat-stroked-button (click)="changeLang('cs')" [title]="'desc.cs' | translate">{{ 'CS' | translate }}</a>
+    }
   </div>
+</div>
 </mat-toolbar>

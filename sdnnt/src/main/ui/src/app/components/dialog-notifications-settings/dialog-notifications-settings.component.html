@@ -12,19 +12,23 @@
           <mat-radio-button value="tyden">{{ 'desc.week' | translate }}</mat-radio-button>
           <mat-radio-button value="mesic">{{ 'desc.month' | translate }}</mat-radio-button>
         </mat-radio-group>
-      </div>  
-
-      <mat-divider class="app-my-3" *ngIf="administratorNotificationSettingsEnabled()"></mat-divider>
-
-      <div *ngIf="administratorNotificationSettingsEnabled()" class="app-mb-3">
-        <mat-checkbox [(ngModel)]="this.state.user.administratorske_notifikace">
-          {{ 'desc.administratorske_notifikace' | translate }}
-        </mat-checkbox>
       </div>
+
+      @if (administratorNotificationSettingsEnabled()) {
+        <mat-divider class="app-my-3"></mat-divider>
+      }
+
+      @if (administratorNotificationSettingsEnabled()) {
+        <div class="app-mb-3">
+          <mat-checkbox [(ngModel)]="this.state.user.administratorske_notifikace">
+            {{ 'desc.administratorske_notifikace' | translate }}
+          </mat-checkbox>
+        </div>
+      }
     </mat-tab>
     <mat-tab [label]="'desc.hromadne_notifikace' | translate">
       <div class="app-mb-4">
-        <ng-container *ngFor="let notif of notifications">
+        @for (notif of notifications; track notif) {
           <table class="app-table app-mt-4 app-mb-2" [cellPadding]="0" [cellSpacing]="0">
             <tr>
               <th>{{ 'desc.nazev_notifikace' | translate }}</th>
@@ -39,19 +43,38 @@
             <tr>
               <th>{{ 'desc.pouzite_filtry' | translate }}</th>
               <td>
-                <ng-container *ngFor="let f of notif.filters; let last = last">
+                @for (f of notif.filters; track f; let last = $last) {
                   <span>{{ 'field.' + f.field | translate }}: </span>
-                  <ng-container [ngSwitch]="f.field">
-                    <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
-                    <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-                  </ng-container><ng-container *ngIf="!last">,&#160;</ng-container>
-                </ng-container>
+                  @switch (f.field) {
+                    @case ('license') {
+                      {{ 'license.' + f.value | translate }}
+                    }
+                    @case ('dntstav') {
+                      {{ 'field.' + f.value | translate }}
+                    }
+                    @case ('kuratorstav') {
+                      {{ 'field.' + f.value | translate }}
+                    }
+                    @case ('controlled') {
+                      {{ 'controlled.' + f.value | translate }}
+                    }
+                    @case ('fmt') {
+                      {{ 'fmt.' + f.value | translate }}
+                    }
+                    @case ('language') {
+                      {{ 'language.' + f.value | translate }}
+                    }
+                    @case ('sigla') {
+                      {{ 'sigla.' + f.value | translate }}
+                    }
+                    @default {
+                      {{ f.value }}
+                    }
+                  }
+                  @if (!last) {
+                    ,&#160;
+                  }
+                }
               </td>
             </tr>
             <tr>
@@ -66,8 +89,7 @@
               </td>
             </tr>
           </table>
-  
-        </ng-container>
+        }
 
 
       </div>

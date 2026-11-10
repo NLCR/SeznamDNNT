@@ -6,7 +6,7 @@ import { HistoryItem } from 'src/app/shared/history-item';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatButton } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
@@ -22,7 +22,7 @@ export enum KuratorStavColumns {
     selector: 'app-dialog-history',
     templateUrl: './dialog-history.component.html',
     styleUrls: ['./dialog-history.component.scss'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, NgIf, NgFor, MatTooltip, MatDialogActions, MatButton, MatDialogClose, DatePipe, TranslateModule]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, MatTooltip, MatDialogActions, MatButton, MatDialogClose, DatePipe, TranslateModule]
 })
 export class DialogHistoryComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogHistoryComponent>>(MatDialogRef);

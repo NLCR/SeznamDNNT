@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
@@ -12,7 +12,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-searchbar',
     templateUrl: './searchbar.component.html',
     styleUrls: ['./searchbar.component.scss'],
-    imports: [FormsModule, NgIf, MatTooltip, MatIcon, TranslateModule]
+    imports: [FormsModule, MatTooltip, MatIcon, TranslateModule]
 })
 export class SearchBarComponent {
   private router = inject(Router);

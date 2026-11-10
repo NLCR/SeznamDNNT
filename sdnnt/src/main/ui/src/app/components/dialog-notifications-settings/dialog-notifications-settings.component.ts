@@ -8,7 +8,7 @@ import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatTabGroup, MatTab } from '@angular/material/tabs';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+
 import { MatDivider } from '@angular/material/list';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatIcon } from '@angular/material/icon';
@@ -20,27 +20,22 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-notifications-settings.component.html',
     styleUrls: ['./dialog-notifications-settings.component.scss'],
     imports: [
-      MatDialogTitle,
-      CdkScrollable,
-      MatDialogContent,
-      MatTabGroup,
-      MatTab,
-      MatRadioGroup,
-      FormsModule,
-      MatRadioButton,
-      NgIf,
-      MatDivider,
-      MatCheckbox,
-      NgFor,
-      NgSwitch,
-      NgSwitchCase,
-      NgSwitchDefault,
-      MatIcon,
-      MatDialogActions,
-      MatButton,
-      MatDialogClose,
-      TranslateModule
-    ]
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatTabGroup,
+    MatTab,
+    MatRadioGroup,
+    FormsModule,
+    MatRadioButton,
+    MatDivider,
+    MatCheckbox,
+    MatIcon,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    TranslateModule
+]
 })
 export class DialogNotificationsSettingsComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogNotificationsSettingsComponent>>(MatDialogRef);

@@ -6,7 +6,7 @@ import { AppState } from 'src/app/app.state';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { NgIf } from '@angular/common';
+
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatLabel } from '@angular/material/form-field';
 import { MatButton } from '@angular/material/button';
@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-dialog-session-expiration',
     templateUrl: './dialog-session-expiration.component.html',
     styleUrls: ['./dialog-session-expiration.component.scss'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, NgIf, FlexModule, MatLabel, MatDialogActions, MatButton, TranslateModule]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, FlexModule, MatLabel, MatDialogActions, MatButton, TranslateModule]
 })
 export class DialogSessionExpirationComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogSessionExpirationComponent>>(MatDialogRef);

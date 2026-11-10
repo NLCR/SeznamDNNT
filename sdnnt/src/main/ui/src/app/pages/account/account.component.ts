@@ -12,7 +12,7 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgIf, NgFor, NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
@@ -25,7 +25,6 @@ import { MatIconButton } from '@angular/material/button';
 import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { TranslateModule } from '@ngx-translate/core'; // autocomplete
 
 
@@ -35,43 +34,40 @@ import { TranslateModule } from '@ngx-translate/core'; // autocomplete
     templateUrl: './account.component.html',
     styleUrls: ['./account.component.scss'],
     imports: [
-      FlexModule,
-      NgIf,
-      MatList,
-      MatListSubheaderCssMatStyler,
-      MatTooltip,
-      MatIcon,
-      NgFor,
-      MatListItem,
-      MatAccordion,
-      MatExpansionPanel,
-      MatExpansionPanelHeader,
-      MatExpansionPanelTitle,
-      PaginatorComponent,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      FormsModule,
-      MatIconButton,
-      MatSuffix,
-      MatTable,
-      MatColumnDef,
-      MatHeaderCellDef,
-      MatHeaderCell,
-      MatCellDef,
-      MatCell,
-      CdkCopyToClipboard,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatHeaderRowDef,
-      MatHeaderRow,
-      MatRowDef,
-      MatRow,
-      NgClass,
-      ExtendedModule,
-      DatePipe,
-      TranslateModule
-    ]
+    FlexModule,
+    MatList,
+    MatListSubheaderCssMatStyler,
+    MatTooltip,
+    MatIcon,
+    MatListItem,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    PaginatorComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatIconButton,
+    MatSuffix,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    CdkCopyToClipboard,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    NgClass,
+    DatePipe,
+    TranslateModule
+]
 })
 export class AccountComponent implements OnInit {
   dialog = inject(MatDialog);

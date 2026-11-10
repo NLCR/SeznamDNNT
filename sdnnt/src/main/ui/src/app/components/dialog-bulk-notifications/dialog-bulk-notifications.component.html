@@ -4,34 +4,58 @@
     <mat-form-field fxFlex="100%"  appearance="outline">
       <mat-label>{{ 'desc.nazev_notifikace' | translate }}</mat-label>
       <input matInput  [placeholder]="'desc.zadejte_nazev_notifikace' | translate" [formControl]="notificationNameControl" required>
-      <mat-error *ngIf="notificationNameControl.invalid">
-        {{ 'msg.error.nazev_notifikace' | translate }}
-      </mat-error>
+      @if (notificationNameControl.invalid) {
+        <mat-error>
+          {{ 'msg.error.nazev_notifikace' | translate }}
+        </mat-error>
+      }
     </mat-form-field>
   </div>
-  <div *ngIf="state.q">
-    <label class="app-label">{{ 'desc.hledany_vyraz' | translate }}:</label>
-    <ul class="app-m-0 app-pl-4">
-      <li><span>Text: </span>{{ state.q }}</li>
-    </ul>
-  </div>
-  <mat-divider *ngIf="state.q" class="app-mt-4 app-mb-4"></mat-divider>
+  @if (state.q) {
+    <div>
+      <label class="app-label">{{ 'desc.hledany_vyraz' | translate }}:</label>
+      <ul class="app-m-0 app-pl-4">
+        <li><span>Text: </span>{{ state.q }}</li>
+      </ul>
+    </div>
+  }
+  @if (state.q) {
+    <mat-divider class="app-mt-4 app-mb-4"></mat-divider>
+  }
   <div>
     <label class="app-label">{{ 'desc.pouzite_filtry' | translate }}:</label>
     <ul class="app-m-0 app-pl-4">
-      <li *ngFor="let f of state.usedFilters">
-        <span>{{ 'field.' + f.field | translate }}: </span>
-        <ng-container [ngSwitch]="f.field">
-          <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'sigla'">{{ 'sigla.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-        </ng-container>
-      </li>
+      @for (f of state.usedFilters; track f) {
+        <li>
+          <span>{{ 'field.' + f.field | translate }}: </span>
+          @switch (f.field) {
+            @case ('license') {
+              {{ 'license.' + f.value | translate }}
+            }
+            @case ('dntstav') {
+              {{ 'field.' + f.value | translate }}
+            }
+            @case ('kuratorstav') {
+              {{ 'field.' + f.value | translate }}
+            }
+            @case ('controlled') {
+              {{ 'controlled.' + f.value | translate }}
+            }
+            @case ('fmt') {
+              {{ 'fmt.' + f.value | translate }}
+            }
+            @case ('language') {
+              {{ 'language.' + f.value | translate }}
+            }
+            @case ('sigla') {
+              {{ 'sigla.' + f.value | translate }}
+            }
+            @default {
+              {{ f.value }}
+            }
+          }
+        </li>
+      }
     </ul>
   </div>
   <mat-divider class="app-mt-4 app-mb-4"></mat-divider>

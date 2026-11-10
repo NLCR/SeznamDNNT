@@ -5,7 +5,9 @@
   </ul>
   <div fxLayout="row" fxLayoutGap="32px" class="app-import-wrapper">
     <div class="app-left app-fx-facets">
-      <app-facets *ngIf="facets" [facet_fields]="facets" [view]="'import'"></app-facets>
+      @if (facets) {
+        <app-facets [facet_fields]="facets" [view]="'import'"></app-facets>
+      }
     </div>
     <div fxFlex class="app-right">
       <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
@@ -21,125 +23,158 @@
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
               <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
-              <span class="app-metadata" *ngIf="import">
-                <ng-container *ngIf="import.date">{{ import.date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
-                </ng-container>
-                <ng-container *ngIf="import.origin">{{ import.origin }}<span class="app-pipe"></span></ng-container>
-                <ng-container><mat-icon class="material-icons-outlined" [class]="import.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (import.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
-                  <ng-container *ngIf="!import.processed">lock_open</ng-container>
-                  <ng-container *ngIf="import.processed">lock</ng-container>
-                </mat-icon><span class="app-pipe"></span></ng-container>
-              </span>
-            </div>
-            <!-- <div>
-            <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'desc.zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyEAN" (change)="onlyEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_presne_shody' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
-            <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'desc.zobrazit_nenalezene' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
-          </div> -->
+              @if (import) {
+                <span class="app-metadata">
+                  @if (import.date) {
+                    {{ import.date | date : 'dd.MM.yyyy HH:mm' }}<span class="app-pipe"></span>
+                  }
+                  @if (import.origin) {
+                    {{ import.origin }}<span class="app-pipe"></span>
+                  }
+                  <ng-container><mat-icon class="material-icons-outlined" [class]="import.processed ? 'processed' : 'open'" [matTooltip]="'state.' + (import.processed ? 'processed' : 'waiting') | translate" matTooltip="above">
+                    @if (!import.processed) {
+                      lock_open
+                    }
+                    @if (import.processed) {
+                      lock
+                    }
+                    </mat-icon><span class="app-pipe"></span></ng-container>
+                  </span>
+                }
+              </div>
+              <!-- <div>
+              <mat-slide-toggle [checked]="fullCatalog" (change)="fullCatalogChange($event)" class="app-mr-3">{{ 'desc.zobrazit_shody_z_celeho_katalogu_nejen_na_vyrazeni' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
+              <mat-slide-toggle [checked]="onlyEAN" (change)="onlyEANChange($event)" class="app-mr-3">{{ 'desc.zobrazit_jen_presne_shody' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
+              <mat-slide-toggle [checked]="onlyNoHits" (change)="onlyNoHitsChange($event)">{{ 'desc.zobrazit_nenalezene' | translate }} <span class="app-metadata"></span></mat-slide-toggle>
+            </div> -->
           </div>
         </mat-card>
-        <ng-container *ngFor="let doc of docs">
+        @for (doc of docs; track doc) {
           <mat-card appearance="outlined" class="app-view-import">
             <mat-card-content>
               <div fxLayout="row" fxLayoutGap="32px">
                 <div fxFlex="calc(100% - 400px)">
-                  <ng-container *ngIf="doc.name">
+                  @if (doc.name) {
                     <strong [matTooltip]="doc.name" matTooltipPosition="below">{{ doc.name  }}</strong><br />
-                  </ng-container>
+                  }
                 </div>
                 <div>
-                  <ng-container *ngIf="doc.author">{{ doc.author }}<span class="app-pipe"></span></ng-container>
-                  <ng-container *ngIf="doc.ean">{{ doc.ean }}<span class="app-pipe"></span></ng-container>
+                  @if (doc.author) {
+                    {{ doc.author }}<span class="app-pipe"></span>
+                  }
+                  @if (doc.ean) {
+                    {{ doc.ean }}<span class="app-pipe"></span>
+                  }
                   <!-- <ng-container *ngIf="doc.num_hits">{{ doc.num_hits }}<span class="app-pipe"></span></ng-container> -->
-                  <ng-container *ngIf="doc.hit_type">
+                  @if (doc.hit_type) {
                     <mat-icon [ngClass]="doc.hit_type === 'ean' ? 'app-color-success' : 'app-color-warning'"
                       [matTooltip]="doc.hit_type === 'ean' ? ('desc.ean_se_shoduje' | translate) : ('desc.ean_se_neshoduje' | translate)">
                       {{ doc.hit_type === 'ean' ? 'thumb_up' : 'thumb_down' }}
                     </mat-icon>
                     <span class="app-pipe"></span>
-                  </ng-container>
-                  <ng-container *ngIf="doc.item.URL">
+                  }
+                  @if (doc.item.URL) {
                     <a [href]="sanitize(doc.item.URL)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate"><mat-icon>link</mat-icon></a><span class="app-pipe"></span>
-                  </ng-container>
-                  <ng-container *ngIf="doc.eanAlephLink">
+                  }
+                  @if (doc.eanAlephLink) {
                     <a [href]="sanitize(doc.eanAlephLink)" target="_blank" [matTooltip]="'desc.otevrit_zdroj' | translate">SKC</a><span class="app-pipe"></span>
-                  </ng-container>
-                  <ng-container *ngIf="doc.ean">
+                  }
+                  @if (doc.ean) {
                     <a [href]="'http://google.com/search?q=' + doc.ean" target="_blank" [matTooltip]="'desc.hledat_na_google' | translate"><mat-icon>travel_explore</mat-icon></a><span class="app-pipe"></span>
-                  </ng-container>
-                  <a *ngIf="!doc.controlled" class="app-right" (click)="setControlled(doc)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
-                    <mat-icon class="material-icons-outlined">done</mat-icon>
-                  </a>
-                  <span *ngIf="doc.controlled">{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}} <mat-icon *ngIf="doc.controlled_note" [matTooltip]="doc.controlled_note">info</mat-icon></span>
+                  }
+                  @if (!doc.controlled) {
+                    <a class="app-right" (click)="setControlled(doc)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate">
+                      <mat-icon class="material-icons-outlined">done</mat-icon>
+                    </a>
+                  }
+                  @if (doc.controlled) {
+                    <span>{{ 'desc.controlled_by' | translate}}: {{ doc.controlled_user}} @if (doc.controlled_note) {
+                      <mat-icon [matTooltip]="doc.controlled_note">info</mat-icon>
+                    }</span>
+                  }
                 </div>
               </div>
             </mat-card-content>
-            <mat-card-actions *ngIf="filteredIds[doc.id]?.length > 0">
-              <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
-                <tbody>
-                  <ng-container *ngFor="let id of filteredIds[doc.id]; let idx = index">
-                    <tr>
-                      <td [class.approved]="id.approved" colspan="2">
-                        <div>
-                          <ng-container *ngIf="id.nazev">{{ id.nazev }}</ng-container>
-                        </div>
-                        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start end" class="app-pt-1 app-pb-1">
-                          <div fxFlex>
-                            <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" *ngIf="id.dntstav" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
-                              {{ id.dntstav[id.dntstav.length-1] }}
-                            </div>
-
-                            <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" *ngIf="id.kuratorstav && curatorAndPublicStateAreDifferent(id)" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
-                              {{ id.kuratorstav[id.kuratorstav.length-1] }}  
-                            </div>
-
-                            <div *ngIf="id.license" [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
-                              <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
-                              {{ 'license.' + id.license + '-badge' | translate }}
-                            </div>
-                          </div>
+            @if (filteredIds[doc.id]?.length > 0) {
+              <mat-card-actions>
+                <table class="app-table-import" [cellPadding]="0" [cellSpacing]="0">
+                  <tbody>
+                    @for (id of filteredIds[doc.id]; track id; let idx = $index) {
+                      <tr>
+                        <td [class.approved]="id.approved" colspan="2">
                           <div>
-                            <mat-button-toggle-group *ngIf="id.dntstav[id.dntstav.length-1] !== 'N' &&  id.dntstav[id.dntstav.length-1] !== 'X' &&  id.dntstav[id.dntstav.length-1] !== 'D' && !doc.controlled" >
-                              <mat-button-toggle mat-stroked-button class="app-color-warning" (click)="changeState(doc,id)" ><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
-                              <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
-                            </mat-button-toggle-group>
-
-                            <mat-button-toggle  *ngIf="id.dntstav[id.dntstav.length-1] === 'N' || doc.controlled " mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
-
-                            <mat-menu #menuMore="matMenu">
-                              <button mat-menu-item *ngIf="id.marc_998a && id.marc_998a[0].startsWith('http')"  (click)="gotoAleph(id.marc_998a[0])">
-                                <mat-icon>link</mat-icon>
-                                <a [href]="id.marc_998a[0]" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
-                              </button>
-                              <button mat-menu-item (click)="showIdentifiers(id)">
-                                <mat-icon>fingerprint</mat-icon>
-                                <a>{{ 'desc.identifikatory' | translate }}</a>
-                              </button>
-                              <button mat-menu-item (click)="showHistory(id)">
-                                <mat-icon>update</mat-icon>
-                                <a>{{ 'desc.historie_zmen' | translate }}</a>
-                              </button>
-                              <button mat-menu-item *ngIf="id.granularity && id.granularity.length > 1" (click)="showGranularity(id)">
-                                <mat-icon>format_list_numbered</mat-icon>
-                                <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
-                              </button>
-                            </mat-menu>
+                            @if (id.nazev) {
+                              {{ id.nazev }}
+                            }
                           </div>
-                        </div>
-                      </td>
-                     <!--  <td *ngIf="id.ean" class="app-cell-ean">
+                          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start end" class="app-pt-1 app-pb-1">
+                            <div fxFlex>
+                              @if (id.dntstav) {
+                                <div [class]="'app-badge ' + id.dntstav[id.dntstav.length-1]" [matTooltip]="'state.tooltip.' + id.dntstav[id.dntstav.length-1] | translate">
+                                  {{ id.dntstav[id.dntstav.length-1] }}
+                                </div>
+                              }
+                              @if (id.kuratorstav && curatorAndPublicStateAreDifferent(id)) {
+                                <div [class]="'app-badge app-ml-1 ' + id.kuratorstav[id.kuratorstav.length-1]" [matTooltip]="'state.tooltip.' + id.kuratorstav[id.kuratorstav.length-1] | translate">
+                                  {{ id.kuratorstav[id.kuratorstav.length-1] }}
+                                </div>
+                              }
+                              @if (id.license) {
+                                <div [class]="'app-badge app-icon-in ' + id.license" class="app-ml-1" [matTooltip]="id.license === 'dnnto' ? ('license.' + id.license | translate) : ('license.' + id.license | translate)">
+                                  <mat-icon class="material-icons-outlined">{{ id.license.toString() === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                                  {{ 'license.' + id.license + '-badge' | translate }}
+                                </div>
+                              }
+                            </div>
+                            <div>
+                              @if (id.dntstav[id.dntstav.length-1] !== 'N' &&  id.dntstav[id.dntstav.length-1] !== 'X' &&  id.dntstav[id.dntstav.length-1] !== 'D' && !doc.controlled) {
+                                <mat-button-toggle-group >
+                                  <mat-button-toggle mat-stroked-button class="app-color-warning" (click)="changeState(doc,id)" ><mat-icon class="material-icons-outlined" [matTooltip]="'tooltip.removing_work_from_the_list' | translate">close</mat-icon></mat-button-toggle>
+                                  <mat-button-toggle mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
+                                </mat-button-toggle-group>
+                              }
+                              @if (id.dntstav[id.dntstav.length-1] === 'N' || doc.controlled ) {
+                                <mat-button-toggle  mat-stroked-button [matMenuTriggerFor]="menuMore"><mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vice' | translate }}</mat-button-toggle>
+                              }
+                              <mat-menu #menuMore="matMenu">
+                                @if (id.marc_998a && id.marc_998a[0].startsWith('http')) {
+                                  <button mat-menu-item  (click)="gotoAleph(id.marc_998a[0])">
+                                    <mat-icon>link</mat-icon>
+                                    <a [href]="id.marc_998a[0]" target="_blank">{{ 'desc.zaznam_z_katalogu' | translate }}</a>
+                                  </button>
+                                }
+                                <button mat-menu-item (click)="showIdentifiers(id)">
+                                  <mat-icon>fingerprint</mat-icon>
+                                  <a>{{ 'desc.identifikatory' | translate }}</a>
+                                </button>
+                                <button mat-menu-item (click)="showHistory(id)">
+                                  <mat-icon>update</mat-icon>
+                                  <a>{{ 'desc.historie_zmen' | translate }}</a>
+                                </button>
+                                @if (id.granularity && id.granularity.length > 1) {
+                                  <button mat-menu-item (click)="showGranularity(id)">
+                                    <mat-icon>format_list_numbered</mat-icon>
+                                    <a>{{ 'desc.zobrazit_granularitu'| translate }}</a>
+                                  </button>
+                                }
+                              </mat-menu>
+                            </div>
+                          </div>
+                        </td>
+                        <!--  <td *ngIf="id.ean" class="app-cell-ean">
                         <span class="app-text-cutter" [matTooltip]="id.ean" matTooltipPosition="below" matTooltipClass="app-clean-truncated">{{ id.ean }}</span>
                       </td> -->
                     </tr>
-                  </ng-container>
+                  }
                 </tbody>
               </table>
             </mat-card-actions>
-          </mat-card>
-        </ng-container>
-      </div>
-      <div class="app-mt-4">
-        <app-paginator [storeStateKey]="importId" [rowsParam]="'importRows'" [numFound]="numFound" [showSort]="false"></app-paginator>
-      </div>
+          }
+        </mat-card>
+      }
+    </div>
+    <div class="app-mt-4">
+      <app-paginator [storeStateKey]="importId" [rowsParam]="'importRows'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
+</div>

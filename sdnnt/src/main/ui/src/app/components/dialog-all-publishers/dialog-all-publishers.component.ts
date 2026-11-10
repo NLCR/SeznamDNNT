@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDia
 import { AppState } from 'src/app/app.state';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
-import { NgIf, NgFor } from '@angular/common';
+
 import { MatFormField } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { CdkScrollable } from '@angular/cdk/scrolling';
@@ -19,7 +19,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-dialog-all-publishers',
     templateUrl: './dialog-all-publishers.component.html',
     styleUrls: ['./dialog-all-publishers.component.scss'],
-    imports: [MatDialogTitle, NgIf, MatFormField, MatInput, CdkScrollable, MatDialogContent, NgFor, MatCheckbox, MatTooltip, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
+    imports: [MatDialogTitle, MatFormField, MatInput, CdkScrollable, MatDialogContent, MatCheckbox, MatTooltip, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class DialogAllPublishersComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogAllPublishersComponent>>(MatDialogRef);

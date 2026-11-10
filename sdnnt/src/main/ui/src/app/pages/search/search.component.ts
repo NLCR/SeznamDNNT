@@ -16,10 +16,9 @@ import { AppConfiguration } from 'src/app/app-configuration';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatIconButton, MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { NgIf, NgClass, NgFor } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { FacetsComponent } from '../../components/facets/facets.component';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { MatCard } from '@angular/material/card';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
@@ -33,27 +32,24 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './search.component.html',
     styleUrls: ['./search.component.scss'],
     imports: [
-      FlexModule,
-      MatIconButton,
-      MatIcon,
-      NgIf,
-      FacetsComponent,
-      MatButton,
-      PaginatorComponent,
-      NgClass,
-      ExtendedModule,
-      MatCard,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatMenuTrigger,
-      MatTooltip,
-      MatMenu,
-      NgFor,
-      MatMenuItem,
-      MatDivider,
-      ResultItemComponent,
-      TranslateModule
-    ]
+    FlexModule,
+    MatIconButton,
+    MatIcon,
+    FacetsComponent,
+    MatButton,
+    PaginatorComponent,
+    NgClass,
+    MatCard,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatMenuTrigger,
+    MatTooltip,
+    MatMenu,
+    MatMenuItem,
+    MatDivider,
+    ResultItemComponent,
+    TranslateModule
+]
 })
 export class SearchComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

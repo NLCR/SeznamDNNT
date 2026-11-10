@@ -9,10 +9,9 @@ import { MatInput } from '@angular/material/input';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
-import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
 import { MatOption, MatSelect } from '@angular/material/select';
@@ -27,30 +26,27 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-registration-form.component.html',
     styleUrls: ['./dialog-registration-form.component.scss'],
     imports: [
-      NgIf,
-      FlexModule,
-      MatRadioGroup,
-      FormsModule,
-      MatRadioButton,
-      ExtendedModule,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      MatAutocompleteTrigger,
-      ReactiveFormsModule,
-      MatAutocomplete,
-      NgFor,
-      MatOption,
-      MatButton,
-      MatSuffix,
-      MatTooltip,
-      MatIcon,
-      MatSelect,
-      MatCheckbox,
-      MatDivider,
-      AsyncPipe,
-      TranslateModule
-    ]
+    FlexModule,
+    MatRadioGroup,
+    FormsModule,
+    MatRadioButton,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatAutocompleteTrigger,
+    ReactiveFormsModule,
+    MatAutocomplete,
+    MatOption,
+    MatButton,
+    MatSuffix,
+    MatTooltip,
+    MatIcon,
+    MatSelect,
+    MatCheckbox,
+    MatDivider,
+    AsyncPipe,
+    TranslateModule
+]
 })
 export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   config = inject(AppConfiguration);

@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-password/dialog-change-password.component';
-import { NgIf } from '@angular/common';
+
 
 enum Tokenvalidation {
   INVALID, VALID, NOT_FETCHED
@@ -17,7 +17,7 @@ enum Tokenvalidation {
     selector: 'app-reset-password',
     templateUrl: './reset-password.component.html',
     styleUrls: ['./reset-password.component.scss'],
-    imports: [NgIf]
+    imports: []
 })
 export class ResetPasswordComponent implements OnInit {
   private route = inject(ActivatedRoute);

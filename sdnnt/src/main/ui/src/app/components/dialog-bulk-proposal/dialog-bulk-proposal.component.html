@@ -4,10 +4,16 @@
     <!--
     <mat-radio-button  [value]="'xx'">"MOCK"</mat-radio-button>
     <mat-radio-button  [value]="'yy'">"MOCK"</mat-radio-button>
--->
-    <mat-radio-button *ngIf="navrhNaZarazeni" [value]="'NZN'">{{ 'desc.navrh_na_zarazeni' | translate }}</mat-radio-button>
-    <mat-radio-button *ngIf="navrhNaVyrazeni" [value]="'VN'" >{{ 'desc.navrh_na_vyrazeni' | translate }}</mat-radio-button>
-    <mat-radio-button *ngIf="navrhNaOmezeni" [value]="'VNZ'">{{ 'desc.omezit_na_terminal' | translate }}</mat-radio-button>
+    -->
+    @if (navrhNaZarazeni) {
+      <mat-radio-button [value]="'NZN'">{{ 'desc.navrh_na_zarazeni' | translate }}</mat-radio-button>
+    }
+    @if (navrhNaVyrazeni) {
+      <mat-radio-button [value]="'VN'" >{{ 'desc.navrh_na_vyrazeni' | translate }}</mat-radio-button>
+    }
+    @if (navrhNaOmezeni) {
+      <mat-radio-button [value]="'VNZ'">{{ 'desc.omezit_na_terminal' | translate }}</mat-radio-button>
+    }
 
   </mat-radio-group>
 </div>

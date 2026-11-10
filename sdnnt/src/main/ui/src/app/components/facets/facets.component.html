@@ -2,102 +2,132 @@
 
 <mat-accordion multi>
 
-  <mat-expansion-panel  [expanded]="getPanelExpansion()" *ngIf="state.user && state.user.role !== 'user' && view === 'search'">
-    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-      <mat-panel-title>
-        {{ 'desc.search' | translate }}
-      </mat-panel-title>
-    </mat-expansion-panel-header>
-
-    <mat-radio-group fxLayout="column" [(ngModel)]="selectedRadioButton"  (ngModelChange)="onRadioButtonChange()">
-      <mat-radio-button value="in_list">{{ 'desc.in_the_list' | translate }}</mat-radio-button>
-      <mat-radio-button value="outside_list"  >{{ 'desc.off_the_list' | translate }}</mat-radio-button>
-      <mat-radio-button value="all" >{{ 'desc.all' | translate }}</mat-radio-button>
-    </mat-radio-group>   
-  </mat-expansion-panel>
-  
-
-
-  <ng-container *ngFor="let facet of facets">
-    <mat-expansion-panel *ngIf="facet_fields[facet].length > 0" [expanded]="getPanelExpansion()">
+  @if (state.user && state.user.role !== 'user' && view === 'search') {
+    <mat-expansion-panel  [expanded]="getPanelExpansion()">
       <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
         <mat-panel-title>
-          {{ 'field.' + facet | translate }}
+          {{ 'desc.search' | translate }}
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <div class="app-facet-wrapper">
-        <ng-container *ngFor="let f of facet_fields[facet]">
-          <div *ngIf="f.name !== '   '" class="app-facet-item-wrapper">
-            <ng-container [ngSwitch]="facet">
-
-              <a *ngSwitchCase="'c_actions'" (click)="addFilter(facet, f)">
-                <div class="app-badge state-change app-icon-in app-mr-1">
-                  <mat-icon class="material-icons-outlined app-m-0">track_changes</mat-icon>
-                </div>
-                {{ f.name }}
-              </a>
-
-              <a *ngSwitchCase="'export'" (click)="addFilter(facet, f)">
-                <div [class]="'app-badge app-bordered app-img-in'" class="app-mr-1">
-                  <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
-                </div>
-                {{ 'desc.euipo_badge_tooltip' | translate }}
-              </a>
-              <a *ngSwitchCase="'license'" (click)="addFilter(facet, f)">
-                <div [class]="'app-badge app-icon-in ' + f.name" class="app-mr-1">
-                  <mat-icon class="material-icons-outlined app-m-0">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
-                </div>
-                <!-- <mat-icon [class]="'material-icons-outlined app-m-0 ' + f.name">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon> -->
-                {{ 'license.' + f.name | translate }}
-              </a>
-              <a *ngSwitchCase="'dntstav'" (click)="addFilter(facet, f)">
-                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
-                {{ ('field.' + f.name | translate) }}
-              </a>
-              <a *ngSwitchCase="'kuratorstav'" (click)="addFilter(facet, f)" >
-                <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
-                {{ ('field.' + f.name | translate) }}
-              </a>
-              <a *ngSwitchCase="'controlled'" (click)="addFilter(facet, f)">{{ 'controlled.' + f.name | translate }}</a>
-              <a *ngSwitchCase="'fmt'" (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
-              <a *ngSwitchCase="'language'" (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
-              <a *ngSwitchCase="'sigla'" (click)="addFilter(facet, f)">{{  f.name  }}</a>
-              <a *ngSwitchCase="'digital_libraries'" (click)="addFilter(facet, f)" [class]="'app-dk-facet-highlight ' + digitalLibraryState(f.name)" [matTooltip]="digitalLibraryTooltip(f.name)">
-                <span>{{ 'sigla.' + f.name | translate }}</span>
-              </a>
-              <a *ngSwitchDefault (click)="addFilter(facet, f)">{{ f.name }}</a>&#160;<span class="app-count">({{ f.value }})</span>
-            </ng-container>
-          </div>
-        </ng-container>
-      </div>
-      <button *ngIf=" state.user &&  facet === 'nakladatel' && usedFacet('nakladatel').length === 0 " (click)="showAllPublishers()" mat-stroked-button class="app-w-100 app-mt-4">{{ 'desc.show_all' | translate }}</button>
+      <mat-radio-group fxLayout="column" [(ngModel)]="selectedRadioButton"  (ngModelChange)="onRadioButtonChange()">
+        <mat-radio-button value="in_list">{{ 'desc.in_the_list' | translate }}</mat-radio-button>
+        <mat-radio-button value="outside_list"  >{{ 'desc.off_the_list' | translate }}</mat-radio-button>
+        <mat-radio-button value="all" >{{ 'desc.all' | translate }}</mat-radio-button>
+      </mat-radio-group>
     </mat-expansion-panel>
-  </ng-container>
+  }
 
-  <mat-expansion-panel *ngIf="showRoky" [expanded]="getPanelExpansion()">
-    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
-      <mat-panel-title>
-        {{ 'field.rokvydani' | translate }}
-      </mat-panel-title>
-    </mat-expansion-panel-header>
-    <div fxLayout="row" fxLayoutGap="16px" class="app-facet-date-wrapper">
-      <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
-        <mat-label>{{ 'desc.rok_od' | translate }}</mat-label>
-        <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true"  >
-        <input matInput [(ngModel)]="rokod" [placeholder]="'Rok od' | translate" (click)="rok_od.open()" name="aa">
-        <mat-datepicker-toggle matSuffix [for]="rok_od"></mat-datepicker-toggle>
-        <mat-datepicker #rok_od startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_od, 'from')">
-        </mat-datepicker>
-      </mat-form-field>
-      <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
-        <mat-label>{{ 'desc.rok_do' | translate }}</mat-label>
-        <input matInput [matDatepicker]="rok_do" [value]="rokdodate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true">
-        <input matInput [(ngModel)]="rokdo" [placeholder]="'Rok do' | translate" (click)="rok_do.open()" name="bb">
-        <mat-datepicker-toggle matSuffix [for]="rok_do"></mat-datepicker-toggle>
-        <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">
-        </mat-datepicker>
-      </mat-form-field>
-      <button fxFlex="24%" [disabled]="isYearsButtonDisabled()"  mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
-    </div>
-  </mat-expansion-panel>
+
+
+  @for (facet of facets; track facet) {
+    @if (facet_fields[facet].length > 0) {
+      <mat-expansion-panel [expanded]="getPanelExpansion()">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title>
+            {{ 'field.' + facet | translate }}
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="app-facet-wrapper">
+          @for (f of facet_fields[facet]; track f) {
+            @if (f.name !== '   ') {
+              <div class="app-facet-item-wrapper">
+                @switch (facet) {
+                  @case ('c_actions') {
+                    <a (click)="addFilter(facet, f)">
+                      <div class="app-badge state-change app-icon-in app-mr-1">
+                        <mat-icon class="material-icons-outlined app-m-0">track_changes</mat-icon>
+                      </div>
+                      {{ f.name }}
+                    </a>
+                  }
+                  @case ('export') {
+                    <a (click)="addFilter(facet, f)">
+                      <div [class]="'app-badge app-bordered app-img-in'" class="app-mr-1">
+                        <img src="assets/img/logo-euipo.svg" [alt]="'desc.euipo_badge_tooltip' | translate" />
+                      </div>
+                      {{ 'desc.euipo_badge_tooltip' | translate }}
+                    </a>
+                  }
+                  @case ('license') {
+                    <a (click)="addFilter(facet, f)">
+                      <div [class]="'app-badge app-icon-in ' + f.name" class="app-mr-1">
+                        <mat-icon class="material-icons-outlined app-m-0">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon>
+                      </div>
+                      <!-- <mat-icon [class]="'material-icons-outlined app-m-0 ' + f.name">{{ f.name === 'dnnto' ? 'camera_alt' : 'no_photography' }}</mat-icon> -->
+                      {{ 'license.' + f.name | translate }}
+                    </a>
+                  }
+                  @case ('dntstav') {
+                    <a (click)="addFilter(facet, f)">
+                      <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                      {{ ('field.' + f.name | translate) }}
+                    </a>
+                  }
+                  @case ('kuratorstav') {
+                    <a (click)="addFilter(facet, f)" >
+                      <div [class]="'app-badge ' + f.name" class="app-mr-1">{{ f.name }}</div>
+                      {{ ('field.' + f.name | translate) }}
+                    </a>
+                  }
+                  @case ('controlled') {
+                    <a (click)="addFilter(facet, f)">{{ 'controlled.' + f.name | translate }}</a>
+                  }
+                  @case ('fmt') {
+                    <a (click)="addFilter(facet, f)">{{ 'fmt.' + f.name | translate }}</a>
+                  }
+                  @case ('language') {
+                    <a (click)="addFilter(facet, f)">{{ 'language.' + f.name | translate }}</a>
+                  }
+                  @case ('sigla') {
+                    <a (click)="addFilter(facet, f)">{{  f.name  }}</a>
+                  }
+                  @case ('digital_libraries') {
+                    <a (click)="addFilter(facet, f)" [class]="'app-dk-facet-highlight ' + digitalLibraryState(f.name)" [matTooltip]="digitalLibraryTooltip(f.name)">
+                      <span>{{ 'sigla.' + f.name | translate }}</span>
+                    </a>
+                  }
+                  @default {
+                    <a (click)="addFilter(facet, f)">{{ f.name }}</a>
+                  }
+                }
+                &#160;<span class="app-count">({{ f.value }})</span>
+              </div>
+            }
+          }
+        </div>
+        @if ( state.user &&  facet === 'nakladatel' && usedFacet('nakladatel').length === 0 ) {
+          <button (click)="showAllPublishers()" mat-stroked-button class="app-w-100 app-mt-4">{{ 'desc.show_all' | translate }}</button>
+        }
+      </mat-expansion-panel>
+    }
+  }
+
+  @if (showRoky) {
+    <mat-expansion-panel [expanded]="getPanelExpansion()">
+      <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+        <mat-panel-title>
+          {{ 'field.rokvydani' | translate }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div fxLayout="row" fxLayoutGap="16px" class="app-facet-date-wrapper">
+        <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
+          <mat-label>{{ 'desc.rok_od' | translate }}</mat-label>
+          <input matInput [matDatepicker]="rok_od" [value]="rokoddate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true"  >
+          <input matInput [(ngModel)]="rokod" [placeholder]="'Rok od' | translate" (click)="rok_od.open()" name="aa">
+          <mat-datepicker-toggle matSuffix [for]="rok_od"></mat-datepicker-toggle>
+          <mat-datepicker #rok_od startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_od, 'from')">
+          </mat-datepicker>
+        </mat-form-field>
+        <mat-form-field appearance="outline" fxFlex="calc(38% - 16px)" class="app-clean-bottom-gap">
+          <mat-label>{{ 'desc.rok_do' | translate }}</mat-label>
+          <input matInput [matDatepicker]="rok_do" [value]="rokdodate.value" [placeholder]="'desc.rok_od' | translate" hidden=true [readonly]="true">
+          <input matInput [(ngModel)]="rokdo" [placeholder]="'Rok do' | translate" (click)="rok_do.open()" name="bb">
+          <mat-datepicker-toggle matSuffix [for]="rok_do"></mat-datepicker-toggle>
+          <mat-datepicker #rok_do startView="multi-year" (yearSelected)="chosenYearHandler($event, rok_do, 'until')">
+          </mat-datepicker>
+        </mat-form-field>
+        <button fxFlex="24%" [disabled]="isYearsButtonDisabled()"  mat-stroked-button fxFlexAlign="flex-end" (click)="clickRokFacet()">{{ 'desc.pouzit' | translate}}</button>
+      </div>
+    </mat-expansion-panel>
+  }
 </mat-accordion>

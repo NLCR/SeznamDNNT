@@ -8,7 +8,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect, MatOption } from '@angular/material/select';
-import { NgFor, NgIf } from '@angular/common';
+
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatInput } from '@angular/material/input';
 import { MatButton } from '@angular/material/button';
@@ -19,23 +19,21 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-states.component.html',
     styleUrls: ['./dialog-states.component.scss'],
     imports: [
-      MatDialogTitle,
-      CdkScrollable,
-      MatDialogContent,
-      MatFormField,
-      MatLabel,
-      MatSelect,
-      FormsModule,
-      NgFor,
-      MatOption,
-      MatTooltip,
-      NgIf,
-      MatInput,
-      MatDialogActions,
-      MatButton,
-      MatDialogClose,
-      TranslateModule
-    ]
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    FormsModule,
+    MatOption,
+    MatTooltip,
+    MatInput,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    TranslateModule
+]
 })
 export class DialogStatesComponent implements OnInit {
   dialogRef = inject<MatDialogRef<DialogStatesComponent>>(MatDialogRef);

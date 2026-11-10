@@ -1,27 +1,49 @@
-<mat-list *ngIf="state.usedFilters.length > 0">
-  <h3 matSubheader fxLayout="row">
-    <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
-    <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAll()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
-  </h3>
-  <div class="app-list-content-wrapper">
-    <mat-list-item *ngFor="let f of state.usedFilters">
-      <span class="app-used-filter-content">
-        <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="removeFilter(f)"><mat-icon>clear</mat-icon></a>
-        <span class="app-used-filter-label">
-          <span>{{ 'field.' + f.field | translate }}: </span>
-          <ng-container [ngSwitch]="f.field">
-            <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchCase="'sigla'">{{  f.value  }}</ng-container>
-            <ng-container *ngSwitchCase="'digital_libraries'">{{ 'sigla.' + f.value | translate }}</ng-container>
-            <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-          </ng-container>
-        </span>
-      </span>
-    </mat-list-item>
-  </div>
-</mat-list>
+@if (state.usedFilters.length > 0) {
+  <mat-list>
+    <h3 matSubheader fxLayout="row">
+      <div fxFlex>{{ 'desc.pouzite_filtry' | translate }}</div>
+      <a [matTooltip]="'desc.odstranit_vsechny_filtry' | translate" matTooltipPosition="above" (click)="removeAll()"><mat-icon class="material-icons-outlined">highlight_off</mat-icon></a>
+    </h3>
+    <div class="app-list-content-wrapper">
+      @for (f of state.usedFilters; track f) {
+        <mat-list-item>
+          <span class="app-used-filter-content">
+            <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="removeFilter(f)"><mat-icon>clear</mat-icon></a>
+            <span class="app-used-filter-label">
+              <span>{{ 'field.' + f.field | translate }}: </span>
+              @switch (f.field) {
+                @case ('license') {
+                  {{ 'license.' + f.value | translate }}
+                }
+                @case ('dntstav') {
+                  {{ 'field.' + f.value | translate }}
+                }
+                @case ('kuratorstav') {
+                  {{ 'field.' + f.value | translate }}
+                }
+                @case ('controlled') {
+                  {{ 'controlled.' + f.value | translate }}
+                }
+                @case ('fmt') {
+                  {{ 'fmt.' + f.value | translate }}
+                }
+                @case ('language') {
+                  {{ 'language.' + f.value | translate }}
+                }
+                @case ('sigla') {
+                  {{  f.value  }}
+                }
+                @case ('digital_libraries') {
+                  {{ 'sigla.' + f.value | translate }}
+                }
+                @default {
+                  {{ f.value }}
+                }
+              }
+            </span>
+          </span>
+        </mat-list-item>
+      }
+    </div>
+  </mat-list>
+}

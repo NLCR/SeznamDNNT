@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
-import { NgIf, NgFor } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatButton } from '@angular/material/button';
@@ -10,7 +10,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-granularity',
     templateUrl: './granularity.component.html',
     styleUrls: ['./granularity.component.scss'],
-    imports: [MatDialogTitle, NgIf, FormsModule, CdkScrollable, MatDialogContent, NgFor, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
+    imports: [MatDialogTitle, FormsModule, CdkScrollable, MatDialogContent, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class GranularityComponent {
   dialogRef = inject<MatDialogRef<GranularityComponent>>(MatDialogRef);

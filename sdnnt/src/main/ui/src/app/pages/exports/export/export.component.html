@@ -9,7 +9,9 @@
   <div fxLayout="row" fxLayoutGap="32px" class="app-export-wrapper">
     <div class="app-left app-fx-facets">
       <!-- to do - happy -->
-      <app-facets *ngIf="facets" [facet_fields]="facets" [view]="'export'" ></app-facets>
+      @if (facets) {
+        <app-facets [facet_fields]="facets" [view]="'export'" ></app-facets>
+      }
 
     </div>
     <div fxFlex class="app-right">
@@ -22,37 +24,47 @@
         </div>
       </div>
       <div fxLayout="row wrap" fxLayoutGap="32px" fxLayoutAlign="start center" class="app-toolbar">
-        <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
-          <mat-label>{{ 'desc.vyhledavani_ve_vysledcich_exportu' | translate }}</mat-label>
-          <input type="text" matInput (keyup)="onFilterExportKeyUp($event.target)" [ngModel]="state.prefixsearch['export']">
-          <button *ngIf="state.prefixsearch['export']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExport()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
-            <mat-icon class="app-color-warning">close</mat-icon>
-          </button>
-        </mat-form-field>
+        @if (state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')) {
+          <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline" >
+            <mat-label>{{ 'desc.vyhledavani_ve_vysledcich_exportu' | translate }}</mat-label>
+            <input type="text" matInput (keyup)="onFilterExportKeyUp($event.target)" [ngModel]="state.prefixsearch['export']">
+            @if (state.prefixsearch['export']) {
+              <button matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExport()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+                <mat-icon class="app-color-warning">close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+        }
       </div>
       <div class="app-results-wrapper">
-        <mat-card  appearance="outlined"  *ngIf="exportObj && (!exportObj.export_processed || !exportObj.all_exported_identifiers_flag)">
-          <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-            <div fxFlex ></div>
-            <div>
-              <mat-button-toggle mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
-                <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_exportu' | translate }}
-              </mat-button-toggle>
-              <mat-menu  #menuVyrizeniZadosti="matMenu">
-                <button *ngIf="exportObj &&  !exportObj.export_processed && exportObj.all_exported_identifiers_flag"  (click)="setProcessed()" mat-menu-item>{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
-                <button  *ngIf="exportObj  &&  !exportObj.all_exported_identifiers_flag" (click)="approveAll()" mat-menu-item>{{ 'desc.oznacit_jako_exportovane' | translate }}</button>
-              </mat-menu>
+        @if (exportObj && (!exportObj.export_processed || !exportObj.all_exported_identifiers_flag)) {
+          <mat-card  appearance="outlined" >
+            <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
+              <div fxFlex ></div>
+              <div>
+                <mat-button-toggle mat-button [title]="'desc.oznacit_jako_zpracovane' | translate" [matMenuTriggerFor]="menuVyrizeniZadosti">
+                  <mat-icon class="material-icons-outlined app-mr-1">more_vert</mat-icon>{{ 'desc.vyrizeni_exportu' | translate }}
+                </mat-button-toggle>
+                <mat-menu  #menuVyrizeniZadosti="matMenu">
+                  @if (exportObj &&  !exportObj.export_processed && exportObj.all_exported_identifiers_flag) {
+                    <button  (click)="setProcessed()" mat-menu-item>{{ 'desc.oznacit_jako_zpracovane' | translate }}</button>
+                  }
+                  @if (exportObj  &&  !exportObj.all_exported_identifiers_flag) {
+                    <button  (click)="approveAll()" mat-menu-item>{{ 'desc.oznacit_jako_exportovane' | translate }}</button>
+                  }
+                </mat-menu>
+              </div>
             </div>
-          </div>
-        </mat-card>
-        <ng-container *ngFor="let doc of docs">
-          <app-result-item 
-          [doc]="doc" 
-          [view]="'exports'" 
-          [export]="exportObj"
-          (processExportEvent)="processExport($event)"
+          </mat-card>
+        }
+        @for (doc of docs; track doc) {
+          <app-result-item
+            [doc]="doc"
+            [view]="'exports'"
+            [export]="exportObj"
+            (processExportEvent)="processExport($event)"
           ></app-result-item>
-        </ng-container>
+        }
       </div>
       <div class="app-mt-2">
         <app-paginator [storeStateKey]="'export'" [numFound]="numFound" [showSort]="false"></app-paginator>

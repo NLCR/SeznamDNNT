@@ -11,7 +11,7 @@ import { Zadost } from 'src/app/shared/zadost';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
 import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
-import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
 import { MatCard } from '@angular/material/card';
@@ -29,24 +29,22 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './zadost.component.html',
     styleUrls: ['./zadost.component.scss'],
     imports: [
-      NgIf,
-      FlexModule,
-      PaginatorComponent,
-      MatCard,
-      MatIcon,
-      MatTooltip,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatMenuTrigger,
-      MatMenu,
-      MatMenuItem,
-      NgFor,
-      MatSlideToggle,
-      FormsModule,
-      ResultItemComponent,
-      DatePipe,
-      TranslateModule
-    ]
+    FlexModule,
+    PaginatorComponent,
+    MatCard,
+    MatIcon,
+    MatTooltip,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    MatSlideToggle,
+    FormsModule,
+    ResultItemComponent,
+    DatePipe,
+    TranslateModule
+]
 })
 export class ZadostComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);

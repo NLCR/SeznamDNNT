@@ -3,10 +3,12 @@
   <div class="app-overflow-x-auto">
     <table class="app-table" [cellPadding]="0" [cellSpacing]="0">
       <tbody>
-        <tr *ngFor="let item of data.items">
-          <th>{{ item.label | translate }}</th>
-          <td>{{ item.value }}</td>
-        </tr>
+        @for (item of data.items; track item) {
+          <tr>
+            <th>{{ item.label | translate }}</th>
+            <td>{{ item.value }}</td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>

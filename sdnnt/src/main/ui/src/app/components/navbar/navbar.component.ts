@@ -15,7 +15,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { NgSwitch, NgSwitchCase, NgSwitchDefault, NgIf } from '@angular/common';
+
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -24,22 +24,18 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './navbar.component.html',
     styleUrls: ['./navbar.component.scss'],
     imports: [
-      MatToolbar,
-      FlexModule,
-      RouterLink,
-      SearchBarComponent,
-      MatButton,
-      MatIcon,
-      NgSwitch,
-      NgSwitchCase,
-      NgSwitchDefault,
-      RouterLinkActive,
-      NgIf,
-      MatMenuTrigger,
-      MatMenu,
-      MatMenuItem,
-      TranslateModule
-    ]
+    MatToolbar,
+    FlexModule,
+    RouterLink,
+    SearchBarComponent,
+    MatButton,
+    MatIcon,
+    RouterLinkActive,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    TranslateModule
+]
 })
 export class NavbarComponent {
   private dialog = inject(MatDialog);

@@ -16,13 +16,12 @@ import { Import } from 'src/app/shared/import';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgIf, NgFor, NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { FacetsComponent } from '../../../components/facets/facets.component';
 import { PaginatorComponent } from '../../../components/paginator/paginator.component';
 import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
 import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
 import { TranslateModule } from '@ngx-translate/core';
@@ -32,27 +31,24 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './import.component.html',
     styleUrls: ['./import.component.scss'],
     imports: [
-      RouterLink,
-      FlexModule,
-      NgIf,
-      FacetsComponent,
-      PaginatorComponent,
-      MatCard,
-      MatIcon,
-      MatTooltip,
-      NgFor,
-      MatCardContent,
-      NgClass,
-      ExtendedModule,
-      MatCardActions,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatMenuTrigger,
-      MatMenu,
-      MatMenuItem,
-      DatePipe,
-      TranslateModule
-    ]
+    RouterLink,
+    FlexModule,
+    FacetsComponent,
+    PaginatorComponent,
+    MatCard,
+    MatIcon,
+    MatTooltip,
+    MatCardContent,
+    NgClass,
+    MatCardActions,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    DatePipe,
+    TranslateModule
+]
 })
 export class ImportComponent implements OnInit, OnDestroy {
   dialog = inject(MatDialog);

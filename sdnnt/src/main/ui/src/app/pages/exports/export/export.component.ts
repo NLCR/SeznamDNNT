@@ -9,7 +9,7 @@ import { SolrDocument } from 'src/app/shared/solr-document';
 import { AppState } from 'src/app/app.state';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgIf, NgFor } from '@angular/common';
+
 import { FacetsComponent } from '../../../components/facets/facets.component';
 import { PaginatorComponent } from '../../../components/paginator/paginator.component';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
@@ -30,28 +30,26 @@ import { TranslateModule } from '@ngx-translate/core'; // autocomplete
     templateUrl: './export.component.html',
     styleUrls: ['./export.component.scss'],
     imports: [
-      FlexModule,
-      RouterLink,
-      NgIf,
-      FacetsComponent,
-      PaginatorComponent,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      FormsModule,
-      MatIconButton,
-      MatSuffix,
-      MatTooltip,
-      MatIcon,
-      MatCard,
-      MatButtonToggle,
-      MatMenuTrigger,
-      MatMenu,
-      MatMenuItem,
-      NgFor,
-      ResultItemComponent,
-      TranslateModule
-    ]
+    FlexModule,
+    RouterLink,
+    FacetsComponent,
+    PaginatorComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatIconButton,
+    MatSuffix,
+    MatTooltip,
+    MatIcon,
+    MatCard,
+    MatButtonToggle,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    ResultItemComponent,
+    TranslateModule
+]
 })
 export class ExportComponent implements OnInit {
   private route = inject(ActivatedRoute);

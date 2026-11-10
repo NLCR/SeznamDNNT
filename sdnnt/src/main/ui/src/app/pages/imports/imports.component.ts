@@ -15,13 +15,12 @@ import { PaginatorComponent } from '../../components/paginator/paginator.compone
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { NgIf, NgClass, DatePipe } from '@angular/common';
+import { NgClass, DatePipe } from '@angular/common';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
 import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
-import { ExtendedModule } from '@angular/flex-layout/extended';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -29,34 +28,32 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './imports.component.html',
     styleUrls: ['./imports.component.scss'],
     imports: [
-      FlexModule,
-      PaginatorComponent,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      FormsModule,
-      NgIf,
-      MatIconButton,
-      MatSuffix,
-      MatTooltip,
-      MatIcon,
-      MatTable,
-      MatColumnDef,
-      MatHeaderCellDef,
-      MatHeaderCell,
-      MatCellDef,
-      MatCell,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatHeaderRowDef,
-      MatHeaderRow,
-      MatRowDef,
-      MatRow,
-      NgClass,
-      ExtendedModule,
-      DatePipe,
-      TranslateModule
-    ]
+    FlexModule,
+    PaginatorComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatIconButton,
+    MatSuffix,
+    MatTooltip,
+    MatIcon,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    NgClass,
+    DatePipe,
+    TranslateModule
+]
 })
 export class ImportsComponent implements OnInit {
   private route = inject(ActivatedRoute);

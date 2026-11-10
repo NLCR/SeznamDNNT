@@ -1,17 +1,23 @@
 <div fxLayout="row wrap" class="app-graphs-wrapper">
   <div class="app-graph-wrapper app-fx-50">
     <div>
-      <div *ngIf="stavOpts.series" class="app-graph" echarts [options]="stavOpts" style="height: 350px;" ></div>
+      @if (stavOpts.series) {
+        <div class="app-graph" echarts [options]="stavOpts" style="height: 350px;" ></div>
+      }
     </div>
   </div>
   <div class="app-graph-wrapper app-fx-50">
     <div>
-      <div *ngIf="licenseOpts.series" class="app-graph" echarts [options]="licenseOpts" style="height: 350px;" ></div>
+      @if (licenseOpts.series) {
+        <div class="app-graph" echarts [options]="licenseOpts" style="height: 350px;" ></div>
+      }
     </div>
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <div *ngIf="historyUserActivityOpts.series" class="app-graph" echarts [options]="historyUserActivityOpts" style="height: 350px;" ></div>
+      @if (historyUserActivityOpts.series) {
+        <div class="app-graph" echarts [options]="historyUserActivityOpts" style="height: 350px;" ></div>
+      }
     </div>
   </div>
   <div class="app-graph-wrapper">
@@ -27,15 +33,19 @@
           <mat-option value="1DAY">{{ 'graph.desc.day' | translate }}</mat-option>
         </mat-select>
       </mat-form-field>
-      <div *ngIf="historyUserOpts.series" class="app-graph"  style="height: 350px;"
-        echarts #userChart [options]="historyUserOpts" 
-        (chartLegendSelectChanged)="selectUserLegent($event)" 
+      @if (historyUserOpts.series) {
+        <div class="app-graph"  style="height: 350px;"
+          echarts #userChart [options]="historyUserOpts"
+          (chartLegendSelectChanged)="selectUserLegent($event)"
         (chartInit)="onChartInit($event)"></div>
+      }
     </div>
   </div>
   <div class="app-graph-wrapper">
     <div>
-      <div *ngIf="historyStavOpts.series" class="app-graph" echarts [options]="historyStavOpts" style="height: 350px;" ></div>
+      @if (historyStavOpts.series) {
+        <div class="app-graph" echarts [options]="historyStavOpts" style="height: 350px;" ></div>
+      }
     </div>
   </div>
 </div>

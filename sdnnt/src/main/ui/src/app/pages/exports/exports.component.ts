@@ -10,7 +10,7 @@ import { SolrResponse } from 'src/app/shared/solr-response';
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { PaginatorComponent } from '../../components/paginator/paginator.component';
-import { NgIf, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
@@ -26,32 +26,31 @@ import { TranslateModule } from '@ngx-translate/core'; // autocomplete
     templateUrl: './exports.component.html',
     styleUrls: ['./exports.component.scss'],
     imports: [
-      FlexModule,
-      PaginatorComponent,
-      NgIf,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      FormsModule,
-      MatIconButton,
-      MatSuffix,
-      MatTooltip,
-      MatIcon,
-      MatTable,
-      MatColumnDef,
-      MatHeaderCellDef,
-      MatHeaderCell,
-      MatCellDef,
-      MatCell,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      MatHeaderRowDef,
-      MatHeaderRow,
-      MatRowDef,
-      MatRow,
-      DatePipe,
-      TranslateModule
-    ]
+    FlexModule,
+    PaginatorComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatIconButton,
+    MatSuffix,
+    MatTooltip,
+    MatIcon,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    DatePipe,
+    TranslateModule
+]
 })
 export class ExportsComponent implements OnInit {
   private route = inject(ActivatedRoute);

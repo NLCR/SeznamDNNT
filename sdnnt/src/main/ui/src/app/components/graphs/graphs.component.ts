@@ -1,4 +1,4 @@
-import { DatePipe, NgIf } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { ECharts, EChartsCoreOption } from 'echarts/core';
@@ -13,7 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-graphs',
     templateUrl: './graphs.component.html',
     styleUrls: ['./graphs.component.scss'],
-    imports: [FlexModule, NgIf, NgxEchartsDirective, MatFormField, MatLabel, MatSelect, MatOption, TranslateModule]
+    imports: [FlexModule, NgxEchartsDirective, MatFormField, MatLabel, MatSelect, MatOption, TranslateModule]
 })
 export class GraphsComponent implements OnInit {
   private datePipe = inject(DatePipe);

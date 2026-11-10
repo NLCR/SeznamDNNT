@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDia
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
-import { NgIf } from '@angular/common';
+
 import { MatProgressBar } from '@angular/material/progress-bar';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { FlexModule } from '@angular/flex-layout/flex';
@@ -22,24 +22,23 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './dialog-login.component.html',
     styleUrls: ['./dialog-login.component.scss'],
     imports: [
-      NgIf,
-      MatProgressBar,
-      MatDialogTitle,
-      CdkScrollable,
-      MatDialogContent,
-      FlexModule,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      FormsModule,
-      MatIcon,
-      MatSuffix,
-      MatCheckbox,
-      MatDialogActions,
-      MatButton,
-      MatDialogClose,
-      TranslateModule
-    ]
+    MatProgressBar,
+    MatDialogTitle,
+    CdkScrollable,
+    MatDialogContent,
+    FlexModule,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    FormsModule,
+    MatIcon,
+    MatSuffix,
+    MatCheckbox,
+    MatDialogActions,
+    MatButton,
+    MatDialogClose,
+    TranslateModule
+]
 })
 export class DialogLoginComponent implements AfterViewInit {
   dialogRef = inject<MatDialogRef<DialogLoginComponent>>(MatDialogRef);

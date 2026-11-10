@@ -11,7 +11,6 @@ import { AppService } from 'src/app/app.service';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { FacetsUsedComponent } from './facets-used/facets-used.component';
 import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
-import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { FlexModule } from '@angular/flex-layout/flex';
 import { MatIcon } from '@angular/material/icon';
@@ -27,32 +26,27 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './facets.component.html',
     styleUrls: ['./facets.component.scss'],
     imports: [
-      FacetsUsedComponent,
-      MatAccordion,
-      NgIf,
-      MatExpansionPanel,
-      MatExpansionPanelHeader,
-      MatExpansionPanelTitle,
-      MatRadioGroup,
-      FlexModule,
-      FormsModule,
-      MatRadioButton,
-      NgFor,
-      NgSwitch,
-      NgSwitchCase,
-      MatIcon,
-      MatTooltip,
-      NgSwitchDefault,
-      MatButton,
-      MatFormField,
-      MatLabel,
-      MatInput,
-      MatDatepickerInput,
-      MatDatepickerToggle,
-      MatSuffix,
-      MatDatepicker,
-      TranslateModule
-    ]
+    FacetsUsedComponent,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatRadioGroup,
+    FlexModule,
+    FormsModule,
+    MatRadioButton,
+    MatIcon,
+    MatTooltip,
+    MatButton,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatSuffix,
+    MatDatepicker,
+    TranslateModule
+]
 })
 export class FacetsComponent implements OnInit {
   private router = inject(Router);
@@ -220,7 +214,7 @@ export class FacetsComponent implements OnInit {
   }
 
   // get breakpoint
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onWindowResize() {
     this.getScreenWidth = window.innerWidth;
   }

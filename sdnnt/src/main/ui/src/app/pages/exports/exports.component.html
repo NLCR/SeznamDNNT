@@ -7,13 +7,17 @@
       <app-paginator [storeStateKey]="'exports'" [numFound]="numFound" [showSort]="false"></app-paginator>
     </div>
   </div>
-  <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline"  *ngIf="state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')">
-    <mat-label>{{ 'desc.vyhledavani_v_exportech' | translate }}</mat-label>
-    <input type="text" matInput (keyup)="onFilterExportsKeyUp($event.target)"[ngModel]="state.prefixsearch['export']">
-    <button *ngIf="state.prefixsearch['export']" matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExports()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
-      <mat-icon class="app-color-warning">close</mat-icon>
-    </button>
-  </mat-form-field>
+  @if (state.user && (state.user?.role === 'kurator' ||  state.user?.role === 'mainKurator')) {
+    <mat-form-field class="app-w-100 app-clean-top-gap" appearance="outline" >
+      <mat-label>{{ 'desc.vyhledavani_v_exportech' | translate }}</mat-label>
+      <input type="text" matInput (keyup)="onFilterExportsKeyUp($event.target)"[ngModel]="state.prefixsearch['export']">
+      @if (state.prefixsearch['export']) {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="cleanFilterExports()" [matTooltip]="'desc.odstranit_tento_filtr' | translate">
+          <mat-icon class="app-color-warning">close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+  }
 
   <div class="app-results-wrapper app-overflow-x-auto">
     <table mat-table [dataSource]="exports" class="mat-elevation-z0 app-table-responsive">
@@ -47,8 +51,12 @@
           <span class="app-fx-left mat-header-cell">{{ 'desc.stav' | translate }}</span>
           <span class="app-fx-right">
             <mat-icon class="material-icons-outlined" [class]="element.export_processed ? 'processed' : 'open'" [matTooltip]="'state.' + (element.export_processed ? 'processed' : 'waiting') | translate" matTooltip="above">
-              <ng-container *ngIf="!element.export_processed">lock_open</ng-container>
-              <ng-container *ngIf="element.export_processed">lock</ng-container>
+              @if (!element.export_processed) {
+                lock_open
+              }
+              @if (element.export_processed) {
+                lock
+              }
             </mat-icon>
           </span>
         </td>
@@ -70,12 +78,14 @@
             <mat-button-toggle-group>
               <mat-button-toggle (click)="showExport(element)" [matTooltip]="'desc.vysledek_exportu' | translate" matTooltipPosition="above">
                 <mat-icon class="material-icons-outlined">visibility</mat-icon>
-              </mat-button-toggle>    
-              <mat-button-toggle *ngIf="!element.export_processed" 
-              [disabled]="!element.all_exported_identifiers_flag"
-              (click)="approveANDProcess(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
-                <mat-icon class="material-icons-outlined">done</mat-icon>
-              </mat-button-toggle>    
+              </mat-button-toggle>
+              @if (!element.export_processed) {
+                <mat-button-toggle
+                  [disabled]="!element.all_exported_identifiers_flag"
+                  (click)="approveANDProcess(element)" [matTooltip]="'desc.oznacit_jako_zpracovane' | translate" matTooltipPosition="above">
+                  <mat-icon class="material-icons-outlined">done</mat-icon>
+                </mat-button-toggle>
+              }
             </mat-button-toggle-group>
           </span>
         </td>
@@ -96,17 +106,17 @@
           <mat-button-toggle-group>
             <mat-button-toggle (click)="showExport(element)" [matTooltip]="'desc.vysledek_exportu' | translate" matTooltipPosition="above">
               <mat-icon class="material-icons-outlined">visibility</mat-icon>
-            </mat-button-toggle>    
-          </mat-button-toggle-group> 
+            </mat-button-toggle>
+          </mat-button-toggle-group>
         </td>
       </ng-container>
-    -->
+      -->
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
-  
+
   <div class="app-mt-4">
     <app-paginator [storeStateKey]="'exports'" [numFound]="numFound" [showSort]="false"></app-paginator>
   </div>

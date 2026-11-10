@@ -5,7 +5,7 @@ import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgIf } from '@angular/common';
+
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatIcon } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
@@ -14,7 +14,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-export-item',
     templateUrl: './export-item.component.html',
     styleUrls: ['./export-item.component.scss'],
-    imports: [MatCard, MatCardHeader, FlexModule, NgIf, MatCardTitle, MatCardSubtitle, MatCardActions, MatTooltip, MatIcon, TranslateModule]
+    imports: [MatCard, MatCardHeader, FlexModule, MatCardTitle, MatCardSubtitle, MatCardActions, MatTooltip, MatIcon, TranslateModule]
 })
 export class ExportItemComponent {
   state = inject(AppState);

@@ -1,4 +1,4 @@
-import { DatePipe, NgIf, NgFor } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -36,24 +36,22 @@ import { TranslateModule } from '@ngx-translate/core';
     templateUrl: './result-item.component.html',
     styleUrls: ['./result-item.component.scss'],
     imports: [
-      MatCard,
-      MatCardHeader,
-      FlexModule,
-      NgIf,
-      MatCardTitle,
-      MatCardSubtitle,
-      MatCardActions,
-      MatTooltip,
-      MatIcon,
-      MatButtonToggleGroup,
-      MatButtonToggle,
-      ResultActionsExportComponent,
-      MatMenuTrigger,
-      MatMenu,
-      MatMenuItem,
-      NgFor,
-      TranslateModule
-    ]
+    MatCard,
+    MatCardHeader,
+    FlexModule,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardActions,
+    MatTooltip,
+    MatIcon,
+    MatButtonToggleGroup,
+    MatButtonToggle,
+    ResultActionsExportComponent,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    TranslateModule
+]
 })
 export class ResultItemComponent implements OnInit {
   private datePipe = inject(DatePipe);

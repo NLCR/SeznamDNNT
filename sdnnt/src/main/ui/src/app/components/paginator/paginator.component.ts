@@ -5,7 +5,7 @@ import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { Sort } from 'src/app/shared/configuration';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { FlexModule } from '@angular/flex-layout/flex';
-import { NgIf, NgFor } from '@angular/common';
+
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatSelect, MatSelectTrigger, MatOption } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
@@ -16,7 +16,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-paginator',
     templateUrl: './paginator.component.html',
     styleUrls: ['./paginator.component.scss'],
-    imports: [FlexModule, MatPaginator, NgIf, MatFormField, MatLabel, MatSelect, FormsModule, MatSelectTrigger, MatIcon, NgFor, MatOption, TranslateModule]
+    imports: [FlexModule, MatPaginator, MatFormField, MatLabel, MatSelect, FormsModule, MatSelectTrigger, MatIcon, MatOption, TranslateModule]
 })
 export class PaginatorComponent implements OnInit {
   private route = inject(ActivatedRoute);

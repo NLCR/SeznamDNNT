@@ -9,7 +9,7 @@ import { Zadost } from 'src/app/shared/zadost';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+
 import { MatButton } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -17,7 +17,7 @@ import { TranslateModule } from '@ngx-translate/core';
     selector: 'app-dialog-bulk-proposal',
     templateUrl: './dialog-bulk-proposal.component.html',
     styleUrls: ['./dialog-bulk-proposal.component.scss'],
-    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatRadioGroup, FormsModule, NgIf, MatRadioButton, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatRadioGroup, FormsModule, MatRadioButton, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class DialogBulkProposalComponent {
   dialogRef = inject<MatDialogRef<DialogBulkProposalComponent>>(MatDialogRef);
