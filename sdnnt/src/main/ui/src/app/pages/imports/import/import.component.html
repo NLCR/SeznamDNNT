@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="app-results-wrapper">
-        <mat-card>
+        <mat-card appearance="outlined">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
             <div fxFlex>
               <strong class="app-mr-2">{{ 'desc.vysledek_importu' | translate }}:</strong>
@@ -39,7 +39,7 @@
           </div>
         </mat-card>
         <ng-container *ngFor="let doc of docs">
-          <mat-card class="app-view-import">
+          <mat-card appearance="outlined" class="app-view-import">
             <mat-card-content>
               <div fxLayout="row" fxLayoutGap="32px">
                 <div fxFlex="calc(100% - 400px)">

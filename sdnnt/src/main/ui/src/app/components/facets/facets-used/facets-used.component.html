@@ -5,21 +5,23 @@
   </h3>
   <div class="app-list-content-wrapper">
     <mat-list-item *ngFor="let f of state.usedFilters">
-      <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="removeFilter(f)"><mat-icon>clear</mat-icon></a>
-      <div>
-        <span>{{ 'field.' + f.field | translate }}: </span>
-        <ng-container [ngSwitch]="f.field">
-          <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchCase="'sigla'">{{  f.value  }}</ng-container>
-          <ng-container *ngSwitchCase="'digital_libraries'">{{ 'sigla.' + f.value | translate }}</ng-container>
-          <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
-        </ng-container>
-      </div>
+      <span class="app-used-filter-content">
+        <a [matTooltip]="'desc.odstranit_tento_filtr' | translate" matTooltipPosition="above" (click)="removeFilter(f)"><mat-icon>clear</mat-icon></a>
+        <span class="app-used-filter-label">
+          <span>{{ 'field.' + f.field | translate }}: </span>
+          <ng-container [ngSwitch]="f.field">
+            <ng-container *ngSwitchCase="'license'">{{ 'license.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'dntstav'">{{ 'field.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'kuratorstav'">{{ 'field.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'controlled'">{{ 'controlled.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'fmt'">{{ 'fmt.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'language'">{{ 'language.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchCase="'sigla'">{{  f.value  }}</ng-container>
+            <ng-container *ngSwitchCase="'digital_libraries'">{{ 'sigla.' + f.value | translate }}</ng-container>
+            <ng-container *ngSwitchDefault>{{ f.value }}</ng-container>
+          </ng-container>
+        </span>
+      </span>
     </mat-list-item>
   </div>
 </mat-list>

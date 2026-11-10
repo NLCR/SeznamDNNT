@@ -1,5 +1,6 @@
 .login-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  align-items: center;
+  column-gap: 8px;
 }

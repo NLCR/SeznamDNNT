@@ -1,6 +1,6 @@
 FROM openshift/base-centos7
 
-MAINTAINER NKP <todo@nkp.cz>
+LABEL org.opencontainers.image.authors="NKP <todo@nkp.cz>"
 
 ## Maven version
 ENV MVN_MAJOR=3
@@ -13,7 +13,7 @@ ENV CATALINA_HOME /usr/local/tomcat
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8
 
 ## Node js versions
-ENV NODEJS=14.17.1
+ENV NODEJS=16.20.2
 
 
 

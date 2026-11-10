@@ -1,7 +1,7 @@
 <h1 mat-dialog-title>Existuje vice zaznamu ({{ data.numFound }}) pro toto vyjadreni <br/>
   {{ data.docs[0].marc_100a }} {{ data.docs[0].marc_245a }} {{ data.docs[0].marc_245d }} {{ data.docs[0].marc_245g }}</h1>
 <div mat-dialog-content>
-      <mat-card *ngFor="let doc of data.docs">
+      <mat-card appearance="outlined" *ngFor="let doc of data.docs">
       <span class="app-text-icon">
         <mat-icon class="app-mr-1">link</mat-icon><a [href]="doc.marc_998a" target="_blank">{{ doc.identifier }}</a>
       </span>

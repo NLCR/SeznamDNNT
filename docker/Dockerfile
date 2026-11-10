@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Match the tool versions in the original S2I builder.
-FROM node:14.17.1-buster AS node
+FROM node:16.20.2-buster AS node
 FROM maven:3.8.5-openjdk-11 AS build
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules

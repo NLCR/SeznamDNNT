@@ -10,7 +10,7 @@ app-admin {
 
 
 
-  .mat-list {
+  .mat-mdc-list {
     @extend .app-clean-pd;
     border: 1px solid $app-brand-border-color;
 
@@ -19,7 +19,7 @@ app-admin {
       overflow-y: auto;
     }
 
-    .mat-list-item {
+    .mat-mdc-list-item {
       @extend .app-cursor-pointer;
       height: 36px;
 
@@ -38,24 +38,23 @@ app-admin {
     }
   }
 
-  .mat-tab-group {
+  .mat-mdc-tab-group {
     &.app-role {
-      .mat-tab-header {
+      .mat-mdc-tab-header {
         @extend .app-clean-border;
-
-        .mat-tab-label {
-          &.mat-tab-label-active {
+        .mdc-tab {
+          &.mdc-tab--active {
             background-color: $app-gray-2;
           }
         }
 
-        .mat-ink-bar {
+        .mdc-tab-indicator {
           @extend .app-dn;
         }
       }
     }
 
-    .mat-tab-body {
+    .mat-mdc-tab-body {
       padding: $app-gap-double 0;
     }
   }

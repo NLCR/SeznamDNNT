@@ -63,39 +63,39 @@ app-search {
     .app-toolbar {
       app-paginator,
       app-paginator > div,
-      .mat-paginator,
-      .mat-paginator-outer-container,
-      .mat-paginator-container {
+      .mat-mdc-paginator,
+      .mat-mdc-paginator-outer-container,
+      .mat-mdc-paginator-container {
         display: contents !important;
       }
 
-      .mat-paginator-page-size {
+      .mat-mdc-paginator-page-size {
         grid-column: 1;
         grid-row: 2;
         margin: 0;
         min-width: 0;
       }
 
-      .mat-paginator-page-size-label {
+      .mat-mdc-paginator-page-size-label {
         white-space: normal;
       }
 
-      .mat-paginator-range-actions {
+      .mat-mdc-paginator-range-actions {
         grid-column: 1 / -1;
         grid-row: 1;
         justify-self: end;
         white-space: nowrap;
       }
 
-      .mat-paginator-range-label {
+      .mat-mdc-paginator-range-label {
         margin: 0 4px 0 0;
         font-size: 12px;
       }
 
-      .mat-paginator-navigation-first,
-      .mat-paginator-navigation-previous,
-      .mat-paginator-navigation-next,
-      .mat-paginator-navigation-last {
+      .mat-mdc-paginator-navigation-first,
+      .mat-mdc-paginator-navigation-previous,
+      .mat-mdc-paginator-navigation-next,
+      .mat-mdc-paginator-navigation-last {
         width: 28px;
       }
 
@@ -104,7 +104,7 @@ app-search {
         grid-column: 2;
         grid-row: 2;
         width: 100%;
-        max-width: 140px;
+        max-width: 220px;
         justify-self: end;
       }
     }
@@ -130,17 +130,17 @@ app-search {
             .app-facet-date-wrapper {
               flex-direction: column !important;
 
-              .mat-form-field,
-              .mat-button-base {
+              .mat-mdc-form-field,
+              .mat-mdc-button-base {
                 margin-right: 0 !important;
                 flex: 1 1 100%;
               }
 
-              .mat-form-field {
+              .mat-mdc-form-field {
                 margin-bottom: 16px;
               }
 
-              .mat-button-base {
+              .mat-mdc-button-base {
                 width: 100% !important;
                 max-width: 100% !important;
               }
@@ -150,16 +150,15 @@ app-search {
       }
 
       app-facets-used {
-        .mat-list {
-          .mat-subheader {
+        .mat-mdc-list {
+          .mat-mdc-subheader {
             padding-left: 0 !important;
             padding-right: 16px !important;
           }
 
           .app-list-content-wrapper {
             padding-left: 0 !important;
-            
-            .mat-list-item-content {
+            .mdc-list-item__content {
               padding-left: 0 !important;
             }
           }
@@ -175,11 +174,11 @@ app-search {
       }
     }
 
-    .mat-paginator {
+    .mat-mdc-paginator {
       flex: 1 1 100% !important;
       margin-left: -12px;
 
-      .mat-paginator-container {
+      .mat-mdc-paginator-container {
         justify-content: flex-start;
       }
     }
@@ -190,14 +189,12 @@ app-search {
     &.app-role-knihovna,
     &.app-role-admin {
       @media only screen and (max-width: 660px) {
-        .mat-card-actions {
+        .mat-mdc-card-actions {
           display: block !important;
-
           .mat-button-toggle-group {
             margin-top: 16px;
             flex-direction: column;
             width: 100%;
-
             .mat-button-toggle + .mat-button-toggle {
               border-top: 1px solid $app-gray-3;
               border-left: 0 !important;
@@ -222,11 +219,11 @@ app-zadost {
       }
     }
     
-    .mat-paginator {
+    .mat-mdc-paginator {
       flex: 1 1 100% !important;
       margin-left: -12px;
 
-      .mat-paginator-container {
+      .mat-mdc-paginator-container {
         justify-content: flex-start;
       }
     }
@@ -263,11 +260,11 @@ app-account {
       }
     }
     
-    .mat-paginator {
+    .mat-mdc-paginator {
       flex: 1 1 100% !important;
       margin-left: -12px;
 
-      .mat-paginator-container {
+      .mat-mdc-paginator-container {
         justify-content: flex-start;
       }
     }
@@ -282,11 +279,11 @@ app-imports {
       }
     }
     
-    .mat-paginator {
+    .mat-mdc-paginator {
       flex: 1 1 100% !important;
       margin-left: -12px;
 
-      .mat-paginator-container {
+      .mat-mdc-paginator-container {
         justify-content: flex-start;
       }
     }
@@ -323,11 +320,11 @@ app-import {
       }
     }
     
-    .mat-paginator {
+    .mat-mdc-paginator {
       flex: 1 1 100% !important;
       margin-left: -12px;
 
-      .mat-paginator-container {
+      .mat-mdc-paginator-container {
         justify-content: flex-start;
       }
     }
@@ -368,7 +365,7 @@ app-footer {
 .app-table-responsive {
   @media only screen and (min-width: 780px) {
     tbody {
-      .mat-cell {
+      .mat-mdc-cell {
         .app-fx-left {
           display: none;
         }
@@ -386,12 +383,12 @@ app-footer {
     tbody {
       display: block !important;
       
-      .mat-row {
+      .mat-mdc-row {
         display: flex;
         flex-direction: column;
       }
   
-      .mat-cell {
+      .mat-mdc-cell {
         flex: 1 1 100%;
         padding: 0 5px 0 5px !important;
         min-height: 31px;

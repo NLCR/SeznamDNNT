@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { AppState } from 'src/app/app.state';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
@@ -11,7 +11,9 @@ import { Router } from '@angular/router';
   templateUrl: './dialog-login.component.html',
   styleUrls: ['./dialog-login.component.scss']
 })
-export class DialogLoginComponent implements OnInit {
+export class DialogLoginComponent implements OnInit, AfterViewInit {
+
+  @ViewChild('loginUserInput') loginUserInput: ElementRef<HTMLInputElement>;
 
   user: string;
   pwd: string;
@@ -34,6 +36,12 @@ export class DialogLoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.dialogRef.afterOpened().subscribe(() => {
+      this.loginUserInput?.nativeElement.focus({preventScroll: true});
+    });
   }
 
   login() {

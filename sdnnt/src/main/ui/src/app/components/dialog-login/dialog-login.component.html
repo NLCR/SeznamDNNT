@@ -5,7 +5,7 @@
     <div fxLayout="row wrap">
       <mat-form-field fxFlex="100%" appearance="outline">
         <mat-label>{{ 'desc.prihlasovaci_jmeno' | translate }}</mat-label>
-        <input matInput [placeholder]="'desc.prihlasovaci_jmeno' | translate" cdkFocusInitial type="text" [(ngModel)]="user" (keyup.enter)="focusp($event, loginpwd)" autocomplete="on" id="loginuser">
+        <input matInput [placeholder]="'desc.prihlasovaci_jmeno' | translate" #loginUserInput type="text" [(ngModel)]="user" (keyup.enter)="focusp($event, loginpwd)" autocomplete="on" id="loginuser">
       </mat-form-field>
       <mat-form-field fxFlex="100%" appearance="outline">
         <mat-label>{{ 'desc.heslo' | translate }}</mat-label>
@@ -33,5 +33,5 @@
   <ng-container *ngIf="state.logged">
     <button mat-button (click)="logout()">{{ 'desc.odhlasit' | translate }}</button>
   </ng-container>
-  <button mat-button [mat-dialog-close]="false" cdkFocusInitial>{{ 'desc.zavrit' | translate }}</button>
+  <button mat-button [mat-dialog-close]="false">{{ 'desc.zavrit' | translate }}</button>
 </div>

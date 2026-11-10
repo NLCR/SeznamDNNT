@@ -2,8 +2,8 @@
 
 app-facets-used,
 .app-facets-used {
-  .mat-list {
-    .mat-subheader {
+  .mat-mdc-list {
+    .mat-mdc-subheader {
       border-bottom: 1px solid $app-brand-border-color;
       font-size: 15px;
       color: initial;
@@ -21,14 +21,17 @@ app-facets-used,
     .app-list-content-wrapper {
       padding: $app-gap $app-gap-half;
   
-      .mat-list-item {
+      .mat-mdc-list-item {
         height: auto;
-        font-size: 14px;
-  
-        .mat-list-item-content {
+        .app-used-filter-content {
+          display: flex;
           align-items: flex-start;
-          
+          font-size: 14px;
+          line-height: 20px;
+          white-space: normal;
+
           a {
+            flex: none;
             margin-right: $app-gap-icon;
             @extend .app-color-warning;
 
@@ -37,8 +40,10 @@ app-facets-used,
             }
           }
 
-          div {
-            span {
+          .app-used-filter-label {
+            min-width: 0;
+
+            > span {
               color: $app-gray-6;
             }
           }

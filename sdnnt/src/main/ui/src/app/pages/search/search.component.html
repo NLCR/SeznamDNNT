@@ -22,7 +22,7 @@
       </div>
       
       <div class="app-results-wrapper" [ngClass]="state.logged ? 'app-role-' + state.user.role : null">
-        <mat-card *ngIf="this.state.user">
+        <mat-card appearance="outlined" *ngIf="this.state.user">
           <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
 
             <div fxFlex>

@@ -2,7 +2,7 @@
   <div fxLayout="row wrap" class="app-mb-8" class="app-cards-wrapper">
     <ng-container *ngFor="let card of config.homeCards">
       <div *ngIf="card['visible']" class="app-card-wrapper">
-        <mat-card [class]="'app-card-home ' + card['field']" routerLink="/search" [queryParams]="card['type'] === 'stav' ? {dntstav: card['field']} : {license: card['field']}">
+        <mat-card appearance="outlined" [class]="'app-card-home ' + card['field']" routerLink="/search" [queryParams]="card['type'] === 'stav' ? {dntstav: card['field']} : {license: card['field']}">
           <mat-card-header>
             <div mat-card-avatar [ngSwitch]="card['type']">
               <ng-container *ngSwitchCase="'licence'">

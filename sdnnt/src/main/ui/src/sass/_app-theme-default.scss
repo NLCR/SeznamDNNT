@@ -1,5 +1,19 @@
 // --- DEFAULT THEME ---
 @use '@angular/material' as mat;
+@use 'sass:map';
+@use 'sass:meta';
+
+// Keep Material's font sizes and weights, but use the app's original character spacing.
+$app-typography: ();
+@each $level, $settings in mat.define-typography-config() {
+  @if meta.type-of($settings) == 'map' {
+    $app-typography: map.set($app-typography, $level, map.set($settings, letter-spacing, normal));
+  } @else {
+    $app-typography: map.set($app-typography, $level, $settings);
+  }
+}
+
+@include mat.all-component-typographies($app-typography);
 @include mat.core();
 
 $app-brand: "blue";
@@ -32,7 +46,10 @@ $nkp: (
 $app-primary: mat.define-palette($nkp, 50);
 $app-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $app-warn: mat.define-palette(mat.$red-palette);
-$app-theme:  mat.define-light-theme($app-primary, $app-accent, $app-warn);
+$app-theme: mat.define-light-theme((
+  color: (primary: $app-primary, accent: $app-accent, warn: $app-warn),
+  density: 0
+));
 
 @include mat.all-component-themes($app-theme);
 

@@ -47,7 +47,7 @@ html {
       @include setIcon($position: sub);
     }
 
-    .mat-flat-button {
+    .mat-mdc-unelevated-button {
       font-size: 16px; 
       background-color: $app-color-fav;
     }

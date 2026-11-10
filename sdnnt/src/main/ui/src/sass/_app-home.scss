@@ -19,10 +19,15 @@ app-home {
         flex-direction: column;
         height: calc(100% - 32px);
   
-        .mat-card-header {
+        .mat-mdc-card-header {
           flex-grow: 1;
+
+          .mat-mdc-card-title,
+          .mat-mdc-card-avatar {
+            color: $app-color-lightnes;
+          }
   
-          .mat-card-avatar {
+          .mat-mdc-card-avatar {
             background-color: rgba($app-color-lightnes, .2);
             display: flex;
             align-items: center;
@@ -31,12 +36,17 @@ app-home {
             font-size: 18px;
           }
   
-          .mat-card-subtitle {
+          .mat-mdc-card-subtitle {
             color: rgba($app-color-lightnes, .7);
           }
         }
   
-        .mat-card-actions {
+        .mat-mdc-card-actions {
+          .mat-mdc-button {
+            color: $app-color-lightnes;
+            --mdc-text-button-label-text-color: #{$app-color-lightnes};
+          }
+
           strong {
             font-size: 16px;
           }
@@ -45,13 +55,12 @@ app-home {
     }
   }
 
-  .mat-tab-group {
-    .mat-tab-body-wrapper {
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-body-wrapper {
 
-      .mat-tab-body {
+      .mat-mdc-tab-body {
         padding: $app-gap-double 0;
-
-        .mat-tab-body-content {
+        .mat-mdc-tab-body-content {
           overflow: unset;
         }
       } 

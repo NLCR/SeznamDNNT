@@ -1,17 +1,14 @@
 // --- MATERIAL OVERRIDE ---
 
 // checkbox
-.mat-checkbox {
-
-  .mat-checkbox-inner-container {
+.mat-mdc-checkbox {
+  .mdc-checkbox {
     @extend .app-mt-1;
  }
-  
-  .mat-checkbox-frame {
+  .mdc-checkbox__background {
     border-color: $app-gray-4;
   }
-
-  .mat-checkbox-layout {
+  .mdc-form-field {
     white-space: normal;
   }
 }
@@ -19,9 +16,7 @@
 // button toggle
 .mat-button-toggle-appearance-standard {
   @extend .app-clean-bg;
-
   .mat-button-toggle-button {
-
     .mat-button-toggle-label-content {
       height: 32px;
       display: flex;
@@ -55,7 +50,7 @@
 }
 
 // card
-.mat-card {
+.mat-mdc-card {
   &:not(.app-card-home) {
     @extend .app-clean-bg, .app-clean-shadow, .app-clean-radius;
     border-bottom: 1px solid $app-brand-border-color;
@@ -70,30 +65,29 @@
         @include setIcon($position: sub)
       }
     }
-    
-    .mat-card-header-text {
+    .mat-mdc-card-header-text {
       @extend .app-clean-mg;
 
-      .mat-card-title {
+      .mat-mdc-card-title {
         font-size: 16px;
         display: flex;
         align-items: flex-start;
 
-        .mat-checkbox {
+        .mat-mdc-checkbox {
           display: flex;
         }
       }
     }
 
-    .mat-card-content {
+    .mat-mdc-card-content {
       @extend .app-clean-mg;
     }
 
-    .mat-card-actions {
+    .mat-mdc-card-actions {
       padding: 8px;
       margin-bottom: 0 !important;
 
-      .mat-button-base {
+      .mat-mdc-button-base {
         margin: 0 0 0 $app-gap-half;
       }
     }
@@ -111,13 +105,13 @@
 }
 
 // table
-.mat-table {
+.mat-mdc-table {
   @extend .app-w-100;
 
   tr {
     @include setStateColor(bglight);
     
-    &.mat-row {
+    &.mat-mdc-row {
       height: auto;
     }
   }
@@ -138,11 +132,9 @@
       &.mat-column-actions {
         @extend .app-p-0;
         height:100%;
-
         .mat-button-toggle-group {
           @extend .app-clean-radius;
           border-width: 0 0 0 1px;
-
           .mat-button-toggle-button {
             .mat-button-toggle-label-content {
               line-height: 38px;
@@ -177,25 +169,11 @@
 }
 
 // radio group
-.mat-radio-group {
-  .mat-radio-button {
+.mat-mdc-radio-group {
+  .mat-mdc-radio-button {
     &:not(:last-child) {
       @extend .app-mr-4;
     }
-
-    .mat-radio-container, 
-    .mat-radio-outer-circle,
-    .mat-radio-inner-circle {
-      width: $app-mat-radio-button-size;
-      height: $app-mat-radio-button-size;
-    }
-
-    /* .mat-radio-ripple {
-        width: 32px;
-        height: 32px;
-        left: calc(50% - 16px); 
-        top: calc(50% - 16px);  
-      } */
   }
 
   &.app-radio-group-vertical {
@@ -207,7 +185,7 @@
 }
 
 // tooltip
-.mat-tooltip  {
+.mat-mdc-tooltip  {
   //white-space: pre-line !important;
   font-size: 14px !important;
   width: auto !important;
@@ -225,51 +203,32 @@
 }
 
 // mat form field
-.mat-form-field {
-  &.app-clean-bottom-gap {
-    .mat-form-field-wrapper {
-      margin-bottom: -1.34375em;
-    }
-  }
-  
-  &.mat-form-field-appearance-fill {
-    &.app-clean-bottom-gap {
-      .mat-form-field-wrapper {
-        margin-bottom: -1.34375em;
-      }
-    }
-  }
-
+.mat-mdc-form-field {
   &.mat-form-field-appearance-outline {
-    .mat-form-field-wrapper {
-      margin-bottom: -0.34375em;
+    margin-bottom: -0.34375em;
 
-      .mat-form-field-suffix {
-        top: .15em;
-        
-        .mat-flat-button {
-          @extend .app-p-0, .app-pr-2, .app-pl-1;
+    .mat-mdc-form-field-icon-suffix,
+    .mat-mdc-form-field-text-suffix {
+      top: .15em;
 
-          .mat-button-wrapper {
-            display: flex;
-            align-items: center;
-            line-height: 0;
-          }
+      .mat-mdc-unelevated-button {
+        @extend .app-p-0, .app-pr-2, .app-pl-1;
+
+        .mdc-button__label {
+          display: flex;
+          align-items: center;
+          line-height: 0;
         }
       }
     }
-    
-    &.app-clean-bottom-gap {
-      .mat-form-field-wrapper {
-        margin-bottom: -1.34375em;
-      }
-    }
+  }
 
-    &.app-clean-top-gap {
-      .mat-form-field-wrapper {
-        @extend .app-mt-0;
-      }
-    }    
+  &.app-clean-bottom-gap {
+    margin-bottom: -1.34375em;
+  }
+
+  &.app-clean-top-gap {
+    @extend .app-mt-0;
   }
 
   &.mat-form-field-invalid {
@@ -295,9 +254,9 @@
 }
 
 // mat menu
-.mat-menu-panel {
-  .mat-menu-content {
-    .mat-menu-item {
+.mat-mdc-menu-panel {
+  .mat-mdc-menu-content {
+    .mat-mdc-menu-item {
       &[disabled] {
         .mat-icon {
           @include setIcon($color: $app-gray-4);

@@ -1,8 +1,8 @@
 // --- DIALOG ---
 
 // general dialog
-.mat-dialog-container {
-  .mat-dialog-title {
+.mat-mdc-dialog-container {
+  .mat-mdc-dialog-title {
     font-size: 18px;
     font-weight: 600;
     line-height: unset;
@@ -14,8 +14,8 @@
     }
   }
 
-  .mat-dialog-actions {
-    .mat-button-base {
+  .mat-mdc-dialog-actions {
+    .mat-mdc-button-base {
       @extend .app-ml-0, .app-mr-2, .app-mb-2;
     }
   }
@@ -23,11 +23,35 @@
 
 // login dialog
 .app-dialog-login {
-  .mat-dialog-container {
+  .mat-mdc-dialog-container {
     position: relative;
 
-    .mat-progress-bar {
+    .mat-mdc-progress-bar {
       @extend .app-pa;
+    }
+  }
+
+  app-dialog-login .mat-mdc-dialog-content {
+    max-height: none;
+    overflow: visible;
+    padding-top: 8px;
+  }
+
+  .mat-dialog-content--scrollbar-fix:after {
+    height: 0;
+  }
+
+  .mat-mdc-dialog-actions {
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 8px 16px;
+
+    .mat-mdc-button-base {
+      min-width: 0;
+      margin: 0 !important;
+      padding: 0 8px;
+      font-size: 13px;
+      white-space: nowrap;
     }
   }
 }
@@ -37,7 +61,7 @@
   .app-col-stav {
     width: 55px !important;
     
-    .mat-select {
+    .mat-mdc-select {
       @extend .app-w-100;
     }
   }
@@ -49,8 +73,8 @@
 
 // reset password dialog
 .app-reset-password-dialog {
-  .mat-dialog-content {
-    .mat-card {
+  .mat-mdc-dialog-content {
+    .mat-mdc-card {
       @extend .app-mb-4, .app-clean-border;
       background-color: $app-gray-1 !important;
     }
@@ -59,7 +83,7 @@
 
 // bulk notifications dialog
 .app-dialog-bulk-notifications {
-  .mat-dialog-content {
+  .mat-mdc-dialog-content {
     ul {
       li {
         font-size: 14px;
@@ -74,7 +98,7 @@
 
 // notifications settings dialog
 .app-dialog-notifications-settings {
-  .mat-dialog-content {
+  .mat-mdc-dialog-content {
     .app-table {
       th {
         $app-th-width: 130px;

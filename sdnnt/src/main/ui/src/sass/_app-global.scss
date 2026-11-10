@@ -313,7 +313,7 @@ table {
       margin-right: 2px;
       @include setIcon(16);
 
-      .mat-card & {
+      .mat-mdc-card & {
         @include setIcon(16);
       }
     }
