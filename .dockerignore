@@ -5,4 +5,7 @@
 .vscode
 .idea
 docker/data
+solr
+.m2repo
+installation
 # The Git metadata is intentionally included for git-commit-id-plugin.
