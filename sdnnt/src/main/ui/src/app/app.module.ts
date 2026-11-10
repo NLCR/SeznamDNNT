@@ -16,7 +16,7 @@ import { ResultItemComponent } from './components/result-item/result-item.compon
 import { FacetsComponent } from './components/facets/facets.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppConfiguration } from './app-configuration';
 import { AppService } from './app.service';
@@ -97,14 +97,15 @@ export function createCustomMatPaginatorIntl(
 
 const providers: any[] =[
   { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
-  AppState, AppConfiguration, HttpClient,
+  AppState, AppConfiguration,
   { provide: APP_INITIALIZER, useFactory: (config: AppConfiguration) => () => config.load(), deps: [AppConfiguration], multi: true },
   TranslateService,
   {
     provide: MatPaginatorIntl, deps: [TranslateService],
     useFactory: createCustomMatPaginatorIntl
   },
-  DatePipe, DecimalPipe, AppService
+  DatePipe, DecimalPipe, AppService,
+  provideHttpClient(withInterceptorsFromDi())
 ];
 
 @NgModule({
@@ -164,7 +165,6 @@ const providers: any[] =[
   ],
   imports: [
     BrowserModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     CommonModule,
