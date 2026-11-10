@@ -1,22 +1,24 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { NgIf, NgFor } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-granularity',
-  templateUrl: './granularity.component.html',
-  styleUrls: ['./granularity.component.scss']
+    selector: 'app-granularity',
+    templateUrl: './granularity.component.html',
+    styleUrls: ['./granularity.component.scss'],
+    imports: [MatDialogTitle, NgIf, FormsModule, CdkScrollable, MatDialogContent, NgFor, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
-export class GranularityComponent implements OnInit {
+export class GranularityComponent {
+  dialogRef = inject<MatDialogRef<GranularityComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+
   selection: any[] = [];
   isWhole: true;
 
-  constructor(
-    public dialogRef: MatDialogRef<GranularityComponent>,
-    @Inject(MAT_DIALOG_DATA) public data) { }
-
-  ngOnInit(): void {
-  }
 
   setWhole(e) {
   }

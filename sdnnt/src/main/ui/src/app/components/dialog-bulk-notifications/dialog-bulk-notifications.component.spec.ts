@@ -8,8 +8,8 @@ describe('DialogBulkNotificationsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogBulkNotificationsComponent ]
-    })
+    imports: [DialogBulkNotificationsComponent]
+})
     .compileComponents();
   });
 

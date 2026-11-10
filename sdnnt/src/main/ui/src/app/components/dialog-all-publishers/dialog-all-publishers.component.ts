@@ -1,19 +1,33 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AppService } from 'src/app/app.service';
 import { SolrResponse } from 'src/app/shared/solr-response';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppState } from 'src/app/app.state';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFormField } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-all-publishers',
-  templateUrl: './dialog-all-publishers.component.html',
-  styleUrls: ['./dialog-all-publishers.component.scss']
+    selector: 'app-dialog-all-publishers',
+    templateUrl: './dialog-all-publishers.component.html',
+    styleUrls: ['./dialog-all-publishers.component.scss'],
+    imports: [MatDialogTitle, NgIf, MatFormField, MatInput, CdkScrollable, MatDialogContent, NgFor, MatCheckbox, MatTooltip, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class DialogAllPublishersComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DialogAllPublishersComponent>>(MatDialogRef);
+  data = inject<{
+    queryParams: HttpParams;
+}>(MAT_DIALOG_DATA);
+  private service = inject(AppService);
+
 
   private subject: Subject<string> = new Subject();
 
@@ -25,12 +39,6 @@ export class DialogAllPublishersComponent implements OnInit {
   selectedFacets: any[] = [];
 
   searchTerm: string;
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogAllPublishersComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { queryParams: HttpParams },
-    private service: AppService
-    ) { }
 
 
   ngOnInit(): void {

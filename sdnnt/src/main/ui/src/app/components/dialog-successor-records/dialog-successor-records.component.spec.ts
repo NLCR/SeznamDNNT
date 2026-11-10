@@ -8,8 +8,8 @@ describe('DialogSuccessorRecordsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogSuccessorRecordsComponent ]
-    })
+    imports: [DialogSuccessorRecordsComponent]
+})
     .compileComponents();
   });
 

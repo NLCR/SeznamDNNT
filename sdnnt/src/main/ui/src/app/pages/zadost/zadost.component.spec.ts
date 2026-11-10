@@ -8,8 +8,8 @@ describe('ZadostComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ZadostComponent ]
-    })
+    imports: [ZadostComponent]
+})
     .compileComponents();
   });
 

@@ -1,18 +1,53 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel, MatSuffix, MatHint, MatError } from '@angular/material/form-field';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatInput } from '@angular/material/input';
+import { NgIf, NgFor } from '@angular/common';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-change-password',
-  templateUrl: './dialog-change-password.component.html',
-  styleUrls: ['./dialog-change-password.component.scss']
+    selector: 'app-dialog-change-password',
+    templateUrl: './dialog-change-password.component.html',
+    styleUrls: ['./dialog-change-password.component.scss'],
+    imports: [
+      MatDialogTitle,
+      CdkScrollable,
+      MatDialogContent,
+      MatFormField,
+      MatLabel,
+      MatIconButton,
+      MatSuffix,
+      MatIcon,
+      MatInput,
+      FormsModule,
+      ReactiveFormsModule,
+      MatHint,
+      NgIf,
+      MatError,
+      MatProgressBar,
+      NgFor,
+      MatDialogActions,
+      MatButton,
+      MatDialogClose,
+      TranslateModule
+    ]
 })
 export class DialogChangePasswordComponent {
+  dialogRef = inject<MatDialogRef<DialogChangePasswordComponent>>(MatDialogRef);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  data = inject(MAT_DIALOG_DATA);
+
 
   readonly maxPasswordLength = 30;
   readonly passwordCriteria = [
@@ -43,12 +78,9 @@ export class DialogChangePasswordComponent {
     return this.strength < 21 ? 'warn' : this.strength < 81 ? 'accent' : 'primary';
   }
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogChangePasswordComponent>,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    @Inject(MAT_DIALOG_DATA) public data: any) {
+  constructor() {
+      const data = this.data;
+
       if (data.token) {
         this.token = data.token;
       }

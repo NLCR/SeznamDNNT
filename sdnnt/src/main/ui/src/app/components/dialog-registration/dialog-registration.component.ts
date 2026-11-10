@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
@@ -8,27 +8,29 @@ import { DialogRegistrationFormComponent } from '../dialog-registration-form/dia
 import { UserRegisterOption } from 'src/app/shared/user-register-option';
 import { UserValidators } from 'src/app/shared/uservalidators';
 import { error } from 'protractor';
+import { NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-registration',
-  templateUrl: './dialog-registration.component.html',
-  styleUrls: ['./dialog-registration.component.scss']
+    selector: 'app-dialog-registration',
+    templateUrl: './dialog-registration.component.html',
+    styleUrls: ['./dialog-registration.component.scss'],
+    imports: [MatDialogTitle, NgSwitch, NgSwitchCase, NgSwitchDefault, CdkScrollable, MatDialogContent, DialogRegistrationFormComponent, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
 export class DialogRegistrationComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DialogRegistrationComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+  state = inject(AppState);
+  private service = inject(AppService);
+  private router = inject(Router);
+
 
   user: User;
   focus: string;
   scroll: string;
-
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogRegistrationComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public state: AppState,
-    private service: AppService,
-    private router: Router) { }
 
   ngOnInit(): void {
     if (this.data.isRegister) {

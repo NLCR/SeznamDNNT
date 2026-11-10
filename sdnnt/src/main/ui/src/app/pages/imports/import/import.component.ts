@@ -1,8 +1,8 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
@@ -15,14 +15,55 @@ import { GranularityComponent } from 'src/app/components/granularity/granularity
 import { Import } from 'src/app/shared/import';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgIf, NgFor, NgClass, DatePipe } from '@angular/common';
+import { FacetsComponent } from '../../../components/facets/facets.component';
+import { PaginatorComponent } from '../../../components/paginator/paginator.component';
+import { MatCard, MatCardContent, MatCardActions } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ExtendedModule } from '@angular/flex-layout/extended';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-import',
-  templateUrl: './import.component.html',
-  styleUrls: ['./import.component.scss']
+    selector: 'app-import',
+    templateUrl: './import.component.html',
+    styleUrls: ['./import.component.scss'],
+    imports: [
+      RouterLink,
+      FlexModule,
+      NgIf,
+      FacetsComponent,
+      PaginatorComponent,
+      MatCard,
+      MatIcon,
+      MatTooltip,
+      NgFor,
+      MatCardContent,
+      NgClass,
+      ExtendedModule,
+      MatCardActions,
+      MatButtonToggleGroup,
+      MatButtonToggle,
+      MatMenuTrigger,
+      MatMenu,
+      MatMenuItem,
+      DatePipe,
+      TranslateModule
+    ]
 })
 export class ImportComponent implements OnInit, OnDestroy {
+  dialog = inject(MatDialog);
+  private sanitizer = inject(DomSanitizer);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private appState = inject(AppState);
+  private config = inject(AppConfiguration);
+  private service = inject(AppService);
+  state = inject(AppState);
+
 
   subs: Subscription[] = [];
   numFound: number;
@@ -45,16 +86,6 @@ export class ImportComponent implements OnInit, OnDestroy {
   eanAlephLink = '';
 
   import: Import;
-
-  constructor(
-    public dialog: MatDialog,
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute,
-    private router: Router,
-    private appState: AppState,
-    private config: AppConfiguration,
-    private service: AppService,
-    public state: AppState) { }
 
   ngOnInit(): void {
     if (!this.state.user) {

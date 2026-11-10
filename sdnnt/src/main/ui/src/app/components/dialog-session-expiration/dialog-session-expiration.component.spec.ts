@@ -8,8 +8,8 @@ describe('DialogSessionExpirationComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogSessionExpirationComponent ]
-    })
+    imports: [DialogSessionExpirationComponent]
+})
     .compileComponents();
   });
 

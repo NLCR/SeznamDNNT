@@ -1,5 +1,5 @@
-import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DatePipe, NgIf, NgFor } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
@@ -21,15 +21,47 @@ import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { DialogSuccessorRecordsComponent } from '../dialog-successor-records/dialog-successor-records.component';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Export } from 'src/app/shared/exports';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ResultActionsExportComponent } from './result-actions-export/result-actions-export.component';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-result-item',
-  templateUrl: './result-item.component.html',
-  styleUrls: ['./result-item.component.scss']
+    selector: 'app-result-item',
+    templateUrl: './result-item.component.html',
+    styleUrls: ['./result-item.component.scss'],
+    imports: [
+      MatCard,
+      MatCardHeader,
+      FlexModule,
+      NgIf,
+      MatCardTitle,
+      MatCardSubtitle,
+      MatCardActions,
+      MatTooltip,
+      MatIcon,
+      MatButtonToggleGroup,
+      MatButtonToggle,
+      ResultActionsExportComponent,
+      MatMenuTrigger,
+      MatMenu,
+      MatMenuItem,
+      NgFor,
+      TranslateModule
+    ]
 })
 export class ResultItemComponent implements OnInit {
+  private datePipe = inject(DatePipe);
+  dialog = inject(MatDialog);
+  config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+
 
   //@Input() inZadost: boolean;
 
@@ -61,15 +93,6 @@ export class ResultItemComponent implements OnInit {
 
 
   dkLinks: string[] = [];
-
-
-  constructor(
-    private datePipe: DatePipe,
-    public dialog: MatDialog,
-    public config: AppConfiguration,
-    public state: AppState,
-    private service: AppService
-  ) { }
 
   ngOnInit(): void {
 

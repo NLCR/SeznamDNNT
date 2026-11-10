@@ -1,27 +1,29 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { Zadost } from 'src/app/shared/zadost';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-send-request',
-  templateUrl: './dialog-send-request.component.html',
-  styleUrls: ['./dialog-send-request.component.scss']
+    selector: 'app-dialog-send-request',
+    templateUrl: './dialog-send-request.component.html',
+    styleUrls: ['./dialog-send-request.component.scss'],
+    imports: [MatDialogTitle, MatFormField, MatLabel, MatInput, FormsModule, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
-export class DialogSendRequestComponent implements OnInit {
+export class DialogSendRequestComponent {
+  dialogRef = inject<MatDialogRef<DialogSendRequestComponent>>(MatDialogRef);
+  data = inject<Zadost>(MAT_DIALOG_DATA);
+  private service = inject(AppService);
+
 
   newState: string;
   poznamka: string;
   pozadavek: string;
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogSendRequestComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Zadost,
-    private service: AppService) { }
-
-  ngOnInit(): void {
-  }
 
   send() {
 

@@ -1,16 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  standalone: false,
   selector: 'app-used-filters',
   templateUrl: './used-filters.component.html',
   styleUrls: ['./used-filters.component.scss']
 })
-export class UsedFiltersComponent implements OnInit {
+export class UsedFiltersComponent {
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
 
 }

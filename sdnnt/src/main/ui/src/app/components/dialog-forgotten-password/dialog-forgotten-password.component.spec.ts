@@ -8,8 +8,8 @@ describe('InputLoginNameDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogForgottenPasswordComponent ]
-    })
+    imports: [DialogForgottenPasswordComponent]
+})
     .compileComponents();
   });
 

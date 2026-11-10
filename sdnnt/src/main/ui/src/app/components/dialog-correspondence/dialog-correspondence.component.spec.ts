@@ -8,8 +8,8 @@ describe('DialogCorrespondenceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogCorrespondenceComponent ]
-    })
+    imports: [DialogCorrespondenceComponent]
+})
     .compileComponents();
   });
 

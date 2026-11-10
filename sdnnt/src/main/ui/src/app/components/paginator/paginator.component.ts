@@ -1,17 +1,29 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { AppState } from 'src/app/app.state';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PageEvent } from '@angular/material/paginator';
+import { PageEvent, MatPaginator } from '@angular/material/paginator';
 import { Sort } from 'src/app/shared/configuration';
 import { AppConfiguration } from 'src/app/app-configuration';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgIf, NgFor } from '@angular/common';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatSelect, MatSelectTrigger, MatOption } from '@angular/material/select';
+import { FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-paginator',
-  templateUrl: './paginator.component.html',
-  styleUrls: ['./paginator.component.scss']
+    selector: 'app-paginator',
+    templateUrl: './paginator.component.html',
+    styleUrls: ['./paginator.component.scss'],
+    imports: [FlexModule, MatPaginator, NgIf, MatFormField, MatLabel, MatSelect, FormsModule, MatSelectTrigger, MatIcon, NgFor, MatOption, TranslateModule]
 })
 export class PaginatorComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  state = inject(AppState);
+  config = inject(AppConfiguration);
+
 
   @Input() numFound;
   @Input() showSort: boolean ;
@@ -22,12 +34,6 @@ export class PaginatorComponent implements OnInit {
   pageIndex: number;
   rows: number;
   page: number;
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    public state: AppState,
-    public config: AppConfiguration) { }
 
   ngOnInit(): void {
     this.pageIndex = this.state.page + 1;

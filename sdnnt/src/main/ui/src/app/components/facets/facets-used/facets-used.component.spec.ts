@@ -8,8 +8,8 @@ describe('FacetsUsedComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FacetsUsedComponent ]
-    })
+    imports: [FacetsUsedComponent]
+})
     .compileComponents();
   });
 

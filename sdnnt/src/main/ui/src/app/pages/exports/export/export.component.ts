@@ -1,22 +1,65 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router, RouterLink } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
 import { DialogExportedFilesComponent } from 'src/app/components/dialog-exported-files/dialog-exported-files.component';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { AppState } from 'src/app/app.state';
-import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgIf, NgFor } from '@angular/common';
+import { FacetsComponent } from '../../../components/facets/facets.component';
+import { PaginatorComponent } from '../../../components/paginator/paginator.component';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatCard } from '@angular/material/card';
+import { MatButtonToggle } from '@angular/material/button-toggle';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { ResultItemComponent } from '../../../components/result-item/result-item.component';
+import { TranslateModule } from '@ngx-translate/core'; // autocomplete
 
 
 @Component({
-  standalone: false,
-  selector: 'app-export',
-  templateUrl: './export.component.html',
-  styleUrls: ['./export.component.scss']
+    selector: 'app-export',
+    templateUrl: './export.component.html',
+    styleUrls: ['./export.component.scss'],
+    imports: [
+      FlexModule,
+      RouterLink,
+      NgIf,
+      FacetsComponent,
+      PaginatorComponent,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      FormsModule,
+      MatIconButton,
+      MatSuffix,
+      MatTooltip,
+      MatIcon,
+      MatCard,
+      MatButtonToggle,
+      MatMenuTrigger,
+      MatMenu,
+      MatMenuItem,
+      NgFor,
+      ResultItemComponent,
+      TranslateModule
+    ]
 })
 export class ExportComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
+
 
   private subject: Subject<string> = new Subject();
 
@@ -33,16 +76,6 @@ export class ExportComponent implements OnInit {
   facets: any;
 
   loading: boolean;
-
-
-  constructor(
-
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog
-    ) { }
 
 
     ngOnInit(): void {

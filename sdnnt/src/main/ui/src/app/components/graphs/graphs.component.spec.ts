@@ -8,8 +8,8 @@ describe('GraphsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GraphsComponent ]
-    })
+    imports: [GraphsComponent]
+})
     .compileComponents();
   });
 

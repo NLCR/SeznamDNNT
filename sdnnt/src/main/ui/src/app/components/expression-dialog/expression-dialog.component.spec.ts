@@ -8,8 +8,8 @@ describe('ExpressionDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExpressionDialogComponent ]
-    })
+    imports: [ExpressionDialogComponent]
+})
     .compileComponents();
   });
 

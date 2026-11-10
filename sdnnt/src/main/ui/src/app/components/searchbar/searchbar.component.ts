@@ -1,31 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppState } from 'src/app/app.state';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-searchbar',
-  templateUrl: './searchbar.component.html',
-  styleUrls: ['./searchbar.component.scss']
+    selector: 'app-searchbar',
+    templateUrl: './searchbar.component.html',
+    styleUrls: ['./searchbar.component.scss'],
+    imports: [FormsModule, NgIf, MatTooltip, MatIcon, TranslateModule]
 })
-export class SearchBarComponent implements OnInit {
+export class SearchBarComponent {
+  private router = inject(Router);
+  state = inject(AppState);
+  config = inject(AppConfiguration);
+  private route = inject(ActivatedRoute);
+
 
   currentPath: string;
 
-
-  constructor(
-    private router: Router,
-    public state: AppState,
-    public config: AppConfiguration,
-    private route: ActivatedRoute
-    ) {
-
-
-    }
-
-  ngOnInit(): void {
-  }
 
   search() {
     const p: any = {};

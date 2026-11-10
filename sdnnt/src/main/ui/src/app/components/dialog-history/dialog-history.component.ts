@@ -1,9 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { HistoryItem } from 'src/app/shared/history-item';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 export enum KuratorStavColumns {
   DEFAULT_COLUMNS,
@@ -13,12 +19,17 @@ export enum KuratorStavColumns {
 
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-history',
-  templateUrl: './dialog-history.component.html',
-  styleUrls: ['./dialog-history.component.scss']
+    selector: 'app-dialog-history',
+    templateUrl: './dialog-history.component.html',
+    styleUrls: ['./dialog-history.component.scss'],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatTabGroup, MatTab, NgIf, NgFor, MatTooltip, MatDialogActions, MatButton, MatDialogClose, DatePipe, TranslateModule]
 })
 export class DialogHistoryComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DialogHistoryComponent>>(MatDialogRef);
+  data = inject<SolrDocument>(MAT_DIALOG_DATA);
+  state = inject(AppState);
+  private service = inject(AppService);
+
 
 
   // plna historie
@@ -44,13 +55,6 @@ export class DialogHistoryComponent implements OnInit {
 
   // pokud ma granulovane stavy
   granularity = false;
-
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogHistoryComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
-    public state: AppState,
-    private service: AppService) { }
 
   ngOnInit(): void {
 

@@ -8,8 +8,8 @@ describe('UserPswDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogChangePasswordComponent ]
-    })
+    imports: [DialogChangePasswordComponent]
+})
     .compileComponents();
   });
 

@@ -1,22 +1,62 @@
-import { Component, Inject, Input, OnInit,OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInput } from '@angular/material/input';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
+import { NgIf, NgFor, AsyncPipe } from '@angular/common';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { ExtendedModule } from '@angular/flex-layout/extended';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatAutocompleteTrigger, MatAutocomplete } from '@angular/material/autocomplete';
+import { MatOption, MatSelect } from '@angular/material/select';
+import { MatButton } from '@angular/material/button';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider } from '@angular/material/list';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-registration-form',
-  templateUrl: './dialog-registration-form.component.html',
-  styleUrls: ['./dialog-registration-form.component.scss']
+    selector: 'app-dialog-registration-form',
+    templateUrl: './dialog-registration-form.component.html',
+    styleUrls: ['./dialog-registration-form.component.scss'],
+    imports: [
+      NgIf,
+      FlexModule,
+      MatRadioGroup,
+      FormsModule,
+      MatRadioButton,
+      ExtendedModule,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      MatAutocompleteTrigger,
+      ReactiveFormsModule,
+      MatAutocomplete,
+      NgFor,
+      MatOption,
+      MatButton,
+      MatSuffix,
+      MatTooltip,
+      MatIcon,
+      MatSelect,
+      MatCheckbox,
+      MatDivider,
+      AsyncPipe,
+      TranslateModule
+    ]
 })
 export class DialogRegistrationFormComponent implements OnInit, OnChanges {
+  config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+
   // institution autocomplete
 
   //autocompleteForm: FormGroup;
@@ -62,16 +102,6 @@ export class DialogRegistrationFormComponent implements OnInit, OnChanges {
   jiny: boolean;
   nakladatel: boolean;
   institutions: string[];
-
-
-  //notifikace_interval: string = 'mesic';
-
-  constructor(
-    public config: AppConfiguration,
-    public state: AppState,
-    private service: AppService) {
-
-  }
 
 
   ngOnChanges(changes: SimpleChanges): void {

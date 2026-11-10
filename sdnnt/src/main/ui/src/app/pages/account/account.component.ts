@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -10,17 +10,76 @@ import { DialogSendRequestComponent } from 'src/app/components/dialog-send-reque
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { SolrResponse } from 'src/app/shared/solr-response';
 import { Zadost } from 'src/app/shared/zadost';
-import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
+import { map, startWith, debounce, debounceTime } from 'rxjs/operators';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgIf, NgFor, NgClass, DatePipe } from '@angular/common';
+import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { PaginatorComponent } from '../../components/paginator/paginator.component';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from '@angular/material/button';
+import { MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow } from '@angular/material/table';
+import { CdkCopyToClipboard } from '@angular/cdk/clipboard';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { ExtendedModule } from '@angular/flex-layout/extended';
+import { TranslateModule } from '@ngx-translate/core'; // autocomplete
 
 
 
 @Component({
-  standalone: false,
-  selector: 'app-account',
-  templateUrl: './account.component.html',
-  styleUrls: ['./account.component.scss']
+    selector: 'app-account',
+    templateUrl: './account.component.html',
+    styleUrls: ['./account.component.scss'],
+    imports: [
+      FlexModule,
+      NgIf,
+      MatList,
+      MatListSubheaderCssMatStyler,
+      MatTooltip,
+      MatIcon,
+      NgFor,
+      MatListItem,
+      MatAccordion,
+      MatExpansionPanel,
+      MatExpansionPanelHeader,
+      MatExpansionPanelTitle,
+      PaginatorComponent,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      FormsModule,
+      MatIconButton,
+      MatSuffix,
+      MatTable,
+      MatColumnDef,
+      MatHeaderCellDef,
+      MatHeaderCell,
+      MatCellDef,
+      MatCell,
+      CdkCopyToClipboard,
+      MatButtonToggleGroup,
+      MatButtonToggle,
+      MatHeaderRowDef,
+      MatHeaderRow,
+      MatRowDef,
+      MatRow,
+      NgClass,
+      ExtendedModule,
+      DatePipe,
+      TranslateModule
+    ]
 })
 export class AccountComponent implements OnInit {
+  dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+
 
   filterState = [
     {id: 'open', val: 'neodeslano'},
@@ -60,15 +119,6 @@ export class AccountComponent implements OnInit {
   allPriorities: string[] = [];
   allDelegated: string[] = [];
   allTypes: string[] = [];
-
-
-  constructor(
-    public dialog: MatDialog,
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState
-    ) { }
 
 
   ngOnInit(): void {

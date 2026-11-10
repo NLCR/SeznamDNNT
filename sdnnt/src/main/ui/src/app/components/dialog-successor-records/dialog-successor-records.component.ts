@@ -1,33 +1,65 @@
 import { ArrayDataSource } from '@angular/cdk/collections';
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { DocsUtils } from 'src/app/shared/docutils';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgIf, NgFor, NgClass, KeyValuePipe } from '@angular/common';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { ExtendedModule } from '@angular/flex-layout/extended';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-successor-records',
-  templateUrl: './dialog-successor-records.component.html',
-  styleUrls: ['./dialog-successor-records.component.scss']
+    selector: 'app-dialog-successor-records',
+    templateUrl: './dialog-successor-records.component.html',
+    styleUrls: ['./dialog-successor-records.component.scss'],
+    imports: [
+      MatDialogTitle,
+      CdkScrollable,
+      MatDialogContent,
+      NgIf,
+      MatCard,
+      MatCardContent,
+      MatIcon,
+      NgFor,
+      MatTooltip,
+      NgClass,
+      ExtendedModule,
+      MatCheckbox,
+      FormsModule,
+      MatDialogActions,
+      MatButton,
+      MatDialogClose,
+      KeyValuePipe,
+      TranslateModule
+    ]
 })
-export class DialogSuccessorRecordsComponent implements OnInit {
+export class DialogSuccessorRecordsComponent {
+  dialogRef = inject<MatDialogRef<DialogSuccessorRecordsComponent>>(MatDialogRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  private config = inject(AppConfiguration);
+  state = inject(AppState);
+  dat = inject(MAT_DIALOG_DATA);
+
 
   documents = [];
 
   edit = false;
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogSuccessorRecordsComponent>,
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    private config: AppConfiguration,
-    public state: AppState,
-    @Inject(MAT_DIALOG_DATA) public dat:  any) {
+  constructor() {
+      const dat = this.dat;
+
 
       this.edit = dat.edit;
 
@@ -41,8 +73,6 @@ export class DialogSuccessorRecordsComponent implements OnInit {
       });
     }
 
-  ngOnInit(): void {
-  }
 
   title(doc: SolrDocument) {
     return DocsUtils.title(doc);

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { Configuration, KrameriusLibrary } from './shared/configuration';
@@ -8,6 +8,9 @@ import { User } from './shared/user';
 @Injectable({
     providedIn: 'root'
 }) export class AppConfiguration {
+    private http = inject(HttpClient);
+    private state = inject(AppState);
+
 
     // version
     static sdnntClientVersion = 'v1.0.9.7';
@@ -129,10 +132,6 @@ import { User } from './shared/user';
      * ['search'] will look for /assets/configs/search.json
      */
     private configs: string[] = [];
-
-    constructor(
-        private http: HttpClient,
-        private state: AppState) { }
 
     public configLoaded() {
         return this.config && true;

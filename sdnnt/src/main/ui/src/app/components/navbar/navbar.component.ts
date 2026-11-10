@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter, ViewChild  } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, inject } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 import { AppService } from 'src/app/app.service';
@@ -6,19 +6,48 @@ import { AppState } from 'src/app/app.state';
 import { DialogLoginComponent } from '../dialog-login/dialog-login.component';
 import { DialogRegistrationComponent } from '../dialog-registration/dialog-registration.component';
 import { User } from 'src/app/shared/user';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { DialogNotificationsSettingsComponent } from '../dialog-notifications-settings/dialog-notifications-settings.component';
 import { SearchComponent } from 'src/app/pages/search/search.component';
 import { SearchBarComponent } from '../searchbar/searchbar.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { NgSwitch, NgSwitchCase, NgSwitchDefault, NgIf } from '@angular/common';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss'],
+    imports: [
+      MatToolbar,
+      FlexModule,
+      RouterLink,
+      SearchBarComponent,
+      MatButton,
+      MatIcon,
+      NgSwitch,
+      NgSwitchCase,
+      NgSwitchDefault,
+      RouterLinkActive,
+      NgIf,
+      MatMenuTrigger,
+      MatMenu,
+      MatMenuItem,
+      TranslateModule
+    ]
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
+  private dialog = inject(MatDialog);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  config = inject(AppConfiguration);
+
 
   @ViewChild(SearchBarComponent) searchBarComponent: SearchBarComponent;
 
@@ -29,18 +58,6 @@ export class NavbarComponent implements OnInit {
 
   public isSearchBar = false;
 
-  //simpleLogin: boolean = false;
-
-  constructor(
-    private dialog: MatDialog,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public config: AppConfiguration
-    ) { }
-
-  ngOnInit(): void {
-  }
 
   changeLang(lang: string) {
     this.service.changeLang(lang);

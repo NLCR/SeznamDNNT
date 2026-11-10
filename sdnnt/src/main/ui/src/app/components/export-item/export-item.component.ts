@@ -1,16 +1,26 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgIf } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-export-item',
-  templateUrl: './export-item.component.html',
-  styleUrls: ['./export-item.component.scss']
+    selector: 'app-export-item',
+    templateUrl: './export-item.component.html',
+    styleUrls: ['./export-item.component.scss'],
+    imports: [MatCard, MatCardHeader, FlexModule, NgIf, MatCardTitle, MatCardSubtitle, MatCardActions, MatTooltip, MatIcon, TranslateModule]
 })
-export class ExportItemComponent implements OnInit {
+export class ExportItemComponent {
+  state = inject(AppState);
+  config = inject(AppConfiguration);
+  private service = inject(AppService);
+
 
   @Input() doc: SolrDocument;
 
@@ -19,16 +29,6 @@ export class ExportItemComponent implements OnInit {
   showAlephLink = true;
   public imgSrc = false;
 
-  constructor(
-    public state: AppState,
-    public config: AppConfiguration,
-    private service: AppService
-  ) { }
-
-  ngOnInit(): void {
-
-
-  }
 
   curatorAndPublicStateAreDifferent(): boolean {
     // neni nastaveny public stav ale ma kuratorsky stav NPA

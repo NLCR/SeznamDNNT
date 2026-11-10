@@ -44,7 +44,7 @@ app-home {
         .mat-mdc-card-actions {
           .mat-mdc-button {
             color: $app-color-lightnes;
-            --mdc-text-button-label-text-color: #{$app-color-lightnes};
+            --mat-button-text-label-text-color: #{$app-color-lightnes};
           }
 
           strong {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Title } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-password/dialog-change-password.component';
+import { NgIf } from '@angular/common';
 
 enum Tokenvalidation {
   INVALID, VALID, NOT_FETCHED
@@ -13,23 +14,18 @@ enum Tokenvalidation {
 
 
 @Component({
-  standalone: false,
-  selector: 'app-reset-password',
-  templateUrl: './reset-password.component.html',
-  styleUrls: ['./reset-password.component.scss']
+    selector: 'app-reset-password',
+    templateUrl: './reset-password.component.html',
+    styleUrls: ['./reset-password.component.scss'],
+    imports: [NgIf]
 })
 export class ResetPasswordComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
 
-
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog
-
-  ) { }
 
   tokenValidation: Tokenvalidation = Tokenvalidation.NOT_FETCHED;
   content: string;

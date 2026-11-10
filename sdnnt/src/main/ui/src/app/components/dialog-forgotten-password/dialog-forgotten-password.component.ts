@@ -1,31 +1,33 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-forgotten-password',
-  templateUrl: './dialog-forgotten-password.component.html',
-  styleUrls: ['./dialog-forgotten-password.component.scss']
+    selector: 'app-dialog-forgotten-password',
+    templateUrl: './dialog-forgotten-password.component.html',
+    styleUrls: ['./dialog-forgotten-password.component.scss'],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatFormField, MatLabel, MatInput, FormsModule, MatDialogActions, MatButton, TranslateModule]
 })
-export class DialogForgottenPasswordComponent implements OnInit {
+export class DialogForgottenPasswordComponent {
+  dialogRef = inject<MatDialogRef<DialogForgottenPasswordComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+  private config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+  private router = inject(Router);
+
 
   user: string;
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogForgottenPasswordComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private config: AppConfiguration,
-    public state: AppState,
-    private service: AppService,
-    private router: Router
-  ) { }
-
-  ngOnInit(): void {
-  }
 
   resetPwd(): void {
     this.dialogRef.close();

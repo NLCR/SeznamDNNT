@@ -1,14 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Export } from 'src/app/shared/exports';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { NgIf } from '@angular/common';
+import { MatButtonToggle } from '@angular/material/button-toggle';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-result-actions-export',
-  templateUrl: './result-actions-export.component.html',
-  styleUrls: ['./result-actions-export.component.scss']
+    selector: 'app-result-actions-export',
+    templateUrl: './result-actions-export.component.html',
+    styleUrls: ['./result-actions-export.component.scss'],
+    imports: [NgIf, MatButtonToggle, MatTooltip, MatIcon, TranslateModule]
 })
-export class ResultActionsExportComponent implements OnInit {
+export class ResultActionsExportComponent {
 
   @Input() export: Export;
   @Input() doc: SolrDocument;
@@ -16,8 +21,6 @@ export class ResultActionsExportComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
 
 
   exported() {

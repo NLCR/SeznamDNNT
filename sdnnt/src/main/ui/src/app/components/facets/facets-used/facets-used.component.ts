@@ -1,23 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppState } from 'src/app/app.state';
 import { Filter } from 'src/app/shared/filter';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { MatList, MatListSubheaderCssMatStyler, MatListItem } from '@angular/material/list';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatIcon } from '@angular/material/icon';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-facets-used',
-  templateUrl: './facets-used.component.html',
-  styleUrls: ['./facets-used.component.scss']
+    selector: 'app-facets-used',
+    templateUrl: './facets-used.component.html',
+    styleUrls: ['./facets-used.component.scss'],
+    imports: [NgIf, MatList, MatListSubheaderCssMatStyler, FlexModule, MatTooltip, MatIcon, NgFor, MatListItem, NgSwitch, NgSwitchCase, NgSwitchDefault, TranslateModule]
 })
-export class FacetsUsedComponent implements OnInit {
+export class FacetsUsedComponent {
+  private router = inject(Router);
+  state = inject(AppState);
 
-  constructor(
-    private router: Router,
-    public state: AppState) { }
-
-  ngOnInit(): void {
-
-  }
 
   removeFilter(filter: Filter) {
     const q: any = {};

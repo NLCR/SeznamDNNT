@@ -8,8 +8,8 @@ describe('DialogAllPublishersComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogAllPublishersComponent ]
-    })
+    imports: [DialogAllPublishersComponent]
+})
     .compileComponents();
   });
 

@@ -1,18 +1,49 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormControl, FormsModule } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { NgFor, NgIf } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatInput } from '@angular/material/input';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-states',
-  templateUrl: './dialog-states.component.html',
-  styleUrls: ['./dialog-states.component.scss']
+    selector: 'app-dialog-states',
+    templateUrl: './dialog-states.component.html',
+    styleUrls: ['./dialog-states.component.scss'],
+    imports: [
+      MatDialogTitle,
+      CdkScrollable,
+      MatDialogContent,
+      MatFormField,
+      MatLabel,
+      MatSelect,
+      FormsModule,
+      NgFor,
+      MatOption,
+      MatTooltip,
+      NgIf,
+      MatInput,
+      MatDialogActions,
+      MatButton,
+      MatDialogClose,
+      TranslateModule
+    ]
 })
 export class DialogStatesComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DialogStatesComponent>>(MatDialogRef);
+  data = inject<SolrDocument>(MAT_DIALOG_DATA);
+  config = inject(AppConfiguration);
+  private service = inject(AppService);
+  state = inject(AppState);
+
 
   newState: string;
   newLicense: string;
@@ -33,13 +64,6 @@ export class DialogStatesComponent implements OnInit {
   link: string;
   stav: string[];
   fmt: string;
-
-  constructor(
-    public dialogRef: MatDialogRef<DialogStatesComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: SolrDocument,
-    public config: AppConfiguration,
-    private service: AppService,
-    public state: AppState) { }
 
   ngOnInit(): void {
     this.newState = this.data.kuratorstav ?  this.data.kuratorstav[0]  : 'A';

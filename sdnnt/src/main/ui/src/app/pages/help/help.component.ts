@@ -1,21 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 
 @Component({
-  standalone: false,
-  selector: 'app-help',
-  templateUrl: './help.component.html',
-  styleUrls: ['./help.component.scss']
+    selector: 'app-help',
+    templateUrl: './help.component.html',
+    styleUrls: ['./help.component.scss']
 })
 export class HelpComponent implements OnInit {
+  state = inject(AppState);
+  private service = inject(AppService);
+
 
   content: string;
-
-
-  constructor(public state: AppState,
-    private service: AppService,
-    ) { }
 
   ngOnInit(): void {
     this.state.activePage = 'Help';

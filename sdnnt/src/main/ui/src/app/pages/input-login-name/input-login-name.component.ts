@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from 'src/app/app.service';
@@ -6,20 +6,19 @@ import { AppState } from 'src/app/app.state';
 import { DialogForgottenPasswordComponent } from 'src/app/components/dialog-forgotten-password/dialog-forgotten-password.component';
 
 @Component({
-  standalone: false,
-  selector: 'app-input-login-name',
-  templateUrl: './input-login-name.component.html',
-  styleUrls: ['./input-login-name.component.scss']
+    selector: 'app-input-login-name',
+    templateUrl: './input-login-name.component.html',
+    styleUrls: ['./input-login-name.component.scss']
 })
-export class InputLoginNameComponent implements OnInit {
+export class InputLoginNameComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog
-  ) {
+
+  constructor() {
 
     const data = {};
     const dialogRef = this.dialog.open(DialogForgottenPasswordComponent, {
@@ -34,8 +33,5 @@ export class InputLoginNameComponent implements OnInit {
 
    }
 
-
-  ngOnInit(): void {
-  }
 
 }

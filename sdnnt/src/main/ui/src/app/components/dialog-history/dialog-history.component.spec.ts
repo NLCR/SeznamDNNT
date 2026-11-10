@@ -8,8 +8,8 @@ describe('HistoryDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogHistoryComponent ]
-    })
+    imports: [DialogHistoryComponent]
+})
     .compileComponents();
   });
 

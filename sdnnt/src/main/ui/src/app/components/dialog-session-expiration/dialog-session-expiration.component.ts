@@ -1,29 +1,32 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions } from '@angular/material/dialog';
 import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgIf } from '@angular/common';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatLabel } from '@angular/material/form-field';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-session-expiration',
-  templateUrl: './dialog-session-expiration.component.html',
-  styleUrls: ['./dialog-session-expiration.component.scss']
+    selector: 'app-dialog-session-expiration',
+    templateUrl: './dialog-session-expiration.component.html',
+    styleUrls: ['./dialog-session-expiration.component.scss'],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, NgIf, FlexModule, MatLabel, MatDialogActions, MatButton, TranslateModule]
 })
 export class DialogSessionExpirationComponent implements OnInit {
+  dialogRef = inject<MatDialogRef<DialogSessionExpirationComponent>>(MatDialogRef);
+  private config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+  private router = inject(Router);
+  data = inject(MAT_DIALOG_DATA);
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogSessionExpirationComponent>,
-    private config: AppConfiguration,
-    public state: AppState,
-    private service: AppService,
-    private router: Router,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-
-  ) { }
 
    timer = 0;
    counter = 20;

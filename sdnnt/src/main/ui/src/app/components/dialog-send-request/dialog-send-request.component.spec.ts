@@ -8,8 +8,8 @@ describe('ZadostSendDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogSendRequestComponent ]
-    })
+    imports: [DialogSendRequestComponent]
+})
     .compileComponents();
   });
 

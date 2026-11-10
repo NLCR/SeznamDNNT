@@ -1,23 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CookieService } from 'ngx-cookie';
 import { AppState } from 'src/app/app.state';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-consent',
-  templateUrl: './consent.component.html',
-  styleUrls: ['./consent.component.scss']
+    selector: 'app-consent',
+    templateUrl: './consent.component.html',
+    styleUrls: ['./consent.component.scss'],
+    imports: [FlexModule, MatIcon, MatButton, TranslateModule]
 })
-export class ConsentComponent implements OnInit {
+export class ConsentComponent {
+  state = inject(AppState);
 
-
-  constructor(
-    //private cookieService: CookieService,
-    public state: AppState
-  ) { }
-
-  ngOnInit(): void {
-  }
 
   close(): void {
     localStorage.setItem('consent', 'true');

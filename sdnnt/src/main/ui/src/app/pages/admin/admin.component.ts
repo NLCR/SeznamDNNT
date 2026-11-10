@@ -1,22 +1,51 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularEditorConfig } from '@kolkov/angular-editor';
+import { Component, OnInit, inject } from '@angular/core';
+import { AngularEditorConfig, AngularEditorModule } from '@kolkov/angular-editor';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { User } from 'src/app/shared/user';
-import { FormControl } from '@angular/forms'; // autocomplete
+import { FormControl, FormsModule } from '@angular/forms'; // autocomplete
 import { Observable, Subject } from 'rxjs'; // autocomplete
 import { map, startWith, debounce, debounceTime } from 'rxjs/operators'; // autocomplete
 import { UserValidators } from 'src/app/shared/uservalidators';
+import { NgIf, NgFor } from '@angular/common';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatList, MatListItem } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { DialogRegistrationFormComponent } from '../../components/dialog-registration-form/dialog-registration-form.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss']
+    selector: 'app-admin',
+    templateUrl: './admin.component.html',
+    styleUrls: ['./admin.component.scss'],
+    imports: [
+      NgIf,
+      MatTabGroup,
+      MatTab,
+      FlexModule,
+      MatList,
+      NgFor,
+      MatListItem,
+      AngularEditorModule,
+      FormsModule,
+      MatButton,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      DialogRegistrationFormComponent,
+      TranslateModule
+    ]
 })
 export class AdminComponent implements OnInit {
+  config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+
 
 
   private subject: Subject<string> = new Subject();
@@ -73,13 +102,6 @@ export class AdminComponent implements OnInit {
   public users: User[];
   selUser: User;
   focus: string;
-  //userFilterValue: string ="";
-
-  constructor(
-    public config: AppConfiguration,
-    public state: AppState,
-    private service: AppService
-  ) { }
 
   ngOnInit(): void {
     this.state.activePage = 'Admin';

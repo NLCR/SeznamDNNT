@@ -1,16 +1,24 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import { HttpParams } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { ECharts, EChartsCoreOption } from 'echarts/core';
 import { AppService } from 'src/app/app.service';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgxEchartsDirective } from 'ngx-echarts';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatSelect, MatOption } from '@angular/material/select';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-graphs',
-  templateUrl: './graphs.component.html',
-  styleUrls: ['./graphs.component.scss']
+    selector: 'app-graphs',
+    templateUrl: './graphs.component.html',
+    styleUrls: ['./graphs.component.scss'],
+    imports: [FlexModule, NgIf, NgxEchartsDirective, MatFormField, MatLabel, MatSelect, MatOption, TranslateModule]
 })
 export class GraphsComponent implements OnInit {
+  private datePipe = inject(DatePipe);
+  private service = inject(AppService);
+
 
   facets: any;
   stavOpts: EChartsCoreOption = {};
@@ -22,10 +30,6 @@ export class GraphsComponent implements OnInit {
   interval = '1MONTH';
   userEchart: ECharts;
   selectedUsers: {[user: string]: boolean} = {};
-
-  constructor(
-    private datePipe: DatePipe,
-    private service: AppService) { }
 
   ngOnInit(): void {
     this.getFacets();

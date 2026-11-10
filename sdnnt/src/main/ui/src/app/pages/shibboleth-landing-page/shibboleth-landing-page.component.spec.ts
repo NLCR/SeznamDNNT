@@ -8,8 +8,8 @@ describe('ShibbolethLandingPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ShibbolethLandingPageComponent ]
-    })
+    imports: [ShibbolethLandingPageComponent]
+})
     .compileComponents();
   });
 

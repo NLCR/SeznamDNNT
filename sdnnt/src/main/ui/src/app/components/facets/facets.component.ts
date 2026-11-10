@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, HostListener } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { Component, Input, OnInit, HostListener, inject } from '@angular/core';
+import { FormControl, FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
@@ -9,14 +9,59 @@ import { DialogAllPublishersComponent } from '../dialog-all-publishers/dialog-al
 import { HttpParams } from '@angular/common/http';
 import { AppService } from 'src/app/app.service';
 import { SolrResponse } from 'src/app/shared/solr-response';
+import { FacetsUsedComponent } from './facets-used/facets-used.component';
+import { MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle } from '@angular/material/expansion';
+import { NgIf, NgFor, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButton } from '@angular/material/button';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-facets',
-  templateUrl: './facets.component.html',
-  styleUrls: ['./facets.component.scss']
+    selector: 'app-facets',
+    templateUrl: './facets.component.html',
+    styleUrls: ['./facets.component.scss'],
+    imports: [
+      FacetsUsedComponent,
+      MatAccordion,
+      NgIf,
+      MatExpansionPanel,
+      MatExpansionPanelHeader,
+      MatExpansionPanelTitle,
+      MatRadioGroup,
+      FlexModule,
+      FormsModule,
+      MatRadioButton,
+      NgFor,
+      NgSwitch,
+      NgSwitchCase,
+      MatIcon,
+      MatTooltip,
+      NgSwitchDefault,
+      MatButton,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      MatDatepickerInput,
+      MatDatepickerToggle,
+      MatSuffix,
+      MatDatepicker,
+      TranslateModule
+    ]
 })
 export class FacetsComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  config = inject(AppConfiguration);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
+  private service = inject(AppService);
+
 
 
   public getScreenWidth: any;
@@ -47,14 +92,7 @@ export class FacetsComponent implements OnInit {
   rokvydaniParam: string;
 
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    public config: AppConfiguration,
-    public state: AppState,
-    public dialog: MatDialog,
-    private service: AppService
-  ) {
+  constructor() {
 
 
     this.route.queryParams.subscribe((params) => {

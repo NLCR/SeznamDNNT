@@ -1,18 +1,54 @@
-import { AfterViewInit, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { AppState } from 'src/app/app.state';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
+import { NgIf } from '@angular/common';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-login',
-  templateUrl: './dialog-login.component.html',
-  styleUrls: ['./dialog-login.component.scss']
+    selector: 'app-dialog-login',
+    templateUrl: './dialog-login.component.html',
+    styleUrls: ['./dialog-login.component.scss'],
+    imports: [
+      NgIf,
+      MatProgressBar,
+      MatDialogTitle,
+      CdkScrollable,
+      MatDialogContent,
+      FlexModule,
+      MatFormField,
+      MatLabel,
+      MatInput,
+      FormsModule,
+      MatIcon,
+      MatSuffix,
+      MatCheckbox,
+      MatDialogActions,
+      MatButton,
+      MatDialogClose,
+      TranslateModule
+    ]
 })
-export class DialogLoginComponent implements OnInit, AfterViewInit {
+export class DialogLoginComponent implements AfterViewInit {
+  dialogRef = inject<MatDialogRef<DialogLoginComponent>>(MatDialogRef);
+  data = inject(MAT_DIALOG_DATA);
+  private config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+  private router = inject(Router);
+
 
   @ViewChild('loginUserInput') loginUserInput: ElementRef<HTMLInputElement>;
 
@@ -25,19 +61,6 @@ export class DialogLoginComponent implements OnInit, AfterViewInit {
 
   hidePassword = true;
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogLoginComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private config: AppConfiguration,
-    public state: AppState,
-    private service: AppService,
-    private router: Router
-
-
-  ) { }
-
-  ngOnInit(): void {
-  }
 
   ngAfterViewInit(): void {
     this.dialogRef.afterOpened().subscribe(() => {

@@ -1,16 +1,49 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault } from '@angular/common';
+import { MatCard, MatCardHeader, MatCardAvatar, MatCardTitle, MatCardSubtitle, MatCardActions } from '@angular/material/card';
+import { RouterLink } from '@angular/router';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatTabGroup, MatTab } from '@angular/material/tabs';
+import { GraphsComponent } from '../../components/graphs/graphs.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss'],
+    imports: [
+      FlexModule,
+      NgFor,
+      NgIf,
+      MatCard,
+      RouterLink,
+      MatCardHeader,
+      MatCardAvatar,
+      NgSwitch,
+      NgSwitchCase,
+      MatIcon,
+      NgSwitchDefault,
+      MatCardTitle,
+      MatCardSubtitle,
+      MatCardActions,
+      MatButton,
+      MatTabGroup,
+      MatTab,
+      GraphsComponent,
+      TranslateModule
+    ]
 })
 export class HomeComponent implements OnInit {
+  config = inject(AppConfiguration);
+  state = inject(AppState);
+  private service = inject(AppService);
+
 
 
   activeTab: string;
@@ -26,12 +59,6 @@ export class HomeComponent implements OnInit {
     dntt:0,
     dnto:0,
   };
-
-  constructor(
-    public config: AppConfiguration,
-    public state: AppState,
-    private service: AppService
-  ) { }
 
   ngOnInit(): void {
     this.state.activePage = 'Home';

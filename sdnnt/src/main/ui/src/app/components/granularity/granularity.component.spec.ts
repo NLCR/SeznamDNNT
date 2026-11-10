@@ -8,8 +8,8 @@ describe('GranularityComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GranularityComponent ]
-    })
+    imports: [GranularityComponent]
+})
     .compileComponents();
   });
 

@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AppService } from 'src/app/app.service';
@@ -11,14 +11,50 @@ import { Zadost } from 'src/app/shared/zadost';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogCorrespondenceComponent } from 'src/app/components/dialog-correspondence/dialog-correspondence.component';
 import { DialogPromptComponent } from 'src/app/components/dialog-prompt/dialog-prompt.component';
+import { NgIf, NgFor, DatePipe } from '@angular/common';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { PaginatorComponent } from '../../components/paginator/paginator.component';
+import { MatCard } from '@angular/material/card';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { FormsModule } from '@angular/forms';
+import { ResultItemComponent } from '../../components/result-item/result-item.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-zadost',
-  templateUrl: './zadost.component.html',
-  styleUrls: ['./zadost.component.scss']
+    selector: 'app-zadost',
+    templateUrl: './zadost.component.html',
+    styleUrls: ['./zadost.component.scss'],
+    imports: [
+      NgIf,
+      FlexModule,
+      PaginatorComponent,
+      MatCard,
+      MatIcon,
+      MatTooltip,
+      MatButtonToggleGroup,
+      MatButtonToggle,
+      MatMenuTrigger,
+      MatMenu,
+      MatMenuItem,
+      NgFor,
+      MatSlideToggle,
+      FormsModule,
+      ResultItemComponent,
+      DatePipe,
+      TranslateModule
+    ]
 })
 export class ZadostComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
+
 
   subs: Subscription[] = [];
   zadost: Zadost;
@@ -29,14 +65,6 @@ export class ZadostComponent implements OnInit, OnDestroy {
   invalidrecs: string[];
 
   kurators: User[];
-
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog) { }
 
   ngOnInit(): void {
     if (!this.state.user) {

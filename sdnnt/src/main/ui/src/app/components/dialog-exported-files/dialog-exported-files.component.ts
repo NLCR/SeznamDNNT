@@ -1,5 +1,9 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { NgFor } from '@angular/common';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface ExportedFilesData {
   exportname: string;
@@ -10,24 +14,18 @@ export interface ExportedFilesData {
 }
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-exported-files',
-  templateUrl: './dialog-exported-files.component.html',
-  styleUrls: ['./dialog-exported-files.component.scss']
+    selector: 'app-dialog-exported-files',
+    templateUrl: './dialog-exported-files.component.html',
+    styleUrls: ['./dialog-exported-files.component.scss'],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, NgFor, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
-export class DialogExportedFilesComponent implements OnInit {
+export class DialogExportedFilesComponent {
+  data = inject<ExportedFilesData>(MAT_DIALOG_DATA);
+
 
   public files: any = [
   ];
 
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: ExportedFilesData
-  ) {
-  }
-
-  ngOnInit(): void {
-
-  }
 
   encodePath(path) {
     return encodeURIComponent(path);

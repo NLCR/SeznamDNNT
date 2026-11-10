@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 // import {Http, Response, URLSearchParams} from '@angular/http';
 import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, Subject, throwError  } from 'rxjs';
@@ -18,19 +18,18 @@ import { MatSpinner } from '@angular/material/progress-spinner';
 
 @Injectable()
 export class AppService {
+  private http = inject(HttpClient);
+  private translate = inject(TranslateService);
+  private snackBar = inject(MatSnackBar);
+  private overlay = inject(Overlay);
+  private config = inject(AppConfiguration);
+  private state = inject(AppState);
+
 
   private spinnerTopRef = this.cdkSpinnerCreate();
   private numLoading = 0;
   private langSubject: Subject<boolean> = new Subject();
   public langChanged: Observable<boolean> = this.langSubject.asObservable();
-
-  constructor(
-    private http: HttpClient,
-    private translate: TranslateService,
-    private snackBar: MatSnackBar,
-    private overlay: Overlay,
-    private config: AppConfiguration,
-    private state: AppState) { }
 
 
   private get<T>(url: string, params: HttpParams = new HttpParams(), showingLoading: boolean = true, responseType?): Observable<T> {

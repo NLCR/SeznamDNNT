@@ -8,8 +8,8 @@ describe('RejectDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DialogPromptComponent ]
-    })
+    imports: [DialogPromptComponent]
+})
     .compileComponents();
   });
 

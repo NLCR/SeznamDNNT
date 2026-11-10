@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
@@ -10,23 +10,17 @@ import { DialogChangePasswordComponent } from 'src/app/components/dialog-change-
 
 
 @Component({
-  standalone: false,
   selector: 'app-user-reset-password',
   templateUrl: './user-reset-password.component.html',
   styleUrls: ['./user-reset-password.component.scss']
 })
 export class UserResetPasswordComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
 
-
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog
-
-  ) { }
 
 
 

@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDatepickerContent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Params, Router } from '@angular/router';
@@ -13,14 +13,56 @@ import { Zadost } from 'src/app/shared/zadost';
 import { SearchResultsUtils } from 'src/app/shared/searchresultsutils';
 import { DialogBulkNotificationsComponent } from 'src/app/components/dialog-bulk-notifications/dialog-bulk-notifications.component';
 import { AppConfiguration } from 'src/app/app-configuration';
+import { FlexModule } from '@angular/flex-layout/flex';
+import { MatIconButton, MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { NgIf, NgClass, NgFor } from '@angular/common';
+import { FacetsComponent } from '../../components/facets/facets.component';
+import { PaginatorComponent } from '../../components/paginator/paginator.component';
+import { ExtendedModule } from '@angular/flex-layout/extended';
+import { MatCard } from '@angular/material/card';
+import { MatButtonToggleGroup, MatButtonToggle } from '@angular/material/button-toggle';
+import { MatMenuTrigger, MatMenu, MatMenuItem } from '@angular/material/menu';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatDivider } from '@angular/material/list';
+import { ResultItemComponent } from '../../components/result-item/result-item.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.scss']
+    selector: 'app-search',
+    templateUrl: './search.component.html',
+    styleUrls: ['./search.component.scss'],
+    imports: [
+      FlexModule,
+      MatIconButton,
+      MatIcon,
+      NgIf,
+      FacetsComponent,
+      MatButton,
+      PaginatorComponent,
+      NgClass,
+      ExtendedModule,
+      MatCard,
+      MatButtonToggleGroup,
+      MatButtonToggle,
+      MatMenuTrigger,
+      MatTooltip,
+      MatMenu,
+      NgFor,
+      MatMenuItem,
+      MatDivider,
+      ResultItemComponent,
+      TranslateModule
+    ]
 })
 export class SearchComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  state = inject(AppState);
+  dialog = inject(MatDialog);
+  configuration = inject(AppConfiguration);
+
 
   subs: Subscription[] = [];
   // all actions
@@ -41,16 +83,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   closeFilters(): void {
     this.filtersOpen = false;
   }
-
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    public state: AppState,
-    public dialog: MatDialog,
-    public configuration: AppConfiguration
-  ) { }
 
   ngOnInit(): void {
 

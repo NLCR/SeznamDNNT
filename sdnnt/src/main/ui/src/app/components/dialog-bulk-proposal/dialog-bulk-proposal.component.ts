@@ -1,19 +1,33 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppConfiguration } from 'src/app/app-configuration';
 import { AppService } from 'src/app/app.service';
 import { AppState } from 'src/app/app.state';
 import { SolrDocument } from 'src/app/shared/solr-document';
 import { Zadost } from 'src/app/shared/zadost';
+import { CdkScrollable } from '@angular/cdk/scrolling';
+import { MatRadioGroup, MatRadioButton } from '@angular/material/radio';
+import { FormsModule } from '@angular/forms';
+import { NgIf } from '@angular/common';
+import { MatButton } from '@angular/material/button';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
-  standalone: false,
-  selector: 'app-dialog-bulk-proposal',
-  templateUrl: './dialog-bulk-proposal.component.html',
-  styleUrls: ['./dialog-bulk-proposal.component.scss']
+    selector: 'app-dialog-bulk-proposal',
+    templateUrl: './dialog-bulk-proposal.component.html',
+    styleUrls: ['./dialog-bulk-proposal.component.scss'],
+    imports: [MatDialogTitle, CdkScrollable, MatDialogContent, MatRadioGroup, FormsModule, NgIf, MatRadioButton, MatDialogActions, MatButton, MatDialogClose, TranslateModule]
 })
-export class DialogBulkProposalComponent implements OnInit {
+export class DialogBulkProposalComponent {
+  dialogRef = inject<MatDialogRef<DialogBulkProposalComponent>>(MatDialogRef);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private service = inject(AppService);
+  private config = inject(AppConfiguration);
+  state = inject(AppState);
+  data = inject(MAT_DIALOG_DATA);
+
 
   navrhNaZarazeni = false;
   navrhNaVyrazeni = false;
@@ -26,14 +40,9 @@ export class DialogBulkProposalComponent implements OnInit {
 
   docs: SolrDocument[];
 
-  constructor(
-    public dialogRef: MatDialogRef<DialogBulkProposalComponent>,
-    private route: ActivatedRoute,
-    private router: Router,
-    private service: AppService,
-    private config: AppConfiguration,
-    public state: AppState,
-    @Inject(MAT_DIALOG_DATA) public data:  any) {
+  constructor() {
+    const data = this.data;
+
     if (data.VN) {
       this.navrhNaVyrazeni = true;
       this.navrh = 'VN';
@@ -59,8 +68,6 @@ export class DialogBulkProposalComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-  }
 
 
   /** Pripravi a ulozi zadost po te reload */
