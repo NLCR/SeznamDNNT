@@ -63,6 +63,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                     List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
                     MarcRecordDependencyStore depStore = new MarcRecordDependencyStore();
                     try {
+                        reqService.getLogger().log(Level.INFO, "-- CREATING STATE  ----");
                         for (Pair<String, List<String>> pair : batch) {
                             
                             
@@ -111,7 +112,8 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
             protected void update(SolrClient solrClient, AbstractCheckDeleteService reqService,
                     List<Pair<String, List<String>>> batch, Case cs) throws SolrServerException, IOException {
                 try {
-    
+                    reqService.getLogger().log(Level.INFO, "-- CREATING REQUEST  ----");
+
                     for (Pair<String, List<String>> pair : batch) {
                         MarcRecord origin = MarcRecord.fromIndex(solrClient, pair.getKey());
                         origin.followers = pair.getRight();
@@ -120,6 +122,7 @@ public abstract class AbstractCheckDeleteService extends AbstractRequestService 
                         solrClient.add(DataCollections.catalog.name(), document);
                     }
                     List<String> identifiers = batch.stream().map(Pair::getKey).collect(Collectors.toList());
+                    reqService.getLogger().log(Level.INFO, "Creating request for  identifiers "+identifiers.toString());
                     reqService.request(identifiers);
                 } catch (AccountException e) {
                     reqService.getLogger().log(Level.SEVERE,e.getMessage());
