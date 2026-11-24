@@ -34,7 +34,7 @@ public class SearchResultsUtils {
     }
 
     public static void  iterateResult(JSONObject ret, Consumer<JSONObject> consumer) {
-        List<String> ids = new ArrayList<>();
+        //List<String> ids = new ArrayList<>();
         for (Object o : ret.getJSONObject("response").getJSONArray("docs")) {
             JSONObject doc = (JSONObject) o;
             consumer.accept(doc);

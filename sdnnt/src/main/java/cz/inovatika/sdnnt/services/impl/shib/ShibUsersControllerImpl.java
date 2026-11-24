@@ -13,14 +13,13 @@ import cz.inovatika.sdnnt.model.DataCollections;
 import cz.inovatika.sdnnt.model.User;
 import cz.inovatika.sdnnt.rights.Role;
 import cz.inovatika.sdnnt.rights.exceptions.NotAuthorizedException;
-import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerExpiredTokenException;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerInvalidPwdTokenException;
 import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.services.impl.users.UsersUtils;
 
-public class ShibUsersControllerImpl extends AbstractUserController implements UserController{
+public class ShibUsersControllerImpl extends AbstractUserController{
 
 
     @Override

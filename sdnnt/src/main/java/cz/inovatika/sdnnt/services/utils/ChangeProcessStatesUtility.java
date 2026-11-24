@@ -25,7 +25,7 @@ public class ChangeProcessStatesUtility {
 
     
     public static SolrInputDocument changeProcessState(String curState, String license, MarcRecord mr, String user, String message) {
-        List<String> previous = mr.dntstav;
+        //List<String> previous = mr.dntstav;
         CuratorItemState kstav = CuratorItemState.valueOf(curState);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
         if (license != null) {
@@ -52,7 +52,7 @@ public class ChangeProcessStatesUtility {
     }
     
     public static SolrInputDocument changeProcessState(String state, MarcRecord mr, String user, String message) {
-        List<String> previous = mr.dntstav;
+        //List<String> previous = mr.dntstav;
         CuratorItemState kstav = CuratorItemState.valueOf(state);
         PublicItemState pstav = kstav.getPublicItemState(new DocumentProxy(mr, null));
         if (pstav != null && (pstav.equals(PublicItemState.A) || pstav.equals(PublicItemState.PA))) {

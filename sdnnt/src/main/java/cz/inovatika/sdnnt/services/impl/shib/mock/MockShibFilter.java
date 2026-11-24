@@ -55,9 +55,9 @@ public class MockShibFilter implements javax.servlet.Filter {
         try {
             String initParameter = filterConfig.getInitParameter("shibfile");
             if (initParameter != null) {
-                this.shibTable = initFromFile(initParameter);
+                MockShibFilter.shibTable = initFromFile(initParameter);
             } else {
-                this.shibTable = initDefaultShibTable();
+                MockShibFilter.shibTable = initDefaultShibTable();
             }
         } catch ( IOException e) {
             LOGGER.log(Level.SEVERE,e.getMessage(),e);

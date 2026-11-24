@@ -37,7 +37,8 @@ public class SimpleGET {
         HttpURLConnection conn= (HttpURLConnection) url.openConnection();
         //conn.setInstanceFollowRedirects( true);
         conn.setRequestProperty("Content-Type", "application/json");
-        int responseCode = conn.getResponseCode();
+        //int responseCode = 
+        conn.getResponseCode();
 
         String s = "";
         try(InputStream is = conn.getInputStream()) {

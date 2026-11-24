@@ -6,7 +6,6 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import cz.inovatika.sdnnt.services.kraminstances.InstanceConfiguration.KramVersion;
 import cz.inovatika.sdnnt.utils.StringUtils;
 
 /**
@@ -154,7 +153,7 @@ public class InstanceConfiguration {
         
         JSONArray jsonArray = instOBject.optJSONArray("additional_sigla");
         if (jsonArray != null && jsonArray.length() > 0) {
-            List<String> siglas = new ArrayList();
+            List<String> siglas = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 String aSigla = jsonArray.getString(i);
                 siglas.add(aSigla);

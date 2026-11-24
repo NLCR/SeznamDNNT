@@ -40,9 +40,9 @@ public class ShibbolethUtils {
      */
     public static boolean isUnderShibbolethSession(HttpServletRequest httpServletRequest) {
         boolean foundIdentityProvider = false;
-        Enumeration headerNames = httpServletRequest.getHeaderNames();
+        Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
         while(headerNames.hasMoreElements()) {
-            String hname = (String) headerNames.nextElement();
+            String hname = headerNames.nextElement();
             if (hname.toLowerCase().contains(SHIB_PROVIDER_KEY.toLowerCase())) {
                 String headerValue = httpServletRequest.getHeader(hname);
                 if ((headerValue != null) && (!headerValue.trim().equals(""))) {
@@ -68,9 +68,9 @@ public class ShibbolethUtils {
     }
     
     public static String getShibbolethSessionId(HttpServletRequest httpServletRequest) {
-        Enumeration headerNames = httpServletRequest.getHeaderNames();
+        Enumeration<String> headerNames = httpServletRequest.getHeaderNames();
         while(headerNames.hasMoreElements()) {
-            String hname = (String) headerNames.nextElement();
+            String hname = headerNames.nextElement();
             if (hname.toLowerCase().contains(SHIB_SESSION_KEY.toLowerCase())) {
                 String headerValue = httpServletRequest.getHeader(hname);
                 if ((headerValue != null) && (!headerValue.trim().equals(""))) {

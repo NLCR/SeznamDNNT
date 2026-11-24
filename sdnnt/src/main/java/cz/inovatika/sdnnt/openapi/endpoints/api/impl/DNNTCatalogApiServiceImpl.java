@@ -126,7 +126,7 @@ public class DNNTCatalogApiServiceImpl extends CatalogApiService {
                 JSONObject doc = jsonArray.getJSONObject(i);
                 CatalogItem item = createcatalogItemFromJSON(doc);
 
-                String frbr = null;
+                //String frbr = null;
                 if (doc.has("frbr")) {
                     /* Disabled frbr
                     frbr = doc.getString("frbr");

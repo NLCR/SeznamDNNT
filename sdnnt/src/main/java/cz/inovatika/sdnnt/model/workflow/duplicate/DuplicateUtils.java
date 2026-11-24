@@ -294,7 +294,7 @@ public class DuplicateUtils {
         JSONArray dest = new JSONArray();
         for (Object object : source) {
             String str = object.toString();
-            dest.put(new JSONObject(object.toString()));
+            dest.put(new JSONObject(str));
         }
         return dest;
     }

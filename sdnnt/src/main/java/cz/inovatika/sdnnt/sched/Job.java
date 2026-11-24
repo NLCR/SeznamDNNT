@@ -687,7 +687,8 @@ public class Job implements InterruptableJob {
                     EUIPOCancelService impl = new EUIPOCancelServiceImpl(logger, iteration, results);
                     try {
                         List<String> checkBK = impl.check();
-                        int updatedBKCount = impl.update(checkBK);
+                        //int updatedBKCount = 
+                        impl.update(checkBK);
 
                     } catch (Exception e) {
                         impl.getLogger().log(Level.SEVERE, e.getMessage(), e);

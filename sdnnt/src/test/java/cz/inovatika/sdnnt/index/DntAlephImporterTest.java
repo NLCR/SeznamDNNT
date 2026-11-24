@@ -59,7 +59,8 @@ public class DntAlephImporterTest {
                 }
             });
 
-            List<SolrInputDocument> collected = importer.recs.stream().map(r -> {
+            //List<SolrInputDocument> collected = 
+            importer.recs.stream().map(r -> {
                 SolrInputDocument sDoc = new SolrInputDocument();
                 MarcRecordUtilsToRefactor.addStavFromMarc(sDoc, r.dataFields);
                 return sDoc;
@@ -113,7 +114,7 @@ public class DntAlephImporterTest {
     public void testReadDocument3() throws XMLStreamException {
         InputStream resourceAsStream = DntAlephImporterTest.class.getResourceAsStream("oai.3.xml");
         Assert.assertNotNull(resourceAsStream);
-        XMLStreamReader reader = null;
+        //XMLStreamReader reader = null;
     }
     
     @Test

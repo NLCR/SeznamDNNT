@@ -77,7 +77,7 @@ public class User {
   private String pwd;
   private String role;
   private String state;
-  private boolean isActive = true;
+  //private boolean isActive = true;
   private String typ = Typ.fyzickaOsoba.getTyp();
   private String titul;
   private String jmeno;

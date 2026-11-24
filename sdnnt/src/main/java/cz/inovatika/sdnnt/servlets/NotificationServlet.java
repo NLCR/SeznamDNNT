@@ -240,7 +240,8 @@ public class NotificationServlet extends HttpServlet {
                         notification.setUser(login.getUser().getUsername());
                         
                         NotificationsService service = new NotificationServiceImpl(controler, mailService);
-                        RuleNotification saved = service.saveNotificationRule((RuleNotification) notification);
+                        //RuleNotification saved = 
+                        service.saveNotificationRule((RuleNotification) notification);
 
                         
                         List<AbstractNotification> simple = service.findNotificationsByUser(login.getUser().getUsername(), TYPE.simple);

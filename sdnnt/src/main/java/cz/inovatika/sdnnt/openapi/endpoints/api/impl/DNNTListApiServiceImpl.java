@@ -362,7 +362,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
 //        }
 //    }
 
-    private void aStav(List<String> plusList) {
+    /*private void aStav(List<String> plusList) {
         plusList.add(MarcRecordFields.DNTSTAV_FIELD+":A");
     }
 
@@ -373,7 +373,7 @@ public class DNNTListApiServiceImpl extends ListsApiService {
         }
         if(!list.contains(PID_KEY)) { list.add(0,PID_KEY); }
         return list;
-    }
+    }*/
 
 
 //    @Override

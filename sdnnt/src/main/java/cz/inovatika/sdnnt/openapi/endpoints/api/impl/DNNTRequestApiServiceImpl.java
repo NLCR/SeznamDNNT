@@ -54,10 +54,10 @@ import cz.inovatika.sdnnt.openapi.endpoints.model.SuccessRequestSaved;
 import cz.inovatika.sdnnt.services.AccountService;
 import cz.inovatika.sdnnt.services.exceptions.AccountException;
 import cz.inovatika.sdnnt.services.exceptions.ConflictException;
-import cz.inovatika.sdnnt.services.impl.AbstractUserController;
+//import cz.inovatika.sdnnt.services.impl.AbstractUserController;
 import cz.inovatika.sdnnt.services.impl.AccountServiceImpl;
 import cz.inovatika.sdnnt.services.impl.ResourceBundleServiceImpl;
-import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
+//import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 
 
 @Service
@@ -99,7 +99,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
     public Response requestGet(String status, String internalStatus,String navrh, SecurityContext securityContext, ContainerRequestContext containerRequestContext) throws NotFoundException {
         String headerString = containerRequestContext.getHeaderString(API_KEY_HEADER);
         if (headerString != null) {
-            AbstractUserController userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
+            //AbstractUserController userControler = new UserControlerImpl(null);//.findUserByApiKey(headerString);
             OpenApiLoginSupportImpl loginSupport = new OpenApiLoginSupportImpl(headerString);
             if (loginSupport.getUser() != null) {
                 ArrayOfSavedRequest arrayOfSavedRequest = new ArrayOfSavedRequest();
@@ -260,8 +260,7 @@ public class DNNTRequestApiServiceImpl extends RequestApiService {
                                 //List<String> nidentifiers = new ArrayList<>(identifiers);
                                 if (!validIdentifiers.isEmpty()) {
 
-                                    JSONObject prepare = accountService.prepare(navrh);
-                                    Zadost zadost = Zadost.fromJSON(prepare.toString());
+                                    Zadost zadost = Zadost.fromJSON(accountService.prepare(navrh).toString());
 
                                     zadost.setIdentifiers(validIdentifiers);
 

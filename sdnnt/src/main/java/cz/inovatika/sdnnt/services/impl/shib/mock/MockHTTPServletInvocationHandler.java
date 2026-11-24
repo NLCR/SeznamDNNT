@@ -14,17 +14,17 @@ public class MockHTTPServletInvocationHandler implements InvocationHandler {
     public static final Logger LOGGER = Logger.getLogger(MockHTTPServletInvocationHandler.class.getName());
     
     public static class EmbeddedEnumeration  implements Enumeration<String> {
-        private HttpServletRequest request;
-        private Hashtable<String, String> table;
+        //private HttpServletRequest request;
+        //private Hashtable<String, String> table;
 
         private List<String> list = new ArrayList<>();
         public EmbeddedEnumeration(HttpServletRequest request, Hashtable<String, String> table) {
-            this.request = request;
-            this.table = table;
-            Enumeration headerNames = request.getHeaderNames();
-            while(headerNames.hasMoreElements()) list.add((String) headerNames.nextElement());
-            Enumeration tableKeys = table.keys();
-            while(tableKeys.hasMoreElements()) list.add((String) tableKeys.nextElement());
+            //this.request = request;
+            //this.table = table;
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while(headerNames.hasMoreElements()) list.add(headerNames.nextElement());
+            Enumeration<String> tableKeys = table.keys();
+            while(tableKeys.hasMoreElements()) list.add(tableKeys.nextElement());
         }
 
         @Override

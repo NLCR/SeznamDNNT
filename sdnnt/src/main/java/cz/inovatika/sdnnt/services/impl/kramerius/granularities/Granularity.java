@@ -39,7 +39,7 @@ public class Granularity {
     private List<Marc911Rule> rules = new ArrayList<>();
     
     // runtime dirty flag
-    private boolean dirty = false;
+    //private boolean dirty = false;
     
     public Granularity(String identifier) {
         super();
@@ -149,7 +149,7 @@ public class Granularity {
             InstanceConfiguration inst = conf.match(baseUrl);
             if (inst != null) {
                 if (inst.isShouldSkip()) {
-                    this.dirty = true;
+                    //this.dirty = true;
                     toDelete.add(gf);
                     this.gfields.remove(gf);
                 } else {
@@ -158,7 +158,7 @@ public class Granularity {
                 }
             } else {
                 // no instance in configuration; the same as skip=true
-                this.dirty = true;
+                //this.dirty = true;
                 toDelete.add(gf);
                 this.gfields.remove(gf);
             }

@@ -36,7 +36,7 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
         String cislo = jsonObject.optString("cislo");
         String link = jsonObject.optString("link");
         String rocnik = jsonObject.optString("rocnik");
-        String fetched  = jsonObject.optString("fetched");
+        //String fetched  = jsonObject.optString("fetched");
 
         boolean pidpaths = true;
         
@@ -84,8 +84,8 @@ public class ModelDocumentOutput  implements  SolrDocumentOutput{
 
     @Override
     public void output(Pair<String,String> digitalLibraryFilter, Map<String, Object> outputDocument, List<String> ordering, String endpointLicense, boolean doNotEmitParent) {
-        Collection pids = (Collection) outputDocument.get(PIDS_KEY);
-        Set<String> setPids = new LinkedHashSet(pids);
+        Collection<String> pids = (Collection<String>) outputDocument.get(PIDS_KEY);
+        Set<String> setPids = new LinkedHashSet<>(pids);
         if (!setPids.isEmpty()) {
             setPids.forEach(pid-> {
                 pidOutput(digitalLibraryFilter, outputDocument, endpointLicense, pid);

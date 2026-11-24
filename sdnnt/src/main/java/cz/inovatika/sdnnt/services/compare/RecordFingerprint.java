@@ -5,7 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.solr.common.SolrDocument;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public final class RecordFingerprint {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(RecordFingerprint.class);
+    //private static final org.slf4j.Logger log = LoggerFactory.getLogger(RecordFingerprint.class);
     private final String rawBasicFields;
 
     private final String basicFieldsHash;

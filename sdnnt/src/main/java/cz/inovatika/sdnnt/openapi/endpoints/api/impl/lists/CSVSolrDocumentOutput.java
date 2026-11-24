@@ -2,7 +2,7 @@ package cz.inovatika.sdnnt.openapi.endpoints.api.impl.lists;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONArray;
+//import org.json.JSONArray;
 import org.json.JSONObject;
 
 import cz.inovatika.sdnnt.openapi.endpoints.api.impl.utils.PIDSupport;
@@ -41,12 +41,12 @@ public class CSVSolrDocumentOutput implements  SolrDocumentOutput{
         List<String> granularity = (List<String>) outputDocument.get(GRANUARITY_KEY);
         granularity.stream().map(it-> new JSONObject(it)).forEach(jsonObject -> {
             // pokud je vyrazeno nebo x - nepropagovat 
-            JSONArray stav = jsonObject.optJSONArray("stav");
+            //JSONArray stav = jsonObject.optJSONArray("stav");
             String license = jsonObject.optString("license");
-            String cislo = jsonObject.optString("cislo");
+            //String cislo = jsonObject.optString("cislo");
             String link = jsonObject.optString("link");
-            String rocnik = jsonObject.optString("rocnik");
-            String fetched = jsonObject.optString("fetched");
+            //String rocnik = jsonObject.optString("rocnik");
+            //String fetched = jsonObject.optString("fetched");
 
             if (jsonObject.has("cislo") || jsonObject.has("rocnik") || jsonObject.has("fetched")) {
                 if (link != null)  {

@@ -464,10 +464,10 @@ public abstract class GranularityDocChange {
                     JSONObject granitem = pair.getRight().put(HistoryObjectUtils.STAV_FIELD, PublicItemState.D.name());
                     
                     String stav = JSONUtils.first(granitem, "stav");
-                    String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                    //String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
                     String license = granitem.optString("license");
                     String rocnik = granitem.optString("rocnik");
-                    String date = granitem.optString("date");
+                    //String date = granitem.optString("date");
                     String cislo = granitem.optString("cislo");
                     
                     String link = JSONUtils.first(granitem, "link");
@@ -499,10 +499,10 @@ public abstract class GranularityDocChange {
                 JSONObject granitem = changedMap.get(changedKey).getValue();
 
                 String stav = JSONUtils.first(granitem, "stav");
-                String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                //String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
                 String license = granitem.optString("license");
                 String rocnik = granitem.optString("rocnik");
-                String date = granitem.optString("date");
+                //String date = granitem.optString("date");
                 String cislo = granitem.optString("cislo");
                 
                 
@@ -543,10 +543,10 @@ public abstract class GranularityDocChange {
                 JSONObject granitem = right.getValue();
 
                 String stav = JSONUtils.first(granitem, "stav");
-                String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
+                //String kuratorStav = JSONUtils.first(granitem, "kuratorstav");
                 String license = granitem.optString("license");
                 String rocnik = granitem.optString("rocnik");
-                String date = granitem.optString("date");
+                //String date = granitem.optString("date");
                 String cislo = granitem.optString("cislo");
                 
                 String link = JSONUtils.first(granitem, "link");
