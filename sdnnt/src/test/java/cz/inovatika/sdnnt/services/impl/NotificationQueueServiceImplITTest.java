@@ -1,7 +1,6 @@
 package cz.inovatika.sdnnt.services.impl;
 
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;

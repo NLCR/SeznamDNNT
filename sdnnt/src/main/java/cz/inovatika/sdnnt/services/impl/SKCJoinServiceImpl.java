@@ -46,7 +46,6 @@ import cz.inovatika.sdnnt.services.SKCDeleteService;
 import cz.inovatika.sdnnt.services.UserController;
 import cz.inovatika.sdnnt.services.exceptions.UserControlerException;
 import cz.inovatika.sdnnt.services.utils.ChangeProcessStatesUtility;
-import cz.inovatika.sdnnt.services.impl.shib.ShibUsersControllerImpl;
 import cz.inovatika.sdnnt.services.impl.users.UserControlerImpl;
 import cz.inovatika.sdnnt.utils.MarcRecordFields;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;

@@ -108,6 +108,29 @@
   <build>
     <plugins>
 
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>2.44.0</version>
+          <executions>
+            <execution>
+              <id>remove-generated-unused-imports</id>
+              <phase>process-sources</phase>
+              <goals>
+                <goal>apply</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <java>
+              <includes>
+                <include>target/generated-sources/src/gen/java/**/*.java</include>
+              </includes>
+              <removeUnusedImports />
+            </java>
+          </configuration>
+        </plugin>
+
 		<plugin>
           <groupId>io.swagger.codegen.v3</groupId>
           <artifactId>swagger-codegen-maven-plugin</artifactId>

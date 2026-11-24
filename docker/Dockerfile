@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Match Angular's supported Node version.
-FROM node:20.19.5-bullseye AS node
+FROM node:24.19.0-bullseye AS node
 FROM maven:3.8.5-openjdk-11 AS build
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
