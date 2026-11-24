@@ -6,6 +6,7 @@
 /sdnnt/nb-configuration.xml
 sdnnt/src/main/webapp/index.html
 sdnnt/src/main/.DS_Store
+sdnnt/src/main/ui/.angular/cache/
 /solr/**/data
 /openapi/target/
 
@@ -14,3 +15,7 @@ docker/data/logs/
 debug.log
 docker/data/config/texts/
 
+/ISSUE.bat
+/pokusAPIkey.bat
+/testPUT.bat
+find-severe.bat

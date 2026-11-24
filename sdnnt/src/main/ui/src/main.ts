@@ -1,5 +1,5 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { HttpClient, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { HttpClient, provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { enableProdMode, importProvidersFrom, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
@@ -50,7 +50,7 @@ bootstrapApplication(AppComponent, {
       AngularEditorModule,
       NgxEchartsModule.forRoot({ echarts })
     ),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
     provideAnimations(),
     { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
     provideNativeDateAdapter(),
