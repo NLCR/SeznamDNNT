@@ -27,8 +27,8 @@ export class AppService {
 
   private spinnerTopRef = this.cdkSpinnerCreate();
   private numLoading = 0;
-  private langSubject: Subject<boolean> = new Subject();
-  public langChanged: Observable<boolean> = this.langSubject.asObservable();
+  private langSubject: Subject<void> = new Subject();
+  public langChanged: Observable<void> = this.langSubject.asObservable();
 
 
   private get<T>(url: string, params: HttpParams = new HttpParams(), showingLoading: boolean = true): Observable<T> {

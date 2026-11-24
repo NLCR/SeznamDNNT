@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AppState } from './app.state';
 import { Configuration, KrameriusLibrary } from './shared/configuration';
 
@@ -137,8 +138,7 @@ import { Configuration, KrameriusLibrary } from './shared/configuration';
 
     public load(): Promise<any> {
         console.log('loading config...');
-        const promise = this.http.get('assets/config.json')
-            .toPromise()
+        const promise = firstValueFrom(this.http.get('assets/config.json'))
             .then(cfg => {
                 this.config = cfg as Configuration;
                 this.state.setConfig(this.config);
@@ -153,8 +153,7 @@ import { Configuration, KrameriusLibrary } from './shared/configuration';
             this.state.setLogged(this.config.user);
             return;
         }
-        return this.http.get('api/user/remember_login', { withCredentials: true })
-            .toPromise()
+        return firstValueFrom(this.http.get('api/user/remember_login', { withCredentials: true }))
             .then((res: any) => {
                 if (res && res.username) {this.state.setLogged(res);}
             })

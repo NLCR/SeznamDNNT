@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import cz.inovatika.sdnnt.utils.LinksUtilities;
 import cz.inovatika.sdnnt.utils.SolrJUtilities;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -233,17 +232,17 @@ public class DntAlephImporter {
         LOGGER.log(Level.INFO, "ListRecords from {0}...", url);
         String resumptionToken = null;
         File dFile = null;
-        InputStream dStream = null;
         try {
             long start = new Date().getTime();
             CloseableHttpClient client = buildOAIClient();
             //HttpGet httpGet = new HttpGet(url);
             dFile = HarvestUtils.throttle(client, "import_dnt", url);
-            dStream = new FileInputStream(dFile);
 
             reqTime += new Date().getTime() - start;
             start = new Date().getTime();
-            resumptionToken = readFromXML(dStream);
+            try (InputStream dStream = new FileInputStream(dFile)) {
+                resumptionToken = readFromXML(dStream);
+            }
             procTime += new Date().getTime() - start;
             start = new Date().getTime();
             if (!recs.isEmpty()) {
@@ -254,9 +253,6 @@ public class DntAlephImporter {
 
             solrTime += new Date().getTime() - start;
 
-            if (dStream != null ) {
-                IOUtils.closeQuietly(dStream);
-            }
             deletePaths(dFile);
 
             while (resumptionToken != null) {
@@ -268,11 +264,12 @@ public class DntAlephImporter {
                 ret.put("resumptionToken", resumptionToken);
 
                 dFile = HarvestUtils.throttle(client, "import_dnt", url);
-                dStream = new FileInputStream(dFile);
 
                 reqTime += new Date().getTime() - start;
                 start = new Date().getTime();
-                resumptionToken = readFromXML(dStream);
+                try (InputStream dStream = new FileInputStream(dFile)) {
+                    resumptionToken = readFromXML(dStream);
+                }
 
                 procTime += new Date().getTime() - start;
                 start = new Date().getTime();
@@ -287,9 +284,6 @@ public class DntAlephImporter {
                             DurationFormatUtils.formatDurationHMS(procTime),
                             DurationFormatUtils.formatDurationHMS(solrTime)});
                     recs.clear();
-                }
-                if (dStream != null ) {
-                    IOUtils.closeQuietly(dStream);
                 }
                 deletePaths(dFile);
             }

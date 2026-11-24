@@ -12,8 +12,8 @@ export class AppState {
 
   config!: Configuration;
 
-  private _paramsProcessed: ReplaySubject<string> = new ReplaySubject(3);
-  public paramsProcessed: Observable<any> = this._paramsProcessed.asObservable();
+  private _paramsProcessed: ReplaySubject<void> = new ReplaySubject(3);
+  public paramsProcessed: Observable<void> = this._paramsProcessed.asObservable();
 
   private _stateSubject = new Subject();
   public stateChanged: Observable<any> = this._stateSubject.asObservable();

@@ -5,7 +5,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -51,7 +50,6 @@ bootstrapApplication(AppComponent, {
       NgxEchartsModule.forRoot({ echarts })
     ),
     provideHttpClient(withXhr(), withInterceptorsFromDi()),
-    provideAnimations(),
     { provide: MAT_DATE_LOCALE, useValue: 'cs-CZ' },
     provideNativeDateAdapter(),
     AppState,

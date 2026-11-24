@@ -2,8 +2,8 @@ import { Observable, Subject } from 'rxjs';
 
 export class NavigationStore {
 
-    private paginatorSubject: Subject<boolean> = new Subject();
-    public paginatorChanged: Observable<boolean> = this.paginatorSubject.asObservable();
+    private paginatorSubject: Subject<void> = new Subject();
+    public paginatorChanged: Observable<void> = this.paginatorSubject.asObservable();
 
     private _navigationUIStore =new Map();
 

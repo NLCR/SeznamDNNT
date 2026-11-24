@@ -1,19 +1,26 @@
 package {{apiPackage}};
 
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 
 import java.text.FieldPosition;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class RFC3339DateFormat extends ISO8601DateFormat {
+public class RFC3339DateFormat extends StdDateFormat {
 
-    // Same as ISO8601DateFormat but serializing milliseconds.
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneOffset.UTC);
+
+    // Preserve the previous UTC output with millisecond precision.
     @Override
     public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition) {
-        String value = ISO8601Utils.format(date, true);
-        toAppendTo.append(value);
+        toAppendTo.append(FORMATTER.format(date.toInstant()));
         return toAppendTo;
     }
 
+    @Override
+    public RFC3339DateFormat clone() {
+        return new RFC3339DateFormat();
+    }
 }
