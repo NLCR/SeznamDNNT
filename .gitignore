@@ -14,8 +14,3 @@ docker/data/solr-persistence/solr/server/solr/
 docker/data/logs/
 debug.log
 docker/data/config/texts/
-
-/ISSUE.bat
-/pokusAPIkey.bat
-/testPUT.bat
-find-severe.bat
