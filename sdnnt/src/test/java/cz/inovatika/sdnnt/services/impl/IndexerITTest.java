@@ -68,23 +68,23 @@ public class IndexerITTest {
         InputStream resourceAsStream = dntAlephStream("oai_SE_dnnt.xml");
         Assert.assertNotNull(resourceAsStream);
         alephImport(resourceAsStream,36);
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:DNT01-000172209\"");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
         // i granularita musi mit N
-        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:DNT01-000172209", "N", "N", License.dnnto.name(),"poznamka",  "test");
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:DNT01-000172209", "N", "N", License.dnnto.name(),"poznamka",  "test");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         solrQuery = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:DNT01-000172209\"");
-        catalog = prepare.getClient().query("catalog", solrQuery);
+        catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertTrue(catalog.getResults().getNumFound() == 1);
 
-        MarcRecord changedMarcRercord = MarcRecord.fromIndex(prepare.getClient(), "oai:aleph-nkp.cz:DNT01-000172209");
+        MarcRecord changedMarcRercord = MarcRecord.fromIndex(SolrTestServer.getClient(), "oai:aleph-nkp.cz:DNT01-000172209");
         Assert.assertTrue(changedMarcRercord.dntstav != null);
         Assert.assertTrue(changedMarcRercord.dntstav.size() == 1);
         Assert.assertTrue(changedMarcRercord.dntstav.get(0).equals("N"));
@@ -129,12 +129,12 @@ public class IndexerITTest {
         
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:SKC01-000083605\"");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
 
-        Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000083605","N" , "N", null,"poznamka",  "test");
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-000083605","N" , "N", null,"poznamka",  "test");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
     }
 
@@ -177,10 +177,10 @@ public class IndexerITTest {
         // DX
         SolrQuery solrQuery  = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:SKC01-000683439\"");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertTrue(catalog.getResults().getNumFound() == 1);
 
-        MarcRecord changedMarcRercord = MarcRecord.fromIndex(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000683439");
+        MarcRecord changedMarcRercord = MarcRecord.fromIndex(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-000683439");
         Assert.assertTrue(changedMarcRercord.dntstav != null);
         Assert.assertTrue(changedMarcRercord.dntstav.size() == 1);
         Assert.assertTrue(changedMarcRercord.dntstav.get(0).equals("N"));
@@ -188,9 +188,9 @@ public class IndexerITTest {
         Assert.assertTrue(changedMarcRercord.historie_kurator_stavu != null);
         Assert.assertTrue(changedMarcRercord.historie_kurator_stavu.length() == 5);
 
-        ImporterUtils.changePNState(Logger.getLogger("testLogger"), prepare.getClient(), Arrays.asList("oai:aleph-nkp.cz:SKC01-000683439"), "kosmas");
+        ImporterUtils.changePNState(Logger.getLogger("testLogger"), SolrTestServer.getClient(), Arrays.asList("oai:aleph-nkp.cz:SKC01-000683439"), "kosmas");
 
-        changedMarcRercord = MarcRecord.fromIndex(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-000683439");
+        changedMarcRercord = MarcRecord.fromIndex(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-000683439");
         Assert.assertTrue(changedMarcRercord.dntstav != null);
         Assert.assertTrue(changedMarcRercord.dntstav.size() == 1);
         Assert.assertTrue(changedMarcRercord.dntstav.get(0).equals("N"));
@@ -203,14 +203,14 @@ public class IndexerITTest {
 
         solrQuery  = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:SKC01-002326581\"");
-        catalog = prepare.getClient().query("catalog", solrQuery);
+        catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertTrue(catalog.getResults().getNumFound() == 1);
 
-        changedMarcRercord = MarcRecord.fromIndex(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-002326581");
+        changedMarcRercord = MarcRecord.fromIndex(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-002326581");
 
-        ImporterUtils.changePNState(Logger.getLogger("testLogger"), prepare.getClient(), Arrays.asList("oai:aleph-nkp.cz:SKC01-002326581"), "kosmas");
+        ImporterUtils.changePNState(Logger.getLogger("testLogger"), SolrTestServer.getClient(), Arrays.asList("oai:aleph-nkp.cz:SKC01-002326581"), "kosmas");
 
-        changedMarcRercord = MarcRecord.fromIndex(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-002326581");
+        changedMarcRercord = MarcRecord.fromIndex(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-002326581");
 
         Assert.assertTrue(changedMarcRercord.dntstav != null);
         Assert.assertTrue(changedMarcRercord.dntstav.size() == 1);

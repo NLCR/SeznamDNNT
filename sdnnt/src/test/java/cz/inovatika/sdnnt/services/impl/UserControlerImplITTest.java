@@ -67,7 +67,7 @@ public class UserControlerImplITTest {
 
         // delete solr
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -89,8 +89,8 @@ public class UserControlerImplITTest {
         registerOneUser(regUser,sendRegistrationMail,  EasyMock.createMock(HttpServletRequest.class));
 
         // find user
-        List<User> users = prepare.getClient().query("users", solrQuery).getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
-        //List<User> users = prepare.getClient().query("users", solrQuery).getBeans(User.class);
+        List<User> users = SolrTestServer.getClient().query("users", solrQuery).getResults().stream().map(User::fromSolrDocument).collect(Collectors.toList());
+        //List<User> users = SolrTestServer.getClient().query("users", solrQuery).getBeans(User.class);
         Assert.assertTrue(users.size() == 1);
 
         // login
@@ -118,7 +118,7 @@ public class UserControlerImplITTest {
                 .addMockedMethod("buildClient").createMock();
 
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.replay(loginRequest, loginSession, userControler);
 
         User login = userControler.login();
@@ -137,7 +137,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -150,7 +150,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
@@ -184,7 +184,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -197,7 +197,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
@@ -232,7 +232,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -245,7 +245,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
 
         EasyMock.replay(request, session, userControler);
         List<User> all = userControler.getAll();
@@ -277,7 +277,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -288,7 +288,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
@@ -315,7 +315,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -326,7 +326,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
@@ -367,7 +367,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -378,7 +378,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();
@@ -421,7 +421,7 @@ public class UserControlerImplITTest {
         }
 
         SolrQuery solrQuery = new SolrQuery().setQuery("*:*");
-        QueryResponse response = prepare.getClient().query("users", solrQuery);
+        QueryResponse response = SolrTestServer.getClient().query("users", solrQuery);
         long numFound = response.getResults().getNumFound();
         Assert.assertTrue(numFound == 0);
 
@@ -439,7 +439,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
 
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
@@ -498,7 +498,7 @@ public class UserControlerImplITTest {
                 .withConstructor(request, mailService)
                 .addMockedMethod("buildClient").createMock();
 
-        //EasyMock.expect(userControler.buildClient()).andReturn(prepare.getClient()).anyTimes();
+        //EasyMock.expect(userControler.buildClient()).andReturn(SolrTestServer.getClient()).anyTimes();
         EasyMock.expect(userControler.buildClient()).andDelegateTo(
                 new BuildSolrClientSupport()
         ).anyTimes();

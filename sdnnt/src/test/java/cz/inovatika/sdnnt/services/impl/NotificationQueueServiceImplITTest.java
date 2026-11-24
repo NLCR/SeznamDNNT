@@ -361,20 +361,20 @@ public class NotificationQueueServiceImplITTest {
         document.setField("summary", id);
         document.setField("payload", payload.toString());
 
-        prepare.getClient().add(COLLECTION, document);
-        SolrJUtilities.quietCommit(prepare.getClient(), COLLECTION);
+        SolrTestServer.getClient().add(COLLECTION, document);
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), COLLECTION);
     }
 
     private long countByStatus(String status) throws SolrServerException, IOException {
         SolrQuery query = new SolrQuery("*:*")
                 .addFilterQuery("status:" + status)
                 .setRows(0);
-        QueryResponse response = prepare.getClient().query(COLLECTION, query);
+        QueryResponse response = SolrTestServer.getClient().query(COLLECTION, query);
         return response.getResults().getNumFound();
     }
 
     private SolrDocument event(String id) throws SolrServerException, IOException {
-        return prepare.getClient().getById(COLLECTION, id);
+        return SolrTestServer.getClient().getById(COLLECTION, id);
     }
 
     private User user(String username, String email, String firstName, String lastName) {

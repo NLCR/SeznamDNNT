@@ -123,15 +123,15 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
         Assert.assertNotNull(marcRecord2);
 
-        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
-        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
         
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
@@ -151,9 +151,9 @@ public class NotificationServiceImplITTest {
         solrMarc2.datum_stavu = calendar2.getTime();
  
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -251,15 +251,15 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
         Assert.assertNotNull(marcRecord2);
 
-        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
-        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
         
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
@@ -280,9 +280,9 @@ public class NotificationServiceImplITTest {
         solrMarc2.datum_stavu = calendar2.getTime();
  
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -383,15 +383,15 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
         Assert.assertNotNull(marcRecord2);
 
-        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
-        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
         
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
@@ -412,9 +412,9 @@ public class NotificationServiceImplITTest {
         solrMarc2.datum_stavu = calendar2.getTime();
  
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -520,15 +520,15 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
         Assert.assertNotNull(marcRecord2);
 
-        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
-        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
         
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
@@ -549,9 +549,9 @@ public class NotificationServiceImplITTest {
         solrMarc2.datum_stavu = calendar2.getTime();
  
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -656,15 +656,15 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord2 = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057930");
         Assert.assertNotNull(marcRecord2);
 
-        prepare.getClient().add(  "catalog", marcRecord1.toSolrDoc());
-        prepare.getClient().add(  "catalog", marcRecord2.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", marcRecord2.toSolrDoc());
 
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
         
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 2);
         // saved marc record
@@ -685,9 +685,9 @@ public class NotificationServiceImplITTest {
         solrMarc2.datum_stavu = calendar2.getTime();
  
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        prepare.getClient().add(  "catalog", solrMarc2.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrTestServer.getClient().add(  "catalog", solrMarc2.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -787,11 +787,11 @@ public class NotificationServiceImplITTest {
         InputStream resourceAsStream = dntAlephStream("oai_SE_dnnt.xml");
         Assert.assertNotNull(resourceAsStream);
         alephImport(resourceAsStream,36);
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("identifier:\"oai:aleph-nkp.cz:DNT01-000172209\"");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         long numFound = catalog.getResults().getNumFound();
         Assert.assertTrue(numFound == 1);
         // saved marc record
@@ -805,8 +805,8 @@ public class NotificationServiceImplITTest {
         solrMarc1.datum_stavu = calendar1.getTime();
 
         // save and commit
-        prepare.getClient().add(  "catalog", solrMarc1.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add(  "catalog", solrMarc1.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -877,12 +877,12 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
         Assert.assertNotNull(marcRecord);
 
-        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertEquals(1, catalog.getResults().getNumFound());
 
         MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
@@ -891,8 +891,8 @@ public class NotificationServiceImplITTest {
         solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
         solrMarc.datum_stavu = Calendar.getInstance().getTime();
 
-        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -959,12 +959,12 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
         Assert.assertNotNull(marcRecord);
 
-        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertEquals(1, catalog.getResults().getNumFound());
 
         MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
@@ -972,8 +972,8 @@ public class NotificationServiceImplITTest {
         solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
         solrMarc.datum_stavu = Calendar.getInstance().getTime();
 
-        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -1046,12 +1046,12 @@ public class NotificationServiceImplITTest {
         MarcRecord marcRecord = catalogDoc("notifications/oai:aleph-nkp.cz:DNT01-000057932");
         Assert.assertNotNull(marcRecord);
 
-        prepare.getClient().add("catalog", marcRecord.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", marcRecord.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         SolrQuery solrQuery = new SolrQuery();
         solrQuery.setQuery("*:*");
-        QueryResponse catalog = prepare.getClient().query("catalog", solrQuery);
+        QueryResponse catalog = SolrTestServer.getClient().query("catalog", solrQuery);
         Assert.assertEquals(1, catalog.getResults().getNumFound());
 
         MarcRecord solrMarc = MarcRecord.fromDocDep(catalog.getResults().get(0));
@@ -1059,8 +1059,8 @@ public class NotificationServiceImplITTest {
         solrMarc.setKuratorStav("N", "N", null, "testuser", "zmena stavu");
         solrMarc.datum_stavu = Calendar.getInstance().getTime();
 
-        prepare.getClient().add("catalog", solrMarc.toSolrDoc());
-        SolrJUtilities.quietCommit(prepare.getClient(), "catalog");
+        SolrTestServer.getClient().add("catalog", solrMarc.toSolrDoc());
+        SolrJUtilities.quietCommit(SolrTestServer.getClient(), "catalog");
 
         MailServiceImpl mailService = EasyMock.createMockBuilder(MailServiceImpl.class)
                 .addMockedMethod("sendNotificationEmail")
@@ -1097,7 +1097,7 @@ public class NotificationServiceImplITTest {
         service.saveSimpleNotification(simpleNotification("test1", "notification_knihovna_oai_aleph-nkp.cz_SKC01-000057932.json"));
         service.processNotifications(NotificationInterval.den);
 
-        QueryResponse response = prepare.getClient().query("notification_events",
+        QueryResponse response = SolrTestServer.getClient().query("notification_events",
                 new SolrQuery("*:*")
                         .addFilterQuery("event_type:user_notification_email")
                         .addFilterQuery("status:ready"));

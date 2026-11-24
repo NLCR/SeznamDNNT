@@ -67,9 +67,9 @@ public class SKCTypeServiceTTest {
             return;
         }
         try {
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka", "test");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka", "test");
             
             SKCTypeServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCTypeServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
@@ -122,9 +122,9 @@ public class SKCTypeServiceTTest {
             return;
         }
         try {
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "test");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "test");
             
             SKCTypeServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCTypeServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())

@@ -77,7 +77,7 @@ public class SKCJoinServiceImplITTest {
             client.commit("notification_events");
         }
 
-        QueryResponse response = prepare.getClient().query("notification_events",
+        QueryResponse response = SolrTestServer.getClient().query("notification_events",
                 new SolrQuery("*:*")
                         .addFilterQuery("event_type:skc_join_successor_found")
                         .addFilterQuery("status:ready")
@@ -124,7 +124,7 @@ public class SKCJoinServiceImplITTest {
             client.commit("notification_events");
         }
 
-        QueryResponse response = prepare.getClient().query("notification_events",
+        QueryResponse response = SolrTestServer.getClient().query("notification_events",
                 new SolrQuery("*:*")
                         .addFilterQuery("event_type:skc_join_successor_found")
                         .addFilterQuery("status:ready"));
@@ -187,7 +187,7 @@ public class SKCJoinServiceImplITTest {
             client.commit("notification_events");
         }
 
-        QueryResponse response = prepare.getClient().query("notification_events",
+        QueryResponse response = SolrTestServer.getClient().query("notification_events",
                 new SolrQuery("*:*")
                         .addFilterQuery("event_type:skc_join_successor_found")
                         .addFilterQuery("status:ready")
@@ -266,7 +266,7 @@ public class SKCJoinServiceImplITTest {
             client.commit("notification_events");
         }
 
-        QueryResponse response = prepare.getClient().query("notification_events", new SolrQuery("*:*").setRows(0));
+        QueryResponse response = SolrTestServer.getClient().query("notification_events", new SolrQuery("*:*").setRows(0));
         Assert.assertEquals(0, response.getResults().getNumFound());
 
         EasyMock.verify(mailService, service);

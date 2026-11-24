@@ -70,11 +70,11 @@ public class OAIHarvestDeleteServiceTTest {
             return;
         }
         try {
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "zmena na A");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N","N", License.dnnto.name(),"poznamka",  "zmena na N");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA","PA", License.dnnto.name(),"poznamka",  "zmena na PA");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A","A", License.dnnto.name(),"poznamka",  "zmena na A");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "N","N", License.dnnto.name(),"poznamka",  "zmena na N");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "PA","PA", License.dnnto.name(),"poznamka",  "zmena na PA");
 
                     //public SKCDeleteServiceImpl(String loggerName, JSONObject results, List<String> deletedInfo) {
             //String loggerName, JSONObject results, List<String> deletedInfo
@@ -110,7 +110,7 @@ public class OAIHarvestDeleteServiceTTest {
             EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
             EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
 
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
             
             try(SolrClient client = SolrTestServer.getClient()) {
                 SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
@@ -146,10 +146,10 @@ public class OAIHarvestDeleteServiceTTest {
             return;
         }
         try {
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
             
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","A", "A", License.dnnto.name(),"poznamka",  "test");
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","D" ,"D", null,"poznamka",  "test");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","A", "A", License.dnnto.name(),"poznamka",  "test");
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067","D" ,"D", null,"poznamka",  "test");
 
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
@@ -183,7 +183,7 @@ public class OAIHarvestDeleteServiceTTest {
             EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
             EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
 
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc_changed_states.xml"),31, true, true, skcDeleteService);
             
             try(SolrClient client = SolrTestServer.getClient()) {
                 SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
@@ -207,8 +207,8 @@ public class OAIHarvestDeleteServiceTTest {
             return;
         }
         try {
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
-            //Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            //Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", License.dnnto.name(),"poznamka", new JSONArray(), "test");
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject())
                     .addMockedMethod("getOptions")
@@ -241,7 +241,7 @@ public class OAIHarvestDeleteServiceTTest {
             EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
             EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
 
-            alephImport(prepare.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
             
             try(SolrClient client = SolrTestServer.getClient()) {
                 SolrQuery catalogQuery = new SolrQuery("identifier:\"oai:aleph-nkp.cz:SKC01-001579067\"")
@@ -280,8 +280,8 @@ public class OAIHarvestDeleteServiceTTest {
                     + "        }}";
                     
             
-            alephImport(prepare.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
-            Indexer.changeStavDirect(prepare.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka",  "test");
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/update/oai_skc1.xml"),31, true, true);
+            Indexer.changeStavDirect(SolrTestServer.getClient(), "oai:aleph-nkp.cz:SKC01-001579067", "A", "A", License.dnnto.name(),"poznamka",  "test");
             SKCDeleteServiceImpl skcDeleteService = EasyMock.createMockBuilder(SKCDeleteServiceImpl.class)
                     .withConstructor("test-logger",new JSONObject(config).getJSONObject("OAIHavest").getJSONObject("results"))
                     .addMockedMethod("getOptions")
@@ -317,9 +317,9 @@ public class OAIHarvestDeleteServiceTTest {
             EasyMock.expect(skcDeleteService.buildAccountService()).andReturn(aService).anyTimes();
             EasyMock.replay(skcDeleteService, options, controler, appSupport, bservice, aService);
             // vede na zadost
-            alephImport(prepare.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
             // zadost vytvorena, nemela by se objevit
-            alephImport(prepare.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
+            alephImport(SolrTestServer.getClient(), skcAlephStream("skc/delete/oai_skc1_deleted.xml"),30, true, true, skcDeleteService);
 
             
             try(SolrClient client = SolrTestServer.getClient()) {
