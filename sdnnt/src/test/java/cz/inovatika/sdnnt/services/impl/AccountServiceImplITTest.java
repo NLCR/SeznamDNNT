@@ -133,8 +133,8 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service, appLogin,bservice);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
@@ -196,8 +196,8 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service, appLogin);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
@@ -216,8 +216,6 @@ public class AccountServiceImplITTest {
 
 
         service.saveRequest(zadost.toJSON().toString(), null);
-
-        String pokusny11234 = service.getRequest("pokusny11234").toString();
 
         Zadost zadostFromSolr = Zadost.fromJSON(service.getRequest("pokusny11234").toString());
         Map<String, ZadostProcess> process = zadostFromSolr.getProcess();
@@ -256,8 +254,8 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service, appLogin);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
@@ -307,8 +305,8 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service,appLogin);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
@@ -353,8 +351,8 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service,appSupport);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
         Zadost zadost = new Zadost("pokusny11234");
         zadost.setIdentifiers(Arrays.asList("oai:aleph-nkp.cz:DNT01-000057930"));
@@ -525,11 +523,11 @@ public class AccountServiceImplITTest {
 
         EasyMock.replay(controler, service,appSupport);
 
-        prepare.getClient().deleteByQuery("zadost", "*:*");
-        prepare.getClient().commit("zadost");
+        SolrTestServer.getClient().deleteByQuery("zadost", "*:*");
+        SolrTestServer.getClient().commit("zadost");
 
-        prepare.getClient().deleteByQuery("catalog", "*:*");
-        prepare.getClient().commit("catalog");
+        SolrTestServer.getClient().deleteByQuery("catalog", "*:*");
+        SolrTestServer.getClient().commit("catalog");
         return service;
     }
 
